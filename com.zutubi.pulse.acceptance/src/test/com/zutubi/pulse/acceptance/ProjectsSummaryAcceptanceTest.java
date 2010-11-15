@@ -5,17 +5,18 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
 
+import static com.zutubi.util.Constants.SECOND;
+
 /**
- * Tests for the shared projects summary parts of the dashbaord and browse
+ * Tests for the shared projects summary parts of the dashboard and browse
  * sections of the UI.
  */
-public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
+public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
 {
     private static final int BUILD_TIMEOUT = 90000;
 
@@ -38,12 +39,12 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseViewDescendantsBuilding() throws Exception
     {
-        descendantsBuildingHelper(browser.createPage(BrowsePage.class));
+        descendantsBuildingHelper(getBrowser().createPage(BrowsePage.class));
     }
 
     public void testDashboardDescendantsBuilding() throws Exception
     {
-        descendantsBuildingHelper(browser.createPage(DashboardPage.class));
+        descendantsBuildingHelper(getBrowser().createPage(DashboardPage.class));
     }
 
     private void descendantsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception
@@ -62,19 +63,19 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
 
         try
         {
-            browser.loginAsAdmin();
+            getBrowser().loginAsAdmin();
             summaryPage.openAndWaitFor();
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             triggerAndWaitForBuildToCommence(childProject);
-            browser.refresh();
-            browser.waitForPageToLoad(30 * SECOND);
+            getBrowser().refresh();
+            getBrowser().waitForPageToLoad(30 * SECOND);
             assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             FileSystemUtils.createFile(waitFile, "test");
             xmlRpcHelper.waitForBuildToComplete(childProject, 1);
-            browser.refresh();
-            browser.waitForPageToLoad(30 * SECOND);
+            getBrowser().refresh();
+            getBrowser().waitForPageToLoad(30 * SECOND);
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
         }
         finally
@@ -111,8 +112,8 @@ public class ProjectsSummaryAcceptanceTest extends SeleniumTestBase
         svn.put("url", "");
         xmlRpcHelper.saveConfig(svnPath, svn, false);
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertTrue(browsePage.isInvalidProjectPresent(concrete));
     }
 }

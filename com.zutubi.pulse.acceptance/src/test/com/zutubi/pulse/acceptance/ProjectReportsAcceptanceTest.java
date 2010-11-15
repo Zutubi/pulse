@@ -1,31 +1,32 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.FieldScope;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
-public class ProjectReportsAcceptanceTest extends SeleniumTestBase
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
+
+public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 {
     private static final String METRIC1 = "metric1";
     private static final String METRIC2 = "metric2";
@@ -86,7 +87,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
 
     public void testCustomFieldPostProcessing() throws Exception
     {
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS);
 
         Hashtable<String, Object> capture = xmlRpcHelper.createEmptyConfig(FileArtifactConfiguration.class);
@@ -102,9 +103,9 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         assertFields(customFields, "");
         assertFields(customFields, DEFAULT_STAGE, METRIC1, Double.toString(value1), METRIC2, Double.toString(value2));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
+        BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, random, buildId);
         detailsPage.clickStageAndWait(STAGE_DEFAULT);
         assertEquals(Double.toString(value1), detailsPage.getCustomFieldValue(0));
         assertEquals(Double.toString(value2), detailsPage.getCustomFieldValue(1));
@@ -115,7 +116,7 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         final String FIELD_NAME = "test field";
         final String FIELD_VALUE = "3";
 
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         String commandsPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS);
 
         Hashtable<String, Object> field = xmlRpcHelper.createEmptyConfig(CustomFieldConfiguration.class);
@@ -138,15 +139,15 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         assertFields(customFields, "", FIELD_NAME, FIELD_VALUE);
         assertFields(customFields, DEFAULT_STAGE);
         
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, random, buildId);
+        BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, random, buildId);
         assertEquals(FIELD_VALUE, detailsPage.getCustomFieldValue(0));
     }
 
     public void testReportsSanity() throws Exception
     {
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         String reportGroupsPath = getPath(projectPath, Constants.Project.REPORT_GROUPS);
 
         String buildTrendsPath = getPath(reportGroupsPath, REPORT_GROUP_BUILD_TRENDS);
@@ -154,33 +155,33 @@ public class ProjectReportsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.deleteConfig(buildTrendsPath);
         xmlRpcHelper.deleteConfig(testTrendsPath);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         // Check no groups.
-        ProjectReportsPage reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random);
-        assertTrue(browser.isTextPresent(MESSAGE_NO_GROUPS));
+        ProjectReportsPage reportsPage = getBrowser().openAndWaitFor(ProjectReportsPage.class, random);
+        assertTrue(getBrowser().isTextPresent(MESSAGE_NO_GROUPS));
 
         xmlRpcHelper.restoreConfig(buildTrendsPath);
         xmlRpcHelper.restoreConfig(testTrendsPath);
 
         // No group name in the url leads to the first group
-        reportsPage = browser.createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
+        reportsPage = getBrowser().createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
         reportsPage.openAndWaitFor();
 
         // Go away and come back to the full url (with group), check handling of
         // no builds.
-        browser.open(urls.base());
+        getBrowser().open(urls.base());
         reportsPage.openAndWaitFor();
-        assertTrue(browser.isTextPresent(MESSAGE_NO_BUILDS));
+        assertTrue(getBrowser().isTextPresent(MESSAGE_NO_BUILDS));
 
         // Check that a build gives some data to report.
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
         reportsPage.openAndWaitFor();
-        assertFalse(browser.isTextPresent(MESSAGE_NO_BUILDS));
+        assertFalse(getBrowser().isTextPresent(MESSAGE_NO_BUILDS));
 
         checkReportData();
 
-        reportsPage = browser.openAndWaitFor(ProjectReportsPage.class, random, REPORT_GROUP_TEST_TRENDS);
+        reportsPage = getBrowser().openAndWaitFor(ProjectReportsPage.class, random, REPORT_GROUP_TEST_TRENDS);
 
         // Check that clicking apply preserves the visible group.
         reportsPage.clickApply();

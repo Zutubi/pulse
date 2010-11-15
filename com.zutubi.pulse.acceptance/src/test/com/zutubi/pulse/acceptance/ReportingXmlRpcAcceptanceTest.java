@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.hasItem;
  * Tests for the remote API, primarily the reporting functionality.
  * Configration functions are tested in {@link ConfigXmlRpcAcceptanceTest}.
  */
-public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
     private static final String PROJECT_HIERARCHY_PREFIX = "reporting-xmlrpc-hierarchy";
     private static final String PROJECT_HIERARCHY_TEMPLATE = PROJECT_HIERARCHY_PREFIX + "-template";
@@ -51,12 +51,12 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
         super.tearDown();
     }
 
@@ -252,7 +252,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // A bit of a sanity check: in reality we use this method for other
         // tests that run builds so it is exercised in a few ways.
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
 
         xmlRpcHelper.triggerBuild(projectName);
 
@@ -311,14 +311,14 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetBuildUnknownBuild() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         assertNull(xmlRpcHelper.getBuild(projectName, 1));
     }
 
     public void testDeleteBuild() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         xmlRpcHelper.runBuild(projectName);
 
         assertTrue(xmlRpcHelper.deleteBuild(projectName, 1));
@@ -341,14 +341,14 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDeleteBuildUnknownBuild() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         assertFalse(xmlRpcHelper.deleteBuild(projectName, 1));
     }
 
     public void testTriggerBuildWithProperties() throws Exception
     {
         final String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         xmlRpcHelper.insertProjectProperty(projectName, "existing.property", "existing value");
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
@@ -370,7 +370,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         assertNotNull(artifact);
         String permalink = (String) artifact.get("permalink");
-        String text = downloadAsAdmin(baseUrl + permalink.substring(1) + "/env.txt");
+        String text = AcceptanceTestUtils.readUriContent(baseUrl + "/" + permalink.substring(1) + "/env.txt");
 
         assertThat(text, containsString("PULSE_EXISTING_PROPERTY=overriding value"));
         assertThat(text, containsString("PULSE_NEW_PROPERTY=new value"));
@@ -379,7 +379,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetLatestBuildsForProject() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         int number = xmlRpcHelper.runBuild(projectName);
 
         Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(projectName, true, 10);
@@ -419,7 +419,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testQueryBuildsForProject() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         int number = xmlRpcHelper.runBuild(projectName);
 
         Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(projectName, new Vector<String>(), -1, 10, true);
@@ -575,7 +575,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetBuildRequestStatusPaused() throws Exception
     {
         String projectName = randomName();
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         xmlRpcHelper.doConfigAction(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName), ProjectConfigurationActions.ACTION_PAUSE);
 
         Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
@@ -588,7 +588,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private Vector<String> insertAndTriggerProject(String projectName) throws Exception
     {
-        insertSimpleProject(projectName);
+        xmlRpcHelper.insertSimpleProject(projectName);
         Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
         assertEquals(1, ids.size());
         return ids;

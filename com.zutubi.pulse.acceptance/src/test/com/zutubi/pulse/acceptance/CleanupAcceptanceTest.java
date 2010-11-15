@@ -3,9 +3,9 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 
@@ -17,7 +17,7 @@ import static com.zutubi.util.Constants.SECOND;
 /**
  * The set of acceptance tests for the projects cleanup configuration.
  */
-public class CleanupAcceptanceTest extends SeleniumTestBase
+public class CleanupAcceptanceTest extends AcceptanceTestBase
 {
     private static final long CLEANUP_TIMEOUT = SECOND * 10;
 
@@ -28,8 +28,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        browser.loginAsAdmin();
-
+        getBrowser().loginAsAdmin();
         xmlRpcHelper.loginAsAdmin();
 
         utils = new CleanupTestUtils(xmlRpcHelper);
@@ -45,7 +44,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.logout();
 
-        browser.logout();
+        getBrowser().logout();
 
         super.tearDown();
     }
@@ -157,20 +156,20 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         });
 
         // build 2 shows tests
-        BuildTestsPage buildTests = browser.openAndWaitFor(BuildTestsPage.class, projectName, 2L);
+        BuildTestsPage buildTests = getBrowser().openAndWaitFor(BuildTestsPage.class, projectName, 2L);
         assertTrue(buildTests.hasFailedTests());
         assertFalse(buildTests.isFailureUnavailableMessageShown());
 
         // build 1 does not show tests.
-        buildTests = browser.openAndWaitFor(BuildTestsPage.class, projectName, 1L);
+        buildTests = getBrowser().openAndWaitFor(BuildTestsPage.class, projectName, 1L);
         assertTrue(buildTests.hasFailedTests());
         assertTrue(buildTests.isFailureUnavailableMessageShown());
 
-        StageTestsPage stageTests = browser.openAndWaitFor(StageTestsPage.class, projectName, 2L, "default");
+        StageTestsPage stageTests = getBrowser().openAndWaitFor(StageTestsPage.class, projectName, 2L, "default");
         assertFalse(stageTests.isLoadFailureMessageShown());
         assertTrue(stageTests.isBreadcrumbsVisible());
 
-        stageTests = browser.openAndWaitFor(StageTestsPage.class, projectName, 1L, "default");
+        stageTests = getBrowser().openAndWaitFor(StageTestsPage.class, projectName, 1L, "default");
         assertTrue(stageTests.isLoadFailureMessageShown());
         assertTrue(stageTests.isBreadcrumbsVisible());
     }
@@ -293,9 +292,9 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildPresentViaUI(String projectName, long buildNumber)
     {
-        BuildSummaryPage page = browser.open(BuildSummaryPage.class, projectName, buildNumber);
-        browser.waitForPageToLoad();
-        if (browser.isTextPresent("Unknown build"))
+        BuildSummaryPage page = getBrowser().open(BuildSummaryPage.class, projectName, buildNumber);
+        getBrowser().waitForPageToLoad();
+        if (getBrowser().isTextPresent("Unknown build"))
         {
             return false;
         }
@@ -308,7 +307,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildPulseFilePresentViaUI(String projectName, long buildNumber)
     {
-        BuildFilePage page = browser.createPage(BuildFilePage.class, projectName, buildNumber);
+        BuildFilePage page = getBrowser().createPage(BuildFilePage.class, projectName, buildNumber);
         return canOpenPage(page);
     }
 
@@ -338,7 +337,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     private BuildLogPage openBuildLogsUI(String projectName, long buildNumber)
     {
-        BuildLogPage page = browser.createPage(BuildLogPage.class, projectName, buildNumber);
+        BuildLogPage page = getBrowser().createPage(BuildLogPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
             fail("Failed to open build log page.");
@@ -348,7 +347,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     private StageLogPage openStageLogsUI(String projectName, long buildNumber, String stageName)
     {
-        StageLogPage page = browser.createPage(StageLogPage.class, projectName, buildNumber, stageName);
+        StageLogPage page = getBrowser().createPage(StageLogPage.class, projectName, buildNumber, stageName);
         if (!canOpenPage(page))
         {
             fail("Failed to open stage log page.");
@@ -358,7 +357,7 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
 
     public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
     {
-        BuildArtifactsPage page = browser.createPage(BuildArtifactsPage.class, projectName, buildNumber);
+        BuildArtifactsPage page = getBrowser().createPage(BuildArtifactsPage.class, projectName, buildNumber);
         if (!canOpenPage(page))
         {
             return false;
@@ -368,14 +367,14 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         page.resetFilter();
 
         // if artifacts are available, we should have the build command open in the tree.
-        browser.waitForLocator(page.getArtifactLocator("environment"));
+        getBrowser().waitForLocator(page.getArtifactLocator("environment"));
         return page.isArtifactAvailable("environment");
     }
 
     private boolean canOpenPage(SeleniumPage page)
     {
         page.open();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         return page.isPresent();
     }
 

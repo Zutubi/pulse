@@ -18,7 +18,7 @@ import static com.zutubi.util.CollectionUtils.asPair;
 /**
  * Set of acceptance tests that work on testing builds priorities.
  */
-public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 {
     private static final int WAIT_FOR_TIMEOUT = 20000;
 
@@ -182,24 +182,14 @@ public class BuildPriorityAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         buildRunner.triggerBuild(projectB);
 
-        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
-        try
-        {
-            SeleniumBrowser browser = factory.newBrowser();
-            browser.start();
-            browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-            ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectC.getName());
-            home.triggerBuild();
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectC.getName());
+        home.triggerBuild();
 
-            TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
-            form.waitFor();
-            form.triggerFormElements(asPair("priority", "5"));
-        }
-        finally
-        {
-            factory.stop();
-        }
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
+        form.waitFor();
+        form.triggerFormElements(asPair("priority", "5"));
 
         assertBuildOrder(projectA, projectC, projectB);
     }

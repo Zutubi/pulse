@@ -4,15 +4,16 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class BuildCommandEnableDisableAcceptanceTest extends BaseXmlRpcAcceptanceTest
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
+
+public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
     private ProjectConfigurations projects;
     private ConfigurationHelper configurationHelper;

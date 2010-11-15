@@ -10,29 +10,24 @@ import com.zutubi.util.Condition;
 
 import static java.lang.String.valueOf;
 
-public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
 {
-    private SeleniumBrowser browser;
     private Repository repository;
     private String randomName;
     private BuildRunner buildRunner;
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
-    private SeleniumBrowserFactory browserFactory;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
 
         randomName = randomName();
 
         repository = new Repository();
         repository.clean();
-
-        browserFactory = new DefaultSeleniumBrowserFactory();
-        browser = browserFactory.newBrowser();
 
         buildRunner = new BuildRunner(xmlRpcHelper);
 
@@ -45,9 +40,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
     @Override
     protected void tearDown() throws Exception
     {
-        browserFactory.stop();
-        
-        logout();
+        xmlRpcHelper.logout();
 
         super.tearDown();
     }
@@ -59,7 +52,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testBuildDetailsReport() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifactA.jar");
@@ -67,7 +60,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(projectA);
         long projectABuildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, projectA.getName(), projectABuildNumber);
+        BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(detailsPage.isDependenciesTablePresent());
 
         DepAntProject projectB = projects.createDepAntProject(randomName + "B");
@@ -82,7 +75,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
-        detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
+        detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
         assertTrue(detailsPage.isDependenciesTablePresent());
         
         BuildDetailsPage.DependencyRow row1 = detailsPage.getDependencyRow(1);
@@ -102,7 +95,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testBuildArtifactLinksIfAvailable() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifactA.jar");
@@ -115,19 +108,19 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
-        browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
-        assertTrue(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
+        getBrowser().openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
+        assertTrue(getBrowser().isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
 
         // delete the artifact from the file system
         repository.clean();
 
-        browser.openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
-        assertFalse(browser.isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
+        getBrowser().openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
+        assertFalse(getBrowser().isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
     }
 
     public void testRetrieveCommandLogging() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
@@ -142,10 +135,10 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         buildRunner.triggerSuccessfulBuild(projectA);
         xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
-        StageLogPage log = browser.openAndWaitFor(StageLogPage.class, projectB.getName(), 1L, "default");
+        StageLogPage log = getBrowser().openAndWaitFor(StageLogPage.class, projectB.getName(), 1L, "default");
         assertTrue(log.isLogAvailable());
 
-        if (browser.isFirefox())
+        if (getBrowser().isFirefox())
         {
             log.clickDownloadLink();
             // check for a reference to the artifact retrieval in the log.
@@ -153,7 +146,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
             {
                 public boolean satisfied()
                 {
-                    return browser.getBodyText().contains(randomName + "A#artifact(1)");
+                    return getBrowser().getBodyText().contains(randomName + "A#artifact(1)");
                 }
             }, 30000, "artifact retrieval to appear in log");
         }
@@ -172,19 +165,19 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         projectC.addDependency(projectB);
         insertProject(projectC);
 
-        browser.loginAsAdmin();
-        ProjectDependenciesPage page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());
+        getBrowser().loginAsAdmin();
+        ProjectDependenciesPage page = getBrowser().openAndWaitFor(ProjectDependenciesPage.class, projectB.getName());
         assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
         assertTrue(page.isUpstreamPresent(projectB.getName(), 1, 0));
         assertTrue(page.isDownstreamPresent(projectB.getName(), 0, 0));
         assertTrue(page.isDownstreamPresent(projectC.getName(), 1, 0));
 
         // Go to a project with transitive dependencies
-        page = browser.openAndWaitFor(ProjectDependenciesPage.class, projectC.getName());
+        page = getBrowser().openAndWaitFor(ProjectDependenciesPage.class, projectC.getName());
         if (page.getTransitiveMode() != ProjectDependencyGraphBuilder.TransitiveMode.FULL)
         {
             page.setTransitiveModeAndWait(ProjectDependencyGraphBuilder.TransitiveMode.FULL);
-            browser.waitForElement(page.getUpstreamId(projectA.getName(), 0, 0));
+            getBrowser().waitForElement(page.getUpstreamId(projectA.getName(), 0, 0));
         }
 
         assertTrue(page.isUpstreamPresent(projectA.getName(), 0, 0));
@@ -193,7 +186,7 @@ public class DependenciesUIAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // Filter out transients, make sure this takes effect.
         page.setTransitiveModeAndWait(ProjectDependencyGraphBuilder.TransitiveMode.NONE);
 
-        browser.waitForElement(page.getUpstreamId(projectB.getName(), 0, 0));
+        getBrowser().waitForElement(page.getUpstreamId(projectB.getName(), 0, 0));
         assertFalse(page.isUpstreamPresent(projectA.getName(), 0, 0));
     }
 }

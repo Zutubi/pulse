@@ -41,7 +41,6 @@
 #if($page.getProperty("page.helpPage"))
     #set ($helpPage = $page.getProperty("page.helpPage"))
 #end
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   	<head>
@@ -250,7 +249,6 @@
                         'failure': 'exclamation',
                         'working': 'inprogress'
                     };
-
                     message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="[' + type + ']"/> ' + message;
                 }
 
@@ -265,11 +263,7 @@
 		$head
 	</head>
 
-      <body
-#if($page.getProperty("page.onLoad"))
-          onload="$page.getProperty('page.onLoad')"
-#end
-      >
+    <body #if($page.getProperty("page.onLoad")) onload="$page.getProperty('page.onLoad')" #end >
       <noscript><ul class="error"><li class="error">The Pulse UI requires JavaScript.</li></ul></noscript>
       <div id="north">
           <div id="header"></div>
@@ -277,16 +271,16 @@
 #if($page.getProperty("page.selectedTab"))
     #set ($selectedTab = $page.getProperty("page.selectedTab"))
 #end
-      <ul id="nav">
+          <ul id="nav">
 #if($loggedInUser)
-        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/">dashboard</a></li>
+            <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/">dashboard</a></li>
 #end
-        <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
-        <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end id="tab.queues" href="$base/server/">server</a></li>
-        <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
-        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
-      </ul>
-      <div class="clear"></div>
+            <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
+            <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end id="tab.queues" href="$base/server/">server</a></li>
+            <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
+            <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
+          </ul>
+          <div class="clear"></div>
       </div>
 
       <div id="status-area" class="x-layout-inactive-content status-message" style="display: none">

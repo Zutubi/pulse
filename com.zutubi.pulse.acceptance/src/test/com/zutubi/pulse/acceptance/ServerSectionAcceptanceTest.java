@@ -7,13 +7,13 @@ import com.zutubi.util.SystemUtils;
 /**
  * Acceptance tests for the server section of the reporting UI.
  */
-public class ServerSectionAcceptanceTest extends SeleniumTestBase
+public class ServerSectionAcceptanceTest extends AcceptanceTestBase
 {
     public void testServerMessages() throws Exception
     {
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(ServerMessagesPage.class);
-        assertTrue(browser.isTextPresent("messages found"));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(ServerMessagesPage.class);
+        assertTrue(getBrowser().isTextPresent("messages found"));
     }
 
     public void testServerMessagesPaging() throws Exception
@@ -31,34 +31,34 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        browser.loginAsAdmin();
-        ServerMessagesPage page = browser.openAndWaitFor(ServerMessagesPage.class);
+        getBrowser().loginAsAdmin();
+        ServerMessagesPage page = getBrowser().openAndWaitFor(ServerMessagesPage.class);
 
         assertEquals("100 messages found", page.getMessagesCountText());
         assertPagingLinks(page, 10);
         page = page.clickPage(5);
         page.waitFor();
         assertPagingLinks(page, 10);
-        assertTrue(browser.isTextPresent("Test error message 59"));
+        assertTrue(getBrowser().isTextPresent("Test error message 59"));
     }
 
     public void testServerInfo() throws Exception
     {
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(ServerInfoPage.class);
-        assertTrue(browser.isTextPresent("system information"));
-        assertTrue(browser.isTextPresent("java vm"));
-        assertTrue(browser.isTextPresent("version information"));
-        assertTrue(browser.isTextPresent("version number"));
-        assertTrue(browser.isTextPresent("pulse configuration"));
-        assertTrue(browser.isTextPresent("data directory"));
-        assertTrue(browser.isTextPresent("all system properties"));
-        assertTrue(browser.isTextPresent("path.separator"));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(ServerInfoPage.class);
+        assertTrue(getBrowser().isTextPresent("system information"));
+        assertTrue(getBrowser().isTextPresent("java vm"));
+        assertTrue(getBrowser().isTextPresent("version information"));
+        assertTrue(getBrowser().isTextPresent("version number"));
+        assertTrue(getBrowser().isTextPresent("pulse configuration"));
+        assertTrue(getBrowser().isTextPresent("data directory"));
+        assertTrue(getBrowser().isTextPresent("all system properties"));
+        assertTrue(getBrowser().isTextPresent("path.separator"));
 
-        assertTrue(browser.isTextPresent("all environment variables"));
+        assertTrue(getBrowser().isTextPresent("all environment variables"));
         if (SystemUtils.IS_LINUX)
         {
-            assertTrue(browser.isTextPresent("PATH"));
+            assertTrue(getBrowser().isTextPresent("PATH"));
         }
     }
 
@@ -69,34 +69,34 @@ public class ServerSectionAcceptanceTest extends SeleniumTestBase
             String pageId = page.getPageId(i);
             if(i == page.getPageNumber())
             {
-                assertFalse(browser.isElementIdPresent(pageId));
+                assertFalse(getBrowser().isElementIdPresent(pageId));
             }
             else
             {
-                assertTrue(browser.isElementIdPresent(pageId));
+                assertTrue(getBrowser().isElementIdPresent(pageId));
             }
         }
 
         if(page.getPageNumber() == 1)
         {
-            assertFalse(browser.isElementIdPresent("page.latest"));
-            assertFalse(browser.isElementIdPresent("page.previous"));
+            assertFalse(getBrowser().isElementIdPresent("page.latest"));
+            assertFalse(getBrowser().isElementIdPresent("page.previous"));
         }
         else
         {
-            assertTrue(browser.isElementIdPresent("page.latest"));
-            assertTrue(browser.isElementIdPresent("page.previous"));
+            assertTrue(getBrowser().isElementIdPresent("page.latest"));
+            assertTrue(getBrowser().isElementIdPresent("page.previous"));
         }
 
         if(page.getPageNumber() == pageCount)
         {
-            assertFalse(browser.isElementIdPresent("page.oldest"));
-            assertFalse(browser.isElementIdPresent("page.next"));
+            assertFalse(getBrowser().isElementIdPresent("page.oldest"));
+            assertFalse(getBrowser().isElementIdPresent("page.next"));
         }
         else
         {
-            assertTrue(browser.isElementIdPresent("page.oldest"));
-            assertTrue(browser.isElementIdPresent("page.next"));
+            assertTrue(getBrowser().isElementIdPresent("page.oldest"));
+            assertTrue(getBrowser().isElementIdPresent("page.next"));
         }
     }
 }

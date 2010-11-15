@@ -12,7 +12,7 @@ import java.util.Hashtable;
 /**
  * Test for agent resources and project resource requirements.
  */
-public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
     private String random;
     private String resourcesPath;

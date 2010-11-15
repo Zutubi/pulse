@@ -27,6 +27,7 @@ public class ListPage extends ConfigPage
     public static final String ANNOTATION_INHERITED  = "inherited";
     public static final String ANNOTATION_OVERRIDDEN = "overridden";
     public static final String ANNOTATION_HIDDEN     = "hidden";
+    public static final String ANNOTATION_NONE       = "noan";
 
     public static final String ADD_LINK = "map:add";
     
@@ -156,4 +157,31 @@ public class ListPage extends ConfigPage
     {
         return browser.isElementIdPresent("order-overridden");
     }
+
+    public boolean isItemPresent(String baseName, String annotation, String... actions)
+    {
+        if (!isItemPresent(baseName))
+        {
+            return false;
+        }
+
+        if(annotation == null)
+        {
+            annotation = ListPage.ANNOTATION_NONE;
+        }
+        if (!isAnnotationPresent(baseName, annotation))
+        {
+            return false;
+        }
+
+        for(String action: actions)
+        {
+            if (!isActionLinkPresent(baseName, action))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

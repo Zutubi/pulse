@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.util.RandomUtils;
 
-public class InternationalisationAcceptanceTest extends SeleniumTestBase
+public class InternationalisationAcceptanceTest extends AcceptanceTestBase
 {
     private static final String I18N = "Iñtërnâtiônàlizætiøn";
 
@@ -12,14 +12,14 @@ public class InternationalisationAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         xmlRpcHelper.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        browser.logout();
+        getBrowser().logout();
         xmlRpcHelper.logout();
 
         super.tearDown();
@@ -30,7 +30,7 @@ public class InternationalisationAcceptanceTest extends SeleniumTestBase
         String name = randomName();
         xmlRpcHelper.insertSimpleProject(name, false);
 
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, name, false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, name, false);
         assertTrue(projectPage.isPresent());
     }
 

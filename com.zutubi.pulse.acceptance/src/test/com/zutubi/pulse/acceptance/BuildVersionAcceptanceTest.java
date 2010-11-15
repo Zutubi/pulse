@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.containsString;
  * allowing a user to customise a builds version via prompts, configuration and
  * remote api.
  */
-public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class BuildVersionAcceptanceTest extends AcceptanceTestBase
 {
     private String projectName;
     private Repository repository;
@@ -89,34 +89,24 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSpecifyVersionViaManualPrompt() throws Exception
     {
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
 
         // edit the build options, setting prompt to true.
         xmlRpcHelper.enableBuildPrompting(projectName);
 
-        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
-        try
-        {
-            SeleniumBrowser browser = factory.newBrowser();
-            browser.start();
-            browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-            // trigger a build
-            ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
-            home.triggerBuild();
+        // trigger a build
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
+        home.triggerBuild();
 
-            // we should be prompted for a revision and a pname value.
-            TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
-            form.waitFor();
-            assertTrue(form.isFormPresent());
+        // we should be prompted for a revision and a pname value.
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
+        form.waitFor();
+        assertTrue(form.isFormPresent());
 
-            // leave the revision blank
-            form.triggerFormElements(asPair("version", "OH_HAI"));
-        }
-        finally
-        {
-            factory.stop();
-        }
+        // leave the revision blank
+        form.triggerFormElements(asPair("version", "OH_HAI"));
 
         xmlRpcHelper.waitForBuildToComplete(projectName, 1);
 
@@ -160,6 +150,6 @@ public class BuildVersionAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertNotNull(artifact);
 
         String permalink = (String) artifact.get("permalink");
-        return downloadAsAdmin(baseUrl + permalink.substring(1) + "env.txt");
+        return AcceptanceTestUtils.readUriContent(baseUrl + "/" + permalink.substring(1) + "env.txt");
     }
 }

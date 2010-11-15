@@ -1,25 +1,26 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 
-public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+
+public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
 
         super.tearDown();
     }
@@ -53,7 +54,7 @@ public class GroupXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         try
         {
-            call("saveConfig", getGroupPath(groupName), group, true);
+            xmlRpcHelper.saveConfig(getGroupPath(groupName), group, true);
             fail("Expecting failure due to attempt to change readOnly field.");
         }
         catch (Exception e)

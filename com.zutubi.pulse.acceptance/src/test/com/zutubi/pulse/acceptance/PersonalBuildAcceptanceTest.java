@@ -1,13 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -16,7 +14,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -28,8 +25,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -39,10 +34,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
+
 /**
  * Simple sanity checks for personal builds.
  */
-public class PersonalBuildAcceptanceTest extends SeleniumTestBase
+public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 {
     private static final String PROJECT_NAME = "PersonalBuildAcceptanceTest-Project";
     private static final int BUILD_TIMEOUT = 90000;
@@ -65,7 +66,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
+        xmlRpcHelper.cancelIncompleteBuilds();
         xmlRpcHelper.logout();
+        
         removeDirectory(workingCopyDir);
 
         super.tearDown();
@@ -77,20 +80,20 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME);
 
-        browser.loginAsAdmin();
-        ensureProject(PROJECT_NAME);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
 
-        PersonalEnvironmentArtifactPage envPage = browser.openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
+        PersonalEnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(PersonalEnvironmentArtifactPage.class, PROJECT_NAME, buildNumber, "default", "build");
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(false)));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(true)));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, ADMIN_CREDENTIALS.getUserName()));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_USER, ADMIN_CREDENTIALS.getUserName()));
         // Make sure this view is not decorated (CIB-1711).
-        assertFalse(browser.isTextPresent("logout"));
+        assertFalse(getBrowser().isTextPresent("logout"));
         
         verifyPersonalBuildArtifacts(buildNumber);
     }
@@ -129,8 +132,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             makeChangeToBuildFile();
             createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_PROXY_HOST, "localhost"), asPair(PersonalBuildConfig.PROPERTY_PROXY_PORT, PROXY_PORT));
 
-            browser.loginAsAdmin();
-            ensureProject(PROJECT_NAME);
+            getBrowser().loginAsAdmin();
+            xmlRpcHelper.ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
             verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
@@ -146,13 +149,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         checkout(Constants.VERSIONED_REPOSITORY);
         makeChangeToImportedFile();
         createConfigFile(random);
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("Unknown child element 'notrecognised'"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("Unknown child element 'notrecognised'"));
     }
 
     public void testPersonalBuildOnAgent() throws Exception
@@ -161,9 +164,9 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME);
 
-        browser.loginAsAdmin();
-        ensureAgent(AGENT_NAME);
-        ensureProject(PROJECT_NAME);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureAgent(AGENT_NAME);
+        xmlRpcHelper.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
@@ -171,7 +174,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     public void testPersonalBuildWithHooks() throws Exception
     {
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         String hooksPath = PathUtils.getPath(projectPath, "buildHooks");
 
         // Create two of each type of hook: one that runs for personal builds,
@@ -188,7 +191,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -208,7 +211,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     {
         final String HOOK_NAME = "manual-hook";
 
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(ManualBuildHookConfiguration.class);
         hook.put("name", HOOK_NAME);
         xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "buildHooks"), hook);
@@ -218,16 +221,16 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
-        PersonalBuildSummaryPage page = browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        PersonalBuildSummaryPage page = getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
         assertTrue(page.isHookPresent(HOOK_NAME));
         page.clickHook(HOOK_NAME);
 
-        browser.waitForVisible("status-message");
-        assertTrue(browser.isTextPresent("triggered hook '" + HOOK_NAME + "'"));
+        getBrowser().waitForVisible("status-message");
+        assertTrue(getBrowser().isTextPresent("triggered hook '" + HOOK_NAME + "'"));
     }
 
     public void testPersonalBuildFloatingRevision() throws Exception
@@ -236,8 +239,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChangeToBuildFile();
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING));
 
-        browser.loginAsAdmin();
-        ensureProject(PROJECT_NAME);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -245,7 +248,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         SubversionClient client = new SubversionClient(Constants.TRIVIAL_ANT_REPOSITORY, false);
         Revision revision = client.getLatestRevision(null);
 
-        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals(revision.getRevisionString(), changesPage.getCheckedOutRevision());
     }
 
@@ -256,13 +259,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         // Set revision to something before the last edit to the build file.
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, "1"), asPair(PersonalBuildConfig.PROPERTY_UPDATE, false));
 
-        browser.loginAsAdmin();
-        ensureProject(PROJECT_NAME);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
 
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("Patch does not apply cleanly"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("Patch does not apply cleanly"));
     }
 
     public void testGitPersonalBuild() throws Exception
@@ -286,12 +289,12 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         
         xmlRpcHelper.waitForProjectToInitialise(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("Force build failure"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("Force build failure"));
         
-        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals("0f267c3c48939fd51dacbbddcf15f530f82f1523", changesPage.getCheckedOutRevision());
         assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
     }
@@ -352,7 +355,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             core.runP4(null, P4_COMMAND, COMMAND_ADD, newBuildFile.getAbsolutePath());
             createConfigFile(random, asPair(PROPERTY_CLIENT, PerforceUtils.WORKSPACE_PREFIX + random), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
 
-            browser.loginAsAdmin();
+            getBrowser().loginAsAdmin();
             long buildNumber = runPersonalBuild(ResultState.SUCCESS);
             // An unclean patch will raise warnings.
             Hashtable<String, Object> build = xmlRpcHelper.getPersonalBuild((int) buildNumber);
@@ -378,7 +381,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             makeChangeToBuildFile(buildFilePath);
             createConfigFile(random, asPair(PROPERTY_CLIENT, clientName), asPair(PROPERTY_PORT, P4PORT), asPair(PROPERTY_USER, P4USER), asPair(PROPERTY_PASSWORD, P4PASSWD));
 
-            browser.loginAsAdmin();
+            getBrowser().loginAsAdmin();
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
             verifyPersonalBuildTabs(random, buildNumber, buildFilePath);
         }
@@ -399,14 +402,14 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
                 asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING),
                 asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("unified diffs will sink you"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("unified diffs will sink you"));
 
-        PersonalBuildChangesPage changesPage = browser.openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
     }
 
@@ -416,16 +419,16 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         File patchFile = copyInputToDirectory("txt", workingCopyDir);
         createConfigFile(random, asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath()));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("nosuchrecipe"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("nosuchrecipe"));
         
-        browser.openAndWaitFor(PersonalBuildFilePage.class, buildNumber);
-        assertTrue(browser.isTextPresent("default-recipe=\"nosuchrecipe\""));
+        getBrowser().openAndWaitFor(PersonalBuildFilePage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("default-recipe=\"nosuchrecipe\""));
     }
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
@@ -439,13 +442,13 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private String getLogText(String projectName, long buildNumber)
     {
-        PersonalBuildLogPage page = browser.openAndWaitFor(PersonalBuildLogPage.class, projectName, buildNumber);
+        PersonalBuildLogPage page = getBrowser().openAndWaitFor(PersonalBuildLogPage.class, projectName, buildNumber);
         return page.getLog();
     }
 
     private String getLogText(String projectName, long buildNumber, String stageName)
     {
-        PersonalBuildLogsPage page = browser.openAndWaitFor(PersonalBuildLogsPage.class, projectName, buildNumber, stageName);
+        PersonalBuildLogsPage page = getBrowser().openAndWaitFor(PersonalBuildLogsPage.class, projectName, buildNumber, stageName);
         return page.getLog();
     }
 
@@ -504,8 +507,8 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     
     private void refreshUntilBuild(final int buildNumber, ResultState expectedStatus)
     {
-        final MyBuildsPage myBuildsPage = browser.openAndWaitFor(MyBuildsPage.class);
-        browser.refreshUntil(BUILD_TIMEOUT, new Condition()
+        final MyBuildsPage myBuildsPage = getBrowser().openAndWaitFor(MyBuildsPage.class);
+        getBrowser().refreshUntil(BUILD_TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
@@ -526,7 +529,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException
     {
-        buildRunner.createConfigFile(browser.getBaseUrl(), ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
+        buildRunner.createConfigFile(getBrowser().getBaseUrl(), ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
     }
 
     private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, ClientException
@@ -537,41 +540,41 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
     private void verifyPersonalBuildTabs(String projectName, long buildNumber, String buildFilePath)
     {
         // Verify each tab in turn
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(browser.isTextPresent("nosuchcommand"));
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("nosuchcommand"));
 
-        browser.click(IDs.buildLogsTab());
-        BuildLogsPage logsPage = browser.createPage(BuildLogsPage.class, projectName, buildNumber, "default");
+        getBrowser().click(IDs.buildLogsTab());
+        BuildLogsPage logsPage = getBrowser().createPage(BuildLogsPage.class, projectName, buildNumber, "default");
         logsPage.waitFor();
-        assertTrue(browser.isTextPresent("Recipe '[default]' completed with status failure"));
+        assertTrue(getBrowser().isTextPresent("Recipe '[default]' completed with status failure"));
         
-        browser.click(IDs.buildDetailsTab());
-        PersonalBuildDetailsPage detailsPage = browser.createPage(PersonalBuildDetailsPage.class, buildNumber);
+        getBrowser().click(IDs.buildDetailsTab());
+        PersonalBuildDetailsPage detailsPage = getBrowser().createPage(PersonalBuildDetailsPage.class, buildNumber);
         detailsPage.waitFor();
         detailsPage.clickCommandAndWait("default", "build");
-        assertTrue(browser.isTextPresent("nosuchcommand"));
+        assertTrue(getBrowser().isTextPresent("nosuchcommand"));
 
-        browser.click(IDs.buildChangesTab());
-        PersonalBuildChangesPage changesPage = browser.createPage(PersonalBuildChangesPage.class, buildNumber);
+        getBrowser().click(IDs.buildChangesTab());
+        PersonalBuildChangesPage changesPage = getBrowser().createPage(PersonalBuildChangesPage.class, buildNumber);
         changesPage.waitFor();
         // Just parse to make sure it's a number: asserting the revision has
         // proven too fragile.
         Long.parseLong(changesPage.getCheckedOutRevision());
         assertEquals(buildFilePath, changesPage.getChangedFile(0));
 
-        browser.click(IDs.buildTestsTab());
-        PersonalBuildTestsPage testsPage = browser.createPage(PersonalBuildTestsPage.class, buildNumber);
+        getBrowser().click(IDs.buildTestsTab());
+        PersonalBuildTestsPage testsPage = getBrowser().createPage(PersonalBuildTestsPage.class, buildNumber);
         testsPage.waitFor();
         assertEquals(0, testsPage.getTestSummary().getTotal());
 
-        browser.click(IDs.buildFileTab());
-        PersonalBuildFilePage filePage = browser.createPage(PersonalBuildFilePage.class, buildNumber);
+        getBrowser().click(IDs.buildFileTab());
+        PersonalBuildFilePage filePage = getBrowser().createPage(PersonalBuildFilePage.class, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
-        assertTrue(browser.isTextPresent("<ant"));
+        assertTrue(getBrowser().isTextPresent("<ant"));
 
-        PersonalBuildArtifactsPage artifactsPage = browser.openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
+        PersonalBuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
         artifactsPage.setFilterAndWait("");
-        browser.waitForLocator(artifactsPage.getCommandLocator("build"));
+        getBrowser().waitForLocator(artifactsPage.getCommandLocator("build"));
     }
 }

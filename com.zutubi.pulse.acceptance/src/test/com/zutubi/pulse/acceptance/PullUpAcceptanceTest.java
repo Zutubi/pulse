@@ -5,12 +5,13 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 
 import java.util.ArrayList;
+
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import static java.util.Arrays.asList;
 
-public class PullUpAcceptanceTest extends SeleniumTestBase
+public class PullUpAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROPERTY_NAME   = "aprop";
     private static final String TEST_PROPERTY_VALUE  = "value";
@@ -34,28 +35,28 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         String child = random + "-child";
         setupHierarchy(parent, child);
 
-        String labelPath = insertLabel(parent, createLabel("foo"));
+        String labelPath = xmlRpcHelper.addLabel(parent, "foo");
         String childLabelPath = labelPath.replace(parent, child);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertPullUpAvailability(childLabelPath, false);
     }
 
     public void testPullUpLinkPresent() throws Exception
     {
         xmlRpcHelper.insertTrivialProject(random, false);
-        String labelPath = insertLabel(random, createLabel("foo"));
+        String labelPath = xmlRpcHelper.addLabel(random, "foo");
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertPullUpAvailability(labelPath, true);
     }
 
     private void assertPullUpAvailability(String path, boolean expectedAvailable)
     {
-        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
+        ListPage labelsPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
         String baseName = PathUtils.getBaseName(path);
         assertTrue(labelsPage.isItemPresent(baseName));
-        assertEquals(expectedAvailable, browser.isElementIdPresent(labelsPage.getActionId(ConfigurationRefactoringManager.ACTION_PULL_UP, baseName)));
+        assertEquals(expectedAvailable, getBrowser().isElementIdPresent(labelsPage.getActionId(ConfigurationRefactoringManager.ACTION_PULL_UP, baseName)));
     }
 
     public void testPullUp() throws Exception
@@ -72,7 +73,7 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         assertTrue(listPage.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(listPage.isAnnotationPresent(TEST_PROPERTY_NAME, ListPage.ANNOTATION_INHERITED));
         
-        listPage = browser.openAndWaitFor(ListPage.class, listPage.getPath().replace(child, parent));
+        listPage = getBrowser().openAndWaitFor(ListPage.class, listPage.getPath().replace(child, parent));
         assertTrue(listPage.isItemPresent(TEST_PROPERTY_NAME));
     }
 
@@ -96,8 +97,8 @@ public class PullUpAcceptanceTest extends SeleniumTestBase
         setupHierarchy(parent, child);
         String propertyPath = xmlRpcHelper.insertProjectProperty(child, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        browser.loginAsAdmin();
-        ListPage propertyList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
+        getBrowser().loginAsAdmin();
+        ListPage propertyList = getBrowser().openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(propertyList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(propertyList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_PULL_UP));
         return propertyList;

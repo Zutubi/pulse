@@ -1,26 +1,27 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.core.test.TestUtils;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
 
 import java.util.Hashtable;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
  */
-public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
+public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROJECT = "responsibility-test-project";
     private static final String TEST_USER = "responsibility-user";
@@ -50,37 +51,37 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
 
     public void testTakeResponsibility()
     {
-        takeResponsibilityHelper(browser.createPage(ProjectHomePage.class, TEST_PROJECT));
+        takeResponsibilityHelper(getBrowser().createPage(ProjectHomePage.class, TEST_PROJECT));
 
         // Build pages for this project should show the responsibility.
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
+        BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
         awaitAndAssertSelfResponsible(summaryPage);
 
         // Responsibilities should appear on your dashboard.
-        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboardPage.hasResponsibilities());
         assertTrue(dashboardPage.hasResponsibility(TEST_PROJECT));
         assertTrue(dashboardPage.isResponsibilityPresent(null, TEST_PROJECT));
 
         // Responsibilility icons should appear in the browse view
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertTrue(browsePage.isResponsibilityPresent(null, TEST_PROJECT));
     }
 
     public void testTakeResponsibilityOnBuildPage()
     {
-        takeResponsibilityHelper(browser.createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
+        takeResponsibilityHelper(getBrowser().createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
     }
 
     private void takeResponsibilityHelper(ResponsibilityPage page)
     {
-        assertTrue(browser.login(TEST_USER, ""));
+        assertTrue(getBrowser().login(TEST_USER, ""));
         page.openAndWaitFor();
         awaitAndAssertNobodyResponsible(page);
 
         page.clickAction(ProjectConfigurationActions.ACTION_TAKE_RESPONSIBILITY);
 
-        TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(browser);
+        TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(getBrowser());
         dialog.waitFor();
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
@@ -92,10 +93,10 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        assertTrue(browser.login(TEST_USER, ""));
+        assertTrue(getBrowser().login(TEST_USER, ""));
 
         // Clear on the project home tab
-        final ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
+        final ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         awaitAndAssertSelfResponsible(homePage);
         homePage.clickClearResponsible();
         awaitAndAssertNobodyResponsible(homePage);
@@ -103,7 +104,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         // Clear on the build summary tab
         takeResponsibility(TEST_PROJECT);
 
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
+        BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
         assertTrue(summaryPage.hasResponsibleUser());
 
         summaryPage.clickAction(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY);
@@ -112,7 +113,7 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         takeResponsibility(TEST_PROJECT);
 
         // Clear on the dashboard
-        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboardPage.hasResponsibilities());
         dashboardPage.clearResponsibility(TEST_PROJECT);
         dashboardPage.waitForReload();
@@ -124,37 +125,37 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         takeResponsibility(TEST_PROJECT);
 
         xmlRpcHelper.insertTrivialUser(random);
-        assertTrue(browser.login(random, ""));
+        assertTrue(getBrowser().login(random, ""));
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         awaitAndAssertOtherResponsible(homePage);
 
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
+        BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, 1L);
         awaitAndAssertOtherResponsible(summaryPage);
         assertFalse(summaryPage.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
 
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertTrue(browsePage.isResponsibilityPresent(null, TEST_PROJECT));
         
-        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         assertFalse(dashboardPage.hasResponsibilities());
     }
 
     public void testAdminCanClearResponsibility() throws Exception
     {
-        adminClearHelper(browser.createPage(ProjectHomePage.class, TEST_PROJECT));
+        adminClearHelper(getBrowser().createPage(ProjectHomePage.class, TEST_PROJECT));
     }
 
     public void testAdminCanClearResponsibilityOnBuildPage() throws Exception
     {
-        adminClearHelper(browser.createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
+        adminClearHelper(getBrowser().createPage(BuildSummaryPage.class, TEST_PROJECT, 1L));
     }
 
     private void adminClearHelper(ResponsibilityPage page) throws Exception
     {
         takeResponsibility(TEST_PROJECT);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         page.openAndWaitFor();
 
         assertTrue(page.isActionPresent(ProjectConfigurationActions.ACTION_CLEAR_RESPONSIBILITY));
@@ -167,8 +168,8 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
         takeResponsibility(random);
 
-        assertTrue(browser.login(TEST_USER, ""));
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(getBrowser().login(TEST_USER, ""));
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         awaitAndAssertSelfResponsible(homePage);
 
         // Modify the config so the build fails.
@@ -200,8 +201,8 @@ public class BuildResponsibilityAcceptanceTest extends SeleniumTestBase
         optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
         xmlRpcHelper.saveConfig(optionsPath, optionsConfig, false);
 
-        assertTrue(browser.login(TEST_USER, ""));
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(getBrowser().login(TEST_USER, ""));
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         awaitAndAssertSelfResponsible(homePage);
 
         runBuild(random, true);

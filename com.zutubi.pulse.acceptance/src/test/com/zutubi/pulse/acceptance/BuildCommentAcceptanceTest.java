@@ -9,18 +9,19 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
 /**
  * Tests for displaying/adding/removing comments on builds.
  */
-public class BuildCommentAcceptanceTest extends SeleniumTestBase
+public class BuildCommentAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROJECT = "comment-test-project";
     private static final String TEST_USER = "comment-user";
@@ -65,9 +66,11 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
+        xmlRpcHelper.cancelIncompleteBuilds();
+        xmlRpcHelper.logout();
+
         removeDirectory(tempDir);
 
-        xmlRpcHelper.logout();
         super.tearDown();
     }
 
@@ -80,11 +83,11 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
     {
         int buildId = buildRunner.triggerAndWaitForBuild(testProject);
 
-        assertTrue(browser.login(TEST_USER, ""));
-        BuildSummaryPage page = browser.openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, (long) buildId);
+        assertTrue(getBrowser().login(TEST_USER, ""));
+        BuildSummaryPage page = getBrowser().openAndWaitFor(BuildSummaryPage.class, TEST_PROJECT, (long) buildId);
         page.clickAction(BuildResult.ACTION_ADD_COMMENT);
 
-        AddCommentDialog dialog = new AddCommentDialog(browser);
+        AddCommentDialog dialog = new AddCommentDialog(getBrowser());
         dialog.waitFor();
         dialog.clickCancel();
         assertFalse(dialog.isVisible());
@@ -97,14 +100,14 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
         BuildSummaryPage page = addCommentHelper();
 
-        browser.logout();
-        assertTrue(browser.login(random, ""));
+        getBrowser().logout();
+        assertTrue(getBrowser().login(random, ""));
 
         page.openAndWaitFor();
         assertFalse(page.isDeleteCommentLinkPresent(1));
 
-        browser.logout();
-        assertTrue(browser.login(TEST_USER, ""));
+        getBrowser().logout();
+        assertTrue(getBrowser().login(TEST_USER, ""));
         
         page.openAndWaitFor();
         assertTrue(page.isDeleteCommentLinkPresent(1));
@@ -115,7 +118,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         {
             public boolean satisfied()
             {
-                return !browser.isTextPresent(TEST_COMMENT); 
+                return !getBrowser().isTextPresent(TEST_COMMENT);
             }
         }, SeleniumBrowser.WAITFOR_TIMEOUT, "comment to disappear");
     }
@@ -137,7 +140,7 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
 
         page.openAndWaitFor();
-        assertTrue(browser.isTextPresent(TEST_COMMENT));
+        assertTrue(getBrowser().isTextPresent(TEST_COMMENT));
     }
     
     public void testRemoteApi() throws Exception
@@ -229,20 +232,20 @@ public class BuildCommentAcceptanceTest extends SeleniumTestBase
 
     private BuildSummaryPage addCommentToBuild(String project, int buildId)
     {
-        assertTrue(browser.login(TEST_USER, ""));
-        BuildSummaryPage page = browser.openAndWaitFor(BuildSummaryPage.class, project, (long) buildId);
+        assertTrue(getBrowser().login(TEST_USER, ""));
+        BuildSummaryPage page = getBrowser().openAndWaitFor(BuildSummaryPage.class, project, (long) buildId);
         assertFalse(page.isCommentsPresent());
 
         page.clickAction(BuildResult.ACTION_ADD_COMMENT);
 
-        AddCommentDialog dialog = new AddCommentDialog(browser);
+        AddCommentDialog dialog = new AddCommentDialog(getBrowser());
         dialog.waitFor();
         dialog.typeInput(TEST_COMMENT);
         dialog.clickOk();
 
         page.waitForComments(SeleniumBrowser.WAITFOR_TIMEOUT);
-        assertTrue(browser.isTextPresent(TEST_COMMENT));
-        assertTrue(browser.isTextPresent("by " + TEST_USER));
+        assertTrue(getBrowser().isTextPresent(TEST_COMMENT));
+        assertTrue(getBrowser().isTextPresent("by " + TEST_USER));
         return page;
     }
 }

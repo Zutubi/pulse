@@ -17,7 +17,7 @@ import java.util.List;
 import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
 import static com.zutubi.util.CollectionUtils.asPair;
 
-public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 {
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -100,28 +100,19 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         WaitProject project = setUpConcurrentBuildsOnTwoAgents();
 
-        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
-        try
-        {
-            SeleniumBrowser browser = factory.newBrowser();
-            browser.loginAsAdmin();
-            BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
-            String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
-            assertEquals("build 2", browser.getText(buildLinkId));
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
+        String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
+        assertEquals("build 2", getBrowser().getText(buildLinkId));
 
-            xmlRpcHelper.cancelBuild(project.getName(), 2);
+        xmlRpcHelper.cancelBuild(project.getName(), 2);
 
-            browser.refresh();
-            browsePage.waitFor();
-            assertEquals("build 1", browser.getText(buildLinkId));
+        getBrowser().refresh();
+        browsePage.waitFor();
+        assertEquals("build 1", getBrowser().getText(buildLinkId));
 
-            project.releaseBuild();
-            xmlRpcHelper.waitForProjectToBeIdle(project.getName());
-        }
-        finally
-        {
-            factory.stop();
-        }
+        project.releaseBuild();
+        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
     }
 
     public void testReorderingWithinQueueCausingBackwardRevisions() throws Exception
@@ -154,20 +145,10 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // is not as accurate as would be liked, but further changes to the
         // changelist handling are required before we can resolve this.
 
-        SeleniumBrowserFactory factory = new DefaultSeleniumBrowserFactory();
-        try
-        {
-            SeleniumBrowser browser = factory.newBrowser();
-            browser.start();
-            browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-            BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, project.getName(), 3L);
-            assertTrue(browser.isTextPresent(changesPage.formatChangesSince(3)));
-        }
-        finally
-        {
-            factory.stop();
-        }
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, project.getName(), 3L);
+        assertTrue(getBrowser().isTextPresent(changesPage.formatChangesSince(3)));
     }
 
     private void makeChangeToSvn() throws IOException, SVNException
@@ -193,7 +174,7 @@ public class BuildConcurrentAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private WaitProject setUpConcurrentBuildsOnTwoAgents() throws Exception
     {
-        xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
+        xmlRpcHelper.ensureAgent(AGENT_NAME);
 
         WaitProject project = createProject("A");
         bindStagesToAny(project);

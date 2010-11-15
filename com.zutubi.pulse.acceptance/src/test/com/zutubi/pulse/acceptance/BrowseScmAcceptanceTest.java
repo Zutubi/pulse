@@ -11,8 +11,8 @@ import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
 
@@ -20,7 +20,7 @@ import com.zutubi.util.WebUtils;
  * A high level acceptance test that checks the ability to browse and select
  * files and directories from the scm repository.
  */
-public class BrowseScmAcceptanceTest extends SeleniumTestBase
+public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 {
     private static final long TIMEOUT = 30000;
     
@@ -31,7 +31,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         xmlRpcHelper.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
@@ -42,7 +42,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
-        browser.logout();
+        getBrowser().logout();
 
         super.tearDown();
     }
@@ -51,7 +51,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseLinkAvailableInProjectWizardForSubversion()
     {
-        runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
+        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public void commandState(AddProjectWizard.CommandState form)
             {
@@ -65,7 +66,8 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
 
     public void testBrowseLinkNotAvailableInProjectWizardForGit()
     {
-        runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
+        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public String selectScm()
             {
@@ -107,10 +109,10 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     public void testBrowseLinkAvailableForVersionedProjectConversion() throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction("convertToVersioned");
 
-        ConvertToVersionedForm form = browser.createForm(ConvertToVersionedForm.class);
+        ConvertToVersionedForm form = getBrowser().createForm(ConvertToVersionedForm.class);
         form.waitFor();
         
         assertTrue(form.isBrowsePulseFileNameLinkAvailable());
@@ -198,18 +200,18 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     public void testBrowseAddingCommandToExistingProject() throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
-        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "/" +
+        getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "/" +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
                 Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME
         );
-        browser.waitAndClick(ListPage.ADD_LINK);
+        getBrowser().waitAndClick(ListPage.ADD_LINK);
 
-        SelectTypeState commandType = new SelectTypeState(browser);
+        SelectTypeState commandType = new SelectTypeState(getBrowser());
         commandType.waitFor();
         commandType.nextFormElements("zutubi.antCommandConfig");
         
-        final AntCommandForm antForm = browser.createForm(AntCommandForm.class);
+        final AntCommandForm antForm = getBrowser().createForm(AntCommandForm.class);
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
@@ -224,14 +226,14 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig(boolean template) throws Exception
     {
         configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), template);
-        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
+        getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
                 Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME + "/" +
                 Constants.Project.MultiRecipeType.Recipe.COMMANDS + "/"+
                 Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND
         );
-        AntCommandForm antForm = browser.createForm(AntCommandForm.class);
+        AntCommandForm antForm = getBrowser().createForm(AntCommandForm.class);
         antForm.waitFor();
         return antForm;
     }

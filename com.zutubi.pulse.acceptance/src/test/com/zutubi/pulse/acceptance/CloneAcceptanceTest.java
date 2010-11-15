@@ -13,18 +13,19 @@ import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfigurat
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import com.zutubi.util.WebUtils;
 
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
+
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for cloning both of top-level template collection items and of
  * normal map elements.
  */
-public class CloneAcceptanceTest extends SeleniumTestBase
+public class CloneAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROPERTY_NAME   = "aprop";
     private static final String TEST_PROPERTY_VALUE  = "value";
@@ -52,7 +53,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String labelsPath = PathUtils.getPath(projectPath, "labels");
         String labelPath = xmlRpcHelper.insertConfig(labelsPath, label);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertCloneAvailability(labelPath, false);
     }
 
@@ -64,21 +65,21 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String propertyPath = xmlRpcHelper.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        assertTrue(browser.login(user, ""));
+        assertTrue(getBrowser().login(user, ""));
         assertCloneAvailability(propertyPath, false);
 
         String groupPath = xmlRpcHelper.insertGroup(random + "-group", asList(userPath));
         xmlRpcHelper.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
 
-        browser.logout();
-        assertTrue(browser.login(user, ""));
+        getBrowser().logout();
+        assertTrue(getBrowser().login(user, ""));
         assertCloneAvailability(propertyPath, true);
     }
 
     public void testProjectCloneLinkNotPresentForTemplateRoot() throws Exception
     {
-        browser.loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        getBrowser().loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(hierarchyPage.isClonePresent());
     }
 
@@ -89,24 +90,24 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(project, false);
         String userPath = xmlRpcHelper.insertTrivialUser(user);
 
-        assertTrue(browser.login(user, ""));
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, project, false);
+        assertTrue(getBrowser().login(user, ""));
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, project, false);
         assertFalse(hierarchyPage.isClonePresent());
 
         xmlRpcHelper.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
 
-        browser.logout();
-        assertTrue(browser.login(user, ""));
+        getBrowser().logout();
+        assertTrue(getBrowser().login(user, ""));
         hierarchyPage.openAndWaitFor();
         assertTrue(hierarchyPage.isClonePresent());
     }
 
     private void assertCloneAvailability(String path, boolean expectedAvailable)
     {
-        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
+        ListPage labelsPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
         String baseName = PathUtils.getBaseName(path);
         assertTrue(labelsPage.isItemPresent(baseName));
-        assertEquals(expectedAvailable, browser.isElementIdPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
+        assertEquals(expectedAvailable, getBrowser().isElementIdPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
     }
 
     public void testCloneMapItem() throws Exception
@@ -116,9 +117,9 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(CLONE_PROPERTY_NAME);
 
-        ResourcePropertyForm propertyForm = browser.createForm(ResourcePropertyForm.class);
+        ResourcePropertyForm propertyForm = getBrowser().createForm(ResourcePropertyForm.class);
         propertyForm.waitFor();
-        assertFormElements(propertyForm, CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false", "false");
+        assertTrue(propertyForm.checkFormValues(CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false", "false"));
 
         labelList.openAndWaitFor();
         assertTrue(labelList.isItemPresent(CLONE_PROPERTY_NAME));
@@ -132,11 +133,11 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is required"));
+        assertTrue(getBrowser().isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is already in use"));
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
     }
 
     public void testCloneMapItemCancel() throws Exception
@@ -156,8 +157,8 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(random, false);
         String propertyPath = xmlRpcHelper.insertProjectProperty(random, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        browser.loginAsAdmin();
-        ListPage labelList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
+        getBrowser().loginAsAdmin();
+        ListPage labelList = getBrowser().openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(labelList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(labelList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_CLONE));
         return labelList;
@@ -167,35 +168,35 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        browser.loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME);
         
-        browser.waitFor(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
+        getBrowser().waitFor(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
     }
 
     public void testCloneProjectValidation() throws Exception
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        browser.loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is required"));
+        assertTrue(getBrowser().isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is already in use"));
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
     }
 
     public void testCloneProjectHierarchyNoChild() throws Exception
@@ -205,12 +206,12 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(parentName + CLONE_PROPERTY_NAME, "false", null);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentName + CLONE_PROPERTY_NAME, true);
+        ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentName + CLONE_PROPERTY_NAME, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(0, xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
@@ -223,14 +224,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         String childCloneName = childName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", childCloneName);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentCloneName, true);
+        ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
@@ -238,7 +239,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
         hierarchyPage.expandTreeItem(parentCloneName);
-        browser.waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
+        getBrowser().waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
     }
 
     public void testCloneProjectHierarchyValidation() throws Exception
@@ -248,21 +249,21 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is required"));
+        assertTrue(getBrowser().isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is already in use"));
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
 
         cloneForm.cloneFormElements(random, "true", random);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("duplicate name, all names must be unique"));
+        assertTrue(getBrowser().isTextPresent("duplicate name, all names must be unique"));
     }
 
     public void testSmartCloneProject() throws Exception
@@ -278,28 +279,28 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        browser.loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, true);
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("", random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is required"));
+        assertTrue(getBrowser().isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, "");
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is required"));
+        assertTrue(getBrowser().isTextPresent("name is required"));
 
         cloneForm.cloneFormElements(random, random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is already in use"));
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random);
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("name is already in use"));
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
     }
 
     public void testSmartCloneProjectHierarchyWithChild() throws Exception
@@ -309,7 +310,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, true);
         cloneForm.addDescendant(childName);
         cloneForm.waitFor();
         String parentTemplateName = parentName + PARENT_PROPERTY_NAME;
@@ -317,7 +318,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String childCloneName = childName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, parentTemplateName, "true", childCloneName);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, parentCloneName, true);
+        ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
         assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
@@ -326,7 +327,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
         hierarchyPage.expandTreeItem(parentCloneName);
-        browser.waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
+        getBrowser().waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
     }
 
     public void testSmartCloneWithInternalReference() throws Exception
@@ -336,8 +337,8 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         doSmartClone();
 
-        browser.open(urls.adminProject(WebUtils.uriComponentEncode(random)) + Constants.Project.HOOKS + "/stagey");
-        ConfigurationForm hookForm = browser.createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
+        getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) + Constants.Project.HOOKS + "/stagey");
+        ConfigurationForm hookForm = getBrowser().createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
         hookForm.waitFor();
 
         assertTrue("Stages field should have been pulled up to extracted template", hookForm.isInherited("stages"));
@@ -345,15 +346,15 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
     private ProjectHierarchyPage doSmartClone()
     {
-        browser.loginAsAdmin();
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickSmartClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, true);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, true);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random + PARENT_PROPERTY_NAME);
 
-        ProjectHierarchyPage cloneHierarchyPage = browser.createPage(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
+        ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, random + CLONE_PROPERTY_NAME, false);
         cloneHierarchyPage.waitFor();
         return cloneHierarchyPage;
     }
@@ -364,7 +365,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertTrivialProject(childName, parentName, false);
         assertEquals(asList(childName), new ArrayList<String>(xmlRpcHelper.getTemplateChildren(parentPath)));
 
-        browser.loginAsAdmin();
-        return browser.openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
+        getBrowser().loginAsAdmin();
+        return getBrowser().openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
     }
 }

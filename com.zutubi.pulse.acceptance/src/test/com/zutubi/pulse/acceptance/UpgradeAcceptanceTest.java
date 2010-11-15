@@ -7,14 +7,12 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
-import static com.zutubi.pulse.master.database.DatabaseConfig.*;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import static com.zutubi.util.Constants.SECOND;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -27,7 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-public class UpgradeAcceptanceTest extends SeleniumTestBase
+import static com.zutubi.pulse.master.database.DatabaseConfig.*;
+import static com.zutubi.util.Constants.SECOND;
+
+public class UpgradeAcceptanceTest extends AcceptanceTestBase
 {
     private File dataArea;
     private File work;
@@ -133,25 +134,25 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         pulse.setPort(port);
         pulse.start(true);
 
-        browser.open("/");
-        browser.waitForElement("upgrade.preview", 120 * SECOND);
+        getBrowser().open("/");
+        getBrowser().waitForElement("upgrade.preview", 120 * SECOND);
 
         // check that we have received the upgrade preview, and that the data is as expected.
-        assertTrue(browser.isTextPresent("Upgrade Preview"));
+        assertTrue(getBrowser().isTextPresent("Upgrade Preview"));
 
-        browser.click("continue");
-        browser.waitForElement("upgrade.progress", 120 * SECOND);
+        getBrowser().click("continue");
+        getBrowser().waitForElement("upgrade.progress", 120 * SECOND);
 
         // waiting..
-        assertTrue(browser.isTextPresent("Upgrade Progress"));
+        assertTrue(getBrowser().isTextPresent("Upgrade Progress"));
 
         // how long should we be waiting for the upgrade to complete?
-        browser.waitForElement("upgrade.complete", 120 * SECOND);
+        getBrowser().waitForElement("upgrade.complete", 120 * SECOND);
 
-        assertTrue(browser.isTextPresent("Upgrade Complete"));
-        assertTrue(browser.isTextPresent("The upgrade has been successful"));
+        assertTrue(getBrowser().isTextPresent("Upgrade Complete"));
+        assertTrue(getBrowser().isTextPresent("The upgrade has been successful"));
 
-        browser.click("continue");
+        getBrowser().click("continue");
 
         TestUtils.waitForCondition(new Condition()
         {

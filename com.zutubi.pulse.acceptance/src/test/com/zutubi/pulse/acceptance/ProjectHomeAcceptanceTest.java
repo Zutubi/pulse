@@ -1,5 +1,24 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
+import org.tmatesoft.svn.core.SVNException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Hashtable;
+
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
@@ -10,28 +29,10 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
-import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
-import org.tmatesoft.svn.core.SVNException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Hashtable;
-
-public class ProjectHomeAcceptanceTest extends SeleniumTestBase
+public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 {
     private static final long BUILD_TIMEOUT = 90000;
 
@@ -77,6 +78,7 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
     @Override
     protected void tearDown() throws Exception
     {
+        xmlRpcHelper.cancelIncompleteBuilds();
         xmlRpcHelper.logout();
         removeDirectory(tempDir);
         super.tearDown();
@@ -87,9 +89,9 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         final String TEST_DESCRIPTION = "This is a test description.";
 
         String projectPath = xmlRpcHelper.insertSimpleProject(random);
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertEquals("unknown", homePage.getHealth());
         assertEquals("idle", homePage.getState());
         assertEquals(0, homePage.getSuccessRate());
@@ -119,14 +121,14 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         buildRunner.triggerBuild(project);
         xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
 
-        browser.loginAsAdmin();
-        final ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, project.getName());
+        getBrowser().loginAsAdmin();
+        final ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, project.getName());
         assertTrue(homePage.hasBuildActivity());
         assertEquals("building", homePage.getState());
         assertEquals(1, homePage.getActiveBuildCount());
 
         buildRunner.triggerBuild(project);
-        browser.refreshUntil(BUILD_TIMEOUT, new Condition()
+        getBrowser().refreshUntil(BUILD_TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
@@ -146,7 +148,7 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
 
     public void testBuildAndChangeHistory() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         int initialBuildNumber = xmlRpcHelper.runBuild(random);
         String initialRevision = xmlRpcHelper.getBuildRevision(random, initialBuildNumber);
         String brokenRevision = editAndCommitBuildFile(COMMENT_BROKEN, BUILD_FILE_BROKEN);
@@ -154,8 +156,8 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
         String fixedRevision = editAndCommitBuildFile(COMMENT_FIXED, BUILD_FILE_FIXED);
         int fixedBuildNumber = xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        getBrowser().loginAsAdmin();
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertEquals("ok", homePage.getHealth());
         assertEquals("idle", homePage.getState());
         assertEquals(67, homePage.getSuccessRate());
@@ -176,10 +178,10 @@ public class ProjectHomeAcceptanceTest extends SeleniumTestBase
 
     public void testFeaturedArtifacts() throws Exception
     {
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
 
-        browser.loginAsAdmin();
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        getBrowser().loginAsAdmin();
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.hasLatestCompletedBuild());
         assertFalse(homePage.hasFeaturedArtifacts());
 

@@ -16,7 +16,7 @@ import static com.zutubi.util.Constants.SECOND;
 /**
  * Acceptance tests for the users dashboard view.
  */
-public class DashboardAcceptanceTest extends SeleniumTestBase
+public class DashboardAcceptanceTest extends AcceptanceTestBase
 {
     private static final String SHOW_ALL_GROUPS   = "showAllGroups";
     private static final String SHOWN_GROUPS      = "shownGroups";
@@ -32,7 +32,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         String user = RandomUtils.randomString(10);
         userPath = xmlRpcHelper.insertTrivialUser(user);
-        assertTrue(browser.login(user, ""));
+        assertTrue(getBrowser().login(user, ""));
     }
 
     protected void tearDown() throws Exception
@@ -44,11 +44,11 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     public void testNoTrailingSlash() throws Exception
     {
         // See CIB-1715.
-        browser.open(urls.base() + "dashboard");
-        browser.waitForPageToLoad(3 * SECOND);
-        DashboardPage page = browser.createPage(DashboardPage.class);
+        getBrowser().open(urls.base() + "dashboard");
+        getBrowser().waitForPageToLoad(3 * SECOND);
+        DashboardPage page = getBrowser().createPage(DashboardPage.class);
         assertTrue(page.isPresent());
-        assertTitle(page);
+        assertEquals(getBrowser().getTitle(), page.getTitle());
     }
 
     public void testShowGroups() throws Exception
@@ -61,7 +61,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
         addLabel(projectPath, group);
 
-        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group));
         assertTrue(dashboard.isProjectPresent(group, project));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
@@ -79,7 +79,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
-        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isProjectPresent(group1, project));
         assertFalse(dashboard.isGroupPresent(group2));
@@ -99,7 +99,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
-        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isGroupPresent(group2));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
@@ -123,7 +123,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
 
-        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertFalse(dashboard.isUngroupedProjectPresent(project2));
     }
@@ -138,7 +138,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(project1, false);
         xmlRpcHelper.insertSimpleProject(project2, false);
 
-        DashboardPage dashboard = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertTrue(dashboard.isUngroupedProjectPresent(project2));
 

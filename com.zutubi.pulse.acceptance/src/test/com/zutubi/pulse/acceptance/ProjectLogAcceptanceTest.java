@@ -2,16 +2,16 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
 
-public class ProjectLogAcceptanceTest extends SeleniumTestBase
+public class ProjectLogAcceptanceTest extends AcceptanceTestBase
 {
     public void testProjectLogAvailable() throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectLogPage page = browser.openAndWaitFor(ProjectLogPage.class, random);
+        ProjectLogPage page = getBrowser().openAndWaitFor(ProjectLogPage.class, random);
         assertTrue(page.isDownloadLinkAvailable());
         assertTrue(page.logContains("Project initialisation succeeded"));
     }
@@ -19,18 +19,18 @@ public class ProjectLogAcceptanceTest extends SeleniumTestBase
     public void testProjectLogContent() throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectLogPage page = browser.openAndWaitFor(ProjectLogPage.class, random);
+        ProjectLogPage page = getBrowser().openAndWaitFor(ProjectLogPage.class, random);
 
         assertTrue(page.isDownloadLinkAvailable());
 
-        if (browser.isFirefox())
+        if (getBrowser().isFirefox())
         {
             page.clickDownloadLink();
-            assertTrue(browser.getBodyText().contains("Project initialisation succeeded"));
+            assertTrue(getBrowser().getBodyText().contains("Project initialisation succeeded"));
         }
     }
 }

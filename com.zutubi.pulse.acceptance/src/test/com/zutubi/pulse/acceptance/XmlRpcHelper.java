@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -25,6 +26,7 @@ import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
@@ -47,7 +50,7 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
  */
 public class XmlRpcHelper
 {
-    public static final String SYMBOLIC_NAME_KEY = "meta.symbolicName";
+    public static final String SYMBOLIC_NAME_KEY = CompositeType.XML_RPC_SYMBOLIC_NAME;
 
     private static final int INITIALISATION_TIMEOUT = 90000;
 
@@ -58,7 +61,7 @@ public class XmlRpcHelper
 
     public XmlRpcHelper() throws MalformedURLException
     {
-        this(new URL("http", AcceptanceTestUtils.MASTER_HOST, AcceptanceTestUtils.getPulsePort(), "/xmlrpc"));
+        this(new URL(getPulseUrl() + "/xmlrpc"));
     }
 
     public XmlRpcHelper(String url) throws MalformedURLException
@@ -192,6 +195,12 @@ public class XmlRpcHelper
         return (T) call("getConfig", path);
     }
 
+    @SuppressWarnings({"unchecked"})
+    public <T> T getRawConfig(String path) throws Exception
+    {
+        return (T) call("getRawConfig", path);
+    }
+
     public String getConfigHandle(String path) throws Exception
     {
         return call("getConfigHandle", path);
@@ -200,6 +209,11 @@ public class XmlRpcHelper
     public String getConfigPath(String handle) throws Exception
     {
         return call("getConfigPath", handle);
+    }
+
+    public boolean canCloneConfig(String path) throws Exception
+    {
+        return (Boolean)call("canCloneConfig", path);
     }
 
     public boolean isConfigPermanent(String path) throws Exception
@@ -232,9 +246,9 @@ public class XmlRpcHelper
         return (Boolean) call("deleteConfig", path);
     }
 
-    public void deleteAllConfigs(String pathPattern) throws Exception
+    public int deleteAllConfigs(String pathPattern) throws Exception
     {
-        call("deleteAllConfigs", pathPattern);
+        return (Integer) call("deleteAllConfigs", pathPattern);
     }
 
     public void restoreConfig(String path) throws Exception
@@ -861,7 +875,7 @@ public class XmlRpcHelper
             cancelQueuedBuildRequest(queuedRequest.get("id").toString());
         }
 
-        callTest("cancelIncompleteBuilds");
+        callTest("cancelActiveBuilds");
     }
 
     public int getNextBuildNumber(String projectName) throws Exception
@@ -1474,6 +1488,13 @@ public class XmlRpcHelper
     public Vector<Hashtable<String, Object>> getRunningPlugins() throws Exception
     {
         return callTest("getRunningPlugins");
+    }
+
+    public String addLabel(String project, String label) throws Exception
+    {
+        Hashtable<String, Object> config = createEmptyConfig(LabelConfiguration.class);
+        config.put("label", label);
+        return insertConfig(PathUtils.getPath("projects", project, "labels"), config);
     }
 
     private static class BuildHolder

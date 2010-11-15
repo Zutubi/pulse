@@ -1,11 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.components.Pager;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
@@ -14,13 +8,20 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectHistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import static java.util.Arrays.asList;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static java.util.Arrays.asList;
+
+public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
 {
     private static final long BUILD_TIMEOUT = 90000;
 
@@ -41,9 +42,9 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
     public void testNewProject() throws Exception
     {
         xmlRpcHelper.insertSimpleProject(random);
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHistoryPage historyPage = browser.openAndWaitFor(ProjectHistoryPage.class, random);
+        ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
         assertEquals(ProjectHistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
 
@@ -52,7 +53,7 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
         assertEmptyHistory(historyPage);
         
         historyPage.clearStateFilter();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
         assertEquals(ProjectHistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
@@ -62,9 +63,9 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random);
         int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHistoryPage historyPage = browser.openAndWaitFor(ProjectHistoryPage.class, random);
+        ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
         BuildInfo build = new BuildInfo(buildNumber, ResultState.SUCCESS, xmlRpcHelper.getBuildRevision(random, buildNumber));
         assertSingleBuildHistory(historyPage, build);
 
@@ -117,16 +118,16 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
         }
 
         
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHistoryPage historyPage = browser.openAndWaitFor(ProjectHistoryPage.class, random);
+        ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
         assertEquals(ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
         assertEquals(builds.subList(0, ProjectHistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Step forward
         historyPage.getPager().clickNext();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(BUILD_COUNT - ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -135,7 +136,7 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
 
         // Step backward
         historyPage.getPager().clickFirst();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -172,7 +173,7 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
         
         // Step forward, ensure the filter is maintained.
         historyPage.getPager().clickLast();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(successfulBuilds.size() - ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -183,7 +184,7 @@ public class ProjectHistoryAcceptanceTest extends SeleniumTestBase
     private void setFilterAndWait(ProjectHistoryPage historyPage, String stateFilter)
     {
         historyPage.setStateFilter(stateFilter);
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
     }
 

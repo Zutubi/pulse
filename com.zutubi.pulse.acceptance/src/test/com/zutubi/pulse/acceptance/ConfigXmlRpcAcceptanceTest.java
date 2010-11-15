@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
@@ -24,7 +25,7 @@ import static org.hamcrest.Matchers.containsString;
  * tests deal with specific configuration types, this test just concentrates
  * on the general capabilities and boundaries of the config functions.
  */
-public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROJECT_NAME = "config-xml-rpc";
     private static final String TEST_PROJECT_PATH = "projects/config-xml-rpc";
@@ -32,33 +33,33 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
         super.tearDown();
     }
 
     public void testConfigPathExistsEmptyPath() throws Exception
     {
-        assertEquals(false, call("configPathExists", ""));
+        assertEquals(false, xmlRpcHelper.configPathExists(""));
     }
 
     public void testConfigPathExistsNonExistant() throws Exception
     {
-        assertEquals(false, call("configPathExists", "nonexistant"));
+        assertEquals(false, xmlRpcHelper.configPathExists("nonexistant"));
     }
 
     public void testConfigPathExistsExistant() throws Exception
     {
-        assertEquals(true, call("configPathExists", "projects"));
+        assertEquals(true, xmlRpcHelper.configPathExists("projects"));
     }
 
     public void testGetConfigListingEmptyPath() throws Exception
     {
-        Vector<String> listing = call("getConfigListing", "");
+        Vector<String> listing = xmlRpcHelper.getConfigListing("");
         assertSortedEquals(listing, "agents", "groups", "projects", "settings", "users");
     }
 
@@ -69,17 +70,17 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetConfigListingComposite() throws Exception
     {
-        Vector<String> listing = call("getConfigListing", "settings");
+        Vector<String> listing = xmlRpcHelper.getConfigListing("settings");
         assertSortedEquals(listing, "agentPing", "backup", "email", "jabber", "ldap", "license", "logging", "repository");
     }
 
     public void testGetConfigListingCollection() throws Exception
     {
-        Vector<String> listing = call("getConfigListing", "projects");
+        Vector<String> listing = xmlRpcHelper.getConfigListing("projects");
         int sizeBefore = listing.size();
         String project = randomName();
-        insertSimpleProject(project);
-        listing = call("getConfigListing", "projects");
+        xmlRpcHelper.insertSimpleProject(project);
+        listing = xmlRpcHelper.getConfigListing("projects");
         assertEquals(sizeBefore + 1, listing.size());
         assertTrue(listing.contains(project));
     }
@@ -97,21 +98,21 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetConfigPathForHandle() throws Exception
     {
         String path = "settings/email";
-        String handle = call("getConfigHandle", path);
-        assertEquals(path, call("getConfigPath", handle));
+        String handle = xmlRpcHelper.getConfigHandle(path);
+        assertEquals(path, xmlRpcHelper.getConfigPath(handle));
     }
 
     public void testGetConfig() throws Exception
     {
         Hashtable<String, Object> emailConfig = new Hashtable<String, Object>();
-        emailConfig.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        emailConfig.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         emailConfig.put("host", "localhost");
         emailConfig.put("from", "pulse@zutubi.com");
         emailConfig.put("ssl", true);
-        call("saveConfig", "settings/email", emailConfig, false);
+        xmlRpcHelper.saveConfig("settings/email", emailConfig, false);
 
-        emailConfig = call("getConfig", "settings/email");
-        assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
+        emailConfig = xmlRpcHelper.getConfig("settings/email");
+        assertEquals("zutubi.emailConfig", emailConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
         assertEquals("localhost", emailConfig.get("host"));
         assertEquals("pulse@zutubi.com", emailConfig.get("from"));
         assertEquals(true, emailConfig.get("ssl"));
@@ -120,11 +121,11 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = insertSimpleAgent(agentName);
-        Hashtable<String, Object> agentConfig = call("getConfig", path);
+        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        Hashtable<String, Object> agentConfig = xmlRpcHelper.getConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -132,7 +133,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         finally
         {
-            call("deleteConfig", path);
+            xmlRpcHelper.deleteConfig(path);
         }
     }
 
@@ -148,8 +149,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetRawConfig() throws Exception
     {
-        Hashtable<String, Object> emailConfig = call("getRawConfig", "settings/email");
-        assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> emailConfig = xmlRpcHelper.getRawConfig("settings/email");
+        assertEquals("zutubi.emailConfig", emailConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
         assertTrue(emailConfig.containsKey("host"));
         assertTrue(emailConfig.containsKey("port"));
         assertTrue(emailConfig.containsKey("username"));
@@ -159,11 +160,11 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetRawConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = insertSimpleAgent(agentName);
-        Hashtable<String, Object> agentConfig = call("getRawConfig", path);
+        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        Hashtable<String, Object> agentConfig = xmlRpcHelper.getRawConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -171,7 +172,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         finally
         {
-            call("deleteConfig", path);
+            xmlRpcHelper.deleteConfig(path);
         }
     }
 
@@ -193,70 +194,70 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testInsertConfigExistingPath() throws Exception
     {
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("record already exists", "insertConfig", "settings/email", config);
     }
 
     public void testInsertConfigNoSymbolicName() throws Exception
     {
-        ensureProject(TEST_PROJECT_NAME);
+        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
         callAndExpectError("No symbolic name found in XML-RPC struct", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigInvalidSymbolicName() throws Exception
     {
-        ensureProject(TEST_PROJECT_NAME);
+        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
+        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
         callAndExpectError("Unrecognised symbolic name", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigTypeMismatch() throws Exception
     {
-        ensureProject(TEST_PROJECT_NAME);
+        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("Expected type: class com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigValidates() throws Exception
     {
-        ensureProject(TEST_PROJECT_NAME);
+        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         callAndExpectError("name requires a value", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigIntoCollection() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
-        stage.put(SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        stage.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         stage.put("name", "my stage");
         stage.put("recipe", "a recipe");
-        String stagePath = call("insertConfig", projectPath + "/stages", stage);
+        String stagePath = xmlRpcHelper.insertConfig(projectPath + "/stages", stage);
         
-        Hashtable<String, Object> loadedStage = call("getConfig", stagePath);
-        assertEquals("zutubi.stageConfig", loadedStage.get(SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> loadedStage = xmlRpcHelper.getConfig(stagePath);
+        assertEquals("zutubi.stageConfig", loadedStage.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
         assertEquals("my stage", loadedStage.get("name"));
         assertEquals("a recipe", loadedStage.get("recipe"));
     }
 
     public void testInsertConfigIntoSingleton() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         String scmPath = projectPath + "/scm";
-        assertEquals(true, call("deleteConfig", scmPath));
+        assertEquals(true, xmlRpcHelper.deleteConfig(scmPath));
 
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
         scm.put("url", "svn://localhost/test/trunk");
         scm.put("monitor", false);
-        call("insertConfig", scmPath, scm);
+        xmlRpcHelper.insertConfig(scmPath, scm);
 
-        Hashtable<String, Object> loadedScm = call("getConfig", scmPath);
-        assertEquals("zutubi.subversionConfig", loadedScm.get(SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> loadedScm = xmlRpcHelper.getConfig(scmPath);
+        assertEquals("zutubi.subversionConfig", loadedScm.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
         assertEquals("svn://localhost/test/trunk", loadedScm.get("url"));
         assertEquals(false, loadedScm.get("monitor"));
     }
@@ -278,30 +279,30 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testInsertTemplatedConfigConcreteParentPath() throws Exception
     {
-        ensureProject(TEST_PROJECT_NAME);
+        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
         callAndExpectError("template parent is concrete and thus cannot be inherited from", "insertTemplatedConfig", TEST_PROJECT_PATH, new Hashtable(), false);
     }
 
     public void testInsertTemplatedConfig() throws Exception
     {
         String projectName = randomName();
-        String projectPath = insertSimpleProject(projectName);
+        String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
         
-        Hashtable<String, Object> project = call("getConfig", projectPath);
-        assertEquals("zutubi.projectConfig", project.get(SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        assertEquals("zutubi.projectConfig", project.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
         assertEquals(projectName, project.get("name"));
         Hashtable<String, Object> scm = (Hashtable<String, Object>) project.get("scm");
         assertNotNull(scm);
-        assertEquals("zutubi.subversionConfig", scm.get(SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", scm.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     public void testInsertTemplatedConfigValidates() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
@@ -312,16 +313,16 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testInsertTemplatedConfigValidatesAsTemplate() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
 
-        String projectPath = call("insertTemplatedConfig", "projects/global project template", project, true);
-        Hashtable<String, Object> loadedProject = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
+        Hashtable<String, Object> loadedProject = xmlRpcHelper.getConfig(projectPath);
         Hashtable<String, Object> loadedScm = (Hashtable<String, Object>) loadedProject.get("scm");
         assertFalse(loadedScm.containsKey("url"));
     }
@@ -329,12 +330,12 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testInsertTemplatedConfigTemplate() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
 
-        String projectPath = call("insertTemplatedConfig", "projects/global project template", project, true);
-        Hashtable<String, Object> loadedProject = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
+        Hashtable<String, Object> loadedProject = xmlRpcHelper.getConfig(projectPath);
         assertEquals(projectName, loadedProject.get("name"));
     }
 
@@ -350,42 +351,42 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSaveConfigNoSymbolicName() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         Hashtable<String, Object> options = new Hashtable<String, Object>();
         callAndExpectError("No symbolic name found in XML-RPC struct", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigInvalidType() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         Hashtable<String, Object> options = new Hashtable<String, Object>();
-        options.put(SYMBOLIC_NAME_KEY, "invalid");
+        options.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "invalid");
         callAndExpectError("Expecting type 'zutubi.buildOptionsConfig', found 'invalid'", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigValidates() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         String optionsPath = projectPath + "/options";
-        Hashtable<String, Object> options = call("getConfig", optionsPath);
+        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
         options.put("timeout", -10);
         callAndExpectError("timeout must not be negative", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigValidatesShallow() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(0, options.get("timeout"));
         options.put("timeout", -1);
-        call("saveConfig", projectPath, project, false);
+        xmlRpcHelper.saveConfig(projectPath, project, false);
     }
     
     public void testSaveConfigValidatesDeep() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(0, options.get("timeout"));
         options.put("timeout", -1);
@@ -394,44 +395,44 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSaveConfig() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
         String optionsPath = projectPath + "/options";
-        Hashtable<String, Object> options = call("getConfig", optionsPath);
+        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
         assertEquals(false, options.get("prompt"));
         assertEquals(0, options.get("timeout"));
 
         options.put("prompt", true);
         options.put("timeout", 10);
-        call("saveConfig", projectPath + "/options", options, false);
+        xmlRpcHelper.saveConfig(projectPath + "/options", options, false);
 
-        Hashtable<String, Object> loadedOptions = call("getConfig", optionsPath);
+        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(optionsPath);
         assertEquals(true, loadedOptions.get("prompt"));
         assertEquals(10, loadedOptions.get("timeout"));
     }
 
     public void testSaveConfigShallow() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(false, options.get("prompt"));
         options.put("prompt", true);
-        call("saveConfig", projectPath, project, false);
+        xmlRpcHelper.saveConfig(projectPath, project, false);
 
-        Hashtable<String, Object> loadedOptions = call("getConfig", projectPath + "/options");
+        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(projectPath + "/options");
         assertEquals(false, loadedOptions.get("prompt"));
     }
 
     public void testSaveConfigDeep() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(false, options.get("prompt"));
         options.put("prompt", true);
-        call("saveConfig", projectPath, project, true);
+        xmlRpcHelper.saveConfig(projectPath, project, true);
 
-        Hashtable<String, Object> loadedOptions = call("getConfig", projectPath + "/options");
+        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(projectPath + "/options");
         assertEquals(true, loadedOptions.get("prompt"));
     }
 
@@ -442,18 +443,18 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testCanCloneNonexistantPath() throws Exception
     {
-        assertEquals(false, call("canCloneConfig", "foo"));
+        assertEquals(false, xmlRpcHelper.canCloneConfig("foo"));
     }
 
     public void testCanCloneUncloneablePath() throws Exception
     {
-        assertEquals(false, call("canCloneConfig", getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
+        assertEquals(false, xmlRpcHelper.canCloneConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
     }
 
     public void testCanCloneCloneablePath() throws Exception
     {
         String path = xmlRpcHelper.insertTrivialProject(randomName(), false);
-        assertEquals(true, call("canCloneConfig", path));
+        assertEquals(true, xmlRpcHelper.canCloneConfig(path));
     }
 
     public void testCloneInvalidPath() throws Exception
@@ -470,7 +471,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         xmlRpcHelper.insertTrivialProject(name, false);
         Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
         keyMap.put(name, cloneName);
-        assertEquals(true, call("cloneConfig", MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
+        assertEquals(true, xmlRpcHelper.cloneConfig(MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
         assertTrue(xmlRpcHelper.configPathExists(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
     }
 
@@ -481,52 +482,52 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDelete() throws Exception
     {
-        String path = insertSimpleProject(randomName());
-        assertEquals(true, call("configPathExists", path));
-        assertEquals(true, call("deleteConfig", path));
-        assertEquals(false, call("configPathExists", path));
+        String path = xmlRpcHelper.insertSimpleProject(randomName());
+        assertEquals(true, xmlRpcHelper.configPathExists(path));
+        assertEquals(true, xmlRpcHelper.deleteConfig(path));
+        assertEquals(false, xmlRpcHelper.configPathExists(path));
     }
 
     public void testDeleteSingleton() throws Exception
     {
-        String path = insertSimpleProject(randomName());
+        String path = xmlRpcHelper.insertSimpleProject(randomName());
         String scmPath = path + "/scm";
-        assertEquals(true, call("configPathExists", scmPath));
-        assertEquals(true, call("deleteConfig", scmPath));
-        assertEquals(false, call("configPathExists", scmPath));
+        assertEquals(true, xmlRpcHelper.configPathExists(scmPath));
+        assertEquals(true, xmlRpcHelper.deleteConfig(scmPath));
+        assertEquals(false, xmlRpcHelper.configPathExists(scmPath));
     }
 
     public void testDeleteInheritedFrom() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         project.put("name", randomName());
-        String parentPath = call("insertTemplatedConfig", "projects/global project template", project, true);
+        String parentPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
 
         project.put("name", randomName());
-        String childPath = call("insertTemplatedConfig", parentPath, project, true);
-        assertEquals(true, call("configPathExists", parentPath));
-        assertEquals(true, call("configPathExists", childPath));
+        String childPath = xmlRpcHelper.insertTemplatedConfig(parentPath, project, true);
+        assertEquals(true, xmlRpcHelper.configPathExists(parentPath));
+        assertEquals(true, xmlRpcHelper.configPathExists(childPath));
 
-        assertEquals(true, call("deleteConfig", parentPath));
-        assertEquals(false, call("configPathExists", parentPath));
-        assertEquals(false, call("configPathExists", childPath));
+        assertEquals(true, xmlRpcHelper.deleteConfig(parentPath));
+        assertEquals(false, xmlRpcHelper.configPathExists(parentPath));
+        assertEquals(false, xmlRpcHelper.configPathExists(childPath));
     }
 
     public void testDeleteAll() throws Exception
     {
-        String path = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", path);
+        String path = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(path);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
         properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
         properties.put("p2", xmlRpcHelper.createProperty("p2", "v2"));
-        call("saveConfig", path, project, true);
+        xmlRpcHelper.saveConfig(path, project, true);
 
-        Hashtable<String, Object> loadedProperties = call("getConfig", path + "/properties");
+        Hashtable<String, Object> loadedProperties = xmlRpcHelper.getConfig(path + "/properties");
         assertEquals(2, loadedProperties.size());
 
-        assertEquals(2, call("deleteAllConfigs", path + "/properties/*"));
-        loadedProperties = call("getConfig", path + "/properties");
+        assertEquals(2, xmlRpcHelper.deleteAllConfigs(path + "/properties/*"));
+        loadedProperties = xmlRpcHelper.getConfig(path + "/properties");
         assertEquals(0, loadedProperties.size());
     }
 
@@ -539,17 +540,17 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String parentPath = xmlRpcHelper.insertSimpleProject(parent, true);
         String childPath = xmlRpcHelper.insertSimpleProject(child, parent, false);
 
-        Hashtable<String, Object> project = call("getConfig", parentPath);
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(parentPath);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
         properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
-        call("saveConfig", parentPath, project, true);
+        xmlRpcHelper.saveConfig(parentPath, project, true);
 
-        assertEquals(1, call("deleteAllConfigs", childPath+ "/properties/*"));
-        Hashtable<String, Object> loadedProperties = call("getConfig", childPath + "/properties");
+        assertEquals(1, xmlRpcHelper.deleteAllConfigs(childPath+ "/properties/*"));
+        Hashtable<String, Object> loadedProperties = xmlRpcHelper.getConfig(childPath + "/properties");
         assertEquals(0, loadedProperties.size());
 
-        call("restoreConfig", childPath + "/properties/p1");
-        loadedProperties = call("getConfig", childPath + "/properties");
+        xmlRpcHelper.restoreConfig(childPath + "/properties/p1");
+        loadedProperties = xmlRpcHelper.getConfig(childPath + "/properties");
         assertEquals(1, loadedProperties.size());
     }
 
@@ -696,8 +697,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetConfigDoesntReturnExternalState() throws Exception
     {
-        String projectPath = insertSimpleProject(randomName());
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         assertNull(project.get("projectId"));
     }
 
@@ -706,19 +707,19 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // CIB-1542: check that a normal save does not touch the projectId
         // external state field.
         String name = randomName();
-        String projectPath = insertSimpleProject(name);
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(name);
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         project.put("url", "http://i.feel.like.a.change.com");
-        call("saveConfig", projectPath, project, false);
+        xmlRpcHelper.saveConfig(projectPath, project, false);
 
-        assertEquals("idle", call("getProjectState", name));
+        assertEquals(Project.State.IDLE, xmlRpcHelper.getProjectState(name));
     }
 
     public void testSaveConfigConfigChangeExternalState() throws Exception
     {
         String name = randomName();
-        String projectPath = insertSimpleProject(name);
-        Hashtable<String, Object> project = call("getConfig", projectPath);
+        String projectPath = xmlRpcHelper.insertSimpleProject(name);
+        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
         project.put("projectId", "1");
         callAndExpectError("Unrecognised property 'projectId'", "saveConfig", projectPath, project, false);
     }
@@ -998,7 +999,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     private void checkPathType(String path, String expectedType) throws Exception
     {
         Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
-        assertEquals(expectedType, config.get("meta.symbolicName"));
+        assertEquals(expectedType, config.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
     }
 
     private void checkExpectedDeletedPaths(Hashtable<String, Object> result, String... expected)
@@ -1117,6 +1118,19 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         for (int i = 0; i < gotArray.length; i++)
         {
             assertEquals(expected[i], gotArray[i]);
+        }
+    }
+
+    private void callAndExpectError(String error, String function, Object... args)
+    {
+        try
+        {
+            xmlRpcHelper.call(function, args);
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertTrue("Message '" + e.getMessage() + "' does not contain '" + error + "'", e.getMessage().contains(error));
         }
     }
 }

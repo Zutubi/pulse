@@ -7,10 +7,12 @@ import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 
+import static com.zutubi.pulse.acceptance.XmlRpcHelper.SYMBOLIC_NAME_KEY;
+
 /**
  * Acceptance tests for configuration state display tables.
  */
-public class ConfigStateAcceptanceTest extends SeleniumTestBase
+public class ConfigStateAcceptanceTest extends AcceptanceTestBase
 {
     private static final String FIELD_COMPATIBLE_STAGES = "compatibleStages";
     private static final String FIELD_STATUS = "status";
@@ -40,16 +42,16 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
 
     public void testCompositeState() throws Exception
     {
-        browser.loginAsAdmin();
-        AgentConfigPage agentConfigPage = browser.openAndWaitFor(AgentConfigPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        AgentConfigPage agentConfigPage = getBrowser().openAndWaitFor(AgentConfigPage.class, random, false);
         assertTrue(agentConfigPage.isStatePresent());
         assertTrue(agentConfigPage.isStateFieldPresent(FIELD_STATUS));
     }
 
     public void testCollectionState() throws Exception
     {
-        browser.loginAsAdmin();
-        ListPage agentResourcesPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
+        getBrowser().loginAsAdmin();
+        ListPage agentResourcesPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
         assertTrue(agentResourcesPage.isStatePresent());
         assertTrue(agentResourcesPage.isStateFieldPresent(FIELD_COMPATIBLE_STAGES));
         assertEquals("all projects (all stages)", agentResourcesPage.getStateField(FIELD_COMPATIBLE_STAGES));
@@ -66,12 +68,12 @@ public class ConfigStateAcceptanceTest extends SeleniumTestBase
 
         String unsatisfiedProjectPath = xmlRpcHelper.insertSimpleProject(random + "-project-unsatisfied", false);
         Hashtable<String, Object> resourceRequirement = new Hashtable<String, Object>();
-        resourceRequirement.put("meta.symbolicName", "zutubi.resourceRequirementConfig");
+        resourceRequirement.put(SYMBOLIC_NAME_KEY, "zutubi.resourceRequirementConfig");
         resourceRequirement.put("resource", "doesnotexist");
         xmlRpcHelper.insertConfig(PathUtils.getPath(unsatisfiedProjectPath, "requirements"), resourceRequirement);
 
-        browser.loginAsAdmin();
-        ListPage agentResourcesPage = browser.openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
+        getBrowser().loginAsAdmin();
+        ListPage agentResourcesPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getPath(agentPath, "resources"));
         assertTrue(agentResourcesPage.isStatePresent());
         assertTrue(agentResourcesPage.isStateFieldPresent(FIELD_COMPATIBLE_STAGES));
         assertTrue(agentResourcesPage.isStateFieldExpandable(FIELD_COMPATIBLE_STAGES));

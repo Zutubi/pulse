@@ -21,7 +21,7 @@ import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.US
 /**
  * Acceptance tests for the build navigation portion of the breadcrumbs.
  */
-public class BuildNavigationAcceptanceTest extends SeleniumTestBase
+public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
 {
     //NOTE: This acceptance test is structured slightly differently to avoid the
     //      creation of a heap of projects and builds.  It follows the workflow
@@ -49,13 +49,13 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.loginAsAdmin();
 
-        toolbar = new PulseToolbar(browser);
+        toolbar = new PulseToolbar(getBrowser());
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        browser.logout();
+        getBrowser().logout();
         xmlRpcHelper.logout();
 
         super.tearDown();
@@ -69,7 +69,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
         configurationHelper.insertProject(project.getConfig(), false);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         doTestNoBuildForProjectHomepage();
 
@@ -93,7 +93,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
     private void doTestNoBuildForProjectHomepage()
     {
         // go to project home page - ensure that the standard stuff is there.
-        browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
 
         assertTrue(toolbar.isProjectLinkPresent());
         assertFalse(toolbar.isBuildNavPresent());
@@ -102,7 +102,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestSingleBuild()
     {
-        browser.openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
 
         toolbar.waitForBuildNav();
 
@@ -112,7 +112,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestMultipleBuilds()
     {
-        browser.openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
 
         toolbar.waitForBuildNav();
 
@@ -126,7 +126,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         // check navigation
         toolbar.clickBuildNavItem(5);
-        BuildSummaryPage page = browser.createPage(BuildSummaryPage.class, projectName, 5L);
+        BuildSummaryPage page = getBrowser().createPage(BuildSummaryPage.class, projectName, 5L);
         page.waitFor();
 
         // wait for reload?
@@ -139,7 +139,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestPopupMenu()
     {
-        browser.openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 3L);
 
         toolbar.waitForBuildNav();
 
@@ -154,7 +154,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         assertFalse(toolbar.isNextBrokenBuildLinkPresent());
         assertFalse(toolbar.isPreviousBrokenBuildLinkPresent());
 
-        browser.openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
 
         toolbar.waitForBuildNav();
         toolbar.clickOnNavMenu();
@@ -163,7 +163,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         assertFalse(toolbar.isPreviousSuccessfulBuildLinkPresent());
 
         toolbar.clickNextSuccessfulBuildLink();
-        BuildSummaryPage page = browser.createPage(BuildSummaryPage.class, projectName, 2L);
+        BuildSummaryPage page = getBrowser().createPage(BuildSummaryPage.class, projectName, 2L);
         page.waitFor();
 
         toolbar.waitForBuildNav();
@@ -176,7 +176,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         toolbar.clickLatestBuildLink();
 
-        page = browser.createPage(BuildSummaryPage.class, projectName, 6L);
+        page = getBrowser().createPage(BuildSummaryPage.class, projectName, 6L);
         page.waitFor();
 
         toolbar.waitForBuildNav();
@@ -198,7 +198,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         // user needs 'run personal build' permissions.
         ensureUserCanRunPersonalBuild(userName);
 
-        assertTrue(browser.login(userName, ""));
+        assertTrue(getBrowser().login(userName, ""));
         xmlRpcHelper.login(userName, "");
 
         File workingCopy = createTempDirectory();
@@ -212,7 +212,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         PersonalBuildRunner buildRunner = new PersonalBuildRunner(xmlRpcHelper);
         buildRunner.setBase(workingCopy);
-        buildRunner.createConfigFile(browser.getBaseUrl(), userName, "", projectName);
+        buildRunner.createConfigFile(getBrowser().getBaseUrl(), userName, "", projectName);
 
         doTestNoPersonalBuilds();
 
@@ -234,7 +234,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestNoPersonalBuilds()
     {
-        browser.openAndWaitFor(MyBuildsPage.class);
+        getBrowser().openAndWaitFor(MyBuildsPage.class);
 
         assertTrue(toolbar.isMyBuildsLinkPresent());
         assertFalse(toolbar.isBuildNavPresent());
@@ -243,7 +243,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestSinglePersonalBuild()
     {
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, 1L);
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, 1L);
 
         toolbar.waitForBuildNav();
 
@@ -253,7 +253,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestMultiplePersonalBuilds()
     {
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
 
         toolbar.waitForBuildNav();
 
@@ -266,7 +266,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
         // check navigation
         toolbar.clickBuildNavItem(5);
-        PersonalBuildSummaryPage page = browser.createPage(PersonalBuildSummaryPage.class, 5L);
+        PersonalBuildSummaryPage page = getBrowser().createPage(PersonalBuildSummaryPage.class, 5L);
         page.waitFor();
 
         toolbar.waitForBuildNav();
@@ -277,7 +277,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
 
     private void doTestPersonalPopupMenu()
     {
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, 3L);
 
         toolbar.waitForBuildNav();
 
@@ -291,7 +291,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         assertFalse(toolbar.isNextBrokenBuildLinkPresent());
         assertFalse(toolbar.isPreviousBrokenBuildLinkPresent());
 
-        browser.openAndWaitFor(PersonalBuildSummaryPage.class, 1L);
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, 1L);
         toolbar.waitForBuildNav();
         toolbar.clickOnNavMenu();
 
@@ -299,7 +299,7 @@ public class BuildNavigationAcceptanceTest extends SeleniumTestBase
         assertFalse(toolbar.isPreviousSuccessfulBuildLinkPresent());
 
         toolbar.clickNextSuccessfulBuildLink();
-        BuildSummaryPage page = browser.createPage(PersonalBuildSummaryPage.class, 2L);
+        BuildSummaryPage page = getBrowser().createPage(PersonalBuildSummaryPage.class, 2L);
         page.waitFor();
 
         toolbar.waitForBuildNav();

@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class RssAcceptanceTest extends AcceptanceTestBase
 {
     private static final Messages I18N = Messages.getInstance(BuildResultsRssAction.class);
 
@@ -101,7 +101,7 @@ public class RssAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private SyndFeed readFeed(String path) throws FeedException, IOException
     {
-        String content = AcceptanceTestUtils.readUriContent(baseUrl + path);
+        String content = AcceptanceTestUtils.readUriContent(baseUrl + "/" + path);
         return new SyndFeedInput().build(new XmlReader(new ByteArrayInputStream(content.getBytes())));
     }
 }

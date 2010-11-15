@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
@@ -9,10 +8,12 @@ import com.zutubi.util.Condition;
 
 import java.util.Hashtable;
 
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+
 /**
  * Tests the initialisation/destroy cycle for projects.
  */
-public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
+public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
 {
     @Override
     protected void setUp() throws Exception
@@ -88,8 +89,8 @@ public class ProjectLifecycleAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.waitForProjectToInitialise(random);
 
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(ProjectLogPage.class, project);
-        assertTrue(browser.isTextPresent("Reinitialising"));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(ProjectLogPage.class, project);
+        assertTrue(getBrowser().isTextPresent("Reinitialising"));
     }
 }

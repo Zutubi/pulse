@@ -12,6 +12,8 @@ public class IDs
     public static String COLLECTION_TABLE = "config-table";
     public static String LINKS_BOX = "config-links";
     public static String STATUS_MESSAGE = "status-message";
+    public static String GENERIC_ERROR = "generic-error";
+    public static String ACTION_ERRORS = "action-errors";
 
     private static String buildTab(String name)
     {

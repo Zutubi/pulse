@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 import freemarker.template.utility.StringUtil;
@@ -35,10 +36,13 @@ public class SeleniumBrowser
 {
     private static final String PROPERTY_SELENIUM_BROWSER = "SELENIUM_BROWSER";
 
-    public static final String DEFAULT_TIMEOUT = "60000";
+    public static final long DEFAULT_TIMEOUT = 60000;
     public static final long PAGELOAD_TIMEOUT = 60000;
     public static final long WAITFOR_TIMEOUT = 60000;
     public static final long REFRESH_TIMEOUT = 60000;
+
+    public static final long WAITFOR_INTERVAL = 300;
+    public static final long REFRESH_INTERVAL = 1000;
 
     private static final int SELENIUM_PORT = 4446;
     
@@ -87,7 +91,7 @@ public class SeleniumBrowser
     public SeleniumBrowser(int port, String browser)
     {
         this.browser = browser;
-        baseUrl = AcceptanceTestUtils.getPulseUrl(port) + "/";
+        baseUrl = AcceptanceTestUtils.getPulseUrl(port);
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
         urls = new Urls(baseUrl);
     }
@@ -95,11 +99,6 @@ public class SeleniumBrowser
     public String getBaseUrl()
     {
         return baseUrl;
-    }
-
-    public Urls getUrls()
-    {
-        return urls;
     }
 
     /**
@@ -119,7 +118,7 @@ public class SeleniumBrowser
         if (!started)
         {
             selenium.start();
-            selenium.setTimeout(DEFAULT_TIMEOUT);
+            selenium.setTimeout(String.valueOf(DEFAULT_TIMEOUT));
             started = true;
         }
     }
@@ -256,7 +255,6 @@ public class SeleniumBrowser
     {
         T page = createPage(pageType, extraArgs);
         page.open();
-        page.waitForPageToLoad();
         page.waitFor();
         return page;
     }
@@ -293,7 +291,7 @@ public class SeleniumBrowser
 
     public boolean login(String username, String password)
     {
-        LoginPage page = this.openAndWaitFor(LoginPage.class);
+        LoginPage page = openAndWaitFor(LoginPage.class);
         return page.login(username, password);
     }
 
@@ -303,11 +301,15 @@ public class SeleniumBrowser
     }
 
     /**
-     * Click the logout link on the browser and wait for the page to load.
+     * Click the logout link on the browser and wait for the page to load. This
+     * assumes that the logout link is available.
      */
     public void logout()
     {
-        waitForElement("logout", 10000);
+        if (!isLoggedIn())
+        {
+            throw new IllegalStateException("Can not logout when no logout link is available.");
+        }
         click("//span[@id='logout']/a");
         waitForPageToLoad();
     }
@@ -352,11 +354,6 @@ public class SeleniumBrowser
         selenium.addSelection(fieldLocator, value);
     }
 
-    public void selectWindow(String title)
-    {
-        selenium.selectWindow(title);
-    }
-
     /**
      * Verifies that the specified element is somewhere on the page.
      * @param id   id identifying the element
@@ -382,6 +379,11 @@ public class SeleniumBrowser
         return selenium.isTextPresent(text);
     }
 
+    /**
+     * Check if the text matching the regex is present on the current page.
+     * @param regex  the regex
+     * @return  true if a match is present, false otherwise.
+     */
     public boolean isRegexPresent(String regex)
     {
         String bodyText = selenium.getBodyText();
@@ -449,8 +451,8 @@ public class SeleniumBrowser
     public String getText(String locator)
     {
         // I've experienced Selenium throwing errors from getText saying the
-        // element cannot be found, despite an immediately preceeding call to
-        // isELementPresent returning true.  This was on a page with no
+        // element cannot be found, despite an immediately preceding call to
+        // isElementPresent returning true.  This was on a page with no
         // JavaScript magic.  The ugliness below is intended to work around
         // this.  It's not a replacement for waiting for an element to be
         // present first.
@@ -482,11 +484,6 @@ public class SeleniumBrowser
         // Give it one more go - if selenium throws the caller gets it full in
         // the face this time.
         return selenium.getText(locator);
-    }
-
-    public String[] getAllWindowTitles()
-    {
-        return selenium.getAllWindowTitles();
     }
 
     public String getAttribute(String locator)
@@ -591,29 +588,24 @@ public class SeleniumBrowser
         waitForLocator(locator, false);
     }
     
-    public void waitForLocator(String locator, boolean invert)
+    public void waitForLocator(final String locator, final boolean invert)
     {
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < WAITFOR_TIMEOUT)
+        try
         {
-            boolean present = selenium.isElementPresent(locator);
-            if (present && !invert || !present && invert)
+            TestUtils.waitForCondition(new Condition()
             {
-                return;
-            }
-
-            try
-            {
-                Thread.sleep(300);
-            }
-            catch (InterruptedException e)
-            {
-                // Ignore
-            }
+                public boolean satisfied()
+                {
+                    boolean present = selenium.isElementPresent(locator);
+                    return (present && !invert || !present && invert);
+                }
+            }, WAITFOR_TIMEOUT, WAITFOR_INTERVAL, "locator '" + locator + "' to be present.");
         }
-
-        File failureFile = captureFailure();
-        throw new SeleniumException("Timeout out after " + WAITFOR_TIMEOUT + "ms (see: " + failureFile.getName() + ")");
+        catch (TimeoutException e)
+        {
+            File failureFile = captureFailure();
+            throw new SeleniumException(e.getMessage() + " (see: " + failureFile.getName() + ")");
+        }
     }
 
     public void waitForCondition(String condition)
@@ -630,7 +622,7 @@ public class SeleniumBrowser
         catch (SeleniumException e)
         {
             File failureFile = captureFailure();
-            throw new RuntimeException("Selenium timeout (see: " + failureFile.getName() + "): " + e.getMessage(), e);
+            throw new SeleniumException("Selenium timeout (see: " + failureFile.getName() + "): " + e.getMessage(), e);
         }
     }
 
@@ -644,12 +636,12 @@ public class SeleniumBrowser
                 {
                     return selenium.isVisible(locator);
                 }
-            }, WAITFOR_TIMEOUT, "locator '" + locator + "' to become visible");
+            }, WAITFOR_TIMEOUT, "locator '" + locator + "' to become visible.");
         }
-        catch (Exception e)
+        catch (TimeoutException e)
         {
             File failureFile = captureFailure();
-            throw new RuntimeException(e.getMessage() + " (see: " + failureFile.getName() + ")", e);
+            throw new SeleniumException(e.getMessage() + " (see: " + failureFile.getName() + ")", e);
         }
     }
 
@@ -718,10 +710,12 @@ public class SeleniumBrowser
 
     public void refreshUntil(long timeout, Condition condition, String conditionText)
     {
-        long startTime = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis() + timeout;
+        
         while (!condition.satisfied())
         {
-            if (System.currentTimeMillis() - startTime > timeout)
+            long remainingTime = endTime - System.currentTimeMillis();
+            if (remainingTime <= 0)
             {
                 File failureFile = captureFailure();
                 throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText + " (see: " + failureFile.getName() + ")");
@@ -729,7 +723,7 @@ public class SeleniumBrowser
 
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(REFRESH_INTERVAL);
             }
             catch (InterruptedException e)
             {
@@ -739,7 +733,7 @@ public class SeleniumBrowser
             selenium.refresh();
             try
             {
-                selenium.waitForPageToLoad(String.valueOf(REFRESH_TIMEOUT));
+                selenium.waitForPageToLoad(String.valueOf(remainingTime));
             }
             catch (Exception e)
             {
@@ -748,27 +742,16 @@ public class SeleniumBrowser
         }
     }
 
-    public File captureScreenshot()
+    public void captureScreenshot(File screenshotFile)
     {
-        int i = 1;
-        File screenshotFile;
-        do
-        {
-            screenshotFile = new File("working", "screenshot-" + i + ".png");
-            i++;
-        }
-        while(screenshotFile.exists());
-
         try
         {
             selenium.captureScreenshot(screenshotFile.getCanonicalPath());
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new SeleniumException(e);
         }
-
-        return screenshotFile;
     }
 
     public File captureFailure()
@@ -793,7 +776,6 @@ public class SeleniumBrowser
             {
                 StringWriter stringWriter = new StringWriter();
                 PrintWriter printWriter = new PrintWriter(stringWriter);
-
                 printWriter.println("Unable to get body text using selenium:");
                 e.printStackTrace(printWriter);
                 text = stringWriter.toString();

@@ -18,7 +18,7 @@ import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import static com.zutubi.util.CollectionUtils.asPair;
 
-public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 {
     private File tmpDir;
     private String projectName;
@@ -30,7 +30,7 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         super.setUp();
 
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
 
         Repository repository = new Repository();
         repository.clean();
@@ -50,9 +50,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     @Override
     protected void tearDown() throws Exception
     {
-        removeDirectory(tmpDir);
+        xmlRpcHelper.cancelIncompleteBuilds();
+        xmlRpcHelper.logout();
 
-        logout();
+        removeDirectory(tmpDir);
 
         super.tearDown();
     }
@@ -304,10 +305,10 @@ public class RebuildDependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testTransientArtifactDeliveryForMetaBuild() throws Exception
     {
         // require 2 agents for concurrent builds of project A and project B.
-        xmlRpcHelper.ensureAgent(SeleniumTestBase.AGENT_NAME);
+        xmlRpcHelper.ensureAgent(AGENT_NAME);
         // Ensure that the agent is online and available for the build.  Starting the
         // build without the agent available will result in hung builds.
-        xmlRpcHelper.waitForAgentToBeIdle(SeleniumTestBase.AGENT_NAME);
+        xmlRpcHelper.waitForAgentToBeIdle(AGENT_NAME);
 
         // project A -> project B -> project C
         DepAntProject projectA = projects.createDepAntProject(projectName + "A");

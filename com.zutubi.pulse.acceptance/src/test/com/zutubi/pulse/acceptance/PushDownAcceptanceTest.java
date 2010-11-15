@@ -6,12 +6,13 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 
 import java.util.ArrayList;
+
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import static java.util.Arrays.asList;
 
-public class PushDownAcceptanceTest extends SeleniumTestBase
+public class PushDownAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROPERTY_NAME   = "aprop";
     private static final String TEST_PROPERTY_VALUE  = "value";
@@ -35,10 +36,10 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         String child = random + "-child";
         setupHierarchy(parent, child);
 
-        String labelPath = insertLabel(parent, createLabel("foo"));
+        String labelPath = xmlRpcHelper.addLabel(parent, "foo");
         String childLabelPath = labelPath.replace(parent, child);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertPushDownAvailability(childLabelPath, false);
     }
 
@@ -48,18 +49,18 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         String child = random + "-child";
         setupHierarchy(parent, child);
 
-        String labelPath = insertLabel(parent, createLabel("foo"));
+        String labelPath = xmlRpcHelper.addLabel(parent, "foo");
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertPushDownAvailability(labelPath, true);
     }
 
     private void assertPushDownAvailability(String path, boolean expectedAvailable)
     {
-        ListPage labelsPage = browser.openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
+        ListPage labelsPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(path));
         String baseName = PathUtils.getBaseName(path);
         assertTrue(labelsPage.isItemPresent(baseName));
-        assertEquals(expectedAvailable, browser.isElementIdPresent(labelsPage.getActionId(ConfigurationRefactoringManager.ACTION_PUSH_DOWN, baseName)));
+        assertEquals(expectedAvailable, getBrowser().isElementIdPresent(labelsPage.getActionId(ConfigurationRefactoringManager.ACTION_PUSH_DOWN, baseName)));
     }
 
     public void testPushDown() throws Exception
@@ -75,7 +76,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         listPage.waitFor();
         assertFalse(listPage.isItemPresent(TEST_PROPERTY_NAME));
 
-        listPage = browser.openAndWaitFor(ListPage.class, listPage.getPath().replace(parent, child));
+        listPage = getBrowser().openAndWaitFor(ListPage.class, listPage.getPath().replace(parent, child));
         assertTrue(listPage.isItemPresent(TEST_PROPERTY_NAME));
         assertFalse(listPage.isAnnotationPresent(TEST_PROPERTY_NAME, ListPage.ANNOTATION_INHERITED));
     }
@@ -95,7 +96,7 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         assertTrue(listPage.isItemPresent(TEST_PROPERTY_NAME));
 
         // Also try from property's own page.
-        CompositePage propertyPage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(listPage.getPath(), TEST_PROPERTY_NAME));
+        CompositePage propertyPage = getBrowser().openAndWaitFor(CompositePage.class, PathUtils.getPath(listPage.getPath(), TEST_PROPERTY_NAME));
         propertyPage.clickAction(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
         pushDownForm.waitFor();
         pushDownForm.cancelFormElements(parent);
@@ -107,8 +108,8 @@ public class PushDownAcceptanceTest extends SeleniumTestBase
         setupHierarchy(parent, child);
         String propertyPath = xmlRpcHelper.insertProjectProperty(parent, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
-        browser.loginAsAdmin();
-        ListPage propertyList = browser.openAndWaitFor(ListPage.class, getParentPath(propertyPath));
+        getBrowser().loginAsAdmin();
+        ListPage propertyList = getBrowser().openAndWaitFor(ListPage.class, getParentPath(propertyPath));
         assertTrue(propertyList.isItemPresent(TEST_PROPERTY_NAME));
         assertTrue(propertyList.isActionLinkPresent(TEST_PROPERTY_NAME, ConfigurationRefactoringManager.ACTION_PUSH_DOWN));
         return propertyList;

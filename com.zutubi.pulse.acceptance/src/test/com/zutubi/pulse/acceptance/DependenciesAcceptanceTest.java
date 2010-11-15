@@ -30,7 +30,7 @@ import static com.zutubi.util.Constants.MEGABYTE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class DependenciesAcceptanceTest extends AcceptanceTestBase
 {
     private Repository repository;
     private String randomName;
@@ -44,7 +44,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         super.setUp();
 
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
 
         repository = new Repository();
         repository.clean();
@@ -64,7 +64,7 @@ public class DependenciesAcceptanceTest extends BaseXmlRpcAcceptanceTest
     @Override
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
 
         removeDirectory(tmp);
 

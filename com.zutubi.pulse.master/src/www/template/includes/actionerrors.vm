@@ -2,7 +2,7 @@
 #if($actionErrors && $actionErrors.size() > 0)
     #set($actionErrorDetected = true)
 
-    <ul class="error">
+    <ul id="action-errors" class="error">
 #foreach($error in $actionErrors)
         <li class="error">$!webwork.htmlEncode($error)</li>
 #end

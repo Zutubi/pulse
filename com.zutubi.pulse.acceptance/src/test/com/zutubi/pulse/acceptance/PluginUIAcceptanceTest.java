@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 
@@ -13,12 +14,11 @@ import java.util.Vector;
 
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
-import com.zutubi.pulse.core.test.TestUtils;
 
 /**
  * Tests for the plugin management UI.
  */
-public class PluginUIAcceptanceTest extends SeleniumTestBase
+public class PluginUIAcceptanceTest extends AcceptanceTestBase
 {
     private static final String STATE_ENABLED      = "enabled";
     private static final String STATE_DISABLING    = "disabling";
@@ -43,8 +43,8 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testAllPlugins() throws Exception
     {
-        browser.loginAsAdmin();
-        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
+        getBrowser().loginAsAdmin();
+        PluginsPage pluginsPage = getBrowser().openAndWaitFor(PluginsPage.class);
         assertTrue(pluginsPage.isPluginPresent(ID_COMMANDS_CORE));
         assertFalse(pluginsPage.isActionPresent(ID_COMMANDS_CORE, ACTION_ENABLE));
         assertTrue(pluginsPage.isActionPresent(ID_COMMANDS_CORE, ACTION_DISABLE));
@@ -63,7 +63,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
         try
         {
-            ensureAgent(AGENT_NAME);
+            xmlRpcHelper.ensureAgent(AGENT_NAME);
 
             final String id = getRandomId();
             PluginsPage pluginsPage = installPlugin(id);
@@ -108,8 +108,8 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     public void testCancelInstallPlugin() throws Exception
     {
-        browser.loginAsAdmin();
-        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
+        getBrowser().loginAsAdmin();
+        PluginsPage pluginsPage = getBrowser().openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();
         form.cancel();
@@ -122,7 +122,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        browser.waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
+        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
 
         assertEquals(STATE_DISABLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -139,11 +139,11 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        browser.waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
+        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
 
         pluginsPage.clickEnable(id);
 
-        browser.waitForLocator(pluginsPage.getActionId(ACTION_DISABLE, id));
+        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_DISABLE, id));
 
         assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
         assertTrue(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -160,7 +160,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickUninstall(id);
 
-        browser.waitForLocator(pluginsPage.getActionId(ACTION_UNINSTALL, id), true);
+        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_UNINSTALL, id), true);
 
         assertEquals(STATE_UNINSTALLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_ENABLE));
@@ -176,8 +176,8 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     {
         File testPlugin = makeTestPlugin(id, getRandomProcessorName());
 
-        browser.loginAsAdmin();
-        PluginsPage pluginsPage = browser.openAndWaitFor(PluginsPage.class);
+        getBrowser().loginAsAdmin();
+        PluginsPage pluginsPage = getBrowser().openAndWaitFor(PluginsPage.class);
         InstallPluginForm form = pluginsPage.clickInstall();
         form.waitFor();
         form.continueFormElements(testPlugin.getAbsolutePath());

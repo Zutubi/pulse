@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 
-public class ArtifactRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 {
     private String random = null;
     private Repository repository = null;

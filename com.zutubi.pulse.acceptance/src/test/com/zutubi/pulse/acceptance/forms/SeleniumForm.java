@@ -6,6 +6,8 @@ import junit.framework.Assert;
 
 import java.util.List;
 
+import static com.zutubi.util.StringUtils.stripLineBreaks;
+
 /**
  * Base for form classes: supports methods for reading and writing fields and
  * submitting forms.
@@ -370,6 +372,83 @@ public abstract class SeleniumForm
             }
         }, formValues);
         return formValues;
+    }
+
+    /**
+     * Returns true if the forms field values match the given set of values.
+     *
+     * @param values the values being matched against the forms field values.
+     *
+     * @return true if the values match, false otherwise.
+     */
+    public boolean checkFormValues(String... values)
+    {
+        if (!isFormPresent())
+        {
+            return false;
+        }
+
+        int[] types = getActualFieldTypes();
+        if (values.length != types.length)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < types.length; i++)
+        {
+            if (values[i] != null)
+            {
+                String fieldName = getActualFieldNames()[i];
+                switch (types[i])
+                {
+                    case SeleniumForm.TEXTFIELD:
+                        if (!ObjectUtils.equals(stripLineBreaks(values[i]), stripLineBreaks(getFieldValue(fieldName))))
+                        {
+                            return false;
+                        }
+                        break;
+
+                    case SeleniumForm.CHECKBOX:
+                        String expectedValue = Boolean.valueOf(values[i]) ? "on" : "off";
+                        if (!ObjectUtils.equals(expectedValue, getFieldValue(fieldName)))
+                        {
+                             return false;
+                        }
+                        break;
+
+                    case SeleniumForm.COMBOBOX:
+                        if (!ObjectUtils.equals(values[i], getFieldValue(fieldName)))
+                        {
+                            return false;
+                        }
+                        break;
+
+                    case SeleniumForm.ITEM_PICKER:
+                    case SeleniumForm.MULTI_CHECKBOX:
+                    case SeleniumForm.MULTI_SELECT:
+                        if (values[i] != null)
+                        {
+                            String[] expected = convertMultiValue(values[i]);
+                            String fieldValue = getFieldValue(fieldName);
+                            String[] gotValues = fieldValue.length() == 0 ? new String[0] : fieldValue.split(",");
+                            if (expected.length != gotValues.length)
+                            {
+                                return false;
+                            }
+                            for (int j = 0; j < expected.length; j++)
+                            {
+                                if (!ObjectUtils.equals(expected[j], gotValues[j]))
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    default:
+                        break;
+                }
+            }
+        }
+        return true;
     }
 
     public void setMultiValues(String name, String values)

@@ -2,6 +2,4 @@
 
 #parse("/template/includes/actionerrors.vm")
 
-<p id="generic-error">
-    #wwtext("name=error.advice")
-</p>
+<p id="generic-error">#wwtext("name=error.advice")</p>

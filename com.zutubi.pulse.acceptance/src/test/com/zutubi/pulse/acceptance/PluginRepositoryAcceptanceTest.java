@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-public class PluginRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
 {
     private static final String ID_CORE_COMMANDS = "com.zutubi.pulse.core.commands.core";
     private static final String ID_EMAIL_HOOK_TASK = "com.zutubi.pulse.master.hook.email";
@@ -22,7 +22,7 @@ public class PluginRepositoryAcceptanceTest extends BaseXmlRpcAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        repository = new HttpPluginRepository(baseUrl + "pluginrepository/");
+        repository = new HttpPluginRepository(baseUrl + "/pluginrepository/");
         xmlRpcHelper.loginAsAdmin();
     }
 

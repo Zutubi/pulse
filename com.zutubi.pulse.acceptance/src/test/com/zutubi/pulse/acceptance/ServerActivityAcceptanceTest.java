@@ -15,7 +15,7 @@ import java.util.Vector;
 /**
  * Acceptance tests for the server/activity page.
  */
-public class ServerActivityAcceptanceTest extends SeleniumTestBase
+public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 {
     private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
@@ -31,7 +31,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
@@ -56,7 +56,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     public void testEmptyActivityTables()
     {
-        browser.openAndWaitFor(ServerActivityPage.class);
+        getBrowser().openAndWaitFor(ServerActivityPage.class);
         assertEmptyTable(ID_BUILD_QUEUE_TABLE, "build queue", BuildQueueTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActiveBuildsTable.EMPTY_MESSAGE);
         assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "stage queue", "no stages queued");
@@ -67,7 +67,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // we use contains here since the recipe queue table header gets merged with the
         // pause action when returned by selenium.
         assertTrue(new Table(id).getHeader().contains(header));
-        assertEquals(message, browser.getCellContents(id, 2, 0));
+        assertEquals(message, getBrowser().getCellContents(id, 2, 0));
     }
 
     /**
@@ -82,7 +82,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         createAndTriggerProjectBuild();
 
-        browser.openAndWaitFor(ServerActivityPage.class);
+        getBrowser().openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         assertEquals(1, activeBuildsTable.getRowCount());
@@ -101,14 +101,14 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
     {
         createAndTriggerProjectBuild();
 
-        browser.openAndWaitFor(ServerActivityPage.class);
+        getBrowser().openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         activeBuildsTable.clickCancel(random, 1);
 
         xmlRpcHelper.waitForBuildToComplete(random, 1);
-        browser.openAndWaitFor(BuildSummaryPage.class, random, 1L);
-        assertTrue(browser.isTextPresent("Forceful termination requested by 'admin'"));
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, random, 1L);
+        assertTrue(getBrowser().isTextPresent("Forceful termination requested by 'admin'"));
     }
 
     /**
@@ -126,11 +126,11 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         // build 2 goes into the build queue.
         triggerBuild(false);
 
-        browser.openAndWaitFor(ServerActivityPage.class);
+        getBrowser().openAndWaitFor(ServerActivityPage.class);
 
         verifyQueuedBuildViaRemoteApi();
 
-        browser.openAndWaitFor(ServerActivityPage.class);
+        getBrowser().openAndWaitFor(ServerActivityPage.class);
 
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         waitForQueueCount(activeBuildsTable, 1);
@@ -228,7 +228,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
     private void waitForQueueCount(final Table queueTable, final int count)
     {
-        browser.refreshUntil(TIMEOUT, new Condition()
+        getBrowser().refreshUntil(TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
@@ -271,7 +271,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         public String getHeader()
         {
-            return browser.getCellContents(id, 0, 0);
+            return getBrowser().getCellContents(id, 0, 0);
         }
 
         /**
@@ -284,7 +284,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
         {
             try
             {
-                return browser.getCellContents(id, row + 1, column - 1);
+                return getBrowser().getCellContents(id, row + 1, column - 1);
             }
             catch (Exception e)
             {
@@ -299,7 +299,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
             {
                 try
                 {
-                    browser.getCellContents(id, count + 2, 0);
+                    getBrowser().getCellContents(id, count + 2, 0);
                     count++;
                 }
                 catch (Exception e)
@@ -402,7 +402,7 @@ public class ServerActivityAcceptanceTest extends SeleniumTestBase
 
         public void clickCancel(String owner, long number)
         {
-            browser.click("cancel.active." + owner + "." + Long.toString(number));
+            getBrowser().click("cancel.active." + owner + "." + Long.toString(number));
         }
     }
 }

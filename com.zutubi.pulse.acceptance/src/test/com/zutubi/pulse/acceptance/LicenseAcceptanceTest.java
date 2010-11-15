@@ -13,18 +13,19 @@ import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.Hashtable;
 
+import static com.zutubi.util.CollectionUtils.asPair;
+
 /**
  * Test for managing the server license and ensuring the licenses are
  * enforced.
  */
-public class LicenseAcceptanceTest extends SeleniumTestBase
+public class LicenseAcceptanceTest extends AcceptanceTestBase
 {
     private static final String LICENSE_PATH = "settings/license";
     private static final int BUILD_TIMEOUT = 90000;
@@ -33,7 +34,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
@@ -55,7 +56,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         CompositePage licensePage = goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
-        browser.waitForElement(licensePage.getStateFieldId("name"));
+        getBrowser().waitForElement(licensePage.getStateFieldId("name"));
         assertEquals(random, licensePage.getStateField("name"));
     }
 
@@ -66,13 +67,13 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         CompositePage licensePage = goToLicensePage();
         LicenseForm form = setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
-        browser.waitForElement(licensePage.getStateFieldId("expiry"));
+        getBrowser().waitForElement(licensePage.getStateFieldId("expiry"));
         assertFalse(licensePage.isStateFieldPresent("supportExpiry"));
 
         form.waitFor();
         form.applyFormElements(LicenseHelper.newLicenseKey(LicenseType.ENTERPRISE, random, tomorrow()));
 
-        browser.waitForElement(licensePage.getStateFieldId("supportExpiry"));
+        getBrowser().waitForElement(licensePage.getStateFieldId("supportExpiry"));
         assertFalse(licensePage.isStateFieldPresent("expiry"));
     }
 
@@ -81,10 +82,10 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, twoDaysAgo()));
 
-        browser.open(urls.base());
-        browser.waitForElement("license-expired");
-        assertTrue(browser.isTextPresent("Your license has expired."));
-        assertFalse(browser.isElementIdPresent("support-expired"));
+        getBrowser().open(urls.base());
+        getBrowser().waitForElement("license-expired");
+        assertTrue(getBrowser().isTextPresent("Your license has expired."));
+        assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should be ignored
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -96,26 +97,26 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
-        browser.openAndWaitFor(WelcomePage.class);
+        getBrowser().openAndWaitFor(WelcomePage.class);
 
         int tried = 0;
         Condition condition = new Condition()
         {
             public boolean satisfied()
             {
-                return browser.isElementIdPresent("support-expired");
+                return getBrowser().isElementIdPresent("support-expired");
             }
         };
 
         while (!condition.satisfied() && tried < 3)
         {
-            browser.openAndWaitFor(WelcomePage.class);
+            getBrowser().openAndWaitFor(WelcomePage.class);
             tried++;
         }
 
         assertTrue(condition.satisfied());
-        assertTrue(browser.isTextPresent("support/upgrades have expired"));
-        assertFalse(browser.isElementIdPresent("license-expired"));
+        assertTrue(getBrowser().isTextPresent("support/upgrades have expired"));
+        assertFalse(getBrowser().isElementIdPresent("license-expired"));
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -127,11 +128,11 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, new Date(System.currentTimeMillis() - 999999 * Constants.DAY)));
 
-        browser.open(urls.base());
-        browser.waitForElement("license-cannot-run");
-        assertTrue(browser.isTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date."));
-        assertFalse(browser.isElementIdPresent("license-expired"));
-        assertFalse(browser.isElementIdPresent("support-expired"));
+        getBrowser().open(urls.base());
+        getBrowser().waitForElement("license-cannot-run");
+        assertTrue(getBrowser().isTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date."));
+        assertFalse(getBrowser().isElementIdPresent("license-expired"));
+        assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -148,9 +149,10 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         assertExceeded();
 
         // Adding a project should fail
-        AddProjectWizard.CommandState state = runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
+        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
+        AddProjectWizard.CommandState state = webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
         state.waitFor();
-        assertTrue(browser.isTextPresent("Unable to add project: license limit exceeded"));
+        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
     }
 
     public void testAgentsExceeded() throws Exception
@@ -162,13 +164,13 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         assertExceeded();
 
         // Adding an agent should fail
-        AgentHierarchyPage hierarchyPage = browser.openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
+        AgentHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         hierarchyPage.clickAdd();
-        AgentForm form = browser.createForm(AgentForm.class, true);
+        AgentForm form = getBrowser().createForm(AgentForm.class, true);
         form.waitFor();
         form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
         form.waitFor();
-        assertTrue(browser.isTextPresent("Unable to add agent: license limit exceeded"));
+        assertTrue(getBrowser().isTextPresent("Unable to add agent: license limit exceeded"));
     }
 
     public void testUsersExceeded() throws Exception
@@ -180,13 +182,13 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         assertExceeded();
 
         // Adding a user should fail
-        UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
+        UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
         usersPage.clickAdd();
-        AddUserForm form = browser.createForm(AddUserForm.class);
+        AddUserForm form = getBrowser().createForm(AddUserForm.class);
         form.waitFor();
         form.finishNamedFormElements(asPair("login", random), asPair("name", random), asPair("emailAddress", random + "@example.com"));
         form.waitFor();
-        assertTrue(browser.isTextPresent("Unable to add user: license limit exceeded"));
+        assertTrue(getBrowser().isTextPresent("Unable to add user: license limit exceeded"));
     }
 
     public void testEnforcedViaRemoteApi() throws Exception
@@ -210,14 +212,14 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         int projectCount = xmlRpcHelper.getProjectCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount - 1, -1, -1));
 
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = browser.createForm(CloneForm.class, false);
+        CloneForm cloneForm = getBrowser().createForm(CloneForm.class, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();
-        assertTrue(browser.isTextPresent("Unable to add project: license limit exceeded"));
+        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
     }
 
     private Date tomorrow()
@@ -239,12 +241,12 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private CompositePage goToLicensePage()
     {
-        return browser.openAndWaitFor(CompositePage.class, LICENSE_PATH);
+        return getBrowser().openAndWaitFor(CompositePage.class, LICENSE_PATH);
     }
 
     private LicenseForm setLicenseViaUI(String license)
     {
-        LicenseForm form = browser.createForm(LicenseForm.class);
+        LicenseForm form = getBrowser().createForm(LicenseForm.class);
         form.waitFor();
         form.applyFormElements(license);
         return form;
@@ -252,9 +254,9 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private void assertExceeded() throws Exception
     {
-        browser.open(urls.base());
-        browser.refreshUntilElement("license-exceeded");
-        assertTrue(browser.isTextPresent("Your license limits have been exceeded."));
+        getBrowser().open(urls.base());
+        getBrowser().refreshUntilElement("license-exceeded");
+        assertTrue(getBrowser().isTextPresent("Your license limits have been exceeded."));
 
         // No builds for you!
         assertTriggersIgnored();
@@ -272,9 +274,9 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private void assertTriggers(boolean ignored) throws Exception
     {
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         home.waitFor();
         if (ignored)
         {

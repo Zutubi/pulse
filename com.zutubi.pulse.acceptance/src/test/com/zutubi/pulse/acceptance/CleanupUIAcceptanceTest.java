@@ -1,15 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import com.zutubi.pulse.acceptance.forms.admin.CleanupForm;
 import com.zutubi.pulse.acceptance.pages.admin.CleanupRulesPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The acceptance tests that run through the cleanup web ui.
  */
-public class CleanupUIAcceptanceTest extends SeleniumTestBase
+public class CleanupUIAcceptanceTest extends AcceptanceTestBase
 {
     @Override
     protected void setUp() throws Exception
@@ -27,18 +28,18 @@ public class CleanupUIAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
-    public void testCreateNewCleanupRule()
+    public void testCreateNewCleanupRule() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
 
         CleanupRulesPage cleanupRulesPage = projectPage.clickCleanupAndWait();
         cleanupRulesPage.clickAdd();
 
-        CleanupForm cleanup = browser.createForm(CleanupForm.class);
+        CleanupForm cleanup = getBrowser().createForm(CleanupForm.class);
         cleanup.waitFor();
         cleanup.finishNamedFormElements(asPair(NAME, "new rule"), asPair(RETAIN, "1"), asPair(CLEANUP_ALL, "true"));
 

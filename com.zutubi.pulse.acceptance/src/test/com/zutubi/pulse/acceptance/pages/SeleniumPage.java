@@ -98,7 +98,7 @@ public abstract class SeleniumPage
 
     public String getTitle()
     {
-        return title;
+        return TITLE_PREFIX + title;
     }
 
     public boolean isElementIdPresent(String id)

@@ -7,7 +7,7 @@ import com.zutubi.util.Condition;
 /**
  * A sanity check to ensure that the hibernate statistics are displayable.
  */
-public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
+public class HibernateStatisticsAcceptanceTest extends AcceptanceTestBase
 {
     private static final int TIMEOUT = 60000;
 
@@ -16,12 +16,12 @@ public class HibernateStatisticsAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
     }
 
     public void testCanViewStatistics() throws Exception
     {
-        final HibernateStatisticsPage statsPage = browser.openAndWaitFor(HibernateStatisticsPage.class);
+        final HibernateStatisticsPage statsPage = getBrowser().openAndWaitFor(HibernateStatisticsPage.class);
         assertTrue(statsPage.isPresent());
         assertFalse(statsPage.isEnabled());
 

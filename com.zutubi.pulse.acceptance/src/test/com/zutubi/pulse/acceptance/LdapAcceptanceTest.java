@@ -13,7 +13,7 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 /**
  * Acceptance test for the ldap integration.
  */
-public class LdapAcceptanceTest extends SeleniumTestBase
+public class LdapAcceptanceTest extends AcceptanceTestBase
 {
     private static final String LDAP_CONFIG_PATH = "settings/ldap";
 
@@ -28,9 +28,9 @@ public class LdapAcceptanceTest extends SeleniumTestBase
 
     public void testAuthenticationViaLdap() throws Exception
     {
-        assertFalse(browser.login("user1", "user1"));
+        assertFalse(getBrowser().login("user1", "user1"));
         addUser("user1", true);
-        assertTrue(browser.login("user1", "user1"));
+        assertTrue(getBrowser().login("user1", "user1"));
     }
 
     public void testAuthenticateXmlRpcViaLdap() throws Exception
@@ -51,9 +51,9 @@ public class LdapAcceptanceTest extends SeleniumTestBase
 
     public void testAddUserViaLdap() throws Exception
     {
-        assertFalse(browser.login("user3", "user3"));
+        assertFalse(getBrowser().login("user3", "user3"));
         setAddUserViaLdap(true);
-        assertTrue(browser.login("user3", "user3"));
+        assertTrue(getBrowser().login("user3", "user3"));
     }
 
     public void testEmailContactViaLdap() throws Exception
@@ -61,7 +61,7 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
 
         setAddUserViaLdap(true);
-        assertTrue(browser.login("user3", "user3"));
+        assertTrue(getBrowser().login("user3", "user3"));
         try
         {
             xmlRpcHelper.getConfig(getPath(USERS_SCOPE, "user3", "preferences", "contacts", "LDAP email"));
@@ -72,7 +72,7 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         }
 
         setEmailAttribute("mail");
-        assertTrue(browser.login("user4", "user4"));
+        assertTrue(getBrowser().login("user4", "user4"));
 
         Hashtable<String, Object> contact = xmlRpcHelper.getConfig(getPath(USERS_SCOPE, "user4", "preferences", "contacts", "LDAP email"));
         assertEquals("mborn@example.com", contact.get("address"));
@@ -85,10 +85,10 @@ public class LdapAcceptanceTest extends SeleniumTestBase
         setAddUserViaLdap(true);
         setGroupNameAttribute("cn");
         setGroupSearchFilter("(uniquemember=${user.dn})");
-        assertTrue(browser.login("user2", "user2"));
+        assertTrue(getBrowser().login("user2", "user2"));
 
         // user 2 is an administrator in ldap, so should be able to view the admin pages.
-        GroupsPage page = browser.openAndWaitFor(GroupsPage.class);
+        GroupsPage page = getBrowser().openAndWaitFor(GroupsPage.class);
         assertTrue(page.isPresent());
     }
 

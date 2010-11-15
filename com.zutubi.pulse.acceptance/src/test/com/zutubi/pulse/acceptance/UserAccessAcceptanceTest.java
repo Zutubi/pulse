@@ -9,7 +9,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 
-public class UserAccessAcceptanceTest extends SeleniumTestBase
+public class UserAccessAcceptanceTest extends AcceptanceTestBase
 {
     @Override
     protected void setUp() throws Exception
@@ -24,9 +24,9 @@ public class UserAccessAcceptanceTest extends SeleniumTestBase
     public void testDefaultUserAccess()
     {
         // read access to the pulse ui
-        assertFalse(browser.isLoggedIn());
+        assertFalse(getBrowser().isLoggedIn());
 
-        assertTrue(browser.login(random, ""));
+        assertTrue(getBrowser().login(random, ""));
 
         assertAccessible(DashboardPage.class);
         assertAccessible(MyPreferencesPage.class);
@@ -38,13 +38,13 @@ public class UserAccessAcceptanceTest extends SeleniumTestBase
 
         assertAccessible(urls.admin());
 
-        browser.open(urls.admin());
-        browser.waitForPageToLoad();
-        assertTrue(browser.isElementIdPresent("tab.administration.projects"));
-        assertTrue(browser.isElementIdPresent("tab.administration.agents"));
-        assertFalse(browser.isElementIdPresent("tab.administration.groups"));
-        assertFalse(browser.isElementIdPresent("tab.administration.users"));
-        assertFalse(browser.isElementIdPresent("tab.administration.settings"));
+        getBrowser().open(urls.admin());
+        getBrowser().waitForPageToLoad();
+        assertTrue(getBrowser().isElementIdPresent("tab.administration.projects"));
+        assertTrue(getBrowser().isElementIdPresent("tab.administration.agents"));
+        assertFalse(getBrowser().isElementIdPresent("tab.administration.groups"));
+        assertFalse(getBrowser().isElementIdPresent("tab.administration.users"));
+        assertFalse(getBrowser().isElementIdPresent("tab.administration.settings"));
     }
 
     public void testUserXmlRpcAccess() throws Exception
@@ -72,16 +72,16 @@ public class UserAccessAcceptanceTest extends SeleniumTestBase
 
     private void assertAccessible(String url)
     {
-        browser.open(url);
-        browser.waitForPageToLoad();
+        getBrowser().open(url);
+        getBrowser().waitForPageToLoad();
 
-        LoginPage loginPage = browser.createPage(LoginPage.class);
+        LoginPage loginPage = getBrowser().createPage(LoginPage.class);
         assertFalse(loginPage.isPresent());
     }
 
     private <T extends SeleniumPage> void  assertAccessible(Class<T> page, Object... args)
     {
-        SeleniumPage p = browser.openAndWaitFor(page, args);
+        SeleniumPage p = getBrowser().openAndWaitFor(page, args);
         assertTrue(p.isPresent());
     }
 

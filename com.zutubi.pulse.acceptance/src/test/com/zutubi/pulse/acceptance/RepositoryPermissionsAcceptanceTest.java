@@ -1,27 +1,28 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.utils.Repository;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import static org.mortbay.http.HttpResponse.*;
 
-import java.io.IOException;
 import java.io.File;
-import static java.util.Arrays.asList;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTest
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static java.util.Arrays.asList;
+import static org.mortbay.http.HttpResponse.*;
+
+public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 {
     private static final boolean DEBUG = false;
 
@@ -165,14 +166,14 @@ public class RepositoryPermissionsAcceptanceTest extends BaseXmlRpcAcceptanceTes
 
     private int httpGet(String path, Credentials credentials) throws IOException
     {
-        GetMethod method = new GetMethod(baseUrl + "repository/" + path);
+        GetMethod method = new GetMethod(baseUrl + "/repository/" + path);
         method.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
         return executeMethod(method, credentials);
     }
 
     private int httpPut(String path, Credentials credentials) throws IOException
     {
-        PutMethod method = new PutMethod(baseUrl + "repository/" + path);
+        PutMethod method = new PutMethod(baseUrl + "/repository/" + path);
         method.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
         return executeMethod(method, credentials);
     }

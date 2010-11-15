@@ -4,17 +4,17 @@ import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.ByteArrayOutputStream;
 import java.util.Hashtable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 
-public class LoggingAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class LoggingAcceptanceTest extends AcceptanceTestBase
 {
     private static final String PROPERTY_LOGGING = "logging";
     private static final String PROPERTY_EVENT_LOGGING_ENABLED = "eventLoggingEnabled";
@@ -29,7 +29,7 @@ public class LoggingAcceptanceTest extends BaseXmlRpcAcceptanceTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
         disableExtraLogging();
         logDir = new File(xmlRpcHelper.getServerInfo().get(SimpleMasterConfigurationManager.CORE_PROPERTY_PULSE_LOG_DIR));
     }
@@ -38,7 +38,7 @@ public class LoggingAcceptanceTest extends BaseXmlRpcAcceptanceTest
     protected void tearDown() throws Exception
     {
         disableExtraLogging();
-        logout();
+        xmlRpcHelper.logout();
         logDir = null;
         super.tearDown();
     }

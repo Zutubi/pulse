@@ -24,7 +24,7 @@ import java.util.Hashtable;
  * Acceptance tests for actions that may be executed on configuration
  * instances.
  */
-public class ConfigActionsAcceptanceTest extends SeleniumTestBase
+public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
 {
     private static final String EXPECTED_FILE_CONTENT = "build.xml";
 
@@ -43,59 +43,59 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     public void testActionFeedbackSimple() throws Exception
     {
         xmlRpcHelper.insertSimpleProject(random, false);
-        browser.loginAsAdmin();
-        ProjectConfigPage projectConfigPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectConfigPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
-        browser.waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
+        getBrowser().waitForStatus(Messages.getInstance(ProjectConfiguration.class).format("clean.feedback"));
     }
 
     public void testCustomActionWithArgument() throws Exception
     {
         ListPage usersPage = customActionWithArgumentPrelude();
 
-        SetPasswordForm form = browser.createForm(SetPasswordForm.class);
+        SetPasswordForm form = getBrowser().createForm(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("testpw", "testpw");
 
         usersPage.waitFor();
-        browser.logout();
+        getBrowser().logout();
 
         // Login with the new password
-        assertTrue(browser.login(random, "testpw"));
+        assertTrue(getBrowser().login(random, "testpw"));
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
     {
         customActionWithArgumentPrelude();
-        SetPasswordForm form = browser.createForm(SetPasswordForm.class);
+        SetPasswordForm form = getBrowser().createForm(SetPasswordForm.class);
         form.waitFor();
         form.saveFormElements("one", "two");
         form.waitFor();
-        assertTrue(browser.isTextPresent("passwords do not match"));
+        assertTrue(getBrowser().isTextPresent("passwords do not match"));
     }
 
     public void testCustomActionWithArgumentCancel() throws Exception
     {
         customActionWithArgumentPrelude();
 
-        SetPasswordForm setPasswordForm = browser.createForm(SetPasswordForm.class);
+        SetPasswordForm setPasswordForm = getBrowser().createForm(SetPasswordForm.class);
         setPasswordForm.waitFor();
         setPasswordForm.cancelFormElements("testpw", "testpw");
 
-        UserForm userForm = browser.createForm(UserForm.class, random);
+        UserForm userForm = getBrowser().createForm(UserForm.class, random);
         userForm.waitFor();
-        browser.logout();
+        getBrowser().logout();
 
         // Check the password is unchanged
-        assertTrue(browser.login(random, ""));
+        assertTrue(getBrowser().login(random, ""));
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception
     {
         xmlRpcHelper.insertTrivialUser(random);
 
-        browser.loginAsAdmin();
-        ListPage usersPage = browser.openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
+        getBrowser().loginAsAdmin();
+        ListPage usersPage = getBrowser().openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
         usersPage.clickAction(random, "setPassword");
         return usersPage;
     }
@@ -104,7 +104,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm form = browser.createForm(CustomTypeForm.class);
+        CustomTypeForm form = getBrowser().createForm(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
@@ -112,7 +112,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements(new String[]{null});
 
         projectPage.waitFor();
-        browser.waitForLocator(projectPage.getTreeLinkLocator("custom pulse file"));
+        getBrowser().waitForLocator(projectPage.getTreeLinkLocator("custom pulse file"));
         projectPage.clickComposite("type", "custom pulse file");
 
         form.waitFor();
@@ -123,7 +123,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfigPage projectPage = prepareActionPrelude();
 
-        CustomTypeForm customForm = browser.createForm(CustomTypeForm.class);
+        CustomTypeForm customForm = getBrowser().createForm(CustomTypeForm.class);
         customForm.waitFor();
         customForm.cancelFormElements(new String[]{null});
 
@@ -132,7 +132,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isTreeLinkPresent("recipes, commands and artifacts"));
 
         projectPage.clickComposite("type", "recipes, commands and artifacts");
-        MultiRecipeTypeForm typeForm = browser.createForm(MultiRecipeTypeForm.class);
+        MultiRecipeTypeForm typeForm = getBrowser().createForm(MultiRecipeTypeForm.class);
         typeForm.waitFor();
     }
 
@@ -140,7 +140,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         prepareActionPrelude();
 
-        CustomTypeForm form = browser.createForm(CustomTypeForm.class);
+        CustomTypeForm form = getBrowser().createForm(CustomTypeForm.class);
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
@@ -148,15 +148,15 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("<?xml version=\"1.0\"?><project><nosuchtag/></project>");
         form.waitFor();
 
-        assertTrue(browser.isTextPresent("Unknown child element 'nosuchtag'"));
+        assertTrue(getBrowser().isTextPresent("Unknown child element 'nosuchtag'"));
     }
 
     private ProjectConfigPage prepareActionPrelude() throws Exception
     {
         xmlRpcHelper.insertSimpleProject(random, false);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM);
         return projectPage;
     }
@@ -168,8 +168,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentProject, true);
         xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, childProject, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, childProject, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
     }
@@ -181,8 +181,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentProject, true);
         String childPath = xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentProject, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, parentProject, false);
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
 
@@ -198,15 +198,15 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
     public void testActionsListedForAgent() throws Exception
     {
-        browser.loginAsAdmin();
-        AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.MASTER_AGENT_NAME, false);
+        getBrowser().loginAsAdmin();
+        AgentConfigPage agentPage = getBrowser().openAndWaitFor(AgentConfigPage.class, AgentManager.MASTER_AGENT_NAME, false);
         assertTrue(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
 
     public void testActionsNotListedForTemplateAgent() throws Exception
     {
-        browser.loginAsAdmin();
-        AgentConfigPage agentPage = browser.openAndWaitFor(AgentConfigPage.class, AgentManager.GLOBAL_AGENT_NAME, false);
+        getBrowser().loginAsAdmin();
+        AgentConfigPage agentPage = getBrowser().openAndWaitFor(AgentConfigPage.class, AgentManager.GLOBAL_AGENT_NAME, false);
         assertFalse(agentPage.isActionPresent(AgentConfigurationActions.ACTION_PING));
     }
 
@@ -214,8 +214,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialProject(random, false);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
     }
@@ -224,8 +224,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertSimpleProject(random, true);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, random, false);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_TRIGGER));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
@@ -239,8 +239,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
-        browser.loginAsAdmin();
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, parentName, true);
+        getBrowser().loginAsAdmin();
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, parentName, true);
         assertFalse(projectPage.isDescendantActionsPresent());
 
         String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
@@ -253,7 +253,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertDefaultAndComplexActionsNotShown(projectPage);
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
-        assertTrue(browser.isTextPresent("action 'pause' triggered on 2 descendants"));
+        assertTrue(getBrowser().isTextPresent("action 'pause' triggered on 2 descendants"));
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
@@ -266,7 +266,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
-        assertTrue(browser.isTextPresent("action 'resume' triggered on 1 descendant"));
+        assertTrue(getBrowser().isTextPresent("action 'resume' triggered on 1 descendant"));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
     }

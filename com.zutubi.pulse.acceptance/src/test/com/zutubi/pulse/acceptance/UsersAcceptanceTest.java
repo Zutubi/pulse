@@ -22,7 +22,7 @@ import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class UsersAcceptanceTest extends SeleniumTestBase
+public class UsersAcceptanceTest extends AcceptanceTestBase
 {
     private static final String STATE_LAST_ACCESS = "lastAccess";
     private static final String ACCESS_NEVER = "never";
@@ -47,17 +47,17 @@ public class UsersAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.insertTrivialUser(random);
 
-        browser.loginAsAdmin();
-        UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
+        getBrowser().loginAsAdmin();
+        UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
 
         assertTrue(usersPage.isActiveCountPresent());
         assertEquals("1 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
 
-        browser.logout();
-        assertTrue(browser.login(random, ""));
-        browser.logout();
+        getBrowser().logout();
+        assertTrue(getBrowser().login(random, ""));
+        getBrowser().logout();
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         usersPage.openAndWaitFor();
         assertEquals("2 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
     }
@@ -66,37 +66,37 @@ public class UsersAcceptanceTest extends SeleniumTestBase
     {
         String userPath = xmlRpcHelper.insertTrivialUser(random);
 
-        browser.loginAsAdmin();
-        CompositePage userPage = browser.openAndWaitFor(CompositePage.class, userPath);
+        getBrowser().loginAsAdmin();
+        CompositePage userPage = getBrowser().openAndWaitFor(CompositePage.class, userPath);
 
         assertTrue(userPage.isStateFieldPresent(STATE_LAST_ACCESS));
         assertEquals(ACCESS_NEVER, userPage.getStateField(STATE_LAST_ACCESS));
 
-        browser.logout();
-        assertTrue(browser.login(random, ""));
-        browser.logout();
+        getBrowser().logout();
+        assertTrue(getBrowser().login(random, ""));
+        getBrowser().logout();
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         userPage.openAndWaitFor();
         assertFalse(userPage.getStateField(STATE_LAST_ACCESS).equals(ACCESS_NEVER));
     }
 
     public void testLastAccessTimeForSelf()
     {
-        browser.loginAsAdmin();
-        CompositePage userPage = browser.openAndWaitFor(CompositePage.class, "users/admin");
+        getBrowser().loginAsAdmin();
+        CompositePage userPage = getBrowser().openAndWaitFor(CompositePage.class, "users/admin");
 
         assertTrue(userPage.isStateFieldPresent(STATE_LAST_ACCESS));
         assertEquals(ACCESS_NOW, userPage.getStateField(STATE_LAST_ACCESS));
 
-        browser.logout();
+        getBrowser().logout();
     }
 
     public void testPrimaryContactPointCreation()
     {
         String contactPath = createUserWithContact(random);
 
-        CompositePage emailContactPage = browser.openAndWaitFor(CompositePage.class, contactPath);
+        CompositePage emailContactPage = getBrowser().openAndWaitFor(CompositePage.class, contactPath);
         assertPrimaryContact(emailContactPage);
     }
 
@@ -125,13 +125,13 @@ public class UsersAcceptanceTest extends SeleniumTestBase
         emailConfig.put("address", "another@example.com");
         xmlRpcHelper.insertConfig(contactsPath, emailConfig);
 
-        CompositePage emailContactPage = browser.openAndWaitFor(CompositePage.class, PathUtils.getPath(contactsPath, NAME_ANOTHER));
+        CompositePage emailContactPage = getBrowser().openAndWaitFor(CompositePage.class, PathUtils.getPath(contactsPath, NAME_ANOTHER));
         assertNotPrimaryContact(emailContactPage);
 
         emailContactPage.clickActionAndWait(ContactConfigurationActions.ACTION_MARK_PRIMARY);
         assertPrimaryContact(emailContactPage);
 
-        emailContactPage = browser.openAndWaitFor(CompositePage.class, originalContactPath);
+        emailContactPage = getBrowser().openAndWaitFor(CompositePage.class, originalContactPath);
         assertNotPrimaryContact(emailContactPage);
     }
     
@@ -141,28 +141,28 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertTrivialUser(random);
         
-        assertTrue(browser.login(random, ""));
+        assertTrue(getBrowser().login(random, ""));
         
-        PreferencesPage preferencesPage = browser.openAndWaitFor(PreferencesPage.class, random);
+        PreferencesPage preferencesPage = getBrowser().openAndWaitFor(PreferencesPage.class, random);
         preferencesPage.clickAction(UserPreferencesConfigurationActions.ACTION_CHANGE_PASSWORD);
         
-        ChangePasswordForm changePasswordForm = browser.createForm(ChangePasswordForm.class);
+        ChangePasswordForm changePasswordForm = getBrowser().createForm(ChangePasswordForm.class);
         changePasswordForm.waitFor();
 
         changePasswordForm.saveFormElements("nope", NEW_PASSWORD, NEW_PASSWORD);
         changePasswordForm.waitFor();
-        assertTrue(browser.isTextPresent("password is incorrect"));
+        assertTrue(getBrowser().isTextPresent("password is incorrect"));
 
         changePasswordForm.saveFormElements("", NEW_PASSWORD, "wrong");
         changePasswordForm.waitFor();
-        assertTrue(browser.isTextPresent("new passwords do not match"));
+        assertTrue(getBrowser().isTextPresent("new passwords do not match"));
 
         changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
-        browser.waitForStatus("password changed");
-        browser.logout();
+        getBrowser().waitForStatus("password changed");
+        getBrowser().logout();
 
-        LoginPage loginPage = browser.openAndWaitFor(LoginPage.class);
-        LoginForm loginForm = browser.createForm(LoginForm.class);
+        LoginPage loginPage = getBrowser().openAndWaitFor(LoginPage.class);
+        LoginForm loginForm = getBrowser().createForm(LoginForm.class);
         loginForm.submitNamedFormElements("login", asPair(LoginPage.FIELD_USERNAME, random), asPair(LoginPage.FIELD_PASSWORD, ""));
         loginForm.waitFor();
         
@@ -172,10 +172,10 @@ public class UsersAcceptanceTest extends SeleniumTestBase
 
     private String createUserWithContact(String name)
     {
-        browser.loginAsAdmin();
-        UsersPage usersPage = browser.openAndWaitFor(UsersPage.class);
+        getBrowser().loginAsAdmin();
+        UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
         usersPage.clickAdd();
-        AddUserForm addUserForm = browser.createForm(AddUserForm.class);
+        AddUserForm addUserForm = getBrowser().createForm(AddUserForm.class);
         addUserForm.waitFor();
         String email = name + "@example.com";
         addUserForm.finishNamedFormElements(asPair("login", name), asPair("name", name), asPair("emailAddress", email));

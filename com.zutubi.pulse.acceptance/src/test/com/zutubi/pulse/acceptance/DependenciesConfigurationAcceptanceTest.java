@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * A set of acceptance tests focused on the dependency systems UI.
  */
-public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
+public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 {
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -61,14 +61,14 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         String projectName = random;
 
         // create project
-        String path = addProject(projectName, true);
+        String path = xmlRpcHelper.insertSimpleProject(projectName);
 
         String projectHandle = xmlRpcHelper.getConfigHandle(path);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         // go to add dependency page.
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectName, false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, projectName, false);
 
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
         DependencyForm form = projectDependenciesPage.clickAdd();
@@ -83,16 +83,16 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         String projectB = random + "B";
         String projectC = random + "C";
 
-        addProject(projectA, true);
-        addProject(projectB, true);
-        addProject(projectC, true);
+        xmlRpcHelper.insertSimpleProject(projectA);
+        xmlRpcHelper.insertSimpleProject(projectB);
+        xmlRpcHelper.insertSimpleProject(projectC);
 
         addStages(projectA, "a1", "a2", "a3", "a4");
         addStages(projectB, "b1", "b2");
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectC, false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, projectC, false);
 
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
         DependencyForm form = projectDependenciesPage.clickAdd();
@@ -144,9 +144,9 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         projectC.addDependency(projectB);
         insertProject(projectC);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectConfigPage projectPage = browser.openAndWaitFor(ProjectConfigPage.class, projectA.getName(), false);
+        ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, projectA.getName(), false);
 
         ProjectDependenciesPage projectDependenciesPage = projectPage.clickDependenciesAndWait();
         DependencyForm form = projectDependenciesPage.clickAdd(); // takes us to the wizard version of the dependency form.
@@ -162,11 +162,11 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         String projectA = random + "A";
         String projectB = random + "B";
 
-        addProject(projectA, true);
-        addProject(projectB, true);
+        xmlRpcHelper.insertSimpleProject(projectA);
+        xmlRpcHelper.insertSimpleProject(projectB);
         xmlRpcHelper.enableBuildPrompting(projectB);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         assertFalse(isRebuildOptionAvailableOnPrompt(projectB, false));
 
@@ -178,10 +178,10 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     private boolean isRebuildOptionAvailableOnPrompt(String projectName, boolean expected)
     {
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
         home.triggerBuild();
 
-        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
         if (expected)
         {
             form.expectRebuildField();
@@ -199,20 +199,20 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
         String downstreamMilestoneProject = random + "-downstream-milestone";
         String downstreamBothProject = random + "-downstream-both";
 
-        addProject(upstreamProject1, true);
-        addProject(upstreamProject2, true);
+        xmlRpcHelper.insertSimpleProject(upstreamProject1);
+        xmlRpcHelper.insertSimpleProject(upstreamProject2);
 
-        addProject(downstreamIntegrationProject, true);
+        xmlRpcHelper.insertSimpleProject(downstreamIntegrationProject);
         addDependency(downstreamIntegrationProject, upstreamProject1);
 
-        addProject(downstreamMilestoneProject, true);
+        xmlRpcHelper.insertSimpleProject(downstreamMilestoneProject);
         addDependency(downstreamMilestoneProject, upstreamProject1, IvyStatus.STATUS_MILESTONE);
 
-        addProject(downstreamBothProject, true);
+        xmlRpcHelper.insertSimpleProject(downstreamBothProject);
         addDependency(downstreamBothProject, upstreamProject1);
         addDependency(downstreamBothProject, upstreamProject2, IvyStatus.STATUS_MILESTONE);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         assertFalse(isRebuildActionAvailableOnProjectHomePage(upstreamProject1));
         assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamIntegrationProject));
@@ -225,7 +225,7 @@ public class DependenciesConfigurationAcceptanceTest extends SeleniumTestBase
 
     private boolean isRebuildActionAvailableOnProjectHomePage(String projectName)
     {
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
         return home.isRebuildActionPresent();
     }
 

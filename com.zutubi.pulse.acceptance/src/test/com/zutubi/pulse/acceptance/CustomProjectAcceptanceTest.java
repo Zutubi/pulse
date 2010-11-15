@@ -11,19 +11,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * Acceptance tests for the custom project.
  */
-public class CustomProjectAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class CustomProjectAcceptanceTest extends AcceptanceTestBase
 {
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        loginAsAdmin();
+        xmlRpcHelper.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        logout();
+        xmlRpcHelper.logout();
         super.tearDown();
     }
 

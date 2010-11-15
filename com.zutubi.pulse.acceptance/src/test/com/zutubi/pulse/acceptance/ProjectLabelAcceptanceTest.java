@@ -8,7 +8,7 @@ import java.util.Hashtable;
 /**
  * Acceptance tests that verify categorisation of projects using labels.
  */
-public class ProjectLabelAcceptanceTest extends SeleniumTestBase
+public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
 {
     protected void setUp() throws Exception
     {
@@ -34,14 +34,12 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(p2,  false);
         xmlRpcHelper.insertSimpleProject(p3,  false);
 
-        Hashtable<String, Object> label1 = createLabel(g1);
-        Hashtable<String, Object> label2 = createLabel(g2);
-        insertLabel(p1, label1);
-        insertLabel(p1, label2);
-        insertLabel(p2, label1);
+        xmlRpcHelper.addLabel(p1, g1);
+        xmlRpcHelper.addLabel(p1, g2);
+        xmlRpcHelper.addLabel(p2, g1);
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, g1, p1, p2);
         assertGroupPresent(browsePage, g2, p1);
         assertGroupPresent(browsePage, null, p3);
@@ -59,14 +57,13 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         String userLogin = random + "-user";
 
         xmlRpcHelper.insertSimpleProject(projectName,  false);
-        Hashtable<String, Object> label = createLabel(labelName);
-        insertLabel(projectName, label);
+        xmlRpcHelper.addLabel(projectName, labelName);
 
         String userPath = xmlRpcHelper.insertTrivialUser(userLogin);
-        assertTrue(browser.login(userLogin, ""));
+        assertTrue(getBrowser().login(userLogin, ""));
 
         // Default is group by label
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, labelName, projectName);
         assertFalse(browsePage.isProjectPresent(null, projectName));
 
@@ -90,15 +87,14 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(p1,  false);
         xmlRpcHelper.insertSimpleProject(p2,  false);
 
-        Hashtable<String, Object> label1 = createLabel(group);
-        insertLabel(p1, label1);
+        xmlRpcHelper.addLabel(p1, group);
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
         assertFalse(browsePage.isProjectPresent(group, p2));
 
-        insertLabel(p2, label1);
+        xmlRpcHelper.addLabel(p2, group);
 
         browsePage.openAndWaitFor();
         assertGroupPresent(browsePage, group, p1, p2);
@@ -113,12 +109,11 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(p1,  false);
         xmlRpcHelper.insertSimpleProject(p2,  false);
 
-        Hashtable<String, Object> label1 = createLabel(group);
-        insertLabel(p1, label1);
-        String path = insertLabel(p2, label1);
+        xmlRpcHelper.addLabel(p1, group);
+        String path = xmlRpcHelper.addLabel(p2, group);
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1, p2);
 
         xmlRpcHelper.call("deleteConfig", path);
@@ -135,11 +130,10 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.insertSimpleProject(p1,  false);
 
-        Hashtable<String, Object> label1 = createLabel(group);
-        String path = insertLabel(p1, label1);
+        String path = xmlRpcHelper.addLabel(p1, group);
 
-        browser.loginAsAdmin();
-        BrowsePage browsePage = browser.openAndWaitFor(BrowsePage.class);
+        getBrowser().loginAsAdmin();
+        BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
 
         xmlRpcHelper.call("deleteConfig", path);

@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -23,8 +22,10 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
-import static java.util.Arrays.asList;
 import java.util.*;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static java.util.Arrays.asList;
 
 /**
  * Sanity acceptance tests for notifications.
@@ -34,7 +35,7 @@ import java.util.*;
  * The specifics of each type of notification and more complex conditions
  * are tested at the unit level.
  */
-public class NotificationAcceptanceTest extends BaseXmlRpcAcceptanceTest
+public class NotificationAcceptanceTest extends AcceptanceTestBase
 {
     private static final String DEFAULT_HOST = "localhost";
     private static final String EMAIL_DOMAIN = "@zutubi.com";

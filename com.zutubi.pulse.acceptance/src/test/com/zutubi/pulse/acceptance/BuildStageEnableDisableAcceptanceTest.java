@@ -2,16 +2,16 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.Collections;
 
-public class BuildStageEnableDisableAcceptanceTest  extends BaseXmlRpcAcceptanceTest
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+
+public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
     private ProjectConfigurations projects;
     private ConfigurationHelper configurationHelper;

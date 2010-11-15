@@ -1,17 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -31,8 +20,6 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -46,19 +33,13 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -68,14 +49,9 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -85,11 +61,36 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+
 /**
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.
  */
-public class BuildAcceptanceTest extends SeleniumTestBase
+public class BuildAcceptanceTest extends AcceptanceTestBase
 {
     private static final int BUILD_TIMEOUT = 90000;
 
@@ -132,25 +133,26 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     protected void tearDown() throws Exception
     {
+        xmlRpcHelper.cancelIncompleteBuilds();
         xmlRpcHelper.logout();
         super.tearDown();
     }
 
     public void testSimpleBuild() throws Exception
     {
-        browser.loginAsAdmin();
-        addProject(random, true);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.insertSimpleProject(random);
 
         triggerSuccessfulBuild(random);
 
         // Check changes page handling of no changes.
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 1L);
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, 1L);
         assertFalse(changesPage.hasChanges());
         assertFalse(changesPage.isCompareToPopDownPresent());
-        assertTrue(browser.isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
+        assertTrue(getBrowser().isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
 
         // Check some properties
-        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
+        EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_LOCAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_PERSONAL_BUILD, Boolean.toString(false)));
         assertTrue(envPage.isPulsePropertyPresentWithValue(BuildProperties.PROPERTY_OWNER, random));
@@ -159,24 +161,24 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     
     public void testNoChangesBetweenBuilds() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, 2L);
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, 2L);
         assertFalse(changesPage.hasChanges());
         // Unlike where there are no previous builds, in this case we expect
         // the compare-to popdown.
         assertTrue(changesPage.isCompareToPopDownPresent());
-        assertTrue(browser.isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
+        assertTrue(getBrowser().isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
     }
 
     public void testChangesBetweenBuilds() throws Exception
     {
         // Run an initial build
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         xmlRpcHelper.runBuild(random);
 
         // Commit a change to the repository.  Note monitoring the SCM is
@@ -186,9 +188,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         long buildNumber = xmlRpcHelper.runBuild(random);
 
         // Check the changes tab.
-        browser.loginAsAdmin();
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTrue(browser.isTextPresent(changesPage.formatChangesSince(buildNumber)));
+        getBrowser().loginAsAdmin();
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
+        assertTrue(getBrowser().isTextPresent(changesPage.formatChangesSince(buildNumber)));
 
         List<Changelist> changelists = changesPage.getChangelists();
         assertEquals(1, changelists.size());
@@ -200,11 +202,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         // Check the changelist view too.
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
-        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
+        ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
         assertBuildFileChangelist(changelistPage.getChangelist(), revisionString);
         
         // Check appearance of change on user's dashboard.
-        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         DashboardPage.ProjectChange change = dashboardPage.getProjectChange(0);
         assertEquals(ResultState.SUCCESS, change.status);
         assertEquals(random + " :: build " + buildNumber, change.builds);
@@ -247,20 +249,20 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         
         long buildNumber = xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTrue(browser.isTextPresent(String.format("%d more files", CHANGE_COUNT - 5)));
+        getBrowser().loginAsAdmin();
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
+        assertTrue(getBrowser().isTextPresent(String.format("%d more files", CHANGE_COUNT - 5)));
 
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
-        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
+        ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changeIds.get(0), revisionString);
         Changelist changelist = changelistPage.getChangelist();
         assertEquals(100, changelist.getChanges().size());
         assertTrue(changelistPage.isNextLinkPresent());
         assertFalse(changelistPage.isPreviousLinkPresent());
 
         changelistPage.clickNext();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         changelist = changelistPage.getChangelist();
         assertEquals(CHANGE_COUNT - 100, changelist.getChanges().size());
         assertFalse(changelistPage.isNextLinkPresent());
@@ -273,8 +275,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         String unviewableProject = random + "-unviewable";
         String regularUser = random + "-user";
         
-        addProject(viewableProject, true);
-        String unviewableProjectPath = addProject(unviewableProject, true);
+        xmlRpcHelper.insertSimpleProject(viewableProject);
+        String unviewableProjectPath = xmlRpcHelper.insertSimpleProject(unviewableProject);
         xmlRpcHelper.insertTrivialUser(regularUser);
         
         // Remove permissions that allow normal users to view the invisible
@@ -293,11 +295,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         long unviewableBuildNumber = xmlRpcHelper.runBuild(unviewableProject);
 
         // Check the changes tab.
-        browser.loginAsAdmin();
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, viewableProject, viewableBuildNumber);
+        getBrowser().loginAsAdmin();
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, viewableProject, viewableBuildNumber);
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
-        ViewChangelistPage changelistPage = browser.openAndWaitFor(ViewChangelistPage.class, viewableProject, viewableBuildNumber, changeIds.get(0), revisionString);
+        ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class, viewableProject, viewableBuildNumber, changeIds.get(0), revisionString);
         List<Pair<String, Long>> builds = changelistPage.getBuilds();
         assertEquals(2, builds.size());
         assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
@@ -305,13 +307,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         
         // Dashboard project changes table should show popup for multiple
         // builds.
-        DashboardPage dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         DashboardPage.ProjectChange change = dashboardPage.getProjectChange(0);
         assertEquals(ResultState.SUCCESS, change.status);
         assertEquals("2 builds", change.builds);
 
-        browser.logout();
-        assertTrue(browser.login(regularUser, ""));
+        getBrowser().logout();
+        assertTrue(getBrowser().login(regularUser, ""));
         
         // Regular user should only see the visible project.
         changelistPage.openAndWaitFor();
@@ -320,9 +322,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
         
         // Check other pages that we can view where the changelist appears.
-        browser.openAndWaitFor(ProjectHomePage.class, viewableProject);
+        getBrowser().openAndWaitFor(ProjectHomePage.class, viewableProject);
 
-        dashboardPage = browser.openAndWaitFor(DashboardPage.class);
+        dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         change = dashboardPage.getProjectChange(0);
         assertEquals(ResultState.SUCCESS, change.status);
         assertEquals(viewableProject + " :: build " + viewableBuildNumber, change.builds);
@@ -333,7 +335,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         final String FISHEYE_BASE = "http://fisheye";
         final String FISHEYE_PROJECT = "project";
 
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
         Hashtable<String, Object> changeViewer = xmlRpcHelper.createDefaultConfig(FisheyeConfiguration.class);
         changeViewer.put("baseURL", FISHEYE_BASE);
         changeViewer.put("projectPath", FISHEYE_PROJECT);
@@ -345,18 +347,18 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
 
-        browser.loginAsAdmin();
-        BuildChangesPage changesPage = browser.openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTrue(browser.isLinkToPresent(changelistLink));
+        getBrowser().loginAsAdmin();
+        BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
+        assertTrue(getBrowser().isLinkToPresent(changelistLink));
 
-        browser.openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changesPage.getChangeIds().get(0), revisionString);
+        getBrowser().openAndWaitFor(ViewChangelistPage.class, random, buildNumber, changesPage.getChangeIds().get(0), revisionString);
 
         String prefixPart = FISHEYE_BASE + "/browse/";
         String filePart = FISHEYE_PROJECT + "/accept/trunk/triviant/" + CHANGE_FILENAME;
-        assertTrue(browser.isLinkToPresent(changelistLink));
-        assertTrue(browser.isLinkToPresent(prefixPart + filePart + "?r=" + revisionString));
-        assertTrue(browser.isLinkToPresent(prefixPart + "~raw,r=" + revisionString + "/" + filePart));
-        assertTrue(browser.isLinkToPresent(prefixPart + filePart + "?r1=" + new Revision(revisionString).calculatePreviousNumericalRevision() + "&r2=" + revisionString));
+        assertTrue(getBrowser().isLinkToPresent(changelistLink));
+        assertTrue(getBrowser().isLinkToPresent(prefixPart + filePart + "?r=" + revisionString));
+        assertTrue(getBrowser().isLinkToPresent(prefixPart + "~raw,r=" + revisionString + "/" + filePart));
+        assertTrue(getBrowser().isLinkToPresent(prefixPart + filePart + "?r1=" + new Revision(revisionString).calculatePreviousNumericalRevision() + "&r2=" + revisionString));
     }
 
     private String editAndCommitBuildFile() throws IOException, SVNException
@@ -406,21 +408,21 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testAgentBuild() throws Exception
     {
-        addProject(random, true);
-        browser.loginAsAdmin();
+        xmlRpcHelper.insertSimpleProject(random);
+        getBrowser().loginAsAdmin();
 
         String agentHandle;
-        ensureAgent(AGENT_NAME);
+        xmlRpcHelper.ensureAgent(AGENT_NAME);
         agentHandle = xmlRpcHelper.getConfigHandle("agents/" + AGENT_NAME);
 
-        ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
         ListPage stagesPage = configPage.clickCollection(ProjectConfigPage.BUILD_STAGES_BASE, ProjectConfigPage.BUILD_STAGES_DISPLAY);
         stagesPage.waitFor();
         stagesPage.clickView("default");
 
-        BuildStageForm stageForm = browser.createForm(BuildStageForm.class, true);
+        BuildStageForm stageForm = getBrowser().createForm(BuildStageForm.class, true);
         stageForm.waitFor();
 
         stageForm.applyFormElements("", agentHandle);
@@ -454,8 +456,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", random);
         long buildNumber = xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
+        getBrowser().loginAsAdmin();
+        BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertEquals(ResultState.FAILURE.getPrettyString(), summaryPage.getBuildStatus());
 
         assertTrue(summaryPage.isErrorListPresent());
@@ -473,7 +475,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.saveConfig(featuresArtifactPath, artifact, false);
         buildNumber = xmlRpcHelper.runBuild(random);
 
-        summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
+        summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertTrue(summaryPage.isFeaturedArtifactsTablePresent());
         assertEquals("stage :: " + DEFAULT_STAGE, summaryPage.getFeaturedArtifactsRow(0));
         assertEquals("features", summaryPage.getFeaturedArtifactsRow(1));
@@ -483,20 +485,20 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         String projectName = random + "-project";
 
-        addProject(projectName, true);
+        xmlRpcHelper.insertSimpleProject(projectName);
         xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        final BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
+        getBrowser().loginAsAdmin();
+        final BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
         assertTrue(summaryPage.isRightPaneVisible());
-        browser.logout();
+        getBrowser().logout();
 
         GlobalConfiguration globalConfig = configurationHelper.getConfiguration(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
         if (!globalConfig.isAnonymousAccessEnabled())
         {
             globalConfig.setAnonymousAccessEnabled(true);
             configurationHelper.update(globalConfig, false);
-            browser.newSession();
+            getBrowser().newSession();
         }
 
         try
@@ -559,8 +561,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         
         xmlRpcHelper.runBuild(mainProjectName, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        BuildDetailsPage detailsPage = browser.openAndWaitFor(BuildDetailsPage.class, mainProjectName, 1L);
+        getBrowser().loginAsAdmin();
+        BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, mainProjectName, 1L);
         assertTrue(detailsPage.isBuildBasicsPresent());
         assertEquals(asPair("status", "failure"), detailsPage.getBuildBasicsRow(0));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
@@ -595,11 +597,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
-        assertTrue(browser.isTextPresent("error feature"));
-        assertTrue(browser.isTextPresent("warning feature"));
-        assertTrue(browser.isTextPresent("info feature"));
-        assertTrue(browser.isTextPresent("context line 1"));
-        assertTrue(browser.isTextPresent("info context line 2"));
+        assertTrue(getBrowser().isTextPresent("error feature"));
+        assertTrue(getBrowser().isTextPresent("warning feature"));
+        assertTrue(getBrowser().isTextPresent("info feature"));
+        assertTrue(getBrowser().isTextPresent("context line 1"));
+        assertTrue(getBrowser().isTextPresent("info context line 2"));
     }
 
     private void insertFeaturesProcessor(String projectName, String processorName) throws Exception
@@ -649,8 +651,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.triggerBuild(project.getName());
             xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
             
-            browser.loginAsAdmin();
-            final BuildDetailsPage detailsPage = browser.createPage(BuildDetailsPage.class, project.getName(), 1L);
+            getBrowser().loginAsAdmin();
+            final BuildDetailsPage detailsPage = getBrowser().createPage(BuildDetailsPage.class, project.getName(), 1L);
             TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
@@ -683,8 +685,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     
     public void testPulseEnvironmentVariables() throws Exception
     {
-        browser.loginAsAdmin();
-        ensureProject(random);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(random);
 
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
@@ -699,10 +701,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("test-property", "test-value", false, false, false));
 
         String projectName = random + "-project";
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "PULSE_TEST-PROPERTY=test-value");
     }
@@ -715,11 +717,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         String projectName = random + "-project";
         String projectPath = getPath(PROJECTS_SCOPE, projectName);
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         xmlRpcHelper.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
         xmlRpcHelper.insertConfig(getPath(projectPath, "properties"), xmlRpcHelper.createProperty("pp", "ref ${rp}", true, true, false));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "pp=ref rv");
     }
@@ -733,10 +735,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(propertiesPath, xmlRpcHelper.createProperty("referer", "ref ${referee}", true, true, false));
 
         String projectName = random + "-project";
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "referer=ref ee");
     }
@@ -744,11 +746,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     public void testProjectPropertyReferencesAgentName() throws Exception
     {
         String projectName = random + "-project";
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "pp=ref " + MASTER_AGENT_NAME);
     }
@@ -760,10 +762,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "ref ${agent}", true, true, false));
 
         String projectName = random + "-project";
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "rp=ref " + MASTER_AGENT_NAME);
     }
@@ -771,17 +773,17 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     public void testSuppressedProperty() throws Exception
     {
         String projectName = random + "-project";
-        ensureProject(projectName);
+        xmlRpcHelper.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
         xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         goToEnv(projectName, 1);
-        assertTrue(browser.isTextPresent(suppressedName));
-        assertFalse(browser.isTextPresent(suppressedValue));
+        assertTrue(getBrowser().isTextPresent(suppressedName));
+        assertFalse(getBrowser().isTextPresent(suppressedValue));
     }
 
     public void testScmPropertiesAvailableInPulseFile() throws Exception
@@ -792,37 +794,37 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), type);
         xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         goToArtifact(random, 1, OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
-        assertTrue(browser.isTextPresent(TRIVIAL_ANT_REPOSITORY));
+        assertTrue(getBrowser().isTextPresent(TRIVIAL_ANT_REPOSITORY));
     }
 
     public void testBuildLogs() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(random);
 
         // The logs tab, which should show us the first stage.
-        BuildLogsPage logsPage = browser.openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
+        BuildLogsPage logsPage = getBrowser().openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
         assertTrue(logsPage.isLogAvailable());
-        assertTrue(browser.isTextPresent(MESSAGE_RECIPE_COMPLETED));
+        assertTrue(getBrowser().isTextPresent(MESSAGE_RECIPE_COMPLETED));
 
-        if (browser.isFirefox())
+        if (getBrowser().isFirefox())
         {
             logsPage.clickDownloadLink();
-            browser.waitForPageToLoad();
-            assertTrue(browser.isTextPresent(MESSAGE_CHECKING_REQUIREMENTS));
+            getBrowser().waitForPageToLoad();
+            assertTrue(getBrowser().isTextPresent(MESSAGE_CHECKING_REQUIREMENTS));
         }
 
         // Direct to the build log (high-level build messages).
-        BuildLogPage logPage = browser.openAndWaitFor(BuildLogPage.class, random, 1L);
+        BuildLogPage logPage = getBrowser().openAndWaitFor(BuildLogPage.class, random, 1L);
         assertTrue(logPage.isLogAvailable());
-        assertTrue(browser.isTextPresent(MESSAGE_BUILD_COMPLETED));
+        assertTrue(getBrowser().isTextPresent(MESSAGE_BUILD_COMPLETED));
 
-        StageLogPage stageLogPage = browser.createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
-        if (browser.isFirefox())
+        StageLogPage stageLogPage = getBrowser().createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
+        if (getBrowser().isFirefox())
         {
             // Unfortunately JS security prevents us using the combo in proxy
             // mode.
@@ -835,14 +837,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             stageLogPage.waitFor();
         }
         assertTrue(stageLogPage.isLogAvailable());
-        assertTrue(browser.isTextPresent(MESSAGE_RECIPE_COMPLETED));
+        assertTrue(getBrowser().isTextPresent(MESSAGE_RECIPE_COMPLETED));
 
         // Change the settings via the popup
         int maxLines = stageLogPage.getMaxLines();
         TailSettingsDialog dialog = stageLogPage.clickConfigureAndWaitForDialog();
         dialog.setMaxLines(maxLines + 5);
         dialog.clickApply();
-        browser.waitForPageToLoad();
+        getBrowser().waitForPageToLoad();
         assertEquals(maxLines + 5, stageLogPage.getMaxLines());
     }
 
@@ -861,9 +863,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildNumber = xmlRpcHelper.runBuild(projectName);
 
-        assertTrue(browser.login(userLogin, ""));
+        assertTrue(getBrowser().login(userLogin, ""));
 
-        BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
+        BuildArtifactsPage page = getBrowser().openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
         assertEquals(User.DEFAULT_ARTIFACTS_FILTER, page.getCurrentFilter());
         assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
         assertTrue(page.isArtifactListed(explicitArtifact.getName()));
@@ -881,7 +883,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         page.clickSaveFilterAndWait();
 
-        browser.refresh();
+        getBrowser().refresh();
         page.waitForReload();
         
         assertEquals("featured", page.getCurrentFilter());
@@ -895,18 +897,18 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     public void testDownloadArtifactLink() throws Exception
     {
         // CIB-1724: download raw artifacts via 2.0 url scheme.
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         long buildNumber = xmlRpcHelper.runBuild(random);
         Hashtable<String, Object> outputArtifact = getArtifact(random, buildNumber, "command output");
         String permalink = (String) outputArtifact.get("permalink");
         // This is to check for the new 2.0-ised URL.
         assertTrue(permalink.contains("/downloads/"));
 
-        browser.loginAsAdmin();
-        browser.open(permalink + "/output.txt");
-        browser.waitForPageToLoad(30 * SECOND);
+        getBrowser().loginAsAdmin();
+        getBrowser().open(permalink + "/output.txt");
+        getBrowser().waitForPageToLoad(30 * SECOND);
 
-        assertTrue(browser.getBodyText().contains("BUILD SUCCESSFUL"));
+        assertTrue(getBrowser().getBodyText().contains("BUILD SUCCESSFUL"));
     }
 
     public void testSetArtifactContentType() throws Exception
@@ -915,7 +917,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         final String ARTIFACT_FILENAME = "build.xml";
         final String CONTENT_TYPE = "application/test";
 
-        String projectPath = addProject(random, true);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
 
         Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put(NAME, ARTIFACT_NAME);
@@ -951,9 +953,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         String content = AcceptanceTestUtils.readUriContent(getArtifactFileUrl(BUILD_FILE, hashedInfo));
         String expectedHash = SecurityUtils.md5Digest(content);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
+        BuildArtifactsPage page = getBrowser().openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
         assertTrue(page.isArtifactFileListed(NAME_NOT_HASHED, BUILD_FILE));
         assertEquals("", page.getArtifactFileHash(NAME_NOT_HASHED, BUILD_FILE));
         assertTrue(page.isArtifactFileListed(NAME_HASHED, BUILD_FILE));
@@ -977,19 +979,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private String getArtifactFileUrl(String filename, Hashtable<String, Object> artifact)
     {
-        String base = browser.getBaseUrl();
-        if (base.endsWith("/"))
-        {
-            base = base.substring(0, base.length() - 1);
-        }
-
-        return base + artifact.get("permalink") + filename;
+        return getBrowser().getBaseUrl() + artifact.get("permalink") + filename;
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception
     {
-        browser.loginAsAdmin();
-        ensureProject(random);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(random);
 
         // add the pname=pvalue property to the build.
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
@@ -998,11 +994,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.enableBuildPrompting(random);
 
         // trigger a build
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
         form.waitFor();
         assertTrue(form.isFormPresent());
 
@@ -1021,8 +1017,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
      */
     public void testManualTriggerBuildWithPromptAllowsPropertyValueOverride() throws Exception
     {
-        browser.loginAsAdmin();
-        ensureProject(random);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(random);
 
         // add the pname=pvalue property to the build.
         xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
@@ -1031,11 +1027,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.enableBuildPrompting(random);
 
         // trigger a build
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
 
         // we should be prompted for a revision and a pname value.
-        TriggerBuildForm form = browser.createForm(TriggerBuildForm.class);
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
         form.addProperty("pname");
         form.waitFor();
         // leave the revision blank, update pname to qvalue.
@@ -1048,7 +1044,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEnvironment(random, 1, "pname=qvalue", "PULSE_PNAME=qvalue");
 
         // go back to the properties page and ensure that the value is pvalue.
-        ListPage propertiesPage = browser.openAndWaitFor(ListPage.class, getPropertiesPath(random));
+        ListPage propertiesPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(random));
 
         assertEquals("pname", propertiesPage.getCellContent(0, 0));
         assertEquals("pvalue", propertiesPage.getCellContent(0, 1));
@@ -1056,15 +1052,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testManualTriggerBuildWithPromptAllowsStatusSelection() throws Exception
     {
-        browser.loginAsAdmin();
-        ensureProject(random);
+        getBrowser().loginAsAdmin();
+        xmlRpcHelper.ensureProject(random);
         xmlRpcHelper.enableBuildPrompting(random);
 
         // trigger a build
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
 
-        TriggerBuildForm triggerBuildForm = browser.createForm(TriggerBuildForm.class);
+        TriggerBuildForm triggerBuildForm = getBrowser().createForm(TriggerBuildForm.class);
         triggerBuildForm.waitFor();
         triggerBuildForm.triggerFormElements(asPair("status", STATUS_RELEASE));
 
@@ -1079,8 +1075,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         String manualProject = random + "-manual";
         String buildCompletedProject = random + "-completed";
 
-        ensureProject(manualProject);
-        ensureProject(buildCompletedProject);
+        xmlRpcHelper.ensureProject(manualProject);
+        xmlRpcHelper.ensureProject(buildCompletedProject);
 
         Hashtable<String, Object> buildCompletedTrigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
         buildCompletedTrigger.put("name", "cascade");
@@ -1095,13 +1091,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.runBuild(manualProject);
         xmlRpcHelper.waitForBuildToComplete(buildCompletedProject, 1);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         assertEnvironment(buildCompletedProject, 1, "PULSE_TP=tpv");
     }
 
     public void testVersionedBuildWithImports() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
 
         triggerSuccessfulBuild(random);
@@ -1162,8 +1158,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         boolean success = (Boolean) build.get("succeeded");
         assertEquals(expectedSuccess, success);
 
-        browser.loginAsAdmin();
-        BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
+        getBrowser().loginAsAdmin();
+        BuildTestsPage testsPage = getBrowser().openAndWaitFor(BuildTestsPage.class, random, buildId);
 
         assertEquals(expectedSummary, testsPage.getTestSummary());
 
@@ -1217,10 +1213,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildId = xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
         // Test we can drill all the way down then back up again.
-        BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
+        BuildTestsPage testsPage = getBrowser().openAndWaitFor(BuildTestsPage.class, random, buildId);
 
         assertTrue(testsPage.getTestSummary().getTotal() > 0);
         StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
@@ -1247,9 +1243,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, random, buildId);
+        BuildTestsPage testsPage = getBrowser().openAndWaitFor(BuildTestsPage.class, random, buildId);
         TestResultSummary expectedSummary = new TestResultSummary(0, 0, 3, 0, 583);
 
         assertEquals(expectedSummary, testsPage.getTestSummary());
@@ -1324,8 +1320,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
                 }
             }, BUILD_TIMEOUT, "stage to complete");
 
-            browser.loginAsAdmin();
-            BuildTestsPage testsPage = browser.openAndWaitFor(BuildTestsPage.class, project.getName(), 1L);
+            getBrowser().loginAsAdmin();
+            BuildTestsPage testsPage = getBrowser().openAndWaitFor(BuildTestsPage.class, project.getName(), 1L);
             assertTrue(testsPage.isStagePresent(defaultStageName));
             assertTrue(testsPage.isStageComplete(defaultStageName));
             assertTrue(testsPage.isStageLinkPresent(defaultStageName));
@@ -1437,9 +1433,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTrue(browser.isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
+        assertTrue(getBrowser().isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
@@ -1454,9 +1450,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertFalse(browser.isTextPresent("terminated"));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
+        assertFalse(getBrowser().isTextPresent("terminated"));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.SUCCESS, build);
@@ -1475,9 +1471,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        browser.openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTrue(browser.isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
+        getBrowser().loginAsAdmin();
+        getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
+        assertTrue(getBrowser().isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
 
         Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
@@ -1507,7 +1503,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testDeadlockUpdatingConfigAfterTrigger() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         String propertyPath = xmlRpcHelper.insertProjectProperty(random, "prop", "val", false, true, false);
         Hashtable<String, Object> property = xmlRpcHelper.getConfig(propertyPath);
         
@@ -1526,14 +1522,14 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     
     public void testPulseFileTab() throws Exception
     {
-        addProject(random, true);
+        xmlRpcHelper.insertSimpleProject(random);
         long buildId = xmlRpcHelper.runBuild(random);
 
-        browser.loginAsAdmin();
-        BuildFilePage buildFilePage = browser.openAndWaitFor(BuildFilePage.class, random, buildId);
+        getBrowser().loginAsAdmin();
+        BuildFilePage buildFilePage = getBrowser().openAndWaitFor(BuildFilePage.class, random, buildId);
         assertTrue(buildFilePage.isDownloadLinkPresent());
         assertTrue(buildFilePage.isHighlightedFilePresent());
-        assertTrue(browser.isTextPresent("default-recipe=\"default\""));
+        assertTrue(getBrowser().isTextPresent("default-recipe=\"default\""));
     }
     
     public void testCleanBuild() throws Exception
@@ -1557,12 +1553,12 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
             long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
 
-            browser.loginAsAdmin();
+            getBrowser().loginAsAdmin();
 
-            browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTrue(browser.isTextPresent("build.xml"));
+            getBrowser().openAndWaitFor(CommandArtifactPage.class, projectName, buildId, DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
+            assertTrue(getBrowser().isTextPresent("build.xml"));
 
-            AgentStatusPage statusPage = browser.openAndWaitFor(AgentStatusPage.class, agentName);
+            AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
             AgentStatusPage.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessage(0);
             assertEquals("clean up stage '" + DEFAULT_STAGE + "' of project '" + projectName + "'", synchronisationMessage.description);
         }
@@ -1606,10 +1602,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             assignStageToAgent(projectName, SECOND_STAGE_NAME, AgentManager.MASTER_AGENT_NAME);
             long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
 
-            browser.loginAsAdmin();
+            getBrowser().loginAsAdmin();
 
-            browser.openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTrue(browser.isTextPresent("build.xml"));
+            getBrowser().openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
+            assertTrue(getBrowser().isTextPresent("build.xml"));
         }
         finally
         {
@@ -1644,13 +1640,13 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
 
-        browser.loginAsAdmin();
-        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
+        getBrowser().loginAsAdmin();
+        EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
         assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "original-value"));
         assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "original-value"));
         assertFalse(envPage.isPulsePropertyPresent("p2"));
         
-        envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c2");
+        envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c2");
         assertTrue(envPage.isPulsePropertyPresentWithValue("outerp", "new-value"));
         assertTrue(envPage.isPulsePropertyPresentWithValue("p1", "new-value"));
         assertTrue(envPage.isPulsePropertyPresentWithValue("p2", "value"));
@@ -1670,8 +1666,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.triggerBuild(random, options);
         xmlRpcHelper.waitForBuildToComplete(random, 1);
 
-        browser.loginAsAdmin();
-        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
+        getBrowser().loginAsAdmin();
+        EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
 
         assertTrue(envPage.isPropertyPresentWithValue("env", "value"));
         assertFalse(envPage.isPropertyPresent("notenv"));
@@ -1695,8 +1691,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.triggerBuild(random, options);
         xmlRpcHelper.waitForBuildToComplete(random, 1);
 
-        browser.loginAsAdmin();
-        EnvironmentArtifactPage envPage = browser.openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
+        getBrowser().loginAsAdmin();
+        EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
         assertTrue(envPage.isPropertyPresentWithValue("env", "newvalue"));
         assertFalse(envPage.isPropertyPresent("notenv"));
         assertTrue(envPage.isPulsePropertyPresentWithValue("env", "newvalue"));
@@ -1759,7 +1755,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         goToEnv(projectName, buildId);
         for (String env : envs)
         {
-            assertTrue(browser.isTextPresent(env));
+            assertTrue(getBrowser().isTextPresent(env));
         }
     }
 
@@ -1770,10 +1766,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void goToArtifact(String projectName, long buildId, String artifact, String file)
     {
-        BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildId);
+        BuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(BuildArtifactsPage.class, projectName, buildId);
         artifactsPage.setFilterAndWait("");
         artifactsPage.clickArtifactFileDownload(artifact, file);
-        browser.waitForPageToLoad(10 * SECOND);
+        getBrowser().waitForPageToLoad(10 * SECOND);
     }
 
     private String addResource(String agent, String name) throws Exception
@@ -1798,7 +1794,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void triggerSuccessfulBuild(String projectName)
     {
-        ProjectHomePage home = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
         home.triggerBuild();
 
         waitForBuildOnProjectHomePage(projectName);
@@ -1806,7 +1802,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void waitForBuildOnProjectHomePage(String projectName)
     {
-        ProjectHomePage projectHomePage = browser.openAndWaitFor(ProjectHomePage.class, projectName);
+        ProjectHomePage projectHomePage = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
         ResultState state = projectHomePage.waitForLatestCompletedBuild(1, BUILD_TIMEOUT);
         assertEquals(ResultState.SUCCESS, state);
     }

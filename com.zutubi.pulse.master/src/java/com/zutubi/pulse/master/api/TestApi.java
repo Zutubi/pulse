@@ -129,9 +129,10 @@ public class TestApi
      * @param token authentication token.
      * @return true
      */
-    public boolean cancelIncompleteBuilds(String token)
+    public boolean cancelActiveBuilds(String token)
     {
         tokenManager.verifyAdmin(token);
+
         List<BuildResult> results = buildManager.queryBuilds(null, ResultState.getIncompleteStates(), -1, -1, -1, -1, false);
         for (BuildResult result : results)
         {

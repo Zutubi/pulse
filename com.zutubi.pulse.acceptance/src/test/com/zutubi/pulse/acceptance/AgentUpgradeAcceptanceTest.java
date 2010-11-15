@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.XmlRpcHelper.SYMBOLIC_NAME_KEY;
 import static com.zutubi.util.Constants.MINUTE;
 import static com.zutubi.util.Constants.SECOND;
 
@@ -95,7 +96,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         // b) add agent to master.
         Hashtable<String, Object> agentConfig = new Hashtable<String, Object>();
-        agentConfig.put("meta.symbolicName", "zutubi.agentConfig");
+        agentConfig.put(SYMBOLIC_NAME_KEY, "zutubi.agentConfig");
         agentConfig.put("name", "upgrade-agent");
         agentConfig.put("host", "localhost");
         agentConfig.put("port", 7689);

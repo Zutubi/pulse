@@ -1,8 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
@@ -10,17 +7,21 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 
 import java.util.Hashtable;
 import java.util.Vector;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
+import static com.zutubi.util.CollectionUtils.asPair;
+
 /**
  * The acceptance tests for the Pulse builtin maven 1.x and 2.x integration.
  */
-public class MavenAcceptanceTest extends SeleniumTestBase
+public class MavenAcceptanceTest extends AcceptanceTestBase
 {
     private static final String COMMAND_NAME = "build";
     private static final String JUNIT_PROCESSOR_NAME = "junit xml report processor";
@@ -41,7 +42,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMavenDefaultTestCaptureConfiguration() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         createMavenProject();
 
         // We expect a artifact called surefire-reports to be configured.
@@ -54,7 +55,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMaven2DefaultTestArtifactConfiguration() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         createMaven2Project();
 
         // We expect a artifact called surefire-reports to be configured.
@@ -67,18 +68,18 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     public void testMaven2BuildPicksUpTests() throws Exception
     {
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         createMaven2Project();
 
         long buildNumber = runBuild(random);
 
         // We expect the summary page to report that 1 test passed.
-        BuildSummaryPage summaryPage = browser.openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
+        BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertEquals("1 passed", summaryPage.getTestsSummary());
 
         // We expect the artifacts page to contain an artifact called test reports.
-        BuildArtifactsPage artifactsPage = browser.openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
-        browser.waitForLocator(artifactsPage.getArtifactLocator("test reports"));
+        BuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
+        getBrowser().waitForLocator(artifactsPage.getArtifactLocator("test reports"));
     }
 
     private void assertDefaultRequirement(String projectName, String resourceName) throws Exception
@@ -117,7 +118,8 @@ public class MavenAcceptanceTest extends SeleniumTestBase
 
     private void createMavenProject(final String commandType, final Pair<String, String>... fieldValues) throws Exception
     {
-        runAddProjectWizard(new DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
+        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
             public void scmState(AddProjectWizard.ScmState form)
@@ -142,7 +144,7 @@ public class MavenAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        ProjectHierarchyPage hierarchyPage = browser.createPage(ProjectHierarchyPage.class, random, false);
+        ProjectHierarchyPage hierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, random, false);
         hierarchyPage.waitFor();
     }
 

@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class TriggerConfigurationActions
 {
-    private static final String ACTION_RESUME = "resume";
+    public static final String ACTION_RESUME = "resume";
 
-    private static final String ACTION_PAUSE = "pause";
+    public static final String ACTION_PAUSE = "pause";
 
     private Scheduler scheduler;
 

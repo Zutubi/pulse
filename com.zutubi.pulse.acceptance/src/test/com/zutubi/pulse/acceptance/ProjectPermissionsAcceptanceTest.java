@@ -5,15 +5,16 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItemInArray;
 
 import java.util.Vector;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItemInArray;
 
 /**
  * Acceptance tests for project ACLs
  */
-public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
+public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
 {
     protected void setUp() throws Exception
     {
@@ -34,11 +35,11 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
         Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
 
-        assertTrue(browser.login(random, ""));
-        ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
+        assertTrue(getBrowser().login(random, ""));
+        ListPage permissionsPage = getBrowser().openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 
-        ProjectAclForm aclForm = browser.createForm(ProjectAclForm.class);
+        ProjectAclForm aclForm = getBrowser().createForm(ProjectAclForm.class);
         aclForm.waitFor();
         String[] groups = aclForm.getComboBoxOptions("group");
         // Two options could just be the default plus the current value.  As
@@ -51,11 +52,11 @@ public class ProjectPermissionsAcceptanceTest extends SeleniumTestBase
         String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
         Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
 
-        browser.loginAsAdmin();
-        ListPage permissionsPage = browser.openAndWaitFor(ListPage.class, permissionsPath);
+        getBrowser().loginAsAdmin();
+        ListPage permissionsPage = getBrowser().openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 
-        ProjectAclForm aclForm = browser.createForm(ProjectAclForm.class);
+        ProjectAclForm aclForm = getBrowser().createForm(ProjectAclForm.class);
         aclForm.waitFor();
         String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions.choice");
         assertThat(actionDisplays, hasItemInArray("view"));

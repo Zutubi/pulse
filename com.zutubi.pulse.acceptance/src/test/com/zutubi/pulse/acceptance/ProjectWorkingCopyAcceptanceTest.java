@@ -21,7 +21,7 @@ import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWi
 /**
  * Tests for the working copy functionality.
  */
-public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
+public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
 {
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -47,7 +47,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();
-        browser.logout();
+        getBrowser().logout();
 
         super.tearDown();
     }
@@ -56,9 +56,9 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     {
         ProjectConfiguration project = createProject(random);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.isViewWorkingCopyPresent());
 
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
@@ -72,16 +72,16 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         ProjectConfiguration project = createProject(random);
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
 
-        browser.logout();
+        getBrowser().logout();
 
         // create user without view source permissions for the project and log in.
         UserConfiguration user = createUser(randomName());
-        assertTrue(browser.login(user.getName(), ""));
+        assertTrue(getBrowser().login(user.getName(), ""));
 
         homePage.openAndWaitFor();
         assertFalse(homePage.isViewWorkingCopyPresent());
@@ -104,9 +104,9 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
         buildRunner.triggerSuccessfulBuild(project);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
 
         PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
@@ -126,9 +126,9 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
         ProjectConfiguration project = createProject(random);
         updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
 
         PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
@@ -147,7 +147,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
     {
         xmlRpcHelper.ensureAgent(AGENT_NAME);
 
-        browser.loginAsAdmin();
+        getBrowser().loginAsAdmin();
         enableAgent(AGENT_NAME);
 
         ProjectConfiguration project = createProject(random, AGENT_NAME);
@@ -156,7 +156,7 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
 
         disableAgent(AGENT_NAME);
 
-        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertTrue(homePage.isViewWorkingCopyPresent());
 
         PulseFileSystemBrowserWindow window = homePage.viewWorkingCopy();
@@ -177,21 +177,21 @@ public class ProjectWorkingCopyAcceptanceTest extends SeleniumTestBase
 
     private void disableAgent(String name)
     {
-        AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
+        AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
         if(agentsPage.isActionAvailable(name, ACTION_DISABLE))
         {
             agentsPage.clickAction(name, ACTION_DISABLE);
-            browser.refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
+            getBrowser().refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
         }
     }
 
     private void enableAgent(String name)
     {
-        AgentsPage agentsPage = browser.openAndWaitFor(AgentsPage.class);
+        AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
         if (agentsPage.isActionAvailable(name, ACTION_ENABLE))
         {
             agentsPage.clickAction(name, ACTION_ENABLE);
-            browser.refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
+            getBrowser().refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
         }
     }
 
