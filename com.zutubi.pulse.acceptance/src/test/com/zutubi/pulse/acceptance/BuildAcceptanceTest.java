@@ -458,7 +458,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
-        assertEquals(ResultState.FAILURE.getPrettyString(), summaryPage.getBuildStatus());
+        assertEquals(ResultState.FAILURE, summaryPage.getBuildStatus());
 
         assertTrue(summaryPage.isErrorListPresent());
         assertTrue(summaryPage.isWarningListPresent());

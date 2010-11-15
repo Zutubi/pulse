@@ -8,7 +8,9 @@ import com.zutubi.pulse.acceptance.components.pulse.project.TestFailuresTable;
 import com.zutubi.pulse.acceptance.components.table.LinkTable;
 import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.webwork.Urls;
+
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -68,9 +70,9 @@ public class BuildSummaryPage extends ResponsibilityPage
         return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().panel.layout.east.panel.isVisible()"));
     }
     
-    public String getBuildStatus()
+    public ResultState getBuildStatus()
     {
-        return statusBox.getValue(PROPERTY_STATUS);
+        return ResultState.fromPrettyString(statusBox.getValue(PROPERTY_STATUS));
     }
 
     public String getTestsSummary()

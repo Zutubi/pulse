@@ -36,6 +36,5 @@ public class InstallPluginForm
     {
         browser.type(ID_PATH_FIELD, path);
         browser.click(ID_CONTINUE);
-        browser.waitForPageToLoad();
     }
 }

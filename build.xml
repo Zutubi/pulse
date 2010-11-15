@@ -519,7 +519,7 @@
         </exec>
 
         <echo message="Start acceptance test suite."/>
-        <junit printsummary="yes" fork="on" forkmode="once" outputtoformatters="false" maxmemory="512m"
+        <junit printsummary="yes" fork="on" forkmode="once" showoutput="true" outputtoformatters="false" maxmemory="512m"
                failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="pulse.package" value="build/pulse-${pulse.version}.${extension}"/>

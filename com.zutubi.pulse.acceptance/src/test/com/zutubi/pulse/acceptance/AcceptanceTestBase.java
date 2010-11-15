@@ -3,6 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.TimeStamps;
+import junit.framework.AssertionFailedError;
 
 import java.io.File;
 
@@ -75,13 +77,32 @@ public abstract class AcceptanceTestBase extends PulseTestCase
     // @Override
     public void runBare() throws Throwable
     {
+        // leave a trace in the output so that we can see the progress of the tests.
+        System.out.print(getClass().getName() + ":" + getName() + " ");
+        System.out.flush(); // flush here since we do not write a full line above.
+
+        long startTime = 0;
+
         setUp();
         try
         {
+            startTime = System.currentTimeMillis();
+            
             runTest();
+
+            System.out.print("[success]");
         }
         catch (Throwable t)
         {
+            if (t instanceof AssertionFailedError)
+            {
+                System.out.print("[failed]");
+            }
+            else
+            {
+                System.out.print("[error]");
+            }
+
             if (browser != null)
             {
                 String filename = getName() + ".png";
@@ -100,9 +121,8 @@ public abstract class AcceptanceTestBase extends PulseTestCase
         }
         finally
         {
+            System.out.println(" " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - startTime));
             tearDown();
         }
     }
-
-
 }
