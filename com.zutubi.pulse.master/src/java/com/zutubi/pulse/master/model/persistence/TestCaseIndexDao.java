@@ -11,5 +11,5 @@ public interface TestCaseIndexDao extends EntityDao<TestCaseIndex>
     TestCaseIndex findByCase(long stageNameId, String name);
     List<TestCaseIndex> findBySuite(long stageNameId, String suite);
     List<TestCaseIndex> findByStage(long stageNameId);
-    List<TestCaseIndex> findByProject(long projectId, int max);
+    int deleteByProject(long projectId);
 }

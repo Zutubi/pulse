@@ -75,4 +75,31 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(i2, found.get(1));
         assertPropertyEquals(i3, found.get(2));
     }
+
+    public void testDeleteByProject() throws Exception
+    {
+        TestCaseIndex i1 = new TestCaseIndex(1, 101, "suite1/case1");
+        TestCaseIndex i2 = new TestCaseIndex(1, 101, "suite2/case1");
+        TestCaseIndex i3 = new TestCaseIndex(2, 101, "suite1/case1");
+        TestCaseIndex i4 = new TestCaseIndex(2, 201, "suite1/case2");
+
+        testCaseIndexDao.save(i1);
+        testCaseIndexDao.save(i2);
+        testCaseIndexDao.save(i3);
+        testCaseIndexDao.save(i4);
+
+        commitAndRefreshTransaction();
+
+        int count = testCaseIndexDao.deleteByProject(1);
+        assertEquals(2, count);
+
+        List<TestCaseIndex> all = testCaseIndexDao.findAll();
+        assertEquals(2, all.size());
+        assertTrue(all.contains(i3));
+        assertTrue(all.contains(i4));
+        
+        count = testCaseIndexDao.deleteByProject(2);
+        assertEquals(2, count);
+        assertEquals(0, testCaseIndexDao.findAll().size());
+    }
 }

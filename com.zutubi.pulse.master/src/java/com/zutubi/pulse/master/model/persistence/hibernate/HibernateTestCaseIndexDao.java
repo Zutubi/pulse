@@ -68,18 +68,17 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
         });
     }
 
-    public List<TestCaseIndex> findByProject(final long projectId, final int max)
+    public int deleteByProject(final long projectId)
     {
-        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from TestCaseIndex model where model.projectId = :projectId");
+                Query queryObject = session.createQuery("delete from TestCaseIndex model where model.projectId = :projectId");
                 queryObject.setParameter("projectId", projectId);
-                queryObject.setMaxResults(max);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
-                return queryObject.list();
+                return queryObject.executeUpdate();
             }
         });
     }

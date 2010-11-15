@@ -145,6 +145,7 @@
                 <ref local="renameCancelBuildPermission"/>
                 <ref local="cleanIvyCache"/>
                 <ref local="fixNullPostProcessors"/>
+                <ref local="testCaseIndexIndices"/>
                 <ref local="addAgentSynchTimestamp"/>
                 <ref local="addEnableDisableToCommandAndStage"/>
                 <ref local="addTerminatedResultStateToBuildHooks"/>
@@ -749,6 +750,10 @@
         <property name="buildNumber" value="202008001"/>
     </bean>
 
+    <bean id="testCaseIndexIndices" class="com.zutubi.pulse.master.upgrade.tasks.TestCaseIndexIndicesUpgradeTask">
+        <property name="buildNumber" value="202013001"/>
+    </bean>
+    
     <bean id="addAgentSynchTimestamp" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
         <property name="buildNumber" value="202999001"/>
         <property name="mappings">
@@ -781,5 +786,4 @@
     <bean id="addConcurrentBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddConcurrentBuildsFieldUpgradeTask">
         <property name="buildNumber" value="202999007"/>
     </bean>
-
 </beans>
