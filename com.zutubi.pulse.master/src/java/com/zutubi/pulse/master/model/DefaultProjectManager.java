@@ -150,6 +150,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     idToConfig.remove(instance.getProjectId());
                     validConfigs.remove(instance);
                     removeFromLabelMap(instance);
+                    reloadDownstreamProjects(instance);
                     refreshDownstreamCache();
                 }
                 finally

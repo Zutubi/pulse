@@ -1,18 +1,26 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.*;
+import static com.zutubi.util.Constants.MEGABYTE;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.*;
@@ -20,15 +28,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
-import static com.zutubi.util.Constants.MEGABYTE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 public class DependenciesAcceptanceTest extends AcceptanceTestBase
 {
@@ -486,6 +485,29 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         assertEquals(upstreamProject.getName(), descriptors[0].getDependencyId().getName());
     }
 
+    // CIB-2626
+    public void testRetrieve_AfterUpstreamDelete() throws Exception
+    {
+        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        upstreamProject.addArtifacts("build/artifact.jar");
+        upstreamProject.addFilesToCreate("build/artifact.jar");
+        insertProject(upstreamProject);
+
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+
+        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        downstreamProject.addDependency(upstreamProject.getConfig());
+        insertProject(downstreamProject);
+
+        xmlRpcHelper.deleteConfig(upstreamProject.getConfig().getConfigurationPath());
+
+        int buildNumber = buildRunner.triggerSuccessfulBuild(downstreamProject.getConfig());
+
+        IvyModuleDescriptor ivyModuleDescriptor = repository.getIvyModuleDescriptor(downstreamProject.getName(), buildNumber);
+        DependencyDescriptor[] descriptors = ivyModuleDescriptor.getDescriptor().getDependencies();
+        assertEquals(0, descriptors.length);
+    }
+    
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
         DepAntProject projectA = projects.createDepAntProject(randomName + "A");
