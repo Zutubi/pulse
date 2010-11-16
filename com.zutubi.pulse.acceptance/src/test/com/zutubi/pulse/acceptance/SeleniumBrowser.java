@@ -52,6 +52,8 @@ public class SeleniumBrowser
     private String baseUrl;
     private Urls urls;
 
+    private boolean captureNetworkTraffic;
+
     private static String getBrowserProperty()
     {
         // System properties (-D...).  This option is for running
@@ -117,7 +119,15 @@ public class SeleniumBrowser
     {
         if (!started)
         {
-            selenium.start();
+            if (captureNetworkTraffic)
+            {
+                selenium.start("captureNetworkTraffic=true");
+            }
+            else
+            {
+                selenium.start();
+            }
+            
             selenium.setTimeout(String.valueOf(DEFAULT_TIMEOUT));
             started = true;
         }
@@ -740,6 +750,21 @@ public class SeleniumBrowser
                 e.printStackTrace(System.err);
             }
         }
+    }
+
+    public void setCaptureNetworkTraffic(boolean b)
+    {
+        captureNetworkTraffic = b;
+    }
+
+    public void resetCapturedNetworkTraffic()
+    {
+        getCapturedNetworkTraffic();
+    }
+    
+    public String getCapturedNetworkTraffic()
+    {
+        return selenium.captureNetworkTraffic("xml");
     }
 
     public void captureScreenshot(File screenshotFile)

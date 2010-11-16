@@ -56,18 +56,21 @@ public class RememberMeAcceptanceTest extends AcceptanceTestBase
 
         String cookie = getBrowser().getCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY);
 
+        getBrowser().setCaptureNetworkTraffic(true);
         getBrowser().newSession();
         getBrowser().deleteAllCookies();
 
         // open the browser at '/' and ensure we are asked to login.
         getBrowser().open("/");
         getBrowser().waitForPageToLoad();
-        assertTrue(loginPage.isPresent());
-        
+        assertTrue("Login page is expected.", loginPage.isPresent());
+        getBrowser().resetCapturedNetworkTraffic();
         getBrowser().setCookie(SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, cookie);
         getBrowser().open("/");
         getBrowser().waitForPageToLoad();
-        assertFalse(loginPage.isPresent());
+        assertFalse("Login page is not expected.", loginPage.isPresent());
+
+        System.out.println(getBrowser().getCapturedNetworkTraffic());
     }
 
     private boolean isRememberMeCookieSet()
