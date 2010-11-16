@@ -2803,7 +2803,7 @@ if(Ext.ux.tree) { ZUTUBI.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 sortable: false,
                 tpl: '<tpl if="extraAttributes.actions">' +
                          '<tpl for="extraAttributes.actions">' +
-                             '&nbsp;<a href="{url}">' +
+                             '&nbsp;<a href="' + window.baseUrl + '{url}">' +
                                  '<img alt="{type}" src="'+ window.baseUrl + '/images/artifacts/{type}.gif" ext:qtip="{[ZUTUBI.ArtifactsTree.prototype.tooltips[values.type]]}"/>' +
                              '</a>' +
                          '</tpl>' +
