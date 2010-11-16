@@ -11,6 +11,7 @@ import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
@@ -235,7 +236,7 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         return antForm;
     }
 
-    private void selectJUnitJarAndConfirm(AntCommandForm antForm)
+    private void selectJUnitJarAndConfirm(final AntCommandForm antForm)
     {
         PulseFileSystemBrowserWindow browse = antForm.clickBrowseBuildFile();
         browse.waitForNode("lib");
@@ -245,6 +246,13 @@ public class BrowseScmAcceptanceTest extends SeleniumTestBase
         browse.clickOk();
         browse.waitForClose();
         
-        assertEquals("lib/junit-3.8.1.jar", antForm.getBuildFileFieldValue());
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return "lib/junit-3.8.1.jar".equals(antForm.getBuildFileFieldValue());
+            }
+        }, TIMEOUT, "build file field to be updated to with the selected value. " +
+                "Current value is " + antForm.getBuildFileFieldValue() + ", expected lib/junit-3.8.1.jar");
     }
 }
