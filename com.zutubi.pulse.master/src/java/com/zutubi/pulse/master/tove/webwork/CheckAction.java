@@ -6,8 +6,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.SimpleInstantiator;
-import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 
@@ -60,8 +60,14 @@ public class CheckAction extends ToveActionSupport
         }
 
         String symbolicName = formParameters.get("symbolicName")[0];
-        Type type = typeRegistry.getType(symbolicName);
-        record = ToveUtils.toRecord((CompositeType) type, formParameters);
+        CompositeType type = typeRegistry.getType(symbolicName);
+        record = ToveUtils.toRecord(type, formParameters);
+        
+        Record existingRecord = configurationTemplateManager.getRecord(path);
+        if (existingRecord != null)
+        {
+            ToveUtils.unsuppressPasswords(existingRecord, (MutableRecord) record, type, false);
+        }
 
         // Now lets create the record for the secondary form, used to generate the check processor. 
         CompositeType checkType = configurationRegistry.getConfigurationCheckType((CompositeType) type);

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 
@@ -15,6 +15,14 @@ import java.util.Hashtable;
  */
 public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    public static final String P4PORT = ":6777";
+    public static final String P4USER = "pulse";
+    public static final String P4PASSWD = "pulse";
+    public static final String P4CLIENT = "triviant";
+
+    private static final String WORKSPACE_PREFIX = "pulse-";
+
+    private static final long BUILD_TIMEOUT = 90000;
     private static final long WORKSPACE_TIMEOUT = 30000;
 
     private PerforceCore core;
