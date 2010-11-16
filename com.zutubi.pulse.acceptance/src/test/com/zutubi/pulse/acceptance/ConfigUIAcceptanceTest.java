@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.PerforceAcceptanceTest.*;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -9,10 +10,12 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.StringUtils.uriComponentEncode;
-
 import static java.util.Arrays.asList;
+
 import java.util.Hashtable;
 
 /**
@@ -813,6 +816,46 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         configPage.clickBuildOptionsAndWait();
     }
 
+    public void testPasswordSuppression() throws Exception
+    {
+        final String FIELD_PASSWORD = "password";
+
+        Hashtable<String, Object> p4Config = xmlRpcHelper.createPerforceConfig(P4PORT, P4USER, P4PASSWD, P4CLIENT);
+        String projectName = random;
+        xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
+        
+        loginAsAdmin();
+        goTo(urls.adminProject(uriComponentEncode(projectName)) + "scm/");
+        PerforceForm form = new PerforceForm(selenium);
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        CheckForm checkForm = new CheckForm(form);
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
+        
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, ""));
+        form.waitFor();
+        assertEquals("", form.getFieldValue(FIELD_PASSWORD));
+
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+        
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, "broken"));
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, P4PASSWD));
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
+    }
+    
     private void checkListedRecipes(String... expectedRecipes)
     {
         loginAsAdmin();

@@ -121,12 +121,14 @@ public abstract class SeleniumForm
 
     public void submitNamedFormElements(String submitValue, Pair<String, String>... fieldValues)
     {
-        if (fieldValues != null)
+        if (fieldValues != null && fieldValues.length > 0)
         {
             for (Pair<String, String> fv: fieldValues)
             {
                 setFieldValue(fv.first, fv.second);
             }
+            
+            updateButtons(fieldValues[0].first);
         }
 
         submit(submitValue);
@@ -314,8 +316,13 @@ public abstract class SeleniumForm
         // selenium doesn't work :|.
         if (names.length > 0)
         {
-            selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(names[0]) + "'); field.form.updateButtons()");
+            updateButtons(names[0]);
         }
+    }
+
+    private void updateButtons(String name)
+    {
+        selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "'); field.form.updateButtons()");
     }
 
     public String[] getFormValues()

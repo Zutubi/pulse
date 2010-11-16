@@ -17,6 +17,7 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Listing;
+import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
@@ -44,6 +45,7 @@ public class ToveUtils
     private static final String KEY_TABLE_HEADING = "table.heading";
 
     private static final String[] EMPTY_ARRAY = {};
+    public static final String SUPPRESSED_PASSWORD = "[suppressed password]";
 
     public static String getConfigURL(String path, String action, String submitField)
     {
@@ -672,5 +674,87 @@ public class ToveUtils
             default:
                 return "content";
         }
+    }
+
+    /**
+     * Suppresses the values of all password fields in the given record in
+     * preparation for it to be handed out via a UI. 
+     * 
+     * @param record the record to suppress password values within
+     * @param type   the type of the given record
+     * @param deep   set to true to recursively suppresses values in child
+     *               records
+     */
+    public static void suppressPasswords(MutableRecord record, ComplexType type, boolean deep)
+    {
+        if (type instanceof CompositeType)
+        {
+            CompositeType compositeType = (CompositeType) type;
+            for (String propertyName: compositeType.getSimplePropertyNames())
+            {
+                if (record.containsKey(propertyName) && isPasswordProperty(compositeType, propertyName))
+                {
+                    record.put(propertyName, SUPPRESSED_PASSWORD);
+                }
+            }
+        }
+        
+        if (deep)
+        {
+            for (String nestedKey: record.nestedKeySet())
+            {
+                MutableRecord childRecord = (MutableRecord) record.get(nestedKey);
+                suppressPasswords(childRecord, (ComplexType) type.getActualPropertyType(nestedKey, childRecord), true);
+            }
+        }
+    }
+
+    /**
+     * Restores the values of all unchanged password fields in the given record
+     * from the given original record.  An unchanged field will have the
+     * placeholder value used by {@link #suppressPasswords(com.zutubi.tove.type.record.MutableRecord, com.zutubi.tove.type.ComplexType, boolean)}.
+     * 
+     * @param originalRecord the original record, with original password values
+     * @param newRecord      the input record in which to unsuppress passwords
+     * @param type           the type of the given records
+     * @param deep           set to true to recursively unsuppresses values in
+     *                       child records
+     */
+    public static void unsuppressPasswords(Record originalRecord, MutableRecord newRecord, ComplexType type, boolean deep)
+    {
+        if (type instanceof CompositeType)
+        {
+            CompositeType compositeType = (CompositeType) type;
+            for (String propertyName: compositeType.getSimplePropertyNames())
+            {
+                if (SUPPRESSED_PASSWORD.equals(newRecord.get(propertyName)) && isPasswordProperty(compositeType, propertyName))
+                {
+                    newRecord.put(propertyName, originalRecord.get(propertyName));
+                }
+            }
+        }
+        
+        if (deep)
+        {
+            for (String nestedKey: newRecord.nestedKeySet())
+            {
+                MutableRecord childNewRecord = (MutableRecord) newRecord.get(nestedKey);
+                ComplexType childNewType = (ComplexType) type.getActualPropertyType(nestedKey, childNewRecord);
+                Record childOriginalRecord = (Record) originalRecord.get(nestedKey);
+                if (childOriginalRecord != null)
+                {
+                    ComplexType childOriginalType = (ComplexType) type.getActualPropertyType(nestedKey, childOriginalRecord);
+                    if (childNewType.equals(childOriginalType))
+                    {
+                        unsuppressPasswords(childOriginalRecord, childNewRecord, childNewType, true);
+                    }
+                }
+            }
+        }
+    }
+    
+    private static boolean isPasswordProperty(CompositeType type, String propertyName)
+    {
+        return propertyName.equals("password") || type.getProperty(propertyName).getAnnotation(Password.class) != null;
     }
 }

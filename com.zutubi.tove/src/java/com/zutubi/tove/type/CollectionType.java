@@ -143,4 +143,38 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
         return changes;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        CollectionType that = (CollectionType) o;
+
+        if (ordered != that.ordered)
+        {
+            return false;
+        }
+        if (collectionType != null ? !collectionType.equals(that.collectionType) : that.collectionType != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = collectionType != null ? collectionType.hashCode() : 0;
+        result = 31 * result + (ordered ? 1 : 0);
+        return result;
+    }
 }

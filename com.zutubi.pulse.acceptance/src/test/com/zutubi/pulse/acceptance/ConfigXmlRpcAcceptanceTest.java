@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
@@ -20,6 +21,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final String TEST_PROJECT_NAME = "config-xml-rpc";
     private static final String TEST_PROJECT_PATH = "projects/config-xml-rpc";
+    
+    private static final String PATH_EMAIL_SETTINGS = "settings/email";
 
     protected void setUp() throws Exception
     {
@@ -93,9 +96,9 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         emailConfig.put("host", "localhost");
         emailConfig.put("from", "pulse@zutubi.com");
         emailConfig.put("ssl", true);
-        call("saveConfig", "settings/email", emailConfig, false);
+        call("saveConfig", PATH_EMAIL_SETTINGS, emailConfig, false);
 
-        emailConfig = call("getConfig", "settings/email");
+        emailConfig = call("getConfig", PATH_EMAIL_SETTINGS);
         assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertEquals("localhost", emailConfig.get("host"));
         assertEquals("pulse@zutubi.com", emailConfig.get("from"));
@@ -121,6 +124,12 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
+    public void testGetConfigWithPassword() throws Exception
+    {
+        Hashtable<String, Object> emailConfig = call("getConfig", PATH_EMAIL_SETTINGS);
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, emailConfig.get("password"));
+    }
+        
     public void testGetRawConfigEmptyPath() throws Exception
     {
         callAndExpectError("does not exist", "getConfig", "");
@@ -133,7 +142,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetRawConfig() throws Exception
     {
-        Hashtable<String, Object> emailConfig = call("getRawConfig", "settings/email");
+        Hashtable<String, Object> emailConfig = call("getRawConfig", PATH_EMAIL_SETTINGS);
         assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertTrue(emailConfig.containsKey("host"));
         assertTrue(emailConfig.containsKey("port"));
@@ -141,6 +150,12 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(emailConfig.containsKey("ssl"));
     }
 
+    public void testGetRawConfigWithPassword() throws Exception
+    {
+        Hashtable<String, Object> emailConfig = call("getRawConfig", PATH_EMAIL_SETTINGS);
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, emailConfig.get("password"));
+    }
+    
     public void testGetRawConfigTemplated() throws Exception
     {
         String agentName = randomName();
@@ -179,7 +194,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Hashtable<String, Object> config = new Hashtable<String, Object>();
         config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
-        callAndExpectError("record already exists", "insertConfig", "settings/email", config);
+        callAndExpectError("record already exists", "insertConfig", PATH_EMAIL_SETTINGS, config);
     }
 
     public void testInsertConfigNoSymbolicName() throws Exception
@@ -258,7 +273,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testInsertTemplatedConfigNonTemplatedParentPath() throws Exception
     {
-        callAndExpectError("parent path 'settings' is not a templated collection", "insertTemplatedConfig", "settings/email", new Hashtable(), false);
+        callAndExpectError("parent path 'settings' is not a templated collection", "insertTemplatedConfig", PATH_EMAIL_SETTINGS, new Hashtable(), false);
     }
 
     public void testInsertTemplatedConfigConcreteParentPath() throws Exception

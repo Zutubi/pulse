@@ -351,6 +351,17 @@ public class XmlRpcHelper
         return scm;
     }
 
+    public Hashtable<String, Object> createPerforceConfig(String port, String user, String password, String client) throws Exception
+    {
+        Hashtable<String, Object> p4Config = createDefaultConfig("zutubi.perforceConfig");
+        p4Config.put("port", port);
+        p4Config.put("user", user);
+        p4Config.put("password", password);
+        p4Config.put("spec", client);
+        p4Config.put("monitor", false);
+        return p4Config;
+    }
+    
     public Hashtable<String, Object> getAntConfig()
     {
         Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");

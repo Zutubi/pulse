@@ -17,10 +17,10 @@ import java.util.List;
  */
 public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
-    private static final String P4PORT = ":6777";
-    private static final String P4USER = "pulse";
-    private static final String P4PASSWD = "pulse";
-    private static final String P4CLIENT = "triviant";
+    public static final String P4PORT = ":6777";
+    public static final String P4USER = "pulse";
+    public static final String P4PASSWD = "pulse";
+    public static final String P4CLIENT = "triviant";
 
     private static final String WORKSPACE_PREFIX = "pulse-";
 
@@ -105,15 +105,10 @@ public class PerforceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         core.setEnv(PerforceConstants.ENV_CLIENT, P4CLIENT);
         return core;
     }
-
+    
     private Hashtable<String, Object> createPerforceConfig() throws Exception
     {
-        Hashtable<String, Object> p4Config = xmlRpcHelper.createDefaultConfig("zutubi.perforceConfig");
-        p4Config.put("port", P4PORT);
-        p4Config.put("user", P4USER);
-        p4Config.put("password", P4PASSWD);
-        p4Config.put("spec", P4CLIENT);
-        p4Config.put("monitor", false);
-        return p4Config;
+        return xmlRpcHelper.createPerforceConfig(P4PORT, P4USER, P4PASSWD, P4CLIENT);
     }
+    
 }
