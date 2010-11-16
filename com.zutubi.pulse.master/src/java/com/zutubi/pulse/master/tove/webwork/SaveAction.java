@@ -7,6 +7,7 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
 
 /**
@@ -65,7 +66,12 @@ public class SaveAction extends ToveActionSupport
         }
 
         record = ToveUtils.toRecord(type, ActionContext.getContext().getParameters());
-
+        Record existingRecord = configurationTemplateManager.getRecord(path);
+        if (existingRecord != null)
+        {
+            ToveUtils.unsuppressPasswords(existingRecord, (MutableRecord) record, type, false);
+        }
+        
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
         try
