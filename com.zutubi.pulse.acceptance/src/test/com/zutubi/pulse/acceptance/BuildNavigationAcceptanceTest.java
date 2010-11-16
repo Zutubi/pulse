@@ -212,7 +212,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
 
         PersonalBuildRunner buildRunner = new PersonalBuildRunner(xmlRpcHelper);
         buildRunner.setBase(workingCopy);
-        buildRunner.createConfigFile(getBrowser().getBaseUrl(), userName, "", projectName);
+        buildRunner.createConfigFile(baseUrl, userName, "", projectName);
 
         doTestNoPersonalBuilds();
 

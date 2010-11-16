@@ -529,7 +529,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     private void createConfigFile(String projectName, Pair<String, ?>... extraProperties) throws IOException
     {
-        buildRunner.createConfigFile(getBrowser().getBaseUrl(), ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
+        buildRunner.createConfigFile(baseUrl, ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), projectName, extraProperties);
     }
 
     private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException, ClientException

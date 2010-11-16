@@ -979,7 +979,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private String getArtifactFileUrl(String filename, Hashtable<String, Object> artifact)
     {
-        return getBrowser().getBaseUrl() + artifact.get("permalink") + filename;
+        return baseUrl + artifact.get("permalink") + filename;
     }
 
     public void testManualTriggerBuildWithPrompt() throws Exception

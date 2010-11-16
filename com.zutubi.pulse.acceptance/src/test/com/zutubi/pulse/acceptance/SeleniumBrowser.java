@@ -49,7 +49,6 @@ public class SeleniumBrowser
     private Selenium selenium;
     private String browser;
     private boolean started = false;
-    private String baseUrl;
     private Urls urls;
 
     private boolean captureNetworkTraffic;
@@ -93,14 +92,9 @@ public class SeleniumBrowser
     public SeleniumBrowser(int port, String browser)
     {
         this.browser = browser;
-        baseUrl = AcceptanceTestUtils.getPulseUrl(port);
+        String baseUrl = AcceptanceTestUtils.getPulseUrl(port);
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
         urls = new Urls(baseUrl);
-    }
-
-    public String getBaseUrl()
-    {
-        return baseUrl;
     }
 
     /**

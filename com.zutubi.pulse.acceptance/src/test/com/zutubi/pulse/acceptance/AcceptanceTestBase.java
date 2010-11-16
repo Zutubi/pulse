@@ -42,7 +42,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
         xmlRpcHelper = new XmlRpcHelper();
         random = randomName();
 
-        browserFactory = new DefaultSeleniumBrowserFactory();
+        browserFactory = new SingleSeleniumBrowserFactory();
         browserFactory.cleanup();
 
         urls = new Urls(baseUrl);
