@@ -51,8 +51,8 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseLinkAvailableInProjectWizardForSubversion()
     {
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public void commandState(AddProjectWizard.CommandState form)
             {
@@ -66,8 +66,8 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseLinkNotAvailableInProjectWizardForGit()
     {
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public String selectScm()
             {

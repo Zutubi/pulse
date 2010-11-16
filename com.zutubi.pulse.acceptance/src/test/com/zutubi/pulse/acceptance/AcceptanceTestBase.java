@@ -11,7 +11,10 @@ import java.io.File;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 
 /**
- *
+ * The base class for all acceptance level tests.  It provides some useful
+ * support for debugging acceptance tests.  In particular, screenshots are taken
+ * when tests that use a browser fail, and the execution of a test is sent to
+ * standard out so that it can be picked up in the logs.
  */
 public abstract class AcceptanceTestBase extends PulseTestCase
 {
@@ -74,7 +77,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
      *
      * @throws Throwable if any exception is thrown
      */
-    // @Override
+    @Override
     public void runBare() throws Throwable
     {
         // leave a trace in the output so that we can see the progress of the tests.

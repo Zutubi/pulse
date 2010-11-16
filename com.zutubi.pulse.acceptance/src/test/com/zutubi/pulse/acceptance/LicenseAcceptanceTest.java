@@ -149,8 +149,8 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertExceeded();
 
         // Adding a project should fail
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        AddProjectWizard.CommandState state = webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard.CommandState state = wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
         state.waitFor();
         assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
     }

@@ -118,8 +118,8 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
 
     private void createMavenProject(final String commandType, final Pair<String, String>... fieldValues) throws Exception
     {
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
             public void scmState(AddProjectWizard.ScmState form)

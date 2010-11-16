@@ -65,8 +65,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         // When configuring a template and a single select is shown, that
         // single select should have an empty option added.
         getBrowser().loginAsAdmin();
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.addProject(random, true, GLOBAL_PROJECT_NAME);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.addProject(random, true, GLOBAL_PROJECT_NAME);
         getBrowser().open(urls.adminProject(uriComponentEncode(random)) + "scm/");
         SubversionForm form = getBrowser().createForm(SubversionForm.class);
         form.waitFor();
@@ -586,8 +586,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
             public String selectType()
@@ -638,8 +638,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
 
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.runAddProjectWizard(new WebUIHelper.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
             public String selectType()
@@ -717,8 +717,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     public void testDefaultProjectConfigCreated()
     {
         getBrowser().loginAsAdmin();
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.addProject(random);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.addProject(random);
 
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "stages"));
         assertTrue(listPage.isItemPresent("default", ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE));
@@ -733,8 +733,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String childName = random + "-child";
 
         getBrowser().loginAsAdmin();
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.addProject(parentName, true, GLOBAL_PROJECT_NAME);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.addProject(parentName, true, GLOBAL_PROJECT_NAME);
+        
         addInheritingProject(parentName, childName);
 
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, childName, "stages"));
@@ -944,8 +945,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         String punctuatedName = ".;.,." + random;
-        WebUIHelper webUIHelper = new WebUIHelper(getBrowser(), xmlRpcHelper);
-        webUIHelper.addProject(punctuatedName);
+
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        wizard.addProject(punctuatedName);
 
         // Check the hierarchy, config and such.
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, punctuatedName, false);
