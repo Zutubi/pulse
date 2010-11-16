@@ -2,35 +2,37 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
+import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.IOUtils;
-
-import java.util.*;
-
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
+import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Condition;
+import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
+import com.zutubi.util.io.IOUtils;
+
 import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -1076,6 +1078,46 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
                 return !templatePage.isTreeLinkVisible("properties");
             }
         }, SeleniumBrowser.WAITFOR_TIMEOUT, "tree to collapse");
+    }
+    
+    public void testPasswordSuppression() throws Exception
+    {
+        final String FIELD_PASSWORD = "password";
+
+        Hashtable<String, Object> p4Config = PerforceUtils.createSpecConfig(xmlRpcHelper);
+        String projectName = random;
+        xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
+        
+        getBrowser().loginAsAdmin();
+        getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(projectName)) + "scm/");
+        PerforceForm form = new PerforceForm(getBrowser());
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        CheckForm checkForm = new CheckForm(form);
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
+        
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, ""));
+        form.waitFor();
+        assertEquals("", form.getFieldValue(FIELD_PASSWORD));
+
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+        
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, "broken"));
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        checkForm.checkFormElementsAndWait();
+        assertFalse(checkForm.isResultOk());
+
+        form.applyNamedFormElements(asPair(FIELD_PASSWORD, P4PASSWD));
+        form.waitFor();
+        assertEquals(ToveUtils.SUPPRESSED_PASSWORD, form.getFieldValue(FIELD_PASSWORD));
+        
+        checkForm.checkFormElementsAndWait();
+        assertTrue(checkForm.isResultOk());
     }
     
     private void checkListedRecipes(String... expectedRecipes)

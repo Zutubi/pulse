@@ -35,6 +35,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -42,6 +43,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -62,8 +64,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -440,9 +440,15 @@ public class RemoteApi
 
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
 
-            Type t = configurationTemplateManager.getType(path);
+            ComplexType type = configurationTemplateManager.getType(path);
             String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
-            return t.toXmlRpc(templateOwnerPath, t.unstantiate(instance, templateOwnerPath));
+            Object unstantiated = type.unstantiate(instance, templateOwnerPath);
+            if (unstantiated instanceof MutableRecord)
+            {
+                ToveUtils.suppressPasswords((MutableRecord) unstantiated, type, true);
+            }
+            
+            return type.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), unstantiated);
         }
         finally
         {
@@ -541,8 +547,10 @@ public class RemoteApi
             }
 
             configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
-            Type t = configurationTemplateManager.getType(path);
-            return t.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), record);
+            ComplexType type = configurationTemplateManager.getType(path);
+            MutableRecord clone = record.copy(true, true);
+            ToveUtils.suppressPasswords(clone, type, true);
+            return type.toXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), clone);
         }
         finally
         {
@@ -834,6 +842,7 @@ public class RemoteApi
 
             CompositeType type = typeRegistry.getType(existingSymbolicName);
             MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config);
+            ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
 
             Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, configurationTemplateManager.isConcrete(path), deep);
             if ((deep && !type.isValid(instance)) || !instance.isValid())

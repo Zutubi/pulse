@@ -2,11 +2,10 @@ package com.zutubi.pulse.acceptance.forms;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.*;
+import static com.zutubi.util.StringUtils.stripLineBreaks;
 import junit.framework.Assert;
 
 import java.util.List;
-
-import static com.zutubi.util.StringUtils.stripLineBreaks;
 
 /**
  * Base for form classes: supports methods for reading and writing fields and
@@ -255,9 +254,9 @@ public abstract class SeleniumForm
         int type = getFieldType(name);
         setFormElement(name, value, type);
 
-        // Hack: make sure buttons are updated.  Typing something empty in
-        // selenium doesn't work :|.
-        if (type == TEXTFIELD && value != null && value.length() == 0)
+        // Hack: make sure buttons are updated.  Typing in selenium doesn't
+        // work :|.
+        if (type == TEXTFIELD)
         {
             forceButtonUpdate(name);
         }
