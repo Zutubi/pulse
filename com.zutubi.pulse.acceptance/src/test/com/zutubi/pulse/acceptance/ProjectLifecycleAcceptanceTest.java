@@ -1,14 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
+import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
+import com.zutubi.util.EnumUtils;
 
 import java.util.Hashtable;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 
 /**
  * Tests the initialisation/destroy cycle for projects.
@@ -80,6 +83,40 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
         xmlRpcHelper.waitForProjectToInitialise(random);
     }
 
+    public void testPauseResume() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random);
+        assertProjectState(random, Project.State.IDLE);
+
+        getBrowser().loginAsAdmin();
+        final ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(homePage.isTransitionLinkPresent(Project.Transition.PAUSE));
+        assertFalse(homePage.isTransitionLinkPresent(Project.Transition.RESUME));
+
+        homePage.clickTransitionLink(Project.Transition.PAUSE);
+        TestUtils.waitForCondition(new ProjectStateCondition(homePage, Project.State.PAUSED), SeleniumBrowser.DEFAULT_TIMEOUT, "project to become paused");
+
+        assertFalse(homePage.isTransitionLinkPresent(Project.Transition.PAUSE));
+        assertTrue(homePage.isTransitionLinkPresent(Project.Transition.RESUME));
+
+        homePage.clickTransitionLink(Project.Transition.RESUME);
+        TestUtils.waitForCondition(new ProjectStateCondition(homePage, Project.State.IDLE), SeleniumBrowser.DEFAULT_TIMEOUT, "project to become idle");
+
+        assertTrue(homePage.isTransitionLinkPresent(Project.Transition.PAUSE));
+        assertFalse(homePage.isTransitionLinkPresent(Project.Transition.RESUME));
+    }
+
+    public void testInitialisationFailed() throws Exception
+    {
+        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig("bad url"), xmlRpcHelper.getAntConfig());
+        assertProjectState(random, Project.State.INITIALISATION_FAILED);
+
+        getBrowser().loginAsAdmin();
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
+        assertEquals(EnumUtils.toPrettyString(Project.State.INITIALISATION_FAILED), homePage.getState());
+        assertTrue(homePage.isTransitionLinkPresent(Project.Transition.INITIALISE));
+    }
+
     private void assertProjectState(String project, Project.State expectedState) throws Exception
     {
         assertEquals(expectedState, xmlRpcHelper.getProjectState(project));
@@ -92,5 +129,22 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(ProjectLogPage.class, project);
         assertTrue(getBrowser().isTextPresent("Reinitialising"));
+    }
+
+    private static class ProjectStateCondition implements Condition
+    {
+        private final ProjectHomePage homePage;
+        private Project.State state;
+
+        public ProjectStateCondition(ProjectHomePage homePage, Project.State state)
+        {
+            this.homePage = homePage;
+            this.state = state;
+        }
+
+        public boolean satisfied()
+        {
+            return homePage.getState().equals(EnumUtils.toPrettyString(state));
+        }
     }
 }

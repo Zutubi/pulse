@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.model.Project;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
@@ -100,6 +101,32 @@ public class ProjectHomePage extends ResponsibilityPage
         state = StringUtils.stripSuffix(state, "reinitialise");
         state = state.trim();
         return state;
+    }
+
+    /**
+     * Indicates if a link is present for the given project transition.
+     *
+     * @param transition the transition to check for
+     * @return true if there is a link to make the given transition
+     */
+    public boolean isTransitionLinkPresent(Project.Transition transition)
+    {
+        return browser.isElementIdPresent(getTransitionId(transition));
+    }
+
+    /**
+     * Clicks the link for the given project transition.
+     *
+     * @param transition the transition to trigger
+     */
+    public void clickTransitionLink(Project.Transition transition)
+    {
+        browser.click(getTransitionId(transition));
+    }
+
+    private String getTransitionId(Project.Transition transition)
+    {
+        return "project-transition-" + transition.toString().toLowerCase();
     }
 
     /**

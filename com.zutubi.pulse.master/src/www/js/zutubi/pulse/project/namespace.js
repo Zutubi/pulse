@@ -149,7 +149,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
                 
         TRANSITION_TEMPLATE: new Ext.XTemplate(
-            '<a class="unadorned" href="{[window.baseUrl]}/projectState.action?projectName={encodedProjectName}&amp;transition={transition}">' +
+            '<a id="project-transition-{transition}" class="unadorned" href="{[window.baseUrl]}/projectState.action?projectName={encodedProjectName}&amp;transition={transition}">' +
                 '<img src="{[window.baseUrl]}/images/project/{transition}.gif"/> ' +
                 '{label}' +
             '</a>'
