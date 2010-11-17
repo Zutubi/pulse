@@ -20,28 +20,39 @@ public class CommentList extends Component
     }
 
     /**
-     * Indicates if a delete link is shown for the comment of the given number.
-     * 
-     * @param commentNumber one-based position of the comment in the list
-     * @return true if the given comment has a delete link
+     * Indicates if a comment with the given id is present.
+     *
+     * @param commentId unique id of the comment
+     * @return true if the comment is present, false otherwise
      */
-    public boolean isDeleteLinkPresent(int commentNumber)
+    public boolean isCommentPresent(long commentId)
     {
-        return browser.isElementIdPresent(getDeleteLinkId(commentNumber));
+        return browser.isElementIdPresent("comment-" + commentId);
     }
 
     /**
-     * Clicks the delete link for the comment of the given number.
+     * Indicates if a delete link is shown for the comment of the given id.
      * 
-     * @param commentNumber one-based position of the comment in the list
+     * @param commentId unique id of the comment
+     * @return true if the given comment has a delete link
      */
-    public void clickDeleteLink(int commentNumber)
+    public boolean isDeleteLinkPresent(long commentId)
     {
-        browser.click(getDeleteLinkId(commentNumber));
+        return browser.isElementIdPresent(getDeleteLinkId(commentId));
     }
 
-    private String getDeleteLinkId(int commentNumber)
+    /**
+     * Clicks the delete link for the comment of the given id.
+     * 
+     * @param commentId unique id of the comment
+     */
+    public void clickDeleteLink(long commentId)
     {
-        return "delete-comment-" + commentNumber;
+        browser.click(getDeleteLinkId(commentId));
+    }
+
+    private String getDeleteLinkId(long commentId)
+    {
+        return "delete-comment-" + commentId;
     }
 }

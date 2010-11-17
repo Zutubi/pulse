@@ -10,7 +10,6 @@ import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.webwork.Urls;
-
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -65,9 +64,24 @@ public class BuildSummaryPage extends ResponsibilityPage
         browser.waitForVariable("panel.initialised");
     }
 
+    /**
+     * Returns the number for the build.
+     *
+     * @return the build number
+     */
+    public long getBuildId()
+    {
+        return buildId;
+    }
+
+    /**
+     * Indicates if the right-hand panel (with actions, links etc) is visible.
+     *
+     * @return true if the panel is visible, false if it is collapsed
+     */
     public boolean isRightPaneVisible()
     {
-        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().panel.layout.east.panel.isVisible()"));
+        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('build-summary-right').isVisible()"));
     }
     
     public ResultState getBuildStatus()
@@ -90,14 +104,37 @@ public class BuildSummaryPage extends ResponsibilityPage
         return commentList.isPresent();
     }
 
-    public boolean isDeleteCommentLinkPresent(int commentNumber)
+    /**
+     * Indicates if a comment with the given id is present.
+     *
+     * @param commentId unique id of the comment
+     * @return true if the comment is present, false otherwise
+     */
+    public boolean isCommentPresent(long commentId)
     {
-        return commentList.isDeleteLinkPresent(commentNumber);
+        return commentList.isCommentPresent(commentId);
     }
 
-    public ConfirmDialog clickDeleteComment(int commentNumber)
+    /**
+     * Indicates if a delete link is shown for the comment of the given id.
+     *
+     * @param commentId unique id of the comment
+     * @return true if the given comment has a delete link
+     */
+    public boolean isCommentDeleteLinkPresent(long commentId)
     {
-        commentList.clickDeleteLink(commentNumber);
+        return commentList.isDeleteLinkPresent(commentId);
+    }
+
+    /**
+     * Clicks the delete link for the comment of the given id.
+     *
+     * @param commentId unique id of the comment
+     * @return a confirmation dialog that will be poppe up on clicking the link
+     */
+    public ConfirmDialog clickDeleteComment(long commentId)
+    {
+        commentList.clickDeleteLink(commentId);
         return new ConfirmDialog(browser);
     }
 

@@ -41,7 +41,7 @@ public class BuildStageModel extends ResultModel
         recipe = recipeResult.getRecipeName();
         agent = stageResult.getHost();
         tests = recipeResult.getTestSummary().toString();
-        buildLink = Urls.getBaselessInstance().build(buildResult).substring(1);
+        buildLink = Urls.getRelativeInstance().build(buildResult);
 
         if (collectArtifacts)
         {

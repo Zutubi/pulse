@@ -89,7 +89,7 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
                 case 'skipped':
                     return 'unknown';
                 default:
-                    return 'broken'
+                    return 'broken';
             }
         }
         else

@@ -7,10 +7,37 @@
  * trigger client-side (i.e. JavaScript) actions, or may navigate to other pages.
  *
  * For a simple link table, the data is an array of models containing an icon, label and action.
- * The models may optionally include an argument property, which is passed to the handler function.
+ * The models may optionally include an argument property, which is passed to the handler function:
+ *
+ * [{
+ *      icon: 'lightning',
+ *      label: 'trigger',
+ *      action: 'triggerBuild',
+ *      argument: false
+ *  }, {
+ *      icon: 'lightning',
+ *      label: 'rebuild',
+ *      action: 'triggerBuild',
+ *      argument: true
+ *  }, {
+ *      icon: 'brush',
+ *      label: 'clean up',
+ *      action: 'cleanUp',
+ *  }, ...
+ * ]
+ *
  * Links may optionally be divided into named categories.  In this case the data is an array of
  * objects that contain a name and an array of links in a property named by the linksProperty
- * config.
+ * config.  For example, if linksProperty was set to 'actions', two categories named 'c1' and 'c2'
+ * may be represented like:
+ *
+ * [{
+ *     name: 'c1',
+ *     actions: [{icon: 'foo', label: 'foo it', action: 'dofoo'}, ...]
+ *  }, {
+ *     name: 'c2',
+ *     actions: [{icon: 'bar', label: 'bar me', action: 'dobar'}, ...],
+ * }]
  *
  * @cfg {String} cls            Class to use for the table (defaults to 'content-table')
  * @cfg {Object} handlers       Mapping of link actions to either URLs (strings) or callback
@@ -23,12 +50,13 @@
  * @cfg {String} title          Title for the table heading row.
  * @cfg {String} idProperty     Which property of the links to use as the id suffix for the link
  *                              elements.  Defaults to 'icon'.
- * @cfg {String} categorised    If true, expect data split into named categories.
+ * @cfg {String} categorised    If true, expect data split into named categories.  Each category is
+ *                              separated by a row with the category prefix and name.
  * @cfg {String} categoryPrefix Optional prefix to prepend to category names.
  * @cfg {String} linksProperty  Name of the property that holds the links in a category model
  *                              (defaults to 'links').
- * @cfg {String} emptyMessage Message to show when the table has no rows to display (if not
- *                            specified, the table is hidden in this case).
+ * @cfg {String} emptyMessage   Message to show when the table has no rows to display (if not
+ *                              specified, the table is hidden in this case).
  */
 Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     initComponent: function()

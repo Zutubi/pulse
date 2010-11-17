@@ -17,8 +17,7 @@ import java.util.List;
  */
 public class BuildFeaturesModel
 {
-    private static final int FEATURE_LIMIT = 100;
-    
+
     private List<FeatureModel> features;
     private List<StageFeaturesModel> stages;
 
@@ -202,6 +201,8 @@ public class BuildFeaturesModel
 
     public static class FileFeaturesModel
     {
+        private static final int FEATURE_LIMIT = 100;
+        
         private String path;
         private int featureCount;
         private List<FeatureModel> features = new LinkedList<FeatureModel>();

@@ -13,6 +13,16 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
     imageSource: function(type, value) {
         return window.baseUrl + '/images/' + type + '/' + value.replace(' ', '').toLowerCase() + '.gif';
     },
+
+    /**
+     * Returns an HTML fragment with an image, for example a build status icon.
+     *
+     * @param type  designates the type of value (e.g. 'health', 'status')
+     * @param value the actual value (e.g. 'broken', 'success')
+     */
+    image: function(type, value) {
+        return '<img alt="' + value + '" src="' + Zutubi.pulse.project.imageSource(type, value) + '"/>';
+    },
     
     /**
      * Returns an HTML fragment with an image and label, for example a build status icon and
@@ -23,7 +33,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
      *              constant)
      */
     imageLabel: function(type, value) {
-        return '<img alt="' + value + '" src="' + Zutubi.pulse.project.imageSource(type, value) + '"/> ' + value;    
+        return Zutubi.pulse.project.image(type, value) + ' ' + value;
     },
     
     TRIMMED_TEMPLATE: new Ext.XTemplate(
@@ -209,16 +219,16 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         resultStatus: function(status, result) {
             if (status == 'in progress' && result.elapsed && result.elapsed.prettyEstimatedTimeRemaining)
             {
-                return '<img alt="in progress" src="' + window.baseUrl + '/images/status/inprogress.gif"/> ' +
+                return Zutubi.pulse.project.image('status', status) + ' ' +
                        Zutubi.pulse.project.renderers.resultElapsed(result.elapsed, result);
             }
             else if (status == 'success' && result.warnings && result.warnings > 0)
             {
-                return '<img alt="success with warnings" src="' + window.baseUrl + '/images/status/warnings.gif"/> success';
+                return Zutubi.pulse.project.image('status', 'warnings') + ' success';
             }
             else if (status == 'queued' && result.prettyQueueTime)
             {
-                return '<img alt="queued" src="' + window.baseUrl + '/images/status/queued.gif"/> ' +
+                return Zutubi.pulse.project.image('status', status) + ' ' +
                        'queued (' + result.prettyQueueTime + ')';
             }
             else

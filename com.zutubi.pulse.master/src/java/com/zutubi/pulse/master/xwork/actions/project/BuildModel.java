@@ -63,7 +63,7 @@ public class BuildModel extends ResultModel
             stages.add(new BuildStageModel(buildResult, node, urls, collectArtifacts));
         }
         
-        link = Urls.getBaselessInstance().build(buildResult).substring(1);
+        link = Urls.getRelativeInstance().build(buildResult);
     }
 
     public long getNumber()

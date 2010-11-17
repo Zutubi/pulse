@@ -21,31 +21,44 @@ import static com.zutubi.util.WebUtils.uriPathEncode;
 public class Urls
 {
     private static final Urls BASELESS_INSTANCE = new Urls("");
+    private static final Urls RELATIVE_INSTANCE = new Urls(null);
 
-    private String baseUrl;
+    private String baseUrl = null;
 
     /**
-     * @return a singleton Urls instance for relative URLs, i.e. those that
-     *         have an empty base url
+     * @return a singleton Urls instance for URLs with an empty base (i.e.
+     *         prefixed with a simple slash)
      */
     public static Urls getBaselessInstance()
     {
         return BASELESS_INSTANCE;
     }
 
+    /**
+     * @return a singleton Urls instance for relative URLs (i.e. with no
+     *         prefix, not beginning with a slash)
+     */
+    public static Urls getRelativeInstance()
+    {
+        return RELATIVE_INSTANCE;
+    }
+
     public Urls(String baseUrl)
     {
-        this.baseUrl = (baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl);
+        if (baseUrl != null)
+        {
+            this.baseUrl = (baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl);
+        }
     }
 
     public String base()
     {
-        return baseUrl + "/";
+        return baseUrl == null ? "" : baseUrl + "/";
     }
 
     public String login()
     {
-        return baseUrl + "/login!input.action";
+        return base() + "login!input.action";
     }
     
     public String dashboard()
@@ -125,7 +138,7 @@ public class Urls
 
     public String browse()
     {
-        return baseUrl + "/browse/";
+        return base() + "browse/";
     }
 
     public String projects()
@@ -443,7 +456,7 @@ public class Urls
 
     public String server()
     {
-        return baseUrl + "/server/";
+        return base() + "server/";
     }
 
     public String serverActivity()
@@ -463,7 +476,7 @@ public class Urls
 
     public String agents()
     {
-        return baseUrl + "/agents/";
+        return base() + "agents/";
     }
 
     private String getEncodedAgentName(Object agent)
@@ -535,7 +548,7 @@ public class Urls
 
     public String admin()
     {
-        return baseUrl + "/admin/";
+        return base() + "admin/";
     }
 
     public String adminProjects()

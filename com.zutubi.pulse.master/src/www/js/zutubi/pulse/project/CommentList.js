@@ -22,14 +22,14 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     ),
 
     commentTemplate: new Ext.XTemplate(
-        '<li>' +
+        '<li id="comment-{id}">' +
             '<div class="comment-body">' +
                 '{message:plainToHtml}' +
             '</div>' +
             '<div class="comment-author">' +
                 'by {author:htmlEncode}, {relativeDate} ({absoluteDate})' +
                 '<tpl if="canDelete">' +
-                    ' [<a id="delete-comment-{#}" href="#" onclick="deleteComment({buildId}, {id}); return false;">delete</a>]' +
+                    ' [<a id="delete-comment-{id}" href="#" onclick="deleteComment({buildId}, {id}); return false;">delete</a>]' +
                 '</tpl>' +
             '</div>' +
         '</li>'
