@@ -12,15 +12,14 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 /**
  * A set of acceptance tests focused on the dependency systems UI.
@@ -35,10 +34,10 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
     }
@@ -46,7 +45,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -61,9 +60,9 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         String projectName = random;
 
         // create project
-        String path = xmlRpcHelper.insertSimpleProject(projectName);
+        String path = rpcClient.RemoteApi.insertSimpleProject(projectName);
 
-        String projectHandle = xmlRpcHelper.getConfigHandle(path);
+        String projectHandle = rpcClient.RemoteApi.getConfigHandle(path);
 
         getBrowser().loginAsAdmin();
 
@@ -83,9 +82,9 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         String projectB = random + "B";
         String projectC = random + "C";
 
-        xmlRpcHelper.insertSimpleProject(projectA);
-        xmlRpcHelper.insertSimpleProject(projectB);
-        xmlRpcHelper.insertSimpleProject(projectC);
+        rpcClient.RemoteApi.insertSimpleProject(projectA);
+        rpcClient.RemoteApi.insertSimpleProject(projectB);
+        rpcClient.RemoteApi.insertSimpleProject(projectC);
 
         addStages(projectA, "a1", "a2", "a3", "a4");
         addStages(projectB, "b1", "b2");
@@ -114,7 +113,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
         assertDependenciesTableRow(projectDependenciesPage, 1, projectB, "latest.integration", "b1", "true");
 
-        Vector<String> listing = xmlRpcHelper.getConfigListing("projects/" + projectC + "/dependencies/dependencies");
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing("projects/" + projectC + "/dependencies/dependencies");
         String dependencyName = listing.get(0);
 
         form = projectDependenciesPage.clickView(dependencyName);
@@ -162,9 +161,9 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         String projectA = random + "A";
         String projectB = random + "B";
 
-        xmlRpcHelper.insertSimpleProject(projectA);
-        xmlRpcHelper.insertSimpleProject(projectB);
-        xmlRpcHelper.enableBuildPrompting(projectB);
+        rpcClient.RemoteApi.insertSimpleProject(projectA);
+        rpcClient.RemoteApi.insertSimpleProject(projectB);
+        rpcClient.RemoteApi.enableBuildPrompting(projectB);
 
         getBrowser().loginAsAdmin();
 
@@ -199,16 +198,16 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         String downstreamMilestoneProject = random + "-downstream-milestone";
         String downstreamBothProject = random + "-downstream-both";
 
-        xmlRpcHelper.insertSimpleProject(upstreamProject1);
-        xmlRpcHelper.insertSimpleProject(upstreamProject2);
+        rpcClient.RemoteApi.insertSimpleProject(upstreamProject1);
+        rpcClient.RemoteApi.insertSimpleProject(upstreamProject2);
 
-        xmlRpcHelper.insertSimpleProject(downstreamIntegrationProject);
+        rpcClient.RemoteApi.insertSimpleProject(downstreamIntegrationProject);
         addDependency(downstreamIntegrationProject, upstreamProject1);
 
-        xmlRpcHelper.insertSimpleProject(downstreamMilestoneProject);
+        rpcClient.RemoteApi.insertSimpleProject(downstreamMilestoneProject);
         addDependency(downstreamMilestoneProject, upstreamProject1, IvyStatus.STATUS_MILESTONE);
 
-        xmlRpcHelper.insertSimpleProject(downstreamBothProject);
+        rpcClient.RemoteApi.insertSimpleProject(downstreamBothProject);
         addDependency(downstreamBothProject, upstreamProject1);
         addDependency(downstreamBothProject, upstreamProject2, IvyStatus.STATUS_MILESTONE);
 
@@ -232,9 +231,9 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
     private void turnOnPromptOption(String project) throws Exception
     {
         String optionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         options.put("prompt", true);
-        xmlRpcHelper.saveConfig(optionsPath, options, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
     }
 
     private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)
@@ -259,7 +258,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
     private String getProjectHandle(String name) throws Exception
     {
-        return xmlRpcHelper.getConfigHandle("projects/" + name);
+        return rpcClient.RemoteApi.getConfigHandle("projects/" + name);
     }
 
     private String[] getStageHandles(String projectName, String... stageNames) throws Exception
@@ -267,7 +266,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         List<String> handles = new LinkedList<String>();
         for (String stageName : stageNames)
         {
-            handles.add(xmlRpcHelper.getConfigHandle("projects/" + projectName + "/stages/" + stageName));
+            handles.add(rpcClient.RemoteApi.getConfigHandle("projects/" + projectName + "/stages/" + stageName));
         }
         return handles.toArray(new String[handles.size()]);
     }
@@ -276,9 +275,9 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
     {
         for (String stageName : stageNames)
         {
-            Hashtable<String, Object> stage = xmlRpcHelper.createDefaultConfig(BuildStageConfiguration.class);
+            Hashtable<String, Object> stage = rpcClient.RemoteApi.createDefaultConfig(BuildStageConfiguration.class);
             stage.put("name", stageName);
-            xmlRpcHelper.insertConfig("projects/" + projectName + "/stages", stage);
+            rpcClient.RemoteApi.insertConfig("projects/" + projectName + "/stages", stage);
         }
     }
 
@@ -292,7 +291,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         // configure the default stage.
         String projectDependenciesPath = "projects/" + projectFrom + "/dependencies";
 
-        Hashtable<String, Object> projectDependencies = xmlRpcHelper.getConfig(projectDependenciesPath);
+        Hashtable<String, Object> projectDependencies = rpcClient.RemoteApi.getConfig(projectDependenciesPath);
         if (!projectDependencies.containsKey("dependencies"))
         {
             projectDependencies.put("dependencies", new Vector<Hashtable<String, Object>>());
@@ -300,12 +299,12 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> dependencies = (Vector<Hashtable<String, Object>>) projectDependencies.get("dependencies");
-        Hashtable<String, Object> dependency = xmlRpcHelper.createEmptyConfig(DependencyConfiguration.class);
+        Hashtable<String, Object> dependency = rpcClient.RemoteApi.createEmptyConfig(DependencyConfiguration.class);
         dependency.put("project", "projects/" + projectTo);
         dependency.put("revision", IvyLatestRevisionMatcher.LATEST + status);
 
         dependencies.add(dependency);
 
-        xmlRpcHelper.saveConfig(projectDependenciesPath, projectDependencies, true);
+        rpcClient.RemoteApi.saveConfig(projectDependenciesPath, projectDependencies, true);
     }
 }

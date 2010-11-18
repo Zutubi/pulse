@@ -31,18 +31,18 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testActionFeedbackSimple() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectConfigPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectConfigPage.clickAction("clean");
@@ -92,7 +92,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
 
     private ListPage customActionWithArgumentPrelude() throws Exception
     {
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
 
         getBrowser().loginAsAdmin();
         ListPage usersPage = getBrowser().openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
@@ -153,7 +153,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
 
     private ProjectConfigPage prepareActionPrelude() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
@@ -165,8 +165,8 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
     {
         String parentProject = random + "-parent";
         String childProject = random + "-child";
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        rpcClient.RemoteApi.insertTrivialProject(childProject, parentProject, false);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, childProject, false);
@@ -178,8 +178,8 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
     {
         String parentProject = random + "-parent";
         String childProject = random + "-child";
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childProject, parentProject, false);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childProject, parentProject, false);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, parentProject, false);
@@ -187,9 +187,9 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         assertTrue(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_VERSIONED));
 
         String childTypePath = PathUtils.getPath(childPath, "type");
-        Hashtable<String, Object> childType = xmlRpcHelper.getConfig(childTypePath);
+        Hashtable<String, Object> childType = rpcClient.RemoteApi.getConfig(childTypePath);
         childType.put("defaultRecipe", "meoverridenow");
-        xmlRpcHelper.saveConfig(childTypePath, childType, false);
+        rpcClient.RemoteApi.saveConfig(childTypePath, childType, false);
 
         projectPage.openAndWaitFor();
         assertFalse(projectPage.isActionPresent(ProjectConfigurationActions.ACTION_CONVERT_TO_CUSTOM));
@@ -212,7 +212,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
 
     public void testActionsNotListedForInvalidProject() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
@@ -222,7 +222,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
 
     public void testActionsListedForTemplateProject() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, true);
+        rpcClient.RemoteApi.insertSimpleProject(random, true);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
@@ -237,14 +237,14 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         String child1Name = random + "-child1";
         String child2Name = random + "-child2";
 
-        xmlRpcHelper.insertSimpleProject(parentName, true);
+        rpcClient.RemoteApi.insertSimpleProject(parentName, true);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, parentName, true);
         assertFalse(projectPage.isDescendantActionsPresent());
 
-        String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
-        xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
+        String child1Path = rpcClient.RemoteApi.insertTrivialProject(child1Name, parentName, false);
+        rpcClient.RemoteApi.insertTrivialProject(child2Name, parentName, false);
 
         projectPage.openAndWaitFor();
         assertTrue(projectPage.isDescendantActionsPresent());
@@ -257,10 +257,10 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
-        assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child1Name));
-        assertEquals(Project.State.PAUSED, xmlRpcHelper.getProjectState(child2Name));
+        assertEquals(Project.State.PAUSED, rpcClient.RemoteApi.getProjectState(child1Name));
+        assertEquals(Project.State.PAUSED, rpcClient.RemoteApi.getProjectState(child2Name));
 
-        xmlRpcHelper.doConfigAction(child1Path, ProjectConfigurationActions.ACTION_RESUME);
+        rpcClient.RemoteApi.doConfigAction(child1Path, ProjectConfigurationActions.ACTION_RESUME);
         projectPage.openAndWaitFor();
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));

@@ -36,6 +36,18 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     List<BuildResult> findLatestCompleted(Project project, int first, int max);
 
+    /**
+     * Returns all builds for the given projects that completed after the given
+     * time stamp.
+     *
+     * @param projects  the projects to find builds of
+     * @param sinceTime time in milliseconds since the epoch to restrict
+     *                  completed times to
+     * @return all completed builds of the given projects with completion times
+     *         after the given time
+     */
+    List<BuildResult> findCompletedSince(Project[] projects, long sinceTime);
+
     BuildResult findPreviousBuildResult(BuildResult result);
 
     BuildResult findPreviousBuildResultWithRevision(final BuildResult result, final ResultState[] states);

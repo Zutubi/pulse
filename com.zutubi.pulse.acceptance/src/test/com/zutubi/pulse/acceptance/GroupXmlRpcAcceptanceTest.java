@@ -1,13 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
-
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 
 public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
@@ -15,12 +14,12 @@ public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -54,7 +53,7 @@ public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            xmlRpcHelper.saveConfig(getGroupPath(groupName), group, true);
+            rpcClient.RemoteApi.saveConfig(getGroupPath(groupName), group, true);
             fail("Expecting failure due to attempt to change readOnly field.");
         }
         catch (Exception e)
@@ -71,7 +70,7 @@ public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.getConfig(getGroupPath(groupName));
+            rpcClient.RemoteApi.getConfig(getGroupPath(groupName));
         }
         catch (Exception e)
         {
@@ -81,7 +80,7 @@ public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private Hashtable<String, Object> assertGroupExists(String groupName) throws Exception
     {
-        Hashtable<String, Object> group = xmlRpcHelper.getConfig(getGroupPath(groupName));
+        Hashtable<String, Object> group = rpcClient.RemoteApi.getConfig(getGroupPath(groupName));
         assertNotNull(group);
         return group;
     }

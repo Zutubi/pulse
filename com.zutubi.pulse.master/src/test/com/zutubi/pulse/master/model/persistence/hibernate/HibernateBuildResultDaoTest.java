@@ -10,9 +10,9 @@ import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Arrays;
 
 
 /**
@@ -1101,6 +1101,65 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(results.get(2), buildResult);
     }
 
+    public void testFindCompletedSince()
+    {
+        User user = new User();
+        userDao.save(user);
+
+        Project p1 = new Project();
+        Project p2 = new Project();
+        projectDao.save(p1);
+        projectDao.save(p2);
+
+        buildResultDao.save(createCompletedBuild(p1, 1));
+        buildResultDao.save(createCompletedBuild(p2, 1));
+        long timeAfterBuild1 = time;
+        buildResultDao.save(createCompletedBuild(p1, 2));
+        buildResultDao.save(createCompletedBuild(p2, 2));
+        buildResultDao.save(createCompletedBuild(p1, 3));
+        buildResultDao.save(createCompletedBuild(p2, 3));
+        long timeAfterBuild3 = time;
+        buildResultDao.save(createCompletedBuild(p1, 4));
+        buildResultDao.save(createCompletedBuild(p2, 4));
+        buildResultDao.save(createIncompleteBuild(p1, 5));
+        buildResultDao.save(createIncompleteBuild(p2, 5));
+
+        buildResultDao.save(createPersonalBuild(user, p1, 1));
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.findCompletedSince(new Project[]{p1}, -1);
+        assertEquals(4, results.size());
+        assertBuild(p1, 4, results.get(0));
+        assertBuild(p1, 3, results.get(1));
+        assertBuild(p1, 2, results.get(2));
+        assertBuild(p1, 1, results.get(3));
+
+        results = buildResultDao.findCompletedSince(new Project[]{p1, p2}, -1);
+        assertEquals(8, results.size());
+        assertBuild(p2, 4, results.get(0));
+        assertBuild(p1, 4, results.get(1));
+        assertBuild(p2, 3, results.get(2));
+        assertBuild(p1, 3, results.get(3));
+        assertBuild(p2, 2, results.get(4));
+        assertBuild(p1, 2, results.get(5));
+        assertBuild(p2, 1, results.get(6));
+        assertBuild(p1, 1, results.get(7));
+
+        results = buildResultDao.findCompletedSince(new Project[]{p1}, timeAfterBuild1);
+        assertEquals(3, results.size());
+        assertBuild(p1, 4, results.get(0));
+        assertBuild(p1, 3, results.get(1));
+        assertBuild(p1, 2, results.get(2));
+
+        results = buildResultDao.findCompletedSince(new Project[]{p1}, timeAfterBuild3);
+        assertEquals(1, results.size());
+        assertBuild(p1, 4, results.get(0));
+
+        results = buildResultDao.findCompletedSince(new Project[]{p1}, time);
+        assertEquals(0, results.size());
+    }
+
     private List<BuildResult> save(BuildResult... results)
     {
         for (BuildResult result: results)
@@ -1109,6 +1168,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         }
         commitAndRefreshTransaction();
         return Arrays.asList(results);
+    }
+
+    private void assertBuild(Project expectedProject, long expectedNumber, BuildResult build)
+    {
+        assertEquals(expectedProject, build.getProject());
+        assertEquals(expectedNumber, build.getNumber());
     }
 
     private BuildResult createResultWithRecipes()
@@ -1130,6 +1195,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result.addFeature(level, "a message");
         result.calculateFeatureCounts();
         buildResultDao.save(result);
+    }
+
+    private BuildResult createIncompleteBuild(Project project, long number)
+    {
+        BuildResult result = new BuildResult(TEST_REASON, project, number, false);
+        result.setRevision(new Revision(number));
+        result.commence(time++);
+        return result;
     }
 
     private BuildResult createCompletedBuild(Project project, long number)

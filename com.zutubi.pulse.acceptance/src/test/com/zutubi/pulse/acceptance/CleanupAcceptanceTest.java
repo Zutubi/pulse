@@ -7,12 +7,11 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -29,20 +28,20 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
-        utils = new CleanupTestUtils(xmlRpcHelper);
+        utils = new CleanupTestUtils(rpcClient.RemoteApi);
 
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "build");
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), antConfig);
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), antConfig);
         utils.deleteCleanupRule(random, "default");
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         getBrowser().logout();
 
@@ -55,12 +54,12 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildDirectory(projectName, 1));
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -87,7 +86,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         assertFalse(isBuildArtifactsPresentViaUI(projectName, 1));
 
         // the remote api returns artifacts based on what is in the database.
-        Vector artifactsInBuild = xmlRpcHelper.getArtifactsInBuild(projectName, 1);
+        Vector artifactsInBuild = rpcClient.RemoteApi.getArtifactsInBuild(projectName, 1);
         assertEquals(3, artifactsInBuild.size());
     }
 
@@ -97,13 +96,13 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
         utils.addCleanupRule(projectName, "everything");
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuild(projectName, 1));
         assertTrue(isBuildPresentViaUI(projectName, 1));
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -121,7 +120,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         // Unknown build '1' for project 'testCleanupAll-8KHqy3jjGJ'
         try
         {
-            xmlRpcHelper.getArtifactsInBuild(projectName, 1);
+            rpcClient.RemoteApi.getArtifactsInBuild(projectName, 1);
         }
         catch(Exception e)
         {
@@ -137,10 +136,10 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         utils.insertTestCapture("projects/" + projectName, "junit xml report processor");
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -179,7 +178,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         final String projectName = random;
         prepareProjectWithRepositoryCleanup(projectName);
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         assertTrue(utils.hasIvyFile(projectName, 2));
 
         waitForCleanupToRunAsynchronously(new InvertedCondition()
@@ -200,7 +199,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
         // rename the project.
         String newProjectName = renameProject(projectName);
-        xmlRpcHelper.runBuild(newProjectName);
+        rpcClient.RemoteApi.runBuild(newProjectName);
 
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
@@ -218,7 +217,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
     {
         utils.addCleanupRule(projectName, "repository_artifacts", CleanupWhat.REPOSITORY_ARTIFACTS);
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasIvyFile(projectName, 1));
@@ -230,14 +229,14 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
         utils.addCleanupRule(projectName, "logs", CleanupWhat.LOGS);
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously();
 
         assertTrue(utils.hasBuildLog(projectName, 1));
         assertBuildLogsPresentViaUI(projectName, 1);
         assertStageLogsPresentViaUI(projectName, 1, "default");
 
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
         waitForCleanupToRunAsynchronously(new InvertedCondition()
         {
             public boolean notSatisfied() throws Exception
@@ -260,9 +259,9 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
     private String renameProject(String projectName) throws Exception
     {
         String newProjectName = getName() + "-" + RandomUtils.randomString(10);
-        Hashtable<String, Object> projectConfig = xmlRpcHelper.getConfig("projects/" + projectName);
+        Hashtable<String, Object> projectConfig = rpcClient.RemoteApi.getConfig("projects/" + projectName);
         projectConfig.put("name", newProjectName);
-        xmlRpcHelper.saveConfig("projects/" + projectName, projectConfig, false);
+        rpcClient.RemoteApi.saveConfig("projects/" + projectName, projectConfig, false);
         return newProjectName;
     }
 

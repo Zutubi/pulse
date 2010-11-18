@@ -35,33 +35,33 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testConfigPathExistsEmptyPath() throws Exception
     {
-        assertEquals(false, xmlRpcHelper.configPathExists(""));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists(""));
     }
 
     public void testConfigPathExistsNonExistant() throws Exception
     {
-        assertEquals(false, xmlRpcHelper.configPathExists("nonexistant"));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists("nonexistant"));
     }
 
     public void testConfigPathExistsExistant() throws Exception
     {
-        assertEquals(true, xmlRpcHelper.configPathExists("projects"));
+        assertEquals(true, rpcClient.RemoteApi.configPathExists("projects"));
     }
 
     public void testGetConfigListingEmptyPath() throws Exception
     {
-        Vector<String> listing = xmlRpcHelper.getConfigListing("");
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing("");
         assertSortedEquals(listing, "agents", "groups", "projects", "settings", "users");
     }
 
@@ -72,17 +72,17 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testGetConfigListingComposite() throws Exception
     {
-        Vector<String> listing = xmlRpcHelper.getConfigListing("settings");
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing("settings");
         assertSortedEquals(listing, "agentPing", "backup", "email", "jabber", "ldap", "license", "logging", "repository");
     }
 
     public void testGetConfigListingCollection() throws Exception
     {
-        Vector<String> listing = xmlRpcHelper.getConfigListing("projects");
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing("projects");
         int sizeBefore = listing.size();
         String project = randomName();
-        xmlRpcHelper.insertSimpleProject(project);
-        listing = xmlRpcHelper.getConfigListing("projects");
+        rpcClient.RemoteApi.insertSimpleProject(project);
+        listing = rpcClient.RemoteApi.getConfigListing("projects");
         assertEquals(sizeBefore + 1, listing.size());
         assertTrue(listing.contains(project));
     }
@@ -100,21 +100,21 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetConfigPathForHandle() throws Exception
     {
         String path = "settings/email";
-        String handle = xmlRpcHelper.getConfigHandle(path);
-        assertEquals(path, xmlRpcHelper.getConfigPath(handle));
+        String handle = rpcClient.RemoteApi.getConfigHandle(path);
+        assertEquals(path, rpcClient.RemoteApi.getConfigPath(handle));
     }
 
     public void testGetConfig() throws Exception
     {
         Hashtable<String, Object> emailConfig = new Hashtable<String, Object>();
-        emailConfig.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        emailConfig.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         emailConfig.put("host", "localhost");
         emailConfig.put("from", "pulse@zutubi.com");
         emailConfig.put("ssl", true);
-        xmlRpcHelper.saveConfig("settings/email", emailConfig, false);
+        rpcClient.RemoteApi.saveConfig("settings/email", emailConfig, false);
 
-        emailConfig = xmlRpcHelper.getConfig(PATH_EMAIL_SETTINGS);
-        assertEquals("zutubi.emailConfig", emailConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        emailConfig = rpcClient.RemoteApi.getConfig(PATH_EMAIL_SETTINGS);
+        assertEquals("zutubi.emailConfig", emailConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
         assertEquals("localhost", emailConfig.get("host"));
         assertEquals("pulse@zutubi.com", emailConfig.get("from"));
         assertEquals(true, emailConfig.get("ssl"));
@@ -123,11 +123,11 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = xmlRpcHelper.insertSimpleAgent(agentName);
-        Hashtable<String, Object> agentConfig = xmlRpcHelper.getConfig(path);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
+        Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -135,13 +135,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
     public void testGetConfigWithPassword() throws Exception
     {
-        Hashtable<String, Object> emailConfig = xmlRpcHelper.getConfig(PATH_EMAIL_SETTINGS);
+        Hashtable<String, Object> emailConfig = rpcClient.RemoteApi.getConfig(PATH_EMAIL_SETTINGS);
         assertEquals(ToveUtils.SUPPRESSED_PASSWORD, emailConfig.get("password"));
     }
         
@@ -157,8 +157,8 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testGetRawConfig() throws Exception
     {
-        Hashtable<String, Object> emailConfig = xmlRpcHelper.getRawConfig(PATH_EMAIL_SETTINGS);
-        assertEquals("zutubi.emailConfig", emailConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> emailConfig = rpcClient.RemoteApi.getRawConfig(PATH_EMAIL_SETTINGS);
+        assertEquals("zutubi.emailConfig", emailConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
         assertTrue(emailConfig.containsKey("host"));
         assertTrue(emailConfig.containsKey("port"));
         assertTrue(emailConfig.containsKey("username"));
@@ -167,18 +167,18 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testGetRawConfigWithPassword() throws Exception
     {
-        Hashtable<String, Object> emailConfig = xmlRpcHelper.getRawConfig(PATH_EMAIL_SETTINGS);
+        Hashtable<String, Object> emailConfig = rpcClient.RemoteApi.getRawConfig(PATH_EMAIL_SETTINGS);
         assertEquals(ToveUtils.SUPPRESSED_PASSWORD, emailConfig.get("password"));
     }
     
     public void testGetRawConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = xmlRpcHelper.insertSimpleAgent(agentName);
-        Hashtable<String, Object> agentConfig = xmlRpcHelper.getRawConfig(path);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
+        Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getRawConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -186,7 +186,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
@@ -208,70 +208,70 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertConfigExistingPath() throws Exception
     {
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("record already exists", "insertConfig", PATH_EMAIL_SETTINGS, config);
     }
 
     public void testInsertConfigNoSymbolicName() throws Exception
     {
-        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
         callAndExpectError("No symbolic name found in XML-RPC struct", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigInvalidSymbolicName() throws Exception
     {
-        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
+        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
         callAndExpectError("Unrecognised symbolic name", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigTypeMismatch() throws Exception
     {
-        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("Expected type: class com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigValidates() throws Exception
     {
-        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         callAndExpectError("name requires a value", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigIntoCollection() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
-        stage.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        stage.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         stage.put("name", "my stage");
         stage.put("recipe", "a recipe");
-        String stagePath = xmlRpcHelper.insertConfig(projectPath + "/stages", stage);
+        String stagePath = rpcClient.RemoteApi.insertConfig(projectPath + "/stages", stage);
         
-        Hashtable<String, Object> loadedStage = xmlRpcHelper.getConfig(stagePath);
-        assertEquals("zutubi.stageConfig", loadedStage.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> loadedStage = rpcClient.RemoteApi.getConfig(stagePath);
+        assertEquals("zutubi.stageConfig", loadedStage.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
         assertEquals("my stage", loadedStage.get("name"));
         assertEquals("a recipe", loadedStage.get("recipe"));
     }
 
     public void testInsertConfigIntoSingleton() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         String scmPath = projectPath + "/scm";
-        assertEquals(true, xmlRpcHelper.deleteConfig(scmPath));
+        assertEquals(true, rpcClient.RemoteApi.deleteConfig(scmPath));
 
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
         scm.put("url", "svn://localhost/test/trunk");
         scm.put("monitor", false);
-        xmlRpcHelper.insertConfig(scmPath, scm);
+        rpcClient.RemoteApi.insertConfig(scmPath, scm);
 
-        Hashtable<String, Object> loadedScm = xmlRpcHelper.getConfig(scmPath);
-        assertEquals("zutubi.subversionConfig", loadedScm.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> loadedScm = rpcClient.RemoteApi.getConfig(scmPath);
+        assertEquals("zutubi.subversionConfig", loadedScm.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
         assertEquals("svn://localhost/test/trunk", loadedScm.get("url"));
         assertEquals(false, loadedScm.get("monitor"));
     }
@@ -293,30 +293,30 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testInsertTemplatedConfigConcreteParentPath() throws Exception
     {
-        xmlRpcHelper.ensureProject(TEST_PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         callAndExpectError("template parent is concrete and thus cannot be inherited from", "insertTemplatedConfig", TEST_PROJECT_PATH, new Hashtable(), false);
     }
 
     public void testInsertTemplatedConfig() throws Exception
     {
         String projectName = randomName();
-        String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName);
         
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
-        assertEquals("zutubi.projectConfig", project.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
+        assertEquals("zutubi.projectConfig", project.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
         assertEquals(projectName, project.get("name"));
         Hashtable<String, Object> scm = (Hashtable<String, Object>) project.get("scm");
         assertNotNull(scm);
-        assertEquals("zutubi.subversionConfig", scm.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", scm.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     public void testInsertTemplatedConfigValidates() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
@@ -327,16 +327,16 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertTemplatedConfigValidatesAsTemplate() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
 
-        String projectPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
-        Hashtable<String, Object> loadedProject = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertTemplatedConfig("projects/global project template", project, true);
+        Hashtable<String, Object> loadedProject = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> loadedScm = (Hashtable<String, Object>) loadedProject.get("scm");
         assertFalse(loadedScm.containsKey("url"));
     }
@@ -344,12 +344,12 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertTemplatedConfigTemplate() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
 
-        String projectPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
-        Hashtable<String, Object> loadedProject = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertTemplatedConfig("projects/global project template", project, true);
+        Hashtable<String, Object> loadedProject = rpcClient.RemoteApi.getConfig(projectPath);
         assertEquals(projectName, loadedProject.get("name"));
     }
 
@@ -365,42 +365,42 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testSaveConfigNoSymbolicName() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> options = new Hashtable<String, Object>();
         callAndExpectError("No symbolic name found in XML-RPC struct", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigInvalidType() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> options = new Hashtable<String, Object>();
-        options.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "invalid");
+        options.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "invalid");
         callAndExpectError("Expecting type 'zutubi.buildOptionsConfig', found 'invalid'", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigValidates() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         String optionsPath = projectPath + "/options";
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         options.put("timeout", -10);
         callAndExpectError("timeout must not be negative", "saveConfig", projectPath + "/options", options, false);
     }
 
     public void testSaveConfigValidatesShallow() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(0, options.get("timeout"));
         options.put("timeout", -1);
-        xmlRpcHelper.saveConfig(projectPath, project, false);
+        rpcClient.RemoteApi.saveConfig(projectPath, project, false);
     }
     
     public void testSaveConfigValidatesDeep() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(0, options.get("timeout"));
         options.put("timeout", -1);
@@ -409,44 +409,44 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testSaveConfig() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         String optionsPath = projectPath + "/options";
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         assertEquals(false, options.get("prompt"));
         assertEquals(0, options.get("timeout"));
 
         options.put("prompt", true);
         options.put("timeout", 10);
-        xmlRpcHelper.saveConfig(projectPath + "/options", options, false);
+        rpcClient.RemoteApi.saveConfig(projectPath + "/options", options, false);
 
-        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(optionsPath);
         assertEquals(true, loadedOptions.get("prompt"));
         assertEquals(10, loadedOptions.get("timeout"));
     }
 
     public void testSaveConfigShallow() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(false, options.get("prompt"));
         options.put("prompt", true);
-        xmlRpcHelper.saveConfig(projectPath, project, false);
+        rpcClient.RemoteApi.saveConfig(projectPath, project, false);
 
-        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(projectPath + "/options");
+        Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(projectPath + "/options");
         assertEquals(false, loadedOptions.get("prompt"));
     }
 
     public void testSaveConfigDeep() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertEquals(false, options.get("prompt"));
         options.put("prompt", true);
-        xmlRpcHelper.saveConfig(projectPath, project, true);
+        rpcClient.RemoteApi.saveConfig(projectPath, project, true);
 
-        Hashtable<String, Object> loadedOptions = xmlRpcHelper.getConfig(projectPath + "/options");
+        Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(projectPath + "/options");
         assertEquals(true, loadedOptions.get("prompt"));
     }
 
@@ -457,18 +457,18 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testCanCloneNonexistantPath() throws Exception
     {
-        assertEquals(false, xmlRpcHelper.canCloneConfig("foo"));
+        assertEquals(false, rpcClient.RemoteApi.canCloneConfig("foo"));
     }
 
     public void testCanCloneUncloneablePath() throws Exception
     {
-        assertEquals(false, xmlRpcHelper.canCloneConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
+        assertEquals(false, rpcClient.RemoteApi.canCloneConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
     }
 
     public void testCanCloneCloneablePath() throws Exception
     {
-        String path = xmlRpcHelper.insertTrivialProject(randomName(), false);
-        assertEquals(true, xmlRpcHelper.canCloneConfig(path));
+        String path = rpcClient.RemoteApi.insertTrivialProject(randomName(), false);
+        assertEquals(true, rpcClient.RemoteApi.canCloneConfig(path));
     }
 
     public void testCloneInvalidPath() throws Exception
@@ -482,11 +482,11 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String name = randomName();
         String cloneName = name + " clone";
-        xmlRpcHelper.insertTrivialProject(name, false);
+        rpcClient.RemoteApi.insertTrivialProject(name, false);
         Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
         keyMap.put(name, cloneName);
-        assertEquals(true, xmlRpcHelper.cloneConfig(MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
-        assertTrue(xmlRpcHelper.configPathExists(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
+        assertEquals(true, rpcClient.RemoteApi.cloneConfig(MasterConfigurationRegistry.PROJECTS_SCOPE, keyMap));
+        assertTrue(rpcClient.RemoteApi.configPathExists(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
     }
 
     public void testDeleteConfigNonExistantPath() throws Exception
@@ -496,52 +496,52 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testDelete() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(randomName());
-        assertEquals(true, xmlRpcHelper.configPathExists(path));
-        assertEquals(true, xmlRpcHelper.deleteConfig(path));
-        assertEquals(false, xmlRpcHelper.configPathExists(path));
+        String path = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        assertEquals(true, rpcClient.RemoteApi.configPathExists(path));
+        assertEquals(true, rpcClient.RemoteApi.deleteConfig(path));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists(path));
     }
 
     public void testDeleteSingleton() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(randomName());
+        String path = rpcClient.RemoteApi.insertSimpleProject(randomName());
         String scmPath = path + "/scm";
-        assertEquals(true, xmlRpcHelper.configPathExists(scmPath));
-        assertEquals(true, xmlRpcHelper.deleteConfig(scmPath));
-        assertEquals(false, xmlRpcHelper.configPathExists(scmPath));
+        assertEquals(true, rpcClient.RemoteApi.configPathExists(scmPath));
+        assertEquals(true, rpcClient.RemoteApi.deleteConfig(scmPath));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists(scmPath));
     }
 
     public void testDeleteInheritedFrom() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         project.put("name", randomName());
-        String parentPath = xmlRpcHelper.insertTemplatedConfig("projects/global project template", project, true);
+        String parentPath = rpcClient.RemoteApi.insertTemplatedConfig("projects/global project template", project, true);
 
         project.put("name", randomName());
-        String childPath = xmlRpcHelper.insertTemplatedConfig(parentPath, project, true);
-        assertEquals(true, xmlRpcHelper.configPathExists(parentPath));
-        assertEquals(true, xmlRpcHelper.configPathExists(childPath));
+        String childPath = rpcClient.RemoteApi.insertTemplatedConfig(parentPath, project, true);
+        assertEquals(true, rpcClient.RemoteApi.configPathExists(parentPath));
+        assertEquals(true, rpcClient.RemoteApi.configPathExists(childPath));
 
-        assertEquals(true, xmlRpcHelper.deleteConfig(parentPath));
-        assertEquals(false, xmlRpcHelper.configPathExists(parentPath));
-        assertEquals(false, xmlRpcHelper.configPathExists(childPath));
+        assertEquals(true, rpcClient.RemoteApi.deleteConfig(parentPath));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists(parentPath));
+        assertEquals(false, rpcClient.RemoteApi.configPathExists(childPath));
     }
 
     public void testDeleteAll() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(path);
+        String path = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(path);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
-        properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
-        properties.put("p2", xmlRpcHelper.createProperty("p2", "v2"));
-        xmlRpcHelper.saveConfig(path, project, true);
+        properties.put("p1", rpcClient.RemoteApi.createProperty("p1", "v1"));
+        properties.put("p2", rpcClient.RemoteApi.createProperty("p2", "v2"));
+        rpcClient.RemoteApi.saveConfig(path, project, true);
 
-        Hashtable<String, Object> loadedProperties = xmlRpcHelper.getConfig(path + "/properties");
+        Hashtable<String, Object> loadedProperties = rpcClient.RemoteApi.getConfig(path + "/properties");
         assertEquals(2, loadedProperties.size());
 
-        assertEquals(2, xmlRpcHelper.deleteAllConfigs(path + "/properties/*"));
-        loadedProperties = xmlRpcHelper.getConfig(path + "/properties");
+        assertEquals(2, rpcClient.RemoteApi.deleteAllConfigs(path + "/properties/*"));
+        loadedProperties = rpcClient.RemoteApi.getConfig(path + "/properties");
         assertEquals(0, loadedProperties.size());
     }
 
@@ -551,20 +551,20 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parent = random + "-parent";
         String child = random + "-child";
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parent, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(child, parent, false);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parent, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(child, parent, false);
 
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(parentPath);
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(parentPath);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
-        properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
-        xmlRpcHelper.saveConfig(parentPath, project, true);
+        properties.put("p1", rpcClient.RemoteApi.createProperty("p1", "v1"));
+        rpcClient.RemoteApi.saveConfig(parentPath, project, true);
 
-        assertEquals(1, xmlRpcHelper.deleteAllConfigs(childPath+ "/properties/*"));
-        Hashtable<String, Object> loadedProperties = xmlRpcHelper.getConfig(childPath + "/properties");
+        assertEquals(1, rpcClient.RemoteApi.deleteAllConfigs(childPath+ "/properties/*"));
+        Hashtable<String, Object> loadedProperties = rpcClient.RemoteApi.getConfig(childPath + "/properties");
         assertEquals(0, loadedProperties.size());
 
-        xmlRpcHelper.restoreConfig(childPath + "/properties/p1");
-        loadedProperties = xmlRpcHelper.getConfig(childPath + "/properties");
+        rpcClient.RemoteApi.restoreConfig(childPath + "/properties/p1");
+        loadedProperties = rpcClient.RemoteApi.getConfig(childPath + "/properties");
         assertEquals(1, loadedProperties.size());
     }
 
@@ -573,15 +573,15 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String random = randomName();
         String parentName = random + "-parent";
         String childName = random + "-child";
-        xmlRpcHelper.insertSimpleProject(parentName, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        rpcClient.RemoteApi.insertSimpleProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
 
         String stagesPath = getPath(childPath, "stages");
         String hidePath = getPath(stagesPath, "default");
-        xmlRpcHelper.deleteConfig(hidePath);
-        assertEquals(0, xmlRpcHelper.getConfigListing(stagesPath).size());
-        xmlRpcHelper.restoreConfig(hidePath);
-        Vector<String> listing = xmlRpcHelper.getConfigListing(stagesPath);
+        rpcClient.RemoteApi.deleteConfig(hidePath);
+        assertEquals(0, rpcClient.RemoteApi.getConfigListing(stagesPath).size());
+        rpcClient.RemoteApi.restoreConfig(hidePath);
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing(stagesPath);
         assertEquals(1, listing.size());
         assertEquals("default", listing.get(0));
     }
@@ -589,78 +589,78 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testSetOrder() throws Exception
     {
         String random = randomName();
-        String path = xmlRpcHelper.insertSimpleProject(random, true);
+        String path = rpcClient.RemoteApi.insertSimpleProject(random, true);
         String propertiesPath = getPath(path, "properties");
-        xmlRpcHelper.insertProjectProperty(random, "p1", "v1");
-        xmlRpcHelper.insertProjectProperty(random, "p2", "v2");
+        rpcClient.RemoteApi.insertProjectProperty(random, "p1", "v1");
+        rpcClient.RemoteApi.insertProjectProperty(random, "p2", "v2");
 
-        assertEquals(asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
-        xmlRpcHelper.setConfigOrder(propertiesPath, "p2", "p1");
-        assertEquals(asList("p2", "p1"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
+        assertEquals(asList("p1", "p2"), new LinkedList<String>(rpcClient.RemoteApi.getConfigListing(propertiesPath)));
+        rpcClient.RemoteApi.setConfigOrder(propertiesPath, "p2", "p1");
+        assertEquals(asList("p2", "p1"), new LinkedList<String>(rpcClient.RemoteApi.getConfigListing(propertiesPath)));
     }
 
     public void testGetConfigActions() throws Exception
     {
         String agentName = randomName();
-        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         try
         {
-            Vector<String> actions = xmlRpcHelper.getConfigActions(path);
+            Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
             assertEquals(asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING),
                          new LinkedList<String>(actions));
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
     public void testDoConfigAction() throws Exception
     {
         String agentName = randomName();
-        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         try
         {
-            xmlRpcHelper.doConfigAction(path, AgentConfigurationActions.ACTION_DISABLE);
-            Vector<String> actions = xmlRpcHelper.getConfigActions(path);
+            rpcClient.RemoteApi.doConfigAction(path, AgentConfigurationActions.ACTION_DISABLE);
+            Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
             assertEquals(asList(AgentConfigurationActions.ACTION_ENABLE),
                      new LinkedList<String>(actions));
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
     public void testDoConfigActionWithArgument() throws Exception
     {
         String userName = randomName();
-        String path = xmlRpcHelper.insertTrivialUser(userName);
+        String path = rpcClient.RemoteApi.insertTrivialUser(userName);
         try
         {
-            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(SetPasswordConfiguration.class);
+            Hashtable<String, Object> password = rpcClient.RemoteApi.createDefaultConfig(SetPasswordConfiguration.class);
             password.put("password", "foo");
             password.put("confirmPassword", "foo");
-            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
-            xmlRpcHelper.logout();
-            xmlRpcHelper.login(userName, "foo");
+            rpcClient.RemoteApi.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            rpcClient.logout();
+            rpcClient.login(userName, "foo");
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
     public void testDoConfigActionWithInvalidArgument() throws Exception
     {
         String userName = randomName();
-        String path = xmlRpcHelper.insertTrivialUser(userName);
+        String path = rpcClient.RemoteApi.insertTrivialUser(userName);
         try
         {
-            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(SetPasswordConfiguration.class);
+            Hashtable<String, Object> password = rpcClient.RemoteApi.createDefaultConfig(SetPasswordConfiguration.class);
             password.put("password", "foo");
             password.put("confirmPassword", "bar");
-            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            rpcClient.RemoteApi.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
             fail();
         }
         catch(Exception e)
@@ -669,21 +669,21 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
     public void testDoConfigActionWithIncorrectArgument() throws Exception
     {
         String userName = randomName();
-        String path = xmlRpcHelper.insertTrivialUser(userName);
+        String path = rpcClient.RemoteApi.insertTrivialUser(userName);
         try
         {
             // Deliberately pass wrong type as argument
-            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(UserConfiguration.class);
+            Hashtable<String, Object> password = rpcClient.RemoteApi.createDefaultConfig(UserConfiguration.class);
             password.put("login", randomName());
             password.put("name", randomName());
-            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            rpcClient.RemoteApi.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
             fail();
         }
         catch(Exception e)
@@ -693,7 +693,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(path);
+            rpcClient.RemoteApi.deleteConfig(path);
         }
     }
 
@@ -702,17 +702,17 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String random = randomName();
 
         // Use empty config so we don't get bits from default config.
-        Hashtable<String, Object> user = xmlRpcHelper.createEmptyConfig(UserConfiguration.class);
+        Hashtable<String, Object> user = rpcClient.RemoteApi.createEmptyConfig(UserConfiguration.class);
         user.put("login", random);
         user.put("name", random);
-        String path = xmlRpcHelper.insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
-        assertTrue(xmlRpcHelper.isConfigPermanent(getPath(path, "preferences")));
+        String path = rpcClient.RemoteApi.insertConfig(MasterConfigurationRegistry.USERS_SCOPE, user);
+        assertTrue(rpcClient.RemoteApi.isConfigPermanent(getPath(path, "preferences")));
     }
 
     public void testGetConfigDoesntReturnExternalState() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName());
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         assertNull(project.get("projectId"));
     }
 
@@ -721,19 +721,19 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         // CIB-1542: check that a normal save does not touch the projectId
         // external state field.
         String name = randomName();
-        String projectPath = xmlRpcHelper.insertSimpleProject(name);
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(name);
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         project.put("url", "http://i.feel.like.a.change.com");
-        xmlRpcHelper.saveConfig(projectPath, project, false);
+        rpcClient.RemoteApi.saveConfig(projectPath, project, false);
 
-        assertEquals(Project.State.IDLE, xmlRpcHelper.getProjectState(name));
+        assertEquals(Project.State.IDLE, rpcClient.RemoteApi.getProjectState(name));
     }
 
     public void testSaveConfigConfigChangeExternalState() throws Exception
     {
         String name = randomName();
-        String projectPath = xmlRpcHelper.insertSimpleProject(name);
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(name);
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         project.put("projectId", "1");
         callAndExpectError("Unrecognised property 'projectId'", "saveConfig", projectPath, project, false);
     }
@@ -744,12 +744,12 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parentProject = random + "-parent";
         String childProject = random + "-child";
 
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        String hookPath = xmlRpcHelper.insertPostStageHook(parentProject, "hokey", "default");
-        String childPath = xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        String hookPath = rpcClient.RemoteApi.insertPostStageHook(parentProject, "hokey", "default");
+        String childPath = rpcClient.RemoteApi.insertProject(childProject, parentProject, false, null, null);
         
         String childHookPath = hookPath.replace(parentProject, childProject);
-        Hashtable<String, Object> childHook = xmlRpcHelper.getConfig(childHookPath);
+        Hashtable<String, Object> childHook = rpcClient.RemoteApi.getConfig(childHookPath);
         @SuppressWarnings({"unchecked"})
         Vector<String> stages = (Vector<String>) childHook.get("stages");
         assertEquals(getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
@@ -761,14 +761,14 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parentProject = random + "-parent";
         String childProject = random + "-child";
 
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        rpcClient.RemoteApi.insertProject(childProject, parentProject, false, null, null);
 
-        String parentPropertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
-        String childPropertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+        String parentPropertyPath = rpcClient.RemoteApi.insertProjectProperty(parentProject, "pp", "foo");
+        String childPropertyPath = rpcClient.RemoteApi.insertProjectProperty(childProject, "cp", "foo");
 
-        assertTrue(xmlRpcHelper.canPullUpConfig(childPropertyPath, parentProject));
-        assertFalse(xmlRpcHelper.canPullUpConfig(parentPropertyPath.replace(parentProject, childProject), parentProject));
+        assertTrue(rpcClient.RemoteApi.canPullUpConfig(childPropertyPath, parentProject));
+        assertFalse(rpcClient.RemoteApi.canPullUpConfig(parentPropertyPath.replace(parentProject, childProject), parentProject));
     }
 
     public void testPullUp() throws Exception
@@ -777,15 +777,15 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parentProject = random + "-parent";
         String childProject = random + "-child";
 
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        rpcClient.RemoteApi.insertProject(childProject, parentProject, false, null, null);
 
-        String propertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(childProject, "cp", "foo");
         String pulledUpPath = propertyPath.replace(childProject, parentProject);
 
-        assertFalse(xmlRpcHelper.configPathExists(pulledUpPath));
-        assertEquals(pulledUpPath, xmlRpcHelper.pullUpConfig(propertyPath, parentProject));
-        assertTrue(xmlRpcHelper.configPathExists(pulledUpPath));
+        assertFalse(rpcClient.RemoteApi.configPathExists(pulledUpPath));
+        assertEquals(pulledUpPath, rpcClient.RemoteApi.pullUpConfig(propertyPath, parentProject));
+        assertTrue(rpcClient.RemoteApi.configPathExists(pulledUpPath));
     }
 
     public void testCanPushDown() throws Exception
@@ -794,14 +794,14 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parentProject = random + "-parent";
         String childProject = random + "-child";
 
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        rpcClient.RemoteApi.insertProject(childProject, parentProject, false, null, null);
 
-        String parentPropertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
-        String childPropertyPath = xmlRpcHelper.insertProjectProperty(childProject, "cp", "foo");
+        String parentPropertyPath = rpcClient.RemoteApi.insertProjectProperty(parentProject, "pp", "foo");
+        String childPropertyPath = rpcClient.RemoteApi.insertProjectProperty(childProject, "cp", "foo");
 
-        assertTrue(xmlRpcHelper.canPushDownConfig(parentPropertyPath, childProject));
-        assertFalse(xmlRpcHelper.canPushDownConfig(childPropertyPath, childProject));
+        assertTrue(rpcClient.RemoteApi.canPushDownConfig(parentPropertyPath, childProject));
+        assertFalse(rpcClient.RemoteApi.canPushDownConfig(childPropertyPath, childProject));
     }
 
     public void testPushDown() throws Exception
@@ -810,16 +810,16 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String parentProject = random + "-parent";
         String childProject = random + "-child";
 
-        xmlRpcHelper.insertSimpleProject(parentProject, true);
-        xmlRpcHelper.insertProject(childProject, parentProject, false, null, null);
+        rpcClient.RemoteApi.insertSimpleProject(parentProject, true);
+        rpcClient.RemoteApi.insertProject(childProject, parentProject, false, null, null);
 
-        String propertyPath = xmlRpcHelper.insertProjectProperty(parentProject, "pp", "foo");
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(parentProject, "pp", "foo");
         String pushedDownToPath = propertyPath.replace(parentProject, childProject);
 
-        assertTrue(xmlRpcHelper.configPathExists(propertyPath));
-        assertEquals(new Vector<String>(asList(pushedDownToPath)), xmlRpcHelper.pushDownConfig(propertyPath, new Vector<String>(asList(childProject))));
-        assertFalse(xmlRpcHelper.configPathExists(propertyPath));
-        assertTrue(xmlRpcHelper.configPathExists(pushedDownToPath));
+        assertTrue(rpcClient.RemoteApi.configPathExists(propertyPath));
+        assertEquals(new Vector<String>(asList(pushedDownToPath)), rpcClient.RemoteApi.pushDownConfig(propertyPath, new Vector<String>(asList(childProject))));
+        assertFalse(rpcClient.RemoteApi.configPathExists(propertyPath));
+        assertTrue(rpcClient.RemoteApi.configPathExists(pushedDownToPath));
     }
 
     public void testPreviewMoveConfig() throws Exception
@@ -828,19 +828,19 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProject = random + "-child";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        String childProjectPath = rpcClient.RemoteApi.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(Constants.getGitUrl()), rpcClient.RemoteApi.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
-        Hashtable<String, Object> result = xmlRpcHelper.previewMoveConfig(childProjectPath, newTemplateParentProject);
+        Hashtable<String, Object> result = rpcClient.RemoteApi.previewMoveConfig(childProjectPath, newTemplateParentProject);
         
         String scmPath = getPath(childProjectPath, "scm");
         String typePath = getPath(childProjectPath, "type");
         checkExpectedDeletedPaths(result, scmPath, typePath);
         
         // Make sure no changes were made.
-        assertEquals(ProjectManager.GLOBAL_PROJECT_NAME, xmlRpcHelper.getTemplateParent(childProjectPath));
-        assertTrue(xmlRpcHelper.configPathExists(scmPath));
-        assertTrue(xmlRpcHelper.configPathExists(typePath));
+        assertEquals(ProjectManager.GLOBAL_PROJECT_NAME, rpcClient.RemoteApi.getTemplateParent(childProjectPath));
+        assertTrue(rpcClient.RemoteApi.configPathExists(scmPath));
+        assertTrue(rpcClient.RemoteApi.configPathExists(typePath));
     }
 
     public void testMoveConfig() throws Exception
@@ -849,23 +849,23 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProject = random + "-child";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(Constants.getGitUrl()), xmlRpcHelper.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
-        xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
+        String childProjectPath = rpcClient.RemoteApi.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(Constants.getGitUrl()), rpcClient.RemoteApi.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
-        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+        Hashtable<String, Object> result = rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
         
         String scmPath = getPath(childProjectPath, "scm");
         String typePath = getPath(childProjectPath, "type");
         checkExpectedDeletedPaths(result, scmPath, typePath);
         
-        assertEquals(newTemplateParentProject, xmlRpcHelper.getTemplateParent(childProjectPath));
+        assertEquals(newTemplateParentProject, rpcClient.RemoteApi.getTemplateParent(childProjectPath));
         // These paths were incompatible, so should have changed to the new
         // parent's type.
         checkPathType(scmPath, "zutubi.subversionConfig");
         checkPathType(typePath, "zutubi.multiRecipeTypeConfig");
         // This path should have been newly-added from the new parent.
-        assertTrue(xmlRpcHelper.configPathExists(getPath(childProjectPath, "properties", "prop")));
+        assertTrue(rpcClient.RemoteApi.configPathExists(getPath(childProjectPath, "properties", "prop")));
     }
 
     public void testMoveConfigWithSubtree() throws Exception
@@ -876,30 +876,30 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String grandchild2Project = random + "-grandchild2";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertTrivialProject(childProject, true);
-        String grandchild1ProjectPath = xmlRpcHelper.insertSimpleProject(grandchild1Project, childProject, false);
-        String grandchild2ProjectPath = xmlRpcHelper.insertProject(grandchild2Project, childProject, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
-        xmlRpcHelper.insertProjectProperty(newTemplateParentProject, "prop", "val");
+        String childProjectPath = rpcClient.RemoteApi.insertTrivialProject(childProject, true);
+        String grandchild1ProjectPath = rpcClient.RemoteApi.insertSimpleProject(grandchild1Project, childProject, false);
+        String grandchild2ProjectPath = rpcClient.RemoteApi.insertProject(grandchild2Project, childProject, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("path"));
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
-        Hashtable<String, Object> result = xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+        Hashtable<String, Object> result = rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
         
         String grandhchild2TypePath = getPath(grandchild2ProjectPath, "type");
         checkExpectedDeletedPaths(result, grandhchild2TypePath);
         
-        assertEquals(newTemplateParentProject, xmlRpcHelper.getTemplateParent(childProjectPath));
+        assertEquals(newTemplateParentProject, rpcClient.RemoteApi.getTemplateParent(childProjectPath));
         
         // Override of Subversion URL should be maintained.
-        Hashtable<String, Object> grandchild2Scm = xmlRpcHelper.getConfig(getPath(grandchild2ProjectPath, "scm"));
+        Hashtable<String, Object> grandchild2Scm = rpcClient.RemoteApi.getConfig(getPath(grandchild2ProjectPath, "scm"));
         assertEquals(Constants.FAIL_ANT_REPOSITORY, grandchild2Scm.get("url"));
         
         // Incompatible, deleted.
         checkPathType(grandhchild2TypePath, "zutubi.multiRecipeTypeConfig");
         
         // This path should have been newly-added from the new parent.
-        assertTrue(xmlRpcHelper.configPathExists(getPath(childProjectPath, "properties", "prop")));
-        assertTrue(xmlRpcHelper.configPathExists(getPath(grandchild1ProjectPath, "properties", "prop")));
-        assertTrue(xmlRpcHelper.configPathExists(getPath(grandchild2ProjectPath, "properties", "prop")));
+        assertTrue(rpcClient.RemoteApi.configPathExists(getPath(childProjectPath, "properties", "prop")));
+        assertTrue(rpcClient.RemoteApi.configPathExists(getPath(grandchild1ProjectPath, "properties", "prop")));
+        assertTrue(rpcClient.RemoteApi.configPathExists(getPath(grandchild2ProjectPath, "properties", "prop")));
     }
     
     public void testMoveConfigJustEnoughPermissions() throws Exception
@@ -910,19 +910,19 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProject = random + "-child";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
-        String userPath = xmlRpcHelper.insertTrivialUser(user);
-        String groupPath = xmlRpcHelper.insertGroup(group, asList(userPath));
-        Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
+        String groupPath = rpcClient.RemoteApi.insertGroup(group, asList(userPath));
+        Hashtable<String, Object> acl = rpcClient.RemoteApi.createDefaultConfig(ProjectAclConfiguration.class);
         acl.put("group", groupPath);
         acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_WRITE)));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
         
-        xmlRpcHelper.logout();
-        xmlRpcHelper.login(user, "");
-        xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+        rpcClient.logout();
+        rpcClient.login(user, "");
+        rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
     }
     
     public void testMoveConfigNoWritePermissionForPath() throws Exception
@@ -932,15 +932,15 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProject = random + "-child";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
-        xmlRpcHelper.insertTrivialUser(user);
-        xmlRpcHelper.logout();
-        xmlRpcHelper.login(user, "");
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.logout();
+        rpcClient.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+            rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move a project that we cannot write to");
         }
         catch (Exception e)
@@ -958,24 +958,24 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String grandChildProject = random + "-grandchild";
         String newTemplateParentProject = random + "-new-parent";
 
-        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, true);
-        String grandChildProjectPath = xmlRpcHelper.insertTrivialProject(grandChildProject, childProject, false);
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, true);
+        String grandChildProjectPath = rpcClient.RemoteApi.insertTrivialProject(grandChildProject, childProject, false);
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
-        String userPath = xmlRpcHelper.insertTrivialUser(user);
-        String groupPath = xmlRpcHelper.insertGroup(group, asList(userPath));
-        Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
+        String groupPath = rpcClient.RemoteApi.insertGroup(group, asList(userPath));
+        Hashtable<String, Object> acl = rpcClient.RemoteApi.createDefaultConfig(ProjectAclConfiguration.class);
         acl.put("group", groupPath);
         acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_WRITE)));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(childProjectPath, "permissions"), acl);
 
-        xmlRpcHelper.deleteAllConfigs(getPath(grandChildProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
+        rpcClient.RemoteApi.deleteAllConfigs(getPath(grandChildProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
         
-        xmlRpcHelper.logout();
-        xmlRpcHelper.login(user, "");
+        rpcClient.logout();
+        rpcClient.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+            rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move with descendant we cannot write to");
         }
         catch (Exception e)
@@ -991,17 +991,17 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProject = random + "-child";
         String newTemplateParentProject = random + "-new-parent";
         
-        String childProjectPath = xmlRpcHelper.insertSimpleProject(childProject, false);
-        String newTemplateParentProjectPath = xmlRpcHelper.insertSimpleProject(newTemplateParentProject, true);
+        String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, false);
+        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
-        xmlRpcHelper.deleteAllConfigs(getPath(newTemplateParentProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
+        rpcClient.RemoteApi.deleteAllConfigs(getPath(newTemplateParentProjectPath, "permissions", WILDCARD_ANY_ELEMENT));
         
-        xmlRpcHelper.insertTrivialUser(user);
-        xmlRpcHelper.logout();
-        xmlRpcHelper.login(user, "");
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.logout();
+        rpcClient.login(user, "");
         try
         {
-            xmlRpcHelper.moveConfig(childProjectPath, newTemplateParentProject);
+            rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
             fail("Should not be able to move to new template parent that we cannot view");
         }
         catch (Exception e)
@@ -1012,8 +1012,8 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private void checkPathType(String path, String expectedType) throws Exception
     {
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
-        assertEquals(expectedType, config.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> config = rpcClient.RemoteApi.getConfig(path);
+        assertEquals(expectedType, config.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     private void checkExpectedDeletedPaths(Hashtable<String, Object> result, String... expected)
@@ -1043,20 +1043,20 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         final String ORIGINAL_NAME = "default";
         final String NEW_NAME = "edited";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(randomName(), template);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName(), template);
         String stagePath = getPath(projectPath, Constants.Project.STAGES, "default");
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
         stage.put(Constants.Project.Stage.RECIPE, ORIGINAL_NAME);
-        xmlRpcHelper.saveConfig(stagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, stage, false);
 
 
         String typePath = renameRecipe(projectPath, ORIGINAL_NAME, NEW_NAME);
 
 
-        Hashtable<String, Object> type = xmlRpcHelper.getConfig(typePath);
+        Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(typePath);
         assertEquals(NEW_NAME, type.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
 
-        stage = xmlRpcHelper.getConfig(stagePath);
+        stage = rpcClient.RemoteApi.getConfig(stagePath);
         assertEquals(NEW_NAME, stage.get(Constants.Project.Stage.RECIPE));
     }
 
@@ -1075,42 +1075,42 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String random = randomName();
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
 
         String parentDefaultStagePath = getPath(parentPath, Constants.Project.STAGES, STAGE_DEFAULT);
-        Hashtable<String, Object> parentDefaultStage = xmlRpcHelper.getConfig(parentDefaultStagePath);
+        Hashtable<String, Object> parentDefaultStage = rpcClient.RemoteApi.getConfig(parentDefaultStagePath);
         parentDefaultStage.put(Constants.Project.Stage.RECIPE, ORIGINAL_NAME);
-        xmlRpcHelper.saveConfig(parentDefaultStagePath, parentDefaultStage, false);
+        rpcClient.RemoteApi.saveConfig(parentDefaultStagePath, parentDefaultStage, false);
 
         String childTypePath = getPath(childPath, Constants.Project.TYPE);
-        Hashtable<String, Object> childType = xmlRpcHelper.getConfig(childTypePath);
+        Hashtable<String, Object> childType = rpcClient.RemoteApi.getConfig(childTypePath);
         childType.put(Constants.Project.MultiRecipeType.DEFAULT_RECIPE, OTHER_NAME);
-        xmlRpcHelper.saveConfig(childTypePath, childType, false);
+        rpcClient.RemoteApi.saveConfig(childTypePath, childType, false);
         String childStagesPath = getPath(childPath, Constants.Project.STAGES);
         Hashtable<String, String> keyMap = new Hashtable<String, String>();
         keyMap.put(STAGE_DEFAULT, STAGE_OTHER);
-        xmlRpcHelper.cloneConfig(childStagesPath, keyMap);
+        rpcClient.RemoteApi.cloneConfig(childStagesPath, keyMap);
 
 
         String parentTypePath = renameRecipe(parentPath, ORIGINAL_NAME, NEW_NAME);
 
 
         // Parent references (default recipe, stage) both updated.
-        Hashtable<String, Object> parentType = xmlRpcHelper.getConfig(parentTypePath);
+        Hashtable<String, Object> parentType = rpcClient.RemoteApi.getConfig(parentTypePath);
         assertEquals(NEW_NAME, parentType.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
 
-        parentDefaultStage = xmlRpcHelper.getConfig(parentDefaultStagePath);
+        parentDefaultStage = rpcClient.RemoteApi.getConfig(parentDefaultStagePath);
         assertEquals(NEW_NAME, parentDefaultStage.get(Constants.Project.Stage.RECIPE));
 
         // Overridden child default recipe unchanged.
-        childType = xmlRpcHelper.getConfig(childTypePath);
+        childType = rpcClient.RemoteApi.getConfig(childTypePath);
         assertEquals(OTHER_NAME, childType.get(Constants.Project.MultiRecipeType.DEFAULT_RECIPE));
         
         // Both child stages (one inherited, other local) updated.
-        Hashtable<String, Object> childStage = xmlRpcHelper.getConfig(getPath(childStagesPath, STAGE_DEFAULT));
+        Hashtable<String, Object> childStage = rpcClient.RemoteApi.getConfig(getPath(childStagesPath, STAGE_DEFAULT));
         assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
-        childStage = xmlRpcHelper.getConfig(getPath(childStagesPath, STAGE_OTHER));
+        childStage = rpcClient.RemoteApi.getConfig(getPath(childStagesPath, STAGE_OTHER));
         assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
     }
 
@@ -1118,9 +1118,9 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String typePath = getPath(projectPath, Constants.Project.TYPE);
         String recipePath = getPath(typePath, Constants.Project.MultiRecipeType.RECIPES, originalName);
-        Hashtable<String, Object> recipe = xmlRpcHelper.getConfig(recipePath);
+        Hashtable<String, Object> recipe = rpcClient.RemoteApi.getConfig(recipePath);
         recipe.put(Constants.Project.MultiRecipeType.Recipe.NAME, newName);
-        xmlRpcHelper.saveConfig(recipePath, recipe, false);
+        rpcClient.RemoteApi.saveConfig(recipePath, recipe, false);
         return typePath;
     }
 
@@ -1139,7 +1139,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.call(function, args);
+            rpcClient.RemoteApi.call(function, args);
             fail();
         }
         catch (Exception e)

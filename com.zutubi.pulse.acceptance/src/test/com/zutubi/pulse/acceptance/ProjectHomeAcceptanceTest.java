@@ -1,24 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-import org.tmatesoft.svn.core.SVNException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Hashtable;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
@@ -29,8 +10,26 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
+import org.tmatesoft.svn.core.SVNException;
+
+import java.io.File;
+import java.io.IOException;
 import static java.util.Arrays.asList;
+import java.util.Collections;
+import java.util.Hashtable;
 
 public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 {
@@ -68,18 +67,18 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         tempDir = FileSystemUtils.createTempDir();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
-        buildRunner = new BuildRunner(xmlRpcHelper);
-        xmlRpcHelper.loginAsAdmin();
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
         removeDirectory(tempDir);
         super.tearDown();
     }
@@ -88,7 +87,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
     {
         final String TEST_DESCRIPTION = "This is a test description.";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         getBrowser().loginAsAdmin();
 
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -104,9 +103,9 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         assertEquals(asList("clean up build directories", "trigger", "take responsibility"), homePage.getActions());
         assertEquals(asList("configure"), homePage.getLinks());
         
-        Hashtable<String, Object> project = xmlRpcHelper.getConfig(projectPath);
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         project.put("description", TEST_DESCRIPTION);
-        xmlRpcHelper.saveConfig(projectPath, project, false);
+        rpcClient.RemoteApi.saveConfig(projectPath, project, false);
         
         homePage.openAndWaitFor();
         assertTrue(homePage.hasDescription());
@@ -119,7 +118,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         getBrowser().loginAsAdmin();
         final ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, project.getName());
@@ -145,18 +144,18 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         homePage.waitForLatestCompletedBuild(2, BUILD_TIMEOUT);
         assertFalse(homePage.hasBuildActivity());
 
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());        
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());        
     }
 
     public void testBuildAndChangeHistory() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
-        int initialBuildNumber = xmlRpcHelper.runBuild(random);
-        String initialRevision = xmlRpcHelper.getBuildRevision(random, initialBuildNumber);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        int initialBuildNumber = rpcClient.RemoteApi.runBuild(random);
+        String initialRevision = rpcClient.RemoteApi.getBuildRevision(random, initialBuildNumber);
         String brokenRevision = editAndCommitBuildFile(COMMENT_BROKEN, BUILD_FILE_BROKEN);
-        int brokenBuildNumber = xmlRpcHelper.runBuild(random);
+        int brokenBuildNumber = rpcClient.RemoteApi.runBuild(random);
         String fixedRevision = editAndCommitBuildFile(COMMENT_FIXED, BUILD_FILE_FIXED);
-        int fixedBuildNumber = xmlRpcHelper.runBuild(random);
+        int fixedBuildNumber = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -180,25 +179,25 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
     public void testFeaturedArtifacts() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
 
         getBrowser().loginAsAdmin();
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.hasLatestCompletedBuild());
         assertFalse(homePage.hasFeaturedArtifacts());
 
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.runBuild(random);
         homePage.openAndWaitFor();
         assertTrue(homePage.hasLatestCompletedBuild());
         assertFalse(homePage.hasFeaturedArtifacts());
         
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put(NAME, "buildfile");
         artifactConfig.put(FILE, "build.xml");
         artifactConfig.put(FEATURED, true);
-        xmlRpcHelper.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
-        int buildNumber = xmlRpcHelper.runBuild(random);
+        int buildNumber = rpcClient.RemoteApi.runBuild(random);
         homePage.openAndWaitFor();
         assertTrue(homePage.hasLatestCompletedBuild());
         assertTrue(homePage.hasFeaturedArtifacts());

@@ -1,5 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.components.Pager;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
@@ -9,17 +15,10 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
+import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static java.util.Arrays.asList;
 
 public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
 {
@@ -29,19 +28,19 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testNewProject() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
         getBrowser().loginAsAdmin();
 
         ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
@@ -61,12 +60,12 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
 
     public void testSingleBuild() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
-        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        int buildNumber = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
         getBrowser().loginAsAdmin();
 
         ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
-        BuildInfo build = new BuildInfo(buildNumber, ResultState.SUCCESS, xmlRpcHelper.getBuildRevision(random, buildNumber));
+        BuildInfo build = new BuildInfo(buildNumber, ResultState.SUCCESS, rpcClient.RemoteApi.getBuildRevision(random, buildNumber));
         assertSingleBuildHistory(historyPage, build);
 
         setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_BROKEN);
@@ -82,10 +81,10 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
         final int INDEX_FAILED_BUILD = 4;
         final int INDEX_ERROR_BUILD = 8;
         
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         String antCommandPath = PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND);
         
-        Hashtable<String, Object> originalAntConfig = xmlRpcHelper.getConfig(antCommandPath);
+        Hashtable<String, Object> originalAntConfig = rpcClient.RemoteApi.getConfig(antCommandPath);
         originalAntConfig.put(TARGETS, "");
         originalAntConfig.put("exe", "");
         
@@ -95,25 +94,25 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
             ResultState expectedState = ResultState.SUCCESS;
             if (i == INDEX_FAILED_BUILD)
             {
-                Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(antCommandPath);
+                Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getConfig(antCommandPath);
                 antConfig.put(TARGETS, "unknown");
-                xmlRpcHelper.saveConfig(antCommandPath, antConfig, false);
+                rpcClient.RemoteApi.saveConfig(antCommandPath, antConfig, false);
                 expectedState = ResultState.FAILURE;
             }
             else if (i == INDEX_ERROR_BUILD)
             {
-                Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(antCommandPath);
+                Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getConfig(antCommandPath);
                 antConfig.put("exe", "nosuchantcomment");
-                xmlRpcHelper.saveConfig(antCommandPath, antConfig, false);
+                rpcClient.RemoteApi.saveConfig(antCommandPath, antConfig, false);
                 expectedState = ResultState.ERROR;
             }
 
-            int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
-            builds.add(0, new BuildInfo(buildNumber, expectedState, xmlRpcHelper.getBuildRevision(random, buildNumber)));
+            int buildNumber = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
+            builds.add(0, new BuildInfo(buildNumber, expectedState, rpcClient.RemoteApi.getBuildRevision(random, buildNumber)));
             
             if (expectedState != ResultState.SUCCESS)
             {
-                xmlRpcHelper.saveConfig(antCommandPath, originalAntConfig, false);
+                rpcClient.RemoteApi.saveConfig(antCommandPath, originalAntConfig, false);
             }
         }
 

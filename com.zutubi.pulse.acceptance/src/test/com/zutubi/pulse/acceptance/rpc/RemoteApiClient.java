@@ -1,7 +1,5 @@
-package com.zutubi.pulse.acceptance;
+package com.zutubi.pulse.acceptance.rpc;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
@@ -15,8 +13,10 @@ import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -34,108 +34,29 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
-import org.apache.xmlrpc.XmlRpcClient;
-import org.apache.xmlrpc.XmlRpcException;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
 /**
+ * An XML-RPC client for {@link com.zutubi.pulse.master.api.RemoteApi}.
  */
-public class XmlRpcHelper
+public class RemoteApiClient extends ApiClient
 {
+    public static final String API_NAME = "RemoteApi";
     public static final String SYMBOLIC_NAME_KEY = CompositeType.XML_RPC_SYMBOLIC_NAME;
-
-    private static final int INITIALISATION_TIMEOUT = 90000;
-
-    protected XmlRpcClient xmlRpcClient;
-    protected String token = null;
 
     public static final long BUILD_TIMEOUT = 90000;
 
-    public XmlRpcHelper() throws MalformedURLException
+    private static final int INITIALISATION_TIMEOUT = 90000;
+
+    public RemoteApiClient(RpcClient rpc)
     {
-        this(new URL(getPulseUrl() + "/xmlrpc"));
+        super(API_NAME, rpc);
     }
 
-    public XmlRpcHelper(String url) throws MalformedURLException
-    {
-        this(new URL(url));
-    }
-
-    public XmlRpcHelper(URL url)
-    {
-        xmlRpcClient = new XmlRpcClient(url);
-    }
-
-    public String login(String login, String password) throws Exception
-    {
-        token = (String) callWithoutToken("login", login, password);
-        return token;
-    }
-
-    public String loginAsAdmin() throws Exception
-    {
-        return login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
-    }
-
-    public boolean logout() throws Exception
-    {
-        verifyLoggedIn();
-        Object result = callWithoutToken("logout", token);
-        token = null;
-        return (Boolean)result;
-    }
-
-    public boolean isLoggedIn()
-    {
-        return token != null;
-    }
-
-    private void verifyLoggedIn()
-    {
-        if(!isLoggedIn())
-        {
-            throw new IllegalStateException("Not logged in, call login first");
-        }
-    }
-
-    public Vector<Object> getVector(Object... o)
-    {
-        return new Vector<Object>(Arrays.asList(o));
-    }
-
-    @SuppressWarnings({ "unchecked" })
-    public <T> T callWithoutToken(String function, Object... args) throws Exception
-    {
-        return (T) xmlRpcClient.execute("RemoteApi." + function, getVector(args));
-    }
-
-    public <T> T call(String function, Object... args) throws Exception
-    {
-        return (T)callApi("RemoteApi", function, args);
-    }
-
-    public <T> T callTest(String function, Object... args) throws Exception
-    {
-        return (T)callApi("TestApi", function, args);
-    }
-    
-    @SuppressWarnings({ "unchecked" })
-    private <T> T callApi(String api, String function, Object... args) throws XmlRpcException, IOException
-    {
-        verifyLoggedIn();
-        Vector<Object> argVector = new Vector<Object>(args.length + 1);
-        argVector.add(token);
-        argVector.addAll(Arrays.asList(args));
-        return (T) xmlRpcClient.execute(api + "." + function, argVector);
-    }
-    
     public Hashtable<String, String> getServerInfo() throws Exception
     {
         return call("getServerInfo");
@@ -367,12 +288,12 @@ public class XmlRpcHelper
     public Hashtable<String, Object> getProjectCapture(String projectName, String recipeName, String commandName, String captureName) throws Exception
     {
         Hashtable<String, Object> projectConfig = getConfig(MasterConfigurationRegistry.PROJECTS_SCOPE + "/" + projectName);
-        Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(Constants.Project.TYPE);
+        Hashtable<String, Object> projectType = (Hashtable<String, Object>) projectConfig.get(com.zutubi.pulse.acceptance.Constants.Project.TYPE);
         Hashtable<String, Object> recipes = (Hashtable<String, Object>) projectType.get("recipes");
         Hashtable<String, Object> recipe = (Hashtable<String, Object>) recipes.get(recipeName);
         Hashtable<String, Object> commands = (Hashtable<String, Object>) recipe.get("commands");
         Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get(commandName);
-        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(Constants.Project.Command.ARTIFACTS);
+        Hashtable<String, Object> captures = (Hashtable<String, Object>) command.get(com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS);
         return (Hashtable<String, Object>) captures.get(captureName);
     }
 
@@ -427,7 +348,7 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        return insertSingleCommandProject(name, parent, template, getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
+        return insertSingleCommandProject(name, parent, template, getSubversionConfig(com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY), getAntConfig());
     }
 
     public String insertSingleCommandProject(String name, String parent, boolean template, Hashtable<String, Object> scm, Hashtable<String, Object> command) throws Exception
@@ -741,7 +662,7 @@ public class XmlRpcHelper
     public String insertPostStageHook(String project, String name, String... stageNames) throws Exception
     {
         Hashtable<String, Object> hook = createPostStageHook(project, name, stageNames);
-        return insertConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.HOOKS), hook);
+        return insertConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, com.zutubi.pulse.acceptance.Constants.Project.HOOKS), hook);
     }
 
     public Hashtable<String, Object> createPostStageHook(String project, String name, String... stageNames) throws Exception
@@ -751,7 +672,7 @@ public class XmlRpcHelper
         hook.put("applyToAllStages", stageNames.length == 0);
         if (stageNames.length > 0)
         {
-            String stagesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.STAGES);
+            String stagesPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, com.zutubi.pulse.acceptance.Constants.Project.STAGES);
             Vector<String> stages = new Vector<String>();
             for (String stageName: stageNames)
             {
@@ -845,37 +766,6 @@ public class XmlRpcHelper
         group.put("members", new Vector<String>(memberPaths));
         group.put("serverPermissions", new Vector<String>(Arrays.asList(serverPermissions)));
         return insertConfig(MasterConfigurationRegistry.GROUPS_SCOPE, group);
-    }
-
-    public void logError(String message) throws Exception
-    {
-        callTest("logError", message);
-    }
-
-    public void logWarning(String message) throws Exception
-    {
-        callTest("logWarning", message);
-    }
-
-    public void enqueueSynchronisationMessage(String agent, boolean synchronous, String description, boolean succeed) throws Exception
-    {
-        callTest("enqueueSynchronisationMessage", agent, synchronous, description, succeed);
-    }
-
-    /**
-     * A utility method that cancels all queued builds and cancels any builds that are still
-     * running.
-     *
-     * @throws Exception on error.
-     */
-    public void cancelIncompleteBuilds() throws Exception
-    {
-        for (Hashtable<String, Object> queuedRequest : getBuildQueueSnapshot())
-        {
-            cancelQueuedBuildRequest(queuedRequest.get("id").toString());
-        }
-
-        callTest("cancelActiveBuilds");
     }
 
     public int getNextBuildNumber(String projectName) throws Exception
@@ -1309,6 +1199,7 @@ public class XmlRpcHelper
         Hashtable<String, Object> build = getBuild(projectName, buildNumber);
         if (build != null)
         {
+            @SuppressWarnings("unchecked")
             Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
             return CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
             {
@@ -1480,16 +1371,6 @@ public class XmlRpcHelper
         callWithoutToken("ping");
     }
 
-    public void installPlugin(String path) throws Exception
-    {
-        callTest("installPlugin", path);
-    }
-    
-    public Vector<Hashtable<String, Object>> getRunningPlugins() throws Exception
-    {
-        return callTest("getRunningPlugins");
-    }
-
     public String addLabel(String project, String label) throws Exception
     {
         Hashtable<String, Object> config = createEmptyConfig(LabelConfiguration.class);
@@ -1497,22 +1378,24 @@ public class XmlRpcHelper
         return insertConfig(PathUtils.getPath("projects", project, "labels"), config);
     }
 
+    public void ensureUserCanRunPersonalBuild(String userName) throws Exception
+    {
+        String groupPath = GROUPS_SCOPE + "/" + DEVELOPERS_GROUP_NAME;
+        Hashtable<String, Object> group = getConfig(groupPath);
+        @SuppressWarnings("unchecked")
+        Vector<String> members = (Vector<String>) group.get("members");
+
+        String userReference = USERS_SCOPE + "/" + userName;
+        if (!members.contains(userReference))
+        {
+            members.add(userReference);
+            saveConfig(groupPath, group, false);
+        }
+    }
+
+
     private static class BuildHolder
     {
         Hashtable<String, Object> build = null;
-    }
-
-    public static void main(String[] argv) throws Exception
-    {
-        XmlRpcHelper helper = new XmlRpcHelper();
-        helper.loginAsAdmin();
-        try
-        {
-            helper.insertSimpleProject(argv[0], false);
-        }
-        finally
-        {
-            helper.logout();
-        }
     }
 }

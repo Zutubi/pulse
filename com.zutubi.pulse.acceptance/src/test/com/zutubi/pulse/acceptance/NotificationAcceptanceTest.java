@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -22,10 +23,8 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
-import java.util.*;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  * Sanity acceptance tests for notifications.
@@ -64,7 +63,7 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         random = getName() + "-" + RandomUtils.randomString(10);
 
         ensureDefaultEmailSettings();
@@ -74,8 +73,8 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
     protected void tearDown() throws Exception
     {
         // Remove subscriptions so that subsequent tests are not affected.
-        xmlRpcHelper.deleteAllConfigs("users/*/preferences/subscriptions/*");
-        xmlRpcHelper.logout();
+        rpcClient.RemoteApi.deleteAllConfigs("users/*/preferences/subscriptions/*");
+        rpcClient.logout();
 
         stopSmtpServer();
 
@@ -96,12 +95,12 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private void ensureDefaultEmailSettings() throws Exception
     {
-        Hashtable<String, Object> emailSettings = xmlRpcHelper.createDefaultConfig(EmailConfiguration.class);
+        Hashtable<String, Object> emailSettings = rpcClient.RemoteApi.createDefaultConfig(EmailConfiguration.class);
         emailSettings.put("host", DEFAULT_HOST);
         emailSettings.put("from", DEFAULT_FROM);
         emailSettings.put("customPort", true);
         emailSettings.put("port", DEFAULT_PORT);
-        xmlRpcHelper.saveConfig("settings/email", emailSettings, false);
+        rpcClient.RemoteApi.saveConfig("settings/email", emailSettings, false);
     }
 
     public void testEmailNotification() throws Exception
@@ -116,16 +115,16 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
     private void triggerAndCheckSuccessfulBuild() throws Exception
     {
         String projectName = random + "project" + PROJECT_SUCCESS;
-        int buildNumber = xmlRpcHelper.runBuild(projectName);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
         assertIndividualEmailsTo(BUILDS_ALL, BUILDS_SUCCESSFUL, BUILDS_PROJECT_SUCCESS, BUILDS_LABEL_SUCCESS);
     }
 
     private void triggerAndCheckFailedBuild() throws Exception
     {
         String projectName = random + "project" + PROJECT_FAIL;
-        int buildNumber = xmlRpcHelper.runBuild(projectName);
-        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName);
+        assertEquals(ResultState.FAILURE, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
         assertIndividualEmailsTo(BUILDS_ALL, BUILDS_FAILED, BUILDS_PROJECT_FAIL);
     }
 
@@ -140,22 +139,22 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
         insertUserWithPrimaryContact(user2);
         String groupPath = createGroup(group, user2);
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(project);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(project);
         String contactsPath = PathUtils.getPath(projectPath, Constants.Project.CONTACTS);
-        Hashtable<String, Object> contacts = xmlRpcHelper.getConfig(contactsPath);
+        Hashtable<String, Object> contacts = rpcClient.RemoteApi.getConfig(contactsPath);
         contacts.put("groups", new Vector<String>(asList(groupPath)));
         contacts.put("users", new Vector<String>(asList(user1Path)));
-        xmlRpcHelper.saveConfig(contactsPath, contacts, false);
+        rpcClient.RemoteApi.saveConfig(contactsPath, contacts, false);
 
-        Hashtable<String, Object> hook = xmlRpcHelper.createDefaultConfig(PostBuildHookConfiguration.class);
+        Hashtable<String, Object> hook = rpcClient.RemoteApi.createDefaultConfig(PostBuildHookConfiguration.class);
         hook.put("name", random);
-        Hashtable<String, Object> task = xmlRpcHelper.createDefaultConfig("zutubi.sendEmailTaskConfig");
+        Hashtable<String, Object> task = rpcClient.RemoteApi.createDefaultConfig("zutubi.sendEmailTaskConfig");
         task.put("template", "plain-text-email");
         task.put("emailContacts", true);
         hook.put("task", task);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, Constants.Project.HOOKS), hook);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, Constants.Project.HOOKS), hook);
 
-        xmlRpcHelper.runBuild(project);
+        rpcClient.RemoteApi.runBuild(project);
 
         assertEmailsTo(1, user1, user2);
     }
@@ -167,29 +166,29 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
         String subscribedProject = random + "-project-subscribed";
         String notSubscribedProject = random + "-project-not-subscribed";
 
-        String subscribedProjectPath = xmlRpcHelper.insertSimpleProject(subscribedProject);
-        xmlRpcHelper.insertSimpleProject(notSubscribedProject);
+        String subscribedProjectPath = rpcClient.RemoteApi.insertSimpleProject(subscribedProject);
+        rpcClient.RemoteApi.insertSimpleProject(notSubscribedProject);
         createUserWithSubscription(discerningUserLogin, subscribedProject, null, CONDITION_ALL_BUILDS);
         createUserWithSubscription(promiscuousUserLogin, null, null, CONDITION_ALL_BUILDS);
 
-        xmlRpcHelper.runBuild(subscribedProject);
+        rpcClient.RemoteApi.runBuild(subscribedProject);
         assertEmailsTo(2, discerningUserLogin, promiscuousUserLogin);
 
         clearSmtpServer();
 
-        xmlRpcHelper.deleteConfig(subscribedProjectPath);
-        xmlRpcHelper.runBuild(notSubscribedProject);
+        rpcClient.RemoteApi.deleteConfig(subscribedProjectPath);
+        rpcClient.RemoteApi.runBuild(notSubscribedProject);
         assertEmailsTo(1, promiscuousUserLogin);
     }
 
     private String insertUserWithPrimaryContact(String login) throws Exception
     {
-        String userPath = xmlRpcHelper.insertTrivialUser(login);
-        Hashtable<String, Object> emailContact = xmlRpcHelper.createDefaultConfig(EmailContactConfiguration.class);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(login);
+        Hashtable<String, Object> emailContact = rpcClient.RemoteApi.createDefaultConfig(EmailContactConfiguration.class);
         emailContact.put("address", login + EMAIL_DOMAIN);
         emailContact.put("name", "primary email");
-        String contactPath = xmlRpcHelper.insertConfig(PathUtils.getPath(userPath, "preferences", "contacts"), emailContact);
-        xmlRpcHelper.doConfigAction(contactPath, ContactConfigurationActions.ACTION_MARK_PRIMARY);
+        String contactPath = rpcClient.RemoteApi.insertConfig(PathUtils.getPath(userPath, "preferences", "contacts"), emailContact);
+        rpcClient.RemoteApi.doConfigAction(contactPath, ContactConfigurationActions.ACTION_MARK_PRIMARY);
         return userPath;
     }
 
@@ -232,7 +231,7 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
     private void setupData() throws Exception
     {
         // Firstly, remove all existing subscriptions as we do not want them to interfer / slow things down.
-        xmlRpcHelper.deleteAllConfigs("users/*/preferences/subscriptions/*");
+        rpcClient.RemoteApi.deleteAllConfigs("users/*/preferences/subscriptions/*");
 
         // all builds, all projects, can view all.
         createUserAndGroup(BUILDS_ALL, CONDITION_ALL_BUILDS);
@@ -269,20 +268,20 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private void createUserWithSubscription(String name, String project, String label, int condition) throws Exception
     {
-        String userPath = xmlRpcHelper.insertTrivialUser(name);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(name);
 
         // create email contact point.
-        Hashtable<String, Object> contactPoint = xmlRpcHelper.createDefaultConfig(EmailContactConfiguration.class);
+        Hashtable<String, Object> contactPoint = rpcClient.RemoteApi.createDefaultConfig(EmailContactConfiguration.class);
         contactPoint.put("name", "email");
         contactPoint.put("address", name + EMAIL_DOMAIN);
-        xmlRpcHelper.insertConfig(userPath + "/preferences/contacts", contactPoint);
+        rpcClient.RemoteApi.insertConfig(userPath + "/preferences/contacts", contactPoint);
 
         insertProjectSubscription(userPath, project, label, condition);
     }
 
     private void insertProjectSubscription(String userPath, String project, String label, int condition) throws Exception
     {
-        Hashtable<String, Object> projectSubscription = xmlRpcHelper.createDefaultConfig(ProjectSubscriptionConfiguration.class);
+        Hashtable<String, Object> projectSubscription = rpcClient.RemoteApi.createDefaultConfig(ProjectSubscriptionConfiguration.class);
         projectSubscription.put("name", "a subscription");
         projectSubscription.put("allProjects", project == null && label == null);
         if (project != null)
@@ -299,26 +298,26 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
         switch (condition)
         {
             case CONDITION_ALL_BUILDS:
-                projectSubscription.put("condition", xmlRpcHelper.createDefaultConfig(AllBuildsConditionConfiguration.class));
+                projectSubscription.put("condition", rpcClient.RemoteApi.createDefaultConfig(AllBuildsConditionConfiguration.class));
                 break;
             case CONDITION_SUCCESSFUL_BUILDS:
-                Hashtable<String, Object> successfulCondition = xmlRpcHelper.createDefaultConfig(CustomConditionConfiguration.class);
+                Hashtable<String, Object> successfulCondition = rpcClient.RemoteApi.createDefaultConfig(CustomConditionConfiguration.class);
                 successfulCondition.put("customCondition", NotifyConditionFactory.SUCCESS);
                 projectSubscription.put("condition", successfulCondition);
                 break;
             case CONDITION_FAILED_BUILDS:
-                Hashtable<String, Object> failedCondition = xmlRpcHelper.createDefaultConfig(SelectedBuildsConditionConfiguration.class);
+                Hashtable<String, Object> failedCondition = rpcClient.RemoteApi.createDefaultConfig(SelectedBuildsConditionConfiguration.class);
                 failedCondition.put("unsuccessful", Boolean.TRUE);
                 projectSubscription.put("condition", failedCondition);
                 break;
         }
 
-        xmlRpcHelper.insertConfig(userPath + "/preferences/subscriptions", projectSubscription);
+        rpcClient.RemoteApi.insertConfig(userPath + "/preferences/subscriptions", projectSubscription);
     }
 
     private String createGroup(String group, String... users) throws Exception
     {
-        return xmlRpcHelper.insertGroup(group, CollectionUtils.map(users, new Mapping<String, String>()
+        return rpcClient.RemoteApi.insertGroup(group, CollectionUtils.map(users, new Mapping<String, String>()
         {
             public String map(String name)
             {
@@ -333,32 +332,32 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
         String projectPath;
         if (successful)
         {
-            projectPath = xmlRpcHelper.insertSimpleProject(name, false);
+            projectPath = rpcClient.RemoteApi.insertSimpleProject(name, false);
         }
         else
         {
-            projectPath = xmlRpcHelper.insertSingleCommandProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+            projectPath = rpcClient.RemoteApi.insertSingleCommandProject(name, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
         }
 
         // remove all existing permissions so that we are sure they will not get in the way.
         String permissionsPath = "projects/" + name + "/permissions";
-        Vector<String> listing = xmlRpcHelper.getConfigListing(permissionsPath);
+        Vector<String> listing = rpcClient.RemoteApi.getConfigListing(permissionsPath);
         for (String path : listing)
         {
-            assertTrue(xmlRpcHelper.deleteConfig(permissionsPath + "/" + path));
+            assertTrue(rpcClient.RemoteApi.deleteConfig(permissionsPath + "/" + path));
         }
 
         for (String groupNameSuffix : viewableBy)
         {
-            Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+            Hashtable<String, Object> acl = rpcClient.RemoteApi.createDefaultConfig(ProjectAclConfiguration.class);
             acl.put("group", "groups/" + random + "group" + groupNameSuffix);
             acl.put("allowedActions", new Vector<String>(asList(AccessManager.ACTION_VIEW)));
-            xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "permissions"), acl);
+            rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "permissions"), acl);
         }
 
-        Hashtable<String, Object> labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        Hashtable<String, Object> labelConfig = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);
         labelConfig.put("label", getLabelForSuffix(nameSuffix));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
     }
 
     private String getLabelForSuffix(String nameSuffix)

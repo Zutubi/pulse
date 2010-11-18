@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -34,9 +36,6 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -148,6 +147,11 @@ public class DefaultBuildManager implements BuildManager
     public List<BuildResult> getLatestCompletedBuildResults(Project project, int first, int max)
     {
         return buildResultDao.findLatestCompleted(project, first, max);
+    }
+
+    public List<BuildResult> getBuildsCompletedSince(Project[] projects, long sinceTime)
+    {
+        return buildResultDao.findCompletedSince(projects, sinceTime);
     }
 
     public BuildResult getByProjectAndNumber(final Project project, final long number)

@@ -1,26 +1,25 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import static org.mortbay.http.HttpResponse.*;
 
 import java.io.File;
 import java.io.IOException;
+import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static java.util.Arrays.asList;
-import static org.mortbay.http.HttpResponse.*;
 
 public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 {
@@ -35,10 +34,10 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 
         projectName = randomName();
 
-        xmlRpcHelper.loginAsAdmin();
-        String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
-        String projectHandle = xmlRpcHelper.getConfigHandle(projectPath);
-        xmlRpcHelper.logout();
+        rpcClient.loginAsAdmin();
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName);
+        String projectHandle = rpcClient.RemoteApi.getConfigHandle(projectPath);
+        rpcClient.logout();
 
         // since we are not running builds as such, we need to initialise the repository by manually adding
         // the project handle to the appropriate path.  This is normally handled during a build.
@@ -135,23 +134,23 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 
     private void addAccess(String accessList, String... paths) throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(Constants.Settings.Repository.PATH);
+        rpcClient.loginAsAdmin();
+        Hashtable<String, Object> config = rpcClient.RemoteApi.getConfig(Constants.Settings.Repository.PATH);
         @SuppressWarnings("unchecked")
         Vector<String> g = (Vector<String>) config.get(accessList);
         g.addAll(asList(paths));
-        xmlRpcHelper.saveConfig(Constants.Settings.Repository.PATH, config, true);
-        xmlRpcHelper.logout();
+        rpcClient.RemoteApi.saveConfig(Constants.Settings.Repository.PATH, config, true);
+        rpcClient.logout();
     }
 
     private void resetDefaultAccess() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(Constants.Settings.Repository.PATH);
+        rpcClient.loginAsAdmin();
+        Hashtable<String, Object> config = rpcClient.RemoteApi.getConfig(Constants.Settings.Repository.PATH);
         config.remove(READ_ACCESS);
         config.remove(WRITE_ACCESS);
-        xmlRpcHelper.saveConfig(Constants.Settings.Repository.PATH, config, true);
-        xmlRpcHelper.logout();
+        rpcClient.RemoteApi.saveConfig(Constants.Settings.Repository.PATH, config, true);
+        rpcClient.logout();
     }
 
     private void ensurePathExists(String path) throws IOException
@@ -182,9 +181,9 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
     {
         String user = randomName();
 
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertTrivialUser(user);
-        xmlRpcHelper.logout();
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.logout();
 
         return new UsernamePasswordCredentials(user, "");
     }

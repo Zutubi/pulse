@@ -1824,7 +1824,7 @@ public class RemoteApi
                     {
                         return result;
                     }
-                    result.add(convertResult(build));
+                    result.add(ApiUtils.convertBuild(build, true));
                     return result;
                 }
             });
@@ -2019,16 +2019,7 @@ public class RemoteApi
                 public Vector<Hashtable<String, Object>> process()
                 {
                     Project[] projects = internalGetProjectSet(projectName, true);
-
-                    List<BuildResult> builds = buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst);
-                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-                    for (BuildResult build : builds)
-                    {
-                        Hashtable<String, Object> buildDetails = convertResult(build);
-                        result.add(buildDetails);
-                    }
-
-                    return result;
+                    return ApiUtils.mapBuilds(buildManager.queryBuilds(projects, mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst), true);
                 }
             });
         }
@@ -2071,7 +2062,7 @@ public class RemoteApi
                     Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(buildRange.size());
                     for (BuildResult r : buildRange)
                     {
-                        result.add(convertResult(r));
+                        result.add(ApiUtils.convertBuild(r, true));
                     }
                     return result;
                 }
@@ -2118,7 +2109,7 @@ public class RemoteApi
                     Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
                     if (buildResult != null)
                     {
-                        result.add(convertResult(buildResult));
+                        result.add(ApiUtils.convertBuild(buildResult, true));
                     }
                     return result;
                 }
@@ -2264,15 +2255,7 @@ public class RemoteApi
                         states = ResultState.getCompletedStates();
                     }
 
-                    List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
-                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-                    for (BuildResult build : builds)
-                    {
-                        Hashtable<String, Object> buildDetails = convertResult(build);
-                        result.add(buildDetails);
-                    }
-
-                    return result;
+                    return ApiUtils.mapBuilds(buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true), true);
                 }
             });
         }
@@ -2338,15 +2321,7 @@ public class RemoteApi
                 public Vector<Hashtable<String, Object>> process()
                 {
                     Project[] projects = internalGetProjectSet(projectName, true);
-                    List<BuildResult> builds = buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults);
-                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-                    for (BuildResult build : builds)
-                    {
-                        Hashtable<String, Object> buildDetails = convertResult(build);
-                        result.add(buildDetails);
-                    }
-
-                    return result;
+                    return ApiUtils.mapBuilds(buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults), true);
                 }
             });
         }
@@ -2410,7 +2385,7 @@ public class RemoteApi
                         return result;
                     }
 
-                    result.add(convertResult(build));
+                    result.add(ApiUtils.convertBuild(build, true));
                     return result;
                 }
             });
@@ -2462,14 +2437,7 @@ public class RemoteApi
                         builds = builds.subList(0, maxResults);
                     }
 
-                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-                    for (BuildResult build : builds)
-                    {
-                        Hashtable<String, Object> buildDetails = convertResult(build);
-                        result.add(buildDetails);
-                    }
-
-                    return result;
+                    return ApiUtils.mapBuilds(builds, true);
                 }
             });
         }
@@ -2500,27 +2468,6 @@ public class RemoteApi
         return getLatestPersonalBuilds(token, completedOnly, 1);
     }
 
-    private Hashtable<String, Object> convertResult(BuildResult build)
-    {
-        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-        buildDetails.put("id", (int) build.getNumber());
-        buildDetails.put("project", build.getProject().getName());
-        buildDetails.put("revision", getBuildRevision(build));
-        buildDetails.put("tests", convertTests(build.getTestSummary()));
-        buildDetails.put("version", getBuildVersion(build));
-        buildDetails.put("reason", build.getReason().getSummary());
-        addResultFields(build, buildDetails);
-
-        Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
-        for (RecipeResultNode rrn : build.getRoot().getChildren())
-        {
-            stages.add(convertStage(rrn));
-        }
-        buildDetails.put("stages", stages);
-
-        return buildDetails;
-    }
-
     private Hashtable<String, Object> convertProject(Project project)
     {
         Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
@@ -2536,96 +2483,6 @@ public class RemoteApi
         }
         projectDetails.put("state", project.getState().toString());
         return projectDetails;
-    }
-
-    /**
-     * Extract the build version string from the build result, returning an
-     * empty string if no build version is available.
-     *
-     * @param build from which the build version is being retrieved.
-     * @return a string representing the build version, or an empty string if no
-     *         build version is available.
-     */
-    private String getBuildVersion(BuildResult build)
-    {
-        if (build.getVersion() != null)
-        {
-            return build.getVersion();
-        }
-        return "";
-    }
-
-    private String getBuildRevision(BuildResult build)
-    {
-        Revision revision = build.getRevision();
-        if (revision != null)
-        {
-            return revision.getRevisionString();
-        }
-
-        return "";
-    }
-
-    private Hashtable<String, Object> convertStage(RecipeResultNode recipeResultNode)
-    {
-        Hashtable<String, Object> stage = new Hashtable<String, Object>();
-        stage.put("name", recipeResultNode.getStageName());
-        stage.put("recipe", recipeResultNode.getResult().getRecipeNameSafe());
-        stage.put("agent", recipeResultNode.getHostSafe());
-        stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
-        stage.put("commands", convertCommands(recipeResultNode));
-
-        addResultFields(recipeResultNode.getResult(), stage);
-
-        return stage;
-    }
-
-    private Vector<Hashtable<String, Object>> convertCommands(final RecipeResultNode node)
-    {
-        Vector<Hashtable<String, Object>> commands = new Vector<Hashtable<String, Object>>();
-        for (CommandResult command : node.getResult().getCommandResults())
-        {
-            Hashtable<String, Object> detail = new Hashtable<String, Object>();
-            detail.put("name", command.getCommandName());
-            addResultFields(command, detail);
-            commands.add(detail);
-        }
-        return commands;
-    }
-
-    private void addResultFields(Result result, Hashtable<String, Object> details)
-    {
-        details.put("status", result.getState().getPrettyString());
-        details.put("completed", result.completed());
-        details.put("succeeded", result.succeeded());
-        details.put("errorCount", result.getErrorFeatureCount());
-        details.put("warningCount", result.getWarningFeatureCount());
-
-        TimeStamps timeStamps = result.getStamps();
-        details.put("startTime", new Date(timeStamps.getStartTime()));
-        details.put("startTimeMillis", Long.toString(timeStamps.getStartTime()));
-        details.put("endTime", new Date(timeStamps.getEndTime()));
-        details.put("endTimeMillis", Long.toString(timeStamps.getEndTime()));
-        if (timeStamps.hasEstimatedTimeRemaining())
-        {
-            details.put("progress", timeStamps.getEstimatedPercentComplete());
-        }
-        else
-        {
-            details.put("progress", -1);
-        }
-    }
-
-    private Hashtable<String, Object> convertTests(TestResultSummary testSummary)
-    {
-        Hashtable<String, Object> result = new Hashtable<String, Object>();
-        result.put("total", testSummary.getTotal());
-        result.put("passed", testSummary.getPassed());
-        result.put("skipped", testSummary.getSkipped());
-        result.put("expectedFailures", testSummary.getExpectedFailures());
-        result.put("failures", testSummary.getFailures());
-        result.put("errors", testSummary.getErrors());
-        return result;
     }
 
     /**

@@ -3,16 +3,15 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Hashtable;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 
 public class LoggingAcceptanceTest extends AcceptanceTestBase
 {
@@ -29,16 +28,16 @@ public class LoggingAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         disableExtraLogging();
-        logDir = new File(xmlRpcHelper.getServerInfo().get(SimpleMasterConfigurationManager.CORE_PROPERTY_PULSE_LOG_DIR));
+        logDir = new File(rpcClient.RemoteApi.getServerInfo().get(SimpleMasterConfigurationManager.CORE_PROPERTY_PULSE_LOG_DIR));
     }
 
     @Override
     protected void tearDown() throws Exception
     {
         disableExtraLogging();
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         logDir = null;
         super.tearDown();
     }
@@ -86,10 +85,10 @@ public class LoggingAcceptanceTest extends AcceptanceTestBase
 
     private void makeConfigChange() throws Exception
     {
-        Hashtable<String, Object> globalConfig = xmlRpcHelper.getConfig(GlobalConfiguration.SCOPE_NAME);
+        Hashtable<String, Object> globalConfig = rpcClient.RemoteApi.getConfig(GlobalConfiguration.SCOPE_NAME);
         Integer current = (Integer) globalConfig.get(PROPERTY_SCM_POLLING_INTERVAL);
         globalConfig.put(PROPERTY_SCM_POLLING_INTERVAL, current + 1);
-        xmlRpcHelper.saveConfig(GlobalConfiguration.SCOPE_NAME, globalConfig, false);
+        rpcClient.RemoteApi.saveConfig(GlobalConfiguration.SCOPE_NAME, globalConfig, false);
     }
 
     private void setEventLoggingEnabled(boolean enabled) throws Exception
@@ -104,9 +103,9 @@ public class LoggingAcceptanceTest extends AcceptanceTestBase
 
     private void updateLoggingConfig(String property, boolean value) throws Exception
     {
-        Hashtable<String, Object> loggingConfig = xmlRpcHelper.getConfig(PATH_LOGGING_CONFIG);
+        Hashtable<String, Object> loggingConfig = rpcClient.RemoteApi.getConfig(PATH_LOGGING_CONFIG);
         loggingConfig.put(property, value);
-        xmlRpcHelper.saveConfig(PATH_LOGGING_CONFIG, loggingConfig, false);
+        rpcClient.RemoteApi.saveConfig(PATH_LOGGING_CONFIG, loggingConfig, false);
     }
 
     /**

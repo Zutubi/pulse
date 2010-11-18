@@ -5,15 +5,14 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * A set of acceptance tests for the build version functionality.  This includes
@@ -30,11 +29,11 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         
         // create a project.
         projectName = getName() + "-" + RandomUtils.randomString(10);
-        xmlRpcHelper.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
 
         repository = new Repository();
     }
@@ -42,7 +41,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -50,8 +49,8 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     public void testDefaultBuildVersionIsBuildNumber() throws Exception
     {
         // trigger a successful build.
-        int buildNumber = xmlRpcHelper.runBuild(projectName);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, Integer.toString(buildNumber));
     }
@@ -60,8 +59,8 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     {
         String buildVersion = "FIXED";
 
-        int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName, asPair("version", (Object)buildVersion));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, buildVersion);
     }
@@ -70,8 +69,8 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     {
         String buildVersion = "${project}-${build.number}";
 
-        int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName, asPair("version", (Object)buildVersion));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
 
         assertBuildVersion(projectName, buildNumber, projectName + "-" + buildNumber);
     }
@@ -80,19 +79,19 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     {
         String buildVersion = "version-$(build.revision)";
 
-        int buildNumber = xmlRpcHelper.runBuild(projectName, asPair("version", (Object)buildVersion));
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectName, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(projectName, asPair("version", (Object)buildVersion));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));
 
-        String revision = xmlRpcHelper.getBuildRevision(projectName, buildNumber);
+        String revision = rpcClient.RemoteApi.getBuildRevision(projectName, buildNumber);
         assertBuildVersion(projectName, buildNumber, "version-" + revision);
     }
 
     public void testSpecifyVersionViaManualPrompt() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         // edit the build options, setting prompt to true.
-        xmlRpcHelper.enableBuildPrompting(projectName);
+        rpcClient.RemoteApi.enableBuildPrompting(projectName);
 
         getBrowser().loginAsAdmin();
 
@@ -108,7 +107,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
         // leave the revision blank
         form.triggerFormElements(asPair("version", "OH_HAI"));
 
-        xmlRpcHelper.waitForBuildToComplete(projectName, 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectName, 1);
 
         assertBuildVersion(projectName, 1, "OH_HAI");
     }
@@ -129,7 +128,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
         repository.getIvyModuleDescriptor(projectName, expectedVersion);
 
         // b) the xml rpc interface - build details
-        assertEquals(expectedVersion, xmlRpcHelper.getBuildVersion(projectName, buildNumber));
+        assertEquals(expectedVersion, rpcClient.RemoteApi.getBuildVersion(projectName, buildNumber));
 
         // c) the environment text contents
         String text = getEnvironmentText(projectName, buildNumber);
@@ -139,7 +138,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
 
     private String getEnvironmentText(String projectName, int buildNumber) throws Exception
     {
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(projectName, buildNumber);
+        Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(projectName, buildNumber);
         Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> artifact)

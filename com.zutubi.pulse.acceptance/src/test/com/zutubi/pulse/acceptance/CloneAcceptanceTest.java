@@ -13,13 +13,12 @@ import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfigurat
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import com.zutubi.util.WebUtils;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import static java.util.Arrays.asList;
+import java.util.Hashtable;
 
 /**
  * Tests for cloning both of top-level template collection items and of
@@ -35,23 +34,23 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testCloneLinkNotPresentForListItems() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
-        Hashtable<String, Object> label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
+        Hashtable<String, Object> label = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);
         label.put("label", "foo");
         String labelsPath = PathUtils.getPath(projectPath, "labels");
-        String labelPath = xmlRpcHelper.insertConfig(labelsPath, label);
+        String labelPath = rpcClient.RemoteApi.insertConfig(labelsPath, label);
 
         getBrowser().loginAsAdmin();
         assertCloneAvailability(labelPath, false);
@@ -61,15 +60,15 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
     {
         String project = random + "-project";
         String user = random + "-user";
-        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
-        String propertyPath = xmlRpcHelper.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
-        String userPath = xmlRpcHelper.insertTrivialUser(user);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(project, false);
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
 
         assertTrue(getBrowser().login(user, ""));
         assertCloneAvailability(propertyPath, false);
 
-        String groupPath = xmlRpcHelper.insertGroup(random + "-group", asList(userPath));
-        xmlRpcHelper.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
+        String groupPath = rpcClient.RemoteApi.insertGroup(random + "-group", asList(userPath));
+        rpcClient.RemoteApi.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
 
         getBrowser().logout();
         assertTrue(getBrowser().login(user, ""));
@@ -87,14 +86,14 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
     {
         String project = random + "-project";
         String user = random + "-user";
-        xmlRpcHelper.insertTrivialProject(project, false);
-        String userPath = xmlRpcHelper.insertTrivialUser(user);
+        rpcClient.RemoteApi.insertTrivialProject(project, false);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
 
         assertTrue(getBrowser().login(user, ""));
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, project, false);
         assertFalse(hierarchyPage.isClonePresent());
 
-        xmlRpcHelper.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
+        rpcClient.RemoteApi.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
 
         getBrowser().logout();
         assertTrue(getBrowser().login(user, ""));
@@ -154,8 +153,8 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     private ListPage prepareMapItem() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
-        String propertyPath = xmlRpcHelper.insertProjectProperty(random, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(random, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
         getBrowser().loginAsAdmin();
         ListPage labelList = getBrowser().openAndWaitFor(ListPage.class, getParentPath(propertyPath));
@@ -166,7 +165,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     public void testCloneProject() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -181,7 +180,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     public void testCloneProjectValidation() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -214,7 +213,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentName + CLONE_PROPERTY_NAME, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(0, xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
+        assertEquals(0, rpcClient.RemoteApi.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentName + CLONE_PROPERTY_NAME)).size());
     }
 
     public void testCloneProjectHierarchyWithChild() throws Exception
@@ -234,7 +233,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
+        assertEquals(asList(childCloneName), rpcClient.RemoteApi.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
 
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
@@ -268,7 +267,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     public void testSmartCloneProject() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         ProjectHierarchyPage cloneHierarchyPage = doSmartClone();
         assertTrue(cloneHierarchyPage.isTreeItemPresent(random + PARENT_PROPERTY_NAME));
@@ -277,7 +276,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     public void testSmartCloneProjectValidation() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -321,7 +320,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage cloneHierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, parentCloneName, true);
         cloneHierarchyPage.waitFor();
 
-        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
+        assertEquals(asList(childCloneName), rpcClient.RemoteApi.getTemplateChildren(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
 
         assertTrue(hierarchyPage.isTreeItemPresent(parentTemplateName));
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
@@ -332,8 +331,8 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     public void testSmartCloneWithInternalReference() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
-        xmlRpcHelper.insertPostStageHook(random, "stagey", "default");
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertPostStageHook(random, "stagey", "default");
 
         doSmartClone();
 
@@ -361,9 +360,9 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
     private ProjectHierarchyPage setupHierarchy(String parentName, String childName) throws Exception
     {
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        xmlRpcHelper.insertTrivialProject(childName, parentName, false);
-        assertEquals(asList(childName), new ArrayList<String>(xmlRpcHelper.getTemplateChildren(parentPath)));
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
+        assertEquals(asList(childName), new ArrayList<String>(rpcClient.RemoteApi.getTemplateChildren(parentPath)));
 
         getBrowser().loginAsAdmin();
         return getBrowser().openAndWaitFor(ProjectHierarchyPage.class, parentName, true);

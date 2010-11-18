@@ -1,11 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNException;
@@ -13,9 +15,6 @@ import org.tmatesoft.svn.core.SVNException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 {
@@ -33,18 +32,18 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         tempDir = FileSystemUtils.createTempDir();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
-        buildRunner = new BuildRunner(xmlRpcHelper);
-        xmlRpcHelper.loginAsAdmin();
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         removeDirectory(tempDir);
 
@@ -59,13 +58,13 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         List<String> requestIds = buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildRequestToBeHandled(requestIds.get(0));
+        rpcClient.RemoteApi.waitForBuildRequestToBeHandled(requestIds.get(0));
 
         project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
     }
 
     public void testAllowTwoConcurrentBuilds() throws Exception
@@ -76,24 +75,24 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         buildRunner.triggerBuild(project);
          // pending means active, we only have one agent active atm.
-        xmlRpcHelper.waitForBuildInPending(project.getName(), 2);
+        rpcClient.RemoteApi.waitForBuildInPending(project.getName(), 2);
 
         List<String> requestIds = buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildRequestToBeHandled(requestIds.get(0));
+        rpcClient.RemoteApi.waitForBuildRequestToBeHandled(requestIds.get(0));
 
         project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
     }
 
     public void testProjectConcurrentlyBuildingOnTwoAgents() throws Exception
     {
         WaitProject project = setUpConcurrentBuildsOnTwoAgents();
         project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
     }
 
     public void testActiveBuildThatIsNotLatest() throws Exception
@@ -105,14 +104,14 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
         assertEquals("build 2", getBrowser().getText(buildLinkId));
 
-        xmlRpcHelper.cancelBuild(project.getName(), 2);
+        rpcClient.RemoteApi.cancelBuild(project.getName(), 2);
 
         getBrowser().refresh();
         browsePage.waitFor();
         assertEquals("build 1", getBrowser().getText(buildLinkId));
 
         project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
     }
 
     public void testReorderingWithinQueueCausingBackwardRevisions() throws Exception
@@ -123,23 +122,23 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInPending(project.getName(), 2);
+        rpcClient.RemoteApi.waitForBuildInPending(project.getName(), 2);
 
         buildRunner.triggerBuild(project, asPair("priority", (Object)"5"));
-        xmlRpcHelper.waitForBuildInPending(project.getName(), 3);
+        rpcClient.RemoteApi.waitForBuildInPending(project.getName(), 3);
 
         // release to make build 3 active - terminate since we are unable to
         // selectively release a build at the moment
-        xmlRpcHelper.cancelBuild(project.getName(), 1);
+        rpcClient.RemoteApi.cancelBuild(project.getName(), 1);
 
         // update scm to change the revision.
         makeChangeToSvn();
 
         project.releaseBuild();
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
 
         // view the changes tab and ensure that it does not blow up.  The data
         // is not as accurate as would be liked, but further changes to the
@@ -174,7 +173,7 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject setUpConcurrentBuildsOnTwoAgents() throws Exception
     {
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
 
         WaitProject project = createProject("A");
         bindStagesToAny(project);
@@ -182,10 +181,10 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 2);
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 2);
         return project;
     }
 

@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-
 import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
@@ -27,12 +26,12 @@ public class CollapsedCollectionAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -81,7 +80,7 @@ public class CollapsedCollectionAcceptanceTest extends AcceptanceTestBase
 
     public void testDeleteCollapsedCollectionItemFromItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
 
@@ -118,7 +117,7 @@ public class CollapsedCollectionAcceptanceTest extends AcceptanceTestBase
     {
         final String NEW_NAME = "new recipe";
 
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
 
@@ -139,7 +138,7 @@ public class CollapsedCollectionAcceptanceTest extends AcceptanceTestBase
         // collection.  If we later configure the type to be multi-recipe,
         // this node is dynamically renamed, and we need to ensure it knows
         // it now has a collapsed collection.
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         CompositePage typePage = getBrowser().openAndWaitFor(CompositePage.class, PathUtils.getPath(projectPath, Constants.Project.TYPE));
@@ -173,7 +172,7 @@ public class CollapsedCollectionAcceptanceTest extends AcceptanceTestBase
 
     private ConfigPage addProjectAndNavigateToType() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
 

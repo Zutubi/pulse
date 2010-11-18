@@ -2,9 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.master.model.Project.State.IDLE;
+import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
@@ -12,11 +16,6 @@ import com.zutubi.util.Predicate;
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
-import static com.zutubi.pulse.master.model.Project.State.IDLE;
-import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 {
@@ -30,7 +29,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         Repository repository = new Repository();
         repository.clean();
@@ -39,10 +38,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         projectName = randomName();
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
     }
@@ -50,8 +49,8 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         removeDirectory(tmpDir);
 
@@ -76,21 +75,21 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerRebuild(projectB.getConfig());
 
         // expect projectA to be building, projectB to be pending_dependency.
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         assertBuildQueued(projectB);
 
         projectA.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
 
         // expect projectB to be building.
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
     }
 
     public void testRebuildMultipleDependencies() throws Exception
@@ -116,16 +115,16 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
             {
                 try
                 {
-                    return xmlRpcHelper.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS || xmlRpcHelper.getBuildStatus(projectB.getName(), 1) == ResultState.IN_PROGRESS;
+                    return rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS || rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1) == ResultState.IN_PROGRESS;
                 }
                 catch (Exception e)
                 {
                     return false;
                 }
             }
-        }, XmlRpcHelper.BUILD_TIMEOUT, "a dependency to start building");
+        }, rpcClient.RemoteApi.BUILD_TIMEOUT, "a dependency to start building");
 
-        if (xmlRpcHelper.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS)
+        if (rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS)
         {
             firstDependency = projectA;
             secondDependency = projectB;
@@ -136,24 +135,24 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
             secondDependency = projectA;
         }
 
-        assertEquals(ResultState.PENDING, xmlRpcHelper.getBuildStatus(secondDependency.getName(), 1));
+        assertEquals(ResultState.PENDING, rpcClient.RemoteApi.getBuildStatus(secondDependency.getName(), 1));
         assertBuildQueued(projectC);
         firstDependency.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(firstDependency.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(firstDependency.getName(), 1);
 
-        xmlRpcHelper.waitForBuildInProgress(secondDependency.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(firstDependency.getName(), 1));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(secondDependency.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(secondDependency.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(firstDependency.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(secondDependency.getName(), 1));
         assertBuildQueued(projectC);
         secondDependency.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(secondDependency.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(secondDependency.getName(), 1);
 
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(projectC.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
         projectC.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
     }
 
     public void testRebuildTransitiveDependency() throws Exception
@@ -171,30 +170,30 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerRebuild(projectC.getConfig());
 
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
         assertBuildQueued(projectB);
         assertBuildQueued(projectC);
 
         projectA.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
 
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectC.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
 
         projectC.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
     }
 
     public void testRebuildUsesTransitiveProperty() throws Exception
@@ -215,23 +214,23 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerRebuild(projectC.getConfig());
 
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
 
-        assertEquals(IDLE, xmlRpcHelper.getProjectState(projectA.getName()));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(IDLE, rpcClient.RemoteApi.getProjectState(projectA.getName()));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
 
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
 
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectC.getName(), 1);
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
 
         projectC.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
     }
 
     public void testRebuildUsesStatusProperty() throws Exception
@@ -255,31 +254,31 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerRebuild(projectD.getConfig(), asPair("status", (Object) STATUS_MILESTONE));
 
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
 
-        assertEquals(IDLE, xmlRpcHelper.getProjectState(projectA.getName()));
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertEquals(IDLE, rpcClient.RemoteApi.getProjectState(projectA.getName()));
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
         assertBuildQueued(projectC);
         assertBuildQueued(projectD);
 
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
 
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(projectC.getName(), 1);
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
         assertBuildQueued(projectD);
 
         projectC.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
 
-        xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
-        assertEquals(ResultState.IN_PROGRESS, xmlRpcHelper.getBuildStatus(projectD.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(projectD.getName(), 1);
+        assertEquals(ResultState.IN_PROGRESS, rpcClient.RemoteApi.getBuildStatus(projectD.getName(), 1));
 
         projectD.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectD.getName(), 1);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectD.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(projectD.getName(), 1);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectD.getName(), 1));
     }
 
     public void testRebuildStopsOnFailure() throws Exception
@@ -293,10 +292,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerRebuild(projectB.getConfig());
 
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectA.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), 1);
+        assertEquals(ResultState.FAILURE, rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1));
 
-        assertNull(xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
+        assertNull(rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
 
         // We would normally have to release projectBs' build.  However, it did not run,
         // because projectA failed. 
@@ -305,10 +304,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
     public void testTransientArtifactDeliveryForMetaBuild() throws Exception
     {
         // require 2 agents for concurrent builds of project A and project B.
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
         // Ensure that the agent is online and available for the build.  Starting the
         // build without the agent available will result in hung builds.
-        xmlRpcHelper.waitForAgentToBeIdle(AGENT_NAME);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(AGENT_NAME);
 
         // project A -> project B -> project C
         DepAntProject projectA = projects.createDepAntProject(projectName + "A");
@@ -334,17 +333,17 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerRebuild(projectC);
 
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
 
         buildRunner.triggerSuccessfulBuild(projectA);
 
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
 
         // ensure that project C uses project A build 1 artifacts.
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
     }
 
     private void assertBuildQueued(final ProjectConfigurationHelper project) throws Exception
@@ -355,7 +354,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
     private Hashtable<String, Object> getQueuedBuild(final ProjectConfigurationHelper project)
             throws Exception
     {
-        Vector<Hashtable<String, Object>> snapshot = xmlRpcHelper.getBuildQueueSnapshot();
+        Vector<Hashtable<String, Object>> snapshot = rpcClient.RemoteApi.getBuildQueueSnapshot();
         return CollectionUtils.find(snapshot, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> build)

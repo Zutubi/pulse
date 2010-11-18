@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 
 /**
  * Factory interface for creating ConfigurationHelper instances.
@@ -19,5 +19,5 @@ public interface ConfigurationHelperFactory
      *
      * @throws Exception    on error.
      */
-    ConfigurationHelper create(XmlRpcHelper helper) throws Exception;
+    ConfigurationHelper create(RemoteApiClient helper) throws Exception;
 }

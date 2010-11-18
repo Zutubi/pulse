@@ -3,9 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 
 /**
  * Acceptance tests for links that may be added to configuration pages.
@@ -14,14 +13,14 @@ public class ConfigLinksAcceptanceTest extends AcceptanceTestBase
 {
     public void testLinks() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         try
         {
-            xmlRpcHelper.insertSimpleProject(random, false);
+            rpcClient.RemoteApi.insertSimpleProject(random, false);
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
 
         getBrowser().loginAsAdmin();

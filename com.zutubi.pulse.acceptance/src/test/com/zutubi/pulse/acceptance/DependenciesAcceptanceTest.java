@@ -43,17 +43,17 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         repository = new Repository();
         repository.clean();
 
         randomName = randomName();
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
 
@@ -63,7 +63,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         removeDirectory(tmp);
 
@@ -143,7 +143,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(project);
 
         int buildNumber = buildRunner.triggerAndWaitForBuild(project.getConfig());
-        assertEquals(ResultState.ERROR, xmlRpcHelper.getBuildStatus(project.getName(), buildNumber));
+        assertEquals(ResultState.ERROR, rpcClient.RemoteApi.getBuildStatus(project.getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(project, buildNumber);
@@ -451,7 +451,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(projectB);
 
         int buildNumber = buildRunner.triggerAndWaitForBuild(projectB.getConfig());
-        assertEquals(ResultState.FAILURE, xmlRpcHelper.getBuildStatus(projectB.getConfig().getName(), buildNumber));
+        assertEquals(ResultState.FAILURE, rpcClient.RemoteApi.getBuildStatus(projectB.getConfig().getName(), buildNumber));
 
         // ensure that we have the expected artifact in the repository.
         assertIvyNotInRepository(projectB, buildNumber);
@@ -499,7 +499,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         downstreamProject.addDependency(upstreamProject.getConfig());
         insertProject(downstreamProject);
 
-        xmlRpcHelper.deleteConfig(upstreamProject.getConfig().getConfigurationPath());
+        rpcClient.RemoteApi.deleteConfig(upstreamProject.getConfig().getConfigurationPath());
 
         int buildNumber = buildRunner.triggerSuccessfulBuild(downstreamProject.getConfig());
 
@@ -521,7 +521,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getConfig().getName(), 1);
     }
 
     public void testDependentBuildReason() throws Exception
@@ -534,11 +534,11 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(downstream);
 
         buildRunner.triggerSuccessfulBuild(upstream);
-        xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(downstream.getConfig().getName(), 1);
 
         // verify that the build reasons are as expected.
-        assertEquals("trigger via remote api by admin", xmlRpcHelper.getBuildReason(upstream.getConfig().getName(), 1));
-        assertEquals("dependent of " + upstream.getConfig().getName(), xmlRpcHelper.getBuildReason(downstream.getConfig().getName(), 1));
+        assertEquals("trigger via remote api by admin", rpcClient.RemoteApi.getBuildReason(upstream.getConfig().getName(), 1));
+        assertEquals("dependent of " + upstream.getConfig().getName(), rpcClient.RemoteApi.getBuildReason(downstream.getConfig().getName(), 1));
     }
 
     public void testRebuildBuildReason() throws Exception
@@ -551,11 +551,11 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(downstream);
 
         buildRunner.triggerRebuild(downstream);
-        xmlRpcHelper.waitForBuildToComplete(downstream.getConfig().getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(downstream.getConfig().getName(), 1);
 
         // verify that the build reasons are as expected.
-        assertEquals("build with dependencies of " + downstream.getConfig().getName(), xmlRpcHelper.getBuildReason(upstream.getConfig().getName(), 1));
-        assertEquals("trigger via remote api by admin", xmlRpcHelper.getBuildReason(downstream.getConfig().getName(), 1));
+        assertEquals("build with dependencies of " + downstream.getConfig().getName(), rpcClient.RemoteApi.getBuildReason(upstream.getConfig().getName(), 1));
+        assertEquals("trigger via remote api by admin", rpcClient.RemoteApi.getBuildReason(downstream.getConfig().getName(), 1));
     }
 
     public void testDependentBuild_PropagateStatus() throws Exception
@@ -577,7 +577,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getConfig().getName(), 1);
 
         assertIvyStatus(STATUS_RELEASE, projectB, 1);
         assertIvyRevision("1", projectB, "1");
@@ -600,7 +600,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getConfig().getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getConfig().getName(), 1);
 
         assertIvyInRepository(projectB, "FIXED");
         assertIvyRevision("FIXED", projectB, "FIXED");
@@ -767,7 +767,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(projectB);
 
         buildRunner.triggerSuccessfulBuild(projectA);
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
 
         buildRunner.triggerSuccessfulBuild(projectB);
     }
@@ -789,22 +789,22 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         // test triggering the upstream project.
         buildRunner.triggerSuccessfulBuild(projectA);
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
 
         // verify build revision.
-        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectAName, 1));
-        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectBName, 1));
+        assertEquals(revision, rpcClient.RemoteApi.getBuildRevision(projectAName, 1));
+        assertEquals(revision, rpcClient.RemoteApi.getBuildRevision(projectBName, 1));
 
         // test triggering the downstream project.
         buildRunner.triggerRebuild(projectB);
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 2);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 2);
 
-        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectAName, 2));
-        assertEquals(revision, xmlRpcHelper.getBuildRevision(projectBName, 2));
+        assertEquals(revision, rpcClient.RemoteApi.getBuildRevision(projectAName, 2));
+        assertEquals(revision, rpcClient.RemoteApi.getBuildRevision(projectBName, 2));
 
         // test that triggering b directly picks up its own revision.
         buildRunner.triggerSuccessfulBuild(projectB);
-        assertFalse(revision.equals(xmlRpcHelper.getBuildRevision(projectBName, 3)));
+        assertFalse(revision.equals(rpcClient.RemoteApi.getBuildRevision(projectBName, 3)));
     }
 
     public void testPublishAndRetrievalOfLargeFiles() throws Exception
@@ -829,11 +829,11 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         // double the timeout to give pulse enough time to capture and upload the large file.
 
         List<String> requestIds = buildRunner.triggerBuild(projectA);
-        Hashtable<String, Object> request = xmlRpcHelper.waitForBuildRequestToBeActivated(requestIds.get(0));
+        Hashtable<String, Object> request = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(requestIds.get(0));
         int buildNumber = Integer.valueOf(request.get("buildId").toString());
         
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), buildNumber, XmlRpcHelper.BUILD_TIMEOUT * 2);
-        ResultState buildStatus = xmlRpcHelper.getBuildStatus(projectA.getName(), buildNumber);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), buildNumber, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
+        ResultState buildStatus = rpcClient.RemoteApi.getBuildStatus(projectA.getName(), buildNumber);
         assertEquals(ResultState.SUCCESS, buildStatus);
 
         // The completion of project A's build will trigger a build of project B.
@@ -845,16 +845,16 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
             {
                 try
                 {
-                    return xmlRpcHelper.getBuildQueueSnapshot().size() == 0;
+                    return rpcClient.RemoteApi.getBuildQueueSnapshot().size() == 0;
                 }
                 catch (Exception e)
                 {
                     throw new RuntimeException(e);
                 }
             }
-        }, XmlRpcHelper.BUILD_TIMEOUT, " build queue to clear");
+        }, rpcClient.RemoteApi.BUILD_TIMEOUT, " build queue to clear");
 
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1, XmlRpcHelper.BUILD_TIMEOUT * 2);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
     }
 
     // setup the repository for the propagate revision tests.
@@ -897,7 +897,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     private void assertCommandFailed(String projectName, int buildNumber, String commandName) throws Exception
     {
-        Vector<Hashtable<String, String>> features = xmlRpcHelper.call("getErrorMessagesInBuild", projectName, buildNumber);
+        Vector<Hashtable<String, String>> features = rpcClient.RemoteApi.call("getErrorMessagesInBuild", projectName, buildNumber);
         for (Hashtable<String, String> feature : features)
         {
             if (feature.containsKey("command"))

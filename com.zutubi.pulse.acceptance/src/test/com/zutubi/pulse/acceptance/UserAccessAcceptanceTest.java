@@ -16,9 +16,9 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.ensureUser(random);
-        xmlRpcHelper.logout();
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.ensureUser(random);
+        rpcClient.logout();
     }
 
     public void testDefaultUserAccess()
@@ -49,10 +49,10 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
 
     public void testUserXmlRpcAccess() throws Exception
     {
-        xmlRpcHelper.login(random, "");
-        xmlRpcHelper.getProjectCount();
-        xmlRpcHelper.getAgentCount();
-        xmlRpcHelper.getAllProjectNames();
+        rpcClient.login(random, "");
+        rpcClient.RemoteApi.getProjectCount();
+        rpcClient.RemoteApi.getAgentCount();
+        rpcClient.RemoteApi.getAllProjectNames();
 
         assertXmlRpcDenied("getAllUserLogins");
     }
@@ -61,7 +61,7 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.call(function, args);
+            rpcClient.RemoteApi.call(function, args);
             fail("Expected AccessDeniedException");
         }
         catch (Exception e)

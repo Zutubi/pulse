@@ -30,7 +30,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         getBrowser().loginAsAdmin();
     }
 
@@ -50,7 +50,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
             }
         }
         
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -106,7 +106,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
         activeBuildsTable.clickCancel(random, 1);
 
-        xmlRpcHelper.waitForBuildToComplete(random, 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, 1L);
         assertTrue(getBrowser().isTextPresent("Forceful termination requested by 'admin'"));
     }
@@ -153,11 +153,11 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
     public void testCancelQueuedBuildViaRemoteApi() throws Exception
     {
         createAndTriggerProjectBuild();
-        xmlRpcHelper.triggerBuild(random);
+        rpcClient.RemoteApi.triggerBuild(random);
 
         String id = verifyQueuedBuildViaRemoteApi();
-        xmlRpcHelper.cancelQueuedBuildRequest(id);
-        assertEquals(0, xmlRpcHelper.getBuildQueueSnapshot().size());
+        rpcClient.RemoteApi.cancelQueuedBuildRequest(id);
+        assertEquals(0, rpcClient.RemoteApi.getBuildQueueSnapshot().size());
         
         waitForBuildToComplete(1);
     }
@@ -174,7 +174,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
                 fail("Timed out waiting for queued build request");
             }
 
-            queueSnapshot = xmlRpcHelper.getBuildQueueSnapshot();
+            queueSnapshot = rpcClient.RemoteApi.getBuildQueueSnapshot();
             size = queueSnapshot.size();
             Thread.sleep(100);
         }
@@ -197,10 +197,10 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 
     private void createAndTriggerProjectBuild() throws Exception
     {
-        Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
-        Hashtable<String,Object> ant = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> svn = rpcClient.RemoteApi.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
+        Hashtable<String,Object> ant = rpcClient.RemoteApi.getAntConfig();
         ant.put(Constants.Project.AntCommand.ARGUMENTS, getFileArgument());
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
 
         triggerBuild(true);
     }
@@ -218,11 +218,11 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("wait.file", waitFile.getAbsolutePath().replace("\\", "/"));
-        xmlRpcHelper.triggerBuild(random, "", properties);
+        rpcClient.RemoteApi.triggerBuild(random, "", properties);
 
         if (waitForInProgress)
         {
-            xmlRpcHelper.waitForBuildInProgress(random, thisBuild, TIMEOUT);
+            rpcClient.RemoteApi.waitForBuildInProgress(random, thisBuild, TIMEOUT);
         }
     }
 
@@ -245,7 +245,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
             FileSystemUtils.createFile(waitFile, "test");
         }
 
-        xmlRpcHelper.waitForBuildToComplete(random, buildId);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, buildId);
     }
 
     private String getFileArgument()

@@ -18,10 +18,10 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
         random = randomName();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
         projects = new ProjectConfigurations(configurationHelper);
 
         repository = new Repository();
@@ -30,7 +30,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         
         super.tearDown();
     }
@@ -44,7 +44,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         int buildNumber = createAndRunIvyAntProject("publish");
 
         // ensure that the build passed.
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(random, buildNumber));
 
         assertTrue(repository.isInRepository("zutubi/com.zutubi.sample/jars"));
     }
@@ -59,7 +59,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         int buildNumber = createAndRunIvyAntProject("retrieve");
 
         // ensure that the build passed.
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(random, buildNumber));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(random, buildNumber));
     }
 
     public void testExternalMavenCanUseRepository() throws Exception
@@ -67,7 +67,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         String projectA = random + "A";
         int buildNumber = createAndRunMavenProject(projectA, "pom-artifact1.xml", "clean deploy");
 
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectA, buildNumber));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectA, buildNumber));
 
         assertTrue(repository.isInRepository("zutubi/artifact1/maven-metadata.xml"));
         assertTrue(repository.isInRepository("zutubi/artifact1/1.0/artifact1-1.0.jar"));
@@ -75,7 +75,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
         String projectB = random + "B";
         buildNumber = createAndRunMavenProject(projectB, "pom-artifact2.xml", "clean dependency:copy-dependencies");
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(projectB, buildNumber));
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectB, buildNumber));
     }
 
     private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception
@@ -88,7 +88,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
         configurationHelper.insertProject(project.getConfig(), false);
 
-        return xmlRpcHelper.runBuild(projectName);
+        return rpcClient.RemoteApi.runBuild(projectName);
     }
 
     private int createAndRunIvyAntProject(String target) throws Exception
@@ -99,6 +99,6 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         
         configurationHelper.insertProject(project.getConfig(), false);
 
-        return xmlRpcHelper.runBuild(random);
+        return rpcClient.RemoteApi.runBuild(random);
     }
 }

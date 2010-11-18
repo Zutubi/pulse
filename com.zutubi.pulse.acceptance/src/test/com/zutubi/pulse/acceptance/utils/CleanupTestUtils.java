@@ -2,7 +2,17 @@ package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;
@@ -19,38 +29,27 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-
 /**
  * A set of utility methods used by the cleanup acceptance tests.
  */
 public class CleanupTestUtils
 {
-    private XmlRpcHelper xmlRpcHelper;
+    private RemoteApiClient remoteApi;
 
-    public CleanupTestUtils(XmlRpcHelper xmlRpcHelper)
+    public CleanupTestUtils(RemoteApiClient remoteApi)
     {
-        this.xmlRpcHelper = xmlRpcHelper;
+        this.remoteApi = remoteApi;
     }
 
     public void deleteCleanupRule(String projectName, String name) throws Exception
     {
         String cleanupPath = "projects/" + projectName + "/cleanup/" + name;
-        xmlRpcHelper.deleteConfig(cleanupPath);
+        remoteApi.deleteConfig(cleanupPath);
     }
 
     public void addCleanupRule(String projectName, String name, CleanupWhat... whats) throws Exception
     {
-        Hashtable<String, Object> data = xmlRpcHelper.createDefaultConfig(CleanupConfiguration.class);
+        Hashtable<String, Object> data = remoteApi.createDefaultConfig(CleanupConfiguration.class);
         data.put(NAME, name);
         data.put(RETAIN, 1);
         data.put(UNIT, CleanupUnit.BUILDS.toString());
@@ -70,17 +69,17 @@ public class CleanupTestUtils
         }
 
         String cleanupPath = "projects/" + projectName + "/cleanup";
-        xmlRpcHelper.insertConfig(cleanupPath, data);
+        remoteApi.insertConfig(cleanupPath, data);
     }
     
     public boolean hasBuild(String projectName, int buildNumber) throws Exception
     {
-        return xmlRpcHelper.getBuild(projectName, buildNumber) != null;
+        return remoteApi.getBuild(projectName, buildNumber) != null;
     }
 
     public File getBuildDirectory(String projectName, int buildNumber) throws Exception
     {
-        Hashtable<String, Object> projectConfig = xmlRpcHelper.getProject(projectName);
+        Hashtable<String, Object> projectConfig = remoteApi.getProject(projectName);
         long projectId = Long.parseLong((String) projectConfig.get("id"));
 
         File data = AcceptanceTestUtils.getDataDirectory();
@@ -139,18 +138,18 @@ public class CleanupTestUtils
 
     public void insertTestCapture(String projectPath, String processorName) throws Exception
     {
-        Hashtable<String, Object> dirArtifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        Hashtable<String, Object> dirArtifactConfig = remoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
         dirArtifactConfig.put(NAME, "xml reports");
         dirArtifactConfig.put(BASE, "build/reports/xml");
         dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
+        remoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
     }
 
     public void setAntTarget(String projectName, String target) throws Exception
     {
         String path = "projects/" + projectName + "/type/recipes/default/commands/build";
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(path);
+        Hashtable<String, Object> antConfig = remoteApi.getConfig(path);
         antConfig.put(Constants.Project.AntCommand.TARGETS, target);
-        xmlRpcHelper.saveConfig(path, antConfig, false);
+        remoteApi.saveConfig(path, antConfig, false);
     }
 }

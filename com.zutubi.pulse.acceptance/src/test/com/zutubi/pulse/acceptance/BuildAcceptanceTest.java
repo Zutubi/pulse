@@ -1,6 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -20,6 +31,8 @@ import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
 import com.zutubi.pulse.core.config.ResourceConfiguration;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -33,13 +46,19 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -49,9 +68,14 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -60,31 +84,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -113,35 +112,35 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
-        Vector<String> agents = xmlRpcHelper.getConfigListing(AGENTS_SCOPE);
+        Vector<String> agents = rpcClient.RemoteApi.getConfigListing(AGENTS_SCOPE);
         for (String agent : agents)
         {
             if (!agent.equals(GLOBAL_AGENT_NAME) && !agent.equals(MASTER_AGENT_NAME))
             {
-                xmlRpcHelper.deleteConfig(PathUtils.getPath(AGENTS_SCOPE, agent));
+                rpcClient.RemoteApi.deleteConfig(PathUtils.getPath(AGENTS_SCOPE, agent));
             }
         }
 
         repository = new Repository();
 
         ConfigurationHelperFactory configurationHelperFactory = new SingletonConfigurationHelperFactory();
-        configurationHelper = configurationHelperFactory.create(xmlRpcHelper);
+        configurationHelper = configurationHelperFactory.create(rpcClient.RemoteApi);
         projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testSimpleBuild() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
 
         triggerSuccessfulBuild(random);
 
@@ -161,9 +160,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     
     public void testNoChangesBetweenBuilds() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
 
@@ -178,14 +177,14 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testChangesBetweenBuilds() throws Exception
     {
         // Run an initial build
-        xmlRpcHelper.insertSimpleProject(random);
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        rpcClient.RemoteApi.runBuild(random);
 
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
         String revisionString = editAndCommitBuildFile();
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         // Check the changes tab.
         getBrowser().loginAsAdmin();
@@ -223,8 +222,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         workspace.doCopy("copy triviant", Constants.TRIVIAL_ANT_REPOSITORY, subversionUrl);
         
         // Run an initial build
-        xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(subversionUrl), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(subversionUrl), rpcClient.RemoteApi.getAntConfig());
+        rpcClient.RemoteApi.runBuild(random);
 
         // Commit a large change to the repository.
         String revisionString;
@@ -247,7 +246,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             IOUtils.close(workspace);
         }
         
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
@@ -275,24 +274,24 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String unviewableProject = random + "-unviewable";
         String regularUser = random + "-user";
         
-        xmlRpcHelper.insertSimpleProject(viewableProject);
-        String unviewableProjectPath = xmlRpcHelper.insertSimpleProject(unviewableProject);
-        xmlRpcHelper.insertTrivialUser(regularUser);
+        rpcClient.RemoteApi.insertSimpleProject(viewableProject);
+        String unviewableProjectPath = rpcClient.RemoteApi.insertSimpleProject(unviewableProject);
+        rpcClient.RemoteApi.insertTrivialUser(regularUser);
         
         // Remove permissions that allow normal users to view the invisible
         // project (so only admin can see it).
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(unviewableProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(unviewableProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
         
-        xmlRpcHelper.runBuild(viewableProject);
-        xmlRpcHelper.runBuild(unviewableProject);
+        rpcClient.RemoteApi.runBuild(viewableProject);
+        rpcClient.RemoteApi.runBuild(unviewableProject);
 
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
         String revisionString = editAndCommitBuildFile();
         
-        long viewableBuildNumber = xmlRpcHelper.runBuild(viewableProject);
-        long unviewableBuildNumber = xmlRpcHelper.runBuild(unviewableProject);
+        long viewableBuildNumber = rpcClient.RemoteApi.runBuild(viewableProject);
+        long unviewableBuildNumber = rpcClient.RemoteApi.runBuild(unviewableProject);
 
         // Check the changes tab.
         getBrowser().loginAsAdmin();
@@ -335,15 +334,15 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         final String FISHEYE_BASE = "http://fisheye";
         final String FISHEYE_PROJECT = "project";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
-        Hashtable<String, Object> changeViewer = xmlRpcHelper.createDefaultConfig(FisheyeConfiguration.class);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
+        Hashtable<String, Object> changeViewer = rpcClient.RemoteApi.createDefaultConfig(FisheyeConfiguration.class);
         changeViewer.put("baseURL", FISHEYE_BASE);
         changeViewer.put("projectPath", FISHEYE_PROJECT);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "changeViewer"), changeViewer);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "changeViewer"), changeViewer);
 
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.runBuild(random);
         String revisionString = editAndCommitBuildFile();
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
 
@@ -408,12 +407,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testAgentBuild() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
         getBrowser().loginAsAdmin();
 
         String agentHandle;
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
-        agentHandle = xmlRpcHelper.getConfigHandle("agents/" + AGENT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
+        agentHandle = rpcClient.RemoteApi.getConfigHandle("agents/" + AGENT_NAME);
 
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
@@ -429,7 +428,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         triggerSuccessfulBuild(random);
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, 1);
         @SuppressWarnings({"unchecked"})
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
         assertEquals(AGENT_NAME, stages.get(0).get("agent"));
@@ -439,22 +438,22 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         final String FEATURES_PROCESSOR = "features processor";
 
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(ALL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
         insertTestCapture(projectPath, JUNIT_PROCESSOR);
 
         insertFeaturesProcessor(random, FEATURES_PROCESSOR);
         String featuresArtifactPath = insertFileArtifact(projectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
         
-        Hashtable<String, Object> transformer = xmlRpcHelper.createDefaultConfig(LinkTransformerConfiguration.class);
+        Hashtable<String, Object> transformer = rpcClient.RemoteApi.createDefaultConfig(LinkTransformerConfiguration.class);
         transformer.put("name", "issues");
         transformer.put("expression", "CIB-[0-9]+");
         transformer.put("url", "http://jira.zutubi.com/$0");
-        xmlRpcHelper.insertConfig(getPath(projectPath, COMMIT_MESSAGE_TRANSFORMERS), transformer);
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, COMMIT_MESSAGE_TRANSFORMERS), transformer);
 
         // Run two builds, to generate a change between them.
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
         editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", random);
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
         BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
@@ -470,10 +469,10 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // No featured artifacts in this build, check, then mark one as
         // featured and do another build.
         assertFalse(summaryPage.isFeaturedArtifactsTablePresent());
-        Hashtable<String, Object> artifact = xmlRpcHelper.getConfig(featuresArtifactPath);
+        Hashtable<String, Object> artifact = rpcClient.RemoteApi.getConfig(featuresArtifactPath);
         artifact.put("featured", true);
-        xmlRpcHelper.saveConfig(featuresArtifactPath, artifact, false);
-        buildNumber = xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.saveConfig(featuresArtifactPath, artifact, false);
+        buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildNumber);
         assertTrue(summaryPage.isFeaturedArtifactsTablePresent());
@@ -485,8 +484,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String projectName = random + "-project";
 
-        xmlRpcHelper.insertSimpleProject(projectName);
-        xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         final BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, projectName, 1L);
@@ -527,22 +526,22 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         final String FEATURES_PROCESSOR = "features processor";
 
         String upstreamProjectName = random + "-upstream";
-        Hashtable<String, Object> upstreamAntConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> upstreamAntConfig = rpcClient.RemoteApi.getAntConfig();
         upstreamAntConfig.put(Project.AntCommand.ARGUMENTS, "-Dcreate.list=file.txt");
         upstreamAntConfig.put(Project.AntCommand.TARGETS, "create");
-        String upstreamProjectPath = xmlRpcHelper.insertSingleCommandProject(upstreamProjectName, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(DEP_ANT_REPOSITORY), upstreamAntConfig);
+        String upstreamProjectPath = rpcClient.RemoteApi.insertSingleCommandProject(upstreamProjectName, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(DEP_ANT_REPOSITORY), upstreamAntConfig);
         insertFileArtifact(upstreamProjectPath, UPSTREAM_ARTIFACT, "file.txt", null, true);
-        xmlRpcHelper.runBuild(upstreamProjectName, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(upstreamProjectName, BUILD_TIMEOUT);
         
         String mainProjectName = random + "-main";
-        String mainProjectPath = xmlRpcHelper.insertSingleCommandProject(mainProjectName, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(ALL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        String mainProjectPath = rpcClient.RemoteApi.insertSingleCommandProject(mainProjectName, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(ALL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
         insertTestCapture(mainProjectPath, JUNIT_PROCESSOR);
 
         String mainProcessorsPath = getPath(mainProjectPath, POSTPROCESSORS);
-        Hashtable<String, Object> buildFieldsProcessorConfig = xmlRpcHelper.createDefaultConfig(CustomFieldsPostProcessorConfiguration.class);
+        Hashtable<String, Object> buildFieldsProcessorConfig = rpcClient.RemoteApi.createDefaultConfig(CustomFieldsPostProcessorConfiguration.class);
         buildFieldsProcessorConfig.put(NAME, BUILD_FIELD_PROCESSOR);
         buildFieldsProcessorConfig.put("scope", FieldScope.BUILD.toString());
-        xmlRpcHelper.insertConfig(mainProcessorsPath, buildFieldsProcessorConfig);
+        rpcClient.RemoteApi.insertConfig(mainProcessorsPath, buildFieldsProcessorConfig);
 
         insertFeaturesProcessor(mainProjectName, FEATURES_PROCESSOR);
         
@@ -551,15 +550,15 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         insertFileArtifact(mainProjectPath, "features", "features.txt", FEATURES_PROCESSOR, false);
 
         String mainDependenciesPath = getPath(mainProjectPath, DEPENDENCIES);
-        Hashtable<String, Object> dependenciesConfig = xmlRpcHelper.getConfig(mainDependenciesPath);
+        Hashtable<String, Object> dependenciesConfig = rpcClient.RemoteApi.getConfig(mainDependenciesPath);
         dependenciesConfig.put("syncDestination", false);
-        xmlRpcHelper.saveConfig(mainDependenciesPath, dependenciesConfig, false);
+        rpcClient.RemoteApi.saveConfig(mainDependenciesPath, dependenciesConfig, false);
         
-        Hashtable<String, Object> dependencyConfig = xmlRpcHelper.createDefaultConfig(DependencyConfiguration.class);
+        Hashtable<String, Object> dependencyConfig = rpcClient.RemoteApi.createDefaultConfig(DependencyConfiguration.class);
         dependencyConfig.put("project", upstreamProjectPath);
-        xmlRpcHelper.insertConfig(getPath(mainDependenciesPath, DEPENDENCIES), dependencyConfig);
+        rpcClient.RemoteApi.insertConfig(getPath(mainDependenciesPath, DEPENDENCIES), dependencyConfig);
         
-        xmlRpcHelper.runBuild(mainProjectName, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(mainProjectName, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, mainProjectName, 1L);
@@ -606,7 +605,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private void insertFeaturesProcessor(String projectName, String processorName) throws Exception
     {
-        Hashtable<String, Object> featuresProcessorConfig = xmlRpcHelper.createDefaultConfig(RegexPostProcessorConfiguration.class);
+        Hashtable<String, Object> featuresProcessorConfig = rpcClient.RemoteApi.createDefaultConfig(RegexPostProcessorConfiguration.class);
         featuresProcessorConfig.put(NAME, processorName);
         featuresProcessorConfig.put("leadingContext", 2);
         featuresProcessorConfig.put("trailingContext", 2);
@@ -615,12 +614,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         patterns.add(createRegexPattern(Feature.Level.WARNING, "^warning:"));
         patterns.add(createRegexPattern(Feature.Level.INFO, "^info:"));
         featuresProcessorConfig.put("patterns", patterns);
-        xmlRpcHelper.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, POSTPROCESSORS), featuresProcessorConfig);
+        rpcClient.RemoteApi.insertConfig(getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, POSTPROCESSORS), featuresProcessorConfig);
     }
 
     private Hashtable<String, Object> createRegexPattern(Feature.Level category, String expression)  throws Exception
     {
-        Hashtable<String, Object> pattern = xmlRpcHelper.createDefaultConfig(RegexPatternConfiguration.class);
+        Hashtable<String, Object> pattern = rpcClient.RemoteApi.createDefaultConfig(RegexPatternConfiguration.class);
         pattern.put("category", category.toString());
         pattern.put("expression", expression);
         return pattern;
@@ -628,7 +627,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private String insertFileArtifact(String projectPath, String name, String file, String processorName, boolean publish) throws Exception
     {
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put(NAME, name);
         artifactConfig.put(FILE, file);
         if (processorName != null)
@@ -636,7 +635,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             artifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
         }
         artifactConfig.put(PUBLISH, publish);
-        return xmlRpcHelper.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+        return rpcClient.RemoteApi.insertConfig(getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
     }
     
     public void testDetailsViewInProgress() throws Exception
@@ -647,9 +646,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             final WaitProject project = projects.createWaitAntProject(random, tempDir);
             configurationHelper.insertProject(project.getConfig(), false);
             
-            xmlRpcHelper.waitForProjectToInitialise(project.getName());
-            xmlRpcHelper.triggerBuild(project.getName());
-            xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+            rpcClient.RemoteApi.triggerBuild(project.getName());
+            rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
             
             getBrowser().loginAsAdmin();
             final BuildDetailsPage detailsPage = getBrowser().createPage(BuildDetailsPage.class, project.getName(), 1L);
@@ -667,7 +666,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             assertFalse(detailsPage.isBasicsRowPresent("warnings"));
             
             project.releaseBuild();
-            xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+            rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
 
             detailsPage.openAndWaitFor();
             detailsPage.clickCommandAndWait(DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME);
@@ -686,9 +685,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testPulseEnvironmentVariables() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(random);
+        rpcClient.RemoteApi.ensureProject(random);
 
-        xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
         triggerSuccessfulBuild(random);
         assertEnvironment(random, 1, "pname=pvalue", "PULSE_PNAME=pvalue", "PULSE_BUILD_NUMBER=1");
@@ -698,11 +697,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("test-property", "test-value", false, false, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("test-property", "test-value", false, false, false));
 
         String projectName = random + "-project";
-        xmlRpcHelper.ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -713,13 +712,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "rv", false, false, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "rv", false, false, false));
 
         String projectName = random + "-project";
         String projectPath = getPath(PROJECTS_SCOPE, projectName);
-        xmlRpcHelper.ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
-        xmlRpcHelper.insertConfig(getPath(projectPath, "properties"), xmlRpcHelper.createProperty("pp", "ref ${rp}", true, true, false));
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "properties"), rpcClient.RemoteApi.createProperty("pp", "ref ${rp}", true, true, false));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -731,12 +730,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         String propertiesPath = getPath(resourcePath, "properties");
-        xmlRpcHelper.insertConfig(propertiesPath, xmlRpcHelper.createProperty("referee", "ee", false, false, false));
-        xmlRpcHelper.insertConfig(propertiesPath, xmlRpcHelper.createProperty("referer", "ref ${referee}", true, true, false));
+        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referee", "ee", false, false, false));
+        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referer", "ref ${referee}", true, true, false));
 
         String projectName = random + "-project";
-        xmlRpcHelper.ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -746,9 +745,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testProjectPropertyReferencesAgentName() throws Exception
     {
         String projectName = random + "-project";
-        xmlRpcHelper.ensureProject(projectName);
+        rpcClient.RemoteApi.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
-        xmlRpcHelper.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -759,11 +758,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        xmlRpcHelper.insertConfig(getPath(resourcePath, "properties"), xmlRpcHelper.createProperty("rp", "ref ${agent}", true, true, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "ref ${agent}", true, true, false));
 
         String projectName = random + "-project";
-        xmlRpcHelper.ensureProject(projectName);
-        xmlRpcHelper.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertConfig(getPath(PROJECTS_SCOPE, projectName, "requirements"), createRequiredResource(resourceName, null));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -773,11 +772,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testSuppressedProperty() throws Exception
     {
         String projectName = random + "-project";
-        xmlRpcHelper.ensureProject(projectName);
+        rpcClient.RemoteApi.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
-        xmlRpcHelper.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -788,11 +787,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testScmPropertiesAvailableInPulseFile() throws Exception
     {
-        Hashtable<String, Object> type = xmlRpcHelper.createEmptyConfig(CustomTypeConfiguration.class);
+        Hashtable<String, Object> type = rpcClient.RemoteApi.createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
                 "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
-        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), type);
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), type);
+        rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
         goToArtifact(random, 1, OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
@@ -801,7 +800,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testBuildLogs() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(random);
@@ -853,7 +852,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String userLogin = random + "-user";
         String projectName = random + "-project";
 
-        xmlRpcHelper.insertTrivialUser(userLogin);
+        rpcClient.RemoteApi.insertTrivialUser(userLogin);
 
         AntProjectHelper project = projects.createTrivialAntProject(projectName);
         FileArtifactConfiguration explicitArtifact = project.addArtifact("explicit", "build.xml");
@@ -861,7 +860,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         featuredArtifact.setFeatured(true);
         configurationHelper.insertProject(project.getConfig(), false);
 
-        long buildNumber = xmlRpcHelper.runBuild(projectName);
+        long buildNumber = rpcClient.RemoteApi.runBuild(projectName);
 
         assertTrue(getBrowser().login(userLogin, ""));
 
@@ -897,8 +896,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testDownloadArtifactLink() throws Exception
     {
         // CIB-1724: download raw artifacts via 2.0 url scheme.
-        xmlRpcHelper.insertSimpleProject(random);
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
         Hashtable<String, Object> outputArtifact = getArtifact(random, buildNumber, "command output");
         String permalink = (String) outputArtifact.get("permalink");
         // This is to check for the new 2.0-ised URL.
@@ -917,15 +916,15 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         final String ARTIFACT_FILENAME = "build.xml";
         final String CONTENT_TYPE = "application/test";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
 
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put(NAME, ARTIFACT_NAME);
         artifactConfig.put(Project.Command.FileArtifact.FILE, ARTIFACT_FILENAME);
         artifactConfig.put(TYPE, CONTENT_TYPE);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
-        int buildNumber = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        int buildNumber = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         Hashtable<String, Object> artifact = getArtifact(random, buildNumber, ARTIFACT_NAME);
         String url = getArtifactFileUrl(ARTIFACT_FILENAME, artifact);
@@ -947,7 +946,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         hashedArtifact.setHashAlgorithm(CommandContext.HashAlgorithm.MD5);
         configurationHelper.insertProject(project.getConfig(), false);
 
-        long buildNumber = xmlRpcHelper.runBuild(random);
+        long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         Hashtable<String, Object> hashedInfo = getArtifact(random, buildNumber, NAME_HASHED);
         String content = AcceptanceTestUtils.readUriContent(getArtifactFileUrl(BUILD_FILE, hashedInfo));
@@ -964,7 +963,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private Hashtable<String, Object> getArtifact(String project, long buildNumber, final String name) throws Exception
     {
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(project, buildNumber);
+        Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(project, buildNumber);
         Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> artifact)
@@ -985,13 +984,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testManualTriggerBuildWithPrompt() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(random);
+        rpcClient.RemoteApi.ensureProject(random);
 
         // add the pname=pvalue property to the build.
-        xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
         // edit the build options, setting prompt to true.
-        xmlRpcHelper.enableBuildPrompting(random);
+        rpcClient.RemoteApi.enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -1018,13 +1017,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testManualTriggerBuildWithPromptAllowsPropertyValueOverride() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(random);
+        rpcClient.RemoteApi.ensureProject(random);
 
         // add the pname=pvalue property to the build.
-        xmlRpcHelper.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
 
         // edit the build options, setting prompt to true.
-        xmlRpcHelper.enableBuildPrompting(random);
+        rpcClient.RemoteApi.enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -1053,8 +1052,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testManualTriggerBuildWithPromptAllowsStatusSelection() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(random);
-        xmlRpcHelper.enableBuildPrompting(random);
+        rpcClient.RemoteApi.ensureProject(random);
+        rpcClient.RemoteApi.enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -1075,21 +1074,21 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String manualProject = random + "-manual";
         String buildCompletedProject = random + "-completed";
 
-        xmlRpcHelper.ensureProject(manualProject);
-        xmlRpcHelper.ensureProject(buildCompletedProject);
+        rpcClient.RemoteApi.ensureProject(manualProject);
+        rpcClient.RemoteApi.ensureProject(buildCompletedProject);
 
-        Hashtable<String, Object> buildCompletedTrigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
+        Hashtable<String, Object> buildCompletedTrigger = rpcClient.RemoteApi.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
         buildCompletedTrigger.put("name", "cascade");
         buildCompletedTrigger.put("project", PathUtils.getPath(PROJECTS_SCOPE, manualProject));
 
-        Hashtable<String, Object> property = xmlRpcHelper.createProperty("tp", "tpv");
+        Hashtable<String, Object> property = rpcClient.RemoteApi.createProperty("tp", "tpv");
         Hashtable<String, Hashtable<String, Object>> properties = new Hashtable<String, Hashtable<String, Object>>();
         properties.put("trigger property", property);
         buildCompletedTrigger.put("properties", properties);
 
-        xmlRpcHelper.insertConfig(PathUtils.getPath(PROJECTS_SCOPE, buildCompletedProject, "triggers"), buildCompletedTrigger);
-        xmlRpcHelper.runBuild(manualProject);
-        xmlRpcHelper.waitForBuildToComplete(buildCompletedProject, 1);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(PROJECTS_SCOPE, buildCompletedProject, "triggers"), buildCompletedTrigger);
+        rpcClient.RemoteApi.runBuild(manualProject);
+        rpcClient.RemoteApi.waitForBuildToComplete(buildCompletedProject, 1);
 
         getBrowser().loginAsAdmin();
         assertEnvironment(buildCompletedProject, 1, "PULSE_TP=tpv");
@@ -1098,7 +1097,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testVersionedBuildWithImports() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(VERSIONED_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("pulse/pulse.xml"));
 
         triggerSuccessfulBuild(random);
     }
@@ -1107,9 +1106,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         final String SUCCESSFUL_TEST = "testAdd";
 
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
         insertTestCapture(projectPath, JUNIT_PROCESSOR);
 
         TestSuitePage suitePage = buildAndCheckTestSummary(false, new TestResultSummary(0, 0, 1, 0, 2));
@@ -1129,32 +1128,32 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testTestResultsExpectedFailure() throws Exception
     {
-        Hashtable<String, Object> config = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> config = rpcClient.RemoteApi.getAntConfig();
         config.put(Constants.Project.AntCommand.TARGETS, "test");
         config.put(Constants.Project.AntCommand.ARGUMENTS, "-Dignore.test.result=true");
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), config);
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TEST_ANT_REPOSITORY), config);
 
         // Capture the results, change our processor to load the expected
         // failures.
         insertTestCapture(projectPath, JUNIT_PROCESSOR);
         String ppPath = PathUtils.getPath(projectPath, Project.POST_PROCESSORS, JUNIT_PROCESSOR);
-        config = xmlRpcHelper.getConfig(ppPath);
+        config = rpcClient.RemoteApi.getConfig(ppPath);
         config.put("expectedFailureFile", "expected-failures.txt");
-        xmlRpcHelper.saveConfig(ppPath, config, false);
+        rpcClient.RemoteApi.saveConfig(ppPath, config, false);
 
         // Make sure the ant processor doesn't fail the build.
         ppPath = PathUtils.getPath(projectPath, Project.POST_PROCESSORS, ANT_PROCESSOR);
-        config = xmlRpcHelper.getConfig(ppPath);
+        config = rpcClient.RemoteApi.getConfig(ppPath);
         config.put("failOnError", false);
-        xmlRpcHelper.saveConfig(ppPath, config, false);
+        rpcClient.RemoteApi.saveConfig(ppPath, config, false);
 
         buildAndCheckTestSummary(true, new TestResultSummary(1, 0, 0, 0, 2));
     }
 
     private TestSuitePage buildAndCheckTestSummary(boolean expectedSuccess, TestResultSummary expectedSummary) throws Exception
     {
-        long buildId = xmlRpcHelper.runBuild(random);
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int) buildId);
+        long buildId = rpcClient.RemoteApi.runBuild(random);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int) buildId);
         boolean success = (Boolean) build.get("succeeded");
         assertEquals(expectedSuccess, success);
 
@@ -1200,18 +1199,18 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         final String PROCESSOR_NAME = "nesty";
         final String PROCESSOR_SUITE = "sweety has spaces & special % ch@r@cter$!";
 
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TEST_ANT_REPOSITORY), antConfig);
 
-        Hashtable<String, Object> junitProcessor = xmlRpcHelper.createDefaultConfig(JUnitReportPostProcessorConfiguration.class);
+        Hashtable<String, Object> junitProcessor = rpcClient.RemoteApi.createDefaultConfig(JUnitReportPostProcessorConfiguration.class);
         junitProcessor.put(NAME, PROCESSOR_NAME);
         junitProcessor.put("suite", PROCESSOR_SUITE);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, POSTPROCESSORS), junitProcessor);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, POSTPROCESSORS), junitProcessor);
 
         insertTestCapture(projectPath, PROCESSOR_NAME);
 
-        long buildId = xmlRpcHelper.runBuild(random);
+        long buildId = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
 
@@ -1233,15 +1232,15 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testOCUnitTestResults() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(OCUNIT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(OCUNIT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
 
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(FileArtifactConfiguration.class);
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(FileArtifactConfiguration.class);
         artifactConfig.put("name", "test report");
         artifactConfig.put("file", "results.txt");
         artifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, "ocunit output processor"))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
 
@@ -1299,9 +1298,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             
             configurationHelper.insertProject(project.getConfig(), false);
             
-            xmlRpcHelper.waitForProjectToInitialise(project.getName());
-            xmlRpcHelper.triggerBuild(project.getName());
-            xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+            rpcClient.RemoteApi.triggerBuild(project.getName());
+            rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
             
             final String defaultStageName = project.getDefaultStage().getName();
             TestUtils.waitForCondition(new Condition()
@@ -1310,7 +1309,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
                 {
                     try
                     {
-                        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+                        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
                         return stageIsComplete(build, defaultStageName);
                     }
                     catch (Exception e)
@@ -1333,7 +1332,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             assertFalse(testsPage.hasFailedTestsForStage(SECOND_STAGE));
                 
             project.releaseBuild();
-            xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+            rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
             
             testsPage.openAndWaitFor();
             assertTrue(testsPage.isStagePresent(defaultStageName));
@@ -1373,53 +1372,53 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String follower1 = random + "-follower1";
         String follower2 = random + "-follower2";
 
-        String templatePath = xmlRpcHelper.insertSimpleProject(template, true);
-        String leaderPath = xmlRpcHelper.insertSimpleProject(leader, template, false);
-        xmlRpcHelper.insertSimpleProject(follower1, template, false);
-        xmlRpcHelper.insertSimpleProject(follower2, template, false);
+        String templatePath = rpcClient.RemoteApi.insertSimpleProject(template, true);
+        String leaderPath = rpcClient.RemoteApi.insertSimpleProject(leader, template, false);
+        rpcClient.RemoteApi.insertSimpleProject(follower1, template, false);
+        rpcClient.RemoteApi.insertSimpleProject(follower2, template, false);
 
         // Build follower1 before setting leader, to test the id not being less
         // than an existing build.
-        assertEquals(1, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
+        assertEquals(1, rpcClient.RemoteApi.runBuild(follower1, BUILD_TIMEOUT));
 
         // Set the leader in the template.
         String optionsPath = PathUtils.getPath(templatePath, Constants.Project.OPTIONS);
-        Hashtable<String, Object> templateOptions = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> templateOptions = rpcClient.RemoteApi.getConfig(optionsPath);
         templateOptions.put(Constants.Project.Options.ID_LEADER, leaderPath);
-        xmlRpcHelper.saveConfig(optionsPath, templateOptions, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, templateOptions, false);
 
         // Make sure projects are sharing sequence.
-        assertEquals(2, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
-        assertEquals(3, xmlRpcHelper.runBuild(follower2, BUILD_TIMEOUT));
-        assertEquals(4, xmlRpcHelper.runBuild(follower1, BUILD_TIMEOUT));
+        assertEquals(2, rpcClient.RemoteApi.runBuild(follower1, BUILD_TIMEOUT));
+        assertEquals(3, rpcClient.RemoteApi.runBuild(follower2, BUILD_TIMEOUT));
+        assertEquals(4, rpcClient.RemoteApi.runBuild(follower1, BUILD_TIMEOUT));
 
         // Clear the leader
         templateOptions.put(Constants.Project.Options.ID_LEADER, "");
-        xmlRpcHelper.saveConfig(optionsPath, templateOptions, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, templateOptions, false);
 
         // Make sure follower2 is back on its own sequence.
-        assertEquals(4, xmlRpcHelper.runBuild(follower2, BUILD_TIMEOUT));
+        assertEquals(4, rpcClient.RemoteApi.runBuild(follower2, BUILD_TIMEOUT));
     }
 
     public void testPersistentWorkDir() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         options.put(Constants.Project.Options.PERSISTENT_WORK_DIR, "${data.dir}/customwork/${project}");
-        xmlRpcHelper.saveConfig(optionsPath, options, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
 
         setSchemeToIncrementalUpdate(random);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
         stage.put(Constants.Project.Stage.AGENT, PathUtils.getPath(AGENTS_SCOPE, MASTER_AGENT_NAME));
-        xmlRpcHelper.saveConfig(stagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, stage, false);
 
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
-        String dataDir = xmlRpcHelper.getServerInfo().get(ConfigurationManager.CORE_PROPERTY_PULSE_DATA_DIR);
+        String dataDir = rpcClient.RemoteApi.getServerInfo().get(ConfigurationManager.CORE_PROPERTY_PULSE_DATA_DIR);
         File workDir = new File(FileSystemUtils.composeFilename(dataDir, "customwork", random));
         assertTrue(workDir.isDirectory());
         File buildFile = new File(workDir, "build.xml");
@@ -1431,13 +1430,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
         assertTrue(getBrowser().isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
         assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
         assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
@@ -1448,13 +1447,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectPath = createProjectWithTwoAntStages(random, "build.xml", "another-stage");
         setTerminateStageOnFailure(projectPath);
 
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
         assertFalse(getBrowser().isTextPresent("terminated"));
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.SUCCESS, build);
 
         assertStageState(ResultState.SUCCESS, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
@@ -1465,17 +1464,17 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String projectPath = createProjectWithTwoAntStages(random, "nosuchbuildfile.xml", "another-stage");
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         options.put("stageFailureLimit", 1);
-        xmlRpcHelper.saveConfig(optionsPath, options, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
 
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
         assertTrue(getBrowser().isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(random, (int)buildId);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.TERMINATED, build);
         assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
         assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
@@ -1503,27 +1502,27 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     public void testDeadlockUpdatingConfigAfterTrigger() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
-        String propertyPath = xmlRpcHelper.insertProjectProperty(random, "prop", "val", false, true, false);
-        Hashtable<String, Object> property = xmlRpcHelper.getConfig(propertyPath);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(random, "prop", "val", false, true, false);
+        Hashtable<String, Object> property = rpcClient.RemoteApi.getConfig(propertyPath);
         
         // Run through a few times to make the deadlock more likely to happen.
         // This is a balance between the speed of the test and likelihood of
         // triggering the problem.
         for (int i = 0; i < 3; i++)
         {
-            Vector<String> ids = xmlRpcHelper.triggerBuild(random, new Hashtable<String, Object>());
+            Vector<String> ids = rpcClient.RemoteApi.triggerBuild(random, new Hashtable<String, Object>());
             property.put("value", Integer.toString(i));
-            xmlRpcHelper.saveConfig(propertyPath, property, false);
-            Hashtable<String, Object> buildRequest = xmlRpcHelper.waitForBuildRequestToBeActivated(ids.get(0), BUILD_TIMEOUT);
-            xmlRpcHelper.waitForBuildToComplete(random, Integer.parseInt((String) buildRequest.get("buildId")));
+            rpcClient.RemoteApi.saveConfig(propertyPath, property, false);
+            Hashtable<String, Object> buildRequest = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(ids.get(0), BUILD_TIMEOUT);
+            rpcClient.RemoteApi.waitForBuildToComplete(random, Integer.parseInt((String) buildRequest.get("buildId")));
         }
     }
     
     public void testPulseFileTab() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
-        long buildId = xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        long buildId = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
         BuildFilePage buildFilePage = getBrowser().openAndWaitFor(BuildFilePage.class, random, buildId);
@@ -1537,21 +1536,21 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectName = random + "-project";
         String agentName = random + "-agent";
 
-        Hashtable<String, Object> agent = xmlRpcHelper.createEmptyConfig("zutubi.agentConfig");
+        Hashtable<String, Object> agent = rpcClient.RemoteApi.createEmptyConfig("zutubi.agentConfig");
         agent.put("name", agentName);
         agent.put("remote", false);
 
-        String agentPath = xmlRpcHelper.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+        String agentPath = rpcClient.RemoteApi.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
 
         try
         {
-            String projectPath = xmlRpcHelper.insertSimpleProject(projectName);
+            String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName);
             assignStageToAgent(projectName, DEFAULT_STAGE, agentName);
             setSchemeToIncrementalUpdate(projectName);
 
-            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
-            xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
-            long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+            rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
+            rpcClient.RemoteApi.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
+            long buildId = rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
 
             getBrowser().loginAsAdmin();
 
@@ -1564,7 +1563,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(agentPath);
+            rpcClient.RemoteApi.deleteConfig(agentPath);
         }
     }
     
@@ -1576,11 +1575,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectName = random + "-project";
         String agentName = random + "-agent";
 
-        Hashtable<String, Object> agent = xmlRpcHelper.createEmptyConfig("zutubi.agentConfig");
+        Hashtable<String, Object> agent = rpcClient.RemoteApi.createEmptyConfig("zutubi.agentConfig");
         agent.put("name", agentName);
         agent.put("remote", false);
 
-        String agentPath = xmlRpcHelper.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
+        String agentPath = rpcClient.RemoteApi.insertTemplatedConfig(MasterConfigurationRegistry.AGENTS_SCOPE + "/" + AgentManager.GLOBAL_AGENT_NAME, agent, false);
 
         try
         {
@@ -1588,19 +1587,19 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             setSchemeToIncrementalUpdate(projectName);
 
             // First build establishes directories for both stages on master agent.
-            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+            rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
 
             // For the next build, clean, but send the second stage to a
             // different agent.
             assignStageToAgent(projectName, SECOND_STAGE_NAME, agentName);
-            xmlRpcHelper.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
-            xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+            rpcClient.RemoteApi.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
+            rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
 
             // Finally, set the second stage back to the original agent.  Check
             // that it does not end up with the directory from the first build.
             // This is verified by ensuring the build.xml file is checked out.
             assignStageToAgent(projectName, SECOND_STAGE_NAME, AgentManager.MASTER_AGENT_NAME);
-            long buildId = xmlRpcHelper.runBuild(projectName, BUILD_TIMEOUT);
+            long buildId = rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
 
             getBrowser().loginAsAdmin();
 
@@ -1609,36 +1608,36 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.deleteConfig(agentPath);
+            rpcClient.RemoteApi.deleteConfig(agentPath);
         }
     }
     
     private void setSchemeToIncrementalUpdate(String projectName) throws Exception
     {
         String svnPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Project.SCM);
-        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
+        Hashtable<String, Object> svn = rpcClient.RemoteApi.getConfig(svnPath);
         svn.put(Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
-        xmlRpcHelper.saveConfig(svnPath, svn, false);
-        xmlRpcHelper.waitForProjectToInitialise(projectName);
+        rpcClient.RemoteApi.saveConfig(svnPath, svn, false);
+        rpcClient.RemoteApi.waitForProjectToInitialise(projectName);
     }
 
     private void assignStageToAgent(String projectName, String stageName, String agentName) throws Exception
     {
         String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", stageName);
-        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> defaultStage = rpcClient.RemoteApi.getConfig(stagePath);
         defaultStage.put("agent", getPath(AGENTS_SCOPE, agentName));
-        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, defaultStage, false);
     }
     
     public void testPulseFilePropertiesAddedToEnvironment() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig("pulse/pulse.xml"));
+        String projectPath = rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(VERSIONED_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("pulse/pulse.xml"));
         String stagePath = getPath(projectPath, Constants.Project.STAGES, DEFAULT_STAGE);
-        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> defaultStage = rpcClient.RemoteApi.getConfig(stagePath);
         defaultStage.put(Project.Stage.RECIPE, "properties");
-        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, defaultStage, false);
 
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
         getBrowser().loginAsAdmin();
         EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, "c1");
@@ -1663,8 +1662,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         properties.put("new", "newvalue");
         Hashtable<String, Object> options = new Hashtable<String, Object>();
         options.put("properties", properties);
-        xmlRpcHelper.triggerBuild(random, options);
-        xmlRpcHelper.waitForBuildToComplete(random, 1);
+        rpcClient.RemoteApi.triggerBuild(random, options);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
         getBrowser().loginAsAdmin();
         EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
@@ -1688,8 +1687,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         properties.put("env", "newvalue");
         Hashtable<String, Object> options = new Hashtable<String, Object>();
         options.put("properties", properties);
-        xmlRpcHelper.triggerBuild(random, options);
-        xmlRpcHelper.waitForBuildToComplete(random, 1);
+        rpcClient.RemoteApi.triggerBuild(random, options);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
         getBrowser().loginAsAdmin();
         EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, DEFAULT_STAGE, DEFAULT_COMMAND);
@@ -1705,44 +1704,44 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         project.getConfig().getOptions().setIsolateChangelists(true);
         configurationHelper.insertProject(project.getConfig(), false);
 
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
         
         Hashtable<String, Object> options = new Hashtable<String, Object>();
         options.put("force", false);
-        Vector<String> requests = xmlRpcHelper.triggerBuild(random, options);
+        Vector<String> requests = rpcClient.RemoteApi.triggerBuild(random, options);
         assertEquals(0, requests.size());
         
         options.put("force", true);
-        requests = xmlRpcHelper.triggerBuild(random, options);
+        requests = rpcClient.RemoteApi.triggerBuild(random, options);
         assertEquals(1, requests.size());
-        Hashtable<String, Object> build = xmlRpcHelper.waitForBuildRequestToBeActivated(requests.get(0), BUILD_TIMEOUT);
-        xmlRpcHelper.waitForBuildToComplete(random, Integer.parseInt((String) build.get("buildId")));
+        Hashtable<String, Object> build = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(requests.get(0), BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, Integer.parseInt((String) build.get("buildId")));
     }
     
     private String createProjectWithTwoAntStages(String projectName, String buildFile, String secondStageName) throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig(buildFile));
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig(buildFile));
         Hashtable<String, String> keys = new Hashtable<String, String>();
         keys.put(DEFAULT_STAGE, secondStageName);
-        xmlRpcHelper.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
+        rpcClient.RemoteApi.cloneConfig(PathUtils.getPath(projectPath, Project.STAGES), keys);
         return projectPath;
     }
 
     private void setTerminateStageOnFailure(String projectPath) throws Exception
     {
         String defaultStagePath = PathUtils.getPath(projectPath, Project.STAGES, DEFAULT_STAGE);
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(defaultStagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(defaultStagePath);
         stage.put("terminateBuildOnFailure", true);
-        xmlRpcHelper.saveConfig(defaultStagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(defaultStagePath, stage, false);
     }
 
     private void insertTestCapture(String projectPath, String processorName) throws Exception
     {
-        Hashtable<String, Object> dirArtifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        Hashtable<String, Object> dirArtifactConfig = rpcClient.RemoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
         dirArtifactConfig.put(NAME, "xml reports");
         dirArtifactConfig.put(BASE, "build/reports/xml");
         dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
     }
 
     private String getPropertiesPath(String projectName)
@@ -1774,14 +1773,14 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private String addResource(String agent, String name) throws Exception
     {
-        Hashtable<String, Object> resource = xmlRpcHelper.createDefaultConfig(ResourceConfiguration.class);
+        Hashtable<String, Object> resource = rpcClient.RemoteApi.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", name);
-        return xmlRpcHelper.insertConfig(getPath(AGENTS_SCOPE, agent, "resources"), resource);
+        return rpcClient.RemoteApi.insertConfig(getPath(AGENTS_SCOPE, agent, "resources"), resource);
     }
 
     private Hashtable<String, Object> createRequiredResource(String resource, String version) throws Exception
     {
-        Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirementConfiguration.class);
+        Hashtable<String, Object> requirement = rpcClient.RemoteApi.createDefaultConfig(ResourceRequirementConfiguration.class);
         requirement.put("resource", resource);
         if (StringUtils.stringSet(version))
         {

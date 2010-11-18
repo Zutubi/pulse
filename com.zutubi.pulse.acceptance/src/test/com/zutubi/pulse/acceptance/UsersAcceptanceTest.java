@@ -15,12 +15,11 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationSta
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-
-import java.util.Hashtable;
-
 import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.util.Hashtable;
 
 public class UsersAcceptanceTest extends AcceptanceTestBase
 {
@@ -32,20 +31,20 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testActiveUsers() throws Exception
     {
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
 
         getBrowser().loginAsAdmin();
         UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
@@ -64,7 +63,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
 
     public void testLastAccessTime() throws Exception
     {
-        String userPath = xmlRpcHelper.insertTrivialUser(random);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(random);
 
         getBrowser().loginAsAdmin();
         CompositePage userPage = getBrowser().openAndWaitFor(CompositePage.class, userPath);
@@ -105,7 +104,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
         String contactPath = createUserWithContact(random);
         try
         {
-            xmlRpcHelper.deleteConfig(contactPath);
+            rpcClient.RemoteApi.deleteConfig(contactPath);
             fail("Should not be able to delete primary contact");
         }
         catch (Exception e)
@@ -120,10 +119,10 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
 
         String originalContactPath = createUserWithContact(random);
         String contactsPath = PathUtils.getParentPath(originalContactPath);
-        Hashtable<String,Object> emailConfig = xmlRpcHelper.createDefaultConfig(EmailContactConfiguration.class);
+        Hashtable<String,Object> emailConfig = rpcClient.RemoteApi.createDefaultConfig(EmailContactConfiguration.class);
         emailConfig.put("name", NAME_ANOTHER);
         emailConfig.put("address", "another@example.com");
-        xmlRpcHelper.insertConfig(contactsPath, emailConfig);
+        rpcClient.RemoteApi.insertConfig(contactsPath, emailConfig);
 
         CompositePage emailContactPage = getBrowser().openAndWaitFor(CompositePage.class, PathUtils.getPath(contactsPath, NAME_ANOTHER));
         assertNotPrimaryContact(emailContactPage);
@@ -139,7 +138,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
     {
         final String NEW_PASSWORD = "boo";
 
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
         
         assertTrue(getBrowser().login(random, ""));
         

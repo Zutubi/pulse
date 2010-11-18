@@ -22,17 +22,17 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         randomName = randomName();
 
         repository = new Repository();
         repository.clean();
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
     }
@@ -40,7 +40,7 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -133,7 +133,7 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
         insertProject(projectB);
 
         buildRunner.triggerSuccessfulBuild(projectA);
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
 
         StageLogPage log = getBrowser().openAndWaitFor(StageLogPage.class, projectB.getName(), 1L, "default");
         assertTrue(log.isLogAvailable());

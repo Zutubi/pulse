@@ -4,14 +4,13 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 
 public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
@@ -25,11 +24,11 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
-        buildRunner = new BuildRunner(xmlRpcHelper);
-        xmlRpcHelper.loginAsAdmin();
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
+        rpcClient.loginAsAdmin();
     }
 
     // base line test.
@@ -48,7 +47,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         assertCommandState(commands, "sleep2", SUCCESS);
         assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableCommand() throws Exception
@@ -64,7 +63,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         assertCommandState(commands, "sleep", SKIPPED);
         assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableCommandInFailingBuild() throws Exception
@@ -80,7 +79,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         assertCommandState(commands, "sleep", SKIPPED);
         assertCommandState(commands, DEFAULT_COMMAND, FAILURE);
 
-        assertEquals(FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(FAILURE, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableMultipleCommands() throws Exception
@@ -97,7 +96,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         assertCommandState(commands, "sleep", SKIPPED);
         assertCommandState(commands, DEFAULT_COMMAND, SKIPPED);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testToggleEnableDisable() throws Exception
@@ -106,7 +105,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
 
         Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
         assertCommandState(commands, DEFAULT_COMMAND, SUCCESS);
@@ -115,7 +114,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerAndWaitForBuild(project);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 2));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 2));
         commands = getCommands(project.getName(), DEFAULT_STAGE, 2);
         assertCommandState(commands, DEFAULT_COMMAND, SKIPPED);
     }
@@ -123,14 +122,14 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
     private void toggle(String project, String recipe, String command) throws Exception
     {
         String path = "projects/" + project + "/type/recipes/" + recipe + "/commands/" + command;
-        Hashtable<String, Object> config = xmlRpcHelper.getConfig(path);
+        Hashtable<String, Object> config = rpcClient.RemoteApi.getConfig(path);
         config.put("enabled", !(Boolean)config.get("enabled"));
-        xmlRpcHelper.saveConfig(path, config, false);
+        rpcClient.RemoteApi.saveConfig(path, config, false);
     }
 
     private Vector<Hashtable<String, Object>> getCommands(String project, final String stage, int build) throws Exception
     {
-        Hashtable<String, Object> buildDetails = xmlRpcHelper.getBuild(project, build);
+        Hashtable<String, Object> buildDetails = rpcClient.RemoteApi.getBuild(project, build);
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) buildDetails.get("stages");
         Hashtable<String, Object> stageDetails = CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
         {

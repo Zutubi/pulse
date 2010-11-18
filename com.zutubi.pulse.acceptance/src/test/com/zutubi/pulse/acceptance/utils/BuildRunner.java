@@ -1,15 +1,14 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 
 import java.lang.reflect.Array;
 import java.util.Hashtable;
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The build runner is an acceptance test support class that caters specifically
@@ -17,17 +16,17 @@ import static com.zutubi.util.CollectionUtils.asPair;
  */
 public class BuildRunner
 {
-    private XmlRpcHelper xmlRpcHelper;
+    private RemoteApiClient remoteApi;
 
     /**
      * Create a new instance of the build runner.
      *
-     * @param xmlRpcHelper  the xml rpc helper configured to connect to the pulse server
+     * @param remoteApi  the xml rpc helper configured to connect to the pulse server
      * on which builds will be run.
      */
-    public BuildRunner(XmlRpcHelper xmlRpcHelper)
+    public BuildRunner(RemoteApiClient remoteApi)
     {
-        this.xmlRpcHelper = xmlRpcHelper;
+        this.remoteApi = remoteApi;
     }
 
     /**
@@ -57,7 +56,7 @@ public class BuildRunner
     {
         int buildNumber = triggerAndWaitForBuild(project, options);
 
-        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
+        ResultState buildStatus = remoteApi.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.SUCCESS.equals(buildStatus))
         {
             throw new RuntimeException("Expected success, had " + buildStatus + " instead.");
@@ -92,7 +91,7 @@ public class BuildRunner
     {
         int buildNumber = triggerAndWaitForBuild(project, options);
 
-        ResultState buildStatus = xmlRpcHelper.getBuildStatus(project.getName(), buildNumber);
+        ResultState buildStatus = remoteApi.getBuildStatus(project.getName(), buildNumber);
         if (!ResultState.FAILURE.equals(buildStatus))
         {
             throw new RuntimeException("Expected failure, had " + buildStatus + " instead.");
@@ -129,7 +128,7 @@ public class BuildRunner
         int buildNumber = 0;
         for (String requestId : requestIds)
         {
-            buildNumber = Math.max(xmlRpcHelper.waitForBuildToComplete(project.getName(), requestId), buildNumber);
+            buildNumber = Math.max(remoteApi.waitForBuildToComplete(project.getName(), requestId), buildNumber);
         }
         return buildNumber;
     }
@@ -162,7 +161,7 @@ public class BuildRunner
     public List<String> triggerBuild(ProjectConfiguration project, Pair<String, Object>... options) throws Exception
     {
         // projects that are not initialised will 'drop' the trigger request. 
-        xmlRpcHelper.waitForProjectToInitialise(project.getName());
+        remoteApi.waitForProjectToInitialise(project.getName());
         
         Hashtable<String, Object> triggerOptions = new Hashtable<String, Object>();
         if (options != null)
@@ -173,7 +172,7 @@ public class BuildRunner
             }
         }
 
-        return xmlRpcHelper.call("triggerBuild", project.getName(), triggerOptions);
+        return remoteApi.triggerBuild(project.getName(), triggerOptions);
     }
 
     /**

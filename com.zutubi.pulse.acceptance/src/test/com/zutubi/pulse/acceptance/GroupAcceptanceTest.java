@@ -6,11 +6,10 @@ import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
 import com.zutubi.pulse.acceptance.pages.admin.HierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.UserManager.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
-
-import static com.zutubi.pulse.master.model.UserManager.*;
 
 /**
  * Test for user groups.
@@ -51,15 +50,15 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         String login = "u:" + random;
         String userHandle;
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         try
         {
-            String userPath = xmlRpcHelper.insertTrivialUser(login);
-            userHandle = xmlRpcHelper.getConfigHandle(userPath);
+            String userPath = rpcClient.RemoteApi.insertTrivialUser(login);
+            userHandle = rpcClient.RemoteApi.getConfigHandle(userPath);
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
 
         assertTrue(getBrowser().login(login, ""));
@@ -89,15 +88,15 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         String login = "u:" + random;
         String userHandle;
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         try
         {
-            String userPath = xmlRpcHelper.insertTrivialUser(login);
-            userHandle = xmlRpcHelper.getConfigHandle(userPath);
+            String userPath = rpcClient.RemoteApi.insertTrivialUser(login);
+            userHandle = rpcClient.RemoteApi.getConfigHandle(userPath);
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
 
         getBrowser().loginAsAdmin();

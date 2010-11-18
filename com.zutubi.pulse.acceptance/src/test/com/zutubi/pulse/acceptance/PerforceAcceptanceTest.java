@@ -4,12 +4,11 @@ import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 
 import java.util.Hashtable;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 
 /**
  * Runs simple projects that use a Perforce depot.
@@ -27,31 +26,31 @@ public class PerforceAcceptanceTest extends AcceptanceTestBase
         core = PerforceUtils.createCore();
         PerforceUtils.deleteAllPulseWorkspaces(core);
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testSimpleBuild() throws Exception
     {
-        simpleBuildTest(PerforceUtils.createSpecConfig(xmlRpcHelper));
+        simpleBuildTest(PerforceUtils.createSpecConfig(rpcClient.RemoteApi));
     }
 
     public void testManualView() throws Exception
     {
-        simpleBuildTest(PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW));
+        simpleBuildTest(PerforceUtils.createViewConfig(rpcClient.RemoteApi, PerforceUtils.TRIVIAL_VIEW));
     }
 
     private void simpleBuildTest(Hashtable<String, Object> p4Config) throws Exception
     {
         String project = randomName();
-        xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
-        int buildId = xmlRpcHelper.runBuild(project);
-        assertEquals(ResultState.SUCCESS, xmlRpcHelper.getBuildStatus(project, buildId));
+        rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, rpcClient.RemoteApi.getAntConfig());
+        int buildId = rpcClient.RemoteApi.runBuild(project);
+        assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(project, buildId));
     }
 
     public void testClientsCleanedUp() throws Exception
@@ -59,12 +58,12 @@ public class PerforceAcceptanceTest extends AcceptanceTestBase
         assertTrue(PerforceUtils.getAllPulseWorkspaces(core).isEmpty());
 
         String project = randomName();
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.runBuild(project);
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(rpcClient.RemoteApi), rpcClient.RemoteApi.getAntConfig());
+        rpcClient.RemoteApi.runBuild(project);
 
         assertFalse(PerforceUtils.getAllPulseWorkspaces(core).isEmpty());
 
-        xmlRpcHelper.deleteConfig(projectPath);
+        rpcClient.RemoteApi.deleteConfig(projectPath);
 
         waitForCondition(new Condition()
         {

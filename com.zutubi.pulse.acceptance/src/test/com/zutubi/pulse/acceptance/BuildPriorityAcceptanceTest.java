@@ -3,17 +3,16 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.
@@ -36,18 +35,18 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         tempDir = FileSystemUtils.createTempDir();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
-        buildRunner = new BuildRunner(xmlRpcHelper);
-        xmlRpcHelper.loginAsAdmin();
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         removeDirectory(tempDir);
 
@@ -64,7 +63,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
         
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -83,7 +82,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -101,7 +100,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
@@ -120,36 +119,36 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, WAIT_FOR_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, WAIT_FOR_TIMEOUT);
 
-        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
+        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "C", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage(project.getDefaultStage().getName());
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "C", 1, WAIT_FOR_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "C", 1, WAIT_FOR_TIMEOUT);
 
-        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "C", 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
+        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "C", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("C");
 
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "B", 1, WAIT_FOR_TIMEOUT);
-        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "B", 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
+        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "B", 1, WAIT_FOR_TIMEOUT);
+        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("B");
 
-        xmlRpcHelper.waitForBuildStageInProgress(project.getName(), "D", 1, WAIT_FOR_TIMEOUT);
-        assertEquals(IN_PROGRESS, xmlRpcHelper.getBuildStageStatus(project.getName(), "D", 1));
+        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "D", 1, WAIT_FOR_TIMEOUT);
+        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("D");
 
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
-        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
+        rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testPriorityViaRemoteApi() throws Exception
@@ -161,7 +160,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB, asPair("priority", (Object) 2));
         buildRunner.triggerBuild(projectC, asPair("priority", (Object) 3));
@@ -179,7 +178,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
 
@@ -208,43 +207,43 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(projectA, projectB, projectC, projectD, projectE);
 
         buildRunner.triggerBuild(projectA);
-        xmlRpcHelper.waitForBuildInProgress(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
         buildRunner.triggerBuild(projectC);
         buildRunner.triggerBuild(projectD, asPair("priority", (Object)10));
 
-        xmlRpcHelper.waitForBuildInPending(projectB.getName(), 1);
-        xmlRpcHelper.waitForBuildInPending(projectC.getName(), 1);
-        xmlRpcHelper.waitForBuildInPending(projectD.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInPending(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInPending(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInPending(projectD.getName(), 1);
 
         projectA.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), 1);
 
-        xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
-        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
-        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(projectD.getName(), 1);
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStatus(projectB.getName(), 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
 
         projectD.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectD.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectD.getName(), 1);
 
         // due to timing issues, project B ends up being triggered next because project D is
         // still in the build queue.
-        xmlRpcHelper.waitForBuildInProgress(projectB.getName(), 1);
-        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
-        xmlRpcHelper.waitForBuildInPending(projectE.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInPending(projectE.getName(), 1);
 
         projectB.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1);
 
-        xmlRpcHelper.waitForBuildInProgress(projectE.getName(), 1);
-        assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
+        rpcClient.RemoteApi.waitForBuildInProgress(projectE.getName(), 1);
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
         projectE.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectE.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectE.getName(), 1);
 
-        xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildInProgress(projectC.getName(), 1);
         projectC.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(projectC.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectC.getName(), 1);
     }
 
     private void assertBuildOrder(WaitProject... projects) throws Exception
@@ -257,14 +256,14 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
             do
             {
                 WaitProject current = remaining.remove(0);
-                xmlRpcHelper.waitForBuildInProgress(current.getName(), 1);
+                rpcClient.RemoteApi.waitForBuildInProgress(current.getName(), 1);
                 for (WaitProject project : remaining)
                 {
-                    xmlRpcHelper.waitForBuildInPending(project.getName(), 1);
+                    rpcClient.RemoteApi.waitForBuildInPending(project.getName(), 1);
                 }
                 current.releaseBuild();
-                xmlRpcHelper.waitForBuildToComplete(current.getName(), 1);
-                assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(current.getName(), 1));
+                rpcClient.RemoteApi.waitForBuildToComplete(current.getName(), 1);
+                assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(current.getName(), 1));
             }
             while (remaining.size() > 0);
         }

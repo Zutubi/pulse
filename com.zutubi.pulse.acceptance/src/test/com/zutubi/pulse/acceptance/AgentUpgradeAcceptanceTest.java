@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
@@ -9,16 +12,14 @@ import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.util.*;
+import static com.zutubi.util.Constants.MINUTE;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.XmlRpcHelper.SYMBOLIC_NAME_KEY;
-import static com.zutubi.util.Constants.MINUTE;
-import static com.zutubi.util.Constants.SECOND;
 
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
@@ -90,8 +91,8 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         String agentUrl = agent.getServerUrl();
         agentUrl = agentUrl + "/xmlrpc";
 
-        XmlRpcHelper agentXmlRpc = new XmlRpcHelper(agentUrl);
-        Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
+        RpcClient agentRpcClient = new RpcClient(agentUrl);
+        Integer agentBuild = agentRpcClient.callWithoutToken(RemoteApiClient.API_NAME, "getBuildNumber", agent.getAdminToken());
         assertEquals(200000000, agentBuild.intValue());
 
         // b) add agent to master.
@@ -103,24 +104,24 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         String masterUrl = master.getServerUrl();
         masterUrl = masterUrl + "/xmlrpc";
-        XmlRpcHelper masterXmlRpc = new XmlRpcHelper(masterUrl);
-        masterXmlRpc.loginAsAdmin();
+        RpcClient masterRpcClient = new RpcClient(masterUrl);
+        masterRpcClient.loginAsAdmin();
 
-        masterXmlRpc.insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agentConfig, false);
+        masterRpcClient.RemoteApi.insertTemplatedConfig("agents/" + AgentManager.GLOBAL_AGENT_NAME, agentConfig, false);
 
         Thread.sleep(5 * SECOND);
 
-        masterXmlRpc.waitForAgentToBeIdle("upgrade-agent", 5 * MINUTE);
+        masterRpcClient.RemoteApi.waitForAgentToBeIdle("upgrade-agent", 5 * MINUTE);
 
-        agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
+        agentBuild = agentRpcClient.callWithoutToken(RemoteApiClient.API_NAME, "getBuildNumber", agent.getAdminToken());
         assertFalse(200000000 == agentBuild);
 
-        checkPluginsMatch(masterXmlRpc, agentXmlRpc);
+        checkPluginsMatch(masterRpcClient, agentRpcClient);
     }
 
-    private void checkPluginsMatch(XmlRpcHelper masterXmlRpc, XmlRpcHelper agentXmlRpc) throws Exception
+    private void checkPluginsMatch(RpcClient masterRpcClient, RpcClient agentRpcClient) throws Exception
     {
-        Vector<Hashtable<String, Object>> masterPlugins = masterXmlRpc.getRunningPlugins();
+        Vector<Hashtable<String, Object>> masterPlugins = masterRpcClient.TestApi.getRunningPlugins();
         masterPlugins = new Vector<Hashtable<String, Object>>(CollectionUtils.filter(masterPlugins, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> plugin)
@@ -130,7 +131,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             }
         }));
 
-        Vector<Hashtable<String, Object>> agentPlugins = agentXmlRpc.callWithoutToken("getRunningPlugins", agent.getAdminToken());
+        Vector<Hashtable<String, Object>> agentPlugins = agentRpcClient.callWithoutToken(RemoteApiClient.API_NAME, "getRunningPlugins", agent.getAdminToken());
         assertEquals(masterPlugins.size(), agentPlugins.size());
         
         for (final Hashtable<String, Object> masterPlugin: masterPlugins)

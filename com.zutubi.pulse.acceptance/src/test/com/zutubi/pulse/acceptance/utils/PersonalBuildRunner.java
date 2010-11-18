@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.patchformats.unified.UnifiedPatchFormat;
 import com.zutubi.pulse.core.plugins.sync.PluginSynchroniser;
 import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
@@ -22,14 +22,13 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 /**
  * The personal build runner is an acceptance test support class that
@@ -37,7 +36,7 @@ import static org.mockito.Mockito.mock;
  */
 public class PersonalBuildRunner
 {
-    private XmlRpcHelper xmlRpcHelper;
+    private RemoteApiClient remoteApi;
 
     private DefaultPatchFormatFactory patchFormatFactory;
 
@@ -60,11 +59,11 @@ public class PersonalBuildRunner
     /**
      * Create a new instance of the personal build runner.
      *
-     * @param xmlRpcHelper  an xml rpc helper used to assist with the operations of the
+     * @param remoteApi  an xml rpc helper used to assist with the operations of the
      * personal build runner.  Note that the xml rpc helper should be logged in with the
      * same user as is running the build.
      */
-    public PersonalBuildRunner(XmlRpcHelper xmlRpcHelper)
+    public PersonalBuildRunner(RemoteApiClient remoteApi)
     {
         patchFormatFactory = new DefaultPatchFormatFactory();
         patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
@@ -74,7 +73,7 @@ public class PersonalBuildRunner
         patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
         patchFormatFactory.setObjectFactory(new DefaultObjectFactory());
 
-        this.xmlRpcHelper = xmlRpcHelper;
+        this.remoteApi = remoteApi;
     }
 
     /**
@@ -99,7 +98,7 @@ public class PersonalBuildRunner
     {
         AcceptancePersonalBuildUI ui = triggerBuild();
 
-        xmlRpcHelper.waitForBuildToComplete((int)ui.getBuildNumber());
+        remoteApi.waitForBuildToComplete((int)ui.getBuildNumber());
 
         return ui;
     }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.acceptance.pages.browse.AddCommentDialog;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -40,12 +41,12 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
 
         tempDir = FileSystemUtils.createTempDir(getName());
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
         if (!configurationHelper.isProjectExists(TEST_PROJECT))
@@ -65,8 +66,8 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         removeDirectory(tempDir);
 
@@ -132,14 +133,14 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
 
         List<String> requestIds = buildRunner.triggerBuild(project);
-        Hashtable<String, Object> request = xmlRpcHelper.waitForBuildRequestToBeActivated(requestIds.get(0));
+        Hashtable<String, Object> request = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(requestIds.get(0));
         int buildNumber = Integer.valueOf(request.get("buildId").toString());
 
         BuildSummaryPage page = addCommentToBuild(random, buildNumber);
 
         project.releaseBuild();
 
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), buildNumber);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), buildNumber);
 
         page.openAndWaitFor();
         assertTrue(getBrowser().isTextPresent(TEST_COMMENT));
@@ -157,22 +158,22 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
 
         int buildNumber = buildRunner.triggerAndWaitForBuild(testProject);
 
-        XmlRpcHelper user1Helper = new XmlRpcHelper();
-        user1Helper.login(user1, "");
-        XmlRpcHelper user2Helper = new XmlRpcHelper();
-        user2Helper.login(user2, "");
+        RpcClient user1Client = new RpcClient();
+        user1Client.login(user1, "");
+        RpcClient user2Client = new RpcClient();
+        user2Client.login(user2, "");
 
         try
         {
             // Starts with no comments.
-            Vector<Hashtable<String,Object>> comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            Vector<Hashtable<String,Object>> comments = user1Client.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(0, comments.size());
 
             // Add and verify a comment.
-            String id1 = user1Helper.addBuildComment(TEST_PROJECT, buildNumber, TEST_COMMENT);
+            String id1 = user1Client.RemoteApi.addBuildComment(TEST_PROJECT, buildNumber, TEST_COMMENT);
             assertTrue(Long.parseLong(id1) > 0);
 
-            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            comments = user1Client.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(1, comments.size());
 
             Hashtable<String, Object> comment = comments.get(0);
@@ -181,30 +182,30 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
             assertEquals(id1, comment.get("id"));
 
             // Add a second comment, verify again.
-            String id2 = user1Helper.addBuildComment(TEST_PROJECT, buildNumber, ANOTHER_TEST_COMMENT);
+            String id2 = user1Client.RemoteApi.addBuildComment(TEST_PROJECT, buildNumber, ANOTHER_TEST_COMMENT);
             assertTrue(Long.parseLong(id2) > 0);
 
-            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            comments = user1Client.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(2, comments.size());
             assertEquals(TEST_COMMENT, comments.get(0).get("message"));
             assertEquals(ANOTHER_TEST_COMMENT, comments.get(1).get("message"));
 
             // Delete the second comment.
-            assertTrue(user1Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id2));
-            comments = user1Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertTrue(user1Client.RemoteApi.deleteBuildComment(TEST_PROJECT, buildNumber, id2));
+            comments = user1Client.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(1, comments.size());
             assertEquals(id1, comments.get(0).get("id"));
 
             // Deleting an unknown comment just returns false.
-            assertFalse(user1Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id2));
+            assertFalse(user1Client.RemoteApi.deleteBuildComment(TEST_PROJECT, buildNumber, id2));
 
             // A second user should be able to see, but not delete, a comment.
-            comments = user2Helper.getBuildComments(TEST_PROJECT, buildNumber);
+            comments = user2Client.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(1, comments.size());
 
             try
             {
-                user2Helper.deleteBuildComment(TEST_PROJECT, buildNumber, id1);
+                user2Client.RemoteApi.deleteBuildComment(TEST_PROJECT, buildNumber, id1);
                 fail("Should not be able to delete another user's comments");
             }
             catch (Exception e)
@@ -213,16 +214,16 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
             }
 
             // An admin can both see and delete any comments.
-            comments = xmlRpcHelper.getBuildComments(TEST_PROJECT, buildNumber);
+            comments = rpcClient.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(1, comments.size());
-            assertTrue(xmlRpcHelper.deleteBuildComment(TEST_PROJECT, buildNumber, id1));
-            comments = xmlRpcHelper.getBuildComments(TEST_PROJECT, buildNumber);
+            assertTrue(rpcClient.RemoteApi.deleteBuildComment(TEST_PROJECT, buildNumber, id1));
+            comments = rpcClient.RemoteApi.getBuildComments(TEST_PROJECT, buildNumber);
             assertEquals(0, comments.size());
         }
         finally
         {
-            user1Helper.logout();
-            user2Helper.logout();
+            user1Client.logout();
+            user2Client.logout();
         }
     }
 
@@ -253,7 +254,7 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
 
     private long getLatestCommentId(long buildId) throws Exception
     {
-        Vector<Hashtable<String, Object>> comments = xmlRpcHelper.getBuildComments(TEST_PROJECT, (int) buildId);
+        Vector<Hashtable<String, Object>> comments = rpcClient.RemoteApi.getBuildComments(TEST_PROJECT, (int) buildId);
         Hashtable<String, Object> latestComment = comments.get(comments.size() - 1);
         return Long.parseLong((String) latestComment.get("id"));
     }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
@@ -10,7 +10,11 @@ import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -28,6 +32,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.HandleAllocator;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -36,12 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
-import static org.mockito.Mockito.*;
 
 /**
  * The configuration helper is a support class that bridges the gap between local
@@ -54,7 +53,7 @@ public class ConfigurationHelper
 {
     private MasterConfigurationRegistry configurationRegistry;
     private TypeRegistry typeRegistry;
-    private XmlRpcHelper xmlRpcHelper;
+    private RemoteApiClient remoteApi;
     private ConfigurationReferenceManager referenceManager;
 
     private Instantiator instantiator;
@@ -75,7 +74,7 @@ public class ConfigurationHelper
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
                 long handle = (Long) invocation.getArguments()[1];
-                return xmlRpcHelper.getConfigPath(String.valueOf(handle));
+                return remoteApi.getConfigPath(String.valueOf(handle));
             }
         });
         stub(referenceManager.getReferenceHandleForPath(anyString(), anyString())).toAnswer(new Answer()
@@ -83,7 +82,7 @@ public class ConfigurationHelper
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
                 String path = (String) invocation.getArguments()[1];
-                return Long.valueOf(xmlRpcHelper.getConfigHandle(path));
+                return Long.valueOf(remoteApi.getConfigHandle(path));
             }
         });
 
@@ -175,7 +174,7 @@ public class ConfigurationHelper
     {
         V config = type.newInstance();
         config.setConfigurationPath(path);
-        config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
+        config.setHandle(Long.valueOf(remoteApi.getConfigHandle(path)));
 
         if (config instanceof NamedConfiguration)
         {
@@ -188,7 +187,7 @@ public class ConfigurationHelper
     public <V extends Configuration> V getConfiguration(String path, Class<V> clazz) throws Exception
     {
         CompositeType type = typeRegistry.getType(clazz);
-        Hashtable<String, Object> data = xmlRpcHelper.getConfig(path);
+        Hashtable<String, Object> data = remoteApi.getConfig(path);
 
         MutableRecord record = type.fromXmlRpc(templateOwnerPath, data);
         //noinspection unchecked
@@ -197,7 +196,7 @@ public class ConfigurationHelper
         type.initialise(config, record, instantiator);
         
         config.setConfigurationPath(path);
-        config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
+        config.setHandle(Long.valueOf(remoteApi.getConfigHandle(path)));
 
         if (config instanceof NamedConfiguration)
         {
@@ -217,7 +216,7 @@ public class ConfigurationHelper
      */
     public boolean isProjectExists(String projectName) throws Exception
     {
-        return xmlRpcHelper.configPathExists(PROJECTS_SCOPE + "/" + projectName);
+        return remoteApi.configPathExists(PROJECTS_SCOPE + "/" + projectName);
     }
 
     /**
@@ -238,7 +237,7 @@ public class ConfigurationHelper
 
     public boolean isUserExists(String userName) throws Exception
     {
-        return xmlRpcHelper.configPathExists(USERS_SCOPE + "/" + userName);
+        return remoteApi.configPathExists(USERS_SCOPE + "/" + userName);
     }
 
     public void insertUser(UserConfiguration user) throws Exception
@@ -247,15 +246,15 @@ public class ConfigurationHelper
         insertConfig(USERS_SCOPE, user);
 
         // set the password.
-        Hashtable <String, Object> password = xmlRpcHelper.createEmptyConfig(SetPasswordConfiguration.class);
+        Hashtable <String, Object> password = remoteApi.createEmptyConfig(SetPasswordConfiguration.class);
         password.put("password", user.getPassword());
         password.put("confirmPassword", user.getPassword());
-        xmlRpcHelper.doConfigActionWithArgument(path, "setPassword", password);
+        remoteApi.doConfigActionWithArgument(path, "setPassword", password);
     }
 
     public boolean isAgentExists(String agentName) throws Exception
     {
-        return xmlRpcHelper.configPathExists(AGENTS_SCOPE + "/" + agentName);
+        return remoteApi.configPathExists(AGENTS_SCOPE + "/" + agentName);
     }
 
     /**
@@ -285,7 +284,7 @@ public class ConfigurationHelper
     public String insertTemplatedConfig(String parentTemplatePath, Configuration config, boolean template) throws Exception
     {
         Hashtable<String, Object> data = toXmlRpc(config);
-        String insertedPath = xmlRpcHelper.insertTemplatedConfig(parentTemplatePath, data, template);
+        String insertedPath = remoteApi.insertTemplatedConfig(parentTemplatePath, data, template);
 
         // This step updates the configuration with configuration path and handle details.
         updatePathsAndHandles(config, insertedPath, data);
@@ -304,7 +303,7 @@ public class ConfigurationHelper
     public String insertConfig(String path, Configuration config) throws Exception
     {
         Hashtable<String, Object> data = toXmlRpc(config);
-        String insertedPath = xmlRpcHelper.insertConfig(path, data);
+        String insertedPath = remoteApi.insertConfig(path, data);
         updatePathsAndHandles(config, insertedPath, data);
         return insertedPath;
     }
@@ -336,7 +335,7 @@ public class ConfigurationHelper
     public String update(Configuration configuration, boolean deep) throws Exception
     {
         Hashtable<String, Object> data = toXmlRpc(configuration);
-        return xmlRpcHelper.saveConfig(configuration.getConfigurationPath(), data, deep);
+        return remoteApi.saveConfig(configuration.getConfigurationPath(), data, deep);
     }
 
     /**
@@ -355,7 +354,7 @@ public class ConfigurationHelper
     private void updatePathsAndHandles(Configuration config, String path, Hashtable<String, Object> data) throws Exception
     {
         config.setConfigurationPath(path);
-        config.setHandle(Long.valueOf(xmlRpcHelper.getConfigHandle(path)));
+        config.setHandle(Long.valueOf(remoteApi.getConfigHandle(path)));
 
         // time to fill in the configuration paths and handles.  Remember to not traverse across references
         CompositeType type = typeRegistry.getType(config.getClass());
@@ -412,9 +411,9 @@ public class ConfigurationHelper
         }
     }
 
-    public void setXmlRpcHelper(XmlRpcHelper xmlRpcHelper)
+    public void setXmlRpcHelper(RemoteApiClient remoteApi)
     {
-        this.xmlRpcHelper = xmlRpcHelper;
+        this.remoteApi = remoteApi;
     }
 
 }

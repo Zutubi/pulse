@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 
 /**
  * Implementation of the ConfigurationHelperFactory interface that creates a single
@@ -14,7 +14,7 @@ public class SingletonConfigurationHelperFactory implements ConfigurationHelperF
     private static ConfigurationHelper INSTANCE;
     private static final Object lock = new Object();
 
-    public ConfigurationHelper create(XmlRpcHelper helper) throws Exception
+    public ConfigurationHelper create(RemoteApiClient helper) throws Exception
     {
         synchronized (lock)
         {

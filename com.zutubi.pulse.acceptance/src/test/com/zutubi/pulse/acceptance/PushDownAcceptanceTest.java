@@ -6,10 +6,9 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 
 import java.util.ArrayList;
-
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 import static java.util.Arrays.asList;
 
 public class PushDownAcceptanceTest extends AcceptanceTestBase
@@ -20,13 +19,13 @@ public class PushDownAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -36,7 +35,7 @@ public class PushDownAcceptanceTest extends AcceptanceTestBase
         String child = random + "-child";
         setupHierarchy(parent, child);
 
-        String labelPath = xmlRpcHelper.addLabel(parent, "foo");
+        String labelPath = rpcClient.RemoteApi.addLabel(parent, "foo");
         String childLabelPath = labelPath.replace(parent, child);
 
         getBrowser().loginAsAdmin();
@@ -49,7 +48,7 @@ public class PushDownAcceptanceTest extends AcceptanceTestBase
         String child = random + "-child";
         setupHierarchy(parent, child);
 
-        String labelPath = xmlRpcHelper.addLabel(parent, "foo");
+        String labelPath = rpcClient.RemoteApi.addLabel(parent, "foo");
 
         getBrowser().loginAsAdmin();
         assertPushDownAvailability(labelPath, true);
@@ -106,7 +105,7 @@ public class PushDownAcceptanceTest extends AcceptanceTestBase
     private ListPage prepareProperty(String parent, String child) throws Exception
     {
         setupHierarchy(parent, child);
-        String propertyPath = xmlRpcHelper.insertProjectProperty(parent, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(parent, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
 
         getBrowser().loginAsAdmin();
         ListPage propertyList = getBrowser().openAndWaitFor(ListPage.class, getParentPath(propertyPath));
@@ -117,9 +116,9 @@ public class PushDownAcceptanceTest extends AcceptanceTestBase
 
     private String setupHierarchy(String parentName, String childName) throws Exception
     {
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        xmlRpcHelper.insertTrivialProject(childName, parentName, false);
-        assertEquals(asList(childName), new ArrayList<String>(xmlRpcHelper.getTemplateChildren(parentPath)));
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
+        assertEquals(asList(childName), new ArrayList<String>(rpcClient.RemoteApi.getTemplateChildren(parentPath)));
         return parentPath;
     }
 }

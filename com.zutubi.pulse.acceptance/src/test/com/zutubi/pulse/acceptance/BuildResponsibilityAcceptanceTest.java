@@ -1,22 +1,22 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.*;
-import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.StringUtils;
-
-import java.util.Hashtable;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
+import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
+
+import java.util.Hashtable;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -35,17 +35,17 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.ensureProject(TEST_PROJECT);
-        xmlRpcHelper.ensureUser(TEST_USER);
-        xmlRpcHelper.ensureBuild(TEST_PROJECT, BUILD_NUMBER);
-        xmlRpcHelper.clearResponsibility(TEST_PROJECT);
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.ensureProject(TEST_PROJECT);
+        rpcClient.RemoteApi.ensureUser(TEST_USER);
+        rpcClient.RemoteApi.ensureBuild(TEST_PROJECT, BUILD_NUMBER);
+        rpcClient.RemoteApi.clearResponsibility(TEST_PROJECT);
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -124,7 +124,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
         assertTrue(getBrowser().login(random, ""));
 
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
@@ -165,7 +165,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
     public void testAutoClearResponsibility() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         takeResponsibility(random);
 
         assertTrue(getBrowser().login(TEST_USER, ""));
@@ -174,9 +174,9 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
         // Modify the config so the build fails.
         String antPath = PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND);
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getConfig(antPath);
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getConfig(antPath);
         antConfig.put(Constants.Project.AntCommand.TARGETS, "nosuchtarget");
-        xmlRpcHelper.saveConfig(antPath, antConfig, false);
+        rpcClient.RemoteApi.saveConfig(antPath, antConfig, false);
         runBuild(random, false);
 
         homePage.openAndWaitFor();
@@ -184,7 +184,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
         // Fix the build, so responsibility should clear.
         antConfig.put(Constants.Project.AntCommand.TARGETS, "");
-        xmlRpcHelper.saveConfig(antPath, antConfig, false);
+        rpcClient.RemoteApi.saveConfig(antPath, antConfig, false);
         runBuild(random, true);
 
         homePage.openAndWaitFor();
@@ -193,13 +193,13 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
     public void testAutoClearResponsibilityDisabled() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         takeResponsibility(random);
 
         String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
-        Hashtable<String, Object> optionsConfig = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> optionsConfig = rpcClient.RemoteApi.getConfig(optionsPath);
         optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
-        xmlRpcHelper.saveConfig(optionsPath, optionsConfig, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, optionsConfig, false);
 
         assertTrue(getBrowser().login(TEST_USER, ""));
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -212,15 +212,15 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
     public void testCanDeleteUserWithResponsibility() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         takeResponsibility(random);
-        assertTrue(xmlRpcHelper.deleteConfig(getPath(USERS_SCOPE, TEST_USER)));
+        assertTrue(rpcClient.RemoteApi.deleteConfig(getPath(USERS_SCOPE, TEST_USER)));
     }
 
     private void runBuild(String project, Boolean expectedSuccess) throws Exception
     {
-        int buildId = xmlRpcHelper.runBuild(project);
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project, buildId);
+        int buildId = rpcClient.RemoteApi.runBuild(project);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project, buildId);
         assertEquals(expectedSuccess, build.get("succeeded"));
     }
 
@@ -241,16 +241,15 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
     private void takeResponsibility(String project) throws Exception
     {
-        XmlRpcHelper helper = new XmlRpcHelper();
-        helper.login(TEST_USER, "");
+        RpcClient rpcClient = new RpcClient();
+        rpcClient.login(TEST_USER, "");
         try
         {
-            helper.takeResponsibility(project, TEST_COMMENT);
-
+            rpcClient.RemoteApi.takeResponsibility(project, TEST_COMMENT);
         }
         finally
         {
-            helper.logout();
+            rpcClient.logout();
         }
     }
 

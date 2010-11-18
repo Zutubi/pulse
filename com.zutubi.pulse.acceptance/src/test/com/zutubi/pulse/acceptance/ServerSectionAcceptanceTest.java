@@ -18,17 +18,17 @@ public class ServerSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testServerMessagesPaging() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         try
         {
             for (int i = 0; i < 100; i++)
             {
-                xmlRpcHelper.logError("Test error message " + i);
+                rpcClient.TestApi.logError("Test error message " + i);
             }
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
 
         getBrowser().loginAsAdmin();

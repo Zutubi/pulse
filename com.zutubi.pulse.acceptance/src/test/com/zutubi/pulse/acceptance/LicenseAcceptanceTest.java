@@ -13,13 +13,12 @@ import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.Hashtable;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Test for managing the server license and ensuring the licenses are
@@ -33,7 +32,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         getBrowser().loginAsAdmin();
     }
 
@@ -45,7 +44,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
 
         super.tearDown();
@@ -88,7 +87,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should be ignored
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersIgnored();
     }
 
@@ -119,7 +118,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isElementIdPresent("license-expired"));
 
         // Build triggers should behave normally
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersHandled();
     }
 
@@ -135,21 +134,21 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should behave normally
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersIgnored();
     }
 
     public void testProjectsExceeded() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
 
-        int projectCount = xmlRpcHelper.getProjectCount();
+        int projectCount = rpcClient.RemoteApi.getProjectCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount - 1, -1, -1));
 
         assertExceeded();
 
         // Adding a project should fail
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         AddProjectWizard.CommandState state = wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
         state.waitFor();
         assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
@@ -157,10 +156,10 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     public void testAgentsExceeded() throws Exception
     {
-        int agentCount = xmlRpcHelper.getAgentCount();
+        int agentCount = rpcClient.RemoteApi.getAgentCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, agentCount - 1, -1));
 
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertExceeded();
 
         // Adding an agent should fail
@@ -175,10 +174,10 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     public void testUsersExceeded() throws Exception
     {
-        int userCount = xmlRpcHelper.getUserCount();
+        int userCount = rpcClient.RemoteApi.getUserCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, -1, userCount - 1));
 
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertExceeded();
 
         // Adding a user should fail
@@ -193,11 +192,11 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     public void testEnforcedViaRemoteApi() throws Exception
     {
-        int projectCount = xmlRpcHelper.getProjectCount();
+        int projectCount = rpcClient.RemoteApi.getProjectCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount - 1, -1, -1));
         try
         {
-            xmlRpcHelper.insertTrivialProject(random, false);
+            rpcClient.RemoteApi.insertTrivialProject(random, false);
             fail();
         }
         catch(Exception e)
@@ -208,8 +207,8 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     public void testEnforcedOnClone() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
-        int projectCount = xmlRpcHelper.getProjectCount();
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
+        int projectCount = rpcClient.RemoteApi.getProjectCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount - 1, -1, -1));
 
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -234,9 +233,9 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     private void setLicenseViaApi(String key) throws Exception
     {
-        Hashtable<String, Object> license = xmlRpcHelper.createDefaultConfig(LicenseConfiguration.class);
+        Hashtable<String, Object> license = rpcClient.RemoteApi.createDefaultConfig(LicenseConfiguration.class);
         license.put("key", key);
-        xmlRpcHelper.saveConfig(LICENSE_PATH, license, false);
+        rpcClient.RemoteApi.saveConfig(LICENSE_PATH, license, false);
     }
 
     private CompositePage goToLicensePage()

@@ -6,17 +6,16 @@ import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.agent.AgentStatus.DISABLED;
 import static com.zutubi.pulse.master.agent.AgentStatus.IDLE;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
  * Tests for the working copy functionality.
@@ -34,19 +33,19 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
         projects = new ProjectConfigurations(configurationHelper);
         users = new UserConfigurations();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         getBrowser().logout();
 
         super.tearDown();
@@ -94,7 +93,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
 
     public void testViewWorkingCopyOnRemoteAgent() throws Exception
     {
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
         runTestViewWorkingCopyOnAgent(AGENT_NAME);
     }
 
@@ -145,7 +144,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
 
     public void testViewWorkingCopyWhereAgentIsDisabled() throws Exception
     {
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
 
         getBrowser().loginAsAdmin();
         enableAgent(AGENT_NAME);

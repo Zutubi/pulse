@@ -7,23 +7,22 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-
-import java.io.File;
-import java.util.Vector;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.File;
+import static java.util.Arrays.asList;
+import java.util.Vector;
 
 /**
  * Acceptance test for basic agents section functionality.
@@ -44,11 +43,11 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         removeNonMasterAgents();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
 
@@ -59,8 +58,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     protected void tearDown() throws Exception
     {
         removeNonMasterAgents();
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         removeDirectory(tempDir);
 
@@ -70,12 +69,12 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     private void removeNonMasterAgents() throws Exception
     {
         // Ensure only the master agent is defined.
-        Vector<String> allAgents = xmlRpcHelper.getAllAgentNames();
+        Vector<String> allAgents = rpcClient.RemoteApi.getAllAgentNames();
         for (String agent: allAgents)
         {
             if (!agent.equals(AgentManager.MASTER_AGENT_NAME))
             {
-                xmlRpcHelper.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
+                rpcClient.RemoteApi.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
             }
         }
     }
@@ -117,9 +116,9 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig(), false);
 
-        xmlRpcHelper.waitForProjectToInitialise(project.getName());
-        xmlRpcHelper.triggerBuild(project.getName());
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+        rpcClient.RemoteApi.triggerBuild(project.getName());
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
@@ -134,17 +133,17 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
 
-        assertTrue(xmlRpcHelper.getAgentEnableState(LOCAL_AGENT).isEnabled());
+        assertTrue(rpcClient.RemoteApi.getAgentEnableState(LOCAL_AGENT).isEnabled());
 
         agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
 
         getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), STATUS_DISABLE_ON_IDLE);
 
-        assertTrue(xmlRpcHelper.getAgentEnableState(LOCAL_AGENT).isDisabling());
+        assertTrue(rpcClient.RemoteApi.getAgentEnableState(LOCAL_AGENT).isDisabling());
 
         project.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
-        xmlRpcHelper.waitForAgentStatus(LOCAL_AGENT, DISABLED, XmlRpcHelper.BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
+        rpcClient.RemoteApi.waitForAgentStatus(LOCAL_AGENT, DISABLED, rpcClient.RemoteApi.BUILD_TIMEOUT);
     }
 
     public void testConcurrentBuildsSameHost() throws Exception
@@ -162,12 +161,12 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig(), false);
         configurationHelper.insertProject(project2.getConfig(), false);
-        xmlRpcHelper.waitForProjectToInitialise(project1.getName());
-        xmlRpcHelper.waitForProjectToInitialise(project2.getName());
-        xmlRpcHelper.triggerBuild(project1.getName());
-        xmlRpcHelper.waitForBuildInProgress(project1.getName(), 1);
-        xmlRpcHelper.triggerBuild(project2.getName());
-        xmlRpcHelper.waitForBuildInProgress(project2.getName(), 1);
+        rpcClient.RemoteApi.waitForProjectToInitialise(project1.getName());
+        rpcClient.RemoteApi.waitForProjectToInitialise(project2.getName());
+        rpcClient.RemoteApi.triggerBuild(project1.getName());
+        rpcClient.RemoteApi.waitForBuildInProgress(project1.getName(), 1);
+        rpcClient.RemoteApi.triggerBuild(project2.getName());
+        rpcClient.RemoteApi.waitForBuildInProgress(project2.getName(), 1);
 
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
@@ -175,16 +174,16 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertBuildingStatus(agentsPage.getStatus(agent2));
 
         project2.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project2.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(project2.getName(), 1);
 
         getBrowser().refresh();
         agentsPage.waitFor();
         assertBuildingStatus(agentsPage.getStatus(agent1));
-        xmlRpcHelper.waitForAgentToBeIdle(agent2);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(agent2);
 
         project1.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project1.getName(), 1);
-        xmlRpcHelper.waitForAgentToBeIdle(agent1);
+        rpcClient.RemoteApi.waitForBuildToComplete(project1.getName(), 1);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(agent1);
     }
 
     public void testHostOptionProvider() throws Exception
@@ -230,7 +229,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertEquals(project.getName() + " :: build 1 :: default", agentsPage.getExecutingBuildDetails(AgentManager.MASTER_AGENT_NAME));
 
         project.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
     }
 
     public void testAgentStatusExecutingBuild() throws Exception
@@ -258,7 +257,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertEquals("[default]", statusPage.getExecutingRecipe());
 
         project.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
     }
 
     public void testStatistics() throws Exception
@@ -272,7 +271,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testNoSynchronisationMessages() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(random, "localhost");
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
         assertTrue(statusPage.isSynchronisationTablePresent());
@@ -282,10 +281,10 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testSimpleSynchronisationMessage() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(random, "localhost");
-        xmlRpcHelper.waitForAgentToBeIdle(random);
-        xmlRpcHelper.enqueueSynchronisationMessage(random, true, "test message", true);
-        xmlRpcHelper.waitForAgentToBeIdle(random);
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
+        rpcClient.TestApi.enqueueSynchronisationMessage(random, true, "test message", true);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
 
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
@@ -296,10 +295,10 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testAsyncSynchronisationMessage() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(random, "localhost");
-        xmlRpcHelper.waitForAgentToBeIdle(random);
-        xmlRpcHelper.enqueueSynchronisationMessage(random, false, "test async message", true);
-        xmlRpcHelper.waitForAgentToBeIdle(random);
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
+        rpcClient.TestApi.enqueueSynchronisationMessage(random, false, "test async message", true);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
 
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
@@ -310,10 +309,10 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     
     public void testFailedSynchronisationMessage() throws Exception
     {
-        xmlRpcHelper.insertSimpleAgent(random, "localhost");
-        xmlRpcHelper.waitForAgentToBeIdle(random);
-        xmlRpcHelper.enqueueSynchronisationMessage(random, true, TEST_DESCRIPTION, false);
-        xmlRpcHelper.waitForAgentToBeIdle(random);
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
+        rpcClient.TestApi.enqueueSynchronisationMessage(random, true, TEST_DESCRIPTION, false);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
 
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
@@ -329,11 +328,11 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         String agentName = random + "-agent";
         String projectName = random + "-project";
 
-        xmlRpcHelper.insertSimpleAgent(agentName, "localhost");
+        rpcClient.RemoteApi.insertSimpleAgent(agentName, "localhost");
 
         WaitProject project = startBuildOnAgent(projectName, agentName);
 
-        xmlRpcHelper.enqueueSynchronisationMessage(agentName, true, TEST_DESCRIPTION, true);
+        rpcClient.TestApi.enqueueSynchronisationMessage(agentName, true, TEST_DESCRIPTION, true);
 
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
@@ -342,8 +341,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
 
         project.releaseBuild();
-        xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
-        xmlRpcHelper.waitForAgentToBeIdle(agentName);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
 
         statusPage.openAndWaitFor();
         assertEquals(1, statusPage.getSynchronisationMessageCount());
@@ -355,7 +354,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         final int MESSAGE_COUNT = 12;
 
-        xmlRpcHelper.insertSimpleAgent(random, "localhost");
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
         multipleMessageHelper(random, MESSAGE_COUNT);
     }
 
@@ -363,18 +362,18 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         final int MESSAGE_COUNT = 12;
 
-        xmlRpcHelper.insertLocalAgent(random);
+        rpcClient.RemoteApi.insertLocalAgent(random);
         multipleMessageHelper(random, MESSAGE_COUNT);
     }
 
     private void multipleMessageHelper(String agentName, int messageCount) throws Exception
     {
-        xmlRpcHelper.waitForAgentToBeIdle(agentName);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
         for (int i = 0; i < messageCount; i++)
         {
-            xmlRpcHelper.enqueueSynchronisationMessage(agentName, true, "Description " + i, true);
+            rpcClient.TestApi.enqueueSynchronisationMessage(agentName, true, "Description " + i, true);
         }
-        xmlRpcHelper.waitForAgentToBeIdle(agentName);
+        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
 
         getBrowser().loginAsAdmin();
         AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
@@ -392,9 +391,9 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         WaitProject project = projects.createWaitAntProject(projectName, tempDir);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
         configurationHelper.insertProject(project.getConfig(), false);
-        xmlRpcHelper.waitForProjectToInitialise(project.getName());
-        xmlRpcHelper.triggerBuild(project.getName());
-        xmlRpcHelper.waitForBuildInProgress(project.getName(), 1);
+        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+        rpcClient.RemoteApi.triggerBuild(project.getName());
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
         return project;
     }
 

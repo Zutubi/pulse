@@ -3,7 +3,11 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 
@@ -11,9 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 
 /**
  * Tests for the plugin management UI.
@@ -60,10 +61,10 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
     {
         final String AGENT_NAME = "localhost";
         
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         try
         {
-            xmlRpcHelper.ensureAgent(AGENT_NAME);
+            rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
 
             final String id = getRandomId();
             PluginsPage pluginsPage = installPlugin(id);
@@ -71,7 +72,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
             assertTrue(pluginsPage.isPluginPresent(id));
             assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
 
-            xmlRpcHelper.doConfigAction(PathUtils.getPath(AGENTS_SCOPE, AGENT_NAME), ACTION_PING);
+            rpcClient.RemoteApi.doConfigAction(PathUtils.getPath(AGENTS_SCOPE, AGENT_NAME), ACTION_PING);
             TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()
@@ -82,7 +83,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
     }
 
@@ -90,8 +91,8 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            XmlRpcHelper agentXmlRpcHelper = new XmlRpcHelper("http://localhost:" + AcceptanceTestUtils.getAgentPort() + "/xmlrpc");
-            Vector<Hashtable<String, Object>> plugins = agentXmlRpcHelper.callWithoutToken("getRunningPlugins", AcceptanceTestUtils.getAgentAdminToken());
+            RpcClient agentRpcClient = new RpcClient("http://localhost:" + AcceptanceTestUtils.getAgentPort() + "/xmlrpc");
+            Vector<Hashtable<String, Object>> plugins = agentRpcClient.callWithoutToken(RemoteApiClient.API_NAME, "getRunningPlugins", AcceptanceTestUtils.getAgentAdminToken());
             return CollectionUtils.contains(plugins, new Predicate<Hashtable<String, Object>>()
             {
                 public boolean satisfied(Hashtable<String, Object> pluginInfo)

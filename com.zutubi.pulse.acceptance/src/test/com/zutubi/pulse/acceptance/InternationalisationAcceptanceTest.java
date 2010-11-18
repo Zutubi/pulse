@@ -13,14 +13,14 @@ public class InternationalisationAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
         getBrowser().logout();
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -28,7 +28,7 @@ public class InternationalisationAcceptanceTest extends AcceptanceTestBase
     public void testI18NCharactersInProjectName() throws Exception
     {
         String name = randomName();
-        xmlRpcHelper.insertSimpleProject(name, false);
+        rpcClient.RemoteApi.insertSimpleProject(name, false);
 
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, name, false);
         assertTrue(projectPage.isPresent());

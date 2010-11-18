@@ -7,13 +7,12 @@ import com.sun.syndication.io.XmlReader;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction;
 import com.zutubi.util.RandomUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class RssAcceptanceTest extends AcceptanceTestBase
 {
@@ -23,7 +22,7 @@ public class RssAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     public void testProjectRssFeedGeneration() throws Exception
@@ -90,12 +89,12 @@ public class RssAcceptanceTest extends AcceptanceTestBase
 
     private void createProject(String projectName, int buildCount) throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(projectName, false);
-        xmlRpcHelper.waitForProjectToInitialise(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName, false);
+        rpcClient.RemoteApi.waitForProjectToInitialise(projectName);
         for (int i = 1; i <= buildCount; i++)
         {
-            xmlRpcHelper.triggerBuild(projectName);
-            xmlRpcHelper.waitForBuildToComplete(projectName, i, 5000);
+            rpcClient.RemoteApi.triggerBuild(projectName);
+            rpcClient.RemoteApi.waitForBuildToComplete(projectName, i, 5000);
         }
     }
 

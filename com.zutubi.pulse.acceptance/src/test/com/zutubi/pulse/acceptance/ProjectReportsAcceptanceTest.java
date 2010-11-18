@@ -1,30 +1,29 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
-import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
-import com.zutubi.pulse.core.engine.api.FieldScope;
-import com.zutubi.util.io.IOUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
+import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
+import com.zutubi.pulse.core.engine.api.FieldScope;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.io.IOUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import static java.util.Arrays.asList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 {
@@ -56,7 +55,7 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         tempDir = createTempDirectory();
         propertiesFile = new File(tempDir, "custom.properties");
         generateRandomMetrics();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
@@ -87,18 +86,18 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 
     public void testCustomFieldPostProcessing() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         String capturesPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS);
 
-        Hashtable<String, Object> capture = xmlRpcHelper.createEmptyConfig(FileArtifactConfiguration.class);
+        Hashtable<String, Object> capture = rpcClient.RemoteApi.createEmptyConfig(FileArtifactConfiguration.class);
         capture.put(Constants.Project.Command.FileArtifact.NAME, "fields");
         capture.put(Constants.Project.Command.FileArtifact.FILE, propertiesFile.getAbsolutePath().replace('\\', '/'));
         capture.put(Constants.Project.Command.FileArtifact.POSTPROCESSORS, new Vector<String>(asList(getPath(projectPath, "postProcessors", "custom field processor"))));
 
-        xmlRpcHelper.insertConfig(capturesPath, capture);
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.insertConfig(capturesPath, capture);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
-        Hashtable<String, Object> customFields = xmlRpcHelper.getCustomFieldsInBuild(random, (int) buildId);
+        Hashtable<String, Object> customFields = rpcClient.RemoteApi.getCustomFieldsInBuild(random, (int) buildId);
         assertEquals(new HashSet<String>(asList("", DEFAULT_STAGE)), customFields.keySet());
         assertFields(customFields, "");
         assertFields(customFields, DEFAULT_STAGE, METRIC1, Double.toString(value1), METRIC2, Double.toString(value2));
@@ -116,10 +115,10 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         final String FIELD_NAME = "test field";
         final String FIELD_VALUE = "3";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         String commandsPath = getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS);
 
-        Hashtable<String, Object> field = xmlRpcHelper.createEmptyConfig(CustomFieldConfiguration.class);
+        Hashtable<String, Object> field = rpcClient.RemoteApi.createEmptyConfig(CustomFieldConfiguration.class);
         field.put(Constants.Project.CustomFieldsCommand.Field.NAME, FIELD_NAME);
         field.put(Constants.Project.CustomFieldsCommand.Field.VALUE, FIELD_VALUE);
         field.put(Constants.Project.CustomFieldsCommand.Field.SCOPE, FieldScope.BUILD.toString());
@@ -127,14 +126,14 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> fields = new Hashtable<String, Object>();
         fields.put(FIELD_NAME, field);
 
-        Hashtable<String, Object> command = xmlRpcHelper.createEmptyConfig(CustomFieldsCommandConfiguration.class);
+        Hashtable<String, Object> command = rpcClient.RemoteApi.createEmptyConfig(CustomFieldsCommandConfiguration.class);
         command.put(Constants.Project.Command.NAME, "fields");
         command.put(Constants.Project.CustomFieldsCommand.FIELDS, fields);
 
-        xmlRpcHelper.insertConfig(commandsPath, command);
-        long buildId = xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.insertConfig(commandsPath, command);
+        long buildId = rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
 
-        Hashtable<String, Object> customFields = xmlRpcHelper.getCustomFieldsInBuild(random, (int) buildId);
+        Hashtable<String, Object> customFields = rpcClient.RemoteApi.getCustomFieldsInBuild(random, (int) buildId);
         assertEquals(new HashSet<String>(asList("", DEFAULT_STAGE)), customFields.keySet());
         assertFields(customFields, "", FIELD_NAME, FIELD_VALUE);
         assertFields(customFields, DEFAULT_STAGE);
@@ -147,13 +146,13 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 
     public void testReportsSanity() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         String reportGroupsPath = getPath(projectPath, Constants.Project.REPORT_GROUPS);
 
         String buildTrendsPath = getPath(reportGroupsPath, REPORT_GROUP_BUILD_TRENDS);
         String testTrendsPath = getPath(reportGroupsPath, REPORT_GROUP_TEST_TRENDS);
-        xmlRpcHelper.deleteConfig(buildTrendsPath);
-        xmlRpcHelper.deleteConfig(testTrendsPath);
+        rpcClient.RemoteApi.deleteConfig(buildTrendsPath);
+        rpcClient.RemoteApi.deleteConfig(testTrendsPath);
 
         getBrowser().loginAsAdmin();
 
@@ -161,8 +160,8 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         ProjectReportsPage reportsPage = getBrowser().openAndWaitFor(ProjectReportsPage.class, random);
         assertTrue(getBrowser().isTextPresent(MESSAGE_NO_GROUPS));
 
-        xmlRpcHelper.restoreConfig(buildTrendsPath);
-        xmlRpcHelper.restoreConfig(testTrendsPath);
+        rpcClient.RemoteApi.restoreConfig(buildTrendsPath);
+        rpcClient.RemoteApi.restoreConfig(testTrendsPath);
 
         // No group name in the url leads to the first group
         reportsPage = getBrowser().createPage(ProjectReportsPage.class, random, REPORT_GROUP_BUILD_TRENDS);
@@ -175,7 +174,7 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent(MESSAGE_NO_BUILDS));
 
         // Check that a build gives some data to report.
-        xmlRpcHelper.runBuild(random, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
         reportsPage.openAndWaitFor();
         assertFalse(getBrowser().isTextPresent(MESSAGE_NO_BUILDS));
 
@@ -206,7 +205,7 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
     @SuppressWarnings({"unchecked"})
     private void checkReportData() throws Exception
     {
-        Hashtable<String, Object> reportData = xmlRpcHelper.getReportData(random, REPORT_GROUP_BUILD_TRENDS, REPORT_BUILD_RESULTS, 1, "builds");
+        Hashtable<String, Object> reportData = rpcClient.RemoteApi.getReportData(random, REPORT_GROUP_BUILD_TRENDS, REPORT_BUILD_RESULTS, 1, "builds");
         assertEquals(REPORT_BUILD_RESULTS, reportData.get("name"));
         Vector<Hashtable<String, Object>> seriesList = (Vector<Hashtable<String, Object>>) reportData.get("series");
         assertEquals(2, seriesList.size());

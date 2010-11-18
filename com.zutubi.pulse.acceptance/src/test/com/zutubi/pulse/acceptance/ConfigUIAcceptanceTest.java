@@ -53,12 +53,12 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
         random = randomName() + SPECIAL_CHARACTERS;
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -67,7 +67,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         // When configuring a template and a single select is shown, that
         // single select should have an empty option added.
         getBrowser().loginAsAdmin();
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(random, true, GLOBAL_PROJECT_NAME);
         getBrowser().open(urls.adminProject(uriComponentEncode(random)) + "scm/");
         SubversionForm form = getBrowser().createForm(SubversionForm.class);
@@ -80,8 +80,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
         String labelsPath = getPath(childPath, "labels");
 
         getBrowser().loginAsAdmin();
@@ -104,7 +104,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testCancelAddListItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         getBrowser().loginAsAdmin();
         ListPage labelsPage = getBrowser().openAndWaitFor(ListPage.class, getPath(projectPath, "labels"));
@@ -120,7 +120,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testCancelViewListItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         String labelBaseName = insertLabel(projectPath);
 
         getBrowser().loginAsAdmin();
@@ -137,15 +137,15 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     private String insertLabel(String projectPath) throws Exception
     {
-        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        Hashtable<String, Object> label = rpcClient.RemoteApi.createEmptyConfig(LabelConfiguration.class);
         label.put("label", "test");
-        return PathUtils.getBaseName(xmlRpcHelper.insertConfig(getPath(projectPath, "labels"), label));
+        return PathUtils.getBaseName(rpcClient.RemoteApi.insertConfig(getPath(projectPath, "labels"), label));
     }
 
     public void testCheckForm() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(CHECK_PROJECT);
+        rpcClient.RemoteApi.ensureProject(CHECK_PROJECT);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = getBrowser().createForm(SubversionForm.class);
         form.waitFor();
@@ -159,7 +159,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     public void testCheckFormFailure() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(CHECK_PROJECT);
+        rpcClient.RemoteApi.ensureProject(CHECK_PROJECT);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = getBrowser().createForm(SubversionForm.class);
         form.waitFor();
@@ -173,7 +173,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     public void testCheckFormValidationFailure() throws Exception
     {
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(CHECK_PROJECT);
+        rpcClient.RemoteApi.ensureProject(CHECK_PROJECT);
         getBrowser().open(urls.adminProject(uriComponentEncode(CHECK_PROJECT)) + "scm/");
         SubversionForm form = getBrowser().createForm(SubversionForm.class);
         form.waitFor();
@@ -225,7 +225,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testClearItemPicker() throws Exception
     {
-        xmlRpcHelper.ensureProject(random);
+        rpcClient.RemoteApi.ensureProject(random);
 
         getBrowser().loginAsAdmin();
         ProjectConfigPage configPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
@@ -265,7 +265,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testNameValidationDuplicate() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         String propertiesPath = getPropertiesPath(projectPath);
         insertProperty(projectPath);
 
@@ -283,9 +283,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     public void testNameValidationDuplicateInherited() throws Exception
     {
         String parentName = random + "-parent";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
         insertProperty(parentPath);
-        String childPath = xmlRpcHelper.insertTrivialProject(random + "-child", parentName, false);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(random + "-child", parentName, false);
 
         getBrowser().loginAsAdmin();
         ListPage propertiesPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
@@ -302,8 +302,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
         insertProperty(childPath);
 
         getBrowser().loginAsAdmin();
@@ -323,9 +323,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String parentName = random + "-parent";
         String child1Name = random + "-child1";
         String child2Name = random + "-child2";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
-        String child2Path = xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String child1Path = rpcClient.RemoteApi.insertTrivialProject(child1Name, parentName, false);
+        String child2Path = rpcClient.RemoteApi.insertTrivialProject(child2Name, parentName, false);
         insertProperty(child1Path);
         insertProperty(child2Path);
 
@@ -345,12 +345,12 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
         insertProperty(parentPath);
 
         String childPropertiesPath = getPropertiesPath(childPath);
-        xmlRpcHelper.deleteConfig(getPath(childPropertiesPath, "p1"));
+        rpcClient.RemoteApi.deleteConfig(getPath(childPropertiesPath, "p1"));
 
         getBrowser().loginAsAdmin();
         ListPage propertiesPage = getBrowser().openAndWaitFor(ListPage.class, childPropertiesPath);
@@ -368,8 +368,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
 
         // At this point we should be allowed to configure in the parent
         getBrowser().loginAsAdmin();
@@ -377,9 +377,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(compositePage.isConfigureLinkPresent());
 
         String childChangeViewerPath = getPath(childPath, "changeViewer");
-        Hashtable<String, Object> changeViewer = xmlRpcHelper.createEmptyConfig(CustomChangeViewerConfiguration.class);
+        Hashtable<String, Object> changeViewer = rpcClient.RemoteApi.createEmptyConfig(CustomChangeViewerConfiguration.class);
         changeViewer.put("changesetURL", "dummy");
-        xmlRpcHelper.insertConfig(childChangeViewerPath, changeViewer);
+        rpcClient.RemoteApi.insertConfig(childChangeViewerPath, changeViewer);
 
         // Now the child exists we should no longer be able to configure
         // in the parent.
@@ -431,7 +431,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     private String orderPrelude() throws Exception
     {
-        String path = xmlRpcHelper.insertTrivialProject(random, false);
+        String path = rpcClient.RemoteApi.insertTrivialProject(random, false);
         insertProperty(path, "p1");
         insertProperty(path, "p2");
         insertProperty(path, "p3");
@@ -440,13 +440,13 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testOrderLinksNotPresentForUnorderedCollection() throws Exception
     {
-        String path = xmlRpcHelper.insertTrivialProject(random, false);
-        Hashtable<String, Object> trigger = xmlRpcHelper.createDefaultConfig(ScmBuildTriggerConfiguration.class);
+        String path = rpcClient.RemoteApi.insertTrivialProject(random, false);
+        Hashtable<String, Object> trigger = rpcClient.RemoteApi.createDefaultConfig(ScmBuildTriggerConfiguration.class);
         trigger.put("name", "t1");
         String triggersPath = getPath(path, "triggers");
-        xmlRpcHelper.insertConfig(triggersPath, trigger);
+        rpcClient.RemoteApi.insertConfig(triggersPath, trigger);
         trigger.put("name", "t2");
-        xmlRpcHelper.insertConfig(triggersPath, trigger);
+        rpcClient.RemoteApi.insertConfig(triggersPath, trigger);
 
         getBrowser().loginAsAdmin();
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, triggersPath);
@@ -463,7 +463,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String path = orderPrelude();
 
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
         assertTrue(getBrowser().login(random, ""));
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
@@ -482,8 +482,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
 
         insertProperty(parentPath, "p1");
         insertProperty(parentPath, "p2");
@@ -493,7 +493,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertFalse(listPage.isOrderInheritedPresent());
         assertFalse(listPage.isOrderOverriddenPresent());
 
-        xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
+        rpcClient.RemoteApi.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
         listPage.openAndWaitFor();
         assertTrue(listPage.isOrderInheritedPresent());
         assertFalse(listPage.isOrderOverriddenPresent());
@@ -503,14 +503,14 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertTrivialProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertTrivialProject(childName, parentName, false);
 
         insertProperty(parentPath, "p1");
         insertProperty(parentPath, "p2");
 
-        xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
-        xmlRpcHelper.setConfigOrder(getPropertiesPath(childPath), "p1", "p2");
+        rpcClient.RemoteApi.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
+        rpcClient.RemoteApi.setConfigOrder(getPropertiesPath(childPath), "p1", "p2");
 
         getBrowser().loginAsAdmin();
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(childPath));
@@ -522,7 +522,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        xmlRpcHelper.insertSimpleProject(parentName, true);
+        rpcClient.RemoteApi.insertSimpleProject(parentName, true);
 
         getBrowser().loginAsAdmin();
         addInheritingProject(parentName, childName);
@@ -546,23 +546,23 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String parentName = random + "-parent";
         String childName = random + "-child";
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, true);
         String recipePath = getPath(parentPath, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES, Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME);
-        Hashtable<String, Object> recipe = xmlRpcHelper.getConfig(recipePath);
+        Hashtable<String, Object> recipe = rpcClient.RemoteApi.getConfig(recipePath);
         recipe.put("name", NEW_RECIPE_NAME);
         @SuppressWarnings({"unchecked"})
         Hashtable<String, Object> command = (Hashtable<String, Object>) ((Hashtable<String, Object>) recipe.get(Constants.Project.MultiRecipeType.Recipe.COMMANDS)).get(Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND);
         command.put("name", NEW_COMMAND_NAME);
-        xmlRpcHelper.saveConfig(recipePath, recipe, true);
+        rpcClient.RemoteApi.saveConfig(recipePath, recipe, true);
 
         getBrowser().loginAsAdmin();
         addInheritingProject(parentName, childName);
 
         String childRecipesPath = getPath(PROJECTS_SCOPE, childName, Constants.Project.TYPE, Constants.Project.MultiRecipeType.RECIPES);
-        assertEquals(asList(NEW_RECIPE_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childRecipesPath)));
+        assertEquals(asList(NEW_RECIPE_NAME), new LinkedList<String>(rpcClient.RemoteApi.getConfigListing(childRecipesPath)));
 
         String childCommandsPath = getPath(childRecipesPath, NEW_RECIPE_NAME, Constants.Project.MultiRecipeType.Recipe.COMMANDS);
-        assertEquals(asList(NEW_COMMAND_NAME), new LinkedList<String>(xmlRpcHelper.getConfigListing(childCommandsPath)));
+        assertEquals(asList(NEW_COMMAND_NAME), new LinkedList<String>(rpcClient.RemoteApi.getConfigListing(childCommandsPath)));
         
         getBrowser().openAndWaitFor(CompositePage.class, getPath(childCommandsPath, NEW_COMMAND_NAME));
         AntCommandForm form = getBrowser().createForm(AntCommandForm.class);
@@ -588,7 +588,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
@@ -602,8 +602,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         hierarchyPage.waitFor();
 
         String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
-        Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(projectTypePath);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingMultiRecipeProject() throws Exception
@@ -611,7 +611,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String parent = random + "-parent";
         String child = random + "-child";
         
-        xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getMultiRecipeTypeConfig());
+        rpcClient.RemoteApi.insertProject(parent, GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), rpcClient.RemoteApi.getMultiRecipeTypeConfig());
 
         getBrowser().loginAsAdmin();
 
@@ -630,8 +630,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         childHierarchyPage.waitFor();
 
         String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
-        Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(childTypePath);
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     public void testCustomProject() throws Exception
@@ -640,7 +640,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
 
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
@@ -660,8 +660,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         hierarchyPage.waitFor();
 
         String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
-        Hashtable<String, Object> type = xmlRpcHelper.getConfig(projectTypePath);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(projectTypePath);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingCustomProject() throws Exception
@@ -670,7 +670,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String child = random + "-child";
 
         String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
-        xmlRpcHelper.insertProject(parent, GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.getCustomTypeConfig(pulseFileString));
+        rpcClient.RemoteApi.insertProject(parent, GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), rpcClient.RemoteApi.getCustomTypeConfig(pulseFileString));
 
         getBrowser().loginAsAdmin();
 
@@ -693,15 +693,15 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         childHierarchyPage.waitFor();
 
         String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
-        Hashtable<String, Object> type = xmlRpcHelper.getConfig(childTypePath);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(XmlRpcHelper.SYMBOLIC_NAME_KEY));
+        Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(childTypePath);
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingScrubRequired() throws Exception
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        xmlRpcHelper.insertSimpleProject(parentName, true);
+        rpcClient.RemoteApi.insertSimpleProject(parentName, true);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, parentName, true);
@@ -719,7 +719,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     public void testDefaultProjectConfigCreated()
     {
         getBrowser().loginAsAdmin();
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(random);
 
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "stages"));
@@ -735,7 +735,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String childName = random + "-child";
 
         getBrowser().loginAsAdmin();
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(parentName, true, GLOBAL_PROJECT_NAME);
         
         addInheritingProject(parentName, childName);
@@ -815,7 +815,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testValidationOnSave() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -834,7 +834,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testTemplateValidationOnSave() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, true);
+        rpcClient.RemoteApi.insertSimpleProject(random, true);
 
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, true);
@@ -895,7 +895,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testInstanceErrorsDisplayed() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(CompositePage.class, projectPath);
         assertTrue(getBrowser().isTextPresent("An SCM must be configured to complete this project."));
@@ -929,15 +929,15 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     public void testComboListing() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
         checkListedRecipes("", "default");
     }
 
     public void testComboInvalidVersionedProject() throws Exception
     {
-        Hashtable<String, Object> versionedType = xmlRpcHelper.createDefaultConfig(VersionedTypeConfiguration.class);
+        Hashtable<String, Object> versionedType = rpcClient.RemoteApi.createDefaultConfig(VersionedTypeConfiguration.class);
         versionedType.put(Constants.Project.VersionedType.PULSE_FILE_NAME, "invalid.xml");
-        xmlRpcHelper.insertProject(random, GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
+        rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
 
         checkListedRecipes("");
     }
@@ -948,7 +948,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String punctuatedName = ".;.,." + random;
 
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(punctuatedName);
 
         // Check the hierarchy, config and such.
@@ -966,9 +966,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String template = random + "-template";
         String concrete = random + "-concrete";
         
-        xmlRpcHelper.insertTrivialUser(user);
-        xmlRpcHelper.insertTrivialProject(template, true);
-        xmlRpcHelper.insertTrivialProject(concrete, false);
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.RemoteApi.insertTrivialProject(template, true);
+        rpcClient.RemoteApi.insertTrivialProject(concrete, false);
 
         getBrowser().loginAsAdmin();
 
@@ -997,8 +997,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String newTemplateParent = random + "-newtp";
         String toMove = random + "-tomove";
 
-        xmlRpcHelper.insertTrivialProject(newTemplateParent, true);
-        String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        rpcClient.RemoteApi.insertTrivialProject(newTemplateParent, true);
+        String toMovePath = rpcClient.RemoteApi.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         getBrowser().loginAsAdmin();
 
@@ -1011,7 +1011,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         
         hierarchyPage.waitFor();
         assertTrue(hierarchyPage.isTreeItemPresent(toMove));
-        assertEquals(newTemplateParent, xmlRpcHelper.getTemplateParent(toMovePath));
+        assertEquals(newTemplateParent, rpcClient.RemoteApi.getTemplateParent(toMovePath));
     }
 
     public void testMoveWithConfirmation() throws Exception
@@ -1020,8 +1020,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String newTemplateParent = random + "-newtp";
         String toMove = random + "-tomove";
 
-        xmlRpcHelper.insertProject(newTemplateParent, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), xmlRpcHelper.createVersionedConfig("path"));
-        String toMovePath = xmlRpcHelper.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        rpcClient.RemoteApi.insertProject(newTemplateParent, ProjectManager.GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("path"));
+        String toMovePath = rpcClient.RemoteApi.insertSimpleProject(toMove, ProjectManager.GLOBAL_PROJECT_NAME, false);
 
         getBrowser().loginAsAdmin();
 
@@ -1039,7 +1039,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         
         hierarchyPage.waitFor();
         assertTrue(hierarchyPage.isTreeItemPresent(toMove));
-        assertEquals(newTemplateParent, xmlRpcHelper.getTemplateParent(toMovePath));
+        assertEquals(newTemplateParent, rpcClient.RemoteApi.getTemplateParent(toMovePath));
     }
     
     public void testTemplateNavigation() throws Exception
@@ -1049,8 +1049,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String templateName = random + "-template";
         String concreteName = random + "-concrete";
 
-        xmlRpcHelper.insertTrivialProject(templateName, true);
-        xmlRpcHelper.insertSimpleProject(concreteName, templateName, false);
+        rpcClient.RemoteApi.insertTrivialProject(templateName, true);
+        rpcClient.RemoteApi.insertSimpleProject(concreteName, templateName, false);
 
         getBrowser().loginAsAdmin();
 
@@ -1084,9 +1084,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         final String FIELD_PASSWORD = "password";
 
-        Hashtable<String, Object> p4Config = PerforceUtils.createSpecConfig(xmlRpcHelper);
+        Hashtable<String, Object> p4Config = PerforceUtils.createSpecConfig(rpcClient.RemoteApi);
         String projectName = random;
-        xmlRpcHelper.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, xmlRpcHelper.getAntConfig());
+        rpcClient.RemoteApi.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, p4Config, rpcClient.RemoteApi.getAntConfig());
         
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(projectName)) + "scm/");
@@ -1138,9 +1138,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     private void insertProperty(String projectPath, String name) throws Exception
     {
-        Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourcePropertyConfiguration.class);
+        Hashtable<String, Object> property = rpcClient.RemoteApi.createEmptyConfig(ResourcePropertyConfiguration.class);
         property.put("name", name);
-        xmlRpcHelper.insertConfig(getPropertiesPath(projectPath), property);
+        rpcClient.RemoteApi.insertConfig(getPropertiesPath(projectPath), property);
     }
 
     private String getPropertiesPath(String projectPath)
@@ -1150,7 +1150,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
     protected String getNewestListItem(String labelsPath) throws Exception
     {
-        Vector<String> labels = xmlRpcHelper.call("getConfigListing", labelsPath);
+        Vector<String> labels = rpcClient.RemoteApi.call("getConfigListing", labelsPath);
         Collections.sort(labels, new Comparator<String>()
         {
             public int compare(String o1, String o2)

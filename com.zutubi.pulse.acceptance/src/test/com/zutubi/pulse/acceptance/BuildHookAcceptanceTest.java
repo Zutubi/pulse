@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -26,8 +27,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -53,15 +52,15 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         tempDir = FileSystemUtils.createTempDir(BuildHookAcceptanceTest.class.getName(), "");
         dumpEnv = copyInputToDirectory("dumpenv", "jar", tempDir);
 
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.ensureProject(PROJECT_NAME);
-        xmlRpcHelper.deleteAllConfigs(PathUtils.getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
         getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         removeDirectory(tempDir);
         super.tearDown();
     }
@@ -76,7 +75,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         addDumpEnvTask("${project} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "${status}");
     }
 
@@ -85,7 +84,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         postBuildHelper();
         addDumpEnvTask("${project} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "success");
     }
 
@@ -94,7 +93,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         postBuildHelper();
         addDumpEnvTask("${build.dir}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
 
         // The build directory contains the build log.
@@ -104,8 +103,8 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     public void testPostBuildHookCanAccessProjectProperty() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
-        xmlRpcHelper.insertProjectProperty(random, "some.property", "some.value");
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
 
         chooseHookType(random, "zutubi.postBuildHookConfig");
 
@@ -116,16 +115,16 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         selectFromAllTasks();
         addDumpEnvTask(random, "${project} ${some.property}");
 
-        xmlRpcHelper.runBuild(random);
+        rpcClient.RemoteApi.runBuild(random);
         assertArgs(random, "some.value");
     }
 
     public void testPostBuildHookCanAccessTriggerProperty() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         // Also add the property to the project - we want to make sure it is
         // overridden by the value passed on trigger.
-        xmlRpcHelper.insertProjectProperty(random, "some.property", "some.value");
+        rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
 
         chooseHookType(random, "zutubi.postBuildHookConfig");
 
@@ -138,9 +137,9 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("some.property", "trigger.value");
-        int number = xmlRpcHelper.getNextBuildNumber(random);
-        xmlRpcHelper.triggerBuild(random, "", properties);
-        xmlRpcHelper.waitForBuildToComplete(random, number);
+        int number = rpcClient.RemoteApi.getNextBuildNumber(random);
+        rpcClient.RemoteApi.triggerBuild(random, "", properties);
+        rpcClient.RemoteApi.waitForBuildToComplete(random, number);
         assertArgs("trigger.value");
     }
 
@@ -149,7 +148,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         postStageHelper();
         addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
     }
 
@@ -158,7 +157,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         postStageHelper();
         addDumpEnvTask("${stage.dir}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
 
         // The stage directory contains the recipe log.
@@ -171,14 +170,14 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         manualHookHelper();
 
         CompositePage hookPage = addDumpEnvTask("${build.number} ${project} ${status}");
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         triggerHookAndWait(hookPage, buildNumber);
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
     }
 
     public void testManuallyTriggerPreBuildHook() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         chooseHookType("zutubi.preBuildHookConfig");
 
@@ -193,7 +192,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     public void testManualTriggerNotAvailableWhenDisabled() throws Exception
     {
-        long buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        long buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         chooseHookType("zutubi.preBuildHookConfig");
 
@@ -210,7 +209,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     public void testManuallyTriggerPostStageHook() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         postStageHelper();
         CompositePage hookPage = addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
@@ -232,8 +231,8 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         taskForm.finishFormElements("nosuchexe", null, tempDir.getAbsolutePath(), null, null);
 
         waitForHook(PROJECT_NAME);
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
-        assertEquals(ResultState.ERROR, xmlRpcHelper.getBuildStatus(PROJECT_NAME, buildNumber));
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        assertEquals(ResultState.ERROR, rpcClient.RemoteApi.getBuildStatus(PROJECT_NAME, buildNumber));
     }
 
     public void testRestrictToStates() throws Exception
@@ -247,7 +246,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         selectFromAllTasks();
         addDumpEnvTask("${project}");
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
@@ -258,13 +257,13 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookPage.clickActionAndWait("disable");
         assertEquals("disabled", hookPage.getStateField("state"));
 
-        xmlRpcHelper.runBuild(PROJECT_NAME);
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
     public void testTriggerFromBuildPage() throws Exception
     {
-        long buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        long buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         manualHookHelper();
         addDumpEnvTask("${build.number} ${project} ${status}");
@@ -280,7 +279,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     public void testManualTriggerOutput() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         manualHookHelper();
         File hello = copyInputToDirectory("hello", "jar", tempDir);
@@ -292,7 +291,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     public void testManualTriggerPostStageOutput() throws Exception
     {
-        int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME);
+        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         postStageHelper();
         File hello = copyInputToDirectory("hello", "jar", tempDir);

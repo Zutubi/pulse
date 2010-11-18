@@ -17,13 +17,13 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -35,9 +35,9 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
         {
             public String call() throws Exception
             {
-                return xmlRpcHelper.insertProject(randomName(), ProjectManager.GLOBAL_PROJECT_NAME, false,
-                        xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
-                        xmlRpcHelper.getCustomTypeConfig(pulseFileString));
+                return rpcClient.RemoteApi.insertProject(randomName(), ProjectManager.GLOBAL_PROJECT_NAME, false,
+                        rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
+                        rpcClient.RemoteApi.getCustomTypeConfig(pulseFileString));
             }
         }, 4, TimeUnit.SECONDS, null);
         
@@ -52,9 +52,9 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            xmlRpcHelper.insertProject(randomName(), ProjectManager.GLOBAL_PROJECT_NAME, false,
-                    xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
-                    xmlRpcHelper.getCustomTypeConfig(invalidFragment));
+            rpcClient.RemoteApi.insertProject(randomName(), ProjectManager.GLOBAL_PROJECT_NAME, false,
+                    rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
+                    rpcClient.RemoteApi.getCustomTypeConfig(invalidFragment));
             fail("Invalid Pulse file did not generate an exception on project insert.");
         }
         catch (XmlRpcException e)

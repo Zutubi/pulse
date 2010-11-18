@@ -11,12 +11,6 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 
 /**
  * Acceptance tests for the build navigation portion of the breadcrumbs.
@@ -39,15 +33,15 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        buildRunner = new BuildRunner(xmlRpcHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
         users = new UserConfigurations();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         toolbar = new PulseToolbar(getBrowser());
     }
@@ -56,7 +50,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
     protected void tearDown() throws Exception
     {
         getBrowser().logout();
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
@@ -196,10 +190,10 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertUser(user);
 
         // user needs 'run personal build' permissions.
-        ensureUserCanRunPersonalBuild(userName);
+        rpcClient.RemoteApi.ensureUserCanRunPersonalBuild(userName);
 
         assertTrue(getBrowser().login(userName, ""));
-        xmlRpcHelper.login(userName, "");
+        rpcClient.login(userName, "");
 
         File workingCopy = createTempDirectory();
         SubversionWorkspace workspace = new SubversionWorkspace(workingCopy, "pulse", "pulse");
@@ -210,7 +204,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         FileSystemUtils.createFile(newFile, "new file");
         workspace.doAdd(newFile);
 
-        PersonalBuildRunner buildRunner = new PersonalBuildRunner(xmlRpcHelper);
+        PersonalBuildRunner buildRunner = new PersonalBuildRunner(rpcClient.RemoteApi);
         buildRunner.setBase(workingCopy);
         buildRunner.createConfigFile(baseUrl, userName, "", projectName);
 
@@ -308,19 +302,5 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         toolbar.clickOnNavMenu();
         assertTrue(toolbar.isNextSuccessfulBuildLinkPresent());
         assertTrue(toolbar.isPreviousSuccessfulBuildLinkPresent());
-    }
-
-    private void ensureUserCanRunPersonalBuild(String userName) throws Exception
-    {
-        String groupPath = GROUPS_SCOPE + "/" + DEVELOPERS_GROUP_NAME;
-        Hashtable group = xmlRpcHelper.getConfig(groupPath);
-        Vector members = (Vector) group.get("members");
-
-        String userReference = USERS_SCOPE + "/" + userName;
-        if (!members.contains(userReference))
-        {
-            members.add(userReference);
-            xmlRpcHelper.saveConfig(groupPath, group, false);
-        }
     }
 }

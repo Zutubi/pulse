@@ -1,11 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -14,6 +16,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -25,20 +28,16 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
+import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -58,16 +57,16 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
         workingCopyDir = FileSystemUtils.createTempDir("PersonalBuildAcceptanceTest", "");
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
-        buildRunner = new PersonalBuildRunner(xmlRpcHelper);
+        buildRunner = new PersonalBuildRunner(rpcClient.RemoteApi);
         buildRunner.setBase(workingCopyDir);
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.cancelIncompleteBuilds();
-        xmlRpcHelper.logout();
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
         
         removeDirectory(workingCopyDir);
 
@@ -81,7 +80,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(PROJECT_NAME);
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
@@ -100,7 +99,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     private void verifyPersonalBuildArtifacts(long buildNumber) throws Exception
     {
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInPersonalBuild((int) buildNumber);
+        Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInPersonalBuild((int) buildNumber);
         assertEquals(3, artifacts.size());
 
         Hashtable<String, Object> outputArtifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
@@ -114,7 +113,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         assertNotNull(outputArtifact);
         assertEquals("/dashboard/my/" + buildNumber + "/downloads/default/build/command%20output/", outputArtifact.get("permalink"));
 
-        Vector<String> listing = xmlRpcHelper.getArtifactFileListingPersonal((int) buildNumber, "default", "build", "command output", "");
+        Vector<String> listing = rpcClient.RemoteApi.getArtifactFileListingPersonal((int) buildNumber, "default", "build", "command output", "");
         assertEquals(1, listing.size());
         assertEquals("output.txt", listing.get(0));
     }
@@ -133,7 +132,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
             createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_PROXY_HOST, "localhost"), asPair(PersonalBuildConfig.PROPERTY_PROXY_PORT, PROXY_PORT));
 
             getBrowser().loginAsAdmin();
-            xmlRpcHelper.ensureProject(PROJECT_NAME);
+            rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
             editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
             long buildNumber = runPersonalBuild(ResultState.FAILURE);
             verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
@@ -151,7 +150,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(random);
         getBrowser().loginAsAdmin();
 
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
+        rpcClient.RemoteApi.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.VERSIONED_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
@@ -165,8 +164,8 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(PROJECT_NAME);
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureAgent(AGENT_NAME);
-        xmlRpcHelper.ensureProject(PROJECT_NAME);
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
+        rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         verifyPersonalBuildTabs(PROJECT_NAME, buildNumber, DEFAULT_ANT_BUILD_FILE);
@@ -174,7 +173,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     public void testPersonalBuildWithHooks() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
         String hooksPath = PathUtils.getPath(projectPath, "buildHooks");
 
         // Create two of each type of hook: one that runs for personal builds,
@@ -211,10 +210,10 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
     {
         final String HOOK_NAME = "manual-hook";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random);
-        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(ManualBuildHookConfiguration.class);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
+        Hashtable<String, Object> hook = rpcClient.RemoteApi.createEmptyConfig(ManualBuildHookConfiguration.class);
         hook.put("name", HOOK_NAME);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "buildHooks"), hook);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "buildHooks"), hook);
 
         // Now make a change and run a personal build.
         checkout(Constants.TRIVIAL_ANT_REPOSITORY);
@@ -240,7 +239,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING));
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
@@ -260,7 +259,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(PROJECT_NAME, asPair(PersonalBuildConfig.PROPERTY_REVISION, "1"), asPair(PersonalBuildConfig.PROPERTY_UPDATE, false));
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.ensureProject(PROJECT_NAME);
+        rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, PROJECT_NAME);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
 
@@ -271,7 +270,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
     public void testGitPersonalBuild() throws Exception
     {
         String gitUrl = Constants.getGitUrl();
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig(gitUrl), xmlRpcHelper.getAntConfig());
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(gitUrl), rpcClient.RemoteApi.getAntConfig());
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         removeDirectory(workingCopyDir);
@@ -287,7 +286,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
                 "</project>");
         runGit(workingCopyDir, "commit", "-a", "-m", "Make it fail");
         
-        xmlRpcHelper.waitForProjectToInitialise(random);
+        rpcClient.RemoteApi.waitForProjectToInitialise(random);
 
         getBrowser().loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
@@ -317,27 +316,27 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     public void testPerforcePersonalBuild() throws Exception
     {
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(xmlRpcHelper), xmlRpcHelper.getAntConfig());
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createSpecConfig(rpcClient.RemoteApi), rpcClient.RemoteApi.getAntConfig());
         runPerforcePersonalBuild(DEFAULT_ANT_BUILD_FILE, PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
     public void testPerforcePersonalBuildRemappedFile() throws Exception
     {
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/build.xml"));
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(rpcClient.RemoteApi, PerforceUtils.MAPPED_VIEW), rpcClient.RemoteApi.getAntConfig("mapped/build.xml"));
         runPerforcePersonalBuild(DEFAULT_ANT_BUILD_FILE, PerforceUtils.WORKSPACE_PREFIX + random, null);
     }
 
     public void testPerforcePersonalBuildComplexClientOnDeveloperSide() throws Exception
     {
         buildRunner.setBase(new File(workingCopyDir, "trunk"));
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.TRIVIAL_VIEW), xmlRpcHelper.getAntConfig(DEFAULT_ANT_BUILD_FILE));
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(rpcClient.RemoteApi, PerforceUtils.TRIVIAL_VIEW), rpcClient.RemoteApi.getAntConfig(DEFAULT_ANT_BUILD_FILE));
         String clientName = PerforceUtils.WORKSPACE_PREFIX + random;
         runPerforcePersonalBuild("trunk/build.xml", clientName, "//depot/triviant/trunk/... //" + clientName + "/trunk/...");
     }
 
     public void testPerforcePersonalAddedAndDeletedFiles() throws Exception
     {
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(xmlRpcHelper, PerforceUtils.MAPPED_VIEW), xmlRpcHelper.getAntConfig("mapped/newbuild.xml"));
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, PerforceUtils.createViewConfig(rpcClient.RemoteApi, PerforceUtils.MAPPED_VIEW), rpcClient.RemoteApi.getAntConfig("mapped/newbuild.xml"));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         PerforceCore core = PerforceUtils.createCore();
@@ -358,7 +357,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
             getBrowser().loginAsAdmin();
             long buildNumber = runPersonalBuild(ResultState.SUCCESS);
             // An unclean patch will raise warnings.
-            Hashtable<String, Object> build = xmlRpcHelper.getPersonalBuild((int) buildNumber);
+            Hashtable<String, Object> build = rpcClient.RemoteApi.getPersonalBuild((int) buildNumber);
             assertEquals(0, build.get("warningCount"));
         }
         finally
@@ -393,7 +392,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     public void testUnifiedPatch() throws Exception
     {
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
 
         File patchFile = copyInputToDirectory("txt", workingCopyDir);
         // Specify a revision and a patch file and no working copy should be
@@ -421,7 +420,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
 
-        xmlRpcHelper.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.VERSIONED_REPOSITORY), xmlRpcHelper.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
+        rpcClient.RemoteApi.insertProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.VERSIONED_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig(Constants.VERSIONED_PULSE_FILE));
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
@@ -433,10 +432,10 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {
-        Hashtable<String, Object> hook = xmlRpcHelper.createEmptyConfig(hookClass);
+        Hashtable<String, Object> hook = rpcClient.RemoteApi.createEmptyConfig(hookClass);
         hook.put("name", name);
         hook.put("runForPersonal", runForPersonal);
-        xmlRpcHelper.insertConfig(hooksPath, hook);
+        rpcClient.RemoteApi.insertConfig(hooksPath, hook);
         return hook;
     }
 
@@ -486,9 +485,9 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
     private void editStageToRunOnAgent(String agent, String projectName) throws Exception
     {
         String stagePath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
         stage.put("agent", PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
-        xmlRpcHelper.saveConfig(stagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, stage, false);
     }
 
     private long runPersonalBuild(ResultState expectedStatus) throws IOException, ClientException

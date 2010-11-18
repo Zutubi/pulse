@@ -6,8 +6,8 @@ public class ProjectLogAcceptanceTest extends AcceptanceTestBase
 {
     public void testProjectLogAvailable() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.insertSimpleProject(random);
 
         getBrowser().loginAsAdmin();
 
@@ -18,8 +18,8 @@ public class ProjectLogAcceptanceTest extends AcceptanceTestBase
 
     public void testProjectLogContent() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.insertSimpleProject(random);
 
         getBrowser().loginAsAdmin();
 

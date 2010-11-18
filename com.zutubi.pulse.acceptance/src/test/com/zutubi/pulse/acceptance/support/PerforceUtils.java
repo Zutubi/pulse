@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance.support;
 
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceConstants;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
@@ -27,13 +27,13 @@ public class PerforceUtils
      * Creates a perforce XML-RPC configuration using the triviant client as a
      * template.
      *
-     * @param xmlRpcHelper used to call the remote API
+     * @param remoteApi used to call the remote API
      * @return s perforce configuration based on the triviant client
      * @throws Exception on a remote API error
      */
-    public static Hashtable<String, Object> createSpecConfig(XmlRpcHelper xmlRpcHelper) throws Exception
+    public static Hashtable<String, Object> createSpecConfig(RemoteApiClient remoteApi) throws Exception
     {
-        Hashtable<String, Object> p4Config = createPerforceConfig(xmlRpcHelper);
+        Hashtable<String, Object> p4Config = createPerforceConfig(remoteApi);
         p4Config.put("spec", P4CLIENT);
         return p4Config;
     }
@@ -42,14 +42,14 @@ public class PerforceUtils
      * Creates a perforce XML-RPC configuration using the the given client
      * view.
      *
-     * @param xmlRpcHelper used to call the remote API
+     * @param remoteApi used to call the remote API
      * @param view         perforce client mapping as a single string
      * @return s perforce configuration based on the given view
      * @throws Exception on a remote API error
      */
-    public static Hashtable<String, Object> createViewConfig(XmlRpcHelper xmlRpcHelper, String view) throws Exception
+    public static Hashtable<String, Object> createViewConfig(RemoteApiClient remoteApi, String view) throws Exception
     {
-        Hashtable<String, Object> p4Config = createPerforceConfig(xmlRpcHelper);
+        Hashtable<String, Object> p4Config = createPerforceConfig(remoteApi);
         p4Config.put("useTemplateClient", false);
         p4Config.put("view", view);
         return p4Config;
@@ -59,13 +59,13 @@ public class PerforceUtils
      * Creates a perforce XML-RPC configuration with default values.  A client
      * or view needs to be added to make the configuration valid.
      *
-     * @param xmlRpcHelper used to call the remote API
+     * @param remoteApi used to call the remote API
      * @return a default perforce configuration
      * @throws Exception on a remote API error
      */
-    public static Hashtable<String, Object> createPerforceConfig(XmlRpcHelper xmlRpcHelper) throws Exception
+    public static Hashtable<String, Object> createPerforceConfig(RemoteApiClient remoteApi) throws Exception
     {
-        Hashtable<String, Object> p4Config = xmlRpcHelper.createDefaultConfig("zutubi.perforceConfig");
+        Hashtable<String, Object> p4Config = remoteApi.createDefaultConfig("zutubi.perforceConfig");
         p4Config.put("port", P4PORT);
         p4Config.put("user", P4USER);
         p4Config.put("password", P4PASSWD);

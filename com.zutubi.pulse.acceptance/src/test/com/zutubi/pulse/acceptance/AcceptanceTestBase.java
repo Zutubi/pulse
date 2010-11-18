@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.RandomUtils;
@@ -7,8 +9,6 @@ import com.zutubi.util.TimeStamps;
 import junit.framework.AssertionFailedError;
 
 import java.io.File;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 
 /**
  * The base class for all acceptance level tests.  It provides some useful
@@ -25,7 +25,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
      */
     public static final String AGENT_NAME = "localhost";
 
-    protected XmlRpcHelper xmlRpcHelper;
+    protected RpcClient rpcClient;
     protected String baseUrl;
 
     protected Urls urls;
@@ -39,7 +39,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
         super.setUp();
 
         baseUrl = getPulseUrl();
-        xmlRpcHelper = new XmlRpcHelper();
+        rpcClient = new RpcClient();
         random = randomName();
 
         browserFactory = new SingleSeleniumBrowserFactory();
@@ -51,9 +51,9 @@ public abstract class AcceptanceTestBase extends PulseTestCase
     protected void tearDown() throws Exception
     {
         browserFactory.cleanup();
-        if (xmlRpcHelper.isLoggedIn())
+        if (rpcClient.isLoggedIn())
         {
-            xmlRpcHelper.logout();
+            rpcClient.logout();
         }
         super.tearDown();
     }

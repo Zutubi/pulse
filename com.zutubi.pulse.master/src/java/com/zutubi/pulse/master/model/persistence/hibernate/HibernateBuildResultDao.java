@@ -127,6 +127,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public List<BuildResult> findCompletedSince(final Project[] projects, final long sinceTime)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Restrictions.isNull("user"));
+                addProjectsToCriteria(projects, criteria);
+                criteria.add(Restrictions.gt("stamps.endTime", sinceTime));
+                criteria.addOrder(Order.desc("id"));
+                return criteria.list();
+            }
+        });
+    }
+
     public List<BuildResult> findLatestByProject(final Project project, final ResultState[] states, final int first, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()

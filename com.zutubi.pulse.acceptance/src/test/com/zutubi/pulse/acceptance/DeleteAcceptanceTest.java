@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.*;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
@@ -14,19 +15,17 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
+import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
+import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
+import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
-
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
-import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
-import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
-import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
@@ -42,18 +41,18 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testDeleteListItem() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         String labelPath = insertLabel(projectPath);
 
         getBrowser().loginAsAdmin();
@@ -71,7 +70,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     public void testCancelDelete() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         String labelPath = insertLabel(projectPath);
 
         getBrowser().loginAsAdmin();
@@ -88,7 +87,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     public void testCancelDeleteProject() throws Exception
     {
-        xmlRpcHelper.insertTrivialProject(random, false);
+        rpcClient.RemoteApi.insertTrivialProject(random, false);
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -101,7 +100,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     {
         // Set up the project to build on the master agent, using a custom
         // persistent work directory.
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         File buildDirectory = runBuildInPersistentWorkDirectory();
         
         getBrowser().loginAsAdmin();
@@ -122,17 +121,17 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     public void testDeleteStage() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         File buildDirectory = runBuildInPersistentWorkDirectory();
 
-        xmlRpcHelper.deleteConfig(getPath(projectPath, Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE));
+        rpcClient.RemoteApi.deleteConfig(getPath(projectPath, Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE));
 
         waitForDirectoryToBeCleaned(buildDirectory);
     }
 
     public void testEditPersistentWorkDirPattern() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
         File buildDirectory = runBuildInPersistentWorkDirectory();
 
         setCustomPersistentDir("$(agent.data.dir)/work/$(project.handle)/$(stage)");
@@ -149,7 +148,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         setCustomPersistentDir("$(agent.data.dir)/work/$(project)/$(stage)");
 
         // Run a build, make sure the directory we expect appeared.
-        xmlRpcHelper.runBuild(random, XmlRpcHelper.BUILD_TIMEOUT);
+        rpcClient.RemoteApi.runBuild(random, rpcClient.RemoteApi.BUILD_TIMEOUT);
 
         File agentsDir = new File(AcceptanceTestUtils.getDataDirectory(), "agents");
         final File buildDirectory = new File(agentsDir, FileSystemUtils.composeFilename(getMasterAgentId(agentsDir), "work", random, ProjectConfigurationWizard.DEFAULT_STAGE));
@@ -160,26 +159,26 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     private void setIncrementalUpdate() throws Exception
     {
         String scmPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.SCM);
-        Hashtable<String, Object> scm = xmlRpcHelper.getConfig(scmPath);
+        Hashtable<String, Object> scm = rpcClient.RemoteApi.getConfig(scmPath);
         scm.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.name());
-        xmlRpcHelper.saveConfig(scmPath, scm, false);
-        xmlRpcHelper.waitForProjectToInitialise(random);
+        rpcClient.RemoteApi.saveConfig(scmPath, scm, false);
+        rpcClient.RemoteApi.waitForProjectToInitialise(random);
     }
 
     private void setMasterAgent() throws Exception
     {
         String stagePath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.STAGES, ProjectConfigurationWizard.DEFAULT_STAGE);
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
         stage.put(Constants.Project.Stage.AGENT, getPath(MasterConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
-        xmlRpcHelper.saveConfig(stagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, stage, false);
     }
 
     private void setCustomPersistentDir(String pattern) throws Exception
     {
         String optionsPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = xmlRpcHelper.getConfig(optionsPath);
+        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
         options.put("persistentWorkDir", pattern);
-        xmlRpcHelper.saveConfig(optionsPath, options, false);
+        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
     }
 
     private String getMasterAgentId(File agentsDir)
@@ -211,8 +210,8 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     {
         String refererName = random + "-er";
         String refereeName = random + "-ee";
-        String refererPath = xmlRpcHelper.insertTrivialProject(refererName, false);
-        String refereePath = xmlRpcHelper.insertTrivialProject(refereeName, false);
+        String refererPath = rpcClient.RemoteApi.insertTrivialProject(refererName, false);
+        String refereePath = rpcClient.RemoteApi.insertTrivialProject(refereeName, false);
 
         String triggerPath = insertBuildCompletedTrigger(refereePath, refererPath);
 
@@ -236,21 +235,21 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     {
         // We need a user that is part of a group we can assign privileges to
         String authLogin = "u1:" + random;
-        String authPath = xmlRpcHelper.insertTrivialUser(authLogin);
+        String authPath = rpcClient.RemoteApi.insertTrivialUser(authLogin);
 
         String noAuthLogin = "u2:" + random;
-        String noAuthPath = xmlRpcHelper.insertTrivialUser(noAuthLogin);
+        String noAuthPath = rpcClient.RemoteApi.insertTrivialUser(noAuthLogin);
 
         String groupName = "group:" + random;
-        xmlRpcHelper.insertGroup(groupName, Arrays.asList(authPath, noAuthPath), ServerPermission.DELETE_PROJECT.toString());
+        rpcClient.RemoteApi.insertGroup(groupName, Arrays.asList(authPath, noAuthPath), ServerPermission.DELETE_PROJECT.toString());
 
-        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
 
         String dashboardPath = getPath(authPath, "preferences", "dashboard");
-        Hashtable<String, Object> dashboard = xmlRpcHelper.getConfig(dashboardPath);
+        Hashtable<String, Object> dashboard = rpcClient.RemoteApi.getConfig(dashboardPath);
         dashboard.put("showAllProjects", false);
         dashboard.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
-        xmlRpcHelper.saveConfig(dashboardPath, dashboard, false);
+        rpcClient.RemoteApi.saveConfig(dashboardPath, dashboard, false);
 
         assertTrue(getBrowser().login(authLogin, ""));
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
@@ -273,12 +272,12 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage globalPage = getBrowser().createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         globalPage.waitFor();
 
-        dashboard = xmlRpcHelper.getConfig(dashboardPath);
+        dashboard = rpcClient.RemoteApi.getConfig(dashboardPath);
         assertEquals(0, ((Vector) dashboard.get("shownProjects")).size());
 
         // Make sure that it is not missing just because the reference is now
         // broken
-        assertTrue(xmlRpcHelper.isConfigValid(dashboardPath));
+        assertTrue(rpcClient.RemoteApi.isConfigValid(dashboardPath));
     }
 
     public void testDeleteAgent() throws Exception
@@ -293,7 +292,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private void deleteAgentHelper(String name) throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleAgent(name, random);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(name, random);
         getBrowser().loginAsAdmin();
         AgentHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(AgentHierarchyPage.class, name, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -303,21 +302,21 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().waitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
 
-        assertFalse(xmlRpcHelper.configPathExists(path));
+        assertFalse(rpcClient.RemoteApi.configPathExists(path));
     }
 
     public void testDeleteAgentWithBuildStageReference() throws Exception
     {
         String agentName = "agent-" + random;
-        String agentPath = xmlRpcHelper.insertSimpleAgent(agentName);
+        String agentPath = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         String projectName = "project-" + random;
-        String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName, false);
 
-        Hashtable<String, Object> stage = xmlRpcHelper.createEmptyConfig(BuildStageConfiguration.class);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.createEmptyConfig(BuildStageConfiguration.class);
         stage.put("name", "agent");
         stage.put("agent", agentPath);
         stage.put("recipe", "");
-        String stagePath = xmlRpcHelper.insertConfig(getPath(projectPath, "stages"), stage);
+        String stagePath = rpcClient.RemoteApi.insertConfig(getPath(projectPath, "stages"), stage);
 
         getBrowser().loginAsAdmin();
         AgentHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(AgentHierarchyPage.class, agentName, false);
@@ -328,16 +327,16 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         AgentHierarchyPage globalPage = getBrowser().createPage(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
         globalPage.waitFor();
-        assertFalse(xmlRpcHelper.configPathExists(agentPath));
+        assertFalse(rpcClient.RemoteApi.configPathExists(agentPath));
 
-        assertTrue(xmlRpcHelper.isConfigValid(stagePath));
-        stage = xmlRpcHelper.getConfig(stagePath);
+        assertTrue(rpcClient.RemoteApi.isConfigValid(stagePath));
+        stage = rpcClient.RemoteApi.getConfig(stagePath);
         assertNull(stage.get("agent"));
     }
 
     public void testDeleteUser() throws Exception
     {
-        String path = xmlRpcHelper.insertTrivialUser(random);
+        String path = rpcClient.RemoteApi.insertTrivialUser(random);
         getBrowser().loginAsAdmin();
 
         ListPage usersPage = getBrowser().openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
@@ -356,7 +355,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         String templateProjectName = random + "-parent";
         setupTemplateProjectWithDefaultCleanup(templateProjectName);
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, templateProjectName, false);
 
         getBrowser().loginAsAdmin();
         String cleanupsPath = getPath(projectPath, "cleanup");
@@ -383,7 +382,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         String templateProjectName = random + "-parent";
         setupTemplateProjectWithDefaultCleanup(templateProjectName);
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, templateProjectName, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, templateProjectName, false);
 
         getBrowser().loginAsAdmin();
         String cleanupsPath = getPath(projectPath, "cleanup");
@@ -401,9 +400,9 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private void setupTemplateProjectWithDefaultCleanup(String name) throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(name, true);
+        rpcClient.RemoteApi.insertSimpleProject(name, true);
 
-        CleanupTestUtils cleanupUtils = new CleanupTestUtils(xmlRpcHelper);
+        CleanupTestUtils cleanupUtils = new CleanupTestUtils(rpcClient.RemoteApi);
         cleanupUtils.addCleanupRule(name, "default");
     }
 
@@ -415,10 +414,10 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         setupTemplateProjectWithDefaultCleanup(grandParentName);
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, grandParentName, true);
         String parentCleanupsPath = getPath(parentPath, "cleanup");
         String parentCleanupPath = getPath(parentCleanupsPath, "default");
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
         String childCleanupPath = getPath(childPath, "cleanup", "default");
 
         getBrowser().loginAsAdmin();
@@ -434,7 +433,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         cleanupsPage.waitFor();
         assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
-        assertFalse(xmlRpcHelper.configPathExists(childCleanupPath));
+        assertFalse(rpcClient.RemoteApi.configPathExists(childCleanupPath));
     }
 
     public void testHideMapItemWithDescendantOverride() throws Exception
@@ -445,14 +444,14 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         setupTemplateProjectWithDefaultCleanup(grandParentName);
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, grandParentName, true);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, grandParentName, true);
         String parentCleanupsPath = getPath(parentPath, "cleanup");
         String parentCleanupPath = getPath(parentCleanupsPath, "default");
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
         String childCleanupPath = getPath(childPath, "cleanup", "default");
-        Hashtable<String, Object> childCleanup = xmlRpcHelper.getConfig(childCleanupPath);
+        Hashtable<String, Object> childCleanup = rpcClient.RemoteApi.getConfig(childCleanupPath);
         childCleanup.put("retain", 928);
-        xmlRpcHelper.saveConfig(childCleanupPath, childCleanup, false);
+        rpcClient.RemoteApi.saveConfig(childCleanupPath, childCleanup, false);
 
         getBrowser().loginAsAdmin();
 
@@ -467,7 +466,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         cleanupsPage.waitFor();
         assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
-        assertFalse(xmlRpcHelper.configPathExists(childCleanupPath));
+        assertFalse(rpcClient.RemoteApi.configPathExists(childCleanupPath));
     }
 
     public void testRestoreMapItem() throws Exception
@@ -476,10 +475,10 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         setupTemplateProjectWithDefaultCleanup(parentName);
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, parentName, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, parentName, false);
         String cleanupsPath = getPath(projectPath, "cleanup");
         String cleanupPath = getPath(cleanupsPath, "default");
-        xmlRpcHelper.deleteConfig(cleanupPath);
+        rpcClient.RemoteApi.deleteConfig(cleanupPath);
 
         getBrowser().loginAsAdmin();
 
@@ -500,14 +499,14 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
 
         String parentReqsPath = getPath(parentPath, "requirements");
         String childReqsPath = getPath(childPath, "requirements");
-        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
+        Hashtable<String, Object> req = rpcClient.RemoteApi.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
-        String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
+        String parentReqPath = rpcClient.RemoteApi.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);
         String childReqPath = getPath(childReqsPath, baseName);
 
@@ -522,7 +521,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         reqsPage.waitFor();
         assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_HIDDEN, ACTION_RESTORE));
-        assertFalse(xmlRpcHelper.configPathExists(childReqPath));
+        assertFalse(rpcClient.RemoteApi.configPathExists(childReqPath));
     }
 
     public void testRestoreListItem() throws Exception
@@ -530,17 +529,17 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, true);
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
 
         String parentReqsPath = getPath(parentPath, "requirements");
         String childReqsPath = getPath(childPath, "requirements");
-        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirementConfiguration.class);
+        Hashtable<String, Object> req = rpcClient.RemoteApi.createEmptyConfig(ResourceRequirementConfiguration.class);
         req.put("resource", "foo");
-        String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
+        String parentReqPath = rpcClient.RemoteApi.insertConfig(parentReqsPath, req);
         String baseName = PathUtils.getBaseName(parentReqPath);
         String childReqPath = getPath(childReqsPath, baseName);
-        xmlRpcHelper.deleteConfig(childReqPath);
+        rpcClient.RemoteApi.deleteConfig(childReqPath);
 
         getBrowser().loginAsAdmin();
 
@@ -550,12 +549,12 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         reqsPage.waitFor();
         assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE));
-        assertTrue(xmlRpcHelper.configPathExists(childReqPath));
+        assertTrue(rpcClient.RemoteApi.configPathExists(childReqPath));
     }
 
     public void testDeleteSingleton() throws Exception
     {
-        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
 
         getBrowser().loginAsAdmin();
         String path = getPath(projectPath, "scm");
@@ -571,17 +570,17 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private String insertBuildCompletedTrigger(String refereePath, String refererPath) throws Exception
     {
-        Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
+        Hashtable<String, Object> trigger = rpcClient.RemoteApi.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
         trigger.put("name", "test");
         trigger.put("project", refereePath);
-        return xmlRpcHelper.insertConfig(getPath(refererPath, "triggers"), trigger);
+        return rpcClient.RemoteApi.insertConfig(getPath(refererPath, "triggers"), trigger);
     }
 
     private String insertLabel(String projectPath) throws Exception
     {
-        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        Hashtable<String, Object> label = rpcClient.RemoteApi.createEmptyConfig(LabelConfiguration.class);
         label.put("label", "test");
-        return xmlRpcHelper.insertConfig(getPath(projectPath, "labels"), label);
+        return rpcClient.RemoteApi.insertConfig(getPath(projectPath, "labels"), label);
     }
 
     public void assertTasks(DeleteConfirmPage page, String... pathActionPairs)

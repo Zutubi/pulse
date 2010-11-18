@@ -1,10 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import com.zutubi.pulse.acceptance.forms.admin.CleanupForm;
 import com.zutubi.pulse.acceptance.pages.admin.CleanupRulesPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-
-import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
@@ -17,20 +16,20 @@ public class CleanupUIAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-         xmlRpcHelper.loginAsAdmin();
+         rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
 
         super.tearDown();
     }
 
     public void testCreateNewCleanupRule() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
 
         getBrowser().loginAsAdmin();
 

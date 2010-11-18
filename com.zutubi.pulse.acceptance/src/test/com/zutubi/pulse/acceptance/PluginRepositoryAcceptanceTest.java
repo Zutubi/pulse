@@ -23,13 +23,13 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
         repository = new HttpPluginRepository(baseUrl + "/pluginrepository/");
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -63,7 +63,7 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
             String random = RandomUtils.randomString(10);
             String id = AcceptanceTestUtils.PLUGIN_ID_TEST + "." + random;
             File pluginJar = AcceptanceTestUtils.createTestPlugin(tmpDir, id, getName() + "-" + random);
-            xmlRpcHelper.installPlugin(pluginJar.getAbsolutePath());
+            rpcClient.TestApi.installPlugin(pluginJar.getAbsolutePath());
             
             File downloadedJar = downloadPlugin(tmpDir, id, "2.0.0");
             IOAssertions.assertFilesEqual(pluginJar, downloadedJar);

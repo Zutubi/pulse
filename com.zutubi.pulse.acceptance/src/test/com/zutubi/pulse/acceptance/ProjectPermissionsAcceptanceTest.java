@@ -5,11 +5,10 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-
-import java.util.Vector;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
+
+import java.util.Vector;
 
 /**
  * Acceptance tests for project ACLs
@@ -19,21 +18,21 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testVisibilityOfGroups() throws Exception
     {
-        xmlRpcHelper.insertTrivialUser(random);
+        rpcClient.RemoteApi.insertTrivialUser(random);
 
         String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
-        Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
+        Vector<String> permissions = rpcClient.RemoteApi.getConfigListing(permissionsPath);
 
         assertTrue(getBrowser().login(random, ""));
         ListPage permissionsPage = getBrowser().openAndWaitFor(ListPage.class, permissionsPath);
@@ -50,7 +49,7 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
     public void testPermissionLabels() throws Exception
     {
         String permissionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
-        Vector<String> permissions = xmlRpcHelper.getConfigListing(permissionsPath);
+        Vector<String> permissions = rpcClient.RemoteApi.getConfigListing(permissionsPath);
 
         getBrowser().loginAsAdmin();
         ListPage permissionsPage = getBrowser().openAndWaitFor(ListPage.class, permissionsPath);

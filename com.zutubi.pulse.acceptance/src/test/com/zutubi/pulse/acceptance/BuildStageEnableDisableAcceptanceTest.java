@@ -2,14 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 
 public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
@@ -23,11 +22,11 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         projects = new ProjectConfigurations(configurationHelper);
-        buildRunner = new BuildRunner(xmlRpcHelper);
-        xmlRpcHelper.loginAsAdmin();
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
+        rpcClient.loginAsAdmin();
     }
 
     // base line test.
@@ -41,12 +40,12 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
         assertStageState(build, "stage1", SUCCESS);
         assertStageState(build, "stage2", SUCCESS);
         assertStageState(build, DEFAULT_STAGE, SUCCESS);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableStage() throws Exception
@@ -58,11 +57,11 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
         assertStageState(build, "disabled", SKIPPED);
         assertStageState(build, DEFAULT_STAGE, SUCCESS);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableStageInFailingBuild() throws Exception
@@ -73,11 +72,11 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
         assertStageState(build, "disabled", SKIPPED);
         assertStageState(build, DEFAULT_STAGE, FAILURE);
 
-        assertEquals(FAILURE, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(FAILURE, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testDisableMultipleStages() throws Exception
@@ -89,11 +88,11 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
         assertStageState(build, "disabled", SKIPPED);
         assertStageState(build, DEFAULT_STAGE, SKIPPED);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
     }
 
     public void testToggleEnableDisable() throws Exception
@@ -102,18 +101,18 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));
         
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(project.getName(), 1);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
         assertStageState(build, DEFAULT_STAGE, SUCCESS);
 
         toggle(project.getName(), DEFAULT_STAGE);
 
         buildRunner.triggerAndWaitForBuild(project);
 
-        assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 2));
+        assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 2));
 
-        build = xmlRpcHelper.getBuild(project.getName(), 2);
+        build = rpcClient.RemoteApi.getBuild(project.getName(), 2);
         assertStageState(build, DEFAULT_STAGE, SKIPPED);
     }
 
@@ -121,9 +120,9 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
     {
         String stagePath = "projects/" + projectName + "/stages/" + stageName;
 
-        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
         stage.put("enabled", !(Boolean) stage.get("enabled"));
-        xmlRpcHelper.saveConfig(stagePath, stage, false);
+        rpcClient.RemoteApi.saveConfig(stagePath, stage, false);
     }
 
     private void assertStageState(Hashtable<String, Object> build, final String stageName, ResultState state)

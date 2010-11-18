@@ -5,12 +5,11 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
-
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Tests for the shared projects summary parts of the dashboard and browse
@@ -27,13 +26,13 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -54,12 +53,12 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
 
         File waitFile = new File(FileSystemUtils.getSystemTempDir(), childProject);
 
-        Hashtable<String, Object> svn = xmlRpcHelper.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
-        xmlRpcHelper.insertProject(templateProject, ProjectManager.GLOBAL_PROJECT_NAME, true, svn, null);
+        Hashtable<String, Object> svn = rpcClient.RemoteApi.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
+        rpcClient.RemoteApi.insertProject(templateProject, ProjectManager.GLOBAL_PROJECT_NAME, true, svn, null);
 
-        Hashtable<String,Object> antType = xmlRpcHelper.getAntConfig();
+        Hashtable<String,Object> antType = rpcClient.RemoteApi.getAntConfig();
         antType.put(Constants.Project.AntCommand.ARGUMENTS, getFileArgument(waitFile));
-        xmlRpcHelper.insertSingleCommandProject(childProject, templateProject, false, null, antType);
+        rpcClient.RemoteApi.insertSingleCommandProject(childProject, templateProject, false, null, antType);
 
         try
         {
@@ -73,7 +72,7 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
             assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
 
             FileSystemUtils.createFile(waitFile, "test");
-            xmlRpcHelper.waitForBuildToComplete(childProject, 1);
+            rpcClient.RemoteApi.waitForBuildToComplete(childProject, 1);
             getBrowser().refresh();
             getBrowser().waitForPageToLoad(30 * SECOND);
             assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
@@ -84,7 +83,7 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
             {
                 waitFile.deleteOnExit();
             }
-            xmlRpcHelper.cancelBuild(childProject, 1);
+            rpcClient.RemoteApi.cancelBuild(childProject, 1);
         }
     }
 
@@ -95,8 +94,8 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
 
     private void triggerAndWaitForBuildToCommence(String project) throws Exception
     {
-        xmlRpcHelper.triggerBuild(project);
-        xmlRpcHelper.waitForBuildInProgress(project, 1, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.triggerBuild(project);
+        rpcClient.RemoteApi.waitForBuildInProgress(project, 1, BUILD_TIMEOUT);
     }
 
     public void testInvalidProject() throws Exception
@@ -104,13 +103,13 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
         String template = random + "-template";
         String concrete = random + "-concrete";
 
-        String templatePath = xmlRpcHelper.insertSingleCommandProject(template, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
-        xmlRpcHelper.insertProject(concrete, template, false, null, null);
+        String templatePath = rpcClient.RemoteApi.insertSingleCommandProject(template, ProjectManager.GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
+        rpcClient.RemoteApi.insertProject(concrete, template, false, null, null);
 
         String svnPath = PathUtils.getPath(templatePath, Constants.Project.SCM);
-        Hashtable<String, Object> svn = xmlRpcHelper.getConfig(svnPath);
+        Hashtable<String, Object> svn = rpcClient.RemoteApi.getConfig(svnPath);
         svn.put("url", "");
-        xmlRpcHelper.saveConfig(svnPath, svn, false);
+        rpcClient.RemoteApi.saveConfig(svnPath, svn, false);
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);

@@ -4,14 +4,13 @@ import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -29,15 +28,15 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
         String user = RandomUtils.randomString(10);
-        userPath = xmlRpcHelper.insertTrivialUser(user);
+        userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         assertTrue(getBrowser().login(user, ""));
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -58,7 +57,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         String group = random + "-group";
         String project = random + "-project";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(project, false);
         addLabel(projectPath, group);
 
         DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
@@ -75,7 +74,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, false), asPair(SHOWN_GROUPS, asVector(group1)), asPair(SHOW_ALL_PROJECTS, true));
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(project, false);
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
@@ -95,7 +94,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(project, false);
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
@@ -118,8 +117,8 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         String project1 = random + "-project1";
         String project2 = random + "-project2";
 
-        String project1Path = xmlRpcHelper.insertSimpleProject(project1, false);
-        xmlRpcHelper.insertSimpleProject(project2, false);
+        String project1Path = rpcClient.RemoteApi.insertSimpleProject(project1, false);
+        rpcClient.RemoteApi.insertSimpleProject(project2, false);
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
 
@@ -135,8 +134,8 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
 
-        xmlRpcHelper.insertSimpleProject(project1, false);
-        xmlRpcHelper.insertSimpleProject(project2, false);
+        rpcClient.RemoteApi.insertSimpleProject(project1, false);
+        rpcClient.RemoteApi.insertSimpleProject(project2, false);
 
         DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
@@ -150,21 +149,21 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
 
     private void addLabel(String projectPath, String label) throws Exception
     {
-        Hashtable<String, Object> labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        Hashtable<String, Object> labelConfig = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);
         labelConfig.put("label", label);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
     }
 
     private void setDashboard(Pair<String, ?>... values) throws Exception
     {
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
-        Hashtable<String, Object> dashboardConfig = xmlRpcHelper.getConfig(dashboardPath);
+        Hashtable<String, Object> dashboardConfig = rpcClient.RemoteApi.getConfig(dashboardPath);
         for (Pair<String, ?> pair : values)
         {
             if (!pair.second.equals(dashboardConfig.get(pair.first)))
             {
                 dashboardConfig.put(pair.first, pair.second);
-                xmlRpcHelper.saveConfig(dashboardPath, dashboardConfig, false);
+                rpcClient.RemoteApi.saveConfig(dashboardPath, dashboardConfig, false);
             }
         }
     }

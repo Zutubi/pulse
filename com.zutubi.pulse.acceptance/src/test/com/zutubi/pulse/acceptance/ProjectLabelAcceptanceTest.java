@@ -13,12 +13,12 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -30,13 +30,13 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         String g1 = random + "-g1";
         String g2 = random + "-g2";
 
-        xmlRpcHelper.insertSimpleProject(p1,  false);
-        xmlRpcHelper.insertSimpleProject(p2,  false);
-        xmlRpcHelper.insertSimpleProject(p3,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p2,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p3,  false);
 
-        xmlRpcHelper.addLabel(p1, g1);
-        xmlRpcHelper.addLabel(p1, g2);
-        xmlRpcHelper.addLabel(p2, g1);
+        rpcClient.RemoteApi.addLabel(p1, g1);
+        rpcClient.RemoteApi.addLabel(p1, g2);
+        rpcClient.RemoteApi.addLabel(p2, g1);
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
@@ -56,10 +56,10 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         String labelName = random + "-label";
         String userLogin = random + "-user";
 
-        xmlRpcHelper.insertSimpleProject(projectName,  false);
-        xmlRpcHelper.addLabel(projectName, labelName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName,  false);
+        rpcClient.RemoteApi.addLabel(projectName, labelName);
 
-        String userPath = xmlRpcHelper.insertTrivialUser(userLogin);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(userLogin);
         assertTrue(getBrowser().login(userLogin, ""));
 
         // Default is group by label
@@ -69,9 +69,9 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
 
         // Uncheck option and ensure grouping disappears
         String prefsPath = PathUtils.getPath(userPath, "preferences", "browseView");
-        Hashtable<String, Object> browsePreferences = xmlRpcHelper.getConfig(prefsPath);
+        Hashtable<String, Object> browsePreferences = rpcClient.RemoteApi.getConfig(prefsPath);
         browsePreferences.put("groupsShown", false);
-        xmlRpcHelper.saveConfig(prefsPath, browsePreferences, false);
+        rpcClient.RemoteApi.saveConfig(prefsPath, browsePreferences, false);
 
         browsePage.openAndWaitFor();
         assertFalse(browsePage.isGroupPresent(labelName));
@@ -84,17 +84,17 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         String p2 = random + "-2";
         String group = random + "-group";
 
-        xmlRpcHelper.insertSimpleProject(p1,  false);
-        xmlRpcHelper.insertSimpleProject(p2,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p2,  false);
 
-        xmlRpcHelper.addLabel(p1, group);
+        rpcClient.RemoteApi.addLabel(p1, group);
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
         assertFalse(browsePage.isProjectPresent(group, p2));
 
-        xmlRpcHelper.addLabel(p2, group);
+        rpcClient.RemoteApi.addLabel(p2, group);
 
         browsePage.openAndWaitFor();
         assertGroupPresent(browsePage, group, p1, p2);
@@ -106,17 +106,17 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         String p2 = random + "-2";
         String group = random + "-group";
 
-        xmlRpcHelper.insertSimpleProject(p1,  false);
-        xmlRpcHelper.insertSimpleProject(p2,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p2,  false);
 
-        xmlRpcHelper.addLabel(p1, group);
-        String path = xmlRpcHelper.addLabel(p2, group);
+        rpcClient.RemoteApi.addLabel(p1, group);
+        String path = rpcClient.RemoteApi.addLabel(p2, group);
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1, p2);
 
-        xmlRpcHelper.call("deleteConfig", path);
+        rpcClient.RemoteApi.call("deleteConfig", path);
 
         browsePage.openAndWaitFor();
         assertGroupPresent(browsePage, group, p1);
@@ -128,15 +128,15 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         String p1 = random + "-1";
         String group = random + "-group";
 
-        xmlRpcHelper.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
 
-        String path = xmlRpcHelper.addLabel(p1, group);
+        String path = rpcClient.RemoteApi.addLabel(p1, group);
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
         assertGroupPresent(browsePage, group, p1);
 
-        xmlRpcHelper.call("deleteConfig", path);
+        rpcClient.RemoteApi.call("deleteConfig", path);
 
         browsePage.openAndWaitFor();
         assertFalse(browsePage.isGroupPresent(group));

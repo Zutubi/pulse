@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
@@ -7,16 +10,12 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The acceptance tests for the Pulse builtin maven 1.x and 2.x integration.
@@ -30,13 +29,13 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -84,7 +83,7 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
 
     private void assertDefaultRequirement(String projectName, String resourceName) throws Exception
     {
-        Vector<Hashtable<String, Object>> requiredResources = xmlRpcHelper.getConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Constants.Project.REQUIREMENTS));
+        Vector<Hashtable<String, Object>> requiredResources = rpcClient.RemoteApi.getConfig(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Constants.Project.REQUIREMENTS));
         assertEquals(1, requiredResources.size());
         Hashtable<String, Object> requirement = requiredResources.get(0);
         assertEquals(resourceName, requirement.get("resource"));
@@ -118,7 +117,7 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
 
     private void createMavenProject(final String commandType, final Pair<String, String>... fieldValues) throws Exception
     {
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             @Override
@@ -150,11 +149,11 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
 
     private int runBuild(String projectName) throws Exception
     {
-        return xmlRpcHelper.runBuild(projectName);
+        return rpcClient.RemoteApi.runBuild(projectName);
     }
 
     private Hashtable<String, Object> getCaptureConfiguration(String projectName, String artifactName) throws Exception
     {
-        return xmlRpcHelper.getProjectCapture(projectName, "default", COMMAND_NAME, artifactName);
+        return rpcClient.RemoteApi.getProjectCapture(projectName, "default", COMMAND_NAME, artifactName);
     }
 }

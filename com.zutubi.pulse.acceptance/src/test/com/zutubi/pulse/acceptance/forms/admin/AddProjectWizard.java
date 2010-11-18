@@ -2,9 +2,9 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.XmlRpcHelper;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven.MavenCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
@@ -25,12 +25,12 @@ import java.util.List;
 public class AddProjectWizard
 {
     private SeleniumBrowser browser;
-    private XmlRpcHelper xmlRpcHelper;
+    private RemoteApiClient remoteApi;
 
-    public AddProjectWizard(SeleniumBrowser browser, XmlRpcHelper xmlRpcHelper)
+    public AddProjectWizard(SeleniumBrowser browser, RemoteApiClient remoteApi)
     {
         this.browser = browser;
-        this.xmlRpcHelper = xmlRpcHelper;
+        this.remoteApi = remoteApi;
     }
 
     public String addProject(String name)
@@ -49,7 +49,7 @@ public class AddProjectWizard
         {
             try
             {
-                xmlRpcHelper.waitForProjectToInitialise(name);
+                remoteApi.waitForProjectToInitialise(name);
             }
             catch (Exception e)
             {

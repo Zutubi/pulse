@@ -1,5 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
@@ -14,25 +23,15 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.ToStringMapping;
 import com.zutubi.util.io.IOUtils;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+
+import java.util.Arrays;
+import static java.util.Arrays.asList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Tests for the remote API, primarily the reporting functionality.
@@ -51,18 +50,18 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testGetServerInfo() throws Exception
     {
-        Hashtable<String, String> info = xmlRpcHelper.getServerInfo();
+        Hashtable<String, String> info = rpcClient.RemoteApi.getServerInfo();
         assertTrue(info.containsKey("os.name"));
         assertTrue(info.containsKey("pulse.version"));
         assertTrue(info.containsKey("user.timezone"));
@@ -75,12 +74,12 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         {
             public Vector<String> get() throws Exception
             {
-                return xmlRpcHelper.getAllUserLogins();
+                return rpcClient.RemoteApi.getAllUserLogins();
             }
 
             public void add(String name) throws Exception
             {
-                xmlRpcHelper.insertTrivialUser(name);
+                rpcClient.RemoteApi.insertTrivialUser(name);
             }
         });
     }
@@ -91,19 +90,19 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         {
             public Vector<String> get() throws Exception
             {
-                return xmlRpcHelper.getAllProjectNames();
+                return rpcClient.RemoteApi.getAllProjectNames();
             }
 
             public void add(String name) throws Exception
             {
-                xmlRpcHelper.insertSimpleProject(name, false);
+                rpcClient.RemoteApi.insertSimpleProject(name, false);
             }
         });
     }
 
     public void testGetAllAgentNamesDoesNotIncludeTemplates() throws Exception
     {
-        Vector<String> allAgents = xmlRpcHelper.getAllAgentNames();
+        Vector<String> allAgents = rpcClient.RemoteApi.getAllAgentNames();
         assertFalse(allAgents.contains(AgentManager.GLOBAL_AGENT_NAME));
     }
 
@@ -113,26 +112,26 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         {
             public Vector<String> get() throws Exception
             {
-                return xmlRpcHelper.getAllAgentNames();
+                return rpcClient.RemoteApi.getAllAgentNames();
             }
 
             public void add(String name) throws Exception
             {
-                xmlRpcHelper.insertSimpleAgent(name);
+                rpcClient.RemoteApi.insertSimpleAgent(name);
             }
         });
     }
 
     public void testGetAllProjectNamesDoesNotIncludeTemplates() throws Exception
     {
-        Vector<String> allProjects = xmlRpcHelper.getAllProjectNames();
+        Vector<String> allProjects = rpcClient.RemoteApi.getAllProjectNames();
         assertFalse(allProjects.contains(ProjectManager.GLOBAL_PROJECT_NAME));
     }
 
     public void testGetMyProjectNamesAllProjects() throws Exception
     {
-        Vector<String> allProjects = xmlRpcHelper.getAllProjectNames();
-        Vector<String> myProjects = xmlRpcHelper.getMyProjectNames();
+        Vector<String> allProjects = rpcClient.RemoteApi.getAllProjectNames();
+        Vector<String> myProjects = rpcClient.RemoteApi.getMyProjectNames();
         Sort.StringComparator c = new Sort.StringComparator();
         Collections.sort(allProjects, c);
         Collections.sort(myProjects, c);
@@ -145,18 +144,18 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         String login = random + "-user";
         String project = random + "-project";
 
-        String userPath = xmlRpcHelper.insertTrivialUser(login);
-        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(login);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(project, false);
 
-        xmlRpcHelper.logout();
-        xmlRpcHelper.login(login, "");
+        rpcClient.logout();
+        rpcClient.login(login, "");
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
-        Hashtable<String, Object> dashboardSettings = xmlRpcHelper.getConfig(dashboardPath);
+        Hashtable<String, Object> dashboardSettings = rpcClient.RemoteApi.getConfig(dashboardPath);
         dashboardSettings.put("showAllProjects", false);
         dashboardSettings.put("shownProjects", new Vector<String>(asList(projectPath)));
-        xmlRpcHelper.saveConfig(dashboardPath, dashboardSettings, true);
+        rpcClient.RemoteApi.saveConfig(dashboardPath, dashboardSettings, true);
 
-        Vector<String> myProjects = xmlRpcHelper.getMyProjectNames();
+        Vector<String> myProjects = rpcClient.RemoteApi.getMyProjectNames();
         assertEquals(1, myProjects.size());
         assertEquals(project, myProjects.get(0));
     }
@@ -168,27 +167,27 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         String project1 = random + "-project-1";
         String project2 = random + "-project-2";
 
-        String userPath = xmlRpcHelper.insertTrivialUser(login);
+        String userPath = rpcClient.RemoteApi.insertTrivialUser(login);
 
         // First project has label
-        String project1Path = xmlRpcHelper.insertSimpleProject(project1, false);
-        Hashtable<String, Object> labelConfig = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        String project1Path = rpcClient.RemoteApi.insertSimpleProject(project1, false);
+        Hashtable<String, Object> labelConfig = rpcClient.RemoteApi.createEmptyConfig(LabelConfiguration.class);
         labelConfig.put("label", random);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(project1Path, Constants.Project.LABELS), labelConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(project1Path, Constants.Project.LABELS), labelConfig);
 
         // Second has no label
-        xmlRpcHelper.insertSimpleProject(project2, false);
-        xmlRpcHelper.logout();
+        rpcClient.RemoteApi.insertSimpleProject(project2, false);
+        rpcClient.logout();
 
-        xmlRpcHelper.login(login, "");
+        rpcClient.login(login, "");
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
-        Hashtable<String, Object> dashboardSettings = xmlRpcHelper.getConfig(dashboardPath);
+        Hashtable<String, Object> dashboardSettings = rpcClient.RemoteApi.getConfig(dashboardPath);
         dashboardSettings.put("showAllGroups", false);
         dashboardSettings.put("showUngrouped", false);
         dashboardSettings.put("shownGroups", new Vector<String>(asList(random)));
-        xmlRpcHelper.saveConfig(dashboardPath, dashboardSettings, true);
+        rpcClient.RemoteApi.saveConfig(dashboardPath, dashboardSettings, true);
 
-        Vector<String> myProjects = xmlRpcHelper.getMyProjectNames();
+        Vector<String> myProjects = rpcClient.RemoteApi.getMyProjectNames();
         assertEquals(1, myProjects.size());
         assertEquals(project1, myProjects.get(0));
     }
@@ -196,21 +195,21 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetAllProjectGroups() throws Exception
     {
         String projectName = randomName() + "-project";
-        final String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
+        final String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName, false);
 
         getAllHelper(new GetAllHelper()
         {
             public Vector<String> get() throws Exception
             {
-                return xmlRpcHelper.getAllProjectGroups();
+                return rpcClient.RemoteApi.getAllProjectGroups();
             }
 
             public void add(String name) throws Exception
             {
                 String labelsPath = PathUtils.getPath(projectPath, "labels");
-                Hashtable<String, Object> label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+                Hashtable<String, Object> label = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);
                 label.put("label", name);
-                xmlRpcHelper.insertConfig(labelsPath, label);
+                rpcClient.RemoteApi.insertConfig(labelsPath, label);
             }
         });
     }
@@ -221,13 +220,13 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectName = random + "-project";
         String labelName = random + "-label";
 
-        String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName, false);
         String labelsPath = PathUtils.getPath(projectPath, "labels");
-        Hashtable<String, Object> label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        Hashtable<String, Object> label = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);
         label.put("label", labelName);
-        xmlRpcHelper.insertConfig(labelsPath, label);
+        rpcClient.RemoteApi.insertConfig(labelsPath, label);
 
-        Hashtable<String, Object> group = xmlRpcHelper.getProjectGroup(labelName);
+        Hashtable<String, Object> group = rpcClient.RemoteApi.getProjectGroup(labelName);
         assertEquals(labelName, group.get("name"));
         @SuppressWarnings({"unchecked"})
         Vector<String> projects = (Vector<String>) group.get("projects");
@@ -240,7 +239,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         // Groups are virtual: if you ask for a non-existant label, it is
         // just an empty group
         String testName = "something that does not exist";
-        Hashtable<String, Object> group = xmlRpcHelper.getProjectGroup(testName);
+        Hashtable<String, Object> group = rpcClient.RemoteApi.getProjectGroup(testName);
         assertEquals(testName, group.get("name"));
         @SuppressWarnings({"unchecked"})
         Vector<String> projects = (Vector<String>) group.get("projects");
@@ -252,14 +251,14 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         // A bit of a sanity check: in reality we use this method for other
         // tests that run builds so it is exercised in a few ways.
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
 
-        xmlRpcHelper.triggerBuild(projectName);
+        rpcClient.RemoteApi.triggerBuild(projectName);
 
         Hashtable<String, Object> build;
         do
         {
-            build = xmlRpcHelper.getBuild(projectName, 1);
+            build = rpcClient.RemoteApi.getBuild(projectName, 1);
         }
         while (build == null || !Boolean.TRUE.equals(build.get("completed")));
 
@@ -277,13 +276,13 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testErrorAndWarningCounts() throws Exception
     {
         String projectName = randomName();
-        Hashtable<String, Object> customType = xmlRpcHelper.createDefaultConfig(CustomTypeConfiguration.class);
+        Hashtable<String, Object> customType = rpcClient.RemoteApi.createDefaultConfig(CustomTypeConfiguration.class);
         customType.put("pulseFileString", IOUtils.inputStreamToString(getInput("xml")));
 
-        xmlRpcHelper.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
-        int number = xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
+        int number = rpcClient.RemoteApi.runBuild(projectName);
 
-        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, number);
+        Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(projectName, number);
         assertNotNull(build);
         assertEquals(4, build.get("errorCount"));
         assertEquals(1, build.get("warningCount"));
@@ -299,7 +298,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.getBuild("this is a made up project", 1);
+            rpcClient.RemoteApi.getBuild("this is a made up project", 1);
             fail();
         }
         catch (Exception e)
@@ -311,25 +310,25 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetBuildUnknownBuild() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        assertNull(xmlRpcHelper.getBuild(projectName, 1));
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        assertNull(rpcClient.RemoteApi.getBuild(projectName, 1));
     }
 
     public void testDeleteBuild() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
 
-        assertTrue(xmlRpcHelper.deleteBuild(projectName, 1));
-        assertNull(xmlRpcHelper.getBuild(projectName, 1));
+        assertTrue(rpcClient.RemoteApi.deleteBuild(projectName, 1));
+        assertNull(rpcClient.RemoteApi.getBuild(projectName, 1));
     }
 
     public void testDeleteBuildUknownProject() throws Exception
     {
         try
         {
-            xmlRpcHelper.deleteBuild("this is a made up project", 1);
+            rpcClient.RemoteApi.deleteBuild("this is a made up project", 1);
             fail();
         }
         catch (Exception e)
@@ -341,25 +340,25 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testDeleteBuildUnknownBuild() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        assertFalse(xmlRpcHelper.deleteBuild(projectName, 1));
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        assertFalse(rpcClient.RemoteApi.deleteBuild(projectName, 1));
     }
 
     public void testTriggerBuildWithProperties() throws Exception
     {
         final String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        xmlRpcHelper.insertProjectProperty(projectName, "existing.property", "existing value");
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "existing.property", "existing value");
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("existing.property", "overriding value");
         properties.put("new.property", "new value");
 
-        int number = xmlRpcHelper.getNextBuildNumber(projectName);
-        xmlRpcHelper.triggerBuild(projectName, "", properties);
-        xmlRpcHelper.waitForBuildToComplete(projectName, number);
+        int number = rpcClient.RemoteApi.getNextBuildNumber(projectName);
+        rpcClient.RemoteApi.triggerBuild(projectName, "", properties);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectName, number);
 
-        Vector<Hashtable<String, Object>> artifacts = xmlRpcHelper.getArtifactsInBuild(projectName, number);
+        Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(projectName, number);
         Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
             public boolean satisfied(Hashtable<String, Object> artifact)
@@ -379,10 +378,10 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetLatestBuildsForProject() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        int number = xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        int number = rpcClient.RemoteApi.runBuild(projectName);
 
-        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(projectName, true, 10);
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.getLatestBuildsForProject(projectName, true, 10);
         assertEquals(1, builds.size());
         assertEquals(number, builds.get(0).get("id"));
     }
@@ -391,7 +390,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.getLatestBuildsForProject("thereisnosuchproject", true, 10);
+            rpcClient.RemoteApi.getLatestBuildsForProject("thereisnosuchproject", true, 10);
             fail("Can't get latest builds for unknown project");
         }
         catch (Exception e)
@@ -404,7 +403,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         ensureProjectHierarchy();
 
-        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, true, 10);
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.getLatestBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, true, 10);
         assertEquals(2, builds.size());
 
         Hashtable<String, Object> build = builds.get(0);
@@ -419,10 +418,10 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testQueryBuildsForProject() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        int number = xmlRpcHelper.runBuild(projectName);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        int number = rpcClient.RemoteApi.runBuild(projectName);
 
-        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(projectName, new Vector<String>(), -1, 10, true);
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.queryBuildsForProject(projectName, new Vector<String>(), -1, 10, true);
         assertEquals(1, builds.size());
         assertEquals(number, builds.get(0).get("id"));
     }
@@ -431,7 +430,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            xmlRpcHelper.queryBuildsForProject("iamnothere", new Vector<String>(), -1, 10, true);
+            rpcClient.RemoteApi.queryBuildsForProject("iamnothere", new Vector<String>(), -1, 10, true);
             fail("Can't query builds for unknown project");
         }
         catch (Exception e)
@@ -444,7 +443,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         ensureProjectHierarchy();
 
-        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.queryBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, new Vector<String>(), -1, 10, true);
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.queryBuildsForProject(PROJECT_HIERARCHY_TEMPLATE, new Vector<String>(), -1, 10, true);
         assertEquals(2, builds.size());
 
         Hashtable<String, Object> build = builds.get(0);
@@ -462,27 +461,27 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         ensureProjectHierarchy();
 
         // No builds have warnings, but this sanity check found a login bug.
-        Vector<Hashtable<String, Object>> builds = xmlRpcHelper.getLatestBuildsWithWarnings(PROJECT_HIERARCHY_TEMPLATE, 10);
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.getLatestBuildsWithWarnings(PROJECT_HIERARCHY_TEMPLATE, 10);
         assertEquals(0, builds.size());
     }
 
     public void testGetArtifactFileListing() throws Exception
     {
         String project = randomName();
-        Hashtable<String, Object> svnConfig = xmlRpcHelper.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
-        Hashtable<String, Object> antConfig = xmlRpcHelper.getAntConfig();
+        Hashtable<String, Object> svnConfig = rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(TARGETS, "test");
 
-        String projectPath = xmlRpcHelper.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
 
-        Hashtable<String, Object> artifactConfig = xmlRpcHelper.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
         artifactConfig.put(NAME, "reports");
         artifactConfig.put(BASE, "build/reports");
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
 
-        int buildId = xmlRpcHelper.runBuild(project);
+        int buildId = rpcClient.RemoteApi.runBuild(project);
 
-        Vector<String> files = xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "");
+        Vector<String> files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "");
         Collections.sort(files, new Sort.StringComparator());
         assertEquals(asList(
                 "html/allclasses-frame.html",
@@ -501,17 +500,17 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
                 "xml/TESTS-TestSuites.xml"
         ), files);
 
-        files = xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "html/com/zutubi/testant");
+        files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "html/com/zutubi/testant");
         Collections.sort(files, new Sort.StringComparator());
         assertEquals(asList("0_UnitTest.html", "0_UnitTest-fails.html", "package-frame.html", "package-summary.html"), files);
 
-        assertEquals(Arrays.<String>asList(), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xm"));
-        assertEquals(asList("TESTS-TestSuites.xml"), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml"));
-        assertEquals(asList("TESTS-TestSuites.xml"), xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml/"));
+        assertEquals(Arrays.<String>asList(), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xm"));
+        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml"));
+        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml/"));
 
         try
         {
-            xmlRpcHelper.getArtifactFileListing(project, buildId, "nosuchstage", "build", "reports", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "nosuchstage", "build", "reports", "");
             fail("Shouldn't work for invalid stage name");
         }
         catch (Exception e)
@@ -521,7 +520,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "nosuchcommand", "reports", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "nosuchcommand", "reports", "");
             fail("Shouldn't work for invalid command name");
         }
         catch (Exception e)
@@ -531,7 +530,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            xmlRpcHelper.getArtifactFileListing(project, buildId, "default", "build", "nosuchartifact", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "nosuchartifact", "");
             fail("Shouldn't work for invalid artifact name");
         }
         catch (Exception e)
@@ -545,9 +544,9 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectName = randomName();
         Vector<String> ids = insertAndTriggerProject(projectName);
 
-        Hashtable<String, Object> status = xmlRpcHelper.waitForBuildRequestToBeHandled(ids.get(0), REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = rpcClient.RemoteApi.waitForBuildRequestToBeHandled(ids.get(0), REQUEST_TIMEOUT);
         assertRequestStatusIn(status, BuildRequestRegistry.RequestStatus.ACTIVATED, BuildRequestRegistry.RequestStatus.QUEUED);
-        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
     }
 
     public void testWaitForBuildRequestToBeActivated() throws Exception
@@ -555,9 +554,9 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectName = randomName();
         Vector<String> ids = insertAndTriggerProject(projectName);
 
-        Hashtable<String, Object> status = xmlRpcHelper.waitForBuildRequestToBeActivated(ids.get(0), REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(ids.get(0), REQUEST_TIMEOUT);
         assertFirstActivatedBuild(status);
-        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
     }
 
     public void testGetBuildRequestStatus() throws Exception
@@ -566,30 +565,30 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         Vector<String> ids = insertAndTriggerProject(projectName);
 
         String id = ids.get(0);
-        xmlRpcHelper.waitForBuildRequestToBeActivated(id, REQUEST_TIMEOUT);
-        Hashtable<String, Object> status = xmlRpcHelper.getBuildRequestStatus(id);
+        rpcClient.RemoteApi.waitForBuildRequestToBeActivated(id, REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = rpcClient.RemoteApi.getBuildRequestStatus(id);
         assertFirstActivatedBuild(status);
-        xmlRpcHelper.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForBuildToComplete(projectName, 1, BUILD_TIMEOUT);
     }
 
     public void testGetBuildRequestStatusPaused() throws Exception
     {
         String projectName = randomName();
-        xmlRpcHelper.insertSimpleProject(projectName);
-        xmlRpcHelper.doConfigAction(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName), ProjectConfigurationActions.ACTION_PAUSE);
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        rpcClient.RemoteApi.doConfigAction(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName), ProjectConfigurationActions.ACTION_PAUSE);
 
-        Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
+        Vector<String> ids = rpcClient.RemoteApi.triggerBuild(projectName, new Hashtable<String, Object>());
         String id = ids.get(0);
-        xmlRpcHelper.waitForBuildRequestToBeHandled(id, REQUEST_TIMEOUT);
-        Hashtable<String, Object> status = xmlRpcHelper.getBuildRequestStatus(id);
+        rpcClient.RemoteApi.waitForBuildRequestToBeHandled(id, REQUEST_TIMEOUT);
+        Hashtable<String, Object> status = rpcClient.RemoteApi.getBuildRequestStatus(id);
         assertEquals("REJECTED", status.get("status"));
         assertEquals("project state (paused) does not allow building", status.get("rejectionReason"));
     }
 
     private Vector<String> insertAndTriggerProject(String projectName) throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(projectName);
-        Vector<String> ids = xmlRpcHelper.triggerBuild(projectName, new Hashtable<String, Object>());
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        Vector<String> ids = rpcClient.RemoteApi.triggerBuild(projectName, new Hashtable<String, Object>());
         assertEquals(1, ids.size());
         return ids;
     }
@@ -607,14 +606,14 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private void ensureProjectHierarchy() throws Exception
     {
-        if (!xmlRpcHelper.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_HIERARCHY_TEMPLATE)))
+        if (!rpcClient.RemoteApi.configPathExists(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PROJECT_HIERARCHY_TEMPLATE)))
         {
-            xmlRpcHelper.insertSingleCommandProject(PROJECT_HIERARCHY_TEMPLATE, ProjectManager.GLOBAL_PROJECT_NAME, true, xmlRpcHelper.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), xmlRpcHelper.getAntConfig());
-            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD1, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
-            xmlRpcHelper.insertProject(PROJECT_HIERARCHY_CHILD2, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
+            rpcClient.RemoteApi.insertSingleCommandProject(PROJECT_HIERARCHY_TEMPLATE, ProjectManager.GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), rpcClient.RemoteApi.getAntConfig());
+            rpcClient.RemoteApi.insertProject(PROJECT_HIERARCHY_CHILD1, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
+            rpcClient.RemoteApi.insertProject(PROJECT_HIERARCHY_CHILD2, PROJECT_HIERARCHY_TEMPLATE, false, null, null);
 
-            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD1);
-            xmlRpcHelper.runBuild(PROJECT_HIERARCHY_CHILD2);
+            rpcClient.RemoteApi.runBuild(PROJECT_HIERARCHY_CHILD1);
+            rpcClient.RemoteApi.runBuild(PROJECT_HIERARCHY_CHILD2);
         }
     }
 

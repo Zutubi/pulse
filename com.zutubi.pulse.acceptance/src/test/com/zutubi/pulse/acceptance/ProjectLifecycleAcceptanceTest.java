@@ -22,47 +22,47 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
     }
 
     @Override
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
     public void testManualReinitialise() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(random, false);
+        String path = rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertProjectState(random, Project.State.IDLE);
 
-        xmlRpcHelper.doConfigAction(path, ProjectConfigurationActions.ACTION_INITIALISE);
+        rpcClient.RemoteApi.doConfigAction(path, ProjectConfigurationActions.ACTION_INITIALISE);
 
         assertProjectHasReinitialised(random);
     }
 
     public void testReinitialiseOnScmEdit() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(random, false);
+        String path = rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertProjectState(random, Project.State.IDLE);
 
         String scmPath = PathUtils.getPath(path, Constants.Project.SCM);
-        Hashtable<String, Object> scmConfig = xmlRpcHelper.getConfig(scmPath);
+        Hashtable<String, Object> scmConfig = rpcClient.RemoteApi.getConfig(scmPath);
         scmConfig.put(Constants.Project.Scm.QUIET_PERIOD_ENABLED, true);
-        xmlRpcHelper.saveConfig(scmPath, scmConfig, false);
+        rpcClient.RemoteApi.saveConfig(scmPath, scmConfig, false);
 
         assertProjectHasReinitialised(random);
     }
 
     public void testDeleteAndReAddScm() throws Exception
     {
-        String path = xmlRpcHelper.insertSimpleProject(random, false);
+        String path = rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertProjectState(random, Project.State.IDLE);
 
         String scmPath = PathUtils.getPath(path, Constants.Project.SCM);
-        Hashtable<String, Object> scmConfig = xmlRpcHelper.getConfig(scmPath);
-        xmlRpcHelper.deleteConfig(scmPath);
+        Hashtable<String, Object> scmConfig = rpcClient.RemoteApi.getConfig(scmPath);
+        rpcClient.RemoteApi.deleteConfig(scmPath);
 
         waitForCondition(new Condition()
         {
@@ -70,7 +70,7 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
             {
                 try
                 {
-                    return xmlRpcHelper.getProjectState(random) == Project.State.INITIAL;
+                    return rpcClient.RemoteApi.getProjectState(random) == Project.State.INITIAL;
                 }
                 catch (Exception e)
                 {
@@ -79,13 +79,13 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
             }
         }, 30000, "project '" + random + "' to return to the initial state");
 
-        xmlRpcHelper.insertConfig(scmPath, scmConfig);
-        xmlRpcHelper.waitForProjectToInitialise(random);
+        rpcClient.RemoteApi.insertConfig(scmPath, scmConfig);
+        rpcClient.RemoteApi.waitForProjectToInitialise(random);
     }
 
     public void testPauseResume() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertSimpleProject(random);
         assertProjectState(random, Project.State.IDLE);
 
         getBrowser().loginAsAdmin();
@@ -108,7 +108,7 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
 
     public void testInitialisationFailed() throws Exception
     {
-        xmlRpcHelper.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, xmlRpcHelper.getGitConfig("bad url"), xmlRpcHelper.getAntConfig());
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig("bad url"), rpcClient.RemoteApi.getAntConfig());
         assertProjectState(random, Project.State.INITIALISATION_FAILED);
 
         getBrowser().loginAsAdmin();
@@ -119,12 +119,12 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
 
     private void assertProjectState(String project, Project.State expectedState) throws Exception
     {
-        assertEquals(expectedState, xmlRpcHelper.getProjectState(project));
+        assertEquals(expectedState, rpcClient.RemoteApi.getProjectState(project));
     }
 
     private void assertProjectHasReinitialised(String project) throws Exception
     {
-        xmlRpcHelper.waitForProjectToInitialise(random);
+        rpcClient.RemoteApi.waitForProjectToInitialise(random);
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(ProjectLogPage.class, project);

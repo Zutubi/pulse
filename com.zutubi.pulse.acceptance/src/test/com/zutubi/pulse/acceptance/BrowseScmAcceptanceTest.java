@@ -32,16 +32,16 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         getBrowser().loginAsAdmin();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
         projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         getBrowser().logout();
 
         super.tearDown();
@@ -51,7 +51,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseLinkAvailableInProjectWizardForSubversion()
     {
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public void commandState(AddProjectWizard.CommandState form)
@@ -66,7 +66,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseLinkNotAvailableInProjectWizardForGit()
     {
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), xmlRpcHelper);
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random, false)
         {
             public String selectScm()

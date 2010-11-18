@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -16,23 +17,21 @@ import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 {
@@ -44,15 +43,15 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
-        xmlRpcHelper.loginAsAdmin();
+        rpcClient.loginAsAdmin();
 
         ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(xmlRpcHelper);
+        configurationHelper = factory.create(rpcClient.RemoteApi);
     }
 
     protected void tearDown() throws Exception
     {
-        xmlRpcHelper.logout();
+        rpcClient.logout();
         super.tearDown();
     }
 
@@ -209,7 +208,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 
     private void setAnonymousServerPermissions(ServerPermission... permissions) throws Exception
     {
-        Hashtable<String, Object> group = xmlRpcHelper.getConfig(ANONYMOUS_GROUP_PATH);
+        Hashtable<String, Object> group = rpcClient.RemoteApi.getConfig(ANONYMOUS_GROUP_PATH);
         List<String> permissionStrings = CollectionUtils.map(permissions, new Mapping<ServerPermission, String>()
         {
             public String map(ServerPermission permission)
@@ -218,7 +217,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
             }
         });
         group.put("serverPermissions", new Vector(permissionStrings));
-        xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
+        rpcClient.RemoteApi.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
     }
 
     private void setAnonymousAccess(boolean enabled) throws Exception
