@@ -719,7 +719,7 @@ public class ToveUtils
             CompositeType compositeType = (CompositeType) type;
             for (String propertyName: compositeType.getSimplePropertyNames())
             {
-                if (SUPPRESSED_PASSWORD.equals(newRecord.get(propertyName)) && isPasswordProperty(compositeType, propertyName))
+                if (isPasswordProperty(compositeType, propertyName) && SUPPRESSED_PASSWORD.equals(newRecord.get(propertyName)))
                 {
                     newRecord.put(propertyName, originalRecord.get(propertyName));
                 }
@@ -747,6 +747,6 @@ public class ToveUtils
     
     private static boolean isPasswordProperty(CompositeType type, String propertyName)
     {
-        return propertyName.equals("password") || type.getProperty(propertyName).getAnnotation(Password.class) != null;
+        return type.getProperty(propertyName).getAnnotation(Password.class) != null;
     }
 }

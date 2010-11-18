@@ -43,6 +43,7 @@ public class SetupDatabaseTypeConfiguration extends AbstractConfiguration implem
     @Required
     private String user;
     
+    @Password
     private String password;
 
     public DatabaseType getType()

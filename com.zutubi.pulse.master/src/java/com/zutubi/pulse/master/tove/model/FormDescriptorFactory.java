@@ -40,18 +40,18 @@ public class FormDescriptorFactory
 
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 
-    private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
+    private static final Map<Class, String> DEFAULT_FIELD_TYPE_MAPPING = new HashMap<Class, String>();
 
     static
     {
-        defaultFieldTypeMapping.put(String.class, "text");
-        defaultFieldTypeMapping.put(File.class, "text");
-        defaultFieldTypeMapping.put(Boolean.class, "checkbox");
-        defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
-        defaultFieldTypeMapping.put(Integer.class, "text");
-        defaultFieldTypeMapping.put(Integer.TYPE, "text");
-        defaultFieldTypeMapping.put(Long.class, "text");
-        defaultFieldTypeMapping.put(Long.TYPE, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(String.class, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(File.class, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Boolean.class, "checkbox");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Boolean.TYPE, "checkbox");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Integer.class, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Integer.TYPE, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Long.class, "text");
+        DEFAULT_FIELD_TYPE_MAPPING.put(Long.TYPE, "text");
     }
 
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
@@ -191,16 +191,7 @@ public class FormDescriptorFactory
             SimpleType propertyType = (SimpleType) property.getType();
             if (propertyType instanceof PrimitiveType)
             {
-                // some little bit of magic, take a guess at any property called password. If we come up with any
-                // other magical cases, then we can refactor this a bit.
-                if (property.getName().equals("password"))
-                {
-                    fieldType = FieldType.PASSWORD;
-                }
-                else
-                {
-                    fieldType = defaultFieldTypeMapping.get(propertyType.getClazz());
-                }
+                fieldType = DEFAULT_FIELD_TYPE_MAPPING.get(propertyType.getClazz());
             }
             else if (propertyType instanceof EnumType)
             {

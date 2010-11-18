@@ -25,6 +25,7 @@ public class JabberConfiguration extends AbstractConfiguration
     private int port = JabberManager.DEFAULT_PORT;
     @Required
     private String username;
+    @Password
     private String password;
     private boolean ssl;
 

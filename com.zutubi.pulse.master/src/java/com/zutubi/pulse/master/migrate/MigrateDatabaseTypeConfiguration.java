@@ -45,6 +45,7 @@ public class MigrateDatabaseTypeConfiguration extends AbstractConfiguration impl
     @Required
     private String user;
 
+    @Password
     private String password;
 
     @Required

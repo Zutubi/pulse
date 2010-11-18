@@ -4,8 +4,8 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.record.Record;
 
 /**
- *
- *
+ * Descriptor for a text field that hides its contents - suitable for entering
+ * sensitive values like passwords.
  */
 public class PasswordFieldDescriptor extends FieldDescriptor
 {

@@ -50,6 +50,7 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     @Constraint("SubversionUrlValidator")
     private String url;
     private String username;
+    @Password
     private String password;
     private String keyfile;
     @Password
