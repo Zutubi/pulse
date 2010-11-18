@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.util.cache.ehcache;
 
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import org.hsqldb.lib.StringInputStream;
@@ -10,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Handles creation and maintenance of database second-level caches.
+ * Handles the creation and configuration of the underlying EhCache manager,
+ * and provides a bridge between ehcache implementations and Pulse cache 
+ * interfaces.
  */
 public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheManager
 {
@@ -52,6 +55,27 @@ public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheM
 
     public synchronized EhCache getCache(String name)
     {
+        ensureCacheExists(name);
+        
+        return new EhCache(cacheManager.getCache(name));
+    }
+
+    /**
+     * Get the raw ehcache from the underlying ehcache manager.
+     *
+     * @param name  the name of the cache being retrieved.
+     *
+     * @return the underlying ehcache instance.
+     */
+    public Cache getEhCache(String name)
+    {
+        ensureCacheExists(name);
+
+        return cacheManager.getCache(name);
+    }
+
+    private void ensureCacheExists(String name)
+    {
         if (!cacheManager.cacheExists(name))
         {
             try
@@ -63,7 +87,6 @@ public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheM
                 throw new RuntimeException(e);
             }
         }
-        return new EhCache(cacheManager.getCache(name));
     }
 
     public void flushCaches()

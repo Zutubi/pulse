@@ -71,7 +71,8 @@ public class DefaultSetupManager implements SetupManager
     /**
      * Contexts for Stage B: database
      */
-    private List<String> dataContexts = new LinkedList<String>();
+    private List<String> dataContextsA = new LinkedList<String>();
+    private List<String> dataContextsB = new LinkedList<String>();
 
     /**
      * Contexts for Stage C: restore
@@ -277,7 +278,8 @@ public class DefaultSetupManager implements SetupManager
     {
         state = SetupState.STARTING;
 
-        loadContexts(dataContexts);
+        loadContexts(dataContextsA);
+        loadContexts(dataContextsB);
 
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
@@ -751,9 +753,14 @@ public class DefaultSetupManager implements SetupManager
         this.configContexts = configContexts;
     }
 
-    public void setDataContexts(List<String> dataContexts)
+    public void setDataContextsA(List<String> dataContexts)
     {
-        this.dataContexts = dataContexts;
+        this.dataContextsA = dataContexts;
+    }
+
+    public void setDataContextsB(List<String> dataContexts)
+    {
+        this.dataContextsB = dataContexts;
     }
 
     public void setLicenseContexts(List<String> licenseContexts)

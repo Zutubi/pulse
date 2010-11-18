@@ -8,7 +8,7 @@ import java.io.File;
 public interface UserPaths
 {
     /**
-     * The pulse data direcory is the place where all of the users data is
+     * The pulse data directory is the place where all of the users data is
      * stored.
      *
      * @return the data directory for all pulse data

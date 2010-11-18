@@ -33,7 +33,7 @@ public class PropertiesWriter
         Properties copy = new Properties();
         copy.putAll(props);
 
-        // Convert the property values according to the Properties object convensions. Why? To ensure that
+        // Convert the property values according to the Properties object conventions. Why? To ensure that
         // when we make a change to the config file the properties object is able to accurately read the values.
         convert(copy);
 
@@ -66,7 +66,7 @@ public class PropertiesWriter
                         buffer.append(propertyName).append("=").append(copy.getProperty(propertyName));
                         copy.remove(propertyName);
 
-                        // If the property we are replacing is a multiline property, we need to remove all of it.
+                        // If the property we are replacing is a multi line property, we need to remove all of it.
                         boolean isMultiLine = line.endsWith("\\");
                         while (isMultiLine)
                         {

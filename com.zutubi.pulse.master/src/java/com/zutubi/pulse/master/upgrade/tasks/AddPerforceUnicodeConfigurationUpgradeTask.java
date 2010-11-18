@@ -2,11 +2,11 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
- * Upgrade task to add two new properties to the perforce configurtation,
+ * Upgrade task to add two new properties to the perforce configuration,
  * the unicodeServer flag and the charset field.
  */
 public class AddPerforceUnicodeConfigurationUpgradeTask extends AbstractRecordPropertiesUpgradeTask

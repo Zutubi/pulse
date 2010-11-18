@@ -6,13 +6,14 @@
          its value in the running VM.
 
          The following properties are translated:
-         user.data - User's data directory
-         user.dir - User's current working directory
-         java.io.tmpdir - Default temp file path -->
+            user.data - User's data directory
+            user.dir - User's current working directory
+            java.io.tmpdir - Default temp file path
+            pulse.system.temp.dir - The Pulse system temp directory -->
     <diskStore path="pulse.system.temp.dir"/>
 
 
-    <!--Default Cache configuration. These will applied to caches programmatically created through
+    <!--Default Cache configuration. These will applied to caches pragmatically created through
         the CacheManager.
 
         The following attributes are required:

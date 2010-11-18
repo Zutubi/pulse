@@ -153,6 +153,7 @@
                 <ref local="addPriorityToBuildConfigurations"/>
                 <ref local="updateBuildColumnPreferences"/>
                 <ref local="addConcurrentBuilds"/>
+                <ref local="setHibernateCacheProvider"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -785,5 +786,9 @@
 
     <bean id="addConcurrentBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddConcurrentBuildsFieldUpgradeTask">
         <property name="buildNumber" value="202999007"/>
+    </bean>
+
+    <bean id="setHibernateCacheProvider" class="com.zutubi.pulse.master.upgrade.tasks.ConfigureHibernateCacheProviderUpgradeTask">
+        <property name="buildNumber" value="202999008"/>
     </bean>
 </beans>

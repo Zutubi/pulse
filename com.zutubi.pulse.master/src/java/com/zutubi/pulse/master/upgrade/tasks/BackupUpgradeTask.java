@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.upgrade.UpgradeException;
 import com.zutubi.util.logging.Logger;
 
 /**
- * <class comment/>
+ * Trigger a backup before continuing with the upgrade.
  */
 public class BackupUpgradeTask extends AbstractUpgradeTask 
 {

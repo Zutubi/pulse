@@ -8,6 +8,7 @@
 #
 hibernate.show_sql=false
 hibernate.query.use_query_cache=true
+hibernate.cache.provider_class=com.zutubi.pulse.master.hibernate.EhCacheProvider
 
 #
 # Connection specific properties. Any custom jdbc connection properties can
