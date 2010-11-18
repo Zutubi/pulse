@@ -119,8 +119,8 @@ public abstract class AcceptanceTestBase extends PulseTestCase
                     System.err.println("Couldn't save screenshot " + filename + ": " + e.getMessage());
                     e.printStackTrace();
                 }
-                throw t;
             }
+            throw t;
         }
         finally
         {

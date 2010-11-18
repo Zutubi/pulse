@@ -148,6 +148,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         project.releaseStage("D");
 
         xmlRpcHelper.waitForBuildToComplete(project.getName(), 1);
+        xmlRpcHelper.waitForProjectToBeIdle(project.getName());
         assertEquals(SUCCESS, xmlRpcHelper.getBuildStatus(project.getName(), 1));
     }
 
@@ -218,12 +219,14 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         xmlRpcHelper.waitForBuildInPending(projectD.getName(), 1);
 
         projectA.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectA.getName(), 1);
 
         xmlRpcHelper.waitForBuildInProgress(projectD.getName(), 1);
         assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectB.getName(), 1));
         assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
 
         projectD.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectD.getName(), 1);
 
         // due to timing issues, project B ends up being triggered next because project D is
         // still in the build queue.
@@ -232,10 +235,12 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         xmlRpcHelper.waitForBuildInPending(projectE.getName(), 1);
 
         projectB.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectB.getName(), 1);
 
         xmlRpcHelper.waitForBuildInProgress(projectE.getName(), 1);
         assertEquals(PENDING, xmlRpcHelper.getBuildStatus(projectC.getName(), 1));
         projectE.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(projectE.getName(), 1);
 
         xmlRpcHelper.waitForBuildInProgress(projectC.getName(), 1);
         projectC.releaseBuild();

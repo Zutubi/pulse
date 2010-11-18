@@ -144,6 +144,8 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
         homePage.waitForLatestCompletedBuild(2, BUILD_TIMEOUT);
         assertFalse(homePage.hasBuildActivity());
+
+        xmlRpcHelper.waitForProjectToBeIdle(project.getName());        
     }
 
     public void testBuildAndChangeHistory() throws Exception

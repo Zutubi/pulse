@@ -183,6 +183,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         xmlRpcHelper.waitForAgentToBeIdle(agent2);
 
         project1.releaseBuild();
+        xmlRpcHelper.waitForBuildToComplete(project1.getName(), 1);
         xmlRpcHelper.waitForAgentToBeIdle(agent1);
     }
 

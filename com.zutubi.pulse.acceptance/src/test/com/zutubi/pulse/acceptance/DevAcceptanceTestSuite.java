@@ -57,6 +57,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectWorkingCopyAcceptanceTest.class);
         suite.addTestSuite(UsersAcceptanceTest.class);
         suite.addTestSuite(RememberMeAcceptanceTest.class);
+        suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
         suite.addTestSuite(InternationalisationAcceptanceTest.class);
 
         //---( build tests )---
@@ -84,8 +85,6 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(LocalBuildAcceptanceTest.class);
         suite.addTestSuite(PersonalBuildCommandAcceptanceTest.class);
         suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
-
-        suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
 
         return suite;
     }
