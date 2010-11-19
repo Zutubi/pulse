@@ -12,7 +12,6 @@
             pulse.system.temp.dir - The Pulse system temp directory -->
     <diskStore path="pulse.system.temp.dir"/>
 
-
     <!--Default Cache configuration. These will applied to caches pragmatically created through
         the CacheManager.
 
@@ -48,17 +47,14 @@
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
             diskPersistent="false"
-            diskExpiryThreadIntervalSeconds="120"
-            />
+            diskExpiryThreadIntervalSeconds="120"/>
 
     <cache name="BuildResultsRss"
            maxElementsInMemory="2000"
            eternal="true"
-           overflowToDisk="false"
-            />
+           overflowToDisk="false"/>
 
     <!-- Hibernate built in caches -->
-
     <cache name="org.hibernate.cache.StandardQueryCache"
            maxElementsInMemory="5"
            eternal="false"
@@ -71,7 +67,6 @@
            overflowToDisk="true"/>
 
     <!-- Hibernate entities and associations -->
-
     <cache name="com.zutubi.pulse.master.model.User"
            maxElementsInMemory="500"
            eternal="true"
@@ -101,4 +96,5 @@
            maxElementsInMemory="1000"
            eternal="true"
            overflowToDisk="false"/>
+    
 </ehcache>
