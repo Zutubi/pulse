@@ -22,12 +22,13 @@ wrapper.java.library.path.1=../lib
 wrapper.java.additional.1=-Dpulse.home=..
 wrapper.java.additional.2=-Djava.awt.headless=true
 wrapper.java.additional.3=-Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig
+wrapper.java.additional.4=-XX:MaxPermSize=128m
 
 # Initial Java Heap Size (in MB)
 #wrapper.java.initmemory=3
 
 # Maximum Java Heap Size (in MB)
-wrapper.java.maxmemory=512
+wrapper.java.maxmemory=1024
 
 # Application parameters.  Add parameters as needed starting from 1
 wrapper.app.parameter.1=com.zutubi.pulse.command.PulseCtl

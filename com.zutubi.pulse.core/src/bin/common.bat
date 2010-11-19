@@ -30,7 +30,7 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :haveJava
 
-if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx512m
+if "%JAVA_OPTS%"=="" set JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=128m"
 
 :restart
 

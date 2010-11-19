@@ -61,7 +61,7 @@ fi
 
 if [ -z "$JAVA_OPTS" ]
 then
-    JAVA_OPTS=-Xmx512m
+    JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=128m"
 fi
 
 code=111
