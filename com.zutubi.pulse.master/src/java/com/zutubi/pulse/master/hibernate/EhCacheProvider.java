@@ -9,7 +9,7 @@ import java.util.Properties;
 /**
  * An implementation of the hibernate cache provider interface.
  *
- * This implementation allows us to use our the Pulse systems
+ * This implementation allows us to use the Pulse system's
  * Ehcache configuration, which uses a custom diskStore path.
  *
  * To install this cache provider implementation, add the following
