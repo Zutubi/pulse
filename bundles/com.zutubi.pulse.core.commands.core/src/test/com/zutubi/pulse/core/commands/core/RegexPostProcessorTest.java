@@ -303,7 +303,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
 
         RegexPostProcessor pp = new RegexPostProcessor(ppConfig);
-        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, context));
         List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
@@ -399,7 +399,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         RegexPostProcessor pp = new RegexPostProcessor(config);
-        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, context));
+        pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, context));
         List<PersistentFeature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());

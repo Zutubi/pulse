@@ -81,7 +81,7 @@ public class MakePostProcessorTest extends PulseTestCase
         ExecutionContext context = new PulseExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, file.getParentFile().getAbsolutePath());
 
-        pp.process(file, new DefaultPostProcessorContext(artifact, new CommandResult("w00t"), context));
+        pp.process(file, new DefaultPostProcessorContext(artifact, new CommandResult("w00t"), Integer.MAX_VALUE, context));
         return artifact.getFeatures();
     }
 

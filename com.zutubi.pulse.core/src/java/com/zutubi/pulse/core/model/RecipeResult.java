@@ -258,7 +258,7 @@ public class RecipeResult extends Result
 
     public void loadFeatures(File dataRoot)
     {
-        for(CommandResult command: results)
+        for (CommandResult command: results)
         {
             command.loadFeatures(getRecipeDir(dataRoot));
         }

@@ -11,6 +11,8 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.cli.HelpCommand;
 import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
@@ -39,9 +41,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 
 /**
  * A command to run a post-processor manually over a single file.  Used to
@@ -135,7 +134,7 @@ public class PostProcessCommand implements Command
             PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
             executionContext.add(NAMESPACE_INTERNAL, new GenericVariable<PersistentTestSuiteResult>(PROPERTY_TEST_RESULTS, testResults));
 
-            PostProcessorContext context = new DefaultPostProcessorContext(artifact, result, executionContext);
+            PostProcessorContext context = new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, executionContext);
 
             indenter.println("Running processor...");
             processor.process(in, context);

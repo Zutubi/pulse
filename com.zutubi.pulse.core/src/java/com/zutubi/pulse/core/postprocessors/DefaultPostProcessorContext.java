@@ -23,12 +23,14 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 {
     private StoredFileArtifact artifact;
     private CommandResult commandResult;
+    private int featureLimit;
     private ExecutionContext executionContext;
 
-    public DefaultPostProcessorContext(StoredFileArtifact artifact, CommandResult commandResult, ExecutionContext executionContext)
+    public DefaultPostProcessorContext(StoredFileArtifact artifact, CommandResult commandResult, int featureLimit, ExecutionContext executionContext)
     {
         this.artifact = artifact;
         this.commandResult = commandResult;
+        this.featureLimit = featureLimit;
         this.executionContext = executionContext;
     }
 
@@ -71,7 +73,10 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeature(Feature feature)
     {
-        artifact.addFeature(convertFeature(feature));
+        if (artifact.getFeatures().size() < featureLimit)
+        {
+            artifact.addFeature(convertFeature(feature));
+        }
     }
 
     public void failCommand(String message)

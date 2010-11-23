@@ -1,12 +1,24 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.pulse.core.util.api.XMLUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import nu.xom.*;
+import nu.xom.Attribute;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Text;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * A FeaturePersister is used to read/write artifact feature information
@@ -97,25 +109,60 @@ public class FeaturePersister
         }
     }
 
-    public void readFeatures(CommandResult result, File recipeDir) throws ParsingException, IOException
+    /**
+     * Reads all features stored for file artifacts captured for the given
+     * command result.  Limits may be applied both on a per-file artifact and
+     * total basis, as features are loaded into memory.
+     *  
+     * @param result               command to load the features into
+     * @param recipeDir            directory where the recipe result containing
+     *                             the command is stored
+     * @param perFileArtifactLimit maximum number of features to load for a
+     *                             single file artifact
+     * @param totalLimit           maximum number of features to load in total
+     *                             (i.e. across all file artifacts)
+     * @throws IOException         on error reading the features file
+     * @throws XMLStreamException  if the features file is badly formed
+     */
+    public void readFeatures(CommandResult result, File recipeDir, int perFileArtifactLimit, int totalLimit) throws IOException, XMLStreamException
     {
         File featuresFile = getFeaturesFile(result, recipeDir, false);
-        Builder builder = new Builder();
         if (featuresFile.exists())
         {
-            Document doc = builder.build(featuresFile);
-            readArtifacts(doc.getRootElement(), result);
+            InputStream input = null;
+            try
+            {
+                input = new FileInputStream(featuresFile);
+                XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+                XMLStreamReader reader = inputFactory.createXMLStreamReader(input);
+                while (reader.getEventType() != XMLStreamConstants.END_DOCUMENT && !reader.isStartElement())
+                {
+                    reader.next();
+                }
+
+                // only trigger the callback if there is something to process.
+                if (reader.isStartElement())
+                {
+                    readArtifacts(reader, result, perFileArtifactLimit, totalLimit);
+                }
+            }
+            finally
+            {
+                IOUtils.close(input);
+            }
         }
     }
 
-    private void readArtifacts(Element root, CommandResult result)
+    private int readArtifacts(XMLStreamReader reader, CommandResult result, int perFileArtifactLimit, int totalLimit) throws XMLStreamException
     {
-        Elements children = root.getChildElements(ELEMENT_ARTIFACT);
-        for(int i = 0; i < children.size(); i++)
+        int featuresRead = 0;
+        
+        nextTagOrEnd(reader);
+        while (nextSiblingTag(reader, ELEMENT_ARTIFACT))
         {
-            Element element = children.get(i);
-            String name = element.getAttributeValue(ATTRIBUTE_NAME);
-            if(name != null)
+            Map<String,String> attributes = getAttributes(reader);
+            String name = attributes.get(ATTRIBUTE_NAME);
+            if (name != null)
             {
                 StoredArtifact artifact = result.getArtifact(name);
                 if(artifact == null)
@@ -124,59 +171,94 @@ public class FeaturePersister
                     continue;
                 }
 
-                readArtifact(element, artifact);
+                featuresRead += readArtifact(reader, artifact, Math.min(perFileArtifactLimit, totalLimit - featuresRead), totalLimit - featuresRead);
+                if (featuresRead >= totalLimit)
+                {
+                    return featuresRead;
+                }
             }
+
+            expectEndTag(ELEMENT_ARTIFACT, reader);
+            nextTagOrEnd(reader);
         }
+
+        return featuresRead;
     }
 
-    private void readArtifact(Element artifactElement, StoredArtifact artifact)
+    private int readArtifact(XMLStreamReader reader, StoredArtifact artifact, int perFileArtifactLimit, int totalLimit) throws XMLStreamException
     {
-        Elements children = artifactElement.getChildElements(ELEMENT_FILE_ARTIFACT);
-        for(int i = 0; i < children.size(); i++)
+        int featuresRead = 0;
+
+        nextTagOrEnd(reader);
+        while (nextSiblingTag(reader, ELEMENT_FILE_ARTIFACT))
         {
-            Element element = children.get(i);
-            String path = element.getAttributeValue(ATTRIBUTE_PATH);
-            if(path != null)
+            Map<String,String> attributes = getAttributes(reader);
+            String path = attributes.get(ATTRIBUTE_PATH);
+            if (path != null)
             {
                 StoredFileArtifact fileArtifact = artifact.findFile(path);
-                if(fileArtifact == null)
+                if (fileArtifact == null)
                 {
                     LOG.warning("Features file refers to unknown file artifact '" + path + "'");
                     continue;
                 }
 
-                readFileArtifact(element, fileArtifact);
+                featuresRead += readFileArtifact(reader, fileArtifact, Math.min(perFileArtifactLimit, totalLimit - featuresRead));
+                if (featuresRead >= totalLimit)
+                {
+                    return featuresRead;
+                }
             }
+
+            expectEndTag(ELEMENT_FILE_ARTIFACT, reader);
+            nextTagOrEnd(reader);
         }
+
+        return featuresRead;
     }
 
-    private void readFileArtifact(Element fileArtifactElement, StoredFileArtifact fileArtifact)
+    private int readFileArtifact(XMLStreamReader reader, StoredFileArtifact fileArtifact, int limit) throws XMLStreamException
     {
-        Elements children = fileArtifactElement.getChildElements(ELEMENT_FEATURE);
-        for(int i = 0; i < children.size(); i++)
+        int featuresRead = 0;
+        
+        nextTagOrEnd(reader);
+        while (nextSiblingTag(reader, ELEMENT_FEATURE))
         {
-            Element element = children.get(i);
-            try
+            if (featuresRead < limit)
             {
-                Feature.Level level = Feature.Level.valueOf(getRequiredAttribute(element, ATTRIBUTE_LEVEL));
-                long firstLine = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_FIRST_LINE));
-                long lastLine = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_LAST_LINE));
-                long line = Long.parseLong(getRequiredAttribute(element, ATTRIBUTE_LINE));
-                String summary = XMLUtils.getText(element, null, false);
+                try
+                {
+                    Map<String, String> attributes = getAttributes(reader);
+                    Feature.Level level = Feature.Level.valueOf(getRequiredAttribute(attributes, ATTRIBUTE_LEVEL));
+                    long firstLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_FIRST_LINE));
+                    long lastLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LAST_LINE));
+                    long line = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LINE));
+                    String summary = reader.getElementText();
 
-                fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
+                    fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
+                    featuresRead++;
+                }
+                catch (IllegalArgumentException e)
+                {
+                    LOG.warning(e);
+                }
             }
-            catch (IllegalArgumentException e)
+            else
             {
-                LOG.warning(e);
+                nextTagOrEnd(reader);
             }
+            
+            expectEndTag(ELEMENT_FEATURE, reader);
+            nextTagOrEnd(reader);
         }
+
+        return featuresRead;
     }
 
-    private String getRequiredAttribute(Element element, String name)
+    private String getRequiredAttribute(Map<String, String> attributes, String name)
     {
-        String value = element.getAttributeValue(name);
-        if(value == null)
+        String value = attributes.get(name);
+        if (value == null)
         {
             throw new IllegalArgumentException("Required attribute '" + name + "' not found");
         }
