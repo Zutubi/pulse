@@ -203,7 +203,6 @@ public class MonitorApi
 
     private Hashtable<String, Object> getPersonalBuildStatus(User user, long sinceTime)
     {
-        Hashtable<String, Object> result = new Hashtable<String, Object>();
         List<BuildResult> personalBuilds = buildManager.getPersonalBuilds(user);
         List<BuildResult> inProgress = new LinkedList<BuildResult>();
         BuildResult latestCompleted = null;
