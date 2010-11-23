@@ -50,7 +50,7 @@
 
         <!-- Test dependencies -->
         <dependency org="com.thoughtworks.selenium" name="com.thoughtworks.selenium" rev="2.0.a5" conf="external,build->default;src->src"/>
-        <dependency org="com.dumbster" name="com.dumbster.smtp" rev="1.6.0" conf="external,build->default;src->src"/>
+        <dependency org="com.dumbster" name="com.dumbster.smtp" rev="20090217" conf="external,build->default;src->src"/>
         <dependency org="com.svnkit" name="com.svnkit" rev="1.2.0" conf="external,build->default;src->src"/>
 
         <dependency org="org.python" name="org.jython" rev="20080715" conf="external,build->default;src->src"/>
