@@ -32,13 +32,17 @@ public class DefaultCommandContext implements CommandContext
 
     private ExecutionContext executionContext;
     private CommandResult result;
+    private int perFileFeatureLimit;
+    private int totalFileFeatureLimit;
     private Map<String, ArtifactSpec> registeredArtifacts = new LinkedHashMap<String, ArtifactSpec>();
     private PostProcessorFactory postProcessorFactory;
 
-    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, PostProcessorFactory postProcessorFactory)
+    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, int perFileFeatureLimit, int totalFileFeatureLimit, PostProcessorFactory postProcessorFactory)
     {
         this.executionContext = executionContext;
         this.result = result;
+        this.perFileFeatureLimit = perFileFeatureLimit;
+        this.totalFileFeatureLimit = totalFileFeatureLimit;
         this.postProcessorFactory = postProcessorFactory;
     }
 
@@ -159,6 +163,7 @@ public class DefaultCommandContext implements CommandContext
 
     public void processArtifacts()
     {
+        int fileFeatureCount = 0;
         for (ArtifactSpec spec: registeredArtifacts.values())
         {
             final List<PostProcessor> processors = CollectionUtils.map(spec.getProcessors(), new Mapping<PostProcessorConfiguration, PostProcessor>()
@@ -187,11 +192,14 @@ public class DefaultCommandContext implements CommandContext
                 }
 
                 spec.getArtifact().add(fileArtifact);
-                PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, executionContext);
+                int fileFeatureLimit = Math.min(perFileFeatureLimit, totalFileFeatureLimit - fileFeatureCount);
+                PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, fileFeatureLimit, executionContext);
                 for (PostProcessor pp: processors)
                 {
                     pp.process(file, ppContext);
                 }
+                
+                fileFeatureCount += fileArtifact.getFeatures().size();
             }            
         }
     }

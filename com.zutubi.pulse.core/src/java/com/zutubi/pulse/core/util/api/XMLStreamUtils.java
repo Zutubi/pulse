@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.util.api;
 
 import com.zutubi.util.logging.Logger;
-
-import javax.xml.stream.XMLStreamConstants;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
+
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.lang.reflect.Field;
@@ -324,7 +324,7 @@ public class XMLStreamUtils
 
     /**
      * This method moves the cursor over the current elements siblings, returning true when
-     * an element with one of the specificed tag names is encountered and leaving the cursor
+     * an element with one of the specified tag names is encountered and leaving the cursor
      * at that start tag.  If no tags of the specified name are encountered, the cursor is
      * moved past all of the siblings and false is returned.
      *

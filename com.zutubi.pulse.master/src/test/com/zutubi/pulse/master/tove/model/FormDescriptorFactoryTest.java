@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
 
 public class FormDescriptorFactoryTest extends ZutubiTestCase
 {
@@ -32,7 +32,7 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
-        assertEquals("text", fieldDescriptors.get(0).getType());
+        assertEquals("password", fieldDescriptors.get(0).getType());
     }
 
     public void testTextField() throws TypeException
@@ -64,6 +64,7 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
     @SymbolicName("password")
     public static class PasswordConfig extends AbstractConfiguration
     {
+        @Password
         private String password;
 
         public String getPassword()

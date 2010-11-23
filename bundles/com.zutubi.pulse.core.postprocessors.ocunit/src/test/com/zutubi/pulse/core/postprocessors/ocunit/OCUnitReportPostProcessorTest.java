@@ -179,7 +179,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
         
-        pp.process(new File(tmpDir, artifact.getPath()), new DefaultPostProcessorContext(artifact, result, context));
+        pp.process(new File(tmpDir, artifact.getPath()), new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, context));
         return testResults;
     }
 }

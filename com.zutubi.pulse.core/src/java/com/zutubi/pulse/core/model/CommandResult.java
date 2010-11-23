@@ -17,6 +17,9 @@ import java.util.Properties;
 public class CommandResult extends Result
 {
     private static final Logger LOG = Logger.getLogger(CommandResult.class);
+    
+    public static final int FEATURE_LIMIT_PER_FILE = Integer.getInteger("pulse.feature.limit.per.file", 1024);
+    public static final int FEATURE_LIMIT_PER_COMMAND = Integer.getInteger("pulse.feature.limit.per.command", 4096);  
 
     // NOTE: if you add a field here (or to the base class) you must also
     // modify the update() method!
@@ -149,12 +152,12 @@ public class CommandResult extends Result
 
     public void loadFeatures(File recipeDir)
     {
-        if(completed())
+        if (completed())
         {
             try
             {
                 FeaturePersister persister = new FeaturePersister();
-                persister.readFeatures(this, recipeDir);
+                persister.readFeatures(this, recipeDir, FEATURE_LIMIT_PER_FILE, FEATURE_LIMIT_PER_COMMAND);
             }
             catch (Exception e)
             {

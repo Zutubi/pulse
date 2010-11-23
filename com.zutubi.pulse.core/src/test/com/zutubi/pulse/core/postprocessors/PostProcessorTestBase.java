@@ -69,7 +69,7 @@ public abstract class PostProcessorTestBase extends PulseTestCase
 
     private PostProcessorContext createContext(CommandResult commandResult, ExecutionContext context)
     {
-        return new DefaultPostProcessorContext(artifact, commandResult, context);
+        return new DefaultPostProcessorContext(artifact, commandResult, Integer.MAX_VALUE, context);
     }
 
     protected void assertErrors(String... summaries)

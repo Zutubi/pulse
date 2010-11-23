@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
@@ -13,6 +14,7 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -37,9 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipies.
@@ -397,7 +396,7 @@ public class RecipeProcessor
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
-        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, postProcessorFactory);
+        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, CommandResult.FEATURE_LIMIT_PER_FILE, CommandResult.FEATURE_LIMIT_PER_COMMAND, postProcessorFactory);
         try
         {
             if (commandConfig.isEnabled())
