@@ -34,7 +34,7 @@ if "%JAVA_OPTS%"=="" set JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=128m"
 
 :restart
 
-"%_JAVACMD%" %JAVA_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
+"%_JAVACMD%" "%JAVA_OPTS%" -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
 
 set CODE=%ERRORLEVEL%
 if %CODE% equ 111 goto restart
