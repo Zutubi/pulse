@@ -32,7 +32,7 @@ public class FormDescriptorFactoryTest extends ZutubiTestCase
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
-        assertEquals("password", fieldDescriptors.get(0).getType());
+        assertEquals("text", fieldDescriptors.get(0).getType());
     }
 
     public void testTextField() throws TypeException
