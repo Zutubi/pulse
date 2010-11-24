@@ -668,7 +668,7 @@
             </then>
         </if>
 
-        <zutubi:ivytoidea conf="build, src" projectFile="pulse.ipr" propertiesFile="build.properties">
+        <zutubi:ivytoidea conf="build, src" testConf="test" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
                 <include name="bundles/*/ivy.xml"/>

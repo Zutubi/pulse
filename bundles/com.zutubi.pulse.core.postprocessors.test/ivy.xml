@@ -21,7 +21,7 @@
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,test,src->@"/>
     </dependencies>
     
 </ivy-module>

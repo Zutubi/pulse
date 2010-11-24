@@ -17,12 +17,12 @@
     <publications>
         <artifact name="com.zutubi.pulse.core.scm.svn" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.core.scm.svn-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.core.scm.svn-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.core.scm.svn-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,test,src->@"/>
 
         <!-- External dependencies -->
         <dependency org="com.svnkit" name="com.svnkit" rev="1.3.3" conf="external,build,bundled_3rd_party->default;src->src"/>

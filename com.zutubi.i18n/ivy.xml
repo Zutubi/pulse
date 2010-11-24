@@ -17,7 +17,7 @@
     <publications>
         <artifact name="com.zutubi.i18n" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.i18n-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.i18n-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.i18n-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>

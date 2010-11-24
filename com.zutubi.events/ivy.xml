@@ -17,7 +17,7 @@
     <publications>
         <artifact name="com.zutubi.events" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.events-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.events-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.events-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>

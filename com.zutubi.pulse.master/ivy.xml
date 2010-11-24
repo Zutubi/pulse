@@ -22,7 +22,7 @@
     <publications>
         <artifact name="com.zutubi.pulse.master" type="jar" conf="release,build"/>
         <artifact name="com.zutubi.pulse.master-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.master-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.master-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
@@ -69,7 +69,7 @@
         <dependency org="zutubi" name="jsdeps" rev="0.2" conf="external,build,release->default;src->src"/>
 
         <!-- Test dependencies-->
-        <dependency org="org.apache.directory" name="org.apache.directory.server" rev="1.5.7"  conf="build->default;src->src"/>
+        <dependency org="org.apache.directory" name="org.apache.directory.server" rev="1.5.7"  conf="test->default"/>
 
     </dependencies>
 </ivy-module>

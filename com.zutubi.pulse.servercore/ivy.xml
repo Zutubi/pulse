@@ -21,7 +21,7 @@
     <publications>
         <artifact name="com.zutubi.pulse.servercore" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.pulse.servercore-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.servercore-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.servercore-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>

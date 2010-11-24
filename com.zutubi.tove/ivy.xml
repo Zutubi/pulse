@@ -14,16 +14,16 @@
     <publications>
         <artifact name="com.zutubi.tove" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.tove-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.tove-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.tove-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="release,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="release,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="release,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="release,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
 
         <!-- external libraries -->
         <dependency org="nu.xom" name="nu.xom" rev="20080314" conf="build,release->default;src->src"/>

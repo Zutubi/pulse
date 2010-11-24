@@ -24,6 +24,6 @@
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="build,external,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="build,external,test,src->@"/>
     </dependencies>
 </ivy-module>

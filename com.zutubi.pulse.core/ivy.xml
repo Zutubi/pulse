@@ -19,16 +19,16 @@
     <publications>
         <artifact name="com.zutubi.pulse.core" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.pulse.core-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.core-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.core-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.diff" rev="latest.integration" conf="release,external,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="release,external,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="release,external,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build,src->@"/>
-        <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.diff" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
 
         <!-- Library dependencies -->
         <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default;src->src"/>
@@ -54,8 +54,8 @@
         <dependency org="eclipse" name="equinox-bundles" rev="3.3_2" conf="build->default;src->src"/>
 
         <!-- Test dependencies -->
-        <dependency org="org.junit" name="org.junit" rev="4.8.2" conf="external,build->default;src->src"/>
-        <dependency org="org.mockito" name="org.mockito" rev="1.5.0" conf="external,build->default;src->src"/>
+        <dependency org="org.junit" name="org.junit" rev="4.8.2" conf="external,test->default;src->src"/>
+        <dependency org="org.mockito" name="org.mockito" rev="1.5.0" conf="external,test->default;src->src"/>
         
     </dependencies>
 </ivy-module>

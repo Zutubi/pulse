@@ -14,7 +14,7 @@
     <publications>
         <artifact name="com.zutubi.validation" type="jar" conf="release, build"/>
         <artifact name="com.zutubi.validation-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.validation-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.validation-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
@@ -27,6 +27,6 @@
         <dependency org="javax.mail" name="javax.mail" rev="1.4.0" conf="build,release->default;src->src"/>
 
         <!-- Test dependencies-->
-        <dependency org="org.junit" name="org.junit" rev="4.8.2"  conf="build->default;src->src"/>
+        <dependency org="org.junit" name="org.junit" rev="4.8.2"  conf="test->default;src->src"/>
     </dependencies>
 </ivy-module>

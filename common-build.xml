@@ -166,8 +166,6 @@
         <mkdir dir="${report.dir}/junit/xml"/>
         <mkdir dir="${report.dir}/junit/html"/>
 
-        <!-- resolve the dependencies, into the build/lib directory. -->
-        <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
     </target>
 
     <target name="build-dependencies" unless="skip.dependencies">
@@ -196,6 +194,7 @@
         <echo message="    Component: build ${ivy.module}"/>
         <echo message="----------------------------------------------"/>
 
+        <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
         <javac target="5" destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
             <classpath refid="lib.path"/>
             <src refid="src.paths"/>
@@ -208,6 +207,7 @@
         <if> <!-- if we have tests to build, then do so. -->
             <not><isset property="no.tests"/></not>
             <then>
+                <retrieve-dependencies dest="${build.lib.dir}" conf="test"/>
                 <javac target="5" destdir="${test.classes.dir}" debug="true">
                     <classpath refid="lib.path"/>
                     <classpath location="${classes.dir}"/>

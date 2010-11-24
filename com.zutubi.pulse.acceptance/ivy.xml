@@ -18,7 +18,7 @@
     </configurations>
 
     <publications>
-        <artifact name="com.zutubi.pulse.acceptance" type="jar" conf="release,build"/>
+        <artifact name="com.zutubi.pulse.acceptance" type="jar" conf="release,build,test"/>
     </publications>
 
     <dependencies>

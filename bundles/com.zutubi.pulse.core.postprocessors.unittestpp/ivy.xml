@@ -17,11 +17,11 @@
     <publications>
         <artifact name="com.zutubi.pulse.core.postprocessors.unittestpp" type="jar" conf="bundle,build"/>
         <artifact name="com.zutubi.pulse.core.postprocessors.unittestpp-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.core.postprocessors.unittestpp-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.core.postprocessors.unittestpp-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,test,src->@"/>
     </dependencies>
 </ivy-module>
