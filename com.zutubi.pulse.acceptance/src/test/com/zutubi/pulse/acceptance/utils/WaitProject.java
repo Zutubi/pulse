@@ -7,13 +7,13 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.util.FileSystemUtils;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * A project configuration setup for working with the wait ant projects.
@@ -28,10 +28,12 @@ public class WaitProject extends ProjectConfigurationHelper
     private static final String WAIT_TIMEOUT = "300";
 
     private File waitBaseDir;
+    private boolean cleanup;
 
-    public WaitProject(ProjectConfiguration config, File tmpDir)
+    public WaitProject(ProjectConfiguration config, File tmpDir, boolean cleanup)
     {
         super(config);
+        this.cleanup = cleanup;
         waitBaseDir = new File(tmpDir, config.getName());
 
         File[] files = waitBaseDir.listFiles();
@@ -67,7 +69,13 @@ public class WaitProject extends ProjectConfigurationHelper
         ExecutableCommandConfiguration command = new ExecutableCommandConfiguration();
         command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
         command.setExe("java");
-        command.setExtraArguments(asList("-jar", JAR, "$(" + WAIT_FILE_PROPERTY + ")", WAIT_TIMEOUT));
+        List<String> arguments = new LinkedList<String>(asList("-jar", JAR, "$(" + WAIT_FILE_PROPERTY + ")", WAIT_TIMEOUT));
+        if (cleanup)
+        {
+            arguments.add("true");
+        }
+        
+        command.setExtraArguments(arguments);
         return command;
     }
 

@@ -23,11 +23,11 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Hashtable;
 
@@ -114,7 +114,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
     public void testBuildActivity() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(random, new File(tempDir, random));
+        WaitProject project = projects.createWaitAntProject(random, new File(tempDir, random), false);
         configurationHelper.insertProject(project.getConfig(), false);
 
         buildRunner.triggerBuild(project);

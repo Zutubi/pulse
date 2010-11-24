@@ -645,7 +645,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         File tempDir = createTempDirectory();
         try
         {
-            final WaitProject project = projects.createWaitAntProject(random, tempDir);
+            final WaitProject project = projects.createWaitAntProject(random, tempDir, false);
             configurationHelper.insertProject(project.getConfig(), false);
             
             rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
@@ -1277,7 +1277,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             //   - default: runs a recipe that completes quickly, with tests
             //   - second:  runs the default waiting recipe, which we can
             //              release when we choose (also with tests)
-            final WaitProject project = projects.createWaitAntProject(random, tempDir);
+            final WaitProject project = projects.createWaitAntProject(random, tempDir, false);
 
             DirectoryArtifactConfiguration reportsArtifact = new DirectoryArtifactConfiguration("test reports", "reports/xml");
             PostProcessorConfiguration junitProcessor = project.getConfig().getPostProcessors().get(JUNIT_PROCESSOR);

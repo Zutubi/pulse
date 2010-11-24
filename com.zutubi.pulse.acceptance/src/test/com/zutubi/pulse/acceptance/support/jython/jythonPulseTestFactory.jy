@@ -174,7 +174,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             modifiedCommonFile = open(modifiedCommonPath, 'w')
             try:
                 if isWindows():
-                    tag = '"%_JAVACMD%" %JAVA_OPTS%'
+                    tag = '"%_JAVACMD%" "%JAVA_OPTS%"'
 
                 else:
                     tag = '"$JAVACMD" $JAVA_OPTS'

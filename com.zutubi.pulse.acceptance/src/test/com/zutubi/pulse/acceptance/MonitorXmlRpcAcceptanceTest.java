@@ -80,8 +80,9 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
             ProjectConfigurations projects  = new ProjectConfigurations(configurationHelper);
 
             // Start an initial build, check it shows up as in progress.
-            WaitProject project = projects.createWaitAntProject(random, tempDir);
+            WaitProject project = projects.createWaitAntProject(random, tempDir, true);
             configurationHelper.insertProject(project.getConfig(), false);
+            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 

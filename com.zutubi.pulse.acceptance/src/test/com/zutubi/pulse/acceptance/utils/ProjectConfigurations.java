@@ -100,15 +100,18 @@ public class ProjectConfigurations
      * with the acceptance tests.  When executing, the build will wait until explicitly 'released'
      *
      * @param projectName   the name of the project.
-     * @param dir           a temporary directory that will be used to communicate with the build process.
+     * @param dir           a temporary directory that will be used to communicate with the build
+     *                      process
+     * @param cleanup       if true, the build will clean up the signal that caused it to release
+     *                      before it completes, allowing subsequent builds to wait again
      * @return the project configuration helper instance to allow further configuration
      * of this project.
      * 
      * @throws Exception thrown on error.
      */
-    public WaitProject createWaitAntProject(String projectName, File dir) throws Exception
+    public WaitProject createWaitAntProject(String projectName, File dir, boolean cleanup) throws Exception
     {
-        WaitProject project = new WaitProject(new ProjectConfiguration(projectName), dir);
+        WaitProject project = new WaitProject(new ProjectConfiguration(projectName), dir, cleanup);
         configureBaseProject(project, true);
         configureSvnScm(project, Constants.WAIT_ANT_REPOSITORY);
         return project;

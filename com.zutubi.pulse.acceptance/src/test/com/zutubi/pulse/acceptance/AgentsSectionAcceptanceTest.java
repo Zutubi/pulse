@@ -17,11 +17,11 @@ import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
-import static java.util.Arrays.asList;
 import java.util.Vector;
 
 /**
@@ -94,7 +94,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     public void testDisableEnable() throws Exception
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
-
+        rpcClient.RemoteApi.waitForAgentToBeIdle(LOCAL_AGENT);
+        
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
         assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_DISABLE));
@@ -112,7 +113,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
 
-        WaitProject project = projects.createWaitAntProject(randomName(), tempDir);
+        WaitProject project = projects.createWaitAntProject(randomName(), tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig(), false);
 
@@ -155,8 +156,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
-        WaitProject project1 = projects.createWaitAntProject(random + "-1", tempDir);
-        WaitProject project2 = projects.createWaitAntProject(random + "-2", tempDir);
+        WaitProject project1 = projects.createWaitAntProject(random + "-1", tempDir, false);
+        WaitProject project2 = projects.createWaitAntProject(random + "-2", tempDir, false);
         project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig(), false);
@@ -388,7 +389,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(projectName, tempDir);
+        WaitProject project = projects.createWaitAntProject(projectName, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
         configurationHelper.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());

@@ -65,10 +65,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildSingleDependency() throws Exception
     {
-        WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir);
+        WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -94,13 +94,13 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildMultipleDependencies() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir);
+        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         insertProject(projectB);
 
-        WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir);
+        WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectA);
         projectC.addDependency(projectB);
         insertProject(projectC);
@@ -157,14 +157,14 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildTransitiveDependency() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir);
+        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir);
+        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB);
         insertProject(projectC);
 
@@ -204,11 +204,11 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         // so we require it to have been built at least once for project b to be successful.
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir);
+        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB).setTransitive(false);
         insertProject(projectC);
 
@@ -240,15 +240,15 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA).setRevision(REVISION_LATEST_RELEASE);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir);
+        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB).setRevision(REVISION_LATEST_MILESTONE);
         insertProject(projectC);
 
-        final WaitProject projectD = projects.createWaitAntProject(projectName + "D", tmpDir);
+        final WaitProject projectD = projects.createWaitAntProject(projectName + "D", tmpDir, false);
         projectD.addDependency(projectC).setRevision(REVISION_LATEST_INTEGRATION);
         insertProject(projectD);
 
@@ -286,7 +286,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         ProjectConfigurationHelper projectA = projects.createFailAntProject(projectName + "A");
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -317,7 +317,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         projectA.getDefaultStage().setAgent(null);  // allow project A to run on any agent.
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir);
+        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         projectB.clearTriggers();                   // do not want dependency trigger firing.
         insertProject(projectB);

@@ -105,8 +105,10 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         assertEquals("build 2", getBrowser().getText(buildLinkId));
 
         rpcClient.RemoteApi.cancelBuild(project.getName(), 2);
+        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 2);
 
         getBrowser().refresh();
+        getBrowser().waitForPageToLoad(SeleniumBrowser.PAGELOAD_TIMEOUT);
         browsePage.waitFor();
         assertEquals("build 1", getBrowser().getText(buildLinkId));
 
@@ -190,7 +192,7 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject createProject(String suffix) throws Exception
     {
-        return projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix));
+        return projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix), false);
     }
 
     private void bindStagesToMaster(ProjectConfigurationHelper project) throws Exception

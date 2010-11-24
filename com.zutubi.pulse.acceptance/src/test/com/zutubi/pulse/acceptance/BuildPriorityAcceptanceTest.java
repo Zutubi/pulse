@@ -110,7 +110,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
     public void testStagePriorities() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(randomName(), tempDir);
+        WaitProject project = projects.createWaitAntProject(randomName(), tempDir, false);
         project.addStage("B").setPriority(2);
         project.addStage("C").setPriority(4);
         project.addStage("D").setPriority(-1);
@@ -271,7 +271,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject createProject(String suffix) throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix));
+        WaitProject project = projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix), false);
         // projects can only be built on the master to ensure that we get expected queing behaviour.
         bindStagesToMaster(project);
         return project;

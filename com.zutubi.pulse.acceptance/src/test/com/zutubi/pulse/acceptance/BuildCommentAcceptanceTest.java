@@ -129,7 +129,7 @@ public class BuildCommentAcceptanceTest extends AcceptanceTestBase
     // Checks that the build controller updating a build does not result in comments being lost.
     public void testAddCommentToInProgressBuild() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(random, tempDir);
+        WaitProject project = projects.createWaitAntProject(random, tempDir, false);
         configurationHelper.insertProject(project.getConfig(), false);
 
         List<String> requestIds = buildRunner.triggerBuild(project);
