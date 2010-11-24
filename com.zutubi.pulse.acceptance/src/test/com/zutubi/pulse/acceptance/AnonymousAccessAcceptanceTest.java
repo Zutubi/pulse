@@ -201,6 +201,8 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 
         assertPageVisible(GroupsPage.class);
         assertPageVisible(UsersPage.class);
+
+        setAnonymousServerPermissions();
     }
 
     private void setAnonymousServerPermissions(ServerPermission... permissions) throws Exception
