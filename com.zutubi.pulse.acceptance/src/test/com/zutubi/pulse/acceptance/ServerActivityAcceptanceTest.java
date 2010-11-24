@@ -20,7 +20,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
     private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
     private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
     private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.stage.queue";
-    private static final String REVISION_WAIT_ANT = "28";
+    private static final String REVISION_WAIT_ANT = "29";
 
     private static final int TIMEOUT = 90000;
 
