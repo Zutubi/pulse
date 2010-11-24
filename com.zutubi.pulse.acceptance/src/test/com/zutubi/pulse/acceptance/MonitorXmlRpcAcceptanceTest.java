@@ -7,11 +7,11 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import static com.zutubi.util.Constants.MINUTE;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.*;
 
 /**
@@ -239,10 +239,11 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testGetStatusForAllProjects() throws Exception
     {
-        Vector<String> allProjects = rpcClient.RemoteApi.getAllProjectNames();
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        
         Hashtable<String,Object> statuses = rpcClient.MonitorApi.getStatusForAllProjects(false, "");
         assertSensibleTimestamp(statuses);
-        assertProjects(statuses, allProjects.toArray(new String[allProjects.size()]));
+        assertNotNull(getProject(statuses, random));
         assertFalse(statuses.containsKey(KEY_PERSONAL));
     }
 

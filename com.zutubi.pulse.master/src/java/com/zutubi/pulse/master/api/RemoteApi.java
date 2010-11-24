@@ -620,7 +620,7 @@ public class RemoteApi
 
     /**
      * Adds a new configuration object to this server.  Configuration objects can be inserted into
-     * collection paths (e.g. the project properties collecction), and also to paths that expect a
+     * collection paths (e.g. the project properties collection), and also to paths that expect a
      * single complex object but are not yet configured (e.g. a project scm).  Objects that already
      * exist may not be updated using this function, use {@link #saveConfig(String, String, java.util.Hashtable, boolean)}
      * instead.
