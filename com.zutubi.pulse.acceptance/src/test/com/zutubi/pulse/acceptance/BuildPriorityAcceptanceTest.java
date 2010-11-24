@@ -293,5 +293,10 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         {
             configurationHelper.insertProject(project.getConfig(), false);
         }
+
+        for (WaitProject project: projects)
+        {
+            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+        }
     }
 }
