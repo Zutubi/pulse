@@ -31,16 +31,26 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
     {
         if (browser != null)
         {
-            browser.open("/");
-            browser.waitForPageToLoad();
-            
-            if (browser.isLoggedIn())
+            if (browser.getPulsePort() == AcceptanceTestUtils.getPulsePort())
             {
-                browser.logout();
-            }
+                // Reuse this browser.
+                browser.open("/");
+                browser.waitForPageToLoad();
             
-            browser.open("/");
-            browser.waitForPageToLoad();
+                if (browser.isLoggedIn())
+                {
+                    browser.logout();
+                }
+            
+                browser.open("/");
+                browser.waitForPageToLoad();
+            }
+            else
+            {
+                // Force creation of a new browser.
+                browser.stop();
+                browser = null;
+            }
         }
     }
 

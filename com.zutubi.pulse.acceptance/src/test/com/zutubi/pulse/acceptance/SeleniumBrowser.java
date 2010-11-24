@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -11,6 +12,8 @@ import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 import freemarker.template.utility.StringUtil;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +23,6 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -47,6 +45,7 @@ public class SeleniumBrowser
     private static final int SELENIUM_PORT = 4446;
     
     private Selenium selenium;
+    private int pulsePort;
     private String browser;
     private boolean started = false;
     private Urls urls;
@@ -81,7 +80,7 @@ public class SeleniumBrowser
      */
     public SeleniumBrowser()
     {
-        this(getPulsePort(), getBrowserProperty());
+        this(AcceptanceTestUtils.getPulsePort(), getBrowserProperty());
     }
 
     public SeleniumBrowser(int port)
@@ -94,6 +93,7 @@ public class SeleniumBrowser
         this.browser = browser;
         String baseUrl = AcceptanceTestUtils.getPulseUrl(port);
         selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
+        this.pulsePort = port;
         urls = new Urls(baseUrl);
     }
 
@@ -148,6 +148,16 @@ public class SeleniumBrowser
     public boolean isFirefox()
     {
         return browser.contains("firefox");
+    }
+
+    /**
+     * Returns the Pulse port the browser is connecting to.
+     * 
+     * @return the Pulse port to connect to
+     */
+    public int getPulsePort()
+    {
+        return pulsePort;
     }
 
     /**
