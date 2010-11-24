@@ -14,9 +14,6 @@ import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
-import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
@@ -37,20 +34,20 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 {
     private static final Messages SIGNUP_MESSAGES = Messages.getInstance(SignupUserConfiguration.class);
     private static final String ANONYMOUS_GROUP_PATH =  getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME);
-
-    private ConfigurationHelper configurationHelper;
+    private static final String PROPERTY_ANON_ACCESS =  "anonymousAccessEnabled";
+    private static final String PROPERTY_ANON_SIGNUP =  "anonymousSignupEnabled";
 
     protected void setUp() throws Exception
     {
         super.setUp();
         rpcClient.loginAsAdmin();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
     }
 
     protected void tearDown() throws Exception
     {
+        setAnonymousAccess(false);
+        setAnonymousSignup(false);
+        setAnonymousServerPermissions();
         rpcClient.logout();
         super.tearDown();
     }
@@ -216,28 +213,27 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
                 return permission.toString();
             }
         });
-        group.put("serverPermissions", new Vector(permissionStrings));
+        group.put("serverPermissions", new Vector<String>(permissionStrings));
         rpcClient.RemoteApi.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
     }
 
     private void setAnonymousAccess(boolean enabled) throws Exception
     {
-        GlobalConfiguration globalConfig = configurationHelper.getConfiguration(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
-        if (globalConfig.isAnonymousAccessEnabled() != enabled)
-        {
-            globalConfig.setAnonymousAccessEnabled(enabled);
-            configurationHelper.update(globalConfig, false);
-            getBrowser().newSession();
-        }
+        setBooleanConfig(PROPERTY_ANON_ACCESS, enabled);
     }
 
     private void setAnonymousSignup(boolean enabled) throws Exception
     {
-        GlobalConfiguration globalConfig = configurationHelper.getConfiguration(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
-        if (globalConfig.isAnonymousSignupEnabled() != enabled)
+        setBooleanConfig(PROPERTY_ANON_SIGNUP, enabled);
+    }
+
+    private void setBooleanConfig(String property, boolean enabled) throws Exception
+    {
+        Hashtable<String, Object> global = rpcClient.RemoteApi.getConfig(GlobalConfiguration.SCOPE_NAME);
+        if ((Boolean) global.get(property) != enabled)
         {
-            globalConfig.setAnonymousSignupEnabled(enabled);
-            configurationHelper.update(globalConfig, false);
+            global.put(property, enabled);
+            rpcClient.RemoteApi.saveConfig(GlobalConfiguration.SCOPE_NAME, global, false);
             getBrowser().newSession();
         }
     }
