@@ -66,6 +66,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
         
         buildRunner.triggerBuild(projectB);
+        rpcClient.RemoteApi.waitForBuildInPending(projectB.getName(), 1);
         buildRunner.triggerBuild(projectC);
 
         assertBuildOrder(projectA, projectB, projectC);
@@ -210,11 +211,10 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildInProgress(projectA.getName(), 1);
 
         buildRunner.triggerBuild(projectB);
-        buildRunner.triggerBuild(projectC);
-        buildRunner.triggerBuild(projectD, asPair("priority", (Object)10));
-
         rpcClient.RemoteApi.waitForBuildInPending(projectB.getName(), 1);
+        buildRunner.triggerBuild(projectC);
         rpcClient.RemoteApi.waitForBuildInPending(projectC.getName(), 1);
+        buildRunner.triggerBuild(projectD, asPair("priority", (Object)10));
         rpcClient.RemoteApi.waitForBuildInPending(projectD.getName(), 1);
 
         projectA.releaseBuild();
