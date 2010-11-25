@@ -9,9 +9,6 @@ import junit.extensions.TestSetup;
 import java.io.File;
 import java.io.IOException;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getAgentPort;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulsePort;
-
 public class StartPulseTestSetup extends TestSetup
 {
     public static final String WORK_DIR_MASTER = "master";
@@ -29,25 +26,21 @@ public class StartPulseTestSetup extends TestSetup
     {
         JythonPulseTestFactory factory = new JythonPulseTestFactory();
 
-        int pulsePort = getPulsePort();
-        int agentPort = getAgentPort();
-
         File dir = AcceptanceTestUtils.getWorkingDirectory();
-
-        File userHome = new File(dir, "user.home");
+        File userHome = AcceptanceTestUtils.getUserHome();
         
         File pulsePackage = AcceptanceTestUtils.getPulsePackage();
         PulsePackage pkg = factory.createPackage(pulsePackage);
         pulse = pkg.extractTo(new File(dir, WORK_DIR_MASTER).getCanonicalPath());
-        pulse.setPort(pulsePort);
+        pulse.setPort(AcceptanceTestUtils.getPulsePort());
         pulse.setUserHome(userHome.getCanonicalPath());
+        pulse.setContext(AcceptanceTestUtils.getContextPath());
         pulse.start();
 
-        // start up an agent as well.  port 8890
         File agentPackage = AcceptanceTestUtils.getAgentPackage();
         PulsePackage agentPkg = factory.createPackage(agentPackage);
         agent = agentPkg.extractTo(new File(dir, WORK_DIR_AGENT).getCanonicalPath());
-        agent.setPort(agentPort);
+        agent.setPort(AcceptanceTestUtils.getAgentPort());
         agent.setUserHome(userHome.getCanonicalPath());
         agent.start();
     }

@@ -226,9 +226,6 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
         projectD.releaseBuild();
         rpcClient.RemoteApi.waitForBuildToComplete(projectD.getName(), 1);
-
-        // due to timing issues, project B ends up being triggered next because project D is
-        // still in the build queue.
         rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
         assertEquals(PENDING, rpcClient.RemoteApi.getBuildStatus(projectC.getName(), 1));
         rpcClient.RemoteApi.waitForBuildInPending(projectE.getName(), 1);

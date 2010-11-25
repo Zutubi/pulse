@@ -54,6 +54,11 @@ public class AcceptanceTestUtils
      */
     public static final String PROPERTY_AGENT_PORT = "agent.port";
 
+    /**
+     * The web ui context path that will be used during acceptance testing. 
+     */
+    public static final String PROPERTY_PULSE_CONTEXT = "pulse.context.path";
+
     public static final String PROPERTY_WORK_DIR = "work.dir";
 
     /**
@@ -87,9 +92,33 @@ public class AcceptanceTestUtils
         return getPulseUrl(getPulsePort());
     }
 
+    public static String getContextPath()
+    {
+        String path = System.getProperty(PROPERTY_PULSE_CONTEXT, null);
+        if (path != null)
+        {
+            // ensure that the path starts with a '/' but does not end with a '/'
+            if (!path.startsWith("/"))
+            {
+                path = "/" + path;
+            }
+            if (path.endsWith("/"))
+            {
+                path = path.substring(0, path.length() - 1);
+            }
+        }
+        return path;
+    }
+
     public static String getPulseUrl(int port)
     {
-        return "http://" + MASTER_HOST + ":" + port;
+        String contextPath = getContextPath();
+        if (contextPath == null)
+        {
+            contextPath = "";
+        }
+
+        return "http://" + MASTER_HOST + ":" + port + contextPath;
     }
 
     public static File getWorkingDirectory()
@@ -109,10 +138,14 @@ public class AcceptanceTestUtils
         return System.getProperties().containsKey(PROPERTY_WORK_DIR);
     }
 
+    public static File getUserHome()
+    {
+        return new File(getWorkingDirectory(), "user.home");
+    }
+
     public static File getDataDirectory() throws IOException
     {
-        // Acceptance tests should all be using the user.home directory in the /working directory.
-        File userHome = new File(getWorkingDirectory(), "user.home");
+        File userHome = getUserHome();
         Config config = loadConfigFromHome(userHome);
         if (config != null)
         {

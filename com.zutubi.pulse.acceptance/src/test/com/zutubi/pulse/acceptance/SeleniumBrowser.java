@@ -97,6 +97,11 @@ public class SeleniumBrowser
         urls = new Urls(baseUrl);
     }
 
+    public Urls getUrls()
+    {
+        return urls;
+    }
+
     /**
      * Start a fresh browser session by restarting the browser.
      */

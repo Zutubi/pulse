@@ -133,7 +133,7 @@ public class UpgradeAcceptanceTest extends AcceptanceTestBase
         pulse.setPort(port);
         pulse.start(true);
 
-        getBrowser().open("/");
+        getBrowser().open(urls.base());
         getBrowser().waitForElement("upgrade.preview", 120 * SECOND);
 
         // check that we have received the upgrade preview, and that the data is as expected.

@@ -34,7 +34,7 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
             if (browser.getPulsePort() == AcceptanceTestUtils.getPulsePort())
             {
                 // Reuse this browser.
-                browser.open("/");
+                browser.open(browser.getUrls().base());
                 browser.waitForPageToLoad();
             
                 if (browser.isLoggedIn())
@@ -42,7 +42,7 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
                     browser.logout();
                 }
             
-                browser.open("/");
+                browser.open(browser.getUrls().base());
                 browser.waitForPageToLoad();
             }
             else
