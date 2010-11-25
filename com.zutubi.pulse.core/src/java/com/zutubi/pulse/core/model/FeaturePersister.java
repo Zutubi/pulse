@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.model;
 import com.zutubi.pulse.core.engine.api.Feature;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.pulse.core.util.api.XMLUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.Attribute;
@@ -40,24 +41,36 @@ public class FeaturePersister
     private static final String ATTRIBUTE_LINE = "line";
 
 
-    public void writeFeatures(CommandResult result, File recipeDir) throws IOException
+    public File writeFeatures(CommandResult result, File recipeDir) throws IOException
     {
         File featuresFile = getFeaturesFile(result, recipeDir, true);
         Element root = new Element(ELEMENT_ARTIFACTS);
         Document doc = new Document(root);
         addArtifacts(root, result);
         XMLUtils.writeDocument(featuresFile, doc);
+        return featuresFile;
     }
 
-    private File getFeaturesFile(CommandResult result, File recipeDir, boolean ensureDir) throws IOException
+    private File getFeaturesFile(CommandResult result, File recipeDir, boolean forWrite) throws IOException
     {
         File featuresDir = getFeaturesDirectory(recipeDir);
-        if (ensureDir && !featuresDir.exists() && !featuresDir.mkdirs())
+        if (forWrite && !featuresDir.exists() && !featuresDir.mkdirs())
         {
             throw new IOException("Failed to create new directory: '" + featuresDir.getAbsolutePath() + "'");
         }
 
-        return new File(featuresDir, result.getCommandName() + ".xml");
+        File file = new File(featuresDir, FileSystemUtils.encodeFilenameComponent(result.getCommandName()) + ".xml");
+        if (!forWrite && !file.exists())
+        {
+            // For backwards compatibility, support non-encoded command names.
+            File oldFile = new File(featuresDir, result.getCommandName() + ".xml");
+            if (oldFile.exists())
+            {
+                file = oldFile;
+            }
+        }
+
+        return file;
     }
 
     public static File getFeaturesDirectory(File recipeDir)
