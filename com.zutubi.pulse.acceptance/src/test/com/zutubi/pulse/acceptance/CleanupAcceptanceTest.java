@@ -11,6 +11,7 @@ import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -47,8 +48,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         super.tearDown();
     }
 
-/*
-     FIXME: temporarily disabled to facilitate 2.3.0 release.
     public void testCleanupBuildArtifacts() throws Exception
     {
         final String projectName = random;
@@ -90,7 +89,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         Vector artifactsInBuild = rpcClient.RemoteApi.getArtifactsInBuild(projectName, 1);
         assertEquals(3, artifactsInBuild.size());
     }
-*/
 
     public void testCleanupAll() throws Exception
     {
@@ -356,13 +354,9 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         return page;
     }
 
-    public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
+    private boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
     {
-        BuildArtifactsPage page = getBrowser().createPage(BuildArtifactsPage.class, projectName, buildNumber);
-        if (!canOpenPage(page))
-        {
-            return false;
-        }
+        BuildArtifactsPage page = getBrowser().openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
 
         // reset the filter to ensure that what we need is available.
         page.resetFilter();
