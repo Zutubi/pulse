@@ -6,7 +6,9 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="processingTimestamp" column="PROCESSING_TIMESTAMP" type="long"/>
+        <property name="processingTimestamp" type="long">
+            <column name="PROCESSING_TIMESTAMP" default="0"/>
+        </property>
     </class>
 </hibernate-mapping>
         
