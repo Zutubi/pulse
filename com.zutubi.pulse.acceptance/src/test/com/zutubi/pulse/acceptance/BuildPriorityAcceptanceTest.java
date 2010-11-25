@@ -119,27 +119,27 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         insertProjects(project);
 
         buildRunner.triggerBuild(project);
-        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, WAIT_FOR_TIMEOUT);
-
-        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
-        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "C", 1));
-        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
-        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
-
-        project.releaseStage(project.getDefaultStage().getName());
         rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "C", 1, WAIT_FOR_TIMEOUT);
 
         assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "C", 1));
         assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
         assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("C");
-
         rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "B", 1, WAIT_FOR_TIMEOUT);
+
         assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "B", 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
         assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
 
         project.releaseStage("B");
+
+        rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), project.getDefaultStage().getName(), 1, WAIT_FOR_TIMEOUT);
+        assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), project.getDefaultStage().getName(), 1));
+        assertEquals(PENDING, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));
+
+        project.releaseStage(project.getDefaultStage().getName());
 
         rpcClient.RemoteApi.waitForBuildStageInProgress(project.getName(), "D", 1, WAIT_FOR_TIMEOUT);
         assertEquals(IN_PROGRESS, rpcClient.RemoteApi.getBuildStageStatus(project.getName(), "D", 1));

@@ -575,7 +575,29 @@ public class DefaultBuildController implements EventListener, BuildController
             executingControllers.add(node);
         }
 
-        for (TreeNode<RecipeController> node : nodes)
+        List<TreeNode<RecipeController>> sortedNodes = new LinkedList<TreeNode<RecipeController>>(nodes);
+        Collections.sort(sortedNodes, new Comparator<TreeNode<RecipeController>>()
+        {
+            public int compare(TreeNode<RecipeController> node1, TreeNode<RecipeController> node2)
+            {
+                int priority1 = node1.getData().getAssignmentRequest().getPriority();
+                int priority2 = node2.getData().getAssignmentRequest().getPriority();
+                if (priority1 > priority2)
+                {
+                    return -1;
+                }
+                else if (priority1 < priority2)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        });
+        
+        for (TreeNode<RecipeController> node : sortedNodes)
         {
             node.getData().initialise(bootstrapperCreator.create());
             checkNodeStatus(node);

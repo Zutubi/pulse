@@ -119,6 +119,11 @@ public class RecipeController
         }
     }
 
+    public RecipeAssignmentRequest getAssignmentRequest()
+    {
+        return assignmentRequest;
+    }
+
     public boolean matchesRecipeEvent(RecipeEvent event)
     {
         return event.getRecipeId() == recipeResult.getId();
