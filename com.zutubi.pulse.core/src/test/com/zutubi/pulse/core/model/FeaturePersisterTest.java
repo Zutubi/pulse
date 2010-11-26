@@ -50,7 +50,7 @@ public class FeaturePersisterTest extends PulseTestCase
         roundTrip(result);
     }
 
-    public void testControlCharacterINSummary() throws Exception
+    public void testControlCharacterInSummary() throws Exception
     {
         CommandResult result = getResultWithFeatures(new PersistentPlainFeature(Feature.Level.ERROR, "summary\u0000here", 10));
         roundTrip(result);
@@ -215,6 +215,35 @@ public class FeaturePersisterTest extends PulseTestCase
         assertFalse(featuresDir.exists());
         persister.readFeatures(new CommandResult("dummy"), tempDir, Integer.MAX_VALUE, Integer.MAX_VALUE);
         assertFalse(featuresDir.exists());
+    }
+
+    public void testCommandNameEncoding() throws Exception
+    {
+        PersistentPlainFeature[] features = new PersistentPlainFeature[]{new PersistentPlainFeature(Feature.Level.ERROR, "summary here", 10)};
+        CommandResult result = new CommandResult("command !@#$%^&*(){}|[];:',.<>?");
+        StoredArtifact artifact = new StoredArtifact("artifact", true, false);
+        result.addArtifact(artifact);
+        addFileWithFeatures(artifact, features);
+
+        roundTrip(result);
+    }
+
+    public void testLoadsNonEncodedCommandNameForCompatbility() throws Exception
+    {
+        PersistentPlainFeature[] features = new PersistentPlainFeature[]{new PersistentPlainFeature(Feature.Level.ERROR, "summary here", 10)};
+        CommandResult result = new CommandResult("command %");
+        result.setOutputDir(".");
+        StoredArtifact artifact = new StoredArtifact("artifact", true, false);
+        result.addArtifact(artifact);
+        addFileWithFeatures(artifact, features);
+
+        File file = persister.writeFeatures(result, tempDir);
+        assertTrue(file.renameTo(new File(file.getParent(), result.getCommandName() + ".xml")));
+        
+        String expected = getFeatureDescription(result);
+        nukeFeatures(result);
+        persister.readFeatures(result, tempDir, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        assertEquals(expected, getFeatureDescription(result));
     }
 
     private PersistentPlainFeature getFeature(String summary)
