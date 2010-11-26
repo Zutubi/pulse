@@ -854,6 +854,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
             }
         }, rpcClient.RemoteApi.BUILD_TIMEOUT, " build queue to clear");
 
+        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
         rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
     }
 
