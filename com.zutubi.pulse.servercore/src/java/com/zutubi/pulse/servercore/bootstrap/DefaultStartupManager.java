@@ -2,10 +2,10 @@ package com.zutubi.pulse.servercore.bootstrap;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.config.ConfigSupport;
-import com.zutubi.util.config.FileConfig;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.config.ConfigSupport;
+import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -87,7 +87,7 @@ public class DefaultStartupManager implements StartupManager
     {
         if (isSystemStarted())
         {
-            throw new StartupException("The system has alredy started.");
+            throw new StartupException("The system has already started.");
         }
         if (isSystemStarting())
         {

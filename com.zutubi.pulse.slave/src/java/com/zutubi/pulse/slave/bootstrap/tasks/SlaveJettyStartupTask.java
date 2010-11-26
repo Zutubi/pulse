@@ -7,6 +7,10 @@ import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.pulse.servercore.jetty.PulseWebappConfigurationHandler;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.jetty.Server;
+import org.mortbay.util.MultiException;
+
+import java.net.BindException;
+import java.util.List;
 
 /**
  * Start the slave web application.
@@ -28,10 +32,43 @@ public class SlaveJettyStartupTask implements StartupTask
 
         SystemConfiguration config = configurationManager.getSystemConfig();
 
-        Server server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
-        jettyServerManager.configureContext(WEBAPP_PULSE, config.getContextPath(), webapp);
+        try
+        {
+            Server server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
+            jettyServerManager.configureContext(WEBAPP_PULSE, config.getContextPath(), webapp);
 
-        server.start();
+            server.start();
+        }
+        catch(MultiException e)
+        {
+            for(Exception nested: (List<Exception>)e.getExceptions())
+            {
+                if (nested instanceof BindException)
+                {
+                    handleBindException(config);
+                }
+                else
+                {
+                    LOG.severe("Unable to start server: " + nested.getMessage(), nested);
+                }
+            }
+
+            // This is fatal.
+            System.exit(1);
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Unable to start server: " + e.getMessage(), e);
+
+            // This is fatal.
+            System.exit(1);
+        }
+    }
+
+    private void handleBindException(SystemConfiguration config)
+    {
+        LOG.severe(String.format("Unable to start on port %s because it " +
+                "is being used by another process.  Please select a different port and restart pulse.", config.getServerPort()));
     }
 
     public boolean haltOnFailure()

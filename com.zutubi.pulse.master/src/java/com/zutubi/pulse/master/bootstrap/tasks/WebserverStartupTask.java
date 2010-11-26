@@ -69,7 +69,6 @@ public class WebserverStartupTask implements StartupTask
             // This is fatal.
             System.exit(1);
         }
-        
     }
 
     private void handleBindException(SystemConfiguration config)
