@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.license;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.license.authorisation.Authorisation;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -11,7 +11,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.events.InsertEvent;
-import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.events.ConfigurationSystemEventListener;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class LicenseManager
 {
+    private static final Messages I18N = Messages.getInstance(LicenseManager.class);
     private static final Logger LOG = Logger.getLogger(LicenseManager.class);
 
     private EventManager eventManager;
@@ -38,9 +39,13 @@ public class LicenseManager
      */
     public void installLicense(String newKey) throws LicenseException
     {
-        // check that the license key is valid.
+        // check that the license key is valid.  Decode will throw an exception
+        // if it is not.
         LicenseDecoder decoder = new LicenseDecoder();
-        decoder.decode(newKey.getBytes());
+        if (decoder.decode(newKey.getBytes()) == null)
+        {
+            throw new LicenseException(I18N.format("invalid.key"));
+        }
 
         // persist the license key
         keyStore.setKey(newKey);
@@ -51,31 +56,15 @@ public class LicenseManager
      */
     public void init()
     {
-        eventManager.register(new EventListener()
+        eventManager.register(new ConfigurationSystemEventListener()
         {
-            public void handleEvent(Event evt)
+            @Override
+            public void configurationEventSystemStarted()
             {
-                if(evt instanceof DataDirectoryChangedEvent)
-                {
-                    // the license manager monitors for changes in the system data directory. We 'know' this is
-                    // where the license is stored, so if there is a change, we need to refresh.  This SHOULD be reflected
-                    // in the licenseKeyStore / licenseManager interaction somehow since it is the license key store that
-                    // is using the data directory for storage purposes.
-                    refresh();
-                }
-                else
-                {
-                    // Now the config system is up, we can start enforcing the license.
-                    eventManager.register(new LicenseEnforcingListener());
-                }
-            }
-
-            public Class[] getHandledEvents()
-            {
-                return new Class[]{DataDirectoryChangedEvent.class, ConfigurationEventSystemStartedEvent.class};
+                eventManager.register(new LicenseEnforcingListener());
             }
         });
-
+        
         keyStore.register(new LicenseKeyStoreListener()
         {
             public void keyChanged()
@@ -102,7 +91,7 @@ public class LicenseManager
             catch (LicenseException e)
             {
                 // license key is invalid.
-                LOG.warning("Failed to decode the configured license key.", e);
+                LOG.warning(I18N.format("invalid.key"), e);
                 license = null;
             }
         }
@@ -116,13 +105,17 @@ public class LicenseManager
 
     public void refreshAuthorisations()
     {
-        License license = LicenseHolder.getLicense();
-        List<String> newAuths = new LinkedList<String>();
-        for (Authorisation auth : authorisations)
+        synchronized (LicenseHolder.class)
         {
-            newAuths.addAll(Arrays.asList(auth.getAuthorisation(license)));
+            List<String> newAuthorisations = new LinkedList<String>();
+            
+            License license = LicenseHolder.getLicense();
+            for (Authorisation auth : authorisations)
+            {
+                newAuthorisations.addAll(Arrays.asList(auth.getAuthorisation(license)));
+            }
+            LicenseHolder.setAuthorizations(newAuthorisations);
         }
-        LicenseHolder.setAuthorizations(newAuths);
     }
 
     /**
@@ -165,21 +158,21 @@ public class LicenseManager
             {
                 if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_PROJECT))
                 {
-                    throw new LicenseException("Unable to add project: license limit exceeded");
+                    throw new LicenseException(I18N.format("add.project.limit.exceeded"));
                 }
             }
             else if(instance instanceof AgentConfiguration)
             {
                 if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_AGENT))
                 {
-                    throw new LicenseException("Unable to add agent: license limit exceeded");
+                    throw new LicenseException(I18N.format("add.agent.limit.exceeded"));
                 }
             }
             else if(instance instanceof UserConfiguration)
             {
                 if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_USER))
                 {
-                    throw new LicenseException("Unable to add user: license limit exceeded");
+                    throw new LicenseException(I18N.format("add.user.limit.exceeded"));
                 }
             }
         }

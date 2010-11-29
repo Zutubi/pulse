@@ -27,9 +27,16 @@ public class LicenseHolder
         license = l;
     }
 
-    public static synchronized boolean hasAuthorization(String auth)
+    public static synchronized boolean hasAuthorization(String... auths)
     {
-        return authorisations.contains(auth);
+        for (String auth : auths)
+        {
+            if (!authorisations.contains(auth))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static synchronized void ensureAuthorization(String... auths) throws LicenseException
@@ -38,7 +45,7 @@ public class LicenseHolder
         {
             if(!hasAuthorization(auth))
             {
-                throw new LicenseException();
+                throw new LicenseException("Missing authorisation: " + auth);
             }
         }
     }

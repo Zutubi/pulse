@@ -138,6 +138,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     cacheLock.writeLock().unlock();
                 }
+                licenseManager.refreshAuthorisations();
             }
 
             public void postDelete(ProjectConfiguration instance)
@@ -156,6 +157,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 {
                     cacheLock.writeLock().unlock();
                 }
+                licenseManager.refreshAuthorisations();
             }
 
             public void postSave(ProjectConfiguration instance, boolean nested)
@@ -1081,7 +1083,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void delete(Project project)
     {
         makeStateTransition(project.getId(), Project.Transition.DELETE);
-        licenseManager.refreshAuthorisations();
     }
 
     public List<Long> triggerBuild(ProjectConfiguration projectConfig, TriggerOptions options, Revision revision)

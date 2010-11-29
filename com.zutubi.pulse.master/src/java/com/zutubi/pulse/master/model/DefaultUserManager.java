@@ -69,6 +69,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             public void postInsert(UserConfiguration instance)
             {
                 userConfigsById.put(instance.getUserId(), instance);
+                licenseManager.refreshAuthorisations();
             }
 
             public void postDelete(UserConfiguration instance)
@@ -77,6 +78,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
                 initGroupsByUser();
 
                 userConfigsById.remove(instance.getUserId());
+                licenseManager.refreshAuthorisations();
             }
 
             public void postSave(UserConfiguration instance, boolean nested)
@@ -199,7 +201,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         buildManager.deleteAllBuilds(user);
         userDao.delete(user);
-        licenseManager.refreshAuthorisations();
     }
 
     public void clearAllResponsibilities(User user)

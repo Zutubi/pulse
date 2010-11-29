@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.license;
 
 /**
  * The LicenseKeyStore provides access to loading and storing the license key
- *
- * 
  */
 public interface LicenseKeyStore
 {

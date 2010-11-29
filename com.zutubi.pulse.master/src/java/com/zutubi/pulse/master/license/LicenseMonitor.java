@@ -8,8 +8,6 @@ import com.zutubi.util.logging.Logger;
 /**
  * This task is used to periodically check the systems license and generate a
  * LicenseExpiredEvent if the license has expired.
- *
- * @author Daniel Ostermeier
  */
 public class LicenseMonitor implements Task
 {
@@ -41,7 +39,7 @@ public class LicenseMonitor implements Task
         License license = LicenseHolder.getLicense();
         if (license.isExpired())
         {
-            // trigger a refresh of authoristions.
+            // trigger a refresh of authorisations.
             licenseManager.refreshAuthorisations();
             eventManager.publish(new LicenseExpiredEvent(license));
         }

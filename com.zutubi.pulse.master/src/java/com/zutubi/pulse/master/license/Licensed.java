@@ -23,6 +23,8 @@ import java.lang.annotation.Target;
  *     public void newUser(String userName, String password);
  * </pre>
  * </p>
+ *
+ * @see LicenseHolder for the list of supported authorisations.
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.license;
 
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.Constants;
 import static com.zutubi.util.Constants.UTF8;
 import org.apache.commons.codec.binary.Base64;
 

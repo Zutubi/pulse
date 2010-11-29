@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Condition;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
@@ -32,12 +31,14 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
     protected void setUp() throws Exception
     {
         super.setUp();
+        
         rpcClient.loginAsAdmin();
         getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
+        // ensure that we return back to an unrestricted license.
         try
         {
             setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, "S. O. MeBody"));
@@ -50,27 +51,34 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         super.tearDown();
     }
 
-    public void testChangeLicense()
+    public void testChangeLicenseViaWebUI()
     {
         CompositePage licensePage = goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
+        // wait for the panel to reload.
         getBrowser().waitForElement(licensePage.getStateFieldId("name"));
+        assertEquals(random, licensePage.getStateField("name"));
+    }
+
+    public void testChangeLicenseViaRemoteApi() throws Exception
+    {
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
+
+        CompositePage licensePage = goToLicensePage();
         assertEquals(random, licensePage.getStateField("name"));
     }
 
     public void testExpiresStateField()
     {
-        // Field should be 'expiry' for eval and 'supportExpiry' for all
-        // others.
+        // Field should be 'expiry' for eval and 'supportExpiry' for all others.
         CompositePage licensePage = goToLicensePage();
-        LicenseForm form = setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
+        setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
         getBrowser().waitForElement(licensePage.getStateFieldId("expiry"));
         assertFalse(licensePage.isStateFieldPresent("supportExpiry"));
 
-        form.waitFor();
-        form.applyFormElements(LicenseHelper.newLicenseKey(LicenseType.ENTERPRISE, random, tomorrow()));
+        setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.ENTERPRISE, random, tomorrow()));
 
         getBrowser().waitForElement(licensePage.getStateFieldId("supportExpiry"));
         assertFalse(licensePage.isStateFieldPresent("expiry"));
@@ -87,7 +95,6 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should be ignored
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersIgnored();
     }
 
@@ -97,35 +104,19 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
         getBrowser().openAndWaitFor(WelcomePage.class);
+        getBrowser().refreshUntilElement("support-expired", BUILD_TIMEOUT);
 
-        int tried = 0;
-        Condition condition = new Condition()
-        {
-            public boolean satisfied()
-            {
-                return getBrowser().isElementIdPresent("support-expired");
-            }
-        };
-
-        while (!condition.satisfied() && tried < 3)
-        {
-            getBrowser().openAndWaitFor(WelcomePage.class);
-            tried++;
-        }
-
-        assertTrue(condition.satisfied());
         assertTrue(getBrowser().isTextPresent("support/upgrades have expired"));
         assertFalse(getBrowser().isElementIdPresent("license-expired"));
 
         // Build triggers should behave normally
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersHandled();
     }
 
     public void testExpiredCommercialLicenseInvalidUpgrade() throws Exception
     {
         goToLicensePage();
-        setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, new Date(System.currentTimeMillis() - 999999 * Constants.DAY)));
+        setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, manyYearsAgo()));
 
         getBrowser().open(urls.base());
         getBrowser().waitForElement("license-cannot-run");
@@ -134,7 +125,6 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should behave normally
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertTriggersIgnored();
     }
 
@@ -147,11 +137,35 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
         assertExceeded();
 
-        // Adding a project should fail
-        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
-        AddProjectWizard.CommandState state = wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, random+"-2", false));
-        state.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
+        assertCanNotAddProjectViaApi(random + "B");
+        assertCanNotAddProjectViaWeb(random + "C");
+    }
+
+    public void testCanNotAddProjectsPastLicensedLimit() throws Exception
+    {
+        int projectCount = rpcClient.RemoteApi.getProjectCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount + 1, -1, -1));
+
+        rpcClient.RemoteApi.insertSimpleProject(random + "A", false);
+
+        assertCanNotAddProjectViaApi(random + "B");
+        assertCanNotAddProjectViaWeb(random + "B");
+    }
+
+    public void testDeletingProjectsOnExceededLicenseRefreshesAuthorisations() throws Exception
+    {
+        rpcClient.RemoteApi.insertSimpleProject(random, false);
+        rpcClient.RemoteApi.insertSimpleProject(random + "B", false);
+
+        int projectCount = rpcClient.RemoteApi.getProjectCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), projectCount -1, -1, -1));
+
+        assertExceeded();
+
+        rpcClient.RemoteApi.deleteConfig("projects/" + random + "B");
+        rpcClient.RemoteApi.deleteConfig("projects/" + random);
+
+        assertCanAddProjectViaApi(random + "C");
     }
 
     public void testAgentsExceeded() throws Exception
@@ -159,17 +173,37 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         int agentCount = rpcClient.RemoteApi.getAgentCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, agentCount - 1, -1));
 
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertExceeded();
 
-        // Adding an agent should fail
-        AgentHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
-        hierarchyPage.clickAdd();
-        AgentForm form = getBrowser().createForm(AgentForm.class, true);
-        form.waitFor();
-        form.finishNamedFormElements(asPair("name", random), asPair("host", "localhost"));
-        form.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add agent: license limit exceeded"));
+        assertCanNotAddAgentViaApi(random + "A");
+        assertCanNotAddAgentViaWeb(random + "B");
+    }
+
+    public void testCanNotAddAgentsPastLicensedLimit() throws Exception
+    {
+        int agentCount = rpcClient.RemoteApi.getAgentCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, agentCount + 1, -1));
+
+        rpcClient.RemoteApi.insertSimpleAgent(random + "A");
+
+        assertCanNotAddAgentViaApi(random + "B");
+        assertCanNotAddAgentViaWeb(random + "C");
+    }
+
+    public void testDeletingAgentsOnExceededLicenseRefreshesAuthorisations() throws Exception
+    {
+        rpcClient.RemoteApi.insertSimpleAgent(random + "A");
+        rpcClient.RemoteApi.insertSimpleAgent(random + "B");
+
+        int agentCount = rpcClient.RemoteApi.getAgentCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, agentCount - 1, -1));
+
+        assertExceeded();
+
+        rpcClient.RemoteApi.deleteConfig("agents/" + random + "B");
+        rpcClient.RemoteApi.deleteConfig("agents/" + random + "A");
+
+        assertCanAddAgentViaApi(random + "C");
     }
 
     public void testUsersExceeded() throws Exception
@@ -177,17 +211,37 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         int userCount = rpcClient.RemoteApi.getUserCount();
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, -1, userCount - 1));
 
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
         assertExceeded();
 
-        // Adding a user should fail
-        UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
-        usersPage.clickAdd();
-        AddUserForm form = getBrowser().createForm(AddUserForm.class);
-        form.waitFor();
-        form.finishNamedFormElements(asPair("login", random), asPair("name", random), asPair("emailAddress", random + "@example.com"));
-        form.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add user: license limit exceeded"));
+        assertCanNotAddUserViaApi(random + "C");
+        assertCanNotAddUserViaWeb(random + "C");
+    }
+
+    public void testCanNotAddUsersPastLicensedLimit() throws Exception
+    {
+        int userCount = rpcClient.RemoteApi.getUserCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, -1, userCount + 1));
+
+        rpcClient.RemoteApi.insertTrivialUser(random + "A");
+
+        assertCanNotAddUserViaApi(random + "B");
+        assertCanNotAddUserViaWeb(random + "C");
+    }
+
+    public void testDeletingUsersOnExceededLicenseRefreshesAuthorisations() throws Exception
+    {
+        rpcClient.RemoteApi.insertTrivialUser(random + "A");
+        rpcClient.RemoteApi.insertTrivialUser(random + "B");
+
+        int userCount = rpcClient.RemoteApi.getUserCount();
+        setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, "me", tomorrow(), -1, -1, userCount - 1));
+
+        assertExceeded();
+
+        rpcClient.RemoteApi.deleteConfig("users/" + random + "B");
+        rpcClient.RemoteApi.deleteConfig("users/" + random + "A");
+
+        assertCanAddUserViaApi(random + "C");
     }
 
     public void testEnforcedViaRemoteApi() throws Exception
@@ -231,16 +285,21 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         return new Date(System.currentTimeMillis() - 2 * Constants.DAY);
     }
 
-    private void setLicenseViaApi(String key) throws Exception
+    private Date manyYearsAgo()
     {
-        Hashtable<String, Object> license = rpcClient.RemoteApi.createDefaultConfig(LicenseConfiguration.class);
-        license.put("key", key);
-        rpcClient.RemoteApi.saveConfig(LICENSE_PATH, license, false);
+        return new Date(System.currentTimeMillis() - 100 * Constants.YEAR);
     }
 
     private CompositePage goToLicensePage()
     {
         return getBrowser().openAndWaitFor(CompositePage.class, LICENSE_PATH);
+    }
+
+    private void setLicenseViaApi(String key) throws Exception
+    {
+        Hashtable<String, Object> license = rpcClient.RemoteApi.createDefaultConfig(LicenseConfiguration.class);
+        license.put("key", key);
+        rpcClient.RemoteApi.saveConfig(LICENSE_PATH, license, false);
     }
 
     private LicenseForm setLicenseViaUI(String license)
@@ -249,6 +308,111 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.applyFormElements(license);
         return form;
+    }
+
+    private void assertCanNotAddAgentViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertSimpleAgent(name);
+            fail("Expected exception: Unable to add agent: license limit exceeded");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e.getMessage().contains("Unable to add agent: license limit exceeded"));
+        }
+    }
+
+    private void assertCanAddAgentViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertSimpleAgent(name);
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    private void assertCanNotAddAgentViaWeb(String name)
+    {
+        AgentHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(AgentHierarchyPage.class, AgentManager.GLOBAL_AGENT_NAME, true);
+        hierarchyPage.clickAdd();
+        AgentForm form = getBrowser().createForm(AgentForm.class, true);
+        form.waitFor();
+        form.finishNamedFormElements(asPair("name", name), asPair("host", "localhost"));
+        form.waitFor();
+        assertTrue(getBrowser().isTextPresent("Unable to add agent: license limit exceeded"));
+    }
+
+    private void assertCanNotAddUserViaWeb(String name)
+    {
+        UsersPage usersPage = getBrowser().openAndWaitFor(UsersPage.class);
+        usersPage.clickAdd();
+        AddUserForm form = getBrowser().createForm(AddUserForm.class);
+        form.waitFor();
+        form.finishNamedFormElements(asPair("login", name), asPair("name", name), asPair("emailAddress", name + "@example.com"));
+        form.waitFor();
+        assertTrue(getBrowser().isTextPresent("Unable to add user: license limit exceeded"));
+    }
+
+    private void assertCanAddUserViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertTrivialUser(name);
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    private void assertCanNotAddUserViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertTrivialUser(name);
+            fail("Expected exception: Unable to add user: license limit exceeded");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e.getMessage().contains("Unable to add user: license limit exceeded"));
+        }
+    }
+
+    private void assertCanNotAddProjectViaWeb(String name)
+    {
+        AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
+        AddProjectWizard.CommandState state = wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, name, false));
+        state.waitFor();
+        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
+    }
+
+    private void assertCanAddProjectViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertTrivialProject(name, false);
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    private void assertCanNotAddProjectViaApi(String name)
+    {
+        try
+        {
+            rpcClient.RemoteApi.insertTrivialProject(name, false);
+            fail("Expected exception: Unable to add project: license limit exceeded");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e.getMessage().contains("Unable to add project: license limit exceeded"));
+        }
     }
 
     private void assertExceeded() throws Exception
@@ -273,13 +437,15 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     private void assertTriggers(boolean ignored) throws Exception
     {
+        rpcClient.RemoteApi.ensureProject(random);
+
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
         getBrowser().waitForPageToLoad();
         home.waitFor();
         if (ignored)
         {
-            Thread.sleep(1000);
+            Thread.sleep(Constants.SECOND);
             assertFalse(home.hasBuildActivity());
             assertFalse(home.hasLatestCompletedBuild());
         }

@@ -136,11 +136,6 @@ public final class License
         return supportedUsers;
     }
 
-    public boolean canAddUser(int userCount)
-    {
-        return supportedUsers == UNRESTRICTED || userCount < supportedUsers;
-    }
-
     /**
      * Get the number of agents supported by this license.
      *

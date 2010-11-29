@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.license.config;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.master.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.master.license.LicenseException;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
@@ -38,6 +39,22 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
             public Class[] getHandledEvents()
             {
                 return new Class[]{PostSaveEvent.class};
+            }
+        });
+
+        // We know that the records are stored somewhere in the data directory.
+        // So, if the data directory is changed, then the underlying license is
+        // also changed.
+        eventManager.register(new EventListener()
+        {
+            public void handleEvent(Event evt)
+            {
+                notifyListeners();
+            }
+
+            public Class[] getHandledEvents()
+            {
+                return new Class[]{DataDirectoryChangedEvent.class};
             }
         });
     }

@@ -16,7 +16,6 @@ public class LicenseAnnotationAttributesTest extends PulseTestCase
         super.setUp();
 
         attributes = new LicenseAnnotationAttributes();
-
     }
 
     public void testClassLevelAnnotations()

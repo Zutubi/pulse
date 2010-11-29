@@ -42,6 +42,4 @@ public class AddAgentAuthorisation implements Authorisation
     {
         this.agentManager = agentManager;
     }
-
-
 }

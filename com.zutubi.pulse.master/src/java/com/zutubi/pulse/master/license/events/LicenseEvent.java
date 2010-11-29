@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.license.License;
 /**
  * The base event type for license related events.
  */
-public class LicenseEvent extends Event
+public abstract class LicenseEvent extends Event
 {
     public LicenseEvent(License source)
     {
@@ -22,9 +22,4 @@ public class LicenseEvent extends Event
     {
         return (License) getSource();
     }
-
-    public String toString()
-    {
-        return "License Event";
-    }    
 }
