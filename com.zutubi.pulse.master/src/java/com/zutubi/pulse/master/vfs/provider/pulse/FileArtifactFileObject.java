@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileContentInfoFactory;
@@ -86,7 +87,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     protected String[] doListChildren() throws Exception
     {
-        return UriParser.encode(base.list());
+        return UriParser.encode(FileSystemUtils.listAsArray(base));
     }
 
     protected long doGetContentSize()

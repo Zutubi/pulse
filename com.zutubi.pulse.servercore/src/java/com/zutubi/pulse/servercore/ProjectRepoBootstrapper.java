@@ -157,7 +157,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
         }
 
-        if (localDir.list().length == 0)
+        if (FileSystemUtils.list(localDir).size() == 0)
         {
             return new CheckoutBootstrapper(projectName, revision);
         }
