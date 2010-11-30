@@ -102,9 +102,8 @@ public class FileSystemUtils
             return false;
         }
 
-        String[] contents = dir.list();
-
-        if (contents != null)
+        List<String> contents = list(dir);
+        if (contents.size() > 0)
         {
             for (String child : contents)
             {
@@ -1260,7 +1259,7 @@ public class FileSystemUtils
                 throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getAbsolutePath()));
             }
 
-            for (String file : src.list())
+            for (String file : list(src))
             {
                 internalCopy(new File(src, file), new File(dest, file));
             }
@@ -1428,5 +1427,43 @@ public class FileSystemUtils
     {
         File[] files = dir.listFiles();
         return files == null ? new File[0] : files;
+    }
+
+    /**
+     * Return a listing of the specified directory.  If the directory is empty,
+     * an empty list is returned.
+     *
+     * @param dir   the directory being listed.
+     * @return  a list of strings naming the files and directories within the
+     * specified directory, or an empty list if non exist.
+     *
+     * @see java.io.File#list() 
+     */
+    public static List<String> list(File dir)
+    {
+        List<String> result = new LinkedList<String>();
+        if (dir.isDirectory())
+        {
+            String[] listing = dir.list();
+            if (listing != null)
+            {
+                result.addAll(Arrays.asList(listing));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Same as {@link #list(java.io.File)} except that the resulting listing
+     * is in the form of an array rather than a list.
+     *
+     * @param dir   the directory being listed.
+     * @return an array of strings naming the files and directories within the
+     * specified directory, or an empty array if non exist.
+     */
+    public static String[] listAsArray(File dir)
+    {
+        List<String> listing = list(dir);
+        return listing.toArray(new String[listing.size()]);
     }
 }

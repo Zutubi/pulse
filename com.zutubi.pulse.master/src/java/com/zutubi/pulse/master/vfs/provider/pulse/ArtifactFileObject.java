@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
+import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -106,7 +107,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         File base = getArtifactBase();
         if(base.isDirectory())
         {
-            return UriParser.encode(base.list());
+            return UriParser.encode(FileSystemUtils.listAsArray(base));
         }
         return NO_CHILDREN;
     }

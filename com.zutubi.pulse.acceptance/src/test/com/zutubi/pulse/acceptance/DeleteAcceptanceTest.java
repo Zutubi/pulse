@@ -181,7 +181,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     private String getMasterAgentId(File agentsDir)
     {
-        List<String> agentDirs = new LinkedList<String>(Arrays.asList(agentsDir.list()));
+        List<String> agentDirs = FileSystemUtils.list(agentsDir);
         Collections.sort(agentDirs, new Comparator<String>()
         {
             public int compare(String o1, String o2)

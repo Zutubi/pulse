@@ -210,8 +210,7 @@ public class UpdateCommand implements Runnable
  	 */
     private void checkUnversionedComponents(File installDir, File packageDir, boolean top) throws IOException
     {
-        String[] children = packageDir.list();
-        for (String child : children)
+        for (String child : FileSystemUtils.list(packageDir))
         {
             if (isFileIgnored(child, top))
             {

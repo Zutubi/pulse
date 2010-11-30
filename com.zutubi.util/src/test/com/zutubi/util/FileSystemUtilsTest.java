@@ -1306,6 +1306,14 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals(0, files.size());
     }
 
+    public void testList() throws IOException
+    {
+        assertEquals(0, FileSystemUtils.list(tmpDir).size());
+        assertTrue(new File(tmpDir, "file.txt").createNewFile());
+        assertEquals(1, FileSystemUtils.list(tmpDir).size());
+        assertEquals(0, FileSystemUtils.list(new File("does not exist")).size());
+    }
+
     private void assertCreateFiles(String... paths) throws IOException
     {
         for (String path : paths)

@@ -284,8 +284,7 @@ public class SystemUtils
             File dir = new File(p);
             if (dir.isDirectory())
             {
-                String[] list = dir.list();
-                for (String filename : list)
+                for (String filename : FileSystemUtils.list(dir))
                 {
                     File candidate = new File(dir, filename);
                     if (candidate.isFile() && filenameMatches(name, filename, extensions))

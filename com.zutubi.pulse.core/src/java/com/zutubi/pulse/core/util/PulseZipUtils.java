@@ -94,11 +94,14 @@ public class PulseZipUtils
             }
         }
 
-        if(file == null && source.list().length == 0)
+        if(file == null && FileSystemUtils.list(source).size() == 0)
         {
             // Special case: we create an empty file.  This is understood by
             // our inverse (extractZip).
-            zipFile.createNewFile();
+            if (!zipFile.createNewFile())
+            {
+                throw new IOException("Failed to create file: " + zipFile.getAbsolutePath());
+            }
         }
         else
         {
@@ -155,10 +158,7 @@ public class PulseZipUtils
             {
                 if(file == null)
                 {
-                    for (String f: source.list())
-                    {
-                        command.add(f);
-                    }
+                    command.addAll(FileSystemUtils.list(source));
                 }
                 else
                 {
@@ -282,9 +282,7 @@ public class PulseZipUtils
                 os.putNextEntry(entry);
             }
 
-            String[] files = source.list();
-
-            for (String filename : files)
+            for (String filename : FileSystemUtils.list(source))
             {
                 String path = dirPath + filename;
                 addToZip(os, base, path);
