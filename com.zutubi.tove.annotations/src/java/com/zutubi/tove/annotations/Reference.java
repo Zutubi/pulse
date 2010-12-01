@@ -29,4 +29,11 @@ public @interface Reference
      * @return the field that this field depends on.
      */
     String dependentOn() default DEFAULT_dependentOn;
+
+    /**
+     * @return true if the user should be allowed to reorder selected items,
+     *         false if the order is not important (in this case items are
+     *         sorted for convenience)
+     */
+    boolean allowReordering() default true;
 }

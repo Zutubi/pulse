@@ -42,9 +42,4 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
 
         super.process(field, optionProvider, instance);
     }
-
-    protected String getOptionProviderClass(Annotation annotation)
-    {
-        return ((Reference)annotation).optionProvider();
-    }
 }

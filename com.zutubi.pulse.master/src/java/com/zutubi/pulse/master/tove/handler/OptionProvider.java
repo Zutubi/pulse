@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * An option provider is used to populate select fields (drop-downs,
  * multi-select lists, etc) in the UI.  Typically this interface is
- * implemented indirectly by subclassing {@link ListOptionProvider} or
+ * implemented indirectly by sub classing {@link ListOptionProvider} or
  * {@link MapOptionProvider}.
  */
 public interface OptionProvider

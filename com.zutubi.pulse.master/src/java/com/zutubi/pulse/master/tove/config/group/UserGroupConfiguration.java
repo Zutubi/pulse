@@ -15,7 +15,7 @@ import java.util.List;
 @Classification(single = "group")
 public class UserGroupConfiguration extends GroupConfiguration
 {
-    @Reference
+    @Reference(allowReordering = false)
     private List<UserConfiguration> members = new LinkedList<UserConfiguration>();
 
     public UserGroupConfiguration()
