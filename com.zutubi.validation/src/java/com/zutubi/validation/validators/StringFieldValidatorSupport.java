@@ -40,7 +40,7 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
     {
         if (value == null)
         {
-            if(!allowEmpty)
+            if(allowEmpty)
             {
                 return;
             }

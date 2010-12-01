@@ -41,7 +41,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
         Map<String, String> options = new LinkedHashMap<String, String>();
 
-        // Empty option (0 handle == null refeerence).  This is the initial
+        // Empty option (0 handle == null reference).  This is the initial
         // selection when a new instance is being created - required validation
         // can be used to ensure a selection is made.
         options.put("0", "");
