@@ -1207,9 +1207,22 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     selectedClass: 'x-item-picker-selected',
     hiddenFields: [],
     allowReordering: true,
+
+    /**
+     * If true, duplicate values are allowed in the store.  If false,
+     * options will be removed to avoid duplicate store values.
+     */
+    allowDuplicates: true,
+
     value: [],
     optionStore: undefined,
     defaultAutoCreate: {tag: 'div', cls: 'x-item-picker', tabindex: '0', style:"outline:none;border:0px"},
+
+    /**
+     * A cache of ALL of the valid options for this field instance,
+     * keyed by the option value.
+     */
+    optionRecordCache: {},
 
     onRender: function(ct, position)
     {
@@ -1262,6 +1275,12 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             singleSelect: true,
             store: this.store,
             selectedClass: this.selectedClass
+        });
+
+        var recordCache = this.optionRecordCache;
+        this.optionStore.each(function(record)
+        {
+            recordCache[record.data.value] = record;
         });
 
         this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
@@ -1356,6 +1375,39 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         });
     },
 
+    /**
+     * Used when we do not allow duplicate values, the refreshOptions
+     * method ensures that the combo box options do not contain any records
+     * that has already been selected.
+     *
+     * This does nothing if allowDuplicates is true.
+     */
+    refreshOptions: function()
+    {
+        if (!this.allowDuplicates)
+        {
+            for (var value in this.optionRecordCache)
+            {
+                if (this.store.find('value', value) < 0)
+                {
+                    if (this.combo.store.find(this.valueField, value) < 0)
+                    {
+                        // if the option has not been selected and is not in the options, add it.
+                        this.combo.store.addSorted(this.optionRecordCache[value]);
+                    }
+                }
+                else
+                {
+                    if (this.combo.store.find(this.valueField, value) >= 0)
+                    {
+                        // if the option has been selected and is in the options, remove it.
+                        this.combo.store.remove(this.optionRecordCache[value]);
+                    }
+                }
+            }
+        }
+    },
+
     doLayout: function()
     {
         if(this.rendered)
@@ -1439,6 +1491,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
                 {
                     text = record.get(this.displayField);
                     value = record.get(this.valueField);
+
+                    if (!this.allowDuplicates)
+                    {
+                        // Remove the option from the combo store so that the user can
+                        // not add it a second time.
+                        this.combo.store.remove(record);
+                        this.combo.setValue('');
+                    }
                 }
             }
         }
@@ -1464,7 +1524,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             this.store.addSorted(r);
         }
 
-        this.hiddenFields.push(this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value}));
+        this.hiddenFields.push(this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: Ext.util.Format.htmlEncode(value)}));
         return this.store.indexOf(r);
     },
 
@@ -1473,9 +1533,32 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         var selected = this.getSelection();
         if(selected >= 0)
         {
-            this.store.remove(this.store.getAt(selected));
-            this.hiddenFields[selected].remove();
-            this.hiddenFields.splice(selected, 1);
+            selectedRecord = this.store.getAt(selected);
+            this.store.remove(selectedRecord);
+            var value = selectedRecord.get('value')
+
+            if (!this.allowDuplicates)
+            {
+                // If we are not allowing duplicates, we will have removed this
+                // option from the combo list when it was added.  Now that is has
+                // been removed, re-add it as an option.
+                this.combo.store.addSorted(this.optionRecordCache[value]);
+            }
+
+            // find the matching hidden input field and remove it.
+            var i;
+            for(i = 0; i < this.hiddenFields.length; i++)
+            {
+                var hiddenField = this.hiddenFields[i];
+                if (hiddenField.dom.value == Ext.util.Format.htmlEncode(value))
+                {
+                    // this is the one to remove.
+                    this.hiddenFields[i].remove();
+                    this.hiddenFields.splice(selected, 1);
+                    break;
+                }
+            }
+
             this.fireEvent('change', this, evt);
         }
     },
@@ -1559,6 +1642,8 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
                 this.appendItem(text, value[i]);
             }
         }
+
+        this.refreshOptions();
     },
 
     /**
@@ -1578,6 +1663,8 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             this.hiddenFields[i].remove();
         }
         this.hiddenFields = [];
+
+        this.refreshOptions();
     },
 
     /**
@@ -1612,7 +1699,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         }
         else
         {
-            var record = this.optionStore.data.find(function(r) { return r.get(this.valueField) == value; }, this);
+            var record = this.optionRecordCache[value]
             if(record)
             {
                 return record.get(this.displayField);

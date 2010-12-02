@@ -23,7 +23,8 @@
 
     var optionStore = new Ext.data.SimpleStore({
         fields: ['value', 'text'],
-        data: od
+        data: od,
+        sortInfo: {'field': 'text', 'direction': 'ASC'}
     });
 
     fc.optionStore = optionStore;
@@ -45,6 +46,9 @@
 
     fc.store = store;
     fc.value = v;
+<#if parameters.allowDuplicates?exists>
+    fc.allowDuplicates = ${parameters.allowDuplicates?string};
+</#if>
 <#if parameters.allowReordering?exists>
     fc.allowReordering = ${parameters.allowReordering?string};
 </#if>

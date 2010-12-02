@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.tove.model.Parameterised;
-
 import java.util.HashMap;
 import java.util.Map;
 

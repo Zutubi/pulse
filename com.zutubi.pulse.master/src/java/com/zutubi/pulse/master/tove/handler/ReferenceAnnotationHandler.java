@@ -1,12 +1,9 @@
 package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
-import com.zutubi.tove.annotations.Reference;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
-
-import java.lang.annotation.Annotation;
 
 /**
  * Handler for processing reference properties.  Adds the list to select from
