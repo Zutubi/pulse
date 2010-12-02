@@ -89,10 +89,13 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         });
 
         var recordCache = this.optionRecordCache;
-        this.optionStore.each(function(record)
+        if (this.optionStore != null)
         {
-            recordCache[record.data.value] = record;
-        });
+            this.optionStore.each(function(record)
+            {
+                recordCache[record.data.value] = record;
+            });
+        }
 
         this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
 
