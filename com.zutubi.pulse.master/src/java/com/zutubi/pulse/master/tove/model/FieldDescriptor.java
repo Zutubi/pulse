@@ -26,7 +26,7 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
 
     public Field instantiate(String path, Record instance)
     {
-        // Implementation note:  The path parameter here is the same as the getParamters().get('path') value.
+        // Implementation note:  The path parameter here is the same as the getParameters().get('path') value.
         // However, because it is the FieldDescriptor that is used in the FieldActionPredicate, the path needs
         // to be set before the field is instantiated.
 
