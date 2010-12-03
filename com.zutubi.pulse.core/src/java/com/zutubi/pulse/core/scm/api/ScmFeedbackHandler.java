@@ -6,7 +6,7 @@ package com.zutubi.pulse.core.scm.api;
 public interface ScmFeedbackHandler
 {
     /**
-     * Called to report a simple freeform status message.
+     * Called to report a simple free form status message.
      *
      * @param message status information about the checkout operation
      */

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -13,27 +14,28 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.servercore.repository.FileRepository;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.PrintWriter;
 
 /**
  * A bootstrapper that applies a patch to a working directory bootstrapped
  * by some other bootstrapper.
  */
-public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
+public class PatchBootstrapper extends BootstrapperSupport implements ScmFeedbackHandler
 {
-    private static final String DEFAULT_PATCH_BOOSTRAP_PREFIX = "personal.patch.prefix.default";
+    private static final String DEFAULT_PATCH_BOOTSTRAP_PREFIX = "personal.patch.prefix.default";
+    private static final String PATCH_BOOTSTRAP_PREFIX = "personal.patch.prefix";
 
-    private static final String PATCH_BOOSTRAP_PREFIX = "personal.patch.prefix";
-
+    /**
+     * It is the working directory created by this delegate bootstrapper
+     * that is being patched.
+     */
     private Bootstrapper delegate;
     private long userId;
     private long number;
     private String patchFormatType;
-    private volatile boolean terminated;
-    private transient PrintWriter outputWriter;
 
     public PatchBootstrapper(Bootstrapper delegate, long userId, long number, String patchFormatType)
     {
@@ -43,7 +45,7 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
         this.patchFormatType = patchFormatType;
     }
 
-    public void bootstrap(CommandContext commandContext) throws BuildException
+    public void doBootstrap(CommandContext commandContext) throws BuildException
     {
         delegate.bootstrap(commandContext);
 
@@ -64,8 +66,9 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
         ScmClient scmClient = createScmClient(context);
         try
         {
-            outputWriter = new PrintWriter(commandContext.getExecutionContext().getOutputStream());
-            for (Feature feature: patchFormat.applyPatch(context, patchFile, getBaseBuildDir(context), scmClient, this))
+            File baseDir = getBaseBuildDir(context);
+            writeFeedback("Patching " + FileSystemUtils.getNormalisedAbsolutePath(baseDir) + " with " + FileSystemUtils.getNormalisedAbsolutePath(patchFile));
+            for (Feature feature: patchFormat.applyPatch(context, patchFile, baseDir, scmClient, this))
             {
                 commandContext.addFeature(feature);
             }
@@ -76,7 +79,6 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
         }
         finally
         {
-            outputWriter.flush();
             IOUtils.close(scmClient);
         }
     }
@@ -100,13 +102,13 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
     {
         // check if we need to apply a patch prefix for this bootstrap.
 
-        String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOSTRAP_PREFIX);
+        String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOTSTRAP_PREFIX);
 
         String projectPrefix = null;
         String projectName = context.getString(NAMESPACE_INTERNAL, PROPERTY_PROJECT);
         if (projectName != null)
         {
-            projectPrefix = System.getProperty(PATCH_BOOSTRAP_PREFIX + "." + projectName);
+            projectPrefix = System.getProperty(PATCH_BOOTSTRAP_PREFIX + "." + projectName);
         }
 
         String prefix = null;
@@ -128,18 +130,18 @@ public class PatchBootstrapper implements Bootstrapper, ScmFeedbackHandler
 
     public void terminate()
     {
+        super.terminate();
         delegate.terminate();
-        terminated = true;
     }
 
     public void status(String message)
     {
-        outputWriter.println(message);
+        writeFeedback(message);
     }
 
     public void checkCancelled() throws ScmCancelledException
     {
-        if (terminated)
+        if (isTerminated())
         {
             throw new ScmCancelledException("Operation cancelled");
         }

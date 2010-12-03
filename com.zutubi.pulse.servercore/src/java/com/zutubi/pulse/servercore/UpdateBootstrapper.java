@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -23,6 +24,7 @@ public class UpdateBootstrapper extends ScmBootstrapper
 
     ScmClient doBootstrap(ExecutionContext executionContext)
     {
+        writeFeedback("Updating " + FileSystemUtils.getNormalisedAbsolutePath(executionContext.getWorkingDir()));
         ScmClient scm = null;
         try
         {

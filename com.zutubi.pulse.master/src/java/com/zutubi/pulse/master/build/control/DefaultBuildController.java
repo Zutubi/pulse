@@ -50,7 +50,7 @@ import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
-import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
+import com.zutubi.pulse.servercore.ProjectRepositoryBootstrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import static com.zutubi.util.StringUtils.safeToString;
@@ -442,7 +442,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 Bootstrapper initialBootstrapper;
                 if (buildContext.getBoolean(PROPERTY_INCREMENTAL_BOOTSTRAP, false))
                 {
-                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), request.getRevision());
+                    initialBootstrapper = new ProjectRepositoryBootstrapper(projectConfig.getName(), request.getRevision());
                 }
                 else
                 {
