@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import java.io.File;
 
 /**
- * The RecipePaths interface provides an interface that provides access to a recipies
+ * The RecipePaths interface provides an interface that provides access to a recipes
  * work and output directories.
  */
 public interface RecipePaths

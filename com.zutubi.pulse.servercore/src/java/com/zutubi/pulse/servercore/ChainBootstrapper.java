@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * A chain bootstrapper is a list of bootstrappers that are
+ * run sequentially.
  */
 public class ChainBootstrapper extends BootstrapperSupport
 {
@@ -21,25 +23,33 @@ public class ChainBootstrapper extends BootstrapperSupport
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
-    public void bootstrap(CommandContext commandContext) throws BuildException
-    {
-        for (Bootstrapper bootstrapper : bootstrappers)
-        {
-            currentBootstrapper = bootstrapper;
-            bootstrapper.bootstrap(commandContext);
-        }
-
-        currentBootstrapper = null;
-    }
-
     public ChainBootstrapper add(Bootstrapper bootstrapper)
     {
         bootstrappers.add(bootstrapper);
         return this;
     }
 
-    public void terminate()
+    public void doBootstrap(CommandContext commandContext) throws BuildException
     {
+        for (Bootstrapper bootstrapper : bootstrappers)
+        {
+            synchronized (this)
+            {
+                if (isTerminated())
+                {
+                    break;
+                }
+                currentBootstrapper = bootstrapper;
+            }
+            bootstrapper.bootstrap(commandContext);
+        }
+        currentBootstrapper = null;
+    }
+
+    public synchronized void terminate()
+    {
+        super.terminate();
+        
         if(currentBootstrapper != null)
         {
             currentBootstrapper.terminate();

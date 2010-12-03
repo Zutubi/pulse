@@ -56,6 +56,28 @@ public class IOUtils
         }
     }
 
+    /**
+     * This utility method calls {@link java.io.Flushable#flush()} on the
+     * specified object, handling the case where the parameter is null and
+     * swallowing any exceptions.
+     *
+     * @param flushable the instance on which flush will be called.
+     */
+    public static void flush(Flushable flushable)
+    {
+        try
+        {
+            if (flushable != null)
+            {
+                flushable.flush();
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.finest(e);
+        }
+    }
+
     public static void close(Closeable closeable)
     {
         try

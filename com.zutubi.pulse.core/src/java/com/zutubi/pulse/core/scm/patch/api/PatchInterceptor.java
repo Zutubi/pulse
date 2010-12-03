@@ -29,7 +29,6 @@ public interface PatchInterceptor
      *
      * @param context  execution context for the build
      * @param statuses file statuses contained within the patch file
-     * @throws ScmException on any error
      */
     void afterPatch(ExecutionContext context, List<FileStatus> statuses);
 }

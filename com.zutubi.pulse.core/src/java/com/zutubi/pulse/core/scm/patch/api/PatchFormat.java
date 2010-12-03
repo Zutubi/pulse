@@ -66,7 +66,7 @@ public interface PatchFormat
     /**
      * Applies the changes in the given patch file to a working copy based at the given directory.
      * This patch file would have been created by calling
-     * {@link #writePatchFile(WorkingCopy, WorkingCopyContext, java.io.File, String[])}.
+     * {@link #writePatchFile(WorkingCopy, WorkingCopyContext, java.io.File, String...)}.
      * <p/>
      * Generally speaking the implementation should reject patches that don't apply cleanly.
      * Smaller, recoverable, problems may be reported as warning features in the returned feature

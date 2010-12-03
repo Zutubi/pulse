@@ -11,21 +11,27 @@ import com.zutubi.util.FileSystemUtils;
 import java.io.IOException;
 
 /**
+ * A simple bootstrapper implementation that ensures that the
+ * necessary context directories exist.
+ *
+ * This bootstrapper should always be the first bootstrapper used. 
  */
 public class ServerBootstrapper extends BootstrapperSupport
 {
-    public void bootstrap(CommandContext commandContext)
+    public void doBootstrap(CommandContext commandContext)
     {
-        // ensure that the paths exist
-        try
+        if (!isTerminated())
         {
-            ExecutionContext context = commandContext.getExecutionContext();
-            FileSystemUtils.createDirectory(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR));
-            FileSystemUtils.createDirectory(context.getWorkingDir());
-        }
-        catch (IOException e)
-        {
-            throw new BuildException(e);
+            try
+            {
+                ExecutionContext context = commandContext.getExecutionContext();
+                FileSystemUtils.createDirectory(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR));
+                FileSystemUtils.createDirectory(context.getWorkingDir());
+            }
+            catch (IOException e)
+            {
+                throw new BuildException(e);
+            }
         }
     }
 }

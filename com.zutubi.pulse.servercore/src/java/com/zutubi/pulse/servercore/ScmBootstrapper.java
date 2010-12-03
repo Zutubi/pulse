@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.BootstrapCommand;
-import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -11,23 +11,24 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_D
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  */
-public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandler
+public abstract class ScmBootstrapper extends BootstrapperSupport implements ScmFeedbackHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
     protected String project;
     protected BuildRevision revision;
-    protected volatile boolean terminated = false;
-    protected transient PrintWriter outputWriter;
+    protected transient PrintWriter filesWriter;
 
     public ScmBootstrapper(String project, BuildRevision revision)
     {
@@ -35,7 +36,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         this.revision = revision;
     }
 
-    public void bootstrap(CommandContext commandContext)
+    public void doBootstrap(CommandContext commandContext)
     {
         ExecutionContext context = commandContext.getExecutionContext();
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
@@ -44,23 +45,11 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
             throw new BuildException("Failed to create output directory: " + outDir);
         }
 
-        OutputStream out;
-        FileOutputStream fout = null;
         ScmClient client = null;
 
         try
         {
-            fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
-            if (context.getOutputStream() == null)
-            {
-                out = fout;
-            }
-            else
-            {
-                out = new ForkOutputStream(fout, context.getOutputStream());
-            }
-
-            outputWriter = new PrintWriter(out);
+            filesWriter = new PrintWriter(new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE)));
             client = doBootstrap(context);
         }
         catch (IOException e)
@@ -69,10 +58,8 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
         }
         finally
         {
-            // close the file output stream, but not the contexts output stream. That
-            // will still be used further on in the build, it is not ours to close.
-            outputWriter.flush();
-            IOUtils.close(fout);
+            IOUtils.flush(filesWriter);
+            IOUtils.close(filesWriter);
         }
 
         if (client != null)
@@ -94,20 +81,16 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmFeedbackHandle
 
     public void status(String message)
     {
-        outputWriter.println(message);
+        filesWriter.println(message);
+        writeFeedback(message);
     }
 
     public void checkCancelled() throws ScmCancelledException
     {
-        if (terminated)
+        if (isTerminated())
         {
             throw new ScmCancelledException("Operation cancelled");
         }
-    }
-
-    public void terminate()
-    {
-        terminated = true;
     }
 
     protected ScmClient createScmClient(ExecutionContext executionContext) throws ScmException
