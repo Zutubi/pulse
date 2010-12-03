@@ -88,14 +88,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
             selectedClass: this.selectedClass
         });
 
-        var recordCache = this.optionRecordCache;
-        if (this.optionStore != null)
-        {
-            this.optionStore.each(function(record)
-            {
-                recordCache[record.data.value] = record;
-            });
-        }
+        this.initOptionRecordCache();
 
         this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
 
@@ -219,6 +212,22 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                     }
                 }
             }
+        }
+    },
+
+    /**
+     * Initialise the values in the option record cache.
+     */
+    initOptionRecordCache: function()
+    {
+        if (this.optionStore != null)
+        {
+            var recordCache = {};
+            this.optionStore.each(function(record)
+            {
+                recordCache[record.data.value] = record;
+            });
+            this.optionRecordCache = recordCache;
         }
     },
 
@@ -490,6 +499,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     loadOptions: function(response, append)
     {
         this.optionStore.loadData(response, append);
+
+        this.initOptionRecordCache();
+        this.refreshOptions();
     },
 
     /**
