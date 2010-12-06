@@ -168,7 +168,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, 2L);
         assertFalse(changesPage.hasChanges());
         // Unlike where there are no previous builds, in this case we expect
-        // the compare-to popdown.
+        // the compare-to pop down.
         assertTrue(changesPage.isCompareToPopDownPresent());
         assertTrue(getBrowser().isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
     }

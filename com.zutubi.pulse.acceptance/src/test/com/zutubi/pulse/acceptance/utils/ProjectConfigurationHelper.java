@@ -23,11 +23,13 @@ import java.util.*;
  */
 public abstract class ProjectConfigurationHelper
 {
-    private ProjectConfiguration config;
+    protected ProjectConfiguration config;
+    protected ConfigurationHelper helper;
 
-    public ProjectConfigurationHelper(ProjectConfiguration config)
+    public ProjectConfigurationHelper(ProjectConfiguration config, ConfigurationHelper configurationHelper)
     {
         this.config = config;
+        this.helper = configurationHelper;
     }
 
     public String getName()
@@ -243,6 +245,4 @@ public abstract class ProjectConfigurationHelper
     }
 
     public abstract CommandConfiguration createDefaultCommand();
-    public abstract List<String> getPostProcessorNames();
-    public abstract List<Class> getPostProcessorTypes();
 }

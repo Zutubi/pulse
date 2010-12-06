@@ -9,8 +9,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
-import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
-import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -29,11 +28,11 @@ import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +49,8 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     private File workingCopyDir;
     private PersonalBuildRunner buildRunner;
+    private ProjectConfigurations projects;
+    private ConfigurationHelper configurationHelper;
 
     protected void setUp() throws Exception
     {
@@ -61,6 +62,10 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
         buildRunner = new PersonalBuildRunner(rpcClient.RemoteApi);
         buildRunner.setBase(workingCopyDir);
+
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(rpcClient.RemoteApi);
+        projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
@@ -430,6 +435,49 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent("default-recipe=\"nosuchrecipe\""));
     }
 
+    public void testMultiByteCharactersInPatch() throws Exception
+    {
+        checkout(Constants.TEST_ANT_REPOSITORY);
+
+        File testFile = new File(workingCopyDir, "src/test/com/zutubi/testant/UnitTest.java");
+        FileSystemUtils.createFile(testFile, "package com.zutubi.testant;\n" +
+        "import junit.framework.TestCase;\n" +
+        "public class UnitTest extends TestCase\n" +
+        "{\n" +
+                "public void testPulse() {\n" +
+                "    String s = \"国際化\";\n" +
+                "\n" +
+                "    assertEquals(3, s.length());\n" +
+                "}" +
+        "}");
+
+        createConfigFile(random);
+
+        AntProjectHelper project = projects.createTestAntProject(random);
+        project.setTarget("test");
+        configurationHelper.insertProject(project.getConfig(), false);
+
+        getBrowser().loginAsAdmin();
+        runPersonalBuild(ResultState.SUCCESS);
+    }
+
+    public void testUnifiedPatchWithMultiByteCharacters() throws Exception
+    {
+        AntProjectHelper project = projects.createTestAntProject(random);
+        project.setTarget("test");
+        configurationHelper.insertProject(project.getConfig(), false);
+
+        File patchFile = copyInputToDirectory("txt", workingCopyDir);
+        // Specify a revision and a patch file and no working copy should be required.
+        createConfigFile(random,
+                asPair(PersonalBuildConfig.PROPERTY_REVISION, WorkingCopy.REVISION_FLOATING),
+                asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, patchFile.getAbsolutePath())
+        );
+
+        getBrowser().loginAsAdmin();
+        runPersonalBuild(ResultState.SUCCESS);
+    }
+
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {
         Hashtable<String, Object> hook = rpcClient.RemoteApi.createEmptyConfig(hookClass);
@@ -504,25 +552,12 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         return buildNumber;
     }
     
-    private void refreshUntilBuild(final int buildNumber, ResultState expectedStatus)
+    private void refreshUntilBuild(int buildNumber, ResultState expectedStatus)
     {
-        final MyBuildsPage myBuildsPage = getBrowser().openAndWaitFor(MyBuildsPage.class);
-        getBrowser().refreshUntil(BUILD_TIMEOUT, new Condition()
-        {
-            public boolean satisfied()
-            {
-                myBuildsPage.waitFor();
-                List<BuildInfo> builds = myBuildsPage.getBuilds();
-                if (builds.isEmpty())
-                {
-                    return false;
-                }
+        SeleniumBrowser browser = getBrowser();
+        browser.refreshUntil(BUILD_TIMEOUT, new MyBuildCompleteCondition(browser, buildNumber), "build " + buildNumber + " to complete");
 
-                BuildInfo latestBuild = builds.get(0);
-                return latestBuild.number == buildNumber && latestBuild.status.isCompleted(); 
-            }
-        }, "build " + buildNumber + " to complete");
-        
+        MyBuildsPage myBuildsPage = browser.openAndWaitFor(MyBuildsPage.class);
         assertEquals(expectedStatus, myBuildsPage.getBuilds().get(0).status);
     }
 
@@ -576,4 +611,31 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         artifactsPage.setFilterAndWait("");
         getBrowser().waitForLocator(artifactsPage.getCommandLocator("build"));
     }
+
+    private static class MyBuildCompleteCondition implements Condition
+    {
+        private SeleniumBrowser browser = null;
+        private long buildNumber = 0;
+
+        private MyBuildCompleteCondition(SeleniumBrowser browser, long buildNumber)
+        {
+            this.browser = browser;
+            this.buildNumber = buildNumber;
+        }
+
+        public boolean satisfied()
+        {
+            MyBuildsPage myBuildsPage = browser.openAndWaitFor(MyBuildsPage.class);
+            myBuildsPage.waitFor();
+            List<BuildInfo> builds = myBuildsPage.getBuilds();
+            if (builds.isEmpty())
+            {
+                return false;
+            }
+
+            BuildInfo latestBuild = builds.get(0);
+            return latestBuild.number == buildNumber && latestBuild.status.isCompleted();
+        }
+    }
+
 }

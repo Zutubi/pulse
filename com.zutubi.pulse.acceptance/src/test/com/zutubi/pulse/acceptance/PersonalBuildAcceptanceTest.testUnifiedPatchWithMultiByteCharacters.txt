@@ -1,0 +1,16 @@
+--- src/test/com/zutubi/testant/UnitTest.java	(revision 29)
++++ src/test/com/zutubi/testant/UnitTest.java	(working copy)
+@@ -10,9 +10,10 @@
+     {
+         assertEquals(2, unit.add(1, 1));
+     }
+-
+-    public void testOfFailness()
++    public void testPulse()
+     {
+-        assertEquals(3, unit.add(1, 1));
++        String s = "国際化";
++        assertEquals(3, s.length());
+     }
+ }
++

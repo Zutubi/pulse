@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
@@ -147,7 +148,7 @@ public class ConfigurationHelper
     }
 
     /**
-     * Get a prxy instance to the named agent.
+     * Get a proxy instance to the named agent.
      *
      * @param agentName the name of the agent this proxy will reference.
      * @return an agent reference.
@@ -156,6 +157,19 @@ public class ConfigurationHelper
     public AgentConfiguration getAgentReference(String agentName) throws Exception
     {
         return getConfigurationReference(AGENTS_SCOPE + "/" + agentName, AgentConfiguration.class);
+    }
+
+    /**
+     * Get a proxy instance to the named post processor configured in the global template project.
+     *
+     * @param name  the name of the post processor.
+     * @param type  the type of the configuration being referenced.
+     * @return  the post processor reference
+     * @throws Exception thrown on error.
+     */
+    public <V extends Configuration> V getPostProcessor(String name, Class<V> type) throws Exception
+    {
+        return getConfigurationReference(PROJECTS_SCOPE + "/global project template/postProcessors/" + name, type);
     }
 
     /**

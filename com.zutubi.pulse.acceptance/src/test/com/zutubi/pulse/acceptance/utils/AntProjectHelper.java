@@ -14,30 +14,36 @@ public class AntProjectHelper extends ProjectConfigurationHelper
 {
     protected static final String ANT_PROCESSOR_NAME = "ant output processor";
 
-    protected AntProjectHelper(ProjectConfiguration config)
+    protected AntProjectHelper(ProjectConfiguration config, ConfigurationHelper helper)
     {
-        super(config);
+        super(config, helper);
     }
 
     public CommandConfiguration createDefaultCommand()
     {
-        // might be better to put this in a 'addCommand' type method?
-        AntCommandConfiguration command = new AntCommandConfiguration();
-        command.setBuildFile("build.xml");
-        command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
-        command.addPostProcessor(getConfig().getPostProcessors().get(ANT_PROCESSOR_NAME));
-        return command;
+        try
+        {
+            // might be better to put this in a 'addCommand' type method?
+            AntCommandConfiguration command = new AntCommandConfiguration();
+            command.setBuildFile("build.xml");
+            command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
+            command.addPostProcessor(helper.getPostProcessor(ANT_PROCESSOR_NAME, AntPostProcessorConfiguration.class));
+            return command;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
-    public List<String> getPostProcessorNames()
+    /**
+     * Set the default command target.
+     *
+     * @param target    the ant build target.
+     */
+    public void setTarget(String target)
     {
-        return Arrays.asList(ANT_PROCESSOR_NAME);
-    }
-
-    public List<Class> getPostProcessorTypes()
-    {
-        List<Class> types = new LinkedList<Class>();
-        types.add(AntPostProcessorConfiguration.class);
-        return types;
+        AntCommandConfiguration command = (AntCommandConfiguration) getDefaultCommand();
+        command.setTargets(target);
     }
 }

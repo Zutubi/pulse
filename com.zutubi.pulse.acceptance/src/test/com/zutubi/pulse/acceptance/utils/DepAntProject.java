@@ -1,11 +1,7 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.StringUtils;
@@ -20,9 +16,9 @@ public class DepAntProject extends AntProjectHelper
     public static final String PROPERTY_EXPECTED_LIST = "expected.list";
     public static final String PROPERTY_NOT_EXPECTED_LIST = "not.expected.list";
 
-    public DepAntProject(ProjectConfiguration config)
+    public DepAntProject(ProjectConfiguration config, ConfigurationHelper helper)
     {
-        super(config);
+        super(config, helper);
     }
 
     public BuildStageConfiguration addStage(String stageName)

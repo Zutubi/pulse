@@ -1,7 +1,8 @@
 package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.acceptance.Constants;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTrigge
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * The project configurations instance provides the acceptance tests with a set of
@@ -75,7 +75,7 @@ public class ProjectConfigurations
      */
     public DepAntProject createDepAntProject(String projectName, boolean addDefaultStage) throws Exception
     {
-        DepAntProject project = new DepAntProject(new ProjectConfiguration(projectName));
+        DepAntProject project = new DepAntProject(new ProjectConfiguration(projectName), configurationHelper);
         configureBaseProject(project, addDefaultStage);
         configureSvnScm(project, Constants.DEP_ANT_REPOSITORY);
         return project;
@@ -89,7 +89,7 @@ public class ProjectConfigurations
 
     public MavenProjectHelper createDepMavenProject(String projectName) throws Exception
     {
-        MavenProjectHelper project = new MavenProjectHelper(new ProjectConfiguration(projectName));
+        MavenProjectHelper project = new MavenProjectHelper(new ProjectConfiguration(projectName), configurationHelper);
         configureBaseProject(project, true);
         configureSvnScm(project, Constants.DEP_MAVEN_REPOSITORY);
         return project;
@@ -111,7 +111,7 @@ public class ProjectConfigurations
      */
     public WaitProject createWaitAntProject(String projectName, File dir, boolean cleanup) throws Exception
     {
-        WaitProject project = new WaitProject(new ProjectConfiguration(projectName), dir, cleanup);
+        WaitProject project = new WaitProject(new ProjectConfiguration(projectName), configurationHelper, dir, cleanup);
         configureBaseProject(project, true);
         configureSvnScm(project, Constants.WAIT_ANT_REPOSITORY);
         return project;
@@ -129,7 +129,11 @@ public class ProjectConfigurations
      */
     public AntProjectHelper createTestAntProject(String projectName) throws Exception
     {
-        return createAntProject(projectName, Constants.TEST_ANT_REPOSITORY);
+        AntProjectHelper project = createAntProject(projectName, Constants.TEST_ANT_REPOSITORY);
+        FileArtifactConfiguration artifact = project.addArtifact("junit report", "build/reports/xml/TESTS-TestSuites.xml");
+        artifact.addPostProcessor(configurationHelper.getPostProcessor("junit xml report processor", JUnitReportPostProcessorConfiguration.class));
+
+        return project;
     }
 
     public AntProjectHelper createTrivialAntProject(String projectName) throws Exception
@@ -139,7 +143,7 @@ public class ProjectConfigurations
 
     public AntProjectHelper createAntProject(String projectName, String svnUrl) throws Exception
     {
-        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName), configurationHelper);
         configureBaseProject(project, true);
         configureSvnScm(project, svnUrl);
         return project;
@@ -155,7 +159,7 @@ public class ProjectConfigurations
      */
     public AntProjectHelper createGitAntProject(String projectName) throws Exception
     {
-        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName));
+        AntProjectHelper project = new AntProjectHelper(new ProjectConfiguration(projectName), configurationHelper);
         configureBaseProject(project, true);
         configureGitScm(project, Constants.getGitUrl());
         return project;
@@ -164,17 +168,6 @@ public class ProjectConfigurations
     private void configureBaseProject(ProjectConfigurationHelper helper, boolean addDefaultStage) throws Exception
     {
         AgentConfiguration master = configurationHelper.getMasterAgentReference();
-
-        // setup the post processor references so that the commands have something to reference.
-        List<String> names = helper.getPostProcessorNames();
-        List<Class> types = helper.getPostProcessorTypes();
-        for (int i = 0; i < names.size(); i++)
-        {
-            String name = names.get(i);
-            Class<PostProcessorConfiguration> type = types.get(i);
-            PostProcessorConfiguration reference = configurationHelper.getConfigurationReference("projects/global project template/postProcessors/" + name, type);
-            helper.getConfig().getPostProcessors().put(reference.getName(), reference);
-        }
 
         // setup the defaults:
         if (addDefaultStage)
