@@ -3,12 +3,25 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
-import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
-import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
+import com.zutubi.pulse.core.commands.bjam.BJamPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.core.*;
+import com.zutubi.pulse.core.commands.make.MakePostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.maven.MavenPostProcessorConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2PostProcessorConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.msbuild.MsBuildPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.nant.NAntPostProcessorConfiguration;
+import com.zutubi.pulse.core.commands.xcode.XCodePostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.boostregression.BoostRegressionPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.boosttest.BoostTestReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.cppunit.CppUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.cunit.CUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.gcc.GccPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.nunit.NUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.ocunit.OCUnitReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.qtestlib.QTestLibReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.unittestpp.UnitTestPlusPlusReportPostProcessorConfiguration;
+import com.zutubi.pulse.core.postprocessors.visualstudio.VisualStudioPostProcessorConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
@@ -37,10 +50,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -55,10 +65,8 @@ public class ConfigurationHelper
     private MasterConfigurationRegistry configurationRegistry;
     private TypeRegistry typeRegistry;
     private RemoteApiClient remoteApi;
-    private ConfigurationReferenceManager referenceManager;
 
     private Instantiator instantiator;
-    private HandleAllocator handleAllocator;
     private AtomicLong nextHandle = new AtomicLong(0);
 
     private String templateOwnerPath = "";
@@ -69,7 +77,7 @@ public class ConfigurationHelper
         configurationRegistry.setActionManager(new ActionManager());
 
         // Stub the reference manager to delegate requests to the remote pulse instance.
-        referenceManager = mock(ConfigurationReferenceManager.class);
+        ConfigurationReferenceManager referenceManager = mock(ConfigurationReferenceManager.class);
         stub(referenceManager.getReferencedPathForHandle(eq(templateOwnerPath), anyLong())).toAnswer(new Answer()
         {
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -90,7 +98,7 @@ public class ConfigurationHelper
         // The local handle allocator is used to generate unique keys for records inserted
         // into lists.  This instance does not need to be in 'sync' with pulse's configuration
         // system handle allocator.
-        handleAllocator = mock(HandleAllocator.class);
+        HandleAllocator handleAllocator = mock(HandleAllocator.class);
         stub(handleAllocator.allocateHandle()).toAnswer(new Answer()
         {
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
@@ -114,18 +122,36 @@ public class ConfigurationHelper
         configurationRegistry.setTypeRegistry(typeRegistry);
         configurationRegistry.init();
 
-        // Configure the plugin configuration types that will be available to the acceptance
-        // tests.
-        configurationRegistry.registerConfigurationType(AntCommandConfiguration.class);
-        configurationRegistry.registerConfigurationType(ExecutableCommandConfiguration.class);
-        configurationRegistry.registerConfigurationType(SleepCommandConfiguration.class);
-        configurationRegistry.registerConfigurationType(AntPostProcessorConfiguration.class);
-        configurationRegistry.registerConfigurationType(JUnitReportPostProcessorConfiguration.class);
-        configurationRegistry.registerConfigurationType(SubversionConfiguration.class);
-        configurationRegistry.registerConfigurationType(GitConfiguration.class);
-        configurationRegistry.registerConfigurationType(DependentBuildTriggerConfiguration.class);
-        configurationRegistry.registerConfigurationType(Maven2CommandConfiguration.class);
-        configurationRegistry.registerConfigurationType(Maven2PostProcessorConfiguration.class);
+        // Configure the plugin configuration types that will be available to the acceptance tests.
+        register(AntCommandConfiguration.class);
+        register(ExecutableCommandConfiguration.class);
+        register(SleepCommandConfiguration.class);
+        register(Maven2CommandConfiguration.class);
+        register(SubversionConfiguration.class);
+        register(GitConfiguration.class);
+        register(DependentBuildTriggerConfiguration.class);
+        register(AntPostProcessorConfiguration.class);
+        register(BoostRegressionPostProcessorConfiguration.class);
+        register(BoostTestReportPostProcessorConfiguration.class);
+        register(BJamPostProcessorConfiguration.class);
+        register(CustomFieldsPostProcessorConfiguration.class);
+        register(CppUnitReportPostProcessorConfiguration.class);
+        register(CUnitReportPostProcessorConfiguration.class);
+        register(GccPostProcessorConfiguration.class);
+        register(JUnitEEReportPostProcessorConfiguration.class);
+        register(JUnitReportPostProcessorConfiguration.class);
+        register(JUnitSummaryPostProcessorConfiguration.class);
+        register(MakePostProcessorConfiguration.class);
+        register(MavenPostProcessorConfiguration.class);
+        register(Maven2PostProcessorConfiguration.class);
+        register(MsBuildPostProcessorConfiguration.class);
+        register(NAntPostProcessorConfiguration.class);
+        register(NUnitReportPostProcessorConfiguration.class);
+        register(OCUnitReportPostProcessorConfiguration.class);
+        register(QTestLibReportPostProcessorConfiguration.class);
+        register(UnitTestPlusPlusReportPostProcessorConfiguration.class);
+        register(VisualStudioPostProcessorConfiguration.class);
+        register(XCodePostProcessorConfiguration.class);
     }
 
     public <T extends Configuration> void register(Class<T> type) throws TypeException
@@ -204,7 +230,6 @@ public class ConfigurationHelper
         Hashtable<String, Object> data = remoteApi.getConfig(path);
 
         MutableRecord record = type.fromXmlRpc(templateOwnerPath, data);
-        //noinspection unchecked
 
         V config = (V) type.instantiate(record, instantiator);
         type.initialise(config, record, instantiator);
@@ -289,7 +314,6 @@ public class ConfigurationHelper
      *
      * @param parentTemplatePath the path of the templated parent for the configuration instance
      * @param config             the configuration instance.
-     * @param template
      * @param template           if true, the configuration should be marked as
      *                           a template, if false it should be concrete
      * @return the path at which the configuration instance was inserted.
@@ -342,7 +366,7 @@ public class ConfigurationHelper
      *
      * @param configuration the configuration to be updated.
      * @param deep          indicates whether or not the configurations nested within
-     *                      specified ocnfiguration should also be updated.
+     *                      specified configuration should also be updated.
      * @return the path at which the configuration was updated.
      * @throws Exception thrown on error
      */
@@ -429,5 +453,4 @@ public class ConfigurationHelper
     {
         this.remoteApi = remoteApi;
     }
-
 }

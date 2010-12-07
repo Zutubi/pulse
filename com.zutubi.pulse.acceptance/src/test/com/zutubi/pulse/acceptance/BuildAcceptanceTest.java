@@ -1280,7 +1280,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             final WaitProject project = projects.createWaitAntProject(random, tempDir, false);
 
             DirectoryArtifactConfiguration reportsArtifact = new DirectoryArtifactConfiguration("test reports", "reports/xml");
-            PostProcessorConfiguration junitProcessor = project.getConfig().getPostProcessors().get(JUNIT_PROCESSOR);
+            PostProcessorConfiguration junitProcessor = configurationHelper.getPostProcessor(JUNIT_PROCESSOR, JUnitReportPostProcessorConfiguration.class);
             reportsArtifact.addPostProcessor(junitProcessor);
             
             SleepCommandConfiguration command = new SleepCommandConfiguration("noop");

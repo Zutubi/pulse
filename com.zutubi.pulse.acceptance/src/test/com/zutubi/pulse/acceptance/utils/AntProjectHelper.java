@@ -1,14 +1,10 @@
 package com.zutubi.pulse.acceptance.utils;
 
-import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.LinkedList;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 
 public class AntProjectHelper extends ProjectConfigurationHelper
 {

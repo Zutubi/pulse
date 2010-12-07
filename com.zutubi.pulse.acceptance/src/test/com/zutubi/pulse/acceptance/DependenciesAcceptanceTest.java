@@ -75,11 +75,6 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertProject(project.getConfig(), false);
     }
 
-    private void updateProject(ProjectConfigurationHelper project) throws Exception
-    {
-        configurationHelper.update(project.getConfig());
-    }
-
     public void testPublish_NoArtifacts() throws Exception
     {
         // configure project.
@@ -473,7 +468,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(downstreamProject);
 
         upstreamProject.getConfig().setName(randomName + "-upstream-renamed");
-        updateProject(upstreamProject);
+        configurationHelper.update(upstreamProject.getConfig(), false);
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
         
@@ -744,13 +739,22 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectB);
 
-        dependency.setRevision(LATEST + STATUS_RELEASE);
-        updateProject(projectB);
+        updateDependencyRevision(projectB.getName(), LATEST + STATUS_RELEASE);
 
         buildRunner.triggerFailedBuild(projectB);
 
         // ensure that the 'retrieve' command is what failed.
         assertCommandFailed(projectB.getName(), 2, "retrieve");
+    }
+
+    private void updateDependencyRevision(String projectName, String newRevision) throws Exception
+    {
+        String dependenciesPath = "projects/" + projectName + "/dependencies/dependencies";
+        List<String> listing = rpcClient.RemoteApi.getConfigListing(dependenciesPath);
+        String dependencyPath = dependenciesPath + "/" + listing.get(0);
+        Hashtable<String, Object> d = rpcClient.RemoteApi.getConfig(dependencyPath);
+        d.put("revision", newRevision);
+        rpcClient.RemoteApi.saveConfig(dependencyPath, d, false);
     }
 
     // CIB-2194

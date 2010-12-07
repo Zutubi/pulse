@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance.utils;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
-import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
@@ -22,8 +21,6 @@ import java.util.List;
  */
 public class WaitProject extends ProjectConfigurationHelper
 {
-    protected static final String JUNIT_XML_PROCESSOR_NAME = "junit xml report processor";
-
     private static final String WAIT_FILE_PROPERTY = "waitfile";
     private static final String JAR = "awaitfile.jar";
     private static final String WAIT_TIMEOUT = "300";
@@ -57,24 +54,16 @@ public class WaitProject extends ProjectConfigurationHelper
     @Override
     public CommandConfiguration createDefaultCommand()
     {
-        try
+        ExecutableCommandConfiguration command = new ExecutableCommandConfiguration();
+        command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
+        command.setExe("java");
+        List<String> arguments = new LinkedList<String>(asList("-jar", JAR, "$(" + WAIT_FILE_PROPERTY + ")", WAIT_TIMEOUT));
+        if (cleanup)
         {
-            ExecutableCommandConfiguration command = new ExecutableCommandConfiguration();
-            command.setName(ProjectConfigurationWizard.DEFAULT_COMMAND);
-            command.setExe("java");
-            List<String> arguments = new LinkedList<String>(asList("-jar", JAR, "$(" + WAIT_FILE_PROPERTY + ")", WAIT_TIMEOUT));
-            if (cleanup)
-            {
-                arguments.add("true");
-            }
-            command.addPostProcessor(helper.getPostProcessor(JUNIT_XML_PROCESSOR_NAME, JUnitReportPostProcessorConfiguration.class));
-            command.setExtraArguments(arguments);
-            return command;
+            arguments.add("true");
         }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
+        command.setExtraArguments(arguments);
+        return command;
     }
 
     @Override
