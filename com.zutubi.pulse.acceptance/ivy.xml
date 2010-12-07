@@ -50,7 +50,6 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.nunit" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.qtestlib" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.visualstudio" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.test" rev="latest.integration" conf="*->@"/>
 
         <!-- Test dependencies -->
         <dependency org="com.thoughtworks.selenium" name="com.thoughtworks.selenium" rev="2.0.a5" conf="external,build->default;src->src"/>
