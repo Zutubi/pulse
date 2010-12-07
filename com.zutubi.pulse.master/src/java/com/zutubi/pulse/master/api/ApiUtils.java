@@ -8,10 +8,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.TimeStamps;
 
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Utility methods shared by XML-RPC API classes.
@@ -118,6 +115,16 @@ public class ApiUtils
             Hashtable<String, Object> detail = new Hashtable<String, Object>();
             detail.put("name", command.getCommandName());
             addResultFields(command, detail);
+
+            Hashtable<String, Object> properties = new Hashtable<String, Object>();
+            Enumeration propertyNames = command.getProperties().propertyNames();
+            while(propertyNames.hasMoreElements())
+            {
+                String propertyName = (String) propertyNames.nextElement();
+                properties.put(propertyName, command.getProperties().get(propertyName));
+            }
+            detail.put("properties", properties);
+
             commands.add(detail);
         }
         return commands;

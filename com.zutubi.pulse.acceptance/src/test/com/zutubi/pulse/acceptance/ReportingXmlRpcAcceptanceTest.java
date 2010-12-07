@@ -271,6 +271,22 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertEquals(1, stages.size());
         Hashtable<String, Object> stage = stages.get(0);
         assertEquals("[default]", stage.get("recipe"));
+
+        Vector<Hashtable<String, Object>> commands = (Vector<Hashtable<String, Object>>) stage.get("commands");
+        assertEquals(2, commands.size());
+
+        Hashtable<String, Object> bootstrapCommand = commands.get(0);
+        assertEquals("bootstrap", bootstrapCommand.get("name"));
+        assertEquals("success", bootstrapCommand.get("status"));
+
+        Hashtable<String, Object> buildCommand = commands.get(1);
+        assertEquals("build", buildCommand.get("name"));
+        assertEquals("success", buildCommand.get("status"));
+        Hashtable<String, Object> buildCommandProperties = (Hashtable<String, Object>) buildCommand.get("properties");
+        assertNotNull(buildCommandProperties.get("build file"));
+        assertNotNull(buildCommandProperties.get("exit code"));
+        assertNotNull(buildCommandProperties.get("command line"));
+        assertNotNull(buildCommandProperties.get("working directory"));
     }
 
     public void testErrorAndWarningCounts() throws Exception
