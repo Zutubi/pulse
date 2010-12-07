@@ -39,7 +39,7 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public void expandTreeNode(String path)
     {
-        String nodeExpression = "selenium.browserbot.getCurrentWindow().configTree.getNodeByConfigPath('" + path + "')";
+        String nodeExpression = SeleniumBrowser.CURRENT_WINDOW + ".configTree.getNodeByConfigPath('" + path + "')";
         browser.evalExpression(nodeExpression + ".expand(false, false);");
         browser.waitForCondition(nodeExpression + ".isExpanded();");
     }

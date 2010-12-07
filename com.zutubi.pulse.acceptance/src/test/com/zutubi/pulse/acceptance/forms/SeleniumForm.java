@@ -243,7 +243,7 @@ public abstract class SeleniumForm
         {
             case ITEM_PICKER:
             case MULTI_SELECT:
-                return browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "').getValue();");
+                return browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(name) + "').getValue();");
             default:
                 return browser.getValue(getFieldId(name));
         }
@@ -304,7 +304,7 @@ public abstract class SeleniumForm
         // Custom Ext widgets are tricky to manage.  Since we are
         // not testing the widgets themselves, just go direct to
         // the setValue method.
-        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
+        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
     }
 
     public boolean isFieldNotEmpty(String id)
@@ -356,7 +356,7 @@ public abstract class SeleniumForm
 
     private void forceButtonUpdate(String fieldName)
     {
-        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.form.updateButtons()");
+        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(fieldName) + "'); field.form.updateButtons()");
     }
 
     public String[] getFormValues()
@@ -501,7 +501,7 @@ public abstract class SeleniumForm
 
     public void triggerEvent(String fieldName, String eventType)
     {
-        browser.evalExpression("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('" + eventType + "', field);");
+        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('" + eventType + "', field);");
     }
 
     public abstract String getFormName();

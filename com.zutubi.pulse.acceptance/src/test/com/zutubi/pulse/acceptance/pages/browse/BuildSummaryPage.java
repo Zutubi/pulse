@@ -81,7 +81,7 @@ public class BuildSummaryPage extends ResponsibilityPage
      */
     public boolean isRightPaneVisible()
     {
-        return Boolean.valueOf(browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('build-summary-right').isVisible()"));
+        return Boolean.valueOf(browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('build-summary-right').isVisible()"));
     }
     
     public ResultState getBuildStatus()

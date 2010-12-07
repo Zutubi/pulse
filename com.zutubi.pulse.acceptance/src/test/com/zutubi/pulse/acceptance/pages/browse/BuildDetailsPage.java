@@ -51,7 +51,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     private void waitForPaneToLoad()
     {
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().paneLoading === false");
+        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".paneLoading === false");
     }
 
     public boolean isCustomFieldsTablePresent()

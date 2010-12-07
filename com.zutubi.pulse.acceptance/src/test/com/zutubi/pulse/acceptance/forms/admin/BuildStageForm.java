@@ -26,11 +26,11 @@ public class BuildStageForm extends ConfigurationForm
     {
         // Lazily-loaded options require some effort: simulate a click and
         // ensure we wait for the load to complete.
-        browser.evalExpression("var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "');" +
+        browser.evalExpression("var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('zfid." + name + "');" +
                                "combo.store.on('load', function() { combo.loaded = true; });" +
                                "combo.store.on('loadexception', function() { combo.loaded = true; });" +
                                "combo.onTriggerClick();");
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "').loaded", LAZY_LOAD_TIMEOUT);
+        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('zfid." + name + "').loaded", LAZY_LOAD_TIMEOUT);
         return super.getComboBoxOptions(name);
     }
 }

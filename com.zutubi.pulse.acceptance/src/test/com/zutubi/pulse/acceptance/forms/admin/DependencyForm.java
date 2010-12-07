@@ -31,7 +31,7 @@ public class DependencyForm extends ConfigurationForm
         // processes (update of the option field) is triggered.
         triggerEvent("project", "select");
 
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().actionInProgress === false;");
+        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".actionInProgress === false;");
     }
 
     public Object getStagesValues()
@@ -41,7 +41,7 @@ public class DependencyForm extends ConfigurationForm
 
     public List<String> getStagesOptionValues()
     {
-        String keys = browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid.stages').getOptionValues();");
+        String keys = browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('zfid.stages').getOptionValues();");
         return Arrays.asList(StringUtils.split(keys, ',', true));
     }
 }

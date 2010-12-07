@@ -34,6 +34,12 @@ public class SeleniumBrowser
 {
     private static final String PROPERTY_SELENIUM_BROWSER = "SELENIUM_BROWSER";
 
+    /**
+     * Javascript expression that will provide access to the current window namespace.
+     * As such, this is needed to gain access to the dom tree within selenium tests.
+     */
+    public static final String CURRENT_WINDOW = "selenium.browserbot.getCurrentWindow()";
+
     public static final long DEFAULT_TIMEOUT = 60000;
     public static final long PAGELOAD_TIMEOUT = 60000;
     public static final long WAITFOR_TIMEOUT = 60000;
@@ -454,7 +460,7 @@ public class SeleniumBrowser
 
     public String evalVariable(String variable)
     {
-        return selenium.getEval("selenium.browserbot.getCurrentWindow()." + variable);
+        return selenium.getEval(CURRENT_WINDOW + "." + variable);
     }
 
     public String evalExpression(String expression)
@@ -578,7 +584,7 @@ public class SeleniumBrowser
 
     public void waitForVariable(String variable, boolean inverse)
     {
-        waitForCondition((inverse ? "!" : "") + "selenium.browserbot.getCurrentWindow()." + variable, WAITFOR_TIMEOUT);
+        waitForCondition((inverse ? "!" : "") + CURRENT_WINDOW + "." + variable, WAITFOR_TIMEOUT);
     }
 
     public void waitAndClick(String id)
@@ -845,7 +851,7 @@ public class SeleniumBrowser
         }
 
         evalExpression(
-                "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "');" +
+                "var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "');" +
                 "combo.setValue('" + StringUtil.javaScriptStringEnc(value) + "');" +
                 "var store = combo.getStore();" +
                 "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
@@ -861,7 +867,7 @@ public class SeleniumBrowser
      */
     public String getComboValue(String comboId)
     {
-        return evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "').getValue()");
+        return evalExpression(CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "').getValue()");
     }
 
     /**
@@ -874,7 +880,7 @@ public class SeleniumBrowser
     public String[] getComboOptions(String comboId)
     {
         String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
+                        "var combo = " + CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "'); " +
                         "var values = []; " +
                         "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
                         "return values; " +
@@ -893,7 +899,7 @@ public class SeleniumBrowser
     public String[] getComboDisplays(String comboId)
     {
         String js = "var result = function() { " +
-                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + comboId + "'); " +
+                        "var combo = " + CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "'); " +
                         "var values = []; " +
                         "combo.store.each(function(r) { values.push(r.get(combo.displayField)); }); " +
                         "return values; " +

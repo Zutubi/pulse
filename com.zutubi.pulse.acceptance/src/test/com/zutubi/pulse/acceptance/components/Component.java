@@ -57,7 +57,7 @@ public abstract class Component
      */
     protected String getPresentExpression()
     {
-        return "selenium.browserbot.getCurrentWindow().Ext.getDom('" + id + "') != null";
+        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getDom('" + id + "') != null";
     }
 
     /**
@@ -67,6 +67,6 @@ public abstract class Component
      */
     protected String getComponentJS()
     {
-        return "selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "')";
+        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + id + "')";
     }
 }

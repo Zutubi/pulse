@@ -35,7 +35,7 @@ import java.util.Vector;
 
 /**
  * Tests for the remote API, primarily the reporting functionality.
- * Configration functions are tested in {@link ConfigXmlRpcAcceptanceTest}.
+ * Configuration functions are tested in {@link ConfigXmlRpcAcceptanceTest}.
  */
 public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 {

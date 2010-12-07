@@ -32,7 +32,7 @@ public class PulseFileSystemBrowserWindow
 
     public void waitForLoadingToComplete()
     {
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + BROWSER_ID + "').loading === false");
+        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + BROWSER_ID + "').loading === false");
     }
 
     public void clickOk()

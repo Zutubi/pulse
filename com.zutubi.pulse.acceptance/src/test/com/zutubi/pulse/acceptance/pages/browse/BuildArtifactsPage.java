@@ -12,7 +12,7 @@ import com.zutubi.util.WebUtils;
 public class BuildArtifactsPage extends SeleniumPage
 {
     private static final String ID_COMBO = "filter-combo";
-    private static final String EXPRESSION_COMBO = "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + ID_COMBO + "');";
+    private static final String EXPRESSION_COMBO = "var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + ID_COMBO + "');";
 
     private String projectName;
     private long buildId;
@@ -38,7 +38,7 @@ public class BuildArtifactsPage extends SeleniumPage
 
     private void waitForLoad()
     {
-        browser.waitForCondition("var win = selenium.browserbot.getCurrentWindow(); win.Ext && win.Ext.getCmp('artifacts-tree') && win.Ext.getCmp('artifacts-tree').loading === false");
+        browser.waitForCondition("var win = " + SeleniumBrowser.CURRENT_WINDOW + "; win.Ext && win.Ext.getCmp('artifacts-tree') && win.Ext.getCmp('artifacts-tree').loading === false");
     }
 
     /**

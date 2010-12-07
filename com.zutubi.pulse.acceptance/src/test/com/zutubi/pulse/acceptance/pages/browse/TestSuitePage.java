@@ -42,13 +42,13 @@ public class TestSuitePage extends AbstractTestsPage
 
     public String getCurrentFilter()
     {
-        return browser.evalExpression("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + ID_COMBO + "').getValue();");
+        return browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + ID_COMBO + "').getValue();");
     }
 
     public void setFilterAndWait(String filter)
     {
         browser.setComboByValue(ID_COMBO, filter);
-        browser.waitForCondition("selenium.browserbot.getCurrentWindow().filtering === false");
+        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".filtering === false");
     }
 
     public boolean isTestCaseVisible(String caseName)
