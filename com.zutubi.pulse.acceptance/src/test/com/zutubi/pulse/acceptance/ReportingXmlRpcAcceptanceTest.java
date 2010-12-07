@@ -235,9 +235,9 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(projectName, projects.get(0));
     }
 
-    public void testGetProjectGroupNonExistant() throws Exception
+    public void testGetProjectGroupNonExistent() throws Exception
     {
-        // Groups are virtual: if you ask for a non-existant label, it is
+        // Groups are virtual: if you ask for a non-existent label, it is
         // just an empty group
         String testName = "something that does not exist";
         Hashtable<String, Object> group = xmlRpcHelper.getProjectGroup(testName);
@@ -255,23 +255,34 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         insertSimpleProject(projectName);
 
         xmlRpcHelper.triggerBuild(projectName);
+        xmlRpcHelper.waitForBuildToComplete(projectName, 1);
 
-        Hashtable<String, Object> build;
-        do
-        {
-            build = xmlRpcHelper.getBuild(projectName, 1);
-        }
-        while (build == null || !Boolean.TRUE.equals(build.get("completed")));
+        Hashtable<String, Object> build = xmlRpcHelper.getBuild(projectName, 1);
 
         assertEquals(1, build.get("id"));
         assertEquals(projectName, build.get("project"));
         assertEquals("success", build.get("status"));
         
-        @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
         assertEquals(1, stages.size());
         Hashtable<String, Object> stage = stages.get(0);
         assertEquals("[default]", stage.get("recipe"));
+
+        Vector<Hashtable<String, Object>> commands = (Vector<Hashtable<String, Object>>) stage.get("commands");
+        assertEquals(2, commands.size());
+
+        Hashtable<String, Object> bootstrapCommand = commands.get(0);
+        assertEquals("bootstrap", bootstrapCommand.get("name"));
+        assertEquals("success", bootstrapCommand.get("status"));
+
+        Hashtable<String, Object> buildCommand = commands.get(1);
+        assertEquals("build", buildCommand.get("name"));
+        assertEquals("success", buildCommand.get("status"));
+        Hashtable<String, Object> buildCommandProperties = (Hashtable<String, Object>) buildCommand.get("properties");
+        assertNotNull(buildCommandProperties.get("build file"));
+        assertNotNull(buildCommandProperties.get("exit code"));
+        assertNotNull(buildCommandProperties.get("command line"));
+        assertNotNull(buildCommandProperties.get("working directory"));
     }
 
     public void testErrorAndWarningCounts() throws Exception

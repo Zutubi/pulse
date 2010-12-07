@@ -224,7 +224,7 @@ public interface ExecutionContext
      * @see #add(ResourceProperty)
      * @see com.zutubi.pulse.core.engine.api.BuildProperties
      *
-     * @param namespace        the namespace to add the proeprty to
+     * @param namespace        the namespace to add the property to
      * @param resourceProperty the property to add
      */
     void add(String namespace, ResourceProperty resourceProperty);
@@ -318,7 +318,7 @@ public interface ExecutionContext
      * splits the string at space characters.  For the resolution rules, see
      * {@link #resolveVariables(String)}.
      * <p/>
-     * The string is split at any occurence of one or more ASCII space
+     * The string is split at any occurrence of one or more ASCII space
      * characters.  The space characters are discarded.  To include a literal
      * space character, escape it with a backslash or surround a portion of
      * the string including the space(s) with double quotes (").  As double

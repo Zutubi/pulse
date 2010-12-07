@@ -75,7 +75,7 @@ public class SlaveRecipeRunner implements RecipeRunner
             ServerRecipePaths processorPaths = new ServerRecipePaths(details, dataDir);
 
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(details.getAgentHandle(), masterProxy, serviceTokenManager);
+            ResourceRepository repository = new RemoteResourceRepository(details.getAgentHandle(), masterProxy, serviceTokenManager);
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
@@ -88,7 +88,7 @@ public class SlaveRecipeRunner implements RecipeRunner
 
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
-                context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
