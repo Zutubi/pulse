@@ -128,7 +128,8 @@ public class ProjectHomeModel
             this.name = name;
             this.health = health;
             this.state = state;
-            this.successRate = (int) Math.round((statistics.getTotal() - statistics.getFailed()) * 100.0 / statistics.getTotal());
+            // errors / terminated states are excluded from the success rate statistic
+            this.successRate = (int) Math.round((statistics.getOk()) * 100.0 / (statistics.getFailed() + statistics.getOk()));
             this.statistics = statistics;
         }
 
