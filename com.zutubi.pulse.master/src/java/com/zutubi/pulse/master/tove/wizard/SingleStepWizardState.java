@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.wizard;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
@@ -76,6 +77,8 @@ public class SingleStepWizardState extends AbstractTypeWizardState
         super.updateRecord(parameters);
         if(templateRecord != null)
         {
+            // unsuppress password values before scrubbing.
+            ToveUtils.unsuppressPasswords(templateRecord.getParent(), dataRecord, type, true);
             configurationTemplateManager.scrubInheritedValues(templateRecord, dataRecord);
         }
     }
