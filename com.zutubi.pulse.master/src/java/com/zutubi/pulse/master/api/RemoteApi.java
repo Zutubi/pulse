@@ -2295,28 +2295,33 @@ public class RemoteApi
      * @see #getPreviousBuild(String, String, int)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
-    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults)
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, final String projectName, final boolean completedOnly, final int maxResults)
     {
         tokenManager.loginUser(token);
         try
         {
-            Project[] projects = internalGetProjectSet(projectName, true);
-
-            ResultState[] states = null;
-            if (completedOnly)
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                states = ResultState.getCompletedStates();
-            }
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    Project[] projects = internalGetProjectSet(projectName, true);
 
-            List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-            for (BuildResult build : builds)
-            {
-                Hashtable<String, Object> buildDetails = convertResult(build);
-                result.add(buildDetails);
-            }
+                    ResultState[] states = null;
+                    if (completedOnly)
+                    {
+                        states = ResultState.getCompletedStates();
+                    }
 
-            return result;
+                    List<BuildResult> builds = buildManager.queryBuilds(projects, states, -1, -1, 0, maxResults, true);
+                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+                    for (BuildResult build : builds)
+                    {
+                        Hashtable<String, Object> buildDetails = convertResult(build);
+                        result.add(buildDetails);
+                    }
+                    return result;
+                }
+            });
         }
         finally
         {
