@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *
+ * The api token manager.
  */
 public class DefaultTokenManager implements TokenManager
 {
@@ -47,12 +47,11 @@ public class DefaultTokenManager implements TokenManager
         try
         {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            logoutUser();
 
             // Generate a token which is good for 30 minutes for this user
             long expiryTime = System.currentTimeMillis() + expiry;
             APIAuthenticationToken token = new APIAuthenticationToken(username, password, expiryTime);
-            String encoded = APIAuthenticationToken.encode(token);
+            String encoded = token.toString();
 
             validTokens.add(encoded);
 
@@ -143,7 +142,7 @@ public class DefaultTokenManager implements TokenManager
         SecurityUtils.logout();
     }
 
-    private synchronized User verifyToken(String token) throws AuthenticationException
+    public synchronized User verifyToken(String token) throws AuthenticationException
     {
         checkTokenAccessEnabled();
 
@@ -201,7 +200,7 @@ public class DefaultTokenManager implements TokenManager
         // Token cannot have a bad format or expiry as it was found in
         // validTokens.  We don't even have to verify the signature
         // separately!
-        APIAuthenticationToken t = APIAuthenticationToken.decode(token);
+        APIAuthenticationToken t = new APIAuthenticationToken(token);
 
         long expiry = t.getExpiryTime();
         if (System.currentTimeMillis() > expiry)

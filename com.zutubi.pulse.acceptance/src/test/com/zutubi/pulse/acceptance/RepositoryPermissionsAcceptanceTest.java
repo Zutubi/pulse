@@ -198,41 +198,14 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
         }
 
         client.executeMethod(method);
-        method.releaseConnection();
 
-        debug(method);
-
-        return method.getStatusCode();
-    }
-
-    private void debug(HttpMethod method) throws IOException
-    {
         if (DEBUG)
         {
-            System.out.println("Status Code: " + method.getStatusCode());
-
-            //write out the request headers
-            System.out.println("*** Request ***");
-            System.out.println("Request Path: " + method.getPath());
-            System.out.println("Request Query: " + method.getQueryString());
-            Header[] requestHeaders = method.getRequestHeaders();
-            for (Header requestHeader : requestHeaders)
-            {
-                System.out.print(requestHeader);
-            }
-
-            //write out the response headers
-            System.out.println("*** Response ***");
-            System.out.println("Status Line: " + method.getStatusLine());
-            Header[] responseHeaders = method.getResponseHeaders();
-            for (Header responseHeader : responseHeaders)
-            {
-                System.out.print(responseHeader);
-            }
-
-            //write out the response body
-            System.out.println("*** Response Body ***");
-            System.out.println(new String(method.getResponseBody()));
+            AcceptanceTestUtils.debug(method);
         }
+
+        AcceptanceTestUtils.releaseConnection(method);
+
+        return method.getStatusCode();
     }
 }

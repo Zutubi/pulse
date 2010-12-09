@@ -63,7 +63,7 @@ public class PulseXmlRpcWorker extends XmlRpcWorker
             {
                 // all other authenticated calls will start with a token parameter.  Decode the token to
                 // extract the name.
-                APIAuthenticationToken token = APIAuthenticationToken.decode((String)params.get(0));
+                APIAuthenticationToken token = new APIAuthenticationToken((String)params.get(0));
                 userName = token.getUsername();
             }
             return userName;

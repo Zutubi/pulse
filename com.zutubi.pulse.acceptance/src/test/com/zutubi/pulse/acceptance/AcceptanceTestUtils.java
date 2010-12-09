@@ -382,12 +382,52 @@ public class AcceptanceTestUtils
         return get;
     }
 
-    private static void releaseConnection(GetMethod get)
+    /**
+     * Safely call the {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} method.
+     *
+     * @param method    the method on which release connection will be called.
+     */
+    public static void releaseConnection(HttpMethod method)
     {
-        if (get != null)
+        if (method != null)
         {
-            get.releaseConnection();
+            method.releaseConnection();
         }
+    }
+
+    /**
+     * Dump some http method debugging information to std out.
+     *
+     * @param method the method being debugged.
+     * @throws IOException is thrown if there are problems reading
+     * the method response.
+     */
+    public static void debug(HttpMethod method) throws IOException
+    {
+        System.out.println("Status Code: " + method.getStatusCode());
+
+        //write out the request headers
+        System.out.println("*** Request ***");
+        System.out.println("Request Path: " + method.getPath());
+        System.out.println("Request Query: " + method.getQueryString());
+        Header[] requestHeaders = method.getRequestHeaders();
+        for (Header requestHeader : requestHeaders)
+        {
+            System.out.print(requestHeader);
+        }
+
+        //write out the response headers
+        System.out.println("*** Response ***");
+        System.out.println("Status Line: " + method.getStatusLine());
+        Header[] responseHeaders = method.getResponseHeaders();
+        for (Header responseHeader : responseHeaders)
+        {
+            System.out.print(responseHeader);
+        }
+
+        //write out the response body
+        System.out.println("*** Response Body ***");
+        System.out.println(new String(method.getResponseBody()));
     }
 
     /**

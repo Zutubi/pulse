@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.rpc;
 
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -85,7 +86,7 @@ public class RpcClient
      */
     public String loginAsAdmin() throws Exception
     {
-        return login(com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS.getUserName(), com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS.getPassword());
+        return login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
     }
 
     /**

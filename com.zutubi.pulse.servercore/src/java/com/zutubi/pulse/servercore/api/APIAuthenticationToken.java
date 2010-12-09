@@ -4,8 +4,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
- *
- *
+ * The api token manages the encoding / decoding of the token used
+ * by the api for authenticating requests.
  */
 public class APIAuthenticationToken
 {
@@ -20,20 +20,7 @@ public class APIAuthenticationToken
         this.signature = DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
     }
 
-    private APIAuthenticationToken(String username, long expiryTime, String signature)
-    {
-        this.username = username;
-        this.expiryTime = expiryTime;
-        this.signature = signature;
-    }
-
-    public static String encode(APIAuthenticationToken token)
-    {
-        String tokenValue = token.username + ":" + token.expiryTime + ":" + token.signature;
-        return new String(Base64.encodeBase64(tokenValue.getBytes()));
-    }
-
-    public static APIAuthenticationToken decode(String token)
+    public APIAuthenticationToken(String token)
     {
         String decoded = new String(Base64.decodeBase64(token.getBytes()));
         String[] parts = decoded.split(":");
@@ -47,7 +34,15 @@ public class APIAuthenticationToken
         // verify the signature? Not needed since our handling of the tokens ensures that they are always valid.
         // We keep a copy of created tokens and require that the user provided token first matches one of these.
 
-        return new APIAuthenticationToken(username, Long.valueOf(expiryTime), parts[2]);
+        this.username = username;
+        this.expiryTime = Long.valueOf(expiryTime);
+        this.signature = parts[2];
+    }
+
+    public String toString()
+    {
+        String tokenValue = this.username + ":" + this.expiryTime + ":" + this.signature;
+        return new String(Base64.encodeBase64(tokenValue.getBytes()));
     }
 
     public String getUsername()
