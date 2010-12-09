@@ -58,6 +58,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ProjectWorkingCopyAcceptanceTest.class);
         suite.addTestSuite(UsersAcceptanceTest.class);
         suite.addTestSuite(RememberMeAcceptanceTest.class);
+        suite.addTestSuite(AccessAcceptanceTest.class);
         suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
         suite.addTestSuite(InternationalisationAcceptanceTest.class);
 
