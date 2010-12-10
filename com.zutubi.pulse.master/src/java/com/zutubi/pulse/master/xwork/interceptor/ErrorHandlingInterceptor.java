@@ -13,6 +13,8 @@ import org.springframework.security.access.AccessDeniedException;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * An xwork interceptor implementation that takes some of the commonly raised
+ * exceptions and translates them into the appropriate action responses.
  */
 public class ErrorHandlingInterceptor implements Interceptor
 {
