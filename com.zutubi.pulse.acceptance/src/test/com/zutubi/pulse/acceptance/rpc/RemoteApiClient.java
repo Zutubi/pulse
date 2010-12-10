@@ -698,7 +698,7 @@ public class RemoteApiClient extends ApiClient
 
     public String insertSimpleAgent(String name) throws Exception
     {
-        return insertSimpleAgent(name, name);
+        return insertSimpleAgent(name, "localhost");
     }
 
     public String insertSimpleAgent(String name, String host) throws Exception

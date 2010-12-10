@@ -4,6 +4,8 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -123,13 +125,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName, "localhost");
         Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getConfig(path);
         try
         {
             assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
-            assertEquals(agentName, agentConfig.get("host"));
+            assertEquals("localhost", agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
             assertEquals(true, agentConfig.get("remote"));
         }
@@ -174,13 +176,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetRawConfigTemplated() throws Exception
     {
         String agentName = randomName();
-        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
+        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName, "localhost");
         Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getRawConfig(path);
         try
         {
             assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
-            assertEquals(agentName, agentConfig.get("host"));
+            assertEquals("localhost", agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
             assertFalse(agentConfig.containsKey("remote"));
         }
@@ -606,8 +608,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         try
         {
             Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
-            assertEquals(asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING),
-                         new LinkedList<String>(actions));
+            assertEquals(asList(ACTION_DISABLE, ACTION_PING), new LinkedList<String>(actions));
         }
         finally
         {
@@ -621,7 +622,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         try
         {
-            rpcClient.RemoteApi.doConfigAction(path, AgentConfigurationActions.ACTION_DISABLE);
+            rpcClient.RemoteApi.doConfigAction(path, ACTION_DISABLE);
             Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
             assertEquals(asList(AgentConfigurationActions.ACTION_ENABLE),
                      new LinkedList<String>(actions));
