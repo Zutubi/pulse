@@ -62,11 +62,14 @@ public class CheckAction extends ToveActionSupport
         String symbolicName = formParameters.get("symbolicName")[0];
         CompositeType type = typeRegistry.getType(symbolicName);
         record = ToveUtils.toRecord(type, formParameters);
-        
-        Record existingRecord = configurationTemplateManager.getRecord(path);
-        if (existingRecord != null)
+
+        if (configurationTemplateManager.isPersistent(path))
         {
-            ToveUtils.unsuppressPasswords(existingRecord, (MutableRecord) record, type, false);
+            Record existingRecord = configurationTemplateManager.getRecord(path);
+            if (existingRecord != null)
+            {
+                ToveUtils.unsuppressPasswords(existingRecord, (MutableRecord) record, type, false);
+            }
         }
 
         // Now lets create the record for the secondary form, used to generate the check processor. 
