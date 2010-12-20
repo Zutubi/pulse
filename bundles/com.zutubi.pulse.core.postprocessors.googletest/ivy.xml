@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+    <info organisation="zutubi" module="com.zutubi.pulse.core.postprocessors.googletest" status="integration">
+        <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
+    </info>
+
+    <configurations>
+        <include file="${project.root.dir}/etc/default-ivy-configurations.xml"/>
+        <conf name="bundle"/>
+        <conf name="external"/>
+        <conf name="bundled_3rd_party"/>
+    </configurations>
+
+    <publications>
+        <artifact name="com.zutubi.pulse.core.postprocessors.googletest" type="jar" conf="bundle,build"/>
+        <artifact name="com.zutubi.pulse.core.postprocessors.googletest-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.core.postprocessors.googletest-test" type="jar" conf="test"/>
+    </publications>
+
+    <dependencies>
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="build,test,src->@"/>
+    </dependencies>
+
+</ivy-module>

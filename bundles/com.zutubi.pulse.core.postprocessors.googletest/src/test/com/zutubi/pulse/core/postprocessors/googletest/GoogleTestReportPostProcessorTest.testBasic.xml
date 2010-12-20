@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite errors="0" failures="1" id="0" name="EmptyTest" package="com.zutubi.pulse.junit" tests="1" time="0.091">
+
+    <properties>
+
+      <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+
+          <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\bin"></property>
+
+          <property name="java.vm.version" value="1.5.0_06-b05"></property>
+
+          <property name="ant.library.dir" value="c:/tools/apache-ant-1.6.5/lib"></property>
+
+          <property name="ant.version" value="Apache Ant version 1.6.5 compiled on June 2 2005"></property>
+
+          <property name="ant.java.version" value="1.5"></property>
+
+          <property name="java.vm.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="java.vendor.url" value="http://java.sun.com/"></property>
+
+          <property name="path.separator" value=";"></property>
+
+          <property name="java.vm.name" value="Java HotSpot(TM) Client VM"></property>
+
+          <property name="file.encoding.pkg" value="sun.io"></property>
+
+          <property name="user.country" value="US"></property>
+
+          <property name="sun.os.patch.level" value="Service Pack 2"></property>
+
+          <property name="java.vm.specification.name" value="Java Virtual Machine Specification"></property>
+
+          <property name="user.dir" value="C:\tools\cygwin\home\jason\svn\junit"></property>
+
+          <property name="java.runtime.version" value="1.5.0_06-b05"></property>
+
+          <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"></property>
+
+          <property name="basedir" value="C:\tools\cygwin\home\jason\svn\junit"></property>
+
+          <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\endorsed"></property>
+
+          <property name="os.arch" value="x86"></property>
+
+          <property name="java.io.tmpdir" value="c:\DOCUME~1\Jason\LOCALS~1\Temp\"></property>
+
+          <property name="line.separator" value=" "></property>
+
+          <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="user.variant" value=""></property>
+
+          <property name="os.name" value="Windows XP"></property>
+
+          <property name="ant.home" value="c:/tools/apache-ant-1.6.5"></property>
+
+          <property name="build.dir" value="build"></property>
+
+          <property name="ant.project.name" value="JUnit reports"></property>
+
+          <property name="sun.jnu.encoding" value="Cp1252"></property>
+
+          <property name="cygwin.user.home" value="C:/tools/cygwin/home/jason"></property>
+
+          <property name="java.library.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\bin;.;C:\WINDOWS\system32;C:\WINDOWS;C:\tools\cygwin\usr\X11R6\bin;C:\tools\cygwin\usr\local\bin;C:\tools\cygwin\bin;C:\tools\cygwin\bin;c:\WINDOWS\system32;c:\WINDOWS;c:\WINDOWS\System32\Wbem;c:\Program Files\Sonic\MyDVD;c:\Program Files\Common Files\Adaptec Shared\System;c:\Program Files\Java\jdk1.5.0_06\bin;C:\tools\cygwin\bin;c:\tools\apache-ant-1.6.5\bin;c:\Program Files\Common Files\Ulead Systems\MPEG;c:\Program Files\Perforce;c:\Program Files\Subversion\bin"></property>
+
+          <property name="java.specification.name" value="Java Platform API Specification"></property>
+
+          <property name="java.class.version" value="49.0"></property>
+
+          <property name="sun.management.compiler" value="HotSpot Client Compiler"></property>
+
+          <property name="ant.file.JUnit reports" value="C:\tools\cygwin\home\jason\svn\junit\build.xml"></property>
+
+          <property name="os.version" value="5.1"></property>
+
+          <property name="ant.file" value="C:\tools\cygwin\home\jason\svn\junit\build.xml"></property>
+
+          <property name="user.home" value="C:\Documents and Settings\Jason"></property>
+
+          <property name="user.timezone" value=""></property>
+
+          <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"></property>
+
+          <property name="java.specification.version" value="1.5"></property>
+
+          <property name="file.encoding" value="Cp1252"></property>
+
+          <property name="user.name" value="Jason"></property>
+
+          <property name="java.class.path" value="C:\tools\cygwin\home\jason\svn\junit\build\classes;C:\tools\apache-ant-1.6.5\lib\ant.jar;C:\tools\xjavadoc-1.0\xjavadoc-1.0.jar;C:\tools\xdoclet-1.1.2\lib\xdoclet.jar;C:\tools\junit3.8.1\junit.jar;C:\tools\apache-ant-1.6.5\lib\ant-launcher.jar;C:\tools\apache-ant-1.6.5\lib\ant-junit.jar"></property>
+
+          <property name="report.dir" value="build/report"></property>
+
+          <property name="java.vm.specification.version" value="1.0"></property>
+
+          <property name="sun.arch.data.model" value="32"></property>
+
+          <property name="java.home" value="C:\Program Files\Java\jdk1.5.0_06\jre"></property>
+
+          <property name="java.specification.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="user.language" value="en"></property>
+
+          <property name="classes.dir" value="build/classes"></property>
+
+          <property name="awt.toolkit" value="sun.awt.windows.WToolkit"></property>
+
+          <property name="java.vm.info" value="mixed mode, sharing"></property>
+
+          <property name="java.version" value="1.5.0_06"></property>
+
+          <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\ext"></property>
+
+          <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\rt.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\i18n.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\jce.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.5.0_06\jre\classes"></property>
+
+          <property name="java.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="file.separator" value="\"></property>
+
+          <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"></property>
+
+          <property name="src.dir" value="src"></property>
+
+          <property name="sun.io.unicode.encoding" value="UnicodeLittle"></property>
+
+          <property name="sun.cpu.endian" value="little"></property>
+
+          <property name="sun.desktop" value="windows"></property>
+
+          <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86"></property>
+
+      </properties>
+
+      <testcase classname="com.zutubi.pulse.junit.EmptyTest" name="warning" time="0.01">
+
+      <failure message="No tests found in com.zutubi.pulse.junit.EmptyTest" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: No tests found in com.zutubi.pulse.junit.EmptyTest
+</failure>
+
+      </testcase>
+
+      <system-out></system-out>
+
+      <system-err></system-err>
+
+  </testsuite>
+
+  <testsuite errors="1" failures="1" id="2" name="SimpleTest" package="com.zutubi.pulse.junit" tests="3" time="0.09">
+
+    <properties>
+
+      <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+
+          <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\bin"></property>
+
+          <property name="java.vm.version" value="1.5.0_06-b05"></property>
+
+          <property name="ant.library.dir" value="c:/tools/apache-ant-1.6.5/lib"></property>
+
+          <property name="ant.version" value="Apache Ant version 1.6.5 compiled on June 2 2005"></property>
+
+          <property name="ant.java.version" value="1.5"></property>
+
+          <property name="java.vm.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="java.vendor.url" value="http://java.sun.com/"></property>
+
+          <property name="path.separator" value=";"></property>
+
+          <property name="java.vm.name" value="Java HotSpot(TM) Client VM"></property>
+
+          <property name="file.encoding.pkg" value="sun.io"></property>
+
+          <property name="user.country" value="US"></property>
+
+          <property name="sun.os.patch.level" value="Service Pack 2"></property>
+
+          <property name="java.vm.specification.name" value="Java Virtual Machine Specification"></property>
+
+          <property name="user.dir" value="C:\tools\cygwin\home\jason\svn\junit"></property>
+
+          <property name="java.runtime.version" value="1.5.0_06-b05"></property>
+
+          <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"></property>
+
+          <property name="basedir" value="C:\tools\cygwin\home\jason\svn\junit"></property>
+
+          <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\endorsed"></property>
+
+          <property name="os.arch" value="x86"></property>
+
+          <property name="java.io.tmpdir" value="c:\DOCUME~1\Jason\LOCALS~1\Temp\"></property>
+
+          <property name="line.separator" value=" "></property>
+
+          <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="user.variant" value=""></property>
+
+          <property name="os.name" value="Windows XP"></property>
+
+          <property name="ant.home" value="c:/tools/apache-ant-1.6.5"></property>
+
+          <property name="build.dir" value="build"></property>
+
+          <property name="ant.project.name" value="JUnit reports"></property>
+
+          <property name="sun.jnu.encoding" value="Cp1252"></property>
+
+          <property name="cygwin.user.home" value="C:/tools/cygwin/home/jason"></property>
+
+          <property name="java.library.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\bin;.;C:\WINDOWS\system32;C:\WINDOWS;C:\tools\cygwin\usr\X11R6\bin;C:\tools\cygwin\usr\local\bin;C:\tools\cygwin\bin;C:\tools\cygwin\bin;c:\WINDOWS\system32;c:\WINDOWS;c:\WINDOWS\System32\Wbem;c:\Program Files\Sonic\MyDVD;c:\Program Files\Common Files\Adaptec Shared\System;c:\Program Files\Java\jdk1.5.0_06\bin;C:\tools\cygwin\bin;c:\tools\apache-ant-1.6.5\bin;c:\Program Files\Common Files\Ulead Systems\MPEG;c:\Program Files\Perforce;c:\Program Files\Subversion\bin"></property>
+
+          <property name="java.specification.name" value="Java Platform API Specification"></property>
+
+          <property name="java.class.version" value="49.0"></property>
+
+          <property name="sun.management.compiler" value="HotSpot Client Compiler"></property>
+
+          <property name="ant.file.JUnit reports" value="C:\tools\cygwin\home\jason\svn\junit\build.xml"></property>
+
+          <property name="os.version" value="5.1"></property>
+
+          <property name="ant.file" value="C:\tools\cygwin\home\jason\svn\junit\build.xml"></property>
+
+          <property name="user.home" value="C:\Documents and Settings\Jason"></property>
+
+          <property name="user.timezone" value=""></property>
+
+          <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"></property>
+
+          <property name="java.specification.version" value="1.5"></property>
+
+          <property name="file.encoding" value="Cp1252"></property>
+
+          <property name="user.name" value="Jason"></property>
+
+          <property name="java.class.path" value="C:\tools\cygwin\home\jason\svn\junit\build\classes;C:\tools\apache-ant-1.6.5\lib\ant.jar;C:\tools\xjavadoc-1.0\xjavadoc-1.0.jar;C:\tools\xdoclet-1.1.2\lib\xdoclet.jar;C:\tools\junit3.8.1\junit.jar;C:\tools\apache-ant-1.6.5\lib\ant-launcher.jar;C:\tools\apache-ant-1.6.5\lib\ant-junit.jar"></property>
+
+          <property name="report.dir" value="build/report"></property>
+
+          <property name="java.vm.specification.version" value="1.0"></property>
+
+          <property name="sun.arch.data.model" value="32"></property>
+
+          <property name="java.home" value="C:\Program Files\Java\jdk1.5.0_06\jre"></property>
+
+          <property name="java.specification.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="user.language" value="en"></property>
+
+          <property name="classes.dir" value="build/classes"></property>
+
+          <property name="awt.toolkit" value="sun.awt.windows.WToolkit"></property>
+
+          <property name="java.vm.info" value="mixed mode, sharing"></property>
+
+          <property name="java.version" value="1.5.0_06"></property>
+
+          <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\ext"></property>
+
+          <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.5.0_06\jre\lib\rt.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\i18n.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\jce.jar;C:\Program Files\Java\jdk1.5.0_06\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.5.0_06\jre\classes"></property>
+
+          <property name="java.vendor" value="Sun Microsystems Inc."></property>
+
+          <property name="file.separator" value="\"></property>
+
+          <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"></property>
+
+          <property name="src.dir" value="src"></property>
+
+          <property name="sun.io.unicode.encoding" value="UnicodeLittle"></property>
+
+          <property name="sun.cpu.endian" value="little"></property>
+
+          <property name="sun.desktop" value="windows"></property>
+
+          <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86"></property>
+
+      </properties>
+
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
+
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testAssertionFailure" time="0.01">
+
+      <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;1&gt; but was:&lt;2&gt;
+	at com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)
+</failure>
+
+      </testcase>
+
+      <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testThrowException" time="0.01">
+
+      <error message="random message" type="java.lang.RuntimeException">java.lang.RuntimeException: random message
+	at com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)
+</error>
+
+      </testcase>
+
+      <system-out></system-out>
+
+      <system-err></system-err>
+
+  </testsuite>
+</testsuites>
