@@ -1163,6 +1163,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
         try
         {
+            // Clear any existing validation errors before running a new validation.
+            instance.clearInstanceErrors();
+            instance.clearFieldErrors();
+
             validationManager.validate(instance, context);
         }
         catch (ValidationException e)
