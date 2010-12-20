@@ -13,6 +13,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 import java.util.*;
 
@@ -158,23 +160,27 @@ public abstract class ProjectConfigurationHelper
         return new LinkedList<BuildStageConfiguration>(getConfig().getStages().values());
     }
 
-    public DependencyConfiguration addDependency(ProjectConfigurationHelper project)
+    public DependencyConfiguration addDependency(final ProjectConfigurationHelper target, String... stageNames)
     {
-        return addDependency(project.getConfig());
-    }
-
-    public DependencyConfiguration addDependency(ProjectConfigurationHelper target, String stageName)
-    {
-        DependencyConfiguration dependency = addDependency(target);
-        dependency.setStageType(DependencyConfiguration.StageType.SELECTED_STAGES);
-        dependency.setStages(Arrays.asList(target.getStage(stageName)));
+        DependencyConfiguration dependency = addDependency(target.getConfig());
+        if (stageNames.length > 0)
+        {
+            dependency.setStageType(DependencyConfiguration.StageType.SELECTED_STAGES);
+            dependency.setStages(CollectionUtils.map(stageNames, new Mapping<String, BuildStageConfiguration>()
+            {
+                public BuildStageConfiguration map(String stageName)
+                {
+                    return target.getStage(stageName);
+                }
+            }));
+        }
         return dependency;
     }
-    
-    public DependencyConfiguration addDependency(ProjectConfiguration project)
+
+    public DependencyConfiguration addDependency(ProjectConfiguration target)
     {
         DependencyConfiguration dependency = new DependencyConfiguration();
-        dependency.setProject(project);
+        dependency.setProject(target);
         getConfig().getDependencies().getDependencies().add(dependency);
         return dependency;
     }

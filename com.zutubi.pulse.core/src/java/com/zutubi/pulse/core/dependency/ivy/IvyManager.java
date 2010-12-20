@@ -41,7 +41,7 @@ public class IvyManager
         if (cacheBase != null && configuration.getCacheBase() == null)
         {
             // Give each ivy client a unique cache base directory so that they
-            // can be cleaned up without interferring with each other.
+            // can be cleaned up without interfering with each other.
             File clientCacheBase = new File(cacheBase, randomString(5));
             configuration.setCacheBase(clientCacheBase);
         }

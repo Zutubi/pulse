@@ -862,6 +862,31 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
     }
 
+    public void testProjectDependsOnMultipleStagesOfUpstreamProject() throws Exception
+    {
+        // Create a project with 2 stages, each creating distinct artifacts.
+        DepAntProject projectA = projects.createDepAntProject(randomName + "-upstream");
+        projectA.addRecipe("stage-A").addArtifacts("build/stage-A-artifact.jar");
+        projectA.addStage("stage-A").setRecipe("stage-A");
+        projectA.addFilesToCreateInStage("stage-A", "build/stage-A-artifact.jar");
+
+        projectA.addRecipe("stage-B").addArtifacts("build/stage-B-artifact.jar");
+        projectA.addStage("stage-B").setRecipe("stage-B");
+        projectA.addFilesToCreateInStage("stage-B", "build/stage-B-artifact.jar");
+
+        insertProject(projectA);
+
+        buildRunner.triggerSuccessfulBuild(projectA);
+
+        DepAntProject projectB = projects.createDepAntProject(randomName + "-downstream");
+        projectB.addDependency(projectA, "stage-A", "stage-B");
+
+        projectB.addExpectedFiles("lib/stage-A-artifact.jar", "lib/stage-B-artifact.jar");
+        insertProject(projectB);
+
+        buildRunner.triggerSuccessfulBuild(projectB);
+    }
+
     // setup the repository for the propagate revision tests.
     public String setupPropagateWorkspace() throws IOException, SVNException
     {
