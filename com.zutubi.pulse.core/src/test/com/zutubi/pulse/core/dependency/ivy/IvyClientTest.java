@@ -123,6 +123,24 @@ public class IvyClientTest extends ZutubiTestCase
         assertEquals(2, report.getRetrievedArtifacts().size());
     }
 
+    public void testRetrieveArtifactsFromMultipleStages() throws IOException, ParseException
+    {
+        descriptor.addArtifact(createArtifact("artifactA.jar"), "stageA");
+        descriptor.addArtifact(createArtifact("artifactB.jar"), "stageB");
+        client.publishArtifacts(descriptor);
+        client.publishDescriptor(descriptor);
+
+        IvyModuleDescriptor retrievalDescriptor = new IvyModuleDescriptor("org", "moduleB", "revision", configuration);
+        retrievalDescriptor.addDependency(descriptor.getModuleRevisionId(), TEST_CONF, "stageA", "stageB");
+
+        IvyRetrievalReport report = client.retrieveArtifacts(retrievalDescriptor.getDescriptor(), TEST_CONF, standardRetrievalPattern, true);
+
+        assertExists(workBase, "artifactA-revision.jar");
+        assertExists(workBase, "artifactB-revision.jar");
+        assertEquals(2, report.getRetrievedArtifacts().size());
+
+    }
+
     public void testRetrieveSyncDestination() throws IOException, ParseException
     {
         assertTrue(workBase.mkdirs());

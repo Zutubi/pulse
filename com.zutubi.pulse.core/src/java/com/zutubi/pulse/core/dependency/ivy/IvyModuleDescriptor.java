@@ -101,7 +101,7 @@ public class IvyModuleDescriptor
      * Note, it is assumes that the contents of the url have been encoded according to the rules defined
      * within this class.
      *
-     * @param url               the url refering to an xml formatted module descriptor.
+     * @param url               the url referring to an xml formatted module descriptor.
      * @param configuration     the ivy configuration
      *
      * @return  a new instance of the IvyModuleDescriptor
@@ -261,10 +261,21 @@ public class IvyModuleDescriptor
     {
         String masterConf = ensureConfigurationExists(conf);
 
-        String dependencyConf = (stageNames.length > 0) ? StringUtils.join(NAME_GLUE, stageNames) : ALL_STAGES;
-        DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(descriptor, mrid, true, false, transitive);
-        dependencyDescriptor.addDependencyConfiguration(masterConf, dependencyConf);
-        descriptor.addDependency(IvyEncoder.encode(dependencyDescriptor));
+        if (stageNames.length > 0)
+        {
+            for (String stageName : stageNames)
+            {
+                DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(descriptor, mrid, true, false, transitive);
+                dependencyDescriptor.addDependencyConfiguration(masterConf, stageName);
+                descriptor.addDependency(IvyEncoder.encode(dependencyDescriptor));
+            }
+        }
+        else
+        {
+            DefaultDependencyDescriptor dependencyDescriptor = new DefaultDependencyDescriptor(descriptor, mrid, true, false, transitive);
+            dependencyDescriptor.addDependencyConfiguration(masterConf, ALL_STAGES);
+            descriptor.addDependency(IvyEncoder.encode(dependencyDescriptor));
+        }
     }
 
     /**

@@ -57,6 +57,17 @@ public class DepAntProject extends AntProjectHelper
     }
 
     /**
+     * Add a list of file paths that should be created by the execution of the specified stage.
+     *
+     * @param stage the stage for which the file should be created.
+     * @param paths the paths to be created.
+     */
+    public void addFilesToCreateInStage(String stage, String... paths)
+    {
+        addStageProperty(getConfig().getStage(stage), PROPERTY_CREATE_LIST, StringUtils.join(",", paths));
+    }
+
+    /**
      * Add a list of files paths that this build expects to be present at execution.
      *
      * @param paths the array of paths (relative to the builds base directory)
