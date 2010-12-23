@@ -9,6 +9,8 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;
 
 /**
+ * Validates that the string represents a valid build number for the
+ * project in the validation context.
  */
 public class BuildValidator extends StringFieldValidatorSupport
 {

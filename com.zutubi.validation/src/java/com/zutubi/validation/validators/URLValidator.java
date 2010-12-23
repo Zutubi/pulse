@@ -12,7 +12,6 @@ public class URLValidator extends StringFieldValidatorSupport
 {
     public void validateStringField(String value) throws ValidationException
     {
-
         try
         {
             new URL(value);

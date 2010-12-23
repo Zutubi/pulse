@@ -14,7 +14,7 @@ public class CvsRootValidatorTest extends FieldValidatorTestCase
     public void testEmptyString() throws Exception
     {
         validator.validate(new FieldProvider(""));
-        Assert.assertTrue(validationAware.hasErrors());
+        Assert.assertFalse(validationAware.hasErrors());
     }
 
     public void testNull() throws Exception

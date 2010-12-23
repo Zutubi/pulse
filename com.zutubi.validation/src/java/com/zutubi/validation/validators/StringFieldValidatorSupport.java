@@ -9,7 +9,16 @@ import com.zutubi.validation.ValidationException;
  */
 public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
 {
-    private boolean allowEmpty = false;
+    /**
+     * If true, strings that are not set are ignored by this validator. This
+     * flag should be used in conjunction with the required validator to allow
+     * fields to remain blank in templates.
+     *
+     * Defaults to true.
+     *
+     * @see StringUtils#stringSet(String) 
+     */
+    private boolean ignoreEmpty = true;
 
     protected StringFieldValidatorSupport()
     {
@@ -20,27 +29,27 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
         super(defaultKeySuffix);
     }
 
-    protected StringFieldValidatorSupport(boolean allowEmpty)
+    protected StringFieldValidatorSupport(boolean ignoreEmpty)
     {
-        this.allowEmpty = allowEmpty;
+        this.ignoreEmpty = ignoreEmpty;
     }
 
-    protected StringFieldValidatorSupport(String defaultKeySuffix, boolean allowEmpty)
+    protected StringFieldValidatorSupport(String defaultKeySuffix, boolean ignoreEmpty)
     {
         super(defaultKeySuffix);
-        this.allowEmpty = allowEmpty;
+        this.ignoreEmpty = ignoreEmpty;
     }
 
-    public void setAllowEmpty(boolean allowEmpty)
+    public void setIgnoreEmpty(boolean ignoreEmpty)
     {
-        this.allowEmpty = allowEmpty;
+        this.ignoreEmpty = ignoreEmpty;
     }
 
     protected void validateField(Object value) throws ValidationException
     {
         if (value == null)
         {
-            if(allowEmpty)
+            if (ignoreEmpty)
             {
                 return;
             }
@@ -51,10 +60,12 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
         }
 
         String s = (String) value;
-        if(allowEmpty || StringUtils.stringSet(s))
+        if (!StringUtils.stringSet(s) && ignoreEmpty)
         {
-            validateStringField(s);
+            return;
         }
+
+        validateStringField(s);
     }
 
     protected abstract void validateStringField(String value) throws ValidationException;
