@@ -11,7 +11,7 @@ public class CronExpressionValidator extends StringFieldValidatorSupport
 {
     public CronExpressionValidator()
     {
-        setAllowEmpty(true);
+        setAllowEmpty(false);
     }
 
     public void validateStringField(String expression) throws ValidationException
