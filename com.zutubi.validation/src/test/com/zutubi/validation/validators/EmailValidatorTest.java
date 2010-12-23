@@ -27,16 +27,4 @@ public class EmailValidatorTest extends FieldValidatorTestCase
         validator.validate(new FieldProvider("no support @zutubi.com"));
         assertTrue(validationAware.hasErrors());
     }
-
-    public void testDoNotAllowEmpty() throws ValidationException
-    {
-        validator.validate(new FieldProvider(""));
-        assertTrue(validationAware.hasErrors());
-    }
-
-    public void testDoNotAllowNull() throws ValidationException
-    {
-        validator.validate(new FieldProvider(null));
-        assertTrue(validationAware.hasErrors());
-    }
 }

@@ -11,11 +11,15 @@ public class CronExpressionValidator extends StringFieldValidatorSupport
 {
     public CronExpressionValidator()
     {
-        setAllowEmpty(false);
+        setAllowEmpty(true);
     }
 
     public void validateStringField(String expression) throws ValidationException
     {
+        if (expression == null)
+        {
+            expression = "";
+        }
         try
         {
             new CronTrigger("triggerName", null, expression).computeFirstFireTime(new BaseCalendar());
