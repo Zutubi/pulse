@@ -634,7 +634,7 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean isRestoreRequested()
     {
-        // check for the existance of a PULSE_DATA/restore/archive.zip
+        // check for the existence of a PULSE_DATA/restore/archive.zip
         File archive = getArchiveFile();
         return archive != null;
     }
