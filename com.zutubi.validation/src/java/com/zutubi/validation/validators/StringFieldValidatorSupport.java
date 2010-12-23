@@ -40,7 +40,7 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
     {
         if (value == null)
         {
-            if(allowEmpty)
+            if (allowEmpty)
             {
                 return;
             }
@@ -51,7 +51,14 @@ public abstract class StringFieldValidatorSupport extends FieldValidatorSupport
         }
 
         String s = (String) value;
-        if(allowEmpty || StringUtils.stringSet(s))
+
+        if (!StringUtils.stringSet(s) && !allowEmpty)
+        {
+            addError(".required");
+            return;
+        }
+
+        if (StringUtils.stringSet(s))
         {
             validateStringField(s);
         }

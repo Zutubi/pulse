@@ -27,15 +27,6 @@ public abstract class FieldValidatorTestCase extends ZutubiTestCase
 
     protected abstract FieldValidator createValidator();
 
-    public void tearDown() throws Exception
-    {
-        // add tear down code here.
-        validator = null;
-        validationAware = null;
-
-        super.tearDown();
-    }
-
     protected class FieldProvider
     {
         private Object value;

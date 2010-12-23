@@ -10,8 +10,14 @@ import java.net.URL;
  */
 public class URLValidator extends StringFieldValidatorSupport
 {
+    public URLValidator()
+    {
+        super(true);
+    }
+
     public void validateStringField(String value) throws ValidationException
     {
+
         try
         {
             new URL(value);

@@ -26,7 +26,7 @@ public interface ValidationAware
     void addIgnoredFields(Set<String> fields);
 
     /**
-     * Inidicates that all fields are being ignored by validation.
+     * Indicates that all fields are being ignored by validation.
      */
     void ignoreAllFields();
 

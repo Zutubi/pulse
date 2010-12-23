@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Used to configure a trigger that is defined by a Cron-like expression.
@@ -13,6 +14,7 @@ import com.zutubi.validation.annotations.Constraint;
 @Form(fieldOrder = {"name", "cron"})
 public class CronBuildTriggerConfiguration extends TriggerConfiguration
 {
+    @Required
     @Constraint("CronExpressionValidator")
     private String cron;
 
