@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.engine.api;
 
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.indexOf;
 import com.zutubi.util.EnumUtils;
 
@@ -13,96 +14,67 @@ public enum ResultState
     /**
      * The result has not yet commenced.
      */
-    PENDING(false, false),
+    PENDING,
     
     /**
      * The result has commenced and is in progress (not yet completed).
      */
-    IN_PROGRESS(false, false),
+    IN_PROGRESS,
 
     /**
      * The result has been asked forcefully to complete, and will do so as soon
      * as possible.
      */
-    TERMINATING(false, false),
+    TERMINATING,
+
+    /**
+     * The same as terminating, except that results in the cancelling state transition
+     * to CANCELLED.
+     *
+     * @see #CANCELLED
+     */
+    CANCELLING,
 
     /**
      * The result indicates that the component was skipped.
      */
-    SKIPPED(true, false),
+    SKIPPED,
 
     /**
      * The result completed successfully.
      */
-    SUCCESS(true, false),
+    SUCCESS,
 
     /**
      * The result has completed and has failed due to a build problem.
      */
-    FAILURE(true, true),
+    FAILURE,
 
     /**
      * The result has completed and has failed due to an external problem.
      */
-    ERROR(true, true),
+    ERROR,
+
+    /**
+     * Same as terminated, except that cancelled results have a low priority
+     * when it comes to aggregating a builds result.  Where as a build with
+     * failed and terminated results will be marked as terminated, a build with
+     * failed and cancelled results will be marked as failed.
+     */
+    CANCELLED,
 
     /**
      * The result has completed but has failed because it was intentionally terminated.
      */
-    TERMINATED(true, true);
+    TERMINATED;
 
-    private static final ResultState[] BROKEN_STATES;
-    private static final ResultState[] COMPLETED_STATES;
-    private static final ResultState[] INCOMPLETE_STATES;
-    
-    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED};
+    private static final ResultState[] BROKEN_STATES = new ResultState[]{ FAILURE, ERROR, TERMINATED, CANCELLED };
+    private static final ResultState[] COMPLETED_STATES = new ResultState[]{SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED, CANCELLED };
+    private static final ResultState[] INCOMPLETE_STATES = new ResultState[]{PENDING, IN_PROGRESS, TERMINATING, CANCELLING};
+    private static final ResultState[] TERMINATED_STATES = new ResultState[]{CANCELLED, TERMINATED};
+    private static final ResultState[] TERMINATING_STATES = new ResultState[]{CANCELLING, TERMINATING};
 
-    static
-    {
-        int broken = 0;
-        int complete = 0;
-        int incomplete = 0;
-        for(ResultState state: values())
-        {
-            if(state.isBroken())
-            {
-                broken++;
-            }
-
-            if(state.isCompleted())
-            {
-                complete++;
-            }
-            else
-            {
-                incomplete++;
-            }
-        }
-
-        BROKEN_STATES = new ResultState[broken];
-        COMPLETED_STATES = new ResultState[complete];
-        INCOMPLETE_STATES = new ResultState[incomplete];
-
-        broken = 0;
-        complete = 0;
-        incomplete = 0;
-        for(ResultState state: values())
-        {
-            if(state.isBroken())
-            {
-                BROKEN_STATES[broken++] = state;
-            }
-
-            if(state.isCompleted())
-            {
-                COMPLETED_STATES[complete++] = state;
-            }
-            else
-            {
-                INCOMPLETE_STATES[incomplete++] = state;
-            }
-        }
-    }
+    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{CANCELLED, SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED};
 
     /**
      * @return the set of states that return true from {@link #isBroken()}
@@ -170,28 +142,12 @@ public enum ResultState
     }
 
     /**
-     * True if this state indicates a result that is unsuccessful.
-     */
-    private boolean broken;
-
-    /**
-     * True if this state indicates a result that is complete.
-     */
-    private boolean completed;
-
-    private ResultState(boolean completed, boolean broken)
-    {
-        this.broken = broken;
-        this.completed = completed;
-    }
-
-    /**
      * @return true if this state indicates a result that is complete but
      *         unsuccessful
      */
     public boolean isBroken()
     {
-        return broken;
+        return CollectionUtils.contains(BROKEN_STATES, this);
     }
 
     /**
@@ -199,7 +155,48 @@ public enum ResultState
      */
     public boolean isCompleted()
     {
-        return completed;
+        return CollectionUtils.contains(COMPLETED_STATES, this);
+    }
+
+    /**
+     * @return true if this state indicates this result is a terminated state.
+     *
+     * @see #TERMINATED
+     * @see #CANCELLED
+     */
+    public boolean isTerminated()
+    {
+        return CollectionUtils.contains(TERMINATED_STATES, this);
+    }
+
+    /**
+     * @return true if this state indicates this result is a terminating state.
+     *
+     * @see #TERMINATING
+     * @see #CANCELLING
+     */
+    public boolean isTerminating()
+    {
+        return CollectionUtils.contains(TERMINATING_STATES, this);
+    }
+
+    /**
+     * @return the final terminated state associated with the current result.
+     *
+     * @throws IllegalStateException if this state is not {@link #CANCELLING} or
+     * {@link #TERMINATING}
+     */
+    public ResultState getTerminatedState()
+    {
+        switch (this)
+        {
+            case TERMINATING:
+                return TERMINATED;
+            case CANCELLING:
+                return CANCELLED;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     /**

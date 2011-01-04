@@ -383,7 +383,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
         super.complete();
 
         // Check the recipe results, if there are any failures/errors
-        // then take on the worst result from ourself or any recipe.
+        // then take on the worst result from ourselves or any recipe.
         state = ResultState.getWorseState(state, root.getWorstState(state));
     }
 

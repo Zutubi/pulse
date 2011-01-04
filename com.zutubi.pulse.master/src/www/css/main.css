@@ -410,7 +410,7 @@ table.fill-content
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-centre, th.content-centre, td.content-right, td.content-large, td.image, td.note, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right
+h3.heading, div.box, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-centre, th.content-centre, td.content-right, td.content-large, td.image, td.note, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right, td.cancelling-right, td.cancelled-right
 {
     border: 1px solid #bbb;
     padding: 4px;
@@ -422,7 +422,7 @@ th
     white-space: nowrap;
 }
 
-th.form, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add
+th.form, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.cancelling, td.add
 {
     text-align: left;
     vertical-align: top;
@@ -441,7 +441,7 @@ td.content-centre, th.centre, th.content-centre
     text-align: center;
 }
 
-table.content td.content-right, td.content-right, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right
+table.content td.content-right, td.content-right, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right, td.cancelling-right, td.cancelled-right
 {
     text-align: right;
     vertical-align: top;
@@ -550,7 +550,7 @@ td.warning, td.warning-right
     background-color: #ffffce;
 }
 
-td.failure, td.error, td.terminated, td.failure-right, td.error-right, td.terminated-right
+td.failure, td.error, td.terminated, td.cancelled, td.failure-right, td.error-right, td.terminated-right, td.cancelled-right
 {
     color: #b22;
     font-weight: bold;
@@ -1207,7 +1207,8 @@ td.status-last
 
 .x-tree-node-collapsed .status-failure, .x-tree-node-expanded .status-failure, .x-tree-node-leaf .status-failure,
     .x-tree-node-collapsed .status-error, .x-tree-node-expanded .status-error, .x-tree-node-leaf .status-error,
-    .x-tree-node-collapsed .status-terminated, .x-tree-node-expanded .status-terminated, .x-tree-node-leaf .status-terminated
+    .x-tree-node-collapsed .status-terminated, .x-tree-node-expanded .status-terminated, .x-tree-node-leaf .status-terminated,
+    .x-tree-node-collapsed .status-cancelled, .x-tree-node-expanded .status-cancelled, .x-tree-node-leaf .status-cancelled
 {
     background-image: url(../images/exclamation.gif);
     width: 20px;
@@ -2484,7 +2485,7 @@ td.glegend
     border: #338833 solid 1px;
 }
 
-.x-build-nav-item-failure, .x-build-nav-item-error, .x-build-nav-item-terminated
+.x-build-nav-item-failure, .x-build-nav-item-error, .x-build-nav-item-terminated, .x-build-nav-item-cancelled
 {
     background-color: #f07878;
     padding: 0;

@@ -1439,9 +1439,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
-        assertResultState(ResultState.TERMINATED, build);
+        assertResultState(ResultState.FAILURE, build);
         assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
-        assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
+        assertStageState(ResultState.CANCELLED, "another-stage", build.get("stages"));
     }
 
     public void testTerminateOnStageFailureStageSucceeds() throws Exception
@@ -1477,9 +1477,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
-        assertResultState(ResultState.TERMINATED, build);
+        assertResultState(ResultState.FAILURE, build);
         assertStageState(ResultState.FAILURE, ProjectConfigurationWizard.DEFAULT_STAGE, build.get("stages"));
-        assertStageState(ResultState.TERMINATED, "another-stage", build.get("stages"));
+        assertStageState(ResultState.CANCELLED, "another-stage", build.get("stages"));
     }
 
     private void assertResultState(ResultState expectedState, Hashtable<String, Object> result)

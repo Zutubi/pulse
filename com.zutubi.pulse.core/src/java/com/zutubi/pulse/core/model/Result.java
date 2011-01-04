@@ -52,12 +52,12 @@ public abstract class Result extends Entity
 
     public boolean terminating()
     {
-        return ResultState.TERMINATING == getState();
+        return getState().isTerminating();
     }
 
     public boolean terminated()
     {
-        return ResultState.TERMINATED == getState();
+        return getState().isTerminated();
     }
 
     public boolean succeeded()
@@ -86,13 +86,13 @@ public abstract class Result extends Entity
     }
 
     /**
-     * A result is marked as commenced if it is 'inProcess|terminating|completed'. 
+     * A result is marked as commenced if it is not pending.
      *
      * @return true if the process has commenced, false otherwise.
      */
     public boolean commenced()
     {
-        return inProgress() || terminating() || completed();
+        return !pending();
     }
 
     public boolean completed()
@@ -113,8 +113,8 @@ public abstract class Result extends Entity
     public void commence(long startTime)
     {
         stamps.setStartTime(startTime);
-        // Special case: marked as terminating before we commenced.
-        if (state != ResultState.TERMINATING)
+        
+        if (pending())
         {
             state = ResultState.IN_PROGRESS;
         }
@@ -132,21 +132,17 @@ public abstract class Result extends Entity
 
     public void complete(long endTime)
     {
-        if (state == ResultState.IN_PROGRESS)
+        if (inProgress())
         {
-            // Phew, nothing went wrong.
             state = ResultState.SUCCESS;
         }
-        else if (state == ResultState.TERMINATING)
+        else if (terminating())
         {
-            state = ResultState.TERMINATED;
+            state = state.getTerminatedState();
         }
 
         if (!stamps.started())
         {
-            // CIB-234: if an error occurs before starting the stamps, make
-            // sure we still get a start time (otherwise there is no
-            // information about when this result happened!)
             stamps.setStartTime(endTime);
         }
         stamps.setEndTime(endTime);
@@ -154,17 +150,17 @@ public abstract class Result extends Entity
 
     public void failure()
     {
-        if (state != ResultState.ERROR && state != ResultState.TERMINATING)
+        if (!state.isTerminating())
         {
-            state = ResultState.FAILURE;
+            state = ResultState.getWorseState(state, ResultState.FAILURE);
         }
     }
 
     public void error()
     {
-        if (state != ResultState.TERMINATING)
+        if (!state.isTerminating())
         {
-            state = ResultState.ERROR;
+            state = ResultState.getWorseState(state, ResultState.ERROR);
         }
     }
 
@@ -196,6 +192,12 @@ public abstract class Result extends Entity
     public void warning(String message)
     {
         addFeature(Feature.Level.WARNING, message);
+    }
+
+    public void cancel(String message)
+    {
+        state = ResultState.CANCELLING;
+        addFeature(Feature.Level.ERROR, message);
     }
 
     public void terminate(String message)

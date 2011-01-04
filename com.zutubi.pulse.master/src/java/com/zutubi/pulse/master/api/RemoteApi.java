@@ -3999,7 +3999,7 @@ public class RemoteApi
 
     /**
      * Enables a given disabled agent, allowing it to once more begin processing builds.  If the
-     * agent is curently marked to disable on idle, it will be returned to the building
+     * agent is currently marked to disable on idle, it will be returned to the building
      * state.
      *
      * @param token authentication token (see {@link #login})

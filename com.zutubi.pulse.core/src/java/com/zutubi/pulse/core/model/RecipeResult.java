@@ -67,7 +67,7 @@ public class RecipeResult extends Result
 
     public void update(CommandResult result)
     {
-        // Adjust the command's output directory to the local one
+        // Adjust the command output directory to the local one
         File remoteDir = new File(FileSystemUtils.localiseSeparators(result.getOutputDir()));
         File localDir = new File(getOutputDir(), remoteDir.getName());
         result.setOutputDir(localDir.getPath());
@@ -84,17 +84,9 @@ public class RecipeResult extends Result
     {
         // Update our state to the worse of our current state and the state
         // of the incoming result.
-        switch (result.state)
+        if (!state.isTerminating())
         {
-            case ERROR:
-                state = ResultState.ERROR;
-                break;
-            case FAILURE:
-                if (state != ResultState.ERROR)
-                {
-                    state = ResultState.FAILURE;
-                }
-                break;
+            state = ResultState.getWorseState(this.state, result.getState());
         }
 
         // Copy across features

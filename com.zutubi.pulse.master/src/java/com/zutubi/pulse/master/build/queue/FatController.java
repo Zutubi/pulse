@@ -13,7 +13,6 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
-import static com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent.ALL_BUILDS;
 import com.zutubi.pulse.master.license.License;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
@@ -34,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The fat controller is responsible for managing the scheduling system.
  *
  * This includes its initialisation, startup and shutdown, monitoring the
- * license etc etc.  Essentially, the scheduling systems intergration with
+ * license etc etc.  Essentially, the scheduling systems integration with
  * the rest of pulse.
  */
 public class FatController implements EventListener, Stoppable
@@ -129,7 +128,7 @@ public class FatController implements EventListener, Stoppable
             if (force)
             {
                 // Notify controllers to stop forcefully
-                eventManager.publish(new BuildTerminationRequestEvent(this, ALL_BUILDS, "due to server shutdown"));
+                eventManager.publish(new BuildTerminationRequestEvent(this, "due to server shutdown"));
             }
             else
             {

@@ -101,7 +101,54 @@ public class BuildResultTest extends PulseTestCase
         buildResult.complete();
         assertEquals(ResultState.FAILURE, buildResult.getState());
     }
-    
+
+    public void testCancelRecipe()
+    {
+        BuildResult buildResult = createBuildResult();
+        buildResult.commence();
+
+        buildResult.cancel("cancel");
+        assertEquals(ResultState.CANCELLING, buildResult.getState());
+        assertTrue(buildResult.terminating());
+        
+        buildResult.complete();
+        assertEquals(ResultState.CANCELLED, buildResult.getState());
+        assertTrue(buildResult.terminated());
+    }
+
+    public void testCancelBeforeCommence()
+    {
+        BuildResult buildResult = createBuildResult();
+
+        buildResult.cancel("cancel");
+        assertEquals(ResultState.CANCELLING, buildResult.getState());
+        assertTrue(buildResult.terminating());
+
+        buildResult.complete();
+        assertEquals(ResultState.CANCELLED, buildResult.getState());
+        assertTrue(buildResult.terminated());
+    }
+
+    public void testErrorWhenCancelling()
+    {
+        BuildResult buildResult = createBuildResult();
+        buildResult.commence();
+        buildResult.cancel("cancel");
+        buildResult.error("error");
+        buildResult.complete();
+        assertEquals(ResultState.CANCELLED, buildResult.getState());
+    }
+
+    public void testFailureWhenCancelling()
+    {
+        BuildResult buildResult = createBuildResult();
+        buildResult.commence();
+        buildResult.cancel("cancel");
+        buildResult.failure("fail");
+        buildResult.complete();
+        assertEquals(ResultState.CANCELLED, buildResult.getState());
+    }
+
     private RecipeResultNode createRecipeResultNode(ResultState state)
     {
         RecipeResult result = new RecipeResult("recipe");
