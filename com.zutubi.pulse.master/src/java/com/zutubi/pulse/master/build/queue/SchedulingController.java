@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.InstanceOfPredicate;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
@@ -182,9 +183,9 @@ public class SchedulingController implements EventListener
     {
         if (!handlers.containsKey(event.getMetaBuildId()))
         {
-            // we are processing an existing request, we definately do not
+            // We are processing an existing request, we definitely do not
             // expect to not know its handler.
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unknown meta build handler.");
         }
 
         BuildRequestHandler requestHandler = handlers.get(event.getMetaBuildId());
@@ -205,7 +206,12 @@ public class SchedulingController implements EventListener
 
             if (!result.succeeded())
             {
-                CollectionUtils.filter(buildQueue.getQueuedRequests(), new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()), requestsToComplete);
+                // Identify the queued requests that depend on this failed build so they can be cancelled.
+                Predicate<QueuedRequest> toCancelPredicate = new ConjunctivePredicate<QueuedRequest>(
+                        new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()),
+                        new HasDependencyOnPredicate(buildQueue, requestToComplete.getOwner())
+                );
+                CollectionUtils.filter(buildQueue.getQueuedRequests(), toCancelPredicate, requestsToComplete);
             }
             internalCompleteRequests(requestHandler, requestsToComplete);
         }
@@ -234,7 +240,7 @@ public class SchedulingController implements EventListener
                         {
                             buildQueue.pauseActivation();
 
-                            // cancel all existing queued requests, complete actiated requests.
+                            // cancel all existing queued requests, complete activated requests.
                             for (RequestHolder request : completedRequests)
                             {
                                 long requestId = request.getRequest().getId();

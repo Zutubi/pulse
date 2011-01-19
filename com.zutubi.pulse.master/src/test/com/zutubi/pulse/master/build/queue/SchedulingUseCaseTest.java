@@ -410,32 +410,68 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller.handleEvent(changeB);
 
-        assertEquals(7, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
+        assertQueuedCount(7);
+        assertActivatedCount(1);
 
         verify(buildRequestRegistry, times(1)).requestActivated(changeA, changeA.getId());
 
         controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), utility));
 
-        assertEquals(4, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(3, controller.getSnapshot().getActivatedBuildRequests().size());
+        assertQueuedCount(4);
+        assertActivatedCount(3);
 
         controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), libraryA));
 
-        assertEquals(4, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
+        assertQueuedCount(4);
+        assertActivatedCount(2);
 
         controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), libraryB));
 
-        assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(2, controller.getSnapshot().getActivatedBuildRequests().size());
+        assertQueuedCount(3);
+        assertActivatedCount(2);
 
         controller.handleEvent(createSuccessful(changeA.getMetaBuildId(), client));
 
-        assertEquals(3, controller.getSnapshot().getQueuedBuildRequests().size());
-        assertEquals(1, controller.getSnapshot().getActivatedBuildRequests().size());
+        assertQueuedCount(3);
+        assertActivatedCount(1);
 
         verify(buildRequestRegistry, never()).requestAssimilated((BuildRequestEvent) anyObject(), anyLong());
+    }
+
+    public void testBuildCancellationDueToFailureIsolatedToDependents()
+    {
+        Project a = createProject("A");
+        Project b1 = createProject("B1", dependency(a));
+        Project c1 = createProject("C1", dependency(b1));
+        Project d1 = createProject("D1", dependency(c1));
+        Project b2 = createProject("B2", dependency(a));
+        Project c2 = createProject("C2", dependency(b2));
+
+        BuildRequestEvent request = createRequest(a);
+        controller.handleEvent(request);
+
+        assertQueuedCount(5);
+        assertActivatedCount(1);
+
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), a));
+
+        assertQueuedCount(3);
+        assertActivatedCount(2);
+
+        controller.handleEvent(createFailed(request.getMetaBuildId(), b1));
+
+        assertQueuedCount(1);
+        assertActivatedCount(1);
+
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), b2));
+
+        assertQueuedCount(0);
+        assertActivatedCount(1);
+
+        controller.handleEvent(createSuccessful(request.getMetaBuildId(), c2));
+
+        assertQueuedCount(0);
+        assertActivatedCount(0);
     }
 
     private void assertActivatedCount(int expectedCount)
