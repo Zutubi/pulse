@@ -30,7 +30,7 @@ public class QueuedRequest extends RequestHolder
 
     public QueuedRequest(BuildRequestEvent request, QueuedRequestPredicate... predicates)
     {
-        this(request, Arrays.asList(predicates));
+        this(request, new LinkedList<QueuedRequestPredicate>(Arrays.asList(predicates)));
     }
 
     /**

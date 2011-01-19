@@ -121,12 +121,16 @@ public abstract class BaseQueueTestCase extends PulseTestCase
                 return null;
             }
         };
+        // Is it possible for a matcher to match variable number of arguments, and avoid the following
+        // explicit and error prone enumeration of longs?
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject());
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong());
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong());
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong());
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong());
-    
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong(), anyLong());
+        doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong(), anyLong(), anyLong());
+
         stub(projectManager.updateAndGetNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
 
         buildControllerFactory = mock(BuildControllerFactory.class);

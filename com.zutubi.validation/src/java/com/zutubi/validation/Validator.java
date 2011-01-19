@@ -15,7 +15,7 @@ public interface Validator
     /**
      * Allow the validation context to be wired into the validator.
      *
-     * @param ctx
+     * @param ctx the validation context
      */
     void setValidationContext(ValidationContext ctx);
 
