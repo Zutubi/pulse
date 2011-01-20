@@ -1,13 +1,11 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.api.ScmCancelledException;
-import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
-import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.Constants;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -41,6 +39,10 @@ public class NativeGit
     private ProcessBuilder git;
     private int inactivityTimeout;
     private DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance();
+    /**
+     * The paths to be excluded from log requests.
+     */
+    private List<String> excludedPaths = new LinkedList<String>();
 
     /**
      * Creates a git command line wrapper with no inactivity timeout.
@@ -189,7 +191,7 @@ public class NativeGit
             }
         }
 
-        LogOutputHandler handler = new LogOutputHandler();
+        LogOutputHandler handler = new LogOutputHandler(this.excludedPaths);
 
         runWithHandler(handler, null, true, command.toArray(new String[command.size()]));
 
@@ -445,6 +447,11 @@ public class NativeGit
         return System.getProperty(PROPERTY_GIT_COMMAND, DEFAULT_GIT);
     }
 
+    public void setExcludedPaths(List<String> excludedPaths)
+    {
+        this.excludedPaths = excludedPaths;
+    }
+
     interface OutputHandler
     {
         void handleCommandLine(String line);
@@ -580,7 +587,7 @@ public class NativeGit
     }
 
     /**
-     * Read the output from the git log command, interpretting the output.
+     * Read the output from the git log command, interpreting the output.
      * <p/>
      *        #
      *        e34da05e88de03a4aa5b10b338382f09bbe65d4b
@@ -597,10 +604,17 @@ public class NativeGit
         private List<GitLogEntry> entries;
 
         private List<String> lines;
+        private List<String> excludedPaths;
 
         public LogOutputHandler()
         {
-            lines = new LinkedList<String>();
+            this(new LinkedList<String>());
+        }
+
+        public LogOutputHandler(List<String> excludedPaths)
+        {
+            this.lines = new LinkedList<String>();
+            this.excludedPaths = excludedPaths;
         }
 
         public void handleStdout(String line)
@@ -619,6 +633,8 @@ public class NativeGit
          */
         public List<GitLogEntry> getEntries() throws GitException
         {
+            final Predicate<String> changesFilter = new ExcludePathPredicate(this.excludedPaths);
+
             try
             {
                 if (entries == null)
@@ -674,18 +690,28 @@ public class NativeGit
                         // the time a blank line appears at the end of the
                         // files, but we use the sentinal as a more reliable
                         // way to detect termination.
+                        boolean logEntryHasFiles = false;
                         while (i.hasNext() && !(str = i.next()).equals(LOG_SENTINAL))
                         {
                             String[] parts = str.split("\\s+", 2);
                             if (parts.length == 2)
                             {
-                                logEntry.addFileChange(parts[1], parts[0]);
+                                logEntryHasFiles = true;
+                                if (changesFilter.satisfied(parts[1]))
+                                {
+                                    logEntry.addFileChange(parts[1], parts[0]);
+                                }
                             }
                             raw.add(str);
                         }
 
                         logEntry.setRaw(raw);
-                        entries.add(logEntry);
+                        if (!logEntryHasFiles || logEntry.getFiles().size() > 0)
+                        {
+                            // Either the log entry has no files, in which case none were filtered, or
+                            // it has some files, not all of which were filtered.
+                            entries.add(logEntry);
+                        }
                     }
                 }
                 return entries;
@@ -693,7 +719,7 @@ public class NativeGit
             catch (Exception e)
             {
                 // print some debugging output.
-                LOG.severe("A problem has occured whilst parsing the git log output: " + e.getMessage(), e);
+                LOG.severe("A problem has occurred whilst parsing the git log output: " + e.getMessage(), e);
                 LOG.severe("The log output received was:\n" + StringUtils.join("\n", lines));
 
                 throw new GitException(e);
