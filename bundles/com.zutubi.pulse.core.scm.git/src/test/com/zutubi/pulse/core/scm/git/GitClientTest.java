@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -439,6 +440,27 @@ public class GitClientTest extends GitClientTestBase
         change = fileChanges.get(2);
         assertEquals(FileChange.Action.ADD, change.getAction());
         assertEquals("d.txt", change.getPath());
+    }
+
+    public void testLatestChangesWithExcludes() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        client.setExcludedPaths(Arrays.asList("**/*"));
+
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~1"), new Revision(REVISION_MASTER_LATEST));
+        assertEquals(0, changes.size());
+    }
+
+    public void testLatestChangesWithSpecificExcludes() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        client.setExcludedPaths(Arrays.asList("**/c.txt"));
+
+        List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~1"), new Revision(REVISION_MASTER_LATEST));
+        assertEquals(1, changes.size());
+        Changelist changelist = changes.get(0);
+        List<FileChange> fileChanges = changelist.getChanges();
+        assertEquals(2, fileChanges.size());
     }
 
     public void testMergedChange() throws ScmException

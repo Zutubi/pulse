@@ -15,6 +15,9 @@ public class GitClientFactory implements ScmClientFactory<GitConfiguration>
 {
     public ScmClient createClient(GitConfiguration config) throws ScmException
     {
-        return new GitClient(config.getRepository(), config.getBranch(), config.isInactivityTimeoutEnabled() ? config.getInactivityTimeoutSeconds() : 0, config.isTrackSelectedBranch());
+        int inactivityTimeout = config.isInactivityTimeoutEnabled() ? config.getInactivityTimeoutSeconds() : 0;
+        GitClient client = new GitClient(config.getRepository(), config.getBranch(), inactivityTimeout, config.isTrackSelectedBranch());
+        client.setExcludedPaths(config.getFilterPaths());
+        return client;
     }
 }

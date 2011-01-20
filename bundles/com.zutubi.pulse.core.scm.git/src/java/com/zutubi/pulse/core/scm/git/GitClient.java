@@ -29,6 +29,7 @@ public class GitClient implements ScmClient
 
     static final Messages I18N = Messages.getInstance(GitClient.class);
 
+    public static final String GIT_REPOSITORY_DIRECTORY = ".git";
     static final String KEY_INCOMPLETE_CHECKOUT = "incomplete.checkout.warning";
     static final String KEY_MERGE_ON_UPDATE = "merge.on.update.warning";
     /**
@@ -63,7 +64,7 @@ public class GitClient implements ScmClient
         LOG_ACTION_MAPPINGS.put(ACTION_DELETED, FileChange.Action.DELETE);
         LOG_ACTION_MAPPINGS.put(ACTION_RENAME_MODIFIED, FileChange.Action.MOVE);
 
-        // the following two dont have direct mappings to our internal understanding
+        // the following two don't have direct mappings to our internal understanding
         // of file changes.  Should we add specific actions for them?.
         LOG_ACTION_MAPPINGS.put(ACTION_COPY_MODIFIED, FileChange.Action.UNKNOWN);
         LOG_ACTION_MAPPINGS.put(ACTION_UNMERGED, FileChange.Action.UNKNOWN);
@@ -78,7 +79,7 @@ public class GitClient implements ScmClient
      */
     private String branch;
     /**
-     * Seconds of inactivity (lack of any output) from a git subprocess after
+     * Seconds of inactivity (lack of any output) from a git sub-process after
      * which that process should be timed out.  May be set to zero to indicate
      * no timeout should be applied.
      */
@@ -91,8 +92,10 @@ public class GitClient implements ScmClient
      * branch.
      */
     private boolean trackSelectedBranch;
-
-    public static final String GIT_REPOSITORY_DIRECTORY = ".git";
+    /**
+     * The list of scm paths to be excluded from log requests.
+     */
+    private List<String> excludedPaths = new LinkedList<String>();
 
     public GitClient(String repository, String branch, int inactivityTimeout, boolean trackSelectedBranch)
     {
@@ -369,6 +372,7 @@ public class GitClient implements ScmClient
     private NativeGit preparePersistentDirectory(File workingDir) throws ScmException
     {
         NativeGit git = new NativeGit(inactivityTimeout);
+        git.setExcludedPaths(excludedPaths);
         if (!isGitRepository(workingDir))
         {
             String path;
@@ -600,6 +604,11 @@ public class GitClient implements ScmClient
     public void setBranch(String branch)
     {
         this.branch = branch;
+    }
+
+    public void setExcludedPaths(List<String> excludedPaths)
+    {
+        this.excludedPaths = excludedPaths;
     }
 
     public void setTrackSelectedBranch(boolean trackSelectedBranch)
