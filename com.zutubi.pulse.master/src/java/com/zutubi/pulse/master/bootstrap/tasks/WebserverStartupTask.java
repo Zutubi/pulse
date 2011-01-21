@@ -47,17 +47,7 @@ public class WebserverStartupTask implements StartupTask
         }
         catch(MultiException e)
         {
-            for(Exception nested: (List<Exception>)e.getExceptions())
-            {
-                if (nested instanceof BindException)
-                {
-                    handleBindException(config);
-                }
-                else
-                {
-                    LOG.severe("Unable to start server: " + nested.getMessage(), nested);
-                }
-            }
+            handleMultiException(config, e);
 
             // This is fatal.
             System.exit(1);
@@ -71,10 +61,20 @@ public class WebserverStartupTask implements StartupTask
         }
     }
 
-    private void handleBindException(SystemConfiguration config)
+    private void handleMultiException(SystemConfiguration config, MultiException e)
     {
-        LOG.severe(String.format("Unable to start on port %s because it " +
-                "is being used by another process.  Please select a different port and restart pulse.", config.getServerPort()));
+        for(Exception nested: (List<Exception>)e.getExceptions())
+        {
+            if (nested instanceof BindException)
+            {
+                LOG.severe(String.format("Unable to start on port %s because it " +
+                        "is being used by another process.  Please select a different port and restart pulse.", config.getServerPort()));
+            }
+            else
+            {
+                LOG.severe("Unable to start server: " + nested.getMessage(), nested);
+            }
+        }
     }
 
     public boolean haltOnFailure()
