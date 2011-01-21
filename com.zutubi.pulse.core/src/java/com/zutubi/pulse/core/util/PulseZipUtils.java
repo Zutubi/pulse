@@ -94,7 +94,7 @@ public class PulseZipUtils
             }
         }
 
-        if(file == null && FileSystemUtils.list(source).size() == 0)
+        if(file == null && FileSystemUtils.list(source).length == 0)
         {
             // Special case: we create an empty file.  This is understood by
             // our inverse (extractZip).
@@ -155,7 +155,7 @@ public class PulseZipUtils
             {
                 if(file == null)
                 {
-                    command.addAll(FileSystemUtils.list(source));
+                    command.addAll(Arrays.asList(FileSystemUtils.list(source)));
                 }
                 else
                 {

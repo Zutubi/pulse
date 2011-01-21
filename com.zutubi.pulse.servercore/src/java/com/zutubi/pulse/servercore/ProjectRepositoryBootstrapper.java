@@ -136,7 +136,7 @@ public class ProjectRepositoryBootstrapper extends BootstrapperSupport
             throw new BuildException("Failed to initialise local scm directory: " + localDir.getAbsolutePath());
         }
 
-        if (FileSystemUtils.list(localDir).size() == 0)
+        if (FileSystemUtils.list(localDir).length == 0)
         {
             return new CheckoutBootstrapper(projectName, revision);
         }

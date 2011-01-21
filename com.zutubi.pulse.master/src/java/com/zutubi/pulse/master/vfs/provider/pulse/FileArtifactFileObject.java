@@ -87,7 +87,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     protected String[] doListChildren() throws Exception
     {
-        return UriParser.encode(FileSystemUtils.listAsArray(base));
+        return UriParser.encode(FileSystemUtils.list(base));
     }
 
     protected long doGetContentSize()

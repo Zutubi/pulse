@@ -1309,10 +1309,12 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testList() throws IOException
     {
-        assertEquals(0, FileSystemUtils.list(tmpDir).size());
-        assertTrue(new File(tmpDir, "file.txt").createNewFile());
-        assertEquals(1, FileSystemUtils.list(tmpDir).size());
-        assertEquals(0, FileSystemUtils.list(new File("does not exist")).size());
+        assertEquals(0, FileSystemUtils.list(tmpDir).length);
+        File file = new File(tmpDir, "file.txt");
+        assertTrue(file.createNewFile());
+        assertEquals(1, FileSystemUtils.list(tmpDir).length);
+        assertEquals(0, FileSystemUtils.list(file).length);
+        assertEquals(0, FileSystemUtils.list(new File("does not exist")).length);
     }
 
     public void testRelativePath()

@@ -107,7 +107,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         File base = getArtifactBase();
         if(base.isDirectory())
         {
-            return UriParser.encode(FileSystemUtils.listAsArray(base));
+            return UriParser.encode(FileSystemUtils.list(base));
         }
         return NO_CHILDREN;
     }

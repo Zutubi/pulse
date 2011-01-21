@@ -102,8 +102,8 @@ public class FileSystemUtils
             return false;
         }
 
-        List<String> contents = list(dir);
-        if (contents.size() > 0)
+        String[] contents = list(dir);
+        if (contents.length > 0)
         {
             for (String child : contents)
             {
@@ -1482,7 +1482,7 @@ public class FileSystemUtils
         }
     }
 
-    public static List<File> listFiles(File dir)
+    private static List<File> listFiles(File dir)
     {
         List<File> result = new LinkedList<File>();
         if (dir.isDirectory())
@@ -1497,41 +1497,23 @@ public class FileSystemUtils
     }
 
     /**
-     * Return a listing of the specified directory.  If the directory is empty,
-     * an empty list is returned.
+     * Return an array of the specified directory.  If the directory is empty,
+     * an empty array is returned.
      *
      * @param dir   the directory being listed.
-     * @return  a list of strings naming the files and directories within the
-     * specified directory, or an empty list if non exist.
+     * @return  an array of strings naming the files and directories within the
+     * specified directory, or an empty array if non exist.
      *
      * @see java.io.File#list()
      */
-    public static List<String> list(File dir)
+    public static String[] list(File dir)
     {
-        List<String> result = new LinkedList<String>();
-        if (dir.isDirectory())
+        String[] listing = dir.list();
+        if (listing != null)
         {
-            String[] listing = dir.list();
-            if (listing != null)
-            {
-                result.addAll(Arrays.asList(listing));
-            }
+            return listing;
         }
-        return result;
-    }
-
-    /**
-     * Same as {@link #list(java.io.File)} except that the resulting listing
-     * is in the form of an array rather than a list.
-     *
-     * @param dir   the directory being listed.
-     * @return an array of strings naming the files and directories within the
-     * specified directory, or an empty array if non exist.
-     */
-    public static String[] listAsArray(File dir)
-    {
-        List<String> listing = list(dir);
-        return listing.toArray(new String[listing.size()]);
+        return new String[0];
     }
 
     public static File findFirstChildMatching(File dir, final String regex)

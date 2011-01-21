@@ -73,7 +73,7 @@ public class LocalFile extends AbstractFileObject implements FileObject
         {
             return fs.getRoots();
         }
-        return UriParser.encode(FileSystemUtils.listAsArray(file));
+        return UriParser.encode(FileSystemUtils.list(file));
     }
     
     protected File getFileInfo() throws FileSystemException

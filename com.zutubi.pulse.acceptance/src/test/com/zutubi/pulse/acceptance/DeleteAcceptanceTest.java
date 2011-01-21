@@ -183,7 +183,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private String getMasterAgentId(File agentsDir)
     {
-        List<String> agentDirs = FileSystemUtils.list(agentsDir);
+        List<String> agentDirs = Arrays.asList(FileSystemUtils.list(agentsDir));
         Collections.sort(agentDirs, new Comparator<String>()
         {
             public int compare(String o1, String o2)
