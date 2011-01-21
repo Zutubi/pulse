@@ -83,7 +83,7 @@ public abstract class SeleniumPage
     }
 
     /**
-     * Wait for the browser to reload, and for this page to be avaialble. 
+     * Wait for the browser to reload, and for this page to be available.
      */
     public void waitForReload()
     {

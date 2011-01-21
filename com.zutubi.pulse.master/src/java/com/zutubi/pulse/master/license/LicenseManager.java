@@ -40,7 +40,7 @@ public class LicenseManager
     public void installLicense(String newKey) throws LicenseException
     {
         // check that the license key is valid.  Decode will throw an exception
-        // if it is not.
+        // or return null if it is not.
         LicenseDecoder decoder = new LicenseDecoder();
         if (decoder.decode(newKey.getBytes()) == null)
         {

@@ -2,10 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
-import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.UsersPage;
+import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -53,35 +50,37 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
     public void testChangeLicenseViaWebUI()
     {
-        CompositePage licensePage = goToLicensePage();
+        LicensePage licensePage = goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
         // wait for the panel to reload.
-        getBrowser().waitForElement(licensePage.getStateFieldId("name"));
-        assertEquals(random, licensePage.getStateField("name"));
+        licensePage.waitFor();
+        assertEquals(random, licensePage.getName());
     }
 
     public void testChangeLicenseViaRemoteApi() throws Exception
     {
         setLicenseViaApi(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
-        CompositePage licensePage = goToLicensePage();
-        assertEquals(random, licensePage.getStateField("name"));
+        LicensePage licensePage = goToLicensePage();
+        assertEquals(random, licensePage.getName());
     }
 
     public void testExpiresStateField()
     {
         // Field should be 'expiry' for eval and 'supportExpiry' for all others.
-        CompositePage licensePage = goToLicensePage();
+        LicensePage licensePage = goToLicensePage();
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, tomorrow()));
 
-        getBrowser().waitForElement(licensePage.getStateFieldId("expiry"));
-        assertFalse(licensePage.isStateFieldPresent("supportExpiry"));
+        licensePage.waitFor();
+        assertTrue(licensePage.isExpiryPresent());
+        assertFalse(licensePage.isSupportExpiryPresent());
 
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.ENTERPRISE, random, tomorrow()));
 
-        getBrowser().waitForElement(licensePage.getStateFieldId("supportExpiry"));
-        assertFalse(licensePage.isStateFieldPresent("expiry"));
+        licensePage.waitFor();
+        assertTrue(licensePage.isSupportExpiryPresent());
+        assertFalse(licensePage.isExpiryPresent());
     }
 
     public void testExpiredEvaluationLicense() throws Exception
@@ -290,9 +289,9 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         return new Date(System.currentTimeMillis() - 100 * Constants.YEAR);
     }
 
-    private CompositePage goToLicensePage()
+    private LicensePage goToLicensePage()
     {
-        return getBrowser().openAndWaitFor(CompositePage.class, LICENSE_PATH);
+        return getBrowser().openAndWaitFor(LicensePage.class);
     }
 
     private void setLicenseViaApi(String key) throws Exception
