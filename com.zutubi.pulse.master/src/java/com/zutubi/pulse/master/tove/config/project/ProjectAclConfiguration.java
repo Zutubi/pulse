@@ -20,7 +20,7 @@ public class ProjectAclConfiguration extends AbstractConfiguration
     @Reference
     @Required
     private GroupConfiguration group;
-    @ItemPicker(optionProvider = "ProjectAuthorityProvider", allowReordering = false)
+    @ItemPicker(optionProvider = "ProjectAuthorityProvider") @Ordered(allowReordering = false)
     private List<String> allowedActions = new LinkedList<String>();
 
     public ProjectAclConfiguration()

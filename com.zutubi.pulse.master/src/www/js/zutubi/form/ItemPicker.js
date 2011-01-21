@@ -23,7 +23,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
      * If true, duplicate values are allowed in the store.  If false,
      * options will be removed to avoid duplicate store values.
      */
-    allowDuplicates: true,
+    allowDuplicates: false,
     
     value: [],
     optionStore: undefined,
