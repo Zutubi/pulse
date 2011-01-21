@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.config;
 
 import com.zutubi.pulse.core.ui.api.UserInterface;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.config.*;
@@ -267,7 +268,7 @@ public class DevConfig implements Config
 
     public File getUserConfigFile()
     {
-        String userHome = System.getProperty("user.home");
+        String userHome = System.getProperty(EnvConfig.USER_HOME);
         if (userHome != null)
         {
             return FileSystemUtils.composeFile(userHome, PROPERTIES_FILENAME);

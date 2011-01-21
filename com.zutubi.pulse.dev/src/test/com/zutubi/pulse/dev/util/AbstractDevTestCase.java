@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.util;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.dev.config.DevConfig;
 import com.zutubi.util.Pair;
 import com.zutubi.util.config.Config;
@@ -31,7 +32,7 @@ public abstract class AbstractDevTestCase extends PulseTestCase
         assertTrue(baseDir.mkdirs());
         userHomeDir = new File(tempDir, "home");
         assertTrue(userHomeDir.mkdir());
-        System.setProperty("user.home", userHomeDir.getAbsolutePath());
+        System.setProperty(EnvConfig.USER_HOME, userHomeDir.getAbsolutePath());
     }
 
     @Override

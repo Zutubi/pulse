@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.CollectionUtils;
@@ -140,7 +141,7 @@ public class AcceptanceTestUtils
 
     public static File getUserHome()
     {
-        return new File(getWorkingDirectory(), "user.home");
+        return new File(getWorkingDirectory(), EnvConfig.USER_HOME);
     }
 
     public static File getDataDirectory() throws IOException
@@ -161,7 +162,7 @@ public class AcceptanceTestUtils
 
         // chances are that if we pick up the systems user.home we may or may not
         // be picking up the right config so we try it last.
-        userHome = new File(System.getProperty("user.home"));
+        userHome = new File(System.getProperty(EnvConfig.USER_HOME));
         config = loadConfigFromHome(userHome);
         if (config != null)
         {

@@ -55,7 +55,7 @@ public class SetupDataAction extends TransientAction<SetupDataConfiguration>
     {
         String data;
         SetupDataConfiguration config = new SetupDataConfiguration();
-        String userHome = System.getProperty("user.home");
+        String userHome = System.getProperty(EnvConfig.USER_HOME);
         if (StringUtils.stringSet(userHome))
         {
             String userConfig = configurationManager.getEnvConfig().getDefaultPulseConfigDir(MasterConfigurationManager.CONFIG_DIR);

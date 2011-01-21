@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.tree;
 
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
@@ -56,7 +57,7 @@ public class SelectDirectoryAction extends ActionSupport
         }
 
         // user home
-        userHome = System.getProperty("user.home");
+        userHome = System.getProperty(EnvConfig.USER_HOME);
         userHome = makeJavascriptFriendly(userHome);
 
         separator = makeJavascriptFriendly(File.separator);

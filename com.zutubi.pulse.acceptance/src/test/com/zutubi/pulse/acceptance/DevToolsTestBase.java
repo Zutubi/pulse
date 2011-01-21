@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.BufferingCharHandler;
 import com.zutubi.pulse.dev.bootstrap.DefaultDevPaths;
@@ -61,7 +62,7 @@ public class DevToolsTestBase extends PulseTestCase
         JythonPulseTestFactory factory = new JythonPulseTestFactory();
 
         tmpDir = FileSystemUtils.createTempDir(getName(), ".tmp");
-        File userHomeDir = new File(tmpDir, "user.home");
+        File userHomeDir = new File(tmpDir, EnvConfig.USER_HOME);
         assertTrue(userHomeDir.mkdir());
         
         File devPackage = AcceptanceTestUtils.getDevPackage();

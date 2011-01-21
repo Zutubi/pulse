@@ -2,6 +2,7 @@ package com.zutubi.pulse.dev.bootstrap;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.command.PulseCtl;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 
 import java.io.File;
 
@@ -37,7 +38,7 @@ public class DefaultDevPaths implements DevPaths
         if (userRoot == null)
         {
             File homeDir;
-            String userHome = System.getProperty("user.home");
+            String userHome = System.getProperty(EnvConfig.USER_HOME);
             if(userHome == null)
             {
                 homeDir = new File(".");
