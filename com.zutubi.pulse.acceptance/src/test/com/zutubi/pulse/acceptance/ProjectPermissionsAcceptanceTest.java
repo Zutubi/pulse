@@ -58,12 +58,12 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
         ProjectAclForm aclForm = getBrowser().createForm(ProjectAclForm.class);
         aclForm.waitFor();
         String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions.choice");
-        assertThat(actionDisplays, hasItemInArray("view"));
+        assertThat(actionDisplays, hasItemInArray("administer"));
         assertThat(actionDisplays, hasItemInArray("cancel build"));
         assertThat(actionDisplays, hasItemInArray("view source"));
 
         String[] actionValues = aclForm.getComboBoxOptions("allowedActions.choice");
-        assertThat(actionValues, hasItemInArray("view"));
+        assertThat(actionValues, hasItemInArray("administer"));
         assertThat(actionValues, hasItemInArray("cancelBuild"));
         assertThat(actionValues, hasItemInArray("viewSource"));
     }
