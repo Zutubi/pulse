@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
@@ -144,7 +145,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         project.releaseBuild();
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
-        rpcClient.RemoteApi.waitForAgentStatus(LOCAL_AGENT, DISABLED, rpcClient.RemoteApi.BUILD_TIMEOUT);
+        rpcClient.RemoteApi.waitForAgentStatus(LOCAL_AGENT, DISABLED, RemoteApiClient.BUILD_TIMEOUT);
     }
 
     public void testConcurrentBuildsSameHost() throws Exception

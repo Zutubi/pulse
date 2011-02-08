@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.*;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
@@ -29,7 +30,8 @@ import java.util.Map;
 public class DefaultCommandContext implements CommandContext
 {
     private static final Logger LOG = Logger.getLogger(DefaultCommandContext.class);
-
+    private static final Messages I18N = Messages.getInstance(DefaultCommandContext.class);
+    
     private ExecutionContext executionContext;
     private CommandResult result;
     private int perFileFeatureLimit;
@@ -200,6 +202,10 @@ public class DefaultCommandContext implements CommandContext
                 }
                 
                 fileFeatureCount += fileArtifact.getFeatures().size();
+                if (fileFeatureCount >- totalFileFeatureLimit)
+                {
+                    result.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("total.feature.limit.reached")));
+                }
             }            
         }
     }
