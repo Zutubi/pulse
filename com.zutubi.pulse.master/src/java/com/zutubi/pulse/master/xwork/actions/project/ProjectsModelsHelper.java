@@ -215,9 +215,7 @@ public class ProjectsModelsHelper
     }
 
     /**
-     * Get a list of builds for the specified project.  The number of results returned is at least 2 in length
-     * since we require at least 2 build results (one is possibly active) to be able to determine the health of
-     * the project.  This assumes that only one active build per project at a time.
+     * Get a list of builds for the specified project.
      *
      * @param project       the project in question
      * @param configuration the project summary configuration
@@ -235,7 +233,7 @@ public class ProjectsModelsHelper
             result.addAll(buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, count, true, false));
             if (result.size() < count)
             {
-                result.addAll(buildManager.getLatestBuildResultsForProject(project, count - result.size()));
+                result.addAll(buildManager.getLatestCompletedBuildResults(project, count - result.size()));
             }
             
             cache.put(project, result);

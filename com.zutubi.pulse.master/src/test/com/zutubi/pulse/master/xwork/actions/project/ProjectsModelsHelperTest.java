@@ -396,7 +396,7 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 
         helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).queryBuilds(p1, ResultState.getIncompleteStates(), -1, -1, -1, 3, true, false);
-        verify(buildManager).getLatestBuildResultsForProject(p1, 3);
+        verify(buildManager).getLatestCompletedBuildResults(p1, 3);
         verify(buildManager).getLatestCompletedBuildResult(p1);
         verifyNoMoreInteractions(buildManager);
     }

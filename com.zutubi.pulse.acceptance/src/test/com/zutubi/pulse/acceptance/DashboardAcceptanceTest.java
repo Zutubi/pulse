@@ -2,28 +2,37 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.CollectionUtils.asVector;
 import static com.zutubi.util.Constants.SECOND;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Acceptance tests for the users dashboard view.
  */
 public class DashboardAcceptanceTest extends AcceptanceTestBase
 {
-    private static final String SHOW_ALL_GROUPS   = "showAllGroups";
-    private static final String SHOWN_GROUPS      = "shownGroups";
-    private static final String SHOW_ALL_PROJECTS = "showAllProjects";
-    private static final String SHOWN_PROJECTS    = "shownProjects";
-
+    private static final String SHOW_ALL_GROUPS    = "showAllGroups";
+    private static final String SHOWN_GROUPS       = "shownGroups";
+    private static final String SHOW_ALL_PROJECTS  = "showAllProjects";
+    private static final String SHOWN_PROJECTS     = "shownProjects";
+    private static final String BUILDS_PER_PROJECT = "buildsPerProject";
+    
     private String userPath;
-
+    private ConfigurationHelper configurationHelper;
+    private ProjectConfigurations projects;
+    private BuildRunner buildRunner;
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -32,6 +41,11 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         String user = RandomUtils.randomString(10);
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         assertTrue(getBrowser().login(user, ""));
+        
+        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
+        configurationHelper = factory.create(rpcClient.RemoteApi);
+        projects = new ProjectConfigurations(configurationHelper);
+        buildRunner = new BuildRunner(rpcClient.RemoteApi);
     }
 
     protected void tearDown() throws Exception
@@ -102,7 +116,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertTrue(dashboard.isGroupPresent(group1));
         assertTrue(dashboard.isGroupPresent(group2));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
-        // Check the upngrouped projects cannot be hidden (CIB-1963).
+        // Check the ungrouped projects cannot be hidden (CIB-1963).
         assertFalse(dashboard.isGroupActionPresent(null, ProjectsSummaryPage.ACTION_HIDE));
 
         dashboard.hideGroupAndWait(group1);
@@ -147,6 +161,59 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertTrue(dashboard.isUngroupedProjectPresent(project2));
     }
 
+    
+    public void testMultipleBuildsPerProject() throws Exception
+    {
+        File tmpDir = createTempDirectory();
+        try
+        {
+            setDashboard(asPair(BUILDS_PER_PROJECT, 2));
+
+            WaitProject project = projects.createWaitAntProject(random, tmpDir, true);
+            configurationHelper.insertProject(project.getConfig(), false);
+
+            DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
+            List<Long> buildIds = dashboard.getBuildIds(null, random);
+            assertEquals(0, buildIds.size());
+            
+            buildRunner.triggerBuild(project);
+            rpcClient.RemoteApi.waitForBuildInProgress(random, 1);
+            
+            getBrowser().refresh();
+            dashboard.waitForReload();
+            buildIds = dashboard.getBuildIds(null, random);
+            assertEquals(Arrays.asList(1L), buildIds);
+            
+            project.releaseBuild();
+            rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
+
+            getBrowser().refresh();
+            dashboard.waitForReload();
+            buildIds = dashboard.getBuildIds(null, random);
+            assertEquals(Arrays.asList(1L), buildIds);
+
+            buildRunner.triggerBuild(project);
+            rpcClient.RemoteApi.waitForBuildInProgress(random, 2);
+            
+            getBrowser().refresh();
+            dashboard.waitForReload();
+            buildIds = dashboard.getBuildIds(null, random);
+            assertEquals(Arrays.asList(2L, 1L), buildIds);
+
+            project.releaseBuild();
+            rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
+
+            getBrowser().refresh();
+            dashboard.waitForReload();
+            buildIds = dashboard.getBuildIds(null, random);
+            assertEquals(Arrays.asList(2L, 1L), buildIds);
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tmpDir);
+        }
+    }
+    
     private void addLabel(String projectPath, String label) throws Exception
     {
         Hashtable<String, Object> labelConfig = rpcClient.RemoteApi.createDefaultConfig(LabelConfiguration.class);

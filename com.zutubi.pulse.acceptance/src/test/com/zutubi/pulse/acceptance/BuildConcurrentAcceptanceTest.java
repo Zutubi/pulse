@@ -101,8 +101,8 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
-        String buildLinkId = browsePage.getBuildLinkId(null, project.getName(), 0);
-        assertEquals("build 2", getBrowser().getText(buildLinkId));
+        List<Long> buildIds = browsePage.getBuildIds(null, project.getName());
+        assertEquals(2L, (long) buildIds.get(0));
 
         rpcClient.RemoteApi.cancelBuild(project.getName(), 2);
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 2);
@@ -110,7 +110,8 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
         getBrowser().refresh();
         getBrowser().waitForPageToLoad(SeleniumBrowser.PAGELOAD_TIMEOUT);
         browsePage.waitFor();
-        assertEquals("build 1", getBrowser().getText(buildLinkId));
+        buildIds = browsePage.getBuildIds(null, project.getName());
+        assertEquals(1L, (long) buildIds.get(0));
 
         project.releaseBuild();
         rpcClient.RemoteApi.waitForProjectToBeIdle(project.getName());

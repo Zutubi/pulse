@@ -3,6 +3,9 @@ package com.zutubi.pulse.acceptance.pages;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Base class for pages that show projects with their latest status (e.g. the
  * browse and dashboard views).
@@ -95,8 +98,23 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
         browser.waitForElement(id);
         return browser.getText(id);
     }
+    
+    public List<Long> getBuildIds(String group, String projectName)
+    {
+        List<Long> result = new LinkedList<Long>();
+        int buildIndex = 0;
+        String rowId = getBuildLinkId(group, projectName, buildIndex);
+        while (browser.isElementIdPresent(rowId))
+        {
+            result.add(Long.parseLong(browser.getText(rowId).split("\\s+")[1]));
+            buildIndex++;
+            rowId = getBuildLinkId(group, projectName, buildIndex);
+        }
+        
+        return result;
+    }
 
-    public String getBuildLinkId(String group, String projectName, int buildIndex)
+    private String getBuildLinkId(String group, String projectName, int buildIndex)
     {
         return "b" + (buildIndex + 1) + "." + getProjectRowId(group, projectName) + "-link";
     }
