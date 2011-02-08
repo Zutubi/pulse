@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors;
 
+import com.zutubi.i18n.Messages;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -21,6 +22,8 @@ import java.util.Map;
  */
 public class DefaultPostProcessorContext implements PostProcessorContext
 {
+    private static final Messages I18N = Messages.getInstance(DefaultPostProcessorContext.class);
+
     private StoredFileArtifact artifact;
     private CommandResult commandResult;
     private int featureLimit;
@@ -73,9 +76,14 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeature(Feature feature)
     {
-        if (artifact.getFeatures().size() < featureLimit)
+        int newFeatureCount = artifact.getFeatures().size() + 1;
+        if (newFeatureCount < featureLimit)
         {
             artifact.addFeature(convertFeature(feature));
+        }
+        else if (newFeatureCount == featureLimit)
+        {
+            artifact.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("feature.limit.reached")));
         }
     }
 

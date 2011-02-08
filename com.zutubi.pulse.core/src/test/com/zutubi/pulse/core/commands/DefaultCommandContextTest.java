@@ -20,6 +20,9 @@ import java.util.Arrays;
 
 public class DefaultCommandContextTest extends PulseTestCase
 {
+    private static final String SUMMARY_TOTAL_REACHED = "Total feature limit reached for artifacts captured for this command.  Not all features are recorded.";
+    private static final String SUMMARY_FILE_REACHED = "Feature limit reached for this file.  Not all features are recorded.";
+    
     private File tmpDir;
 
     @Override
@@ -48,6 +51,7 @@ public class DefaultCommandContextTest extends PulseTestCase
         StoredArtifact a1 = commandResult.getArtifact("a1");
         StoredFileArtifact a1f1 = a1.findFile("a1/f1");
         assertEquals(2, a1f1.getFeatures().size());
+        assertEquals(SUMMARY_FILE_REACHED, a1f1.getFeatures().get(1).getSummary());
         StoredFileArtifact a1f2 = a1.findFile("a1/f2");
         assertEquals(2, a1f2.getFeatures().size());
 
@@ -74,6 +78,9 @@ public class DefaultCommandContextTest extends PulseTestCase
         StoredArtifact a2 = commandResult.getArtifact("a2");
         StoredFileArtifact a2f1 = a2.findFile("a2/f1");
         assertEquals(0, a2f1.getFeatures().size());
+        
+        assertEquals(1, commandResult.getFeatures().size());
+        assertEquals(SUMMARY_TOTAL_REACHED, commandResult.getFeatures().get(0).getSummary());
     }
 
     public void testBothFileFeatureLimits() throws IOException
@@ -88,12 +95,17 @@ public class DefaultCommandContextTest extends PulseTestCase
         StoredArtifact a1 = commandResult.getArtifact("a1");
         StoredFileArtifact a1f1 = a1.findFile("a1/f1");
         assertEquals(2, a1f1.getFeatures().size());
+        assertEquals(SUMMARY_FILE_REACHED, a1f1.getFeatures().get(1).getSummary());
         StoredFileArtifact a1f2 = a1.findFile("a1/f2");
         assertEquals(1, a1f2.getFeatures().size());
+        assertEquals(SUMMARY_FILE_REACHED, a1f2.getFeatures().get(0).getSummary());
 
         StoredArtifact a2 = commandResult.getArtifact("a2");
         StoredFileArtifact a2f1 = a2.findFile("a2/f1");
         assertEquals(0, a2f1.getFeatures().size());
+
+        assertEquals(1, commandResult.getFeatures().size());
+        assertEquals(SUMMARY_TOTAL_REACHED, commandResult.getFeatures().get(0).getSummary());
     }
 
     private DefaultCommandContext createContextWithFeatures(CommandResult commandResult, int perFileFeatureLimit, int totalFeatureLimit, final String... features)
