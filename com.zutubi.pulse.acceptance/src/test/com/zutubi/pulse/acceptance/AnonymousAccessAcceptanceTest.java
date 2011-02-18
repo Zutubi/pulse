@@ -10,6 +10,7 @@ import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
@@ -22,7 +23,10 @@ import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
 import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -203,6 +207,27 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         assertPageVisible(UsersPage.class);
 
         setAnonymousServerPermissions();
+    }
+
+    public void testAssignTriggerPermissionToAnonymousUsers() throws Exception
+    {
+        setAnonymousAccess(true);
+        setAnonymousSignup(false);
+
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
+        String permissionsPath = PathUtils.getPath(projectPath, Constants.Project.PERMISSIONS);
+        Hashtable<String, Object> acl = rpcClient.RemoteApi.createDefaultConfig(ProjectAclConfiguration.class);
+        acl.put("group", ANONYMOUS_GROUP_PATH);
+        acl.put("allowedActions", new String[]{ProjectConfigurationActions.ACTION_TRIGGER});
+        rpcClient.RemoteApi.insertConfig(permissionsPath, acl);
+
+        getBrowser().newSession();
+
+        ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(homePage.isTriggerActionPresent());
+        homePage.triggerBuild();
+
+        rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
     }
 
     private void setAnonymousServerPermissions(ServerPermission... permissions) throws Exception

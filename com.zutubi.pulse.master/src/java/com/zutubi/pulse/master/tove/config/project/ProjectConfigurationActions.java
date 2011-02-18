@@ -169,23 +169,17 @@ public class ProjectConfigurationActions
     public void doTrigger(ProjectConfiguration projectConfig)
     {
         String user = SecurityUtils.getLoggedInUsername();
-        if (user != null)
-        {
-            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
-            projectManager.triggerBuild(projectConfig, options, null);
-        }
+        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        projectManager.triggerBuild(projectConfig, options, null);
     }
 
     @Permission(ACTION_TRIGGER)
     public void doRebuild(ProjectConfiguration projectConfig)
     {
         String user = SecurityUtils.getLoggedInUsername();
-        if (user != null)
-        {
-            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
-            options.setRebuild(true);
-            projectManager.triggerBuild(projectConfig, options, null);
-        }
+        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        options.setRebuild(true);
+        projectManager.triggerBuild(projectConfig, options, null);
     }
 
     @Permission(ACTION_PAUSE)
