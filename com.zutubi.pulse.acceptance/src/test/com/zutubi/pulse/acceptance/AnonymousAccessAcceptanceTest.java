@@ -1,17 +1,21 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -159,6 +163,27 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         browser.newSession();
         hierarchyPage.openAndWaitFor();
         browser.waitForElement(ProjectHierarchyPage.LINK_ADD);
+    }
+
+    public void testAssignTriggerPermissionToAnonymousUsers() throws Exception
+    {
+        setAnonymousAccess(true);
+        setAnonymousSignup(false);
+
+        String projectPath = xmlRpcHelper.insertSimpleProject(random);
+        String permissionsPath = PathUtils.getPath(projectPath, Constants.Project.PERMISSIONS);
+        Hashtable<String, Object> acl = xmlRpcHelper.createDefaultConfig(ProjectAclConfiguration.class);
+        acl.put("group", ANONYMOUS_GROUP_PATH);
+        acl.put("allowedActions", new String[]{ProjectConfigurationActions.ACTION_TRIGGER});
+        xmlRpcHelper.insertConfig(permissionsPath, acl);
+
+        browser.newSession();
+
+        ProjectHomePage homePage = browser.openAndWaitFor(ProjectHomePage.class, random);
+        assertTrue(homePage.isTriggerActionPresent());
+        homePage.triggerBuild();
+
+        xmlRpcHelper.waitForBuildToComplete(random, 1);
     }
 
     private void setAnonymousAccess(boolean enabled) throws Exception
