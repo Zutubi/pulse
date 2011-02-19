@@ -202,7 +202,7 @@ public class DefaultCommandContext implements CommandContext
                 }
                 
                 fileFeatureCount += fileArtifact.getFeatures().size();
-                if (fileFeatureCount >- totalFileFeatureLimit)
+                if (fileFeatureCount >= totalFileFeatureLimit)
                 {
                     result.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("total.feature.limit.reached")));
                 }
