@@ -1,9 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
-import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
-import com.zutubi.pulse.core.dependency.ivy.IvyRetrievalReport;
-import com.zutubi.pulse.core.dependency.ivy.RetrieveDependenciesCommand;
+import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
@@ -194,7 +191,8 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
                         stageDependency.setProjectUrl(urls.project(uriComponentEncode(dependencyProjectName)));
                     }
 
-                    String ivyPath = configuration.getIvyPath(mrid, mrid.getRevision());
+                    ModuleRevisionId encodedMrid = IvyEncoder.encode(mrid);
+                    String ivyPath = configuration.getIvyPath(encodedMrid, encodedMrid.getRevision());
                     File ivyFile = new File(repositoryRoot, ivyPath);
                     if (ivyFile.exists())
                     {
