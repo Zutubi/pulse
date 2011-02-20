@@ -5,6 +5,7 @@ import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.att
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -568,7 +569,7 @@ public class DefaultBuildManager implements BuildManager
     {
         final List<File> repositoryFiles = new LinkedList<File>();
 
-        // provide the authentication details for the subsquent repository requests.
+        // provide the authentication details for the subsequent repository requests.
         String masterLocation = masterLocationProvider.getMasterUrl();
 
         // the reponse from the ivy client will be relative to the repository root.
@@ -576,7 +577,7 @@ public class DefaultBuildManager implements BuildManager
 
         IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
 
-        String candidateIvyPath = configuration.getIvyPath(MasterIvyModuleRevisionId.newInstance(build), build.getVersion());
+        String candidateIvyPath = configuration.getIvyPath(IvyEncoder.encode(MasterIvyModuleRevisionId.newInstance(build)), build.getVersion());
         File candidateIvyFile = new File(repositoryRoot, candidateIvyPath);
         if (!candidateIvyFile.isFile())
         {
