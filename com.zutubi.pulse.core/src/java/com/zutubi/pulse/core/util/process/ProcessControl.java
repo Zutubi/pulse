@@ -45,6 +45,7 @@ public class ProcessControl
                         handleField = clazz.getDeclaredField("handle");
                         handleField.setAccessible(true);
                         nativeDestroyAvailable = true;
+                        LOG.info("Using native process destruction");
                     }
                     catch (UnsatisfiedLinkError e)
                     {
@@ -163,11 +164,13 @@ public class ProcessControl
      * on the process.
      * 
      * @param p the process to destroy (if null, this method is a no-op)
+     * @return true if native process termination is being used
      */
-    public static void destroyProcess(Process p)
+    public static boolean destroyProcess(Process p)
     {
         init();
 
+        boolean usingNative = false;
         if (p != null)
         {
             if (nativeDestroyAvailable)
@@ -176,6 +179,7 @@ public class ProcessControl
                 {
                     long handle = handleField.getLong(p);
                     destroy(handle);
+                    usingNative = true;
                 }
                 catch (IllegalAccessException e)
                 {
@@ -186,6 +190,8 @@ public class ProcessControl
             // Always called, so that any additional cleanup is done.
             p.destroy();
         }
+        
+        return usingNative;
     }
 
     private static native boolean destroy(long handle);
