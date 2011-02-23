@@ -77,11 +77,20 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             {
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationProvider.get(itemPath, Configuration.class);
-                messages = Messages.getInstance(instance.getClass());
-                Row row = new Row(itemPath, false, getActions(instance, data, key, messages));
-                addCells(row, instance);
-                applyRowDecorations(data, key, row);
-                table.addRow(row);
+                if (instance != null)
+                {
+                    messages = Messages.getInstance(instance.getClass());
+                    Row row = new Row(itemPath, false, getActions(instance, data, key, messages));
+                    addCells(row, instance);
+                    applyRowDecorations(data, key, row);
+                    table.addRow(row);
+                }
+                else
+                {
+                    Row row = new Row(itemPath, false, Collections.<ActionLink>emptyList());
+                    row.addCell(new Cell(columns.size(), messages.format("unknown.collection.instance", key)));
+                    table.addRow(row);
+                }
             }
 
             if (data instanceof TemplateRecord)

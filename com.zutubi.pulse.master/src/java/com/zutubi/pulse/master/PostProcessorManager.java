@@ -10,9 +10,16 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.logging.Logger;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages post-processors on the master, e.g. contributes default processors
@@ -22,12 +29,42 @@ public class PostProcessorManager implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(PostProcessorManager.class);
 
+    private static final Set<String> KNOWN_DEFAULT_PROCESSOR_KEYS = new HashSet<String>(Arrays.asList(
+        "ant output processor",
+        "boost.test XML report processor",
+        "boost jam output processor",
+        "boost regression xml report processor",
+        "cppunit xml report processor",
+        "cunit xml report processor",
+        "custom field processor",
+        "gcc output processor",
+        "junitee xml report processor",
+        "junit summary output processor",
+        "junit xml report processor",
+        "make output processor",
+        "maven 1 output processor",
+        "maven 2 output processor",
+        "msbuild output processor",
+        "nant output processor",
+        "nunit xml report processor",
+        "ocunit output processor",
+        "qtestlib xml report processor",
+        "unittest++ xml report processor",
+        "visual studio output processor",
+        "xcodebuild output processor"
+    ));
+    
     private PostProcessorExtensionManager postProcessorExtensionManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private RecordManager recordManager;
+    private TypeRegistry typeRegistry;
 
     public void init()
     {
         ProjectConfiguration globalProject = configurationTemplateManager.getRootInstance(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectConfiguration.class);
+
+        cleanupProcessorsOfUnknownType(globalProject.getConfigurationPath());
+        
         boolean changed = false;
         Map<String, PostProcessorConfiguration> postProcessors = globalProject.getPostProcessors();
 
@@ -52,6 +89,32 @@ public class PostProcessorManager implements EventListener
         if (changed)
         {
             configurationTemplateManager.save(globalProject);
+        }
+    }
+
+    private void cleanupProcessorsOfUnknownType(String globalProjectPath)
+    {
+        // A hack to work around CIB-2638 and CIB-2648.  Because we do not have
+        // good handling of configuration of unknown type (usually caused by
+        // missing plugins), instead we just wipe out any default
+        // post-processors for types we don't recognise.  This means the user
+        // won't be bitten by disabling a plugin that is never explicitly used
+        // by them, which hopefully covers a lot of cases where the user
+        // deliberately removes a plugin.
+        String postProcessorsPath = PathUtils.getPath(globalProjectPath, "postProcessors");
+        Record record = recordManager.select(postProcessorsPath);
+        for (String key: record.nestedKeySet())
+        {
+            if (KNOWN_DEFAULT_PROCESSOR_KEYS.contains(key))
+            {
+                Record child = (Record) record.get(key);
+                if (typeRegistry.getType(child.getSymbolicName()) == null)
+                {
+                    String childPath = PathUtils.getPath(postProcessorsPath, key);
+                    LOG.warning("Deleting post-processor at '" + childPath + "' as it has unknown type '" + child.getSymbolicName() + "'");
+                    configurationTemplateManager.delete(childPath);
+                }
+            }
         }
     }
 
@@ -93,5 +156,15 @@ public class PostProcessorManager implements EventListener
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }
