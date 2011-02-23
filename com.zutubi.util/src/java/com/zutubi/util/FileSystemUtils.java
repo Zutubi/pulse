@@ -20,9 +20,12 @@ public class FileSystemUtils
 {
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
 
-    private static final int ROBUST_RETRIES = 3;
-
     private static final String PROPERTY_USE_EXTERNAL_COPY = "pulse.use.external.copy";
+    private static final String PROPERTY_ROBUST_DELAY_MILLIS = "pulse.fs.robust.delay.millis";
+    private static final String PROPERTY_ROBUST_RETRIES = "pulse.fs.robust.retries";
+
+    private static final int ROBUST_DELAY_MILLIS = Integer.getInteger(PROPERTY_ROBUST_DELAY_MILLIS, 100);
+    private static final int ROBUST_RETRIES = Integer.getInteger(PROPERTY_ROBUST_RETRIES, 3);
 
     public static final String NORMAL_SEPARATOR = "/";
     public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
@@ -162,7 +165,7 @@ public class FileSystemUtils
                 System.gc();
                 try
                 {
-                    Thread.sleep(100);
+                    Thread.sleep(ROBUST_DELAY_MILLIS);
                 }
                 catch (InterruptedException e)
                 {
