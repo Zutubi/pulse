@@ -723,7 +723,7 @@ public class DefaultBuildManager implements BuildManager
     {
         if (file != null && file.exists())
         {
-            fileDeletionService.delete(file);
+            fileDeletionService.delete(file, false);
         }
     }
 

@@ -4,15 +4,14 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.FileSystemUtils;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class FileDeletionServiceTest extends PulseTestCase
 {
@@ -68,7 +67,7 @@ public class FileDeletionServiceTest extends PulseTestCase
     {
         File file = createNewFile("file.txt");
 
-        assertTrue(deletionService.delete(file).get());
+        assertTrue(deletionService.delete(file, false).get());
 
         assertFalse(file.exists());
     }
@@ -77,7 +76,7 @@ public class FileDeletionServiceTest extends PulseTestCase
     {
         File dir = createNewDir("dir");
 
-        assertTrue(deletionService.delete(dir).get());
+        assertTrue(deletionService.delete(dir, false).get());
 
         assertFalse(dir.exists());
     }
@@ -87,7 +86,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         File dir = createNewDir("dir");
         File file = createNewFile("dir.dead");
 
-        assertTrue(deletionService.delete(dir).get());
+        assertTrue(deletionService.delete(dir, false).get());
         assertFalse(dir.exists());
         assertTrue(file.exists());
     }
@@ -98,7 +97,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         File nested = createNewDir(dir, "nested");
         File file = createNewFile(dir, "file.txt");
 
-        assertTrue(deletionService.delete(dir).get());
+        assertTrue(deletionService.delete(dir, false).get());
         assertFalse(dir.exists());
         assertFalse(nested.exists());
         assertFalse(file.exists());
@@ -106,14 +105,14 @@ public class FileDeletionServiceTest extends PulseTestCase
 
     public void testNonExistantFile() throws ExecutionException, InterruptedException
     {
-        assertTrue(deletionService.delete(new File("does not exist")).get());
+        assertTrue(deletionService.delete(new File("does not exist"), false).get());
     }
 
     public void testNullFile()
     {
         try
         {
-            deletionService.delete(null);
+            deletionService.delete(null, false);
             fail("Expected exception");
         }
         catch (IllegalArgumentException e)
@@ -129,8 +128,8 @@ public class FileDeletionServiceTest extends PulseTestCase
         File f1 = createNewFile("1");
         File f2 = createNewFile("2");
         
-        deletionService.delete(f1);
-        deletionService.delete(f2);
+        deletionService.delete(f1, false);
+        deletionService.delete(f2, false);
         
         assertFalse(f1.exists());
         assertFalse(f2.exists());
@@ -153,7 +152,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         // is not nuked on restart.
         File f1 = createNewFile("1");
 
-        Future<Boolean> future = deletionService.delete(f1);
+        Future<Boolean> future = deletionService.delete(f1, false);
         assertTrue(future.get());
         deletionService.stop(true);
         
@@ -188,7 +187,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         File dir = FileSystemUtils.createTempDir(getName(), null);
         try
         {
-            Future<Boolean> future = deletionService.delete(dir);
+            Future<Boolean> future = deletionService.delete(dir, false);
             assertEquals(Boolean.TRUE, future.get());
             assertTrue(dir.isDirectory());
         }
