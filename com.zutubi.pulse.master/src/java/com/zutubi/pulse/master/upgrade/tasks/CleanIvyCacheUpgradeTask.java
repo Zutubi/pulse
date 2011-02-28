@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.pulse.master.upgrade.ConfigurationAware;
-import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.Data;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.upgrade.ConfigurationAware;
+import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class CleanIvyCacheUpgradeTask extends AbstractUpgradeTask implements Con
         File cacheBase = new File(data.getData(), "cache");
 
         // this could take a while so schedule it in the background.
-        fileDeletionService.delete(cacheBase);
+        fileDeletionService.delete(cacheBase, false);
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

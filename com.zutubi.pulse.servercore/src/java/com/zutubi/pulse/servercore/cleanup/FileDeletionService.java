@@ -1,9 +1,11 @@
 package com.zutubi.pulse.servercore.cleanup;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.FixedFuture;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -13,7 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 /**
  * The delete file processor, as the name suggests, handles the deletion of
@@ -63,12 +64,17 @@ public class FileDeletionService extends BackgroundServiceSupport
      * Delete the specified file.  This deletion may occur now or at some
      * point in the future.
      *
-     * @param file to be deleted.
+     * @param file          the file or directory to be deleted
+     * @param requireAtomic if true, require that file does not exist when this
+     *                      method returns (at a minimum it must be moved from
+     *                      its current location), or throw if this is not
+     *                      possible
      * @return a Future representing pending completion of the deletion.  The
      *         future will return true if the file has been deleted or no longer
-     *         does exists, false otherwise.
+     *         exists, false otherwise.
+     * @throws com.zutubi.pulse.core.api.PulseRuntimeException on error
      */
-    public Future<Boolean> delete(File file)
+    public Future<Boolean> delete(File file, boolean requireAtomic)
     {
         if (file == null)
         {
@@ -77,25 +83,25 @@ public class FileDeletionService extends BackgroundServiceSupport
 
         if (!file.exists() || !withinDataDir(file))
         {
-            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>()
-            {
-                public Boolean call() throws Exception
-                {
-                    return true;
-                }
-            });
-            task.run();
-            return task;
+            return new FixedFuture<Boolean>(true);
         }
 
         // only rename the file if it has not already been renamed.
         if (!file.getName().endsWith(SUFFIX))
         {
             File dest = determineRenamedFile(file);
-            if (file.renameTo(dest))
+            try
             {
+                FileSystemUtils.robustRename(file, dest);
                 file = dest;
-            } // else rename fails, but should not prevent us from scheduling the deletion.
+            }
+            catch (IOException e)
+            {
+                if (requireAtomic)
+                {
+                    throw new PulseRuntimeException(e);
+                }
+            }
         }
 
         return indexAndScheduleDeletion(file);

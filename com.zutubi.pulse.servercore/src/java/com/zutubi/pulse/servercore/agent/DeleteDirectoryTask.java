@@ -61,7 +61,7 @@ public class DeleteDirectoryTask implements SynchronisationTask
             File dir = new File(path);
             if (dir.exists())
             {
-                fileDeletionService.delete(dir);
+                fileDeletionService.delete(dir, true);
             }
         }
     }

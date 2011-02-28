@@ -41,7 +41,7 @@ public class CleanupAllCapturedWorkingCopiesUpgradeTask extends AbstractUpgradeT
                 {
                     for (File recipeDir : buildDir.listFiles(new DirectoryFileFilter()))
                     {
-                        fileDeletionService.delete(new File(recipeDir, "base"));
+                        fileDeletionService.delete(new File(recipeDir, "base"), false);
                     }
                 }
             }
