@@ -91,10 +91,17 @@ public class PerforceConstants
     public static final String FSTATE_OUR_LOCK = "ourLock";
 
     public static final String ACTION_ADD = "add";
+    public static final String ACTION_ADDED_AS = "added as";
     public static final String ACTION_BRANCH = "branch";
     public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_DELETED_AS = "deleted as";
     public static final String ACTION_EDIT = "edit";
     public static final String ACTION_INTEGRATE = "integrate";
+    public static final String ACTION_MOVE_ADD = "move/add";
+    public static final String ACTION_MOVE_DELETE = "move/delete";
+    public static final String ACTION_REFRESHING = "refreshing";
+    public static final String ACTION_UPDATING = "updating";
+    
 
     public static final String REVISION_NONE = "none";
 

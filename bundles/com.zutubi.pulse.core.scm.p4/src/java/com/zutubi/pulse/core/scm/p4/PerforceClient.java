@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
@@ -17,8 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
@@ -265,25 +264,29 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public static FileChange.Action decodeAction(String action)
     {
-        if (action.equals("add") || action.equals("added as") || action.equals("refreshing"))
+        if (action.equals(ACTION_ADD) || action.equals(ACTION_ADDED_AS) || action.equals(ACTION_REFRESHING))
         {
             return FileChange.Action.ADD;
         }
-        else if (action.equals("branch"))
+        else if (action.equals(ACTION_BRANCH))
         {
             return FileChange.Action.BRANCH;
         }
-        else if (action.equals("delete") || action.equals("deleted as"))
+        else if (action.equals(ACTION_DELETE) || action.equals(ACTION_DELETED_AS) || action.equals(ACTION_MOVE_DELETE))
         {
             return FileChange.Action.DELETE;
         }
-        else if (action.equals("edit") || action.equals("updating"))
+        else if (action.equals(ACTION_EDIT) || action.equals(ACTION_UPDATING))
         {
             return FileChange.Action.EDIT;
         }
-        else if (action.equals("integrate"))
+        else if (action.equals(ACTION_INTEGRATE))
         {
             return FileChange.Action.INTEGRATE;
+        }
+        else if (action.equals(ACTION_MOVE_ADD))
+        {
+            return FileChange.Action.MOVE;
         }
         else
         {
@@ -790,7 +793,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         {
             public boolean satisfied(FileStatus fileStatus)
             {
-                return fileStatus.getState() == FileStatus.State.ADDED || fileStatus.getState() == FileStatus.State.BRANCHED;
+                FileStatus.State state = fileStatus.getState();
+                return state == FileStatus.State.ADDED ||
+                        state == FileStatus.State.BRANCHED || 
+                        state == FileStatus.State.RENAMED;
             }
         };
         
