@@ -14,9 +14,9 @@ import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
+import static java.util.Arrays.asList;
 import org.mortbay.http.HttpRequest;
 
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +130,10 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         if (path.startsWith(REPOSITORY_PATH))
         {
             path = path.substring(REPOSITORY_PATH.length());
+        }
+        if (path.startsWith("/"))
+        {
+            path = path.substring(1);
         }
         return path;
     }

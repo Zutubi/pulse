@@ -29,7 +29,9 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.IsDirectoryPredicate;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -358,18 +360,26 @@ public class DefaultBuildManager implements BuildManager
         File projectDir = paths.getProjectDir(project);
         scheduleCleanup(projectDir);
 
+        try
+        {
+            for (File dir: getRepositoryDirectoriesFor(project))
+            {
+                scheduleCleanup(dir);
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Unable to locate and delete artifact repository directories for project '" + project.getName() + "'");
+        }
+
+        // Files on disk are cleaned by removing project-level directories, so
+        // we just remove the builds from the database.
         do
         {
             results = buildResultDao.findOldestByProject(project, null, 100, true);
-
-            // the build artifacts and working directory have already been cleaned up
-            // via the earlier scheduled cleanup of the projectDir.
-
-            BuildCleanupOptions options = new BuildCleanupOptions(true);
-
             for (BuildResult build : results)
             {
-                cleanup(build, options);
+                cleanupDatabase(build);
             }
         }
         while (results.size() > 0);
@@ -381,15 +391,12 @@ public class DefaultBuildManager implements BuildManager
         File userDir = paths.getUserDir(user.getId());
         scheduleCleanup(userDir);
 
-        // the build artifacts have already been cleaned up via the earlier
-        // scheduled cleanup of the user directory.
-
-        BuildCleanupOptions options = new BuildCleanupOptions(true);
-
+        // Files on disk are cleaned by removing user-level directories, so
+        // we just remove the builds from the database.
         List<BuildResult> builds = buildResultDao.findByUser(user);
         for (BuildResult build : builds)
         {
-            cleanup(build, options);
+            cleanupDatabase(build);
         }
     }
 
@@ -537,21 +544,27 @@ public class DefaultBuildManager implements BuildManager
 
         if (options.isCleanupAll())
         {
-            if (!build.isPersonal())
+            cleanupDatabase(build);
+        }
+    }
+
+    private void cleanupDatabase(BuildResult build)
+    {
+        if (!build.isPersonal())
+        {
+            // Remove records of this build from changelists
+            Revision revision = build.getRevision();
+            if (revision != null)
             {
-                // Remove records of this build from changelists
-                Revision revision = build.getRevision();
-                if (revision != null)
+                List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId(), true);
+                for (PersistentChangelist change : changelists)
                 {
-                    List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId(), true);
-                    for (PersistentChangelist change : changelists)
-                    {
-                        changelistDao.delete(change);
-                    }
+                    changelistDao.delete(change);
                 }
             }
-            buildResultDao.delete(build);
         }
+        
+        buildResultDao.delete(build);
     }
 
     public void terminateBuild(BuildResult buildResult, String reason)
@@ -560,6 +573,19 @@ public class DefaultBuildManager implements BuildManager
         eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason));
     }
 
+    private List<File> getRepositoryDirectoriesFor(final Project project) throws Exception
+    {
+        final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+        List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(project.getConfig().getHandle())));
+        return CollectionUtils.filter(CollectionUtils.map(paths, new Mapping<String, File>()
+        {
+            public File map(String s)
+            {
+                return new File(repositoryRoot, s);
+            }
+        }), new IsDirectoryPredicate());
+    }
+    
     private List<File> getRepositoryFilesFor(final BuildResult build) throws Exception
     {
         final List<File> repositoryFiles = new LinkedList<File>();
@@ -567,7 +593,7 @@ public class DefaultBuildManager implements BuildManager
         // provide the authentication details for the subsequent repository requests.
         String masterLocation = masterLocationProvider.getMasterUrl();
 
-        // the reponse from the ivy client will be relative to the repository root.
+        // the response from the ivy client will be relative to the repository root.
         final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
 
         IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);

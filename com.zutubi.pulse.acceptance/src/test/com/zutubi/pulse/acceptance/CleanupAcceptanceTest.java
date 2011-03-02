@@ -6,12 +6,11 @@ import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -355,15 +354,10 @@ public class CleanupAcceptanceTest extends SeleniumTestBase
         return page;
     }
 
-    public boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
+    private boolean isBuildArtifactsPresentViaUI(String projectName, long buildNumber)
     {
-        BuildArtifactsPage page = browser.createPage(BuildArtifactsPage.class, projectName, buildNumber);
-        if (!canOpenPage(page))
-        {
-            return false;
-        }
+        BuildArtifactsPage page = browser.openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
 
-        // reset the filter to ensure that what we need is available.
         page.resetFilter();
 
         // if artifacts are available, we should have the build command open in the tree.

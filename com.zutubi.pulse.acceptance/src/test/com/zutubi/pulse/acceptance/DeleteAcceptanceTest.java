@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -17,13 +18,12 @@ import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
@@ -100,7 +100,12 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         // persistent work directory.
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
         File buildDirectory = runBuildInPersistentWorkDirectory();
-        
+        assertTrue(buildDirectory.isDirectory());
+
+        Repository repository = new Repository();
+        File repositoryDirectory = new File(repository.getBase(), random); 
+        assertTrue(repositoryDirectory.isDirectory());
+            
         browser.loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = browser.openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -115,6 +120,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         assertFalse(browsePage.isProjectPresent(null, random));
 
         waitForDirectoryToBeCleaned(buildDirectory);
+        waitForDirectoryToBeCleaned(repositoryDirectory);
     }
 
     public void testDeleteStage() throws Exception
@@ -193,15 +199,15 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         return agentDirs.get(0);
     }
 
-    private void waitForDirectoryToBeCleaned(final File buildDirectory)
+    private void waitForDirectoryToBeCleaned(final File d)
     {
         AcceptanceTestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return !buildDirectory.isDirectory();
+                return !d.isDirectory();
             }
-        }, 30000, "agent persistent directory for project to be cleaned up");
+        }, 30000, "directory '" + d.getAbsolutePath() + "' to be cleaned up");
     }
 
     public void testDeleteProjectWithReference() throws Exception
