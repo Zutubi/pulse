@@ -1,11 +1,10 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.EOLStyle;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.ui.api.UserInterface;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * A handler for p4 fstat output that builds up a working copy status.
@@ -118,6 +117,14 @@ public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFee
         else if (action.equals(ACTION_INTEGRATE))
         {
             return FileStatus.State.MERGED;
+        }
+        else if (action.equals(ACTION_MOVE_ADD))
+        {
+            return FileStatus.State.RENAMED;
+        }
+        else if (action.equals(ACTION_MOVE_DELETE))
+        {
+            return FileStatus.State.DELETED;
         }
         else
         {
