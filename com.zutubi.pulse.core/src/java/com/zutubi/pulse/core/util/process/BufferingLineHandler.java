@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  */
-public class BufferingLineHandler implements LineHandler
+public class BufferingLineHandler extends LineHandlerSupport
 {
     private List<String> stdout = new LinkedList<String>();
     private List<String> stderr = new LinkedList<String>();

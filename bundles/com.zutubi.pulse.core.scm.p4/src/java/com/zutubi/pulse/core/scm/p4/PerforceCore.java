@@ -2,8 +2,9 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
-import com.zutubi.pulse.core.util.process.LineHandler;
+import com.zutubi.pulse.core.util.process.LineHandlerSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -16,8 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Core methods used for interaction with the p4 command.
@@ -148,7 +147,7 @@ public class PerforceCore
         }
 
         final AtomicBoolean activity = new AtomicBoolean(false);
-        AsyncProcess async = new AsyncProcess(child, new LineHandler()
+        AsyncProcess async = new AsyncProcess(child, new LineHandlerSupport()
         {
             public void handle(String line, boolean error)
             {

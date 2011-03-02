@@ -223,7 +223,7 @@ public class AsyncProcess
 
         public CharStreamer(InputStream in, boolean error, CharHandler handler)
         {
-            reader = new BufferedReader(new InputStreamReader(in));
+            reader = new BufferedReader(new InputStreamReader(in, handler.getCharset()));
             this.error = error;
             this.handler = handler;
             buffer = new char[1024];
@@ -258,7 +258,7 @@ public class AsyncProcess
 
         public LineStreamer(InputStream in, boolean error, LineHandler handler)
         {
-            reader = new BufferedReader(new InputStreamReader(in));
+            reader = new BufferedReader(new InputStreamReader(in, handler.getCharset()));
             this.error = error;
             this.handler = handler;
         }

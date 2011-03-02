@@ -10,6 +10,7 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,6 +37,8 @@ public class NativeGit
      */
     private static final String LOG_SENTINAL = "#5d7bf160-ce21-11de-8a39-0800200c9a66";
 
+    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
+    
     private ProcessBuilder git;
     private int inactivityTimeout;
     private DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance();
@@ -360,6 +363,11 @@ public class NativeGit
         final StringBuilder stderr = new StringBuilder();
         AsyncProcess async = new AsyncProcess(child, new LineHandler()
         {
+            public Charset getCharset()
+            {
+                return CHARSET_UTF8;
+            }
+
             public void handle(String line, boolean error)
             {
                 lineCount.incrementAndGet();
