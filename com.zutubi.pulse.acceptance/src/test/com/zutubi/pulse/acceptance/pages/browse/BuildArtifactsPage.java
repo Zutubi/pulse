@@ -11,6 +11,7 @@ import com.zutubi.util.WebUtils;
  */
 public class BuildArtifactsPage extends SeleniumPage
 {
+    private static final String ID_TREE = "artifacts-tree";
     private static final String ID_COMBO = "filter-combo";
     private static final String EXPRESSION_COMBO = "var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + ID_COMBO + "');";
 

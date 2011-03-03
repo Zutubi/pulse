@@ -131,6 +131,10 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
         {
             path = path.substring(REPOSITORY_PATH.length());
         }
+        if (path.startsWith("/"))
+        {
+            path = path.substring(1);
+        }
         return path;
     }
 

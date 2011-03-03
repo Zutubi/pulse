@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.pages.admin.*;
 import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -102,7 +103,12 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         // persistent work directory.
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         File buildDirectory = runBuildInPersistentWorkDirectory();
-        
+        assertTrue(buildDirectory.isDirectory());
+
+        Repository repository = new Repository();
+        File repositoryDirectory = new File(repository.getBase(), random); 
+        assertTrue(repositoryDirectory.isDirectory());
+            
         getBrowser().loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -117,6 +123,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         assertFalse(browsePage.isProjectPresent(null, random));
 
         waitForDirectoryToBeCleaned(buildDirectory);
+        waitForDirectoryToBeCleaned(repositoryDirectory);
     }
 
     public void testDeleteStage() throws Exception
@@ -195,15 +202,15 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         return agentDirs.get(0);
     }
 
-    private void waitForDirectoryToBeCleaned(final File buildDirectory)
+    private void waitForDirectoryToBeCleaned(final File d)
     {
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return !buildDirectory.isDirectory();
+                return !d.isDirectory();
             }
-        }, 60000, "agent persistent directory for project to be cleaned up");
+        }, 60000, "directory '" + d.getAbsolutePath() + "' to be cleaned up");
     }
 
     public void testDeleteProjectWithReference() throws Exception

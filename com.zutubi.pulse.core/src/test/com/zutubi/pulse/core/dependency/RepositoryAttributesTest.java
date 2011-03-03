@@ -96,6 +96,10 @@ public class RepositoryAttributesTest extends PulseTestCase
 
         attributes = newAttributes();
         assertEquals("value1", attributes.getAttribute("path1", "name"));
+
+        List<String> paths = attributes.getPaths(attributeEquals("name", "value1"));
+        assertEquals(1, paths.size());
+        assertTrue(paths.contains("path1"));
     }
 
     public void testPersistentRemove() throws IOException
