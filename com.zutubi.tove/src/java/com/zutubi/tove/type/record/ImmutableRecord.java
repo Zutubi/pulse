@@ -32,6 +32,16 @@ public class ImmutableRecord implements Record
         return delegate.get(key);
     }
 
+    public Record getPath(String path)
+    {
+        return delegate.getPath(path);
+    }
+
+    public Record getPath(String[] elements, int index)
+    {
+        return delegate.getPath(elements, index);
+    }
+
     public int size()
     {
         return delegate.size();

@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
@@ -1256,6 +1257,7 @@ public class ConfigurationRefactoringManager
 
                     firstTemplateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(pair.first);
                     commonSimple.putAll(getSimple(r));
+                    removeExternalState(type, commonSimple);
                     commonNestedKeySet.addAll(configurationTemplateManager.getOrderedNestedKeys(r, type));
                 }
                 else
@@ -1323,6 +1325,22 @@ public class ConfigurationRefactoringManager
             }
 
             return result;
+        }
+
+        private void removeExternalState(ComplexType type, Map<String, Object> values)
+        {
+            // CIB-2673: external state cannot be extracted.
+            if (type instanceof CompositeType)
+            {
+                CompositeType compositeType = (CompositeType) type;
+                for (TypeProperty property: compositeType.getInternalProperties())
+                {
+                    if (property.getAnnotation(ExternalState.class) != null)
+                    {
+                        values.remove(property.getName());
+                    }
+                }
+            }
         }
 
         private void mergeSimple(String firstTemplateOwnerPath, String templateOwnerPath, Map<String, Object> commonSimple, Record record, CompositeType compositeType)
@@ -2044,10 +2062,19 @@ public class ConfigurationRefactoringManager
 
                 CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
                 MutableRecord deepCopy = recordManager.select(path).copy(true, false);
+                MutableRecord skeleton = configurationTemplateManager.createSkeletonRecord(type, deepCopy);
+                if (configurationTemplateManager.isConcrete(path))
+                {
+                    // CIB-2673: external state should not be pulled up.
+                    // Transfer and such state from the copy being inserted in
+                    // the ancestor to the remaining skeleton at the original
+                    // concrete path.
+                    transferExternalState(type, deepCopy, skeleton);
+                }
+                
                 configurationTemplateManager.addInheritedSkeletons(scope, PathUtils.getPath(2, elements), type, deepCopy, node, true);
                 recordManager.insert(insertPath, deepCopy);
 
-                Record skeleton = configurationTemplateManager.createSkeletonRecord(type, deepCopy);
                 skeleton.forEach(new DeepSkeletoniseFunction(path));
 
                 // If the pulled up composite has a reference to within itself
@@ -2109,6 +2136,37 @@ public class ConfigurationRefactoringManager
             configurationTemplateManager.raiseInsertEvents(newConcreteDescendants);
 
             return insertPath;
+        }
+
+        private void transferExternalState(CompositeType type, Record fromRecord, final MutableRecord toRecord)
+        {
+            fromRecord.forEach(new TypeAwareFunction(type, fromRecord, "")
+            {
+                @Override
+                protected void process(String path, Record record, Type type)
+                {
+                    if (type instanceof CompositeType)
+                    {
+                        for (TypeProperty property: ((CompositeType)type).getInternalProperties())
+                        {
+                            if (property.getAnnotation(ExternalState.class) != null)
+                            {
+                                Object value = record.get(property.getName());
+                                if (value != null)
+                                {
+                                    Object to = toRecord.getPath(path);
+                                    if (to != null && to instanceof MutableRecord)
+                                    {
+                                        ((MutableRecord) to).put(property.getName(), value);
+                                    }
+
+                                    ((MutableRecord) record).put(property.getName(), "0");
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 

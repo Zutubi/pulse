@@ -642,7 +642,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }, strict, null);
     }
 
-    Record createSkeletonRecord(ComplexType type, Record record)
+    MutableRecord createSkeletonRecord(ComplexType type, Record record)
     {
         MutableRecord result = type.createNewRecord(false);
         for (String key : getOrderedNestedKeys(record, type))

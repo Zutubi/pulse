@@ -41,6 +41,29 @@ public interface Record
     Object get(String key);
 
     /**
+     * Retrieves a descendant record by path, if such a record exists.  The
+     * paths is broken into elements, and each element is followed to a child
+     * record recursively.  If at any point the child does not exist or is not
+     * a record, null will be returned.
+     * 
+     * @param path the path to follow
+     * @return descendant record at the give path, or null if no such record is
+     *         found
+     */
+    Record getPath(String path);
+
+    /**
+     * As with {@link #getPath(String)}, but using a path already composed into
+     * elements and starting at the given index into the elements.
+     * 
+     * @param elements elements of the path to follow
+     * @param index    index of the element to begin from
+     * @return descendant record at the give path, or null if no such record is
+     *         found
+     */
+    Record getPath(String[] elements, int index);
+    
+    /**
      * The size of the record is defined by the number of entries it contains.  An entry is considered
      * to be any key:value pair, regarless of whether the key references another record or a simple data
      * value.

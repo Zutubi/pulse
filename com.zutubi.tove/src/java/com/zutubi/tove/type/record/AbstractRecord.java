@@ -92,6 +92,28 @@ public abstract class AbstractRecord implements Record
         return true;
     }
 
+    public Record getPath(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        return getPath(elements, 0);
+    }
+
+    public Record getPath(String[] elements, int index)
+    {
+        if (index == elements.length)
+        {
+            return this;
+        }
+        
+        Object value = get(elements[index]);
+        if (value != null && value instanceof Record)
+        {
+            return ((Record) value).getPath(elements, index + 1);
+        }
+        
+        return null;
+    }
+
     public Set<String> simpleKeySet()
     {
         return CollectionUtils.filter(keySet(), new Predicate<String>()

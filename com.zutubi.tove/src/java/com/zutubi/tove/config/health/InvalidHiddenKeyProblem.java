@@ -33,7 +33,7 @@ public class InvalidHiddenKeyProblem extends HealthProblemSupport
     public void solve(RecordManager recordManager)
     {
         // If the record still exists with the bad hidden key, remove all
-        // occurences of that key and update.  
+        // occurrences of that key and update.  
         Record record = recordManager.select(getPath());
         if (record != null)
         {

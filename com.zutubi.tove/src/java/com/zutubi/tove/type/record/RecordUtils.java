@@ -1,5 +1,7 @@
 package com.zutubi.tove.type.record;
 
+import com.zutubi.util.BinaryProcedure;
+
 import java.util.Arrays;
 
 /**
@@ -81,5 +83,29 @@ public class RecordUtils
         }
 
         return result;
+    }
+
+    /**
+     * Walks over two record trees in parallel, in depth first order, passing
+     * each matching pair of records to the given procedure.  Only paths
+     * present in both record trees will be followed (other records are
+     * ignored).
+     * 
+     * @param record1 the first record tree
+     * @param record2 the second record tree
+     * @param fn callback function used to process pairs of records
+     */
+    public static void parallelDepthFirstWalk(Record record1, Record record2, BinaryProcedure<Record, Record> fn)
+    {
+        fn.run(record1, record2);
+        for (String key: record1.nestedKeySet())
+        {
+            Object value2 = record2.get(key);
+            if (value2 != null && value2 instanceof Record)
+            {
+                Record child1 = (Record) record1.get(key);
+                parallelDepthFirstWalk(child1, (Record) value2, fn);
+            }
+        }
     }
 }
