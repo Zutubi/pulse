@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.browse.AbstractLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;
 import com.zutubi.pulse.master.build.log.RecipeLogFile;
@@ -15,8 +16,9 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -26,8 +28,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -102,10 +102,13 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         assertTrue(log.exists());
     }
 
-    public void testPostBuildHookCanAccessProjectProperty() throws Exception
+    public void testPostBuildHookCanAccessProjectAndStageProperties() throws Exception
     {
-        xmlRpcHelper.insertSimpleProject(random, false);
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
         xmlRpcHelper.insertProjectProperty(random, "some.property", "some.value");
+        String stagePropertiesPath = getPath(projectPath, "stages", "default", "properties");
+        Hashtable<String, Object> property = xmlRpcHelper.createProperty("a.stage.property", "a.stage.value");
+        xmlRpcHelper.insertConfig(stagePropertiesPath, property);
 
         chooseHookType(random, "zutubi.postBuildHookConfig");
 
@@ -114,10 +117,10 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addDumpEnvTask(random, "${project} ${some.property}");
+        addDumpEnvTask(random, "${project} ${some.property} ${stage.default.a.stage.property}");
 
         xmlRpcHelper.runBuild(random);
-        assertArgs(random, "some.value");
+        assertArgs(random, "some.value", "a.stage.value");
     }
 
     public void testPostBuildHookCanAccessTriggerProperty() throws Exception
