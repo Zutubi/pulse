@@ -10,14 +10,16 @@ import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.hooks.PostStageHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.WebUtils;
+import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 
 /**
@@ -343,6 +345,25 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         assertTrue("Stages field should have been pulled up to extracted template", hookForm.isInherited("stages"));
     }
 
+    public void testSmartCloneWithExternalState() throws Exception
+    {
+        // CIB-2673
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
+        Hashtable<String, Object> trigger = rpcClient.RemoteApi.createDefaultConfig(ScmBuildTriggerConfiguration.class);
+        trigger.put("name", "scm");
+        String childTriggersPath = getPath(childPath, "triggers");
+        rpcClient.RemoteApi.insertConfig(childTriggersPath, trigger);
+
+        doSmartClone();
+
+        ListPage triggersPage = getBrowser().openAndWaitFor(ListPage.class, childTriggersPath);
+        assertEquals("scheduled", triggersPage.getCellContent(0, 2));
+        triggersPage = getBrowser().openAndWaitFor(ListPage.class, getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random + CLONE_PROPERTY_NAME, "triggers"));
+        assertEquals("scheduled", triggersPage.getCellContent(0, 2));
+        triggersPage = getBrowser().openAndWaitFor(ListPage.class, getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random + PARENT_PROPERTY_NAME, "triggers"));
+        assertEquals("n/a", triggersPage.getCellContent(0, 2));
+    }
+    
     private ProjectHierarchyPage doSmartClone()
     {
         getBrowser().loginAsAdmin();

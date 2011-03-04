@@ -3,12 +3,15 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.PullUpForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
+import java.util.Hashtable;
 
 public class PullUpAcceptanceTest extends AcceptanceTestBase
 {
@@ -91,6 +94,26 @@ public class PullUpAcceptanceTest extends AcceptanceTestBase
         assertFalse(listPage.isAnnotationPresent(TEST_PROPERTY_NAME, ListPage.ANNOTATION_INHERITED));
     }
 
+    public void testPullUpTriggerClearsTriggerId() throws Exception
+    {
+        // CIB-2673
+        String parent = random + "-parent";
+        String child = random + "-child";
+        setupHierarchy(parent, child);
+
+        Hashtable<String, Object> trigger = rpcClient.RemoteApi.createDefaultConfig(ScmBuildTriggerConfiguration.class);
+        trigger.put("name", "scm");
+        String childTriggersPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, child, "triggers");
+        String childTriggerPath = rpcClient.RemoteApi.insertConfig(childTriggersPath, trigger);
+        String parentTriggerPath = rpcClient.RemoteApi.pullUpConfig(childTriggerPath, parent);
+
+        getBrowser().loginAsAdmin();
+        ListPage triggersPage = getBrowser().openAndWaitFor(ListPage.class, childTriggersPath);
+        assertEquals("scheduled", triggersPage.getCellContent(0, 2));
+        triggersPage = getBrowser().openAndWaitFor(ListPage.class, getParentPath(parentTriggerPath));
+        assertEquals("n/a", triggersPage.getCellContent(0, 2));
+    }
+    
     private ListPage prepareProperty(String parent, String child) throws Exception
     {
         setupHierarchy(parent, child);

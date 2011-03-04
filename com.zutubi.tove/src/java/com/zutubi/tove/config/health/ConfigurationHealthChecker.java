@@ -1,6 +1,7 @@
 package com.zutubi.tove.config.health;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationScopeInfo;
@@ -516,7 +517,9 @@ public class ConfigurationHealthChecker
 
         if (record instanceof TemplateRecord)
         {
-            checkScrubbed(path, type, (TemplateRecord) record, report);
+            TemplateRecord templateRecord = (TemplateRecord) record;
+            checkScrubbed(path, type, templateRecord, report);
+            checkExternalState(path, type, templateRecord, report);
         }
         
         for (String key : record.simpleKeySet())
@@ -658,7 +661,7 @@ public class ConfigurationHealthChecker
         }
     }
 
-    private void checkScrubbed(String path, ComplexType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
+    private void checkScrubbed(String path, CompositeType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
     {
         TemplateRecord templateParent = templateRecord.getParent();
         if (templateParent != null)
@@ -670,9 +673,34 @@ public class ConfigurationHealthChecker
             {
                 Object value = moi.get(key);
                 Object inheritedValue = emptyChild.get(key);
-                if (RecordUtils.valuesEqual(value, inheritedValue))
+                if (RecordUtils.valuesEqual(value, inheritedValue) && !isExternalStateProperty(type, key))
                 {
                     report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
+                }
+            }
+        }
+    }
+
+    private boolean isExternalStateProperty(CompositeType type, String key)
+    {
+        TypeProperty property = type.getInternalProperty(key);
+        return property != null && property.getAnnotation(ExternalState.class) != null;
+    }
+
+    private void checkExternalState(String path, CompositeType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
+    {
+        if (!configurationTemplateManager.isConcrete(path))
+        {
+            for (TypeProperty property: type.getInternalProperties())
+            {
+                if (property.getAnnotation(ExternalState.class) != null)
+                {
+                    String key = property.getName();
+                    Object value = templateRecord.get(key);
+                    if (value == null || !value.equals(ExternalStateInTemplateProblem.NO_EXTERNAL_STATE))
+                    {
+                        report.addProblem(new ExternalStateInTemplateProblem(path, I18N.format("external.state.in.template", key), key));                        
+                    }
                 }
             }
         }

@@ -4,8 +4,7 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
 
 /**
- *
- *
+ * Formats display fields for triggers.
  */
 public class TriggerConfigurationFormatter
 {
@@ -13,10 +12,14 @@ public class TriggerConfigurationFormatter
 
     public String getState(TriggerConfiguration config)
     {
-        Trigger trigger = scheduler.getTrigger(config.getTriggerId());
-        if (trigger != null)
+        long triggerId = config.getTriggerId();
+        if (triggerId != 0)
         {
-            return trigger.getState().toString().toLowerCase();
+            Trigger trigger = scheduler.getTrigger(triggerId);
+            if (trigger != null)
+            {
+                return trigger.getState().toString().toLowerCase();
+            }
         }
         return "n/a";
     }

@@ -122,30 +122,37 @@ public class MasterBuildProperties extends BuildProperties
         String prefix = "stage.";
 
         RecipeResult recipeResult = node.getResult();
-        if(includeName)
+        if (includeName)
         {
             prefix += name + ".";
         }
         else
         {
-            BuildStageConfiguration stage = result.getProject().getConfig().getStage(node.getStageName());
-            if (stage != null)
-            {
-                for(ResourcePropertyConfiguration property: stage.getProperties().values())
-                {
-                    context.add(property.asResourceProperty());
-                }
-            }
-
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, node.getStageName());
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, node.getStageHandle());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
-
+        
         context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getHostSafe());
-        if(result != null)
+        if (result != null)
         {
+            BuildStageConfiguration stage = result.getProject().getConfig().getStage(node.getStageName());
+            if (stage != null)
+            {
+                for (ResourcePropertyConfiguration property: stage.getProperties().values())
+                {
+                    if (includeName)
+                    {
+                        context.addString(prefix + property.getName(), property.getValue());
+                    }
+                    else
+                    {
+                        context.add(property.asResourceProperty());
+                    }
+                }
+            }
+
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
             File recipeDir = recipeResult.getRecipeDir(configurationManager.getDataDirectory());
@@ -154,7 +161,7 @@ public class MasterBuildProperties extends BuildProperties
                 context.addString(NAMESPACE_INTERNAL, prefix + SUFFIX_DIRECTORY, recipeDir.getAbsolutePath());
             }
 
-            for(CommandResult command: recipeResult.getCommandResults())
+            for (CommandResult command: recipeResult.getCommandResults())
             {
                 addCommandProperties(context, node, command, configurationManager, includeName);
             }

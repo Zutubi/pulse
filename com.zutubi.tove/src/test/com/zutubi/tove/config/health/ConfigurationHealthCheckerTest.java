@@ -1,6 +1,7 @@
 package com.zutubi.tove.config.health;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -16,10 +17,10 @@ import com.zutubi.tove.type.record.MutableRecordImpl;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-import static java.util.Arrays.asList;
 import java.util.*;
 
 public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemTestCase
@@ -434,7 +435,34 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
         checkAllTest();
     }
-    
+
+    public void testCheckAllExternalStateInTemplate()
+    {
+        final String TRIGGER_NAME = "pooh";
+        
+        Project rootProject = new Project("root");
+        rootProject.addTrigger(new Trigger(TRIGGER_NAME));
+        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        
+        // Also add a concrete child to make sure its trigger id is fine.
+        Project childProject = createChildProject(rootPath, "child");
+        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+
+        String rootTriggerPath = addExternalStateToTrigger(rootPath, TRIGGER_NAME);
+        addExternalStateToTrigger(childPath, TRIGGER_NAME);
+        
+        checkAllTest(new ExternalStateInTemplateProblem(rootTriggerPath, I18N.format("external.state.in.template", "triggerId"), "triggerId"));
+    }
+
+    private String addExternalStateToTrigger(String projectPath, String triggerName)
+    {
+        String triggerPath = getPath(projectPath, "triggers", triggerName);
+        MutableRecord triggerRecord = recordManager.select(triggerPath).copy(false, true);
+        triggerRecord.put("triggerId", "123");
+        recordManager.update(triggerPath, triggerRecord);
+        return triggerPath;
+    }
+
     public void testCheckAllTemplateParentInvalid()
     {
         String rootPath = insertRootProjectWithStages();
@@ -677,6 +705,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         private List<Label> labels = new LinkedList<Label>();
         private Map<String, Processor> processors = new HashMap<String, Processor>();
         private Map<String, Recipe> recipes = new HashMap<String, Recipe>();
+        private Map<String, Trigger> triggers = new HashMap<String, Trigger>();
         @Ordered
         private Map<String, Stage> stages = new HashMap<String, Stage>();
         private Map<String, Hook> hooks = new HashMap<String, Hook>();
@@ -764,7 +793,22 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         {
             recipes.put(recipe.getName(), recipe);
         }
-        
+
+        public Map<String, Trigger> getTriggers()
+        {
+            return triggers;
+        }
+
+        public void setTriggers(Map<String, Trigger> triggers)
+        {
+            this.triggers = triggers;
+        }
+
+        public void addTrigger(Trigger trigger)
+        {
+            triggers.put(trigger.getName(), trigger);
+        }
+
         public Map<String, Stage> getStages()
         {
             return stages;
@@ -988,6 +1032,32 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         public void setLabel(String label)
         {
             this.label = label;
+        }
+    }
+    
+    @SymbolicName("trigger")
+    public static class Trigger extends AbstractNamedConfiguration
+    {
+        @ExternalState
+        private long triggerId;
+
+        public Trigger()
+        {
+        }
+
+        public Trigger(String name)
+        {
+            super(name);
+        }
+
+        public long getTriggerId()
+        {
+            return triggerId;
+        }
+
+        public void setTriggerId(long triggerId)
+        {
+            this.triggerId = triggerId;
         }
     }
     

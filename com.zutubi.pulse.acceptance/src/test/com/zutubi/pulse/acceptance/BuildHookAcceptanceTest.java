@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
@@ -37,9 +38,9 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     private static final int TASK_TIMEOUT = 30000;
 
     private static final String PROJECT_NAME = "hook-test-project";
-    private static final String PROJECT_PATH = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
+    private static final String PROJECT_PATH = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
     private static final String HOOKS_BASENAME = "buildHooks";
-    private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
+    private static final String HOOKS_PATH   = getPath(PROJECT_PATH, HOOKS_BASENAME);
 
     private static final String HELLO_MESSAGE = "Hello, hook output.";
 
@@ -54,7 +55,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.loginAsAdmin();
         rpcClient.RemoteApi.ensureProject(PROJECT_NAME);
-        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.RemoteApi.deleteAllConfigs(getPath(HOOKS_PATH, PathUtils.WILDCARD_ANY_ELEMENT));
         getBrowser().loginAsAdmin();
     }
 
@@ -101,10 +102,14 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         assertTrue(log.exists());
     }
 
-    public void testPostBuildHookCanAccessProjectProperty() throws Exception
+    public void testPostBuildHookCanAccessProjectAndStageProperties() throws Exception
     {
-        rpcClient.RemoteApi.insertSimpleProject(random, false);
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
+        rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
+        String stagePropertiesPath = getPath(projectPath, "stages", "default", "properties");
+        Hashtable<String, Object> property = rpcClient.RemoteApi.createProperty("a.stage.property", "a.stage.value");
+        rpcClient.RemoteApi.insertConfig(stagePropertiesPath, property);
 
         chooseHookType(random, "zutubi.postBuildHookConfig");
 
@@ -113,10 +118,10 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addDumpEnvTask(random, "${project} ${some.property}");
+        addDumpEnvTask(random, "${project} ${some.property} ${stage.default.a.stage.property}");
 
         rpcClient.RemoteApi.runBuild(random);
-        assertArgs(random, "some.value");
+        assertArgs(random, "some.value", "a.stage.value");
     }
 
     public void testPostBuildHookCanAccessTriggerProperty() throws Exception
@@ -395,7 +400,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     private String getHooksPath(String projectName)
     {
-        return PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, HOOKS_BASENAME);
+        return getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, HOOKS_BASENAME);
     }
 
     private void selectFromAllTasks()
@@ -434,7 +439,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
     private CompositePage waitForHook(String projectName)
     {
-        return getBrowser().openAndWaitFor(CompositePage.class, PathUtils.getPath(getHooksPath(projectName), random));
+        return getBrowser().openAndWaitFor(CompositePage.class, getPath(getHooksPath(projectName), random));
     }
 
     private List<String> getArgs() throws IOException
