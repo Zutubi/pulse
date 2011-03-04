@@ -449,9 +449,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         transformer.put("url", "http://jira.zutubi.com/$0");
         rpcClient.RemoteApi.insertConfig(getPath(projectPath, COMMIT_MESSAGE_TRANSFORMERS), transformer);
 
-        // Run two builds, to generate a change between them.
+        // Run two builds, to generate changes between them.
         rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
-        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", random);
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", RandomUtils.randomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it harder", RandomUtils.randomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-200: higher number", RandomUtils.randomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-100: lower number", RandomUtils.randomString(10));
         long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();
@@ -463,7 +466,10 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(summaryPage.isTestFailuresTablePresent());
         
         assertTrue(summaryPage.isRelatedLinksTablePresent());
-        assertEquals("CIB-123", summaryPage.getRelatedLinkText(0));
+        assertEquals(3, summaryPage.getRelatedLinksCount());
+        assertEquals("CIB-100", summaryPage.getRelatedLinkText(0));
+        assertEquals("CIB-123", summaryPage.getRelatedLinkText(1));
+        assertEquals("CIB-200", summaryPage.getRelatedLinkText(2));
 
         // No featured artifacts in this build, check, then mark one as
         // featured and do another build.

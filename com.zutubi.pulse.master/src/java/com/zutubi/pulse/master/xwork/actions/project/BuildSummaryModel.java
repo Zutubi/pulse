@@ -11,6 +11,8 @@ import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Model for JSON data for the build summary tab.
@@ -24,7 +26,7 @@ public class BuildSummaryModel
     private BuildFeaturesModel warnings;
     private List<BuildStageTestFailuresModel> failures;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
-    private List<ActionLink> links = new LinkedList<ActionLink>();
+    private Set<ActionLink> links = new TreeSet<ActionLink>();
     private List<ActionLink> hooks = new LinkedList<ActionLink>();
 
     public BuildSummaryModel(BuildResult buildResult, Urls urls)
@@ -101,7 +103,7 @@ public class BuildSummaryModel
         actions.add(action);
     }
     
-    public List<ActionLink> getLinks()
+    public Set<ActionLink> getLinks()
     {
         return links;
     }

@@ -176,6 +176,11 @@ public class BuildSummaryPage extends ResponsibilityPage
         return linksTable.isPresent();
     }
     
+    public int getRelatedLinksCount()
+    {
+        return linksTable.getLinkCount();
+    }
+    
     public String getRelatedLinkText(int index)
     {
         return linksTable.getLinkLabel(index);

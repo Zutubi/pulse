@@ -1,10 +1,13 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.zutubi.util.ObjectUtils;
+import com.zutubi.util.Sort;
+
 /**
  * A simple model for links (which may trigger JavaScript actions or be regular
  * hrefs).
  */
-public class ActionLink
+public class ActionLink implements Comparable<ActionLink>
 {
     private String action;
     private String label;
@@ -83,5 +86,60 @@ public class ActionLink
     public void setArgument(String argument)
     {
         this.argument = argument;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ActionLink that = (ActionLink) o;
+
+        if (action != null ? !action.equals(that.action) : that.action != null)
+        {
+            return false;
+        }
+        if (argument != null ? !argument.equals(that.argument) : that.argument != null)
+        {
+            return false;
+        }
+        if (icon != null ? !icon.equals(that.icon) : that.icon != null)
+        {
+            return false;
+        }
+        if (label != null ? !label.equals(that.label) : that.label != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = action != null ? action.hashCode() : 0;
+        result = 31 * result + (label != null ? label.hashCode() : 0);
+        result = 31 * result + (icon != null ? icon.hashCode() : 0);
+        result = 31 * result + (argument != null ? argument.hashCode() : 0);
+        return result;
+    }
+
+    public int compareTo(ActionLink o)
+    {
+        Sort.StringComparator cmp = new Sort.StringComparator();
+        return cmp.compare(getCompareString(), o.getCompareString());
+    }
+    
+    private String getCompareString()
+    {
+        return ObjectUtils.toString(label) + ObjectUtils.toString(action) + ObjectUtils.toString(icon) + ObjectUtils.toString(argument);
     }
 }
