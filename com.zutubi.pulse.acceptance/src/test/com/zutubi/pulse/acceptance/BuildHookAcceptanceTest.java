@@ -106,7 +106,6 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     {
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
-        rpcClient.RemoteApi.insertProjectProperty(random, "some.property", "some.value");
         String stagePropertiesPath = getPath(projectPath, "stages", "default", "properties");
         Hashtable<String, Object> property = rpcClient.RemoteApi.createProperty("a.stage.property", "a.stage.value");
         rpcClient.RemoteApi.insertConfig(stagePropertiesPath, property);
