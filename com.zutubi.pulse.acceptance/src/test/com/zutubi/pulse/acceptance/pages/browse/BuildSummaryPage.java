@@ -61,6 +61,7 @@ public class BuildSummaryPage extends ResponsibilityPage
     public void waitFor()
     {
         super.waitFor();
+        browser.waitForVariable("panel");
         browser.waitForVariable("panel.initialised");
     }
 
