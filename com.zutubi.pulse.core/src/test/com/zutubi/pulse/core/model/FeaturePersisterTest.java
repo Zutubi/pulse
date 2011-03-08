@@ -58,6 +58,12 @@ public class FeaturePersisterTest extends PulseTestCase
         roundTrip(result);
     }
 
+    public void testNonPlainFeature() throws Exception
+    {
+        CommandResult result = getResultWithFeatures(new PersistentFeature(Feature.Level.WARNING, "summary"));
+        roundTrip(result);
+    }
+    
     public void testArtifactNoFeatures() throws Exception
     {
         CommandResult result = getResultWithFeatures();
@@ -253,7 +259,7 @@ public class FeaturePersisterTest extends PulseTestCase
         return new PersistentPlainFeature(Feature.Level.INFO, summary, 1, 10, 3);
     }
 
-    private CommandResult getResultWithFeatures(PersistentPlainFeature... features)
+    private CommandResult getResultWithFeatures(PersistentFeature... features)
     {
         CommandResult result = new CommandResult("dummy");
         StoredArtifact artifact = new StoredArtifact("artifact", true, false);
@@ -262,11 +268,11 @@ public class FeaturePersisterTest extends PulseTestCase
         return result;
     }
 
-    private void addFileWithFeatures(StoredArtifact artifact, PersistentPlainFeature... features)
+    private void addFileWithFeatures(StoredArtifact artifact, PersistentFeature... features)
     {
         StoredFileArtifact file = new StoredFileArtifact("path/to/file" + (artifact.getChildren().size() + 1));
         artifact.add(file);
-        for (PersistentPlainFeature feature: features)
+        for (PersistentFeature feature: features)
         {
             file.addFeature(feature);
         }
@@ -298,8 +304,15 @@ public class FeaturePersisterTest extends PulseTestCase
                 description.append("  ").append(fa.getPath()).append('\n');
                 for(PersistentFeature f: fa.getFeatures())
                 {
-                    PersistentPlainFeature pf = (PersistentPlainFeature) f;
-                    description.append("    ").append(pf.getLevel()).append(':').append(pf.getFirstLine()).append(':').append(pf.getLastLine()).append(':').append(pf.getLineNumber()).append(':').append(XMLUtils.removeIllegalCharacters(pf.getSummary())).append('\n');
+                    if (f instanceof PersistentPlainFeature)
+                    {
+                        PersistentPlainFeature pf = (PersistentPlainFeature) f;
+                        description.append("    ").append(pf.getLevel()).append(':').append(pf.getFirstLine()).append(':').append(pf.getLastLine()).append(':').append(pf.getLineNumber()).append(':').append(XMLUtils.removeIllegalCharacters(pf.getSummary())).append('\n');
+                    }
+                    else
+                    {
+                        description.append("    ").append(f.getLevel()).append(':').append(XMLUtils.removeIllegalCharacters(f.getSummary())).append('\n');
+                    }
                 }
             }
         }
