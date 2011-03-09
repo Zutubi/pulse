@@ -74,6 +74,7 @@ public class ProjectHomePage extends ResponsibilityPage
     public void waitFor()
     {
         super.waitFor();
+        browser.waitForVariable("panel");
         browser.waitForVariable("panel.initialised");
     }
 
