@@ -62,10 +62,8 @@ public class HostStatusManager implements EventListener, Stoppable
     {
         synchronized (updaters)
         {
-            if (!updaters.containsKey(host.getId()))
+            if (!updaters.containsKey(host.getId()) && setUpgradeState(host, HostState.PersistentUpgradeState.UPGRADING))
             {
-                setUpgradeState(host, HostState.PersistentUpgradeState.UPGRADING);
-
                 HostUpdater updater = objectFactory.buildBean(HostUpdater.class, new Class[]{DefaultHost.class, HostService.class}, new Object[]{host, hostManager.getServiceForHost(host)});
                 updaters.put(host.getId(), updater);
                 updater.start();
@@ -101,8 +99,7 @@ public class HostStatusManager implements EventListener, Stoppable
             {
                 if (hostUpgradeCompleteEvent.isSuccessful())
                 {
-                    setUpgradeState(host, HostState.PersistentUpgradeState.NONE);
-                    resetAgents = true;
+                    resetAgents = setUpgradeState(host, HostState.PersistentUpgradeState.NONE);
                 }
                 else
                 {
@@ -122,12 +119,20 @@ public class HostStatusManager implements EventListener, Stoppable
         }
     }
 
-    private void setUpgradeState(DefaultHost host, HostState.PersistentUpgradeState upgradeState)
+    private boolean setUpgradeState(DefaultHost host, HostState.PersistentUpgradeState upgradeState)
     {
         HostState hostState = hostStateDao.findById(host.getId());
-        hostState.setUpgradeState(upgradeState);
-        hostStateDao.save(hostState);
-        host.setState(hostState);
+        if (hostState == null)
+        {
+            return false;
+        }
+        else
+        {
+            hostState.setUpgradeState(upgradeState);
+            hostStateDao.save(hostState);
+            host.setState(hostState);
+            return true;
+        }
     }
 
     private void handleUpgradeRequested(HostUpgradeRequestedEvent hostUpgradeRequestedEvent)
