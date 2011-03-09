@@ -109,15 +109,18 @@ public class FeaturePersister
 
     private void addFeatures(Element parent, StoredFileArtifact fileArtifact)
     {
-        for(PersistentFeature f: fileArtifact.getFeatures())
+        for (PersistentFeature f: fileArtifact.getFeatures())
         {
-            PersistentPlainFeature pf = (PersistentPlainFeature) f;
             Element element = new Element(ELEMENT_FEATURE);
-            element.addAttribute(new Attribute(ATTRIBUTE_LEVEL, pf.getLevel().toString()));
-            element.addAttribute(new Attribute(ATTRIBUTE_FIRST_LINE, Long.toString(pf.getFirstLine())));
-            element.addAttribute(new Attribute(ATTRIBUTE_LAST_LINE, Long.toString(pf.getLastLine())));
-            element.addAttribute(new Attribute(ATTRIBUTE_LINE, Long.toString(pf.getLineNumber())));
-            element.appendChild(new Text(XMLUtils.removeIllegalCharacters(pf.getSummary())));
+            element.addAttribute(new Attribute(ATTRIBUTE_LEVEL, f.getLevel().toString()));
+            element.appendChild(new Text(XMLUtils.removeIllegalCharacters(f.getSummary())));
+            if (f instanceof PersistentPlainFeature)
+            {
+                PersistentPlainFeature pf = (PersistentPlainFeature) f;
+                element.addAttribute(new Attribute(ATTRIBUTE_FIRST_LINE, Long.toString(pf.getFirstLine())));
+                element.addAttribute(new Attribute(ATTRIBUTE_LAST_LINE, Long.toString(pf.getLastLine())));
+                element.addAttribute(new Attribute(ATTRIBUTE_LINE, Long.toString(pf.getLineNumber())));
+            }
             parent.appendChild(element);
         }
     }
@@ -243,12 +246,20 @@ public class FeaturePersister
                 {
                     Map<String, String> attributes = getAttributes(reader);
                     Feature.Level level = Feature.Level.valueOf(getRequiredAttribute(attributes, ATTRIBUTE_LEVEL));
-                    long firstLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_FIRST_LINE));
-                    long lastLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LAST_LINE));
-                    long line = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LINE));
                     String summary = reader.getElementText();
+                    if (attributes.containsKey(ATTRIBUTE_FIRST_LINE))
+                    {
+                        long firstLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_FIRST_LINE));
+                        long lastLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LAST_LINE));
+                        long line = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LINE));
 
-                    fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
+                        fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
+                    }
+                    else
+                    {
+                        fileArtifact.addFeature(new PersistentFeature(level, summary));
+                    }
+                    
                     featuresRead++;
                 }
                 catch (IllegalArgumentException e)
