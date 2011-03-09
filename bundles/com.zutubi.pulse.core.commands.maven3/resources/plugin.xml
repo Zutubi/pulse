@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension point="com.zutubi.pulse.core.commands">
+        <command name="maven3" class="com.zutubi.pulse.core.commands.maven3.Maven3CommandConfiguration">
+            <resource name="maven3" optional="true"/>
+        </command>
+    </extension>
+    <extension point="com.zutubi.pulse.core.postprocessors">
+        <post-processor name="maven3.pp" display-name="maven 3 output processor"
+                        default-processor="true" class="com.zutubi.pulse.core.commands.maven3.Maven3PostProcessorConfiguration"/>
+    </extension>
+</plugin>

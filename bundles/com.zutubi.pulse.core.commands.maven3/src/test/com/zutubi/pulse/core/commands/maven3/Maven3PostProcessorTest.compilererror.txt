@@ -1,0 +1,37 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building app 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ app ---
+[INFO] skip non existing resourceDirectory /home/jsankey/app/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ app ---
+[INFO] Compiling 1 source file to /home/jsankey/app/target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/jsankey/app/src/main/java/com/zutubi/maven3/test/App.java:[11,18] cannot find symbol
+symbol  : method printl(java.lang.String)
+location: class java.io.PrintStream
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.911s
+[INFO] Finished at: Wed Mar 09 17:54:02 EST 2011
+[INFO] Final Memory: 6M/116M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile (default-compile) on project app: Compilation failure
+[ERROR] /home/jsankey/app/src/main/java/com/zutubi/maven3/test/App.java:[11,18] cannot find symbol
+[ERROR] symbol  : method printl(java.lang.String)
+[ERROR] location: class java.io.PrintStream
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

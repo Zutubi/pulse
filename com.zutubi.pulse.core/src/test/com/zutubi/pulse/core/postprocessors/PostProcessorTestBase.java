@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentFeature;
+import com.zutubi.pulse.core.model.PersistentPlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
@@ -17,6 +18,8 @@ import com.zutubi.util.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -85,6 +88,14 @@ public abstract class PostProcessorTestBase extends PulseTestCase
     protected void assertFeatures(Feature.Level level, String... summaries)
     {
         List<PersistentFeature> features = artifact.getFeatures(level);
+        Collections.sort(features, new Comparator<PersistentFeature>()
+        {
+            public int compare(PersistentFeature o1, PersistentFeature o2)
+            {
+                return (int) (((PersistentPlainFeature) o1).getLineNumber() - ((PersistentPlainFeature) o2).getLineNumber());
+            }
+        });
+        
         assertEquals(summaries.length, features.size());
         for(int i = 0; i < summaries.length; i++)
         {

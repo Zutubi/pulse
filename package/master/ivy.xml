@@ -27,6 +27,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven3" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.msbuild" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.nant" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>

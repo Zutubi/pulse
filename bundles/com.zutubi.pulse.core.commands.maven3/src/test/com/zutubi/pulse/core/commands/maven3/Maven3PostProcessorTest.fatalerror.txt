@@ -1,0 +1,11 @@
+[INFO] Scanning for projects...
+[ERROR] The build could not read 1 project -> [Help 1]
+[ERROR]   
+[ERROR]   The project  (/home/jsankey/app/nosuchpom.xml) has 1 error
+[ERROR]     Non-readable POM /home/jsankey/app/nosuchpom.xml: /home/jsankey/app/nosuchpom.xml (No such file or directory)
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
