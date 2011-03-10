@@ -16,7 +16,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("basic");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile");
         successRun(command, "[compiler:compile", "BUILD SUCCESSFUL");
     }
@@ -25,7 +25,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("basic");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile");
         TestCommandContext context = runCommand(new Maven2Command(command), createExecutionContext());
         assertEquals("1.0-SNAPSHOT", context.getCustomFields().get(asPair(FieldScope.BUILD, "maven.version")));
@@ -35,7 +35,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("basic");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         failedRun(command, "BUILD FAILURE", "You must specify at least one goal");
     }
 
@@ -43,7 +43,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("basic");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile test");
         successRun(command, "BUILD SUCCESSFUL", "Running com.zutubi.maven2.test.AppTest",
                 "task-segment: [compile, test]", "[compiler:compile", "[compiler:testCompile", "[surefire:test",
@@ -54,7 +54,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("nopom");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile");
         failedRun(command, "BUILD ERROR", "Cannot execute mojo: resources", "It requires a project with an existing pom.xml");
     }
@@ -63,7 +63,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("nondefaultpom");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile");
         command.setPomFile("blah/pom.xml");
         successRun(command, "[compiler:compile", "BUILD SUCCESSFUL");
@@ -73,7 +73,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("compilererror");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("compile");
         failedRun(command, "Compilation failure", "BUILD FAILURE", "task-segment: [compile]");
     }
@@ -82,7 +82,7 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
     {
         prepareBaseDir("testfailure");
 
-        Maven2CommandConfiguration command = new Maven2CommandConfiguration();
+        Maven2CommandConfiguration command = createCommandConfig();
         command.setGoals("test");
         failedRun(command, "task-segment: [test]", "There are test failures.");
     }
@@ -93,6 +93,15 @@ public class Maven2CommandTest extends ExecutableCommandTestCase
         assertTrue(baseDir.mkdir());
 
         unzipInput(name, baseDir);
+    }
+
+    private Maven2CommandConfiguration createCommandConfig()
+    {
+        Maven2CommandConfiguration config = new Maven2CommandConfiguration();
+        String m2Home = System.getenv("MAVEN2_HOME");
+        assertNotNull("MAVEN2_HOME must be set to the path of the maven 2 installation", m2Home);
+        config.setExe(m2Home + "/bin/mvn" + (SystemUtils.IS_WINDOWS ? ".bat" : ""));
+        return config;
     }
 
     private TestCommandContext successRun(Maven2CommandConfiguration configuration, String... content) throws Exception
