@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.model.ResourceManager;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.i18n.Messages;
 
 /**
  * Requirements that allow a stage to be dispatched to any agent that has the

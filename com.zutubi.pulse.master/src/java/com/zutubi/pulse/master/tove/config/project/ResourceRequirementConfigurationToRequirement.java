@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.util.Mapping;
 
 /**

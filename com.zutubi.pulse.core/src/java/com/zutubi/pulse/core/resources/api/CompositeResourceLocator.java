@@ -1,16 +1,20 @@
-package com.zutubi.pulse.core.resources;
-
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+package com.zutubi.pulse.core.resources.api;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * A resource locator that combines the resources of multiple child locators.
  */
 public class CompositeResourceLocator implements ResourceLocator
 {
     private ResourceLocator[] locators;
 
+    /**
+     * Creates a new locator with the given children.
+     * 
+     * @param locators set of locators to run
+     */
     public CompositeResourceLocator(ResourceLocator... locators)
     {
         this.locators = locators;

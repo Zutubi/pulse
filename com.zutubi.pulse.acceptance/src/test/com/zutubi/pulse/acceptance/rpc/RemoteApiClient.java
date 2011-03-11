@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.rpc;
 
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;

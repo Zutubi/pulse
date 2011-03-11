@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.SymbolicName;

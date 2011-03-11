@@ -1,7 +1,10 @@
 package com.zutubi.pulse.core.resources;
 
 import com.zutubi.pulse.core.InMemoryResourceRepository;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.CompositeResourceLocator;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.SimpleBinaryResourceLocator;
+import com.zutubi.pulse.core.resources.api.StandardHomeDirectoryResourceLocator;
 
 import java.util.List;
 

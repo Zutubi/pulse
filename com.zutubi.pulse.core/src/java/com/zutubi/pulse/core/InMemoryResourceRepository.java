@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class InMemoryResourceRepository extends ResourceRepositorySupport
     }
 
     /**
-     * Adds all of the given resources to this repoistory via {@link #addResource(com.zutubi.pulse.core.config.ResourceConfiguration)}.
+     * Adds all of the given resources to this repoistory via {@link #addResource(com.zutubi.pulse.core.resources.api.ResourceConfiguration)}.
      *
      * @param resources collection of resources to add
      */

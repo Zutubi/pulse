@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 
 /**
  * Resource property form (suits wizard too).

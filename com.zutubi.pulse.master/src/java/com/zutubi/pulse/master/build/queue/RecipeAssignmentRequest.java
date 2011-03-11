@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;

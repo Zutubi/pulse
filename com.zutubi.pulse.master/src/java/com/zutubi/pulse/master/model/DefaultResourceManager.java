@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.HostLocationFormatter;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -309,7 +309,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
             {
                 if (!existingResource.hasVersion(versionStr))
                 {
-                    existingResource.add(discoveredResource.getVersion(versionStr));
+                    existingResource.addVersion(discoveredResource.getVersion(versionStr));
                 }
                 else
                 {

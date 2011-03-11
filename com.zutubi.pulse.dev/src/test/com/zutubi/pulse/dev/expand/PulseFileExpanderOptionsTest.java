@@ -1,7 +1,7 @@
 package com.zutubi.pulse.dev.expand;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import static org.hamcrest.MatcherAssert.assertThat;

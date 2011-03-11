@@ -1,7 +1,7 @@
 package com.zutubi.pulse.dev.util;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.cli.ParseException;
 

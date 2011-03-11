@@ -1,14 +1,13 @@
 package com.zutubi.pulse.dev.util;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import org.apache.commons.cli.ParseException;
-
-import java.util.Properties;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.util.Properties;
 
 public class OptionUtilsTest extends PulseTestCase
 {

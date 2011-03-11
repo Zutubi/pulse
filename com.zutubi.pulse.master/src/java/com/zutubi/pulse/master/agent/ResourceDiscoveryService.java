@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.model.ResourceManager;

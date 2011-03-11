@@ -1,9 +1,6 @@
-package com.zutubi.pulse.core.resources;
+package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
-import static com.zutubi.pulse.core.resources.StandardHomeDirectoryConstants.*;
+import static com.zutubi.pulse.core.resources.api.StandardHomeDirectoryConstants.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -11,8 +8,18 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Builds a resource located in a standard home directory.  The resource will
+ * have a single version with a name based on the last path of the home
+ * directory.  This version will have some or all of the following properties:
+ * 
+ * <ul>
+ *     <li>&lt;name:uppercased&gt;_HOME - pointing to the home directory</li>
+ *     <li>&lt;name&gt;.bin.dir - pointing to the bin subdirectory</li>
+ *     <li>&lt;name&gt;.bin - pointing to the tool binary (or script)</li>
+ *     <li>&lt;name&gt;.lib - pointing to the lib subdirectory (if any)</li>
+ * </ul>
  */
-public class StandardHomeDirectoryResourceBuilder implements ResourceBuilder
+public class StandardHomeDirectoryResourceBuilder implements FileSystemResourceBuilder
 {
     private static final Logger LOG = Logger.getLogger(StandardHomeDirectoryResourceBuilder.class);
 
@@ -20,11 +27,26 @@ public class StandardHomeDirectoryResourceBuilder implements ResourceBuilder
     private String binaryName;
     private boolean script;
 
+    /**
+     * Creates a simple builder where the resource and binary name match, and
+     * the binary is a script.
+     * 
+     * @param resourceName name of the resource to create
+     */
     public StandardHomeDirectoryResourceBuilder(String resourceName)
     {
         this(resourceName, resourceName, true);
     }
 
+    /**
+     * Creates a builder that will build a resource of the given name, with the
+     * specified binary file.
+     * 
+     * @param resourceName name of the resource to create
+     * @param binaryName   name of the binary for the tool
+     * @param script       true if the binary is a script, false if it is a
+     *                     true binary
+     */
     public StandardHomeDirectoryResourceBuilder(String resourceName, String binaryName, boolean script)
     {
         this.resourceName = resourceName;
@@ -42,7 +64,7 @@ public class StandardHomeDirectoryResourceBuilder implements ResourceBuilder
             // TODO I think we can seriously improve on this, it is not very
             // TODO accurate in many common setups.
             ResourceVersionConfiguration version = new ResourceVersionConfiguration(home.getName());
-            resource.add(version);
+            resource.addVersion(version);
             resource.setDefaultVersion(version.getValue());
 
             version.addProperty(new ResourcePropertyConfiguration(convertResourceNameToEnvironmentVariable(resourceName), getNormalisedPath(home), true, false, false));

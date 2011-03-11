@@ -1,12 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-
 import static java.util.Arrays.asList;
 
 public class RecipeUtilsTest extends PulseTestCase
@@ -34,11 +33,11 @@ public class RecipeUtilsTest extends PulseTestCase
 
         ResourceVersionConfiguration defaultVersion = new ResourceVersionConfiguration(VERSION_DEFAULT);
         defaultVersion.addProperty(property(VERSION_DEFAULT));
-        withDefaultResource.add(defaultVersion);
+        withDefaultResource.addVersion(defaultVersion);
 
         ResourceVersionConfiguration nonDefaultVersion = new ResourceVersionConfiguration(VERSION_NON_DEFAULT);
         nonDefaultVersion.addProperty(property(VERSION_NON_DEFAULT));
-        withDefaultResource.add(nonDefaultVersion);
+        withDefaultResource.addVersion(nonDefaultVersion);
 
         withDefaultResource.setDefaultVersion(VERSION_DEFAULT);
         resourceRepository.addResource(withDefaultResource);
@@ -48,7 +47,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
         ResourceVersionConfiguration onlyVersion = new ResourceVersionConfiguration(VERSION_ONLY);
         onlyVersion.addProperty(property(VERSION_ONLY));
-        noDefaultResource.add(onlyVersion);
+        noDefaultResource.addVersion(onlyVersion);
         resourceRepository.addResource(noDefaultResource);
     }
 

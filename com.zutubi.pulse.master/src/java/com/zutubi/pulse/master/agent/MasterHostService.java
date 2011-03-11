@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.ServerRecipeService;
 import com.zutubi.pulse.servercore.SystemInfo;

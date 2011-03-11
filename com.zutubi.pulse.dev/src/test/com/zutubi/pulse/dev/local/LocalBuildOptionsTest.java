@@ -1,12 +1,11 @@
 package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import static java.util.Arrays.asList;
 
 public class LocalBuildOptionsTest extends PulseTestCase
 {

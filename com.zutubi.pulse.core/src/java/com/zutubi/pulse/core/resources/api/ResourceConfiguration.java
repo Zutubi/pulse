@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.config;
+package com.zutubi.pulse.core.resources.api;
 
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.tove.annotations.*;
@@ -93,45 +93,8 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
         properties.put(name, p);
     }
 
-    public void deleteProperty(String name)
-    {
-        properties.remove(name);
-    }
-
-    public void add(ResourceVersionConfiguration v)
+    public void addVersion(ResourceVersionConfiguration v)
     {
         versions.put(v.getValue(), v);
-    }
-
-    @Transient
-    public int getTotalPropertyCount()
-    {
-        int count = properties.size();
-        for(ResourceVersionConfiguration v: versions.values())
-        {
-            count += v.getProperties().size();
-        }
-
-        return count;
-    }
-
-    @Transient
-    public int getEmptyVersionCount()
-    {
-        int count = 0;
-        if(properties.isEmpty())
-        {
-            count++;
-        }
-
-        for(ResourceVersionConfiguration v: versions.values())
-        {
-            if(v.getProperties().isEmpty())
-            {
-                count++;
-            }
-        }
-
-        return count;
     }
 }

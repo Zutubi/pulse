@@ -1,18 +1,18 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.util.TreeNode;
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;

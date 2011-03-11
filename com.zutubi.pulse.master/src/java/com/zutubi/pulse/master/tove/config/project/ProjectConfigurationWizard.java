@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.plugins.CommandExtensionManager;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;

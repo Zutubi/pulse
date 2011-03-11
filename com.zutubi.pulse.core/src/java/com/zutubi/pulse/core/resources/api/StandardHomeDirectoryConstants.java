@@ -1,12 +1,14 @@
-package com.zutubi.pulse.core.resources;
+package com.zutubi.pulse.core.resources.api;
 
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 
 /**
+ * Constants and conventions used by the {@link StandardHomeDirectoryResourceLocator}
+ * and the implementations it relies upon.
  */
-public class StandardHomeDirectoryConstants
+class StandardHomeDirectoryConstants
 {
     public static final String EXTENSION_SCRIPT     = ".bat";
     public static final String EXTENSION_EXECUTABLE = ".exe";

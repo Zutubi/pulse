@@ -62,14 +62,15 @@ public class FileSystem
         return convertNullToEmpty(dir.listFiles(filter));
     }
 
-    public boolean rmdir(File dir)
+    /**
+     * Deletes the given path, recursively if it is a directory.
+     * 
+     * @param path the path to delete
+     * @throws IOException if the path cannot be fully deleted
+     */
+    public void delete(File path) throws IOException
     {
-        return FileSystemUtils.rmdir(dir);
-    }
-
-    public void delete(File file) throws IOException
-    {
-        FileSystemUtils.delete(file);
+        FileSystemUtils.delete(path);
     }
 
     private File[] convertNullToEmpty(File[] files)

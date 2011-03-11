@@ -1,20 +1,19 @@
 package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.IOAssertions;
 import com.zutubi.util.io.IOUtils;
-
-import java.io.*;
-import java.net.URISyntaxException;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.*;
+import java.net.URISyntaxException;
 
 public class LocalBuildTest extends PulseTestCase
 {

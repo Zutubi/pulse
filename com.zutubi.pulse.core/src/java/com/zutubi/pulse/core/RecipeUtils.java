@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;

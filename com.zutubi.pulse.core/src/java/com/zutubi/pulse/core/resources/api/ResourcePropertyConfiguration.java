@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.config;
+package com.zutubi.pulse.core.resources.api;
 
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.Form;

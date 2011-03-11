@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-
 import static java.util.Arrays.asList;
+
 import java.util.Collections;
 
 public class InMemoryResourceRepositoryTest extends PulseTestCase
@@ -21,7 +21,7 @@ public class InMemoryResourceRepositoryTest extends PulseTestCase
         super.setUp();
         repository = new InMemoryResourceRepository();
         ResourceConfiguration resource = new ResourceConfiguration(EXISTING_RESOURCE);
-        resource.add(new ResourceVersionConfiguration(EXISTING_VERSION));
+        resource.addVersion(new ResourceVersionConfiguration(EXISTING_VERSION));
         repository.addResource(resource);
     }
 

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.resources;
+package com.zutubi.pulse.core.resources.api;
 
 import com.zutubi.util.*;
 
@@ -12,10 +12,29 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A file locator that searches all file system roots for files that match
+ * simple patterns.  The patterns are just paths that use forward slashes as
+ * separators, and may include stars which will match any name.  Stars can only
+ * be used to match whole path elements.  For example:
+ * 
+ * <ul>
+ *     <li>a/fixed/path</li>
+ *     <li>Windows/Microsoft.Net/Framework/*</li>
+ * </ul>
+ * 
+ * Note that because listing file system roots is expensive, this locator
+ * limits the time it will allow for the operation.  If the timeout is reached
+ * incomplete results may be returned.
  */
 public class PathPatternFileLocator implements FileLocator
 {
+    /**
+     * Used to separate path elements in patterns.
+     */
     public static String SEPARATOR = "/";
+    /**
+     * Used to specify a path element that matches any string.
+     */
     public static String WILDCARD = "*";
 
     private static final int ROOT_LISTING_TIMEOUT_SECONDS = 5;
@@ -24,6 +43,11 @@ public class PathPatternFileLocator implements FileLocator
     private String[] patterns;
     private FileSystem fileSystem = new FileSystem();
 
+    /**
+     * Creates a locator that combines the result of matching all patterns.
+     * 
+     * @param patterns the set of patterns to search for
+     */
     public PathPatternFileLocator(String... patterns)
     {
         this.patterns = patterns;

@@ -1,19 +1,19 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
+import static java.util.Arrays.asList;
 import org.mockito.Matchers;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;

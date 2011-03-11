@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.Undefined;
+import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.LinkedHashMap;

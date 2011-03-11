@@ -6,7 +6,7 @@ import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERI
 import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
@@ -30,8 +30,8 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
-
 import static java.util.Arrays.asList;
+
 import java.util.*;
 
 /**

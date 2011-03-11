@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core.resources;
 
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
+import com.zutubi.pulse.core.resources.api.*;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -44,9 +42,20 @@ public class MsBuildResourceLocator implements ResourceLocator
     private FileSystemResourceLocator getLocator(String windowsDir, final boolean bit64)
     {
         String dotNetPattern = StringUtils.join(PathPatternFileLocator.SEPARATOR, windowsDir, "Microsoft.NET", bit64 ? "Framework64" : "Framework", PathPatternFileLocator.WILDCARD);
-        FileLocator fileLocator = new ReversingFileLocator(new SortingFileLocator(new FilteringFileLocator(new DirectoryFilteringFileLocator(new PathPatternFileLocator(dotNetPattern)), new DotNetInstallPredicate()), new VersionComparator()));
+        FileLocator fileLocator = 
+                new ReversingFileLocator(
+                        new SortingFileLocator(
+                                new FilteringFileLocator(
+                                        new DirectoryFilteringFileLocator(
+                                                new PathPatternFileLocator(dotNetPattern)
+                                        ),
+                                        new DotNetInstallPredicate()
+                                ),
+                                new VersionComparator()
+                        )
+                );
 
-        return new FileSystemResourceLocator(fileLocator, new ResourceBuilder()
+        return new FileSystemResourceLocator(fileLocator, new FileSystemResourceBuilder()
         {
             public ResourceConfiguration buildResource(File home)
             {
@@ -59,7 +68,7 @@ public class MsBuildResourceLocator implements ResourceLocator
                         versionName += " (64-bit)";
                     }
                     ResourceVersionConfiguration version = new ResourceVersionConfiguration(versionName);
-                    resource.add(version);
+                    resource.addVersion(version);
                     resource.setDefaultVersion(version.getValue());
                     version.addProperty(new ResourcePropertyConfiguration("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false, false));
                     return resource;

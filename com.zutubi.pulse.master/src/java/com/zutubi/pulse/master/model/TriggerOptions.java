@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.tove.config.Undefined;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;

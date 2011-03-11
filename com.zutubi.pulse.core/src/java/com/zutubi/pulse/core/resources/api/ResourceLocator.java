@@ -1,6 +1,4 @@
-package com.zutubi.pulse.core.resources;
-
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+package com.zutubi.pulse.core.resources.api;
 
 import java.util.List;
 
@@ -28,5 +26,14 @@ import java.util.List;
  */
 public interface ResourceLocator
 {
+    /**
+     * Locates and returns information about resources on the local machine.
+     * Implementations of this method should limit their running time to at
+     * most a few seconds.  It is not advisable, for example, to scan large
+     * areas of the file system.  Rather, searches should be restricted to
+     * probable install locations.
+     * 
+     * @return a list of all resources located
+     */
     List<ResourceConfiguration> locate();
 }

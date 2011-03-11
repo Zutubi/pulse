@@ -1,8 +1,8 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.ResourceRepositorySupport;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;

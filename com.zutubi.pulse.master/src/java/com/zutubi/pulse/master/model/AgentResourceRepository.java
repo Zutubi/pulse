@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.ResourceRepositorySupport;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 
 import java.util.Map;

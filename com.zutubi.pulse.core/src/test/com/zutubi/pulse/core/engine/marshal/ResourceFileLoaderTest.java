@@ -2,19 +2,19 @@ package com.zutubi.pulse.core.engine.marshal;
 
 import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
-import com.zutubi.pulse.core.config.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.config.ResourceRequirement;
-import com.zutubi.pulse.core.config.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.Map;
 

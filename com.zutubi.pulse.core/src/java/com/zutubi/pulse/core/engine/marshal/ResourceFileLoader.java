@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.engine.marshal;
 
 import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import com.zutubi.pulse.core.engine.SimpleResourceRequirementConfiguration;
 import com.zutubi.pulse.core.marshal.LocalFileResolver;
 import com.zutubi.pulse.core.marshal.ToveFileLoader;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;

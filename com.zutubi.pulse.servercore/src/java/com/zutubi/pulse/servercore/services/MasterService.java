@@ -1,8 +1,8 @@
 package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.config.ResourceConfiguration;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 
 import java.util.List;
 
