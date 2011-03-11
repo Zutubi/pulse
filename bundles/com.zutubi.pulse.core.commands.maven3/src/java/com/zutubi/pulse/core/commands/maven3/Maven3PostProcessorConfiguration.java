@@ -13,7 +13,6 @@ import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Min;
@@ -32,7 +31,6 @@ public class Maven3PostProcessorConfiguration extends AbstractNamedConfiguration
 {
     private static final String JUNIT_PROCESSOR_NAME = "junit.summary";
     private static final String MAVEN_ERRORS_PROCESSOR_NAME = "maven.errors";
-    private static final String BUILD_FAILURE_PROCESSOR_NAME = "build.failure";
 
     @Min(0) @Wizard.Ignore
     private int leadingContext = 1;
@@ -66,24 +64,12 @@ public class Maven3PostProcessorConfiguration extends AbstractNamedConfiguration
         // appears as the tests are run.
         group.getProcessors().put(JUNIT_PROCESSOR_NAME, new JUnitSummaryPostProcessorConfiguration(JUNIT_PROCESSOR_NAME));
 
-        // Life is a little complicated.  It is possible to get [ERROR]
-        // reports in a successful Maven build (CIB-616), so we don't just
-        // rely on this to detect failure.  Rather, the specific:
-        //
-        // [INFO] BUILD FAILURE
-        //
-        // is used.  We need to use a separate regex.pp for this to allow
-        // failOnError to be set on Windows for just this one pattern.  We
-        // also need to exclude it from the more generic [ERROR] pattern
-        // that is still used to pick up error features.
-
-        Pattern failurePattern = Pattern.compile("^\\[INFO\\] (BUILD|FATAL) (ERROR|FAILURE)");
-
+        RegexPatternConfiguration failurePattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile("^\\[INFO\\] (BUILD|FATAL) (ERROR|FAILURE)"));
         RegexPatternConfiguration errorPattern = new RegexPatternConfiguration(Feature.Level.ERROR, Pattern.compile("^\\[ERROR\\]"));
-        errorPattern.getExclusions().add(failurePattern.pattern());
         errorPattern.getExclusions().addAll(suppressedErrors);
 
         RegexPostProcessorConfiguration mavenErrorsPP = new RegexPostProcessorConfiguration(MAVEN_ERRORS_PROCESSOR_NAME);
+        mavenErrorsPP.getPatterns().add(failurePattern);
         mavenErrorsPP.getPatterns().add(errorPattern);
 
         RegexPatternConfiguration warningPattern = new RegexPatternConfiguration(Feature.Level.WARNING, Pattern.compile("^\\[WARNING\\]"));
@@ -94,20 +80,6 @@ public class Maven3PostProcessorConfiguration extends AbstractNamedConfiguration
         mavenErrorsPP.setLeadingContext(getLeadingContext());
         mavenErrorsPP.setTrailingContext(getTrailingContext());
         group.getProcessors().put(MAVEN_ERRORS_PROCESSOR_NAME, mavenErrorsPP);
-
-        RegexPostProcessorConfiguration buildFailurePP = new RegexPostProcessorConfiguration(BUILD_FAILURE_PROCESSOR_NAME);
-        RegexPatternConfiguration failureRegex = new RegexPatternConfiguration(Feature.Level.ERROR, failurePattern);
-        buildFailurePP.getPatterns().add(failureRegex);
-
-        if (!SystemUtils.IS_WINDOWS)
-        {
-            // Prefer the exit code on all systems except windows.
-            buildFailurePP.setFailOnError(false);
-        }
-
-        buildFailurePP.setLeadingContext(getLeadingContext());
-        buildFailurePP.setTrailingContext(getTrailingContext());
-        group.getProcessors().put(BUILD_FAILURE_PROCESSOR_NAME, buildFailurePP);
 
         return group;
     }
