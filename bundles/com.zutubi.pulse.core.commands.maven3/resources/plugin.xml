@@ -10,4 +10,7 @@
         <post-processor name="maven3.pp" display-name="maven 3 output processor"
                         default-processor="true" class="com.zutubi.pulse.core.commands.maven3.Maven3PostProcessorConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="maven3" class="com.zutubi.pulse.core.commands.maven3.Maven3ResourceLocator"/>
+    </extension>
 </plugin>

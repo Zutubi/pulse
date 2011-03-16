@@ -60,20 +60,16 @@ public class StandardHomeDirectoryResourceBuilder implements FileSystemResourceB
         {
             ResourceConfiguration resource = new ResourceConfiguration(resourceName);
 
-            // What is the version of this installation? Use the name of the home directory for this.
-            // TODO I think we can seriously improve on this, it is not very
-            // TODO accurate in many common setups.
-            ResourceVersionConfiguration version = new ResourceVersionConfiguration(home.getName());
+            String binDirPath = getNormalisedPath(getBinaryDirectory(home));
+            String binaryPath = getNormalisedPath(getBinaryFile(home, binaryName, script));
+
+            String versionName = getVersionName(home, new File(binaryPath));
+            ResourceVersionConfiguration version = new ResourceVersionConfiguration(versionName);
             resource.addVersion(version);
-            resource.setDefaultVersion(version.getValue());
+            resource.setDefaultVersion(versionName);
 
             version.addProperty(new ResourcePropertyConfiguration(convertResourceNameToEnvironmentVariable(resourceName), getNormalisedPath(home), true, false, false));
-
-            // configure the binary directory for this version.
-            String binDirPath = getNormalisedPath(getBinaryDirectory(home));
             version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY_DIRECTORY, binDirPath, false, true, false));
-
-            String binaryPath = getNormalisedPath(getBinaryFile(home, binaryName, script));
             version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY, binaryPath, false, false, false));
 
             File lib = getLibraryDirectory(home);
@@ -97,5 +93,19 @@ public class StandardHomeDirectoryResourceBuilder implements FileSystemResourceB
     private String getNormalisedPath(File file) throws IOException
     {
         return FileSystemUtils.normaliseSeparators(file.getCanonicalPath());
+    }
+
+    /**
+     * Determines the version of the discovered resource.  By default, the
+     * basename of the home directory is used.  Where possible, subclasses
+     * should override this for more accurate behaviour.
+     * 
+     * @param homeDir the home directory
+     * @param binary  the binary file
+     * @return name to use for the resource version
+     */
+    protected String getVersionName(File homeDir, File binary)
+    {
+        return homeDir.getName();
     }
 }

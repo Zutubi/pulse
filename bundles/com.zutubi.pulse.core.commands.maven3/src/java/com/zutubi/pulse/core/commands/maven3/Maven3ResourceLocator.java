@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.commands.maven2;
+package com.zutubi.pulse.core.commands.maven3;
 
 import com.zutubi.pulse.core.resources.api.FileSystemResourceLocator;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
@@ -9,14 +9,14 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Locates a maven 2 installation.
+ * Locates a maven 3 installation.
  */
-public class Maven2ResourceLocator implements ResourceLocator
+public class Maven3ResourceLocator implements ResourceLocator
 {
     public List<ResourceConfiguration> locate()
     {
-        final Maven2HomeDirectoryLocator homeDirectoryLocator = new Maven2HomeDirectoryLocator();
-        StandardHomeDirectoryResourceBuilder builder = new StandardHomeDirectoryResourceBuilder("maven2", "mvn", true)
+        final Maven3HomeDirectoryLocator homeDirectoryLocator = new Maven3HomeDirectoryLocator();
+        StandardHomeDirectoryResourceBuilder builder = new StandardHomeDirectoryResourceBuilder("maven3", "mvn", true)
         {
             @Override
             protected String getVersionName(File homeDir, File binary)
