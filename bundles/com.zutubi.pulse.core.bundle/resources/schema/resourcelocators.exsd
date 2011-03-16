@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="com.zutubi.pulse.core">
+    <annotation>
+        <appInfo>
+            <meta.schema plugin="com.zutubi.pulse.core" id="resourcelocators" name="Resource Locators"/>
+        </appInfo>
+        <documentation>
+        </documentation>
+    </annotation>
+
+    <element name="extension">
+        <complexType>
+            <sequence>
+                <element ref="resource-locator" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="point" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The extension-point of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="id" type="string">
+                <annotation>
+                    <documentation>
+                        Extension identifier.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="name" type="string">
+                <annotation>
+                    <documentation>
+                        Name of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+
+    <element name="resource-locator">
+        <complexType>
+            <attribute name="name" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The name of the resource locator.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="class" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The specific class implementing the resource locator.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+</schema>

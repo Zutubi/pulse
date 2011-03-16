@@ -3,6 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.plugins.PluginManager;
+import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.PluginScopePredicate;
@@ -56,6 +57,7 @@ public class SlaveServiceImpl implements SlaveService
     private ForwardingEventListener forwardingEventListener;
     private PluginManager pluginManager;
     private PluginSynchroniser pluginSynchroniser;
+    private ResourceLocatorExtensionManager resourceLocatorExtensionManager;
 
     private boolean firstStatus = true;
 
@@ -220,7 +222,7 @@ public class SlaveServiceImpl implements SlaveService
 
     public List<ResourceConfiguration> discoverResources(String token)
     {
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        ResourceDiscoverer discoverer = resourceLocatorExtensionManager.createResourceDiscoverer();
         return discoverer.discover();
     }
 
@@ -319,5 +321,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setPluginSynchroniser(PluginSynchroniser pluginSynchroniser)
     {
         this.pluginSynchroniser = pluginSynchroniser;
+    }
+
+    public void setResourceLocatorExtensionManager(ResourceLocatorExtensionManager resourceLocatorExtensionManager)
+    {
+        this.resourceLocatorExtensionManager = resourceLocatorExtensionManager;
     }
 }

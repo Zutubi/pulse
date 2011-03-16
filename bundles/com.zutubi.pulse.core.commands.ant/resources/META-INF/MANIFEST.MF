@@ -1,6 +1,6 @@
 Bundle-Name: Ant Support
 Bundle-SymbolicName: com.zutubi.pulse.core.commands.ant; singleton:=true
-Bundle-Description: Support for the Apache Ant build tool, in the form of a command and post-processor.
+Bundle-Description: Support for the Apache Ant build tool, in the form of a command, post-processor and resource locator.
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.3.0
 Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.3.0,2.4.0)"

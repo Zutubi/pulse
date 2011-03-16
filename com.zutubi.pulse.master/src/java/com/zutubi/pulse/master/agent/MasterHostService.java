@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -25,6 +26,7 @@ public class MasterHostService implements HostService
     private ServerRecipeService serverRecipeService;
     private StartupManager startupManager;
     private ServerMessagesHandler serverMessagesHandler;
+    private ResourceLocatorExtensionManager resourceLocatorExtensionManager;
 
     public int ping()
     {
@@ -53,7 +55,7 @@ public class MasterHostService implements HostService
 
     public List<ResourceConfiguration> discoverResources()
     {
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        ResourceDiscoverer discoverer = resourceLocatorExtensionManager.createResourceDiscoverer();
         return discoverer.discover();
     }
 
@@ -86,5 +88,10 @@ public class MasterHostService implements HostService
     public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
     {
         this.serverMessagesHandler = serverMessagesHandler;
+    }
+
+    public void setResourceLocatorExtensionManager(ResourceLocatorExtensionManager resourceLocatorExtensionManager)
+    {
+        this.resourceLocatorExtensionManager = resourceLocatorExtensionManager;
     }
 }

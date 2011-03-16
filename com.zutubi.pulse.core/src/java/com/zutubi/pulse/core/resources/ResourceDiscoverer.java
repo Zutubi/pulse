@@ -1,10 +1,8 @@
 package com.zutubi.pulse.core.resources;
 
 import com.zutubi.pulse.core.InMemoryResourceRepository;
-import com.zutubi.pulse.core.resources.api.CompositeResourceLocator;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
-import com.zutubi.pulse.core.resources.api.SimpleBinaryResourceLocator;
-import com.zutubi.pulse.core.resources.api.StandardHomeDirectoryResourceLocator;
+import com.zutubi.pulse.core.resources.api.ResourceLocator;
 
 import java.util.List;
 
@@ -15,9 +13,20 @@ import java.util.List;
  * the ResourceConstructor implementations.
  * 
  */
-//TODO: extend this to allow the registeration of resource constructors.
 public class ResourceDiscoverer
 {
+    private ResourceLocator locator;
+
+    /**
+     * Create a new discoverer that finds resource using the given locator.
+     * 
+     * @param locator locator used to discover resources
+     */
+    public ResourceDiscoverer(ResourceLocator locator)
+    {
+        this.locator = locator;
+    }
+
     /**
      * Run the resource discovery process, returning a list of all the discovered resources.
      *
@@ -25,14 +34,6 @@ public class ResourceDiscoverer
      */
     public List<ResourceConfiguration> discover()
     {
-        CompositeResourceLocator locator = new CompositeResourceLocator(
-                new StandardHomeDirectoryResourceLocator("ant", true),
-                new StandardHomeDirectoryResourceLocator("java", false),
-                new StandardHomeDirectoryResourceLocator("maven", true),
-                new StandardHomeDirectoryResourceLocator("maven2", "MAVEN2_HOME", "mvn", true),
-                new SimpleBinaryResourceLocator("make"),
-                new MsBuildResourceLocator()
-        );
         return locator.locate();
     }
 

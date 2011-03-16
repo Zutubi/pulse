@@ -10,4 +10,7 @@
         <post-processor name="msbuild.pp" display-name="msbuild output processor"
                         default-processor="true" class="com.zutubi.pulse.core.commands.msbuild.MsBuildPostProcessorConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="msbuild" class="com.zutubi.pulse.core.commands.msbuild.MsBuildResourceLocator"/>
+    </extension>
 </plugin>

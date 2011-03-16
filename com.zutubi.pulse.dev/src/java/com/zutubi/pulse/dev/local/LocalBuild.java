@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
+import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -31,6 +32,7 @@ public class LocalBuild
     private EventManager eventManager;
     private RecipeProcessor recipeProcessor;
     private ResourceFileLoader resourceFileLoader;
+    private ResourceLocatorExtensionManager resourceLocatorExtensionManager;
 
     public static void main(String argv[])
     {
@@ -96,7 +98,7 @@ public class LocalBuild
         ResourcesConfiguration resourcesConfiguration = createRepository(options.getResourcesFile());
 
         InMemoryResourceRepository repository = resourcesConfiguration.createRepository();
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        ResourceDiscoverer discoverer = resourceLocatorExtensionManager.createResourceDiscoverer();
         discoverer.discoverAndAdd(repository);
 
         List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>(options.getResourceRequirements());
@@ -208,5 +210,10 @@ public class LocalBuild
     public void setResourceFileLoader(ResourceFileLoader resourceFileLoader)
     {
         this.resourceFileLoader = resourceFileLoader;
+    }
+
+    public void setResourceLocatorExtensionManager(ResourceLocatorExtensionManager resourceLocatorExtensionManager)
+    {
+        this.resourceLocatorExtensionManager = resourceLocatorExtensionManager;
     }
 }

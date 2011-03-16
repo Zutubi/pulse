@@ -10,4 +10,7 @@
         <post-processor name="make.pp" display-name="make output processor"
                         default-processor="true" class="com.zutubi.pulse.core.commands.make.MakePostProcessorConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="make" class="com.zutubi.pulse.core.commands.make.MakeResourceLocator"/>
+    </extension>
 </plugin>

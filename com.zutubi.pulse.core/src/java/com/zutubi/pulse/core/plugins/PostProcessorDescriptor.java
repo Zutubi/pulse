@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Describes a plugged-in post-processor.
  */
 public class PostProcessorDescriptor
 {

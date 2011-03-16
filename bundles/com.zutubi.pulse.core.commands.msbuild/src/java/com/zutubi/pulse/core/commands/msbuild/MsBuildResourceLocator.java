@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.resources;
+package com.zutubi.pulse.core.commands.msbuild;
 
 import com.zutubi.pulse.core.resources.api.*;
 import com.zutubi.util.*;

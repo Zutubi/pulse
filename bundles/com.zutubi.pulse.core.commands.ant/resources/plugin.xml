@@ -10,4 +10,7 @@
         <post-processor name="ant.pp" display-name="ant output processor"
                         default-processor="true" class="com.zutubi.pulse.core.commands.ant.AntPostProcessorConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="ant" class="com.zutubi.pulse.core.commands.ant.AntResourceLocator"/>
+    </extension>
 </plugin>

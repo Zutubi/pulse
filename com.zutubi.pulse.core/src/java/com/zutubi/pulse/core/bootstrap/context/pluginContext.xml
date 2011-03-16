@@ -5,6 +5,7 @@
 
     <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init"/>
     <bean id="postProcessorExtensionManager" class="com.zutubi.pulse.core.plugins.PostProcessorExtensionManager" init-method="init"/>
+    <bean id="resourceLocatorExtensionManager" class="com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager" init-method="init"/>
     <bean id="patchFormatExtensionManager" class="com.zutubi.pulse.core.scm.patch.PatchFormatExtensionManager" init-method="init"/>
     <bean id="patchFormatFactory" class="com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory"/>
     <bean id="scmExtensionManager" class="com.zutubi.pulse.core.scm.ScmExtensionManager" init-method="init"/>

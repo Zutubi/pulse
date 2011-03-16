@@ -22,6 +22,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestResultSummary;
+import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
@@ -219,7 +220,8 @@ public class PostProcessCommand implements Command
             resourceRepository = new InMemoryResourceRepository();
         }
 
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        ResourceLocatorExtensionManager resourceLocatorExtensionManager = SpringComponentContext.getBean("resourceLocatorExtensionManager");
+        ResourceDiscoverer discoverer = resourceLocatorExtensionManager.createResourceDiscoverer();
         discoverer.discoverAndAdd(resourceRepository);
         return resourceRepository;
     }

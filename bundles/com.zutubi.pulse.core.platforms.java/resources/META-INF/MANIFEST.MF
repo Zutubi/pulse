@@ -1,0 +1,6 @@
+Bundle-Name: Java Integration
+Bundle-SymbolicName: com.zutubi.pulse.core.platforms.java; singleton:=true
+Bundle-Description: Provides integration with the Java platform.
+Bundle-Vendor: Zutubi
+Bundle-Version: 2.3.0
+Require-Bundle: com.zutubi.pulse.master; bundle-version="[2.3.0,2.4.0)"
