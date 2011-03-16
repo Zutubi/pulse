@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Maven2HomeDirectoryLocator implements FileLocator
 {
     private static final String BINARY_NAME = "mvn";
-    private static final Pattern VERSION_PATTERN = Pattern.compile("^.*Maven\\s(2[.0-9]+)\\s.*$", Pattern.MULTILINE);
+    private static final Pattern VERSION_PATTERN = Pattern.compile("^.*Maven\\s(?:version:\\s)?(2[.0-9]+)\\s?.*$", Pattern.MULTILINE);
 
     private String capturedVersion = null;
     
