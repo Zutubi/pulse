@@ -9,6 +9,7 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.NullOutputStream;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -17,10 +18,7 @@ import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerConfigurationException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 
 /**
@@ -55,7 +53,13 @@ public class RetrieveDependenciesCommand implements Command
             {
                 public Object process() throws Exception
                 {
-                    final PrintWriter outputWriter = new PrintWriter(context.getOutputStream());
+                    OutputStream outputStream = context.getOutputStream();
+                    if (outputStream == null)
+                    {
+                        outputStream = new NullOutputStream();
+                    }
+                    
+                    final PrintWriter outputWriter = new PrintWriter(outputStream);
                     try
                     {
                         DefaultModuleDescriptor descriptor = context.getValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, DefaultModuleDescriptor.class);

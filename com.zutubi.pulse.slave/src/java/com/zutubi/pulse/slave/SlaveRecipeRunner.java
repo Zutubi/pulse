@@ -17,6 +17,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 
 /**
@@ -25,6 +26,8 @@ import java.net.MalformedURLException;
 public class SlaveRecipeRunner implements RecipeRunner
 {
     private static final Logger LOG = Logger.getLogger(SlaveRecipeRunner.class);
+
+    private static final String PROPERTY_LIVE_LOGGING_ENABLED = "live.logging.enabled";
 
     private String master;
     private SlaveConfigurationManager configurationManager;
@@ -81,7 +84,7 @@ public class SlaveRecipeRunner implements RecipeRunner
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
             context.push();
-            CommandEventOutputStream outputStream = null;
+            OutputStream outputStream = null;
             try
             {
                 recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
@@ -92,8 +95,11 @@ public class SlaveRecipeRunner implements RecipeRunner
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-                outputStream = new CommandEventOutputStream(eventManager, request.getId());
-                context.setOutputStream(outputStream);
+                if (isLiveLoggingEnabled())
+                {
+                    outputStream = new CommandEventOutputStream(eventManager, request.getId());
+                    context.setOutputStream(outputStream);
+                }
                 context.setWorkingDir(processorPaths.getBaseDir());
 
                 recipeProcessor.build(request);
@@ -117,6 +123,12 @@ public class SlaveRecipeRunner implements RecipeRunner
                 eventManager.unregister(listener);
             }
         }
+    }
+
+    private boolean isLiveLoggingEnabled()
+    {
+        String propertyValue = System.getProperty(PROPERTY_LIVE_LOGGING_ENABLED);
+        return propertyValue == null || Boolean.parseBoolean(propertyValue);
     }
 
     public void setConfigurationManager(SlaveConfigurationManager configurationManager)
