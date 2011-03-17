@@ -8,7 +8,7 @@ import java.util.List;
  * variable.  If the variable does not exist or does not point to a directory,
  * nothing is returned.
  */
-public class HomeDirectoryFileLocator implements FileLocator
+public class EnvironmentVariableDirectoryLocator implements FileLocator
 {
     private FileLocator delegate;
 
@@ -18,7 +18,7 @@ public class HomeDirectoryFileLocator implements FileLocator
      * 
      * @param environmentVariable name of the variable to look for
      */
-    public HomeDirectoryFileLocator(String environmentVariable)
+    public EnvironmentVariableDirectoryLocator(String environmentVariable)
     {
         delegate = new DirectoryFilteringFileLocator(new EnvironmentVariableFileLocator(environmentVariable));
     }

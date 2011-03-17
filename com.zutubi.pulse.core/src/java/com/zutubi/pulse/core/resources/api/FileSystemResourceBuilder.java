@@ -14,31 +14,17 @@ import java.io.File;
 public interface FileSystemResourceBuilder
 {
     /**
-     * Used to separate elements of resource property names.
+     * Suffix for properties that point to binaries.
      */
-    public static final String PROPERTY_SEPARATOR                = ".";
-    /**
-     * Suffix for properties relating to binaries or directories that contain
-     * them.
-     */
-    public static final String PROPERTY_SUFFIX_BINARY            = "bin";
-    /**
-     * Suffix used for properties that point to directories.
-     */
-    public static final String PROPERTY_SUFFIX_DIRECTORY         = "dir";
-    /**
-     * Suffix for properties relating to libararies or directories that contain
-     * them.
-     */
-    public static final String PROPERTY_SUFFIX_LIBRARY           = "lib";
+    public static final String PROPERTY_SUFFIX_BINARY            = ".bin";
     /**
      * Standard suffix for properties that point to directories of binaries.
      */
-    public static final String PROPERTY_SUFFIX_BINARY_DIRECTORY  = PROPERTY_SUFFIX_BINARY + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_DIRECTORY;
+    public static final String PROPERTY_SUFFIX_BINARY_DIRECTORY  = ".bin.dir";
     /**
      * Standard suffix for properties that point to directories of libraries.
      */
-    public static final String PROPERTY_SUFFIX_LIBRARY_DIRECTORY = PROPERTY_SUFFIX_LIBRARY + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_DIRECTORY;
+    public static final String PROPERTY_SUFFIX_LIBRARY_DIRECTORY = ".lib.dir";
 
     /**
      * Builds a resource representing the tool found at the given path, if any.

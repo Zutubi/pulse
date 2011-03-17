@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.resources.api;
 
-import static com.zutubi.pulse.core.resources.api.StandardHomeDirectoryConstants.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.zutubi.pulse.core.resources.api.StandardHomeDirectoryConstants.*;
 
 /**
  * Builds a resource located in a standard home directory.  The resource will
@@ -69,14 +70,14 @@ public class StandardHomeDirectoryResourceBuilder implements FileSystemResourceB
             resource.setDefaultVersion(versionName);
 
             version.addProperty(new ResourcePropertyConfiguration(convertResourceNameToEnvironmentVariable(resourceName), getNormalisedPath(home), true, false, false));
-            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY_DIRECTORY, binDirPath, false, true, false));
-            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_BINARY, binaryPath, false, false, false));
+            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY_DIRECTORY, binDirPath, false, true, false));
+            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY, binaryPath, false, false, false));
 
             File lib = getLibraryDirectory(home);
             if (lib.isDirectory())
             {
                 String libDirPath = FileSystemUtils.normaliseSeparators(lib.getAbsolutePath());
-                version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SEPARATOR + PROPERTY_SUFFIX_LIBRARY_DIRECTORY, libDirPath, false, false, false));
+                version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_LIBRARY_DIRECTORY, libDirPath, false, false, false));
             }
 
             return resource;
