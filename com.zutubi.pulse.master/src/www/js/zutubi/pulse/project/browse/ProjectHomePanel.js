@@ -87,8 +87,12 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         xtype: 'xzpropertytable',
                         id: this.id + '-latest',
                         title: 'latest completed build',
-                        rows: [
-                            Zutubi.pulse.project.configs.build.number,
+                        rows: [{
+                                name: 'number',
+                                key: 'build id',
+                                cls: 'nowrap',
+                                renderer: Zutubi.pulse.project.renderers.buildId
+                            },
                             Zutubi.pulse.project.configs.result.status,
                             Zutubi.pulse.project.configs.build.reason,
                             Zutubi.pulse.project.configs.build.revision,

@@ -462,6 +462,7 @@ Ext.apply(Zutubi.pulse.project, {
          result: {
             status: {
                 name: 'status',
+                cls: 'nowrap',
                 renderer: Zutubi.pulse.project.renderers.resultStatus
             },
          
@@ -504,7 +505,7 @@ Ext.apply(Zutubi.pulse.project, {
             number: {
                 name: 'number',
                 key: 'build id',
-                cls: 'right',
+                cls: 'right nowrap',
                 renderer: Zutubi.pulse.project.renderers.buildId
             },
             
@@ -535,6 +536,7 @@ Ext.apply(Zutubi.pulse.project, {
 
             stages: {
                 name: 'stages',
+                cls: 'nowrap',
                 renderer: Zutubi.pulse.project.renderers.buildStages
             }
         },

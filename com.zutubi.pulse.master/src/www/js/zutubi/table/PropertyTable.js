@@ -21,7 +21,7 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
     rowTemplate: new Ext.XTemplate(
         '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">' +
             '<th class="fit-width top right leftmost">{key}</th>' +
-            '<td id="{id}" class="rightmost">{value}</td>' +
+            '<td id="{id}" class="rightmost {cls}">{value}</td>' +
         '</tr>'
     ),
 
@@ -48,6 +48,7 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
             var row = rows[i];
             var args = {
                 id: this.id + '-' + row.name,
+                cls: row.cls || '',
                 key: row.key,
                 value: row.getRenderedValue(this.data)
             };
