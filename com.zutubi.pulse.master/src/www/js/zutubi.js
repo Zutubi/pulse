@@ -409,7 +409,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 fs: 'pulse',
                 basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
                 showFiles: true,
-                preloadDepth: 3,
+                preloadDepth: 1,
                 filterFlag: this.initialConfig.filter
             }),
 
@@ -557,6 +557,23 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         this.on('expandnode', this.initialExpand, this, {single: true});
     },
 
+    onRender: function()
+    {
+        Zutubi.ArtifactsTree.superclass.onRender.apply(this, arguments);
+        this.loadingEl = this.innerBody.createChild({
+            tag: 'div',
+            style: 'padding: 5px',
+            children: [{
+                tag: 'img',
+                alt: 'loading',
+                src: window.baseUrl + '/images/default/tree/loading.gif'
+            }, ' ', {
+                tag: 'span',
+                html: 'Loading...'
+            }]
+        });
+    },
+    
     setInitialColumnWidths: function()
     {
         // If there is more than enough width for our columns,
@@ -608,6 +625,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             if (depth == 0)
             {
                 this.loading = false;
+                this.loadingEl.remove();
             }
         }
     },
