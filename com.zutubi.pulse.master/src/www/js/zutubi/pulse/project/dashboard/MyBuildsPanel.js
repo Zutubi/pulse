@@ -37,7 +37,7 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
                     id: this.id + '-builds',
                     title: 'my builds',
                     selectedColumns: this.columns,
-                    emptyMessage: 'no personal builds found',
+                    emptyMessage: 'no personal builds found'
                 }]
             }, {
                 region: 'east',
