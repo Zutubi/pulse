@@ -39,6 +39,7 @@ public class SubversionClient implements ScmClient
     private static final String PROPERTY_HTTP_AUTH_METHODS = "svnkit.http.methods";
     private static final String HTTP_AUTH_METHODS = "Digest,Basic,Negotiate,NTLM";
 
+    private boolean cleanOnUpdateFailure = true;
     private boolean useExport = false;
     /**
      * If true, we will monitor all externals by recursively scanning for
@@ -241,6 +242,11 @@ public class SubversionClient implements ScmClient
     public void setExcludedPaths(List<String> excludedPaths)
     {
         this.excludedPaths = excludedPaths;
+    }
+
+    public void setCleanOnUpdateFailure(boolean cleanOnUpdateFailure)
+    {
+        this.cleanOnUpdateFailure = cleanOnUpdateFailure;
     }
 
     public void setUseExport(boolean useExport)
@@ -789,7 +795,7 @@ public class SubversionClient implements ScmClient
      */
     private Revision handleUpdateError(ExecutionContext context, Revision rev, ScmFeedbackHandler handler, String errorMessage) throws ScmException
     {
-        if (errorMessage.contains("not a working copy"))
+        if (cleanOnUpdateFailure)
         {
             File wcDir = context.getWorkingDir();
             if (handler != null)
