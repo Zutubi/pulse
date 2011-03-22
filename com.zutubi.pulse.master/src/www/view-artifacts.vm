@@ -11,6 +11,7 @@
                 projectId: '$project.id',
                 buildId: '$buildResult.id',
                 id: 'artifacts-tree',
+                selectedId: '$selectedId',
                 filter: '$filter'
             });
 
