@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import com.zutubi.i18n.Messages;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -22,12 +21,11 @@ import java.util.Map;
  */
 public class DefaultPostProcessorContext implements PostProcessorContext
 {
-    private static final Messages I18N = Messages.getInstance(DefaultPostProcessorContext.class);
-
     private StoredFileArtifact artifact;
     private CommandResult commandResult;
     private int featureLimit;
     private ExecutionContext executionContext;
+    private boolean featuresDiscarded = false;
 
     public DefaultPostProcessorContext(StoredFileArtifact artifact, CommandResult commandResult, int featureLimit, ExecutionContext executionContext)
     {
@@ -76,14 +74,45 @@ public class DefaultPostProcessorContext implements PostProcessorContext
 
     public void addFeature(Feature feature)
     {
-        int newFeatureCount = artifact.getFeatures().size() + 1;
-        if (newFeatureCount < featureLimit)
+        if (featureLimit > 0)
         {
-            artifact.addFeature(convertFeature(feature));
-        }
-        else if (newFeatureCount == featureLimit)
-        {
-            artifact.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("feature.limit.reached")));
+            int newFeatureCount = artifact.getFeatures().size() + 1;
+            if (newFeatureCount < featureLimit)
+            {
+                artifact.addFeature(convertFeature(feature));
+            }
+            else if (newFeatureCount == featureLimit)
+            {
+                if (featuresDiscarded)
+                {
+                    // Can we evict a feature of lower severity?
+                    if (artifact.evictFeature(feature.getLevel()))
+                    {
+                        artifact.addFeature(convertFeature(feature));                
+                    }
+                }
+                else
+                {
+                    artifact.addFeature(convertFeature(feature));
+                }
+            }
+            else
+            {
+                featuresDiscarded = true;
+    
+                // Always evict one feature to make way for the informative
+                // message.  We don't add it yet as we want to avoid it being
+                // evicted.
+                if (!artifact.evictFeature(Feature.Level.ERROR))
+                {
+                    artifact.getFeatures().remove(artifact.getFeatures().size() - 1);
+                }
+                
+                if (artifact.evictFeature(feature.getLevel()))
+                {
+                    artifact.addFeature(convertFeature(feature));
+                }
+            }
         }
     }
 
@@ -124,5 +153,10 @@ public class DefaultPostProcessorContext implements PostProcessorContext
         {
             return new PersistentPlainFeature(feature.getLevel(), feature.getSummary(), feature.getFirstLine(), feature.getLastLine(), feature.getLineNumber());
         }
+    }
+
+    public boolean isFeaturesDiscarded()
+    {
+        return featuresDiscarded;
     }
 }

@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.WebUtils;
 
 import java.net.URLConnection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class StoredFileArtifact extends Entity
 {
@@ -113,6 +112,17 @@ public class StoredFileArtifact extends Entity
         return result;
     }
 
+    public int getFeatureCount(final Feature.Level level)
+    {
+        return CollectionUtils.count(features, new Predicate<PersistentFeature>()
+        {
+            public boolean satisfied(PersistentFeature persistentFeature)
+            {
+                return persistentFeature.getLevel() == level;
+            }
+        });
+    }
+    
     public String getType()
     {
         return type;
@@ -169,6 +179,34 @@ public class StoredFileArtifact extends Entity
             }
         }
 
+        return false;
+    }
+
+    /**
+     * Attempts to evict a feature with a less severe level than the given
+     * level.  Eviction prefers lower severity levels and more recently added
+     * items.
+     * 
+     * @param level one level above the highest severity to evict
+     * @return true if a feature was found and evicted, false if there was no
+     *         suitable feature
+     */
+    public boolean evictFeature(Feature.Level level)
+    {
+        for (int evictOrdinal = 0; evictOrdinal < level.ordinal(); evictOrdinal++)
+        {
+            ListIterator<PersistentFeature> it = features.listIterator(features.size());
+            while (it.hasPrevious())
+            {
+                PersistentFeature feature = it.previous();
+                if (feature.getLevel().ordinal() == evictOrdinal)
+                {
+                    it.remove();
+                    return true;
+                }
+            }
+        }
+        
         return false;
     }
 }
