@@ -681,6 +681,7 @@ table.spaced, ul.spaced
 
 .two-content .content, .two-content .content-right, .two-content td, .content-table th, .content-table td
 {
+    vertical-align: top;
     border: dotted 1px #bbb;
 }
 

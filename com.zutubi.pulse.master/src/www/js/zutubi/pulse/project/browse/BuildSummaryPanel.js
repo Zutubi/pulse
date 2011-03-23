@@ -152,7 +152,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
                         'delete': this.deleteBuild.createDelegate(this),
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
-                        addComment:this.addComment.createDelegate(this),
+                        addComment:this.addComment.createDelegate(this)
                     }
                 }, {
                     xtype: 'xzlinktable',
