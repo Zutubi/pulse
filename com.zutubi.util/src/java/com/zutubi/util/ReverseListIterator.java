@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An iterator that iterates over a linked list from last to first.
@@ -10,10 +10,10 @@ import java.util.LinkedList;
  */
 public class ReverseListIterator<T> implements Iterable<T>, Iterator<T>
 {
-    private LinkedList<T> l;
+    private List<T> l;
     private int index;
 
-    public ReverseListIterator(LinkedList<T> l)
+    public ReverseListIterator(List<T> l)
     {
         this.l = l;
         this.index =  l.size();

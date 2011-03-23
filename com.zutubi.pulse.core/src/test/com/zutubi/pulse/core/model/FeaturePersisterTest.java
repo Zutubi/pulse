@@ -140,75 +140,7 @@ public class FeaturePersisterTest extends PulseTestCase
         addFileWithFeatures(a2);
         addFileWithFeatures(a2, getFeature("a2 f4 s1"));
         
-        storeLoadAndCompare(originalResult, limitedResult, 1, Integer.MAX_VALUE);
-    }
-    
-    public void testTotalLimit() throws Exception
-    {
-        CommandResult originalResult = new CommandResult("dummy");
-
-        StoredArtifact a1 = new StoredArtifact("a1", true, false);
-        originalResult.addArtifact(a1);
-        addFileWithFeatures(a1, getFeature("a1 f1 s1"), getFeature("a1 f1 s2"));
-        addFileWithFeatures(a1, getFeature("a1 f2 s1"), getFeature("a1 f2 s2"), getFeature("a1 f2 s3"));
-        addFileWithFeatures(a1, getFeature("a1 f3 s1"));
-
-        StoredArtifact a2 = new StoredArtifact("a2", true, false);
-        originalResult.addArtifact(a2);
-        addFileWithFeatures(a2, getFeature("a2 f1 s1"));
-        addFileWithFeatures(a2, getFeature("a2 f2 s1"), getFeature("a2 f2 s2"));
-        addFileWithFeatures(a2);
-        addFileWithFeatures(a2, getFeature("a2 f4 s1"), getFeature("a2 f4 s2"), getFeature("a2 f4 s3"));
-
-        CommandResult limitedResult = new CommandResult("dummy");
-
-        a1 = new StoredArtifact("a1", true, false);
-        limitedResult.addArtifact(a1);
-        addFileWithFeatures(a1, getFeature("a1 f1 s1"), getFeature("a1 f1 s2"));
-        addFileWithFeatures(a1, getFeature("a1 f2 s1"), getFeature("a1 f2 s2"));
-        addFileWithFeatures(a1);
-
-        a2 = new StoredArtifact("a2", true, false);
-        limitedResult.addArtifact(a2);
-        addFileWithFeatures(a2);
-        addFileWithFeatures(a2);
-        addFileWithFeatures(a2);
-        addFileWithFeatures(a2);
-        
-        storeLoadAndCompare(originalResult, limitedResult, Integer.MAX_VALUE, 4);
-    }
-    
-    public void testBothLimits() throws Exception
-    {
-        CommandResult originalResult = new CommandResult("dummy");
-
-        StoredArtifact a1 = new StoredArtifact("a1", true, false);
-        originalResult.addArtifact(a1);
-        addFileWithFeatures(a1, getFeature("a1 f1 s1"), getFeature("a1 f1 s2"));
-        addFileWithFeatures(a1, getFeature("a1 f2 s1"), getFeature("a1 f2 s2"), getFeature("a1 f2 s3"));
-        addFileWithFeatures(a1, getFeature("a1 f3 s1"));
-
-        StoredArtifact a2 = new StoredArtifact("a2", true, false);
-        originalResult.addArtifact(a2);
-        addFileWithFeatures(a2, getFeature("a2 f1 s1"), getFeature("a2 f1 s2"));
-        addFileWithFeatures(a2, getFeature("a2 f2 s1"), getFeature("a2 f2 s2"));
-        addFileWithFeatures(a2, getFeature("a2 f3 s1"), getFeature("a2 f3 s2"));
-
-        CommandResult limitedResult = new CommandResult("dummy");
-
-        a1 = new StoredArtifact("a1", true, false);
-        limitedResult.addArtifact(a1);
-        addFileWithFeatures(a1, getFeature("a1 f1 s1"), getFeature("a1 f1 s2"));
-        addFileWithFeatures(a1, getFeature("a1 f2 s1"), getFeature("a1 f2 s2"));
-        addFileWithFeatures(a1, getFeature("a1 f3 s1"));
-
-        a2 = new StoredArtifact("a2", true, false);
-        limitedResult.addArtifact(a2);
-        addFileWithFeatures(a2, getFeature("a2 f1 s1"), getFeature("a2 f1 s2"));
-        addFileWithFeatures(a2, getFeature("a2 f2 s1"));
-        addFileWithFeatures(a2);
-        
-        storeLoadAndCompare(originalResult, limitedResult, 2, 8);
+        storeLoadAndCompare(originalResult, limitedResult, 1);
     }
     
     public void testFeatureWhitespacePreserved() throws IOException, XMLStreamException
@@ -221,7 +153,7 @@ public class FeaturePersisterTest extends PulseTestCase
     {
         File featuresDir = FeaturePersister.getFeaturesDirectory(tempDir);
         assertFalse(featuresDir.exists());
-        persister.readFeatures(new CommandResult("dummy"), tempDir, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        persister.readFeatures(new CommandResult("dummy"), tempDir, Integer.MAX_VALUE);
         assertFalse(featuresDir.exists());
     }
 
@@ -250,7 +182,7 @@ public class FeaturePersisterTest extends PulseTestCase
         
         String expected = getFeatureDescription(result);
         nukeFeatures(result);
-        persister.readFeatures(result, tempDir, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        persister.readFeatures(result, tempDir, Integer.MAX_VALUE);
         assertEquals(expected, getFeatureDescription(result));
     }
 
@@ -280,16 +212,16 @@ public class FeaturePersisterTest extends PulseTestCase
 
     private void roundTrip(CommandResult result) throws IOException, XMLStreamException
     {
-        storeLoadAndCompare(result, result, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        storeLoadAndCompare(result, result, Integer.MAX_VALUE);
     }
 
-    private void storeLoadAndCompare(CommandResult originalResult, CommandResult limitedResult, int perFileArtifactLimit, int totalLimit) throws IOException, XMLStreamException
+    private void storeLoadAndCompare(CommandResult originalResult, CommandResult limitedResult, int perFileArtifactLimit) throws IOException, XMLStreamException
     {
         originalResult.setOutputDir(".");
         persister.writeFeatures(originalResult, tempDir);
         String expected = getFeatureDescription(limitedResult);
         nukeFeatures(originalResult);
-        persister.readFeatures(originalResult, tempDir, perFileArtifactLimit, totalLimit);
+        persister.readFeatures(originalResult, tempDir, perFileArtifactLimit);
         assertEquals(expected, getFeatureDescription(originalResult));
     }
 

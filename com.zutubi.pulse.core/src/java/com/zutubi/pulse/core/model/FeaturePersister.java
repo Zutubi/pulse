@@ -135,12 +135,10 @@ public class FeaturePersister
      *                             the command is stored
      * @param perFileArtifactLimit maximum number of features to load for a
      *                             single file artifact
-     * @param totalLimit           maximum number of features to load in total
-     *                             (i.e. across all file artifacts)
      * @throws IOException         on error reading the features file
      * @throws XMLStreamException  if the features file is badly formed
      */
-    public void readFeatures(CommandResult result, File recipeDir, int perFileArtifactLimit, int totalLimit) throws IOException, XMLStreamException
+    public void readFeatures(CommandResult result, File recipeDir, int perFileArtifactLimit) throws IOException, XMLStreamException
     {
         File featuresFile = getFeaturesFile(result, recipeDir, false);
         if (featuresFile.exists())
@@ -159,7 +157,7 @@ public class FeaturePersister
                 // only trigger the callback if there is something to process.
                 if (reader.isStartElement())
                 {
-                    readArtifacts(reader, result, perFileArtifactLimit, totalLimit);
+                    readArtifacts(reader, result, perFileArtifactLimit);
                 }
             }
             finally
@@ -169,10 +167,8 @@ public class FeaturePersister
         }
     }
 
-    private int readArtifacts(XMLStreamReader reader, CommandResult result, int perFileArtifactLimit, int totalLimit) throws XMLStreamException
+    private void readArtifacts(XMLStreamReader reader, CommandResult result, int perFileArtifactLimit) throws XMLStreamException
     {
-        int featuresRead = 0;
-        
         nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_ARTIFACT))
         {
@@ -187,24 +183,16 @@ public class FeaturePersister
                     continue;
                 }
 
-                featuresRead += readArtifact(reader, artifact, Math.min(perFileArtifactLimit, totalLimit - featuresRead), totalLimit - featuresRead);
-                if (featuresRead >= totalLimit)
-                {
-                    return featuresRead;
-                }
+                readArtifact(reader, artifact, perFileArtifactLimit);
             }
 
             expectEndTag(ELEMENT_ARTIFACT, reader);
             nextTagOrEnd(reader);
         }
-
-        return featuresRead;
     }
 
-    private int readArtifact(XMLStreamReader reader, StoredArtifact artifact, int perFileArtifactLimit, int totalLimit) throws XMLStreamException
+    private void readArtifact(XMLStreamReader reader, StoredArtifact artifact, int perFileArtifactLimit) throws XMLStreamException
     {
-        int featuresRead = 0;
-
         nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_FILE_ARTIFACT))
         {
@@ -219,18 +207,12 @@ public class FeaturePersister
                     continue;
                 }
 
-                featuresRead += readFileArtifact(reader, fileArtifact, Math.min(perFileArtifactLimit, totalLimit - featuresRead));
-                if (featuresRead >= totalLimit)
-                {
-                    return featuresRead;
-                }
+                readFileArtifact(reader, fileArtifact, perFileArtifactLimit);
             }
 
             expectEndTag(ELEMENT_FILE_ARTIFACT, reader);
             nextTagOrEnd(reader);
         }
-
-        return featuresRead;
     }
 
     private int readFileArtifact(XMLStreamReader reader, StoredFileArtifact fileArtifact, int limit) throws XMLStreamException
