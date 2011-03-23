@@ -616,6 +616,11 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             for (var i = 0; i < count; i++)
             {
                 var child = children[i];
+                if (this.selectedId != 0 && this.selectedId == child.attributes.baseName)
+                {
+                    child.select();
+                }
+                
                 if (depth < 2 || this.smallEnough(child))
                 {
                     child.expand(false, false, this.initialExpand, this);
