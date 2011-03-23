@@ -409,7 +409,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 fs: 'pulse',
                 basePath: 'projects/' + this.initialConfig.projectId + '/builds/' + this.initialConfig.buildId + '/artifacts',
                 showFiles: true,
-                preloadDepth: 1,
+                preloadDepth: 3,
                 filterFlag: this.initialConfig.filter
             }),
 
