@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "cleanOnUpdateFailure", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "filterPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration implements Validateable
@@ -56,6 +56,9 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     @Password
     private String keyfilePassphrase;
 
+    @Wizard.Ignore
+    private boolean cleanOnUpdateFailure = true;
+    @Wizard.Ignore
     private boolean useExport;
     @Wizard.Ignore
     @ControllingSelect(dependentFields = {"externalMonitorPaths"}, enableSet = {"MONITOR_SELECTED"})
@@ -127,6 +130,16 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     public void setKeyfilePassphrase(String keyfilePassphrase)
     {
         this.keyfilePassphrase = keyfilePassphrase;
+    }
+
+    public boolean isCleanOnUpdateFailure()
+    {
+        return cleanOnUpdateFailure;
+    }
+
+    public void setCleanOnUpdateFailure(boolean cleanOnUpdateFailure)
+    {
+        this.cleanOnUpdateFailure = cleanOnUpdateFailure;
     }
 
     public boolean isUseExport()
