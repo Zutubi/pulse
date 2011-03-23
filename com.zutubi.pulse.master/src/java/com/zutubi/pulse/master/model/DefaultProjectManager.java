@@ -24,6 +24,7 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
 import com.zutubi.pulse.master.project.events.ProjectDestructionCompletedEvent;
+import com.zutubi.pulse.master.project.events.ProjectDirectoryCleanupRequestEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
@@ -1507,6 +1508,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             handleDestructionCompleted((ProjectDestructionCompletedEvent) evt);
         }
+        else if (evt instanceof ProjectDirectoryCleanupRequestEvent)
+        {
+            cleanupWorkDirs(((ProjectDirectoryCleanupRequestEvent) evt).getProjectConfiguration());
+        }
         else if(evt instanceof ConfigurationEventSystemStartedEvent)
         {
             ConfigurationEventSystemStartedEvent cesse = (ConfigurationEventSystemStartedEvent) evt;
@@ -1527,6 +1532,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return new Class[] { BuildCompletedEvent.class,
                              ProjectInitialisationCompletedEvent.class,
                              ProjectDestructionCompletedEvent.class,
+                             ProjectDirectoryCleanupRequestEvent.class,
                              ConfigurationEventSystemStartedEvent.class,
                              ConfigurationSystemStartedEvent.class };
     }
