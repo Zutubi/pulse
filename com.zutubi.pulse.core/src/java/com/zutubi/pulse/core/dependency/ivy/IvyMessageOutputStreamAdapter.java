@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
-import com.zutubi.util.logging.Logger;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import com.zutubi.util.Constants;
+import com.zutubi.util.io.NullOutputStream;
+import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +27,7 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
 
     public IvyMessageOutputStreamAdapter(OutputStream output)
     {
-        this.output = output;
+        this.output = output == null ? new NullOutputStream() : output;
     }
 
     protected void doProgress()
