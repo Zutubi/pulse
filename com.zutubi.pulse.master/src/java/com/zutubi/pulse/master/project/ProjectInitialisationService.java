@@ -219,6 +219,8 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     return null;
                 }
             });
+            
+            eventManager.publish(new ProjectDirectoryCleanupRequestEvent(this, projectConfiguration));
         }
         catch (Exception e)
         {
