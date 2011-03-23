@@ -395,7 +395,7 @@ public class RecipeProcessor
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
         eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
-        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, CommandResult.FEATURE_LIMIT_PER_FILE, CommandResult.FEATURE_LIMIT_PER_COMMAND, postProcessorFactory);
+        DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, CommandResult.FEATURE_LIMIT_PER_FILE, postProcessorFactory);
         try
         {
             executeAndProcess(commandContext, command, commandConfig);

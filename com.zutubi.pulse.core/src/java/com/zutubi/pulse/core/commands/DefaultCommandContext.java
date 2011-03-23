@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -35,16 +34,14 @@ public class DefaultCommandContext implements CommandContext
     private ExecutionContext executionContext;
     private CommandResult result;
     private int perFileFeatureLimit;
-    private int totalFileFeatureLimit;
     private Map<String, ArtifactSpec> registeredArtifacts = new LinkedHashMap<String, ArtifactSpec>();
     private PostProcessorFactory postProcessorFactory;
 
-    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, int perFileFeatureLimit, int totalFileFeatureLimit, PostProcessorFactory postProcessorFactory)
+    public DefaultCommandContext(ExecutionContext executionContext, CommandResult result, int perFileFeatureLimit, PostProcessorFactory postProcessorFactory)
     {
         this.executionContext = executionContext;
         this.result = result;
         this.perFileFeatureLimit = perFileFeatureLimit;
-        this.totalFileFeatureLimit = totalFileFeatureLimit;
         this.postProcessorFactory = postProcessorFactory;
     }
 
@@ -165,7 +162,6 @@ public class DefaultCommandContext implements CommandContext
 
     public void processArtifacts()
     {
-        int fileFeatureCount = 0;
         for (ArtifactSpec spec: registeredArtifacts.values())
         {
             final List<PostProcessor> processors = CollectionUtils.map(spec.getProcessors(), new Mapping<PostProcessorConfiguration, PostProcessor>()
@@ -194,17 +190,15 @@ public class DefaultCommandContext implements CommandContext
                 }
 
                 spec.getArtifact().add(fileArtifact);
-                int fileFeatureLimit = Math.min(perFileFeatureLimit, totalFileFeatureLimit - fileFeatureCount);
-                PostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, fileFeatureLimit, executionContext);
+                DefaultPostProcessorContext ppContext = new DefaultPostProcessorContext(fileArtifact, result, perFileFeatureLimit, executionContext);
                 for (PostProcessor pp: processors)
                 {
                     pp.process(file, ppContext);
                 }
                 
-                fileFeatureCount += fileArtifact.getFeatures().size();
-                if (fileFeatureCount >= totalFileFeatureLimit)
+                if (perFileFeatureLimit > 0 && ppContext.isFeaturesDiscarded())
                 {
-                    result.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("total.feature.limit.reached")));
+                    fileArtifact.addFeature(new PersistentFeature(Feature.Level.INFO, I18N.format("feature.limit.reached")));
                 }
             }            
         }
