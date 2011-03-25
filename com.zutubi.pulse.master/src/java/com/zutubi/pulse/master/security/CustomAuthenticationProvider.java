@@ -14,6 +14,7 @@ import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
+import org.acegisecurity.ui.WebAuthenticationDetails;
 import org.acegisecurity.userdetails.UserDetails;
 
 /**
@@ -86,7 +87,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
                 }
             }
 
-            if (user != null && user.isAuthenticatedViaLdap())
+            if (user != null && user.isAuthenticatedViaLdap() && isWebLogin(token))
             {
                 AcegiUtils.runAsSystem(new Runnable()
                 {
@@ -99,6 +100,12 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         }
 
         return super.authenticate(token);
+    }
+
+    private boolean isWebLogin(UsernamePasswordAuthenticationToken token)
+    {
+        Object details = token.getDetails();
+        return details != null && details instanceof WebAuthenticationDetails;
     }
 
     private User findUserCaseInsensitive(final String login)
