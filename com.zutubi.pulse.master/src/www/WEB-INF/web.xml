@@ -266,7 +266,7 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/action/*</url-pattern>
+        <url-pattern>/ajax/action/*.action</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
