@@ -21,6 +21,6 @@ public class ProjectDestructionCommencedEvent extends ProjectLifecycleEvent
 
     public String toString()
     {
-        return "Project Destructtion Commenced: " + getProjectConfiguration().getName();
+        return "Project Destruction Commenced: " + getProjectConfiguration().getName();
     }
 }
