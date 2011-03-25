@@ -55,11 +55,11 @@
         <dependency org="org.springframework" name="org.springframework.orm" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.transaction" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.web" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.acls" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.ldap" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.web" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.config" rev="3.0.4.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.acls" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.ldap" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.web" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.config" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="com.sun.syndication" name="com.sun.syndication" rev="0.8.0" conf="external,build,release->default;src->src"/>
         <dependency org="com.sun.syndication" name="com.sun.syndication.content" rev="20060508" conf="external,build,release->default;src->src"/>
         <dependency org="javax.transaction" name="javax.transaction" rev="1.1.0" conf="external,build,release->default;src->src"/>
