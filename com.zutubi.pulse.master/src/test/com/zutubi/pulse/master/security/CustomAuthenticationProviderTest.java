@@ -4,11 +4,13 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import static org.mockito.Mockito.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
-import static org.mockito.Mockito.*;
+import javax.servlet.http.HttpServletRequest;
 
 public class CustomAuthenticationProviderTest extends PulseTestCase
 {
@@ -65,7 +67,26 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         verify(userManager, times(1)).setPassword(same(user), anyString());
     }
 
-    public void testResetPasswordOnKnownUserLogin()
+    public void testResetPasswordOnKnownUserWebLogin()
+    {
+        UserConfiguration user = new UserConfiguration();
+        user.setLogin("user");
+        user.setAuthenticatedViaLdap(true);
+
+        stub(ldapManager.canAutoAdd()).toReturn(true);
+        stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
+        stub(userManager.getUserConfig(user.getLogin())).toReturn(user);
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new Principle(1, user.getLogin(), "pass"));
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
+        token.setDetails(new WebAuthenticationDetails(mock(HttpServletRequest.class)));
+        authenticationProvider.authenticate(token);
+
+        verify(userManager, never()).insert((UserConfiguration)anyObject());
+        verify(userManager, times(1)).setPassword(same(user), anyString());
+    }
+
+    public void testNoResetPasswordOnKnownUserNonWebLogin()
     {
         UserConfiguration user = new UserConfiguration();
         user.setLogin("user");
@@ -80,6 +101,6 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         authenticationProvider.authenticate(token);
 
         verify(userManager, never()).insert((UserConfiguration)anyObject());
-        verify(userManager, times(1)).setPassword(same(user), anyString());
+        verify(userManager, never()).setPassword(same(user), anyString());
     }
 }

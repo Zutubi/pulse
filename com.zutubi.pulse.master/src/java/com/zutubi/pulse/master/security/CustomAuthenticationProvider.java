@@ -15,6 +15,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 /**
  * A custom implementation of {@link DaoAuthenticationProvider}.
@@ -86,7 +87,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
                 }
             }
 
-            if (user != null && user.isAuthenticatedViaLdap())
+            if (user != null && user.isAuthenticatedViaLdap() && isWebLogin(token))
             {
                 SecurityUtils.runAsSystem(new Runnable()
                 {
@@ -99,6 +100,12 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         }
 
         return super.authenticate(token);
+    }
+
+    private boolean isWebLogin(UsernamePasswordAuthenticationToken token)
+    {
+        Object details = token.getDetails();
+        return details != null && details instanceof WebAuthenticationDetails;
     }
 
     private User findUserCaseInsensitive(final String login)

@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.util.StringUtils;
 
 /**
+ * Action for the build artifacts tab.
  */
 public class ViewArtifactsAction extends CommandActionBase
 {

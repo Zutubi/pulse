@@ -146,7 +146,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
             if (initialised != null)
             {
                 eventManager.publish(new ProjectStatusEvent(this, projectConfiguration, I18N.format("reinitialise.message")));
-                doDestroy(initialised);
+                doDestroy(initialised, false);
                 eventManager.publish(new ProjectStatusEvent(this, projectConfiguration, I18N.format("reinitialise.complete.message")));
             }
         }
@@ -172,11 +172,6 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
         {
             public void run()
             {
-                if (!deleted)
-                {
-                    eventManager.publish(new ProjectDestructionCommencedEvent(ProjectInitialisationService.this, projectConfiguration));
-                }
-
                 ProjectConfiguration initialisedConfiguration;
                 synchronized (initialisedConfigurations)
                 {
@@ -186,19 +181,19 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 // If we have no initialised configuration, destroy is a no-op.
                 if (initialisedConfiguration != null)
                 {
-                    doDestroy(initialisedConfiguration);
-                }
-
-                if (!deleted)
-                {
-                    eventManager.publish(new ProjectDestructionCompletedEvent(ProjectInitialisationService.this, projectConfiguration));
+                    doDestroy(initialisedConfiguration, deleted);
                 }
             }
         });
     }
 
-    private void doDestroy(final ProjectConfiguration projectConfiguration)
+    private void doDestroy(final ProjectConfiguration projectConfiguration, boolean deleted)
     {
+        if (!deleted)
+        {
+            eventManager.publish(new ProjectDestructionCommencedEvent(ProjectInitialisationService.this, projectConfiguration));
+        }
+
         try
         {
             ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
@@ -219,14 +214,17 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     return null;
                 }
             });
-            
-            eventManager.publish(new ProjectDirectoryCleanupRequestEvent(this, projectConfiguration));
         }
         catch (Exception e)
         {
             // The project log may be gone by now, so we don't write
             // to it.
             LOG.severe(e);
+        }
+
+        if (!deleted)
+        {
+            eventManager.publish(new ProjectDestructionCompletedEvent(ProjectInitialisationService.this, projectConfiguration));
         }
     }
 
