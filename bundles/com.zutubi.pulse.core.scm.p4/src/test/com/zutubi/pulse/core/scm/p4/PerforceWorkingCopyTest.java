@@ -74,7 +74,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         core.setEnv("PWD", clientRoot.getAbsolutePath());
         core.setWorkingDir(clientRoot);
 
-        core.createOrUpdateWorkspace("client-1", CLIENT_NAME, "description", clientRoot.getAbsolutePath(), null);
+        core.createOrUpdateWorkspace("client-1", CLIENT_NAME, "description", clientRoot.getAbsolutePath(), null, null);
         core.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
 
         otherClientRoot = new File(tmpDir, OTHER_CLIENT_NAME);
@@ -87,7 +87,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         otherCore.setEnv("PWD", otherClientRoot.getAbsolutePath());
         otherCore.setWorkingDir(otherClientRoot);
 
-        otherCore.createOrUpdateWorkspace("client-1", OTHER_CLIENT_NAME, "description", otherClientRoot.getAbsolutePath(), null);
+        otherCore.createOrUpdateWorkspace("client-1", OTHER_CLIENT_NAME, "description", otherClientRoot.getAbsolutePath(), null, null);
         otherCore.runP4(null, P4_COMMAND, COMMAND_SYNC, FLAG_FORCE);
     }
 

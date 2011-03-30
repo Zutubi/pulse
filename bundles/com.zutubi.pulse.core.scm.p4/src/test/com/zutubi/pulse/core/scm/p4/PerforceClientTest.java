@@ -577,7 +577,7 @@ public class PerforceClientTest extends PerforceTestBase
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getCore();
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath(), null);
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath(), null, null);
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -599,7 +599,7 @@ public class PerforceClientTest extends PerforceTestBase
                      "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-i");
         core.runP4(null, "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-d", "9");
 
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath(), null);
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath(), null, null);
         core.setEnv(PerforceConstants.ENV_CLIENT, "edit-client");
         core.runP4(null, "p4", "sync");
         core.runP4(null, "p4", "edit", "//depot/file1");

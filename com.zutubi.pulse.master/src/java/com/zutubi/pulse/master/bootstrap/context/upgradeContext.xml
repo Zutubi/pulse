@@ -156,6 +156,7 @@
                 <ref local="setHibernateCacheProvider"/>
                 <ref local="addSubversionCleanOnUpdateFailure"/>
                 <ref local="addServerHistoryColumnsPreference"/>
+                <ref local="addPerforceOptions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -800,5 +801,9 @@
 
     <bean id="addServerHistoryColumnsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddServerHistoryColumnsPreferenceUpgradeTask">
         <property name="buildNumber" value="203999001"/>
+    </bean>
+
+    <bean id="addPerforceOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceOptionsUpgradeTask">
+        <property name="buildNumber" value="203999002"/>
     </bean>
 </beans>

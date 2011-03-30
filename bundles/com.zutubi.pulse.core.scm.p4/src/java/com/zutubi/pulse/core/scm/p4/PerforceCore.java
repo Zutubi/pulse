@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandlerSupport;
 import com.zutubi.util.StringUtils;
@@ -17,6 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Core methods used for interaction with the p4 command.
@@ -274,7 +275,7 @@ public class PerforceCore
         return getWorkspace(workspaceName, false) != null;
     }
 
-    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root, String view) throws ScmException
+    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root, String view, String options) throws ScmException
     {
         PerforceWorkspace workspace;
         if (templateWorkspace == null)
@@ -300,8 +301,16 @@ public class PerforceCore
             view = view.replaceAll("//" + Pattern.quote(DUMMY_CLIENT) + "/", Matcher.quoteReplacement("//" + workspaceName + "/"));
             workspace.setView(Arrays.asList(view.split("\\n")));
         }
-        workspace.deleteOption(OPTION_LOCKED);
 
+        if (StringUtils.stringSet(options))
+        {
+            workspace.setOptions(Arrays.asList(options.split("\\s+")));
+        }
+        else
+        {
+            workspace.deleteOption(OPTION_LOCKED);
+        }
+        
         runP4(workspace.toSpecification(), getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);
 
         return workspace;

@@ -346,17 +346,17 @@ public class PerforceWorkspace
         this.root = root;
     }
 
-    public void setView(List<String> view)
-    {
-        this.view = view;
-    }
-
     /**
      * @return the set of options enabled for this workspace
      */
     public Set<String> getOptions()
     {
         return Collections.unmodifiableSet(options);
+    }
+
+    public void setOptions(List<String> options)
+    {
+        this.options = new HashSet<String>(options);
     }
 
     /**
@@ -386,6 +386,11 @@ public class PerforceWorkspace
     public List<String> getView()
     {
         return Collections.unmodifiableList(view);
+    }
+
+    public void setView(List<String> view)
+    {
+        this.view = view;
     }
 
     /**

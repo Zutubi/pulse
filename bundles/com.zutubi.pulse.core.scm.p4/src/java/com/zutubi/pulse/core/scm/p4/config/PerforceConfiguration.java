@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "options", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "filterPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -22,10 +22,11 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String user;
     @Password
     private String password;
-    @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"view"})
+    @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"view", "options"})
     private boolean useTemplateClient = true;
     @Required
     private String spec;
+    private String options;
     @TextArea(rows = 10, cols = 80) @Required
     private String view = "//depot/... //pulse/...";
     private boolean useTicketAuth = false;
@@ -111,6 +112,16 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setView(String view)
     {
         this.view = view;
+    }
+
+    public String getOptions()
+    {
+        return options;
+    }
+
+    public void setOptions(String options)
+    {
+        this.options = options;
     }
 
     public String getType()
