@@ -356,11 +356,11 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         var selected = this.getSelection();
         if(selected >= 0)
         {
-            selectedRecord = this.store.getAt(selected);
+            var selectedRecord = this.store.getAt(selected);
             this.store.remove(selectedRecord);
             var value = selectedRecord.get('value')
 
-            if (!this.allowDuplicates)
+            if (this.optionStore && !this.allowDuplicates)
             {
                 // If we are not allowing duplicates, we will have removed this
                 // option from the combo list when it was added.  Now that is has

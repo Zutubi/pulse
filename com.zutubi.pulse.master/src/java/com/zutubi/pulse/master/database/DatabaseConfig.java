@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.database;
 
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.cfg.Environment;
@@ -19,11 +20,17 @@ public class DatabaseConfig
 
     public static final String HIBERNATE_DIALECT      = Environment.DIALECT;
 
-    protected static final String POOL_INITIAL_SIZE = "pool.initialSize";
-    protected static final String POOL_MAX_ACTIVE   = "pool.maxActive";
-    protected static final String POOL_MAX_IDLE     = "pool.maxIdle";
-    protected static final String POOL_MIN_IDLE     = "pool.minIdle";
-    protected static final String POOL_MAX_WAIT     = "pool.maxWait";
+    protected static final String POOL_INITIAL_SIZE                      = "pool.initialSize";
+    protected static final String POOL_MAX_ACTIVE                        = "pool.maxActive";
+    protected static final String POOL_MAX_IDLE                          = "pool.maxIdle";
+    protected static final String POOL_MIN_IDLE                          = "pool.minIdle";
+    protected static final String POOL_MAX_WAIT                          = "pool.maxWait";
+    protected static final String POOL_VALIDATION_QUERY                  = "pool.validationQuery";
+    protected static final String POOL_TEST_ON_BORROW                    = "pool.testOnBorrow";
+    protected static final String POOL_TEST_WHILE_IDLE                   = "pool.testWhileIdle";
+    protected static final String POOL_TIME_BETWEEN_EVICTION_RUNS_MILLIS = "pool.timeBetweenEvictionRunsMillis";
+    protected static final String POOL_NUM_TESTS_PER_EVICTION_RUN        = "pool.numTestsPerEvictionRun";
+    protected static final String POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS    = "pool.minEvictableIdleTimeMillis";
 
     protected static final String JDBC_PROPERTY_PREFIX      = "jdbc.property.";
     protected static final String HIBERNATE_PROPERTY_PREFIX = "hibernate.";
@@ -119,6 +126,39 @@ public class DatabaseConfig
         return getIntProperty(POOL_MAX_WAIT, -1);
     }
 
+    public String getPoolValidationQuery()
+    {
+        // Special case the default for HSQL, where there is no sensible query
+        // before we have created our own schema, and validation is useless in
+        // any case.
+        return properties.getProperty(POOL_VALIDATION_QUERY, getUrl().contains(":hsqldb:") ? "" : "SELECT 1");
+    }
+    
+    public boolean getPoolTestOnBorrow()
+    {
+        return getBooleanProperty(POOL_TEST_ON_BORROW, false);
+    }
+
+    public boolean getPoolTestWhileIdle()
+    {
+        return getBooleanProperty(POOL_TEST_WHILE_IDLE, true);
+    }
+
+    public int getPoolTimeBetweenEvictionRunsMillis()
+    {
+        return getIntProperty(POOL_TIME_BETWEEN_EVICTION_RUNS_MILLIS, 30 * (int)Constants.MINUTE);
+    }
+    
+    public int getPoolNumTestsPerEvitionRun()
+    {
+        return getIntProperty(POOL_NUM_TESTS_PER_EVICTION_RUN, 3);
+    }
+    
+    public int getPoolMinEvictableIdleTimeMillis()
+    {
+        return getIntProperty(POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS, 10 * (int)Constants.MINUTE);
+    }
+    
     private int getIntProperty(String name, int defaultValue)
     {
         int result = defaultValue;
@@ -136,6 +176,19 @@ public class DatabaseConfig
         }
 
         return result;
+    }
+
+    private boolean getBooleanProperty(String name, boolean defaultValue)
+    {
+        String value = properties.getProperty(name);
+        if (value == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return Boolean.valueOf(value);
+        }
     }
 
     /**
@@ -213,7 +266,13 @@ public class DatabaseConfig
         dataSource.setMaxIdle(getPoolMaxIdle());
         dataSource.setMinIdle(getPoolMinIdle());
         dataSource.setMaxWait(getPoolMaxWait());
-
+        dataSource.setValidationQuery(getPoolValidationQuery());
+        dataSource.setTestOnBorrow(getPoolTestOnBorrow());
+        dataSource.setTestWhileIdle(getPoolTestWhileIdle());
+        dataSource.setTimeBetweenEvictionRunsMillis(getPoolTimeBetweenEvictionRunsMillis());
+        dataSource.setNumTestsPerEvictionRun(getPoolNumTestsPerEvitionRun());
+        dataSource.setMinEvictableIdleTimeMillis(getPoolMinEvictableIdleTimeMillis());
+        
         // configure the dataSource using the custom connection properties.
         Properties connectionProperties = getConnectionProperties();
         for (Object o : connectionProperties.keySet())

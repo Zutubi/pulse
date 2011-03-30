@@ -203,6 +203,25 @@ public class PulseExecutionContext implements ExecutionContext
         scopeStack.getScope().add(new GenericVariable<Object>(name, value));
     }
 
+    /**
+     * Updates the given resource property in the scope where it is defined.
+     * If it is not yet defined, it is added.
+     *
+     * @param property the property to update
+     */
+    public void update(ResourceProperty property)
+    {
+        PulseScope scope = scopeStack.getScope().findVariable(property.getName());
+        if (scope == null)
+        {
+            add(property);
+        }
+        else
+        {
+            scope.add(property);
+        }
+    }
+
     public String resolveVariables(String input)
     {
         try

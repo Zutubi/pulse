@@ -81,6 +81,12 @@ public class DataSourceBeanFactory implements FactoryBean
         dataSource.setMaxIdle(databaseConfig.getPoolMaxIdle());
         dataSource.setMinIdle(databaseConfig.getPoolMinIdle());
         dataSource.setMaxWait(databaseConfig.getPoolMaxWait());
+        dataSource.setValidationQuery(databaseConfig.getPoolValidationQuery());
+        dataSource.setTestOnBorrow(databaseConfig.getPoolTestOnBorrow());
+        dataSource.setTestWhileIdle(databaseConfig.getPoolTestWhileIdle());
+        dataSource.setTimeBetweenEvictionRunsMillis(databaseConfig.getPoolTimeBetweenEvictionRunsMillis());
+        dataSource.setNumTestsPerEvictionRun(databaseConfig.getPoolNumTestsPerEvitionRun());
+        dataSource.setMinEvictableIdleTimeMillis(databaseConfig.getPoolMinEvictableIdleTimeMillis());
 
         // configure the dataSource using the custom connection properties.
         Properties connectionProperties = databaseConfig.getConnectionProperties();

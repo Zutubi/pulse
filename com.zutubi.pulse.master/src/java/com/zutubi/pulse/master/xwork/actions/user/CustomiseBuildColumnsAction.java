@@ -11,8 +11,8 @@ import com.zutubi.util.StringUtils;
 public class CustomiseBuildColumnsAction extends UserActionSupport
 {
     private static final String ID_MY_BUILDS_BUILDS = "my-builds-builds";
-    private static final String ID_PROJECT_RECENT = "project-recent";
-    private static final String ID_PROJECT_HISTORY = "project-history";
+    private static final String ID_PROJECT_RECENT = "project-home-recent";
+    private static final String ID_PROJECT_HISTORY = "project-history-builds";
 
     private String tableId;
     private String columns;

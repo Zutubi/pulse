@@ -160,6 +160,30 @@ public class PulseScope implements Scope
         return getVariable(name) != null;
     }
 
+    /**
+     * Locates the closest scope in which a variable of the given name is
+     * defined.
+     * 
+     * @param name name of the variable to find
+     * @return the closest scope in which the variable is defined, or null if
+     *         it is not defined
+     */
+    public PulseScope findVariable(String name)
+    {
+        if (variables.containsKey(name))
+        {
+            return this;
+        }
+        else if (parent == null)
+        {
+            return null;
+        }
+        else
+        {
+            return parent.findVariable(name);
+        }
+    }
+
     public Variable getVariable(String name)
     {
         VariableInfo info = merge().get(name);

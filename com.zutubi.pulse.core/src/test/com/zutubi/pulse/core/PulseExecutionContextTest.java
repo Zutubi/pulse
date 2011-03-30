@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
@@ -157,6 +158,38 @@ public class PulseExecutionContextTest extends PulseTestCase
         assertEquals("c", scope.getVariableValue("child", String.class));
     }
 
+    public void testUpdateNotDefined()
+    {
+        PulseExecutionContext context = makeNonTrivialContext();
+        context.push();
+        context.update(new ResourceProperty("k", "v"));
+        assertEquals("v", context.getString("k"));
+        context.pop();
+        assertNull(context.getString("k"));
+    }
+
+    public void testUpdateDefinedAtLeaf()
+    {
+        PulseExecutionContext context = makeNonTrivialContext();
+        context.push();
+        context.add(new ResourceProperty("k", "original"));
+        context.update(new ResourceProperty("k", "updated"));
+        assertEquals("updated", context.getString("k"));
+        context.pop();
+        assertNull(context.getString("k"));
+    }
+
+    public void testUpdateDefinedUpStack()
+    {
+        PulseExecutionContext context = makeNonTrivialContext();
+        context.add(new ResourceProperty("k", "original"));
+        context.push();
+        context.update(new ResourceProperty("k", "updated"));
+        assertEquals("updated", context.getString("k"));
+        context.pop();
+        assertEquals("updated", context.getString("k"));
+    }
+    
     private PulseExecutionContext makeNonTrivialContext()
     {
         PulseExecutionContext context = new PulseExecutionContext();
