@@ -85,14 +85,6 @@ public interface BuildManager
     int getBuildCount(Project project, long after, long upTo);
 
     /**
-     * Fills out the list in the given history page based on the page offset.
-     * Results in the initial state are NOT included.
-     *
-     * @param page the page to fill in
-     */
-    void fillHistoryPage(HistoryPage page);
-
-    /**
      * Fills out the list in the given history page based on the given
      * criteria and the offset of the page.
      *

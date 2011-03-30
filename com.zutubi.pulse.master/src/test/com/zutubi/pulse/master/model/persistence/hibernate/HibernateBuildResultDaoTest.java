@@ -819,12 +819,18 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         Project p1 = new Project();
         projectDao.save(p1);
+        Project p2 = new Project();
+        projectDao.save(p2);
 
         buildResultDao.save(createCompletedBuild(p1, 1));
         buildResultDao.save(createCompletedBuild(p1, 2));
         buildResultDao.save(createCompletedBuild(p1, 3));
         buildResultDao.save(createCompletedBuild(p1, 4));
         buildResultDao.save(createCompletedBuild(p1, 5));
+
+        buildResultDao.save(createCompletedBuild(p2, 1));
+        buildResultDao.save(createCompletedBuild(p2, 2));
+        buildResultDao.save(createCompletedBuild(p2, 3));
 
         commitAndRefreshTransaction();
 

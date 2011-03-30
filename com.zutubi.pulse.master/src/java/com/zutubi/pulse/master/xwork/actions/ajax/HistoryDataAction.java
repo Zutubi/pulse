@@ -1,9 +1,15 @@
-package com.zutubi.pulse.master.xwork.actions.project;
+package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.HistoryPage;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
+import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
+import com.zutubi.pulse.master.xwork.actions.project.BuildResultToModelMapping;
+import com.zutubi.pulse.master.xwork.actions.project.PagerModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.CollectionUtils;
 
@@ -14,7 +20,7 @@ import java.util.TreeMap;
 /**
  * Action to supply JSON data to the project history tab.
  */
-public class ProjectHistoryDataAction extends ProjectActionBase
+public class HistoryDataAction extends ActionSupport
 {
     public static final int BUILDS_PER_PAGE = 10;
     
@@ -36,12 +42,19 @@ public class ProjectHistoryDataAction extends ProjectActionBase
         NAME_TO_STATES.put(STATE_TERMINATED, new ResultState[]{ResultState.TERMINATED});
         NAME_TO_STATES.put(STATE_SUCCESS, new ResultState[]{ResultState.SUCCESS});
     }
-    
+
+    private long projectId = 0;
     private int startPage;
     private String stateFilter = STATE_ANY;
-    private ProjectHistoryModel model;
-    
+    private HistoryModel model;
+
     private ConfigurationManager configurationManager;
+    private BuildManager buildManager;
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
 
     public void setStartPage(int page)
     {
@@ -53,14 +66,22 @@ public class ProjectHistoryDataAction extends ProjectActionBase
         this.stateFilter = stateFilter;
     }
 
-    public ProjectHistoryModel getModel()
+    public HistoryModel getModel()
     {
         return model;
     }
 
     public String execute()
     {
-        Project project = getRequiredProject();
+        Project project = null;
+        if (projectId != 0)
+        {
+            project = projectManager.getProject(projectId, false);
+            if (project == null)
+            {
+                throw new LookupErrorException("Unknown project [" + projectId + "]");
+            }
+        }
 
         ResultState[] states = NAME_TO_STATES.get(stateFilter);
         if (states == null)
@@ -86,9 +107,18 @@ public class ProjectHistoryDataAction extends ProjectActionBase
         buildManager.fillHistoryPage(page, states);
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        List<BuildModel> builds = CollectionUtils.map(page.getResults(), new BuildResultToModelMapping(urls, project.getConfig().getChangeViewer()));
-        
-        model = new ProjectHistoryModel(builds, new PagerModel(page.getTotalBuilds(), BUILDS_PER_PAGE, startPage));
+        BuildResultToModelMapping toModelMapping;
+        if (project == null)
+        {
+            toModelMapping = new BuildResultToModelMapping(urls);
+        }
+        else
+        {
+            toModelMapping = new BuildResultToModelMapping(urls, project.getConfig().getChangeViewer());
+        }
+
+        List<BuildModel> builds = CollectionUtils.map(page.getResults(), toModelMapping);
+        model = new HistoryModel(builds, new PagerModel(page.getTotalBuilds(), BUILDS_PER_PAGE, startPage));
 
         return SUCCESS;
     }
@@ -96,5 +126,10 @@ public class ProjectHistoryDataAction extends ProjectActionBase
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

@@ -8,12 +8,17 @@ import com.zutubi.util.Mapping;
 /**
  * Maps from build results to JSON build models.
  */
-class BuildResultToModelMapping implements Mapping<BuildResult, BuildModel>
+public class BuildResultToModelMapping implements Mapping<BuildResult, BuildModel>
 {
     private Urls urls;
     private ChangeViewerConfiguration changeViewerConfig;
 
-    BuildResultToModelMapping(Urls urls, ChangeViewerConfiguration changeViewerConfig)
+    public BuildResultToModelMapping(Urls urls)
+    {
+        this(urls, null);
+    }
+
+    public BuildResultToModelMapping(Urls urls, ChangeViewerConfiguration changeViewerConfig)
     {
         this.urls = urls;
         this.changeViewerConfig = changeViewerConfig;
@@ -21,6 +26,13 @@ class BuildResultToModelMapping implements Mapping<BuildResult, BuildModel>
 
     public BuildModel map(BuildResult buildResult)
     {
-        return new BuildModel(buildResult, urls, false, changeViewerConfig);
+        if (changeViewerConfig == null)
+        {
+            return new BuildModel(buildResult, urls, false);
+        }
+        else
+        {
+            return new BuildModel(buildResult, urls, false, changeViewerConfig);
+        }
     }
 }

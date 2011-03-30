@@ -243,6 +243,7 @@
 #macro(serverTabs $selected)
     #openTabs()
         #serverTab("activity" $selected)
+        #serverTab("history" $selected)
         #serverTab("messages" $selected)
         #serverTab("info" $selected)
     #closeTabs()

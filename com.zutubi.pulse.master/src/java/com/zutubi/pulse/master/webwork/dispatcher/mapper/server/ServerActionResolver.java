@@ -13,6 +13,7 @@ public class ServerActionResolver extends StaticMapActionResolver
     {
         super("viewServerQueues");
         addMapping("activity", new ParameterisedActionResolver("viewServerQueues"));
+        addMapping("history", new PagedActionResolver("serverHistory"));
         addMapping("messages", new PagedActionResolver("serverMessages"));
         addMapping("info", new ParameterisedActionResolver("viewSystemInfo"));
     }

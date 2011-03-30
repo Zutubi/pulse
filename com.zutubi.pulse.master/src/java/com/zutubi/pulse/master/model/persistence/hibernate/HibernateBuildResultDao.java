@@ -291,7 +291,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, null, null, false);
+                Criteria criteria = getBuildResultCriteria(session, project, null, false);
                 criteria.add(Restrictions.gt("number", after));
                 criteria.add(Restrictions.le("number", upTo));
                 criteria.setProjection(Projections.rowCount());

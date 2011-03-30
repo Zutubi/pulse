@@ -56,6 +56,8 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private String projectRecentColumns = defaultShortProjectColumns();
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
+    @Internal
+    private String serverHistoryColumns = defaultGlobalColumns();
 
     @Internal
     private ProjectDependencyGraphBuilder.TransitiveMode dependencyTransitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.FULL;
@@ -170,6 +172,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.projectHistoryColumns = projectHistoryColumns;
     }
 
+    public String getServerHistoryColumns()
+    {
+        return serverHistoryColumns;
+    }
+
+    public void setServerHistoryColumns(String serverHistoryColumns)
+    {
+        this.serverHistoryColumns = serverHistoryColumns;
+    }
+
     public ProjectDependencyGraphBuilder.TransitiveMode getDependencyTransitiveMode()
     {
         return dependencyTransitiveMode;
@@ -235,6 +247,11 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         return StringUtils.join(",", COLUMN_NUMBER, COLUMN_PROJECT, COLUMN_STATUS, COLUMN_REASON, COLUMN_TESTS, COLUMN_WHEN, COLUMN_ELAPSED);
     }
     
+    public static String defaultGlobalColumns()
+    {
+        return StringUtils.join(",", COLUMN_PROJECT, COLUMN_NUMBER, COLUMN_REVISION, COLUMN_STATUS, COLUMN_REASON, COLUMN_TESTS, COLUMN_WHEN, COLUMN_ELAPSED);
+    }
+
     public static String defaultProjectColumns()
     {
         return StringUtils.join(",", COLUMN_NUMBER, COLUMN_REVISION, COLUMN_STATUS, COLUMN_REASON, COLUMN_TESTS, COLUMN_WHEN, COLUMN_ELAPSED);

@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
@@ -39,6 +37,9 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -119,11 +120,6 @@ public class DefaultBuildManager implements BuildManager
     public int getBuildCount(Project project, long after, long upTo)
     {
         return buildResultDao.getBuildCount(project, after, upTo);
-    }
-
-    public void fillHistoryPage(HistoryPage page)
-    {
-        fillHistoryPage(page, ResultState.getCompletedStates());
     }
 
     public void fillHistoryPage(HistoryPage page, ResultState[] states)

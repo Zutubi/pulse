@@ -1,60 +1,43 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+
 import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import com.zutubi.pulse.acceptance.components.Pager;
-import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.master.xwork.actions.project.ProjectHistoryDataAction;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
-import static java.util.Arrays.asList;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-
-public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
+public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 {
-    private static final long BUILD_TIMEOUT = 90000;
-
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        rpcClient.loginAsAdmin();
-    }
-
-    @Override
-    protected void tearDown() throws Exception
-    {
-        rpcClient.logout();
-        super.tearDown();
-    }
-
     public void testNewProject() throws Exception
     {
         rpcClient.RemoteApi.insertSimpleProject(random);
         getBrowser().loginAsAdmin();
 
         ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
-        assertEquals(ProjectHistoryDataAction.STATE_ANY, historyPage.getStateFilter());
+        assertEquals(HistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
 
-        setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_BROKEN);
-        assertEquals(ProjectHistoryDataAction.STATE_BROKEN, historyPage.getStateFilter());
+        setFilterAndWait(historyPage, HistoryDataAction.STATE_BROKEN);
+        assertEquals(HistoryDataAction.STATE_BROKEN, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
         
         historyPage.clearStateFilter();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
-        assertEquals(ProjectHistoryDataAction.STATE_ANY, historyPage.getStateFilter());
+        assertEquals(HistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
     }
 
@@ -68,10 +51,10 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
         BuildInfo build = new BuildInfo(buildNumber, ResultState.SUCCESS, rpcClient.RemoteApi.getBuildRevision(random, buildNumber));
         assertSingleBuildHistory(historyPage, build);
 
-        setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_BROKEN);
+        setFilterAndWait(historyPage, HistoryDataAction.STATE_BROKEN);
         assertEmptyHistory(historyPage);
 
-        setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_SUCCESS);
+        setFilterAndWait(historyPage, HistoryDataAction.STATE_SUCCESS);
         assertSingleBuildHistory(historyPage, build);
     }
     
@@ -120,30 +103,30 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
-        assertEquals(ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, ProjectHistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Step forward
         historyPage.getPager().clickNext();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(BUILD_COUNT - ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(BUILD_COUNT - HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertLastPage(historyPage, 2, BUILD_COUNT);
-        assertEquals(builds.subList(ProjectHistoryDataAction.BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
+        assertEquals(builds.subList(HistoryDataAction.BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
 
         // Step backward
         historyPage.getPager().clickFirst();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, ProjectHistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Filter to broken
-        setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_BROKEN);
+        setFilterAndWait(historyPage, HistoryDataAction.STATE_BROKEN);
         List<BuildInfo> brokenBuilds = CollectionUtils.filter(builds, new Predicate<BuildInfo>()
         {
             public boolean satisfied(BuildInfo buildInfo)
@@ -157,7 +140,7 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
         assertEquals(brokenBuilds, historyPage.getBuilds());
         
         // Filter to successful (still multiple pages)
-        setFilterAndWait(historyPage, ProjectHistoryDataAction.STATE_SUCCESS);
+        setFilterAndWait(historyPage, HistoryDataAction.STATE_SUCCESS);
         List<BuildInfo> successfulBuilds = CollectionUtils.filter(builds, new Predicate<BuildInfo>()
         {
             public boolean satisfied(BuildInfo buildInfo)
@@ -166,69 +149,17 @@ public class ProjectHistoryAcceptanceTest extends AcceptanceTestBase
             }
         });
         
-        assertEquals(ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, successfulBuilds.size());
-        assertEquals(successfulBuilds.subList(0, ProjectHistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(successfulBuilds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Step forward, ensure the filter is maintained.
         historyPage.getPager().clickLast();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(successfulBuilds.size() - ProjectHistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(successfulBuilds.size() - HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertLastPage(historyPage, 2, successfulBuilds.size());
-        assertEquals(successfulBuilds.subList(ProjectHistoryDataAction.BUILDS_PER_PAGE, successfulBuilds.size()), historyPage.getBuilds());
-    }
-
-    private void setFilterAndWait(ProjectHistoryPage historyPage, String stateFilter)
-    {
-        historyPage.setStateFilter(stateFilter);
-        getBrowser().waitForPageToLoad();
-        historyPage.waitFor();
-    }
-
-    private void assertEmptyHistory(ProjectHistoryPage historyPage)
-    {
-        assertEquals(0, historyPage.getBuildCount());
-        assertNoPaging(historyPage, 0);
-    }
-
-    private void assertSingleBuildHistory(ProjectHistoryPage historyPage, BuildInfo build)
-    {
-        assertEquals(1, historyPage.getBuildCount());
-        assertNoPaging(historyPage, 1);
-        assertEquals(asList(build), historyPage.getBuilds());
-    }
-
-    private void assertNoPaging(ProjectHistoryPage historyPage, int totalItems)
-    {
-        Pager pager = historyPage.getPager();
-        assertEquals(0, pager.getCurrentPage());
-        assertEquals(totalItems, pager.getTotalItems());
-        assertFalse(pager.hasPagingRow());
-    }
-
-    private void assertFirstPage(ProjectHistoryPage historyPage, int totalItems)
-    {
-        Pager pager = historyPage.getPager();
-        assertEquals(0, pager.getCurrentPage());
-        assertEquals(totalItems, pager.getTotalItems());
-        assertTrue(pager.hasPagingRow());
-        assertFalse(pager.hasFirstLink());
-        assertFalse(pager.hasPreviousLink());
-        assertTrue(pager.hasNextLink());
-        assertTrue(pager.hasLastLink());
-    }
-
-    private void assertLastPage(ProjectHistoryPage historyPage, int totalPages, int totalItems)
-    {
-        Pager pager = historyPage.getPager();
-        assertEquals(totalPages - 1, pager.getCurrentPage());
-        assertEquals(totalItems, pager.getTotalItems());
-        assertTrue(pager.hasPagingRow());
-        assertTrue(pager.hasFirstLink());
-        assertTrue(pager.hasPreviousLink());
-        assertFalse(pager.hasNextLink());
-        assertFalse(pager.hasLastLink());
+        assertEquals(successfulBuilds.subList(HistoryDataAction.BUILDS_PER_PAGE, successfulBuilds.size()), historyPage.getBuilds());
     }
 }

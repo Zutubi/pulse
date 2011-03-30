@@ -5,7 +5,7 @@
 // dependency: zutubi/pulse/project/BuildSummaryTable.js
 
 /**
- * The content of the project history page.  Expects data of the form:
+ * The content of the history pages.  Expects data of the form:
  *
  * {
  *     builds: [ BuildModels ],
@@ -16,7 +16,7 @@
  * @cfg {String} pagerUrl    URL to use as the basis for links in the pager.
  * @cfg {String} stateFilter State filter value.
  */
-Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel, {
+Zutubi.pulse.project.browse.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     autoScroll: true,
     
@@ -72,7 +72,7 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel,
                     }, '->', {
                         xtype: 'xztblink',
                         icon: window.baseUrl + '/images/feed-icon-16x16.gif',
-                        url: window.baseUrl + '/rss.action?projectId=' + this.projectId
+                        url: window.baseUrl + '/rss.action' + (this.projectId == '0' ? '' : '?projectId=' + this.projectId)
                     }]
                 },
                 items: [{
@@ -98,7 +98,7 @@ Zutubi.pulse.project.browse.ProjectHistoryPanel = Ext.extend(Zutubi.ActivePanel,
             }]
         });
 
-        Zutubi.pulse.project.browse.ProjectHistoryPanel.superclass.initComponent.apply(this, arguments);
+        Zutubi.pulse.project.browse.HistoryPanel.superclass.initComponent.apply(this, arguments);
     },
     
     setFilter: function(filter)

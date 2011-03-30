@@ -50,6 +50,11 @@
             <result name="success" type="redirect">/server/activity/</result>
         </action>
 
+        <action name="serverHistory" class="com.zutubi.pulse.master.xwork.actions.server.ServerHistoryAction">
+            <interceptor-ref name="ajaxReadOnlyStack"/>
+            <result name="success" type="velocity">/server-history.vm</result>
+        </action>
+
         <action name="viewAgentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentStatusAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
@@ -388,6 +393,10 @@
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </global-results>
 
+        <action name="historyData" class="com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction">
+            <result name="success" type="flexjson">model</result>
+        </action>
+
         <action name="myBuildsData" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsDataAction">
             <result name="success" type="flexjson">builds</result>
         </action>
@@ -416,10 +425,6 @@
             <result name="success" type="flexjson">model</result>
         </action>
 
-        <action name="projectHistoryData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHistoryDataAction">
-            <result name="success" type="flexjson">model</result>
-        </action>
-        
         <action name="projectDependenciesData" class="com.zutubi.pulse.master.xwork.actions.project.ProjectDependenciesDataAction">
             <result name="success" type="flexjson">
                 <param name="deep">true</param>

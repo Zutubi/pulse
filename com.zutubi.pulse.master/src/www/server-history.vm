@@ -1,6 +1,6 @@
-#helpTag("Project+History+Tab")
+#helpTag("Server+History+Tab")
 #authorisationTags($principle)
-#projectTags($project)
+<content tag="selectedTab">server</content>
 <content tag="header.javascript">
     zutubi/pulse/project/HistoryPanel.js
 </content>
@@ -12,14 +12,14 @@
         
         Ext.onReady(function() {
             panel = new Zutubi.pulse.project.browse.HistoryPanel({
-                id: 'project-history',
-                url: window.baseUrl + '/ajax/historyData.action?projectId=$project.id&startPage=$startPage&stateFilter=' + encodeURIComponent('$stateFilter'),
-                loadingId: '#id("project-history-$project.name")',
+                id: 'server-history',
+                url: window.baseUrl + '/ajax/historyData.action?startPage=$startPage&stateFilter=' + encodeURIComponent('$stateFilter'),
+                loadingId: 'server-history-loading',
                 containerId: 'nested-center',
                 refreshInterval: $refreshInterval,
-                projectId: '$project.id',
+                projectId: '0',
                 columns: '#jss($columns)'.split(','),
-                pagerUrl: '#jss($urls.projectHistory($project))',
+                pagerUrl: '#jss($urls.serverHistory())',
                 stateFilter: '#jss($stateFilter)',
                 anonymous: #if($principle) false #else true #end
             });
@@ -27,8 +27,8 @@
     </script>
 </head>
 <body>
-    #projectTabs("history")
+    #serverTabs("history")
 
-    <div id='#id("project-history-$project.name")'>
+    <div id='server-history-loading'>
     </div>
 </html>

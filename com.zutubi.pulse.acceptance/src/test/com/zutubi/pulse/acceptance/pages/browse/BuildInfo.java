@@ -10,12 +10,19 @@ import java.util.Map;
  */
 public class BuildInfo
 {
+    public String project;
     public int number;
     public ResultState status;
     public String revision;
 
     public BuildInfo(int number, ResultState status, String revision)
     {
+        this(null, number, status, revision);
+    }
+
+    public BuildInfo(String project, int number, ResultState status, String revision)
+    {
+        this.project = project;
         this.number = number;
         this.status = status;
         this.revision = revision;
@@ -23,6 +30,7 @@ public class BuildInfo
 
     public BuildInfo(Map<String, String> row)
     {
+        project = row.get("project");
         number = Integer.parseInt(StringUtils.stripPrefix(row.get("number"), "build "));
         status = ResultState.fromPrettyString(row.get("status"));
         revision = row.get("revision");
@@ -46,6 +54,10 @@ public class BuildInfo
         {
             return false;
         }
+        if (project != null ? !project.equals(buildInfo.project) : buildInfo.project != null)
+        {
+            return false;
+        }
         if (revision != null ? !revision.equals(buildInfo.revision) : buildInfo.revision != null)
         {
             return false;
@@ -61,7 +73,8 @@ public class BuildInfo
     @Override
     public int hashCode()
     {
-        int result = number;
+        int result = project != null ? project.hashCode() : 0;
+        result = 31 * result + number;
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (revision != null ? revision.hashCode() : 0);
         return result;
@@ -71,7 +84,8 @@ public class BuildInfo
     public String toString()
     {
         return "BuildInfo{" +
-                "number=" + number +
+                "project=" + project +
+                ", number=" + number +
                 ", status=" + status +
                 ", revision='" + revision + '\'' +
                 '}';

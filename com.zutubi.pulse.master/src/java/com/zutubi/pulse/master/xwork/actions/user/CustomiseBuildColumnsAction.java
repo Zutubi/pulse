@@ -13,6 +13,7 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
     private static final String ID_MY_BUILDS_BUILDS = "my-builds-builds";
     private static final String ID_PROJECT_RECENT = "project-home-recent";
     private static final String ID_PROJECT_HISTORY = "project-history-builds";
+    private static final String ID_SERVER_HISTORY = "server-history-builds";
 
     private String tableId;
     private String columns;
@@ -53,6 +54,10 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
         else if (tableId.equals(ID_PROJECT_HISTORY))
         {
             preferences.setProjectHistoryColumns(columns);
+        }
+        else if (tableId.equals(ID_SERVER_HISTORY))
+        {
+            preferences.setServerHistoryColumns(columns);
         }
 
         configurationProvider.save(preferences);
