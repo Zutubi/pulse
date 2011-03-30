@@ -15,19 +15,32 @@ import java.util.*;
 
 public class PulseScopeTest extends PulseTestCase
 {
+    public static final String KEY_PARENT_ONLY = "parent only";
+    public static final String KEY_PARENT_AND_CHILD = "parent and child";
+    public static final String KEY_PARENT_ONLY_RESOURCE = "parent only resource";
+    public static final String KEY_PARENT_AND_CHILD_RESOURCE = "parent and child resource";
+    public static final String KEY_CHILD_ONLY = "child only";
+    public static final String KEY_CHILD_ONLY_RESOURCE = "child only resource";
+    public static final String VALUE_PARENT = "parent";
+    public static final String VALUE_CHILD = "child";
+    public static final String VALUE_CHILD_RESOURCE = "child resource";
+    public static final String VALUE_PARENT_RESOURCE = "parent resource";
+    public static final String LABEL_PARENT = "label-parent";
+    public static final String LABEL_CHILD = "label-child";
+
     private PulseScope scope;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         PulseScope parent = new PulseScope();
-        parent.setLabel("parent");
+        parent.setLabel(LABEL_PARENT);
         scope = new PulseScope(parent);
-        scope.setLabel("child");
-        parent.add(new GenericVariable<String>("parent only", "parent"));
-        parent.add(new GenericVariable<String>("parent and child", "parent"));
-        parent.add(new ResourceProperty("parent only resource", "parent resource", true, true, false));
-        parent.add(new ResourceProperty("parent and child resource", "parent resource", true, true, false));
+        scope.setLabel(LABEL_CHILD);
+        parent.add(new GenericVariable<String>(KEY_PARENT_ONLY, VALUE_PARENT));
+        parent.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_PARENT));
+        parent.add(new ResourceProperty(KEY_PARENT_ONLY_RESOURCE, VALUE_PARENT_RESOURCE, true, true, false));
+        parent.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_PARENT_RESOURCE, true, true, false));
 
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
@@ -35,10 +48,10 @@ public class PulseScopeTest extends PulseTestCase
             parent.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
-        scope.add(new GenericVariable<String>("child only", "child"));
-        scope.add(new GenericVariable<String>("parent and child", "child"));
-        scope.add(new ResourceProperty("child only resource", "child resource", true, true, false));
-        scope.add(new ResourceProperty("parent and child resource", "child resource", true, true, false));
+        scope.add(new GenericVariable<String>(KEY_CHILD_ONLY, VALUE_CHILD));
+        scope.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_CHILD));
+        scope.add(new ResourceProperty(KEY_CHILD_ONLY_RESOURCE, VALUE_CHILD_RESOURCE, true, true, false));
+        scope.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_CHILD_RESOURCE, true, true, false));
 
         scope.add(new ResourceProperty("not added", "not added", false, false, false));
     }
@@ -63,12 +76,12 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testProperty()
     {
-        assertEquals("child", getValue("child only"));
+        assertEquals(VALUE_CHILD, getValue(KEY_CHILD_ONLY));
     }
 
     public void testOverriddenProperty()
     {
-        assertEquals("child", getValue("parent and child"));
+        assertEquals(VALUE_CHILD, getValue(KEY_PARENT_AND_CHILD));
     }
 
 
@@ -76,7 +89,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addUnique(new GenericVariable<String>("child only", ""));
+            scope.addUnique(new GenericVariable<String>(KEY_CHILD_ONLY, ""));
             fail();
         }
         catch(IllegalArgumentException e)
@@ -87,8 +100,8 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testAddUniqueOverride()
     {
-        scope.addUnique(new GenericVariable<String>("parent only", "override"));
-        assertEquals("override", scope.getVariableValue("parent only", String.class));
+        scope.addUnique(new GenericVariable<String>(KEY_PARENT_ONLY, "override"));
+        assertEquals("override", scope.getVariableValue(KEY_PARENT_ONLY, String.class));
     }
 
     public void testAddAll()
@@ -102,7 +115,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addAllUnique(Arrays.asList(new GenericVariable<String>("child only", "")));
+            scope.addAllUnique(Arrays.asList(new GenericVariable<String>(KEY_CHILD_ONLY, "")));
             fail();
         }
         catch (IllegalArgumentException e)
@@ -114,15 +127,15 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetVariables()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("parent", "pv"));
+        parent.add(new GenericVariable<String>(VALUE_PARENT, "pv"));
         parent.add(new GenericVariable<String>("both", "bv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>("child", "cv"));
+        child.add(new GenericVariable<String>(VALUE_CHILD, "cv"));
         child.add(new GenericVariable<String>("both", "bv"));
 
         Collection<Variable> variables = child.getVariables();
         assertEquals(3, variables.size());
-        EqualityAssertions.assertEquals(Arrays.asList("parent", "child", "both"), CollectionUtils.map(variables, new Mapping<Variable, String>()
+        EqualityAssertions.assertEquals(Arrays.asList(VALUE_PARENT, VALUE_CHILD, "both"), CollectionUtils.map(variables, new Mapping<Variable, String>()
         {
             public String map(Variable variable)
             {
@@ -159,12 +172,12 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testGetVariableValue()
     {
-        assertEquals("child", scope.getVariableValue("child only", String.class));
+        assertEquals(VALUE_CHILD, scope.getVariableValue(KEY_CHILD_ONLY, String.class));
     }
 
     public void testGetVariableValueWrongType()
     {
-        assertNull(scope.getVariableValue("child only", Long.class));
+        assertNull(scope.getVariableValue(KEY_CHILD_ONLY, Long.class));
     }
 
     public void testEnvironment()
@@ -177,7 +190,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         Map<String, String> originalEnvironment = new HashMap<String, String>();
         originalEnvironment.put("foo", "bar");
-        originalEnvironment.put("child only resource", "overridden");
+        originalEnvironment.put(KEY_CHILD_ONLY_RESOURCE, "overridden");
         scope.applyEnvironment(originalEnvironment);
         assertEnvironment(originalEnvironment);
         assertEquals("bar", originalEnvironment.get("foo"));
@@ -185,9 +198,9 @@ public class PulseScopeTest extends PulseTestCase
 
     private void assertEnvironment(Map<String, String> environment)
     {
-        assertEquals("parent resource", environment.get("parent only resource"));
-        assertEquals("child resource", environment.get("child only resource"));
-        assertEquals("child resource", environment.get("parent and child resource"));
+        assertEquals(VALUE_PARENT_RESOURCE, environment.get(KEY_PARENT_ONLY_RESOURCE));
+        assertEquals(VALUE_CHILD_RESOURCE, environment.get(KEY_CHILD_ONLY_RESOURCE));
+        assertEquals(VALUE_CHILD_RESOURCE, environment.get(KEY_PARENT_AND_CHILD_RESOURCE));
     }
 
     public void testApplyEnvironmentPath()
@@ -232,9 +245,9 @@ public class PulseScopeTest extends PulseTestCase
     {
         List<String> paths = scope.getPathDirectories();
         assertEquals(3, paths.size());
-        assertEquals("child resource", paths.get(0));
-        assertEquals("child resource", paths.get(1));
-        assertEquals("parent resource", paths.get(2));
+        assertEquals(VALUE_CHILD_RESOURCE, paths.get(0));
+        assertEquals(VALUE_CHILD_RESOURCE, paths.get(1));
+        assertEquals(VALUE_PARENT_RESOURCE, paths.get(2));
     }
 
     public void testPathOrdering()
@@ -265,7 +278,7 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testGetPathPrefix()
     {
-        assertEquals(StringUtils.join(File.pathSeparator, "child resource", "child resource", "parent resource") + File.pathSeparator, scope.getPathPrefix());
+        assertEquals(StringUtils.join(File.pathSeparator, VALUE_CHILD_RESOURCE, VALUE_CHILD_RESOURCE, VALUE_PARENT_RESOURCE) + File.pathSeparator, scope.getPathPrefix());
     }
 
     public void testEnvPath()
@@ -348,9 +361,9 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("testvar", "parent", false, true, false));
-        c.add(new ResourceProperty("testvar", "child", false, false, false));
-        assertEquals("parent" + File.pathSeparator, p.getPathPrefix());
+        p.add(new ResourceProperty("testvar", VALUE_PARENT, false, true, false));
+        c.add(new ResourceProperty("testvar", VALUE_CHILD, false, false, false));
+        assertEquals(VALUE_PARENT + File.pathSeparator, p.getPathPrefix());
         assertEquals("", c.getPathPrefix());
     }
 
@@ -358,8 +371,8 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("priceless", "parent", true, false, false));
-        c.add(new ResourceProperty("priceless", "child", false, false, false));
+        p.add(new ResourceProperty("priceless", VALUE_PARENT, true, false, false));
+        c.add(new ResourceProperty("priceless", VALUE_CHILD, false, false, false));
         assertFalse(c.containsVariable("env.PRICELESS"));
     }
 
@@ -481,8 +494,8 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyPreservesLabels()
     {
         PulseScope copy = scope.copy();
-        assertEquals("child", copy.getLabel());
-        assertEquals("parent", copy.getParent().getLabel());
+        assertEquals(LABEL_CHILD, copy.getLabel());
+        assertEquals(LABEL_PARENT, copy.getParent().getLabel());
     }
 
     public void testCopyTo()
@@ -532,8 +545,8 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToPreservesLabels()
     {
         PulseScope copy = scope.copyTo(null);
-        assertEquals("child", copy.getLabel());
-        assertEquals("parent", copy.getParent().getLabel());
+        assertEquals(LABEL_CHILD, copy.getLabel());
+        assertEquals(LABEL_PARENT, copy.getParent().getLabel());
     }
 
     private void assertFullCopy(PulseScope copy)
@@ -547,12 +560,12 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testGetAncestor()
     {
-        assertSame(scope.getParent(), scope.getAncestor("parent"));
+        assertSame(scope.getParent(), scope.getAncestor(LABEL_PARENT));
     }
 
     public void testGetAncestorSelf()
     {
-        assertSame(scope, scope.getAncestor("child"));
+        assertSame(scope, scope.getAncestor(LABEL_CHILD));
     }
 
     public void testGetAncestorNonExistant()
@@ -563,13 +576,13 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetAncestorSomeNotLabelled()
     {
         PulseScope child = new PulseScope(scope);
-        assertSame(scope, child.getAncestor("child"));
+        assertSame(scope, child.getAncestor(LABEL_CHILD));
     }
     
     public void testGetAncestorGrandparent()
     {
         PulseScope child = new PulseScope(scope);
-        assertSame(scope.getParent(), child.getAncestor("parent"));
+        assertSame(scope.getParent(), child.getAncestor(LABEL_PARENT));
     }
 
     // CIB-1976
@@ -587,7 +600,27 @@ public class PulseScopeTest extends PulseTestCase
 
         assertEquals("3", scope.getVariableValue("env." + name, String.class));
     }
+    
+    public void testFindVariableNonExistent()
+    {
+        assertNull(scope.findVariable("nosuchvar"));
+    }
 
+    public void testFindVariableParent()
+    {
+        assertSame(scope.getParent(), scope.findVariable(KEY_PARENT_ONLY));
+    }
+    
+    public void testFindVariableChild()
+    {
+        assertSame(scope, scope.findVariable(KEY_CHILD_ONLY));
+    }
+    
+    public void testFindVariableParentAndChild()
+    {
+        assertSame(scope, scope.findVariable(KEY_PARENT_AND_CHILD));
+    }
+    
     private String getValue(String name)
     {
         Variable variable = scope.getVariable(name);
