@@ -196,7 +196,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                 catch (Exception e)
                 {
                     // Could not complete the service call.  Mark messages for retry later.
-                    LOG.warning("Unabled to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
+                    LOG.warning("Unable to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
                     for (AgentSynchronisationMessage pending : pendingMessages)
                     {
                         pending.applySendingException(e);
