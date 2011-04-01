@@ -11,7 +11,7 @@
         var panel = null;
         
         Ext.onReady(function() {
-            panel = new Zutubi.pulse.project.browse.HistoryPanel({
+            panel = new Zutubi.pulse.project.HistoryPanel({
                 id: 'project-history',
                 url: window.baseUrl + '/ajax/historyData.action?projectId=$project.id&startPage=$startPage&stateFilter=' + encodeURIComponent('$stateFilter'),
                 loadingId: '#id("project-history-$project.name")',

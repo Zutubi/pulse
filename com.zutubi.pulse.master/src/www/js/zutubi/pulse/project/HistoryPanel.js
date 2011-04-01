@@ -16,7 +16,7 @@
  * @cfg {String} pagerUrl    URL to use as the basis for links in the pager.
  * @cfg {String} stateFilter State filter value.
  */
-Zutubi.pulse.project.browse.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
+Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     autoScroll: true,
     
@@ -98,7 +98,7 @@ Zutubi.pulse.project.browse.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
             }]
         });
 
-        Zutubi.pulse.project.browse.HistoryPanel.superclass.initComponent.apply(this, arguments);
+        Zutubi.pulse.project.HistoryPanel.superclass.initComponent.apply(this, arguments);
     },
     
     setFilter: function(filter)
