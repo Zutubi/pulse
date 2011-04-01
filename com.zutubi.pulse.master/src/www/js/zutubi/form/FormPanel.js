@@ -93,6 +93,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
                 var actionDomEls = this.getFieldActionDomEls(id);
                 if (actionDomEls)
                 {
+                console.log(actionDomEls);
                     for(var i = 0; i < actionDomEls.length; i++)
                     {
                         Ext.get(actionDomEls[i]).addClass('x-item-disabled');
@@ -105,7 +106,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     getFieldActionDomEls: function(id)
     {
         var rowEl = this.getFieldRowEl(id);
-        return Ext.query("a[class*='field-action']", rowEl.dom);
+        return Ext.query("*[class*='field-action']", rowEl.dom);
     },
 
     getFieldRowEl: function(id)
@@ -113,10 +114,15 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
         return Ext.get('x-form-row-' + id);
     },
 
-    annotateField: function(id, annotationName, imageName, tooltip)
+    createAnnotationCell: function(id)
     {
         var rowEl = this.getFieldRowEl(id);
-        var cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation'});
+        return cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation'});
+    },
+    
+    annotateField: function(id, annotationName, imageName, tooltip)
+    {
+        var cellEl = this.createAnnotationCell(id);
         var imageEl = cellEl.createChild({tag: 'img', src: imageName, id: id + '.' + annotationName});
         if(tooltip)
         {
@@ -124,6 +130,33 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
         }
 
         return imageEl;
+    },
+    
+    annotateFieldWithMenu: function(id, annotationName, tooltip)
+    {
+        var cellEl = this.createAnnotationCell(id);
+        var menuId = id + '-' + annotationName + '-menu';
+        var linkEl = cellEl.createChild({
+            tag: 'a',
+            id: menuId + '-link',
+            cls: 'unadorned',
+            href: '#',
+            onclick: 'Zutubi.MenuManager.toggleMenu(this); return false'
+        });
+        
+        var buttonEl = linkEl.createChild({
+            tag: 'img',
+            id: menuId + '-button',
+            src: window.baseUrl + Ext.BLANK_IMAGE_URL,
+            cls: annotationName + ' field-action' + (this.readOnly ? ' x-item-disabled' : '')
+        });
+        
+        if (tooltip)
+        {
+            buttonEl.dom.qtip= tooltip;
+        }
+        
+        return menuId;
     },
 
     updateButtons: function()

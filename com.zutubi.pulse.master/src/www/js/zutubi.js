@@ -1007,7 +1007,7 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
     afterRender: function()
     {
         Zutubi.BuildNavToolbarMenu.superclass.afterRender.apply(this, arguments);
-        Zutubi.MenuManager.registerMenu(this.id + '-actions', this.getMenuItems.createDelegate(this));
+        Zutubi.MenuManager.registerMenu(this.id + '-actions', this.getMenuItems.createDelegate(this), this.imgcls);
     },
 
     getMenuItems: function()

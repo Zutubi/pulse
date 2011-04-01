@@ -213,3 +213,27 @@ td.currentstep
     color: #e00;
     background: transparent url(../images/default/shared/warning.gif) no-repeat scroll 0 2px;
 }
+
+img.inherited
+{
+    width: 24px;
+    height: 16px;
+    background: 0 0 no-repeat url(../images/inherited-button.gif);
+}
+
+img.inherited-pressed
+{
+    background: 0 0 no-repeat url(../images/inherited-pressed.gif);
+}
+
+img.overridden
+{
+    width: 24px;
+    height: 16px;
+    background: 0 0 no-repeat url(../images/overridden-button.gif);
+}
+
+img.overridden-pressed
+{
+    background: 0 0 no-repeat url(../images/overridden-pressed.gif);
+}

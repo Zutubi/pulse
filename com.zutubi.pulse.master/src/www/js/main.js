@@ -353,7 +353,39 @@ function showFieldHelp(field)
     }
 }
 
-function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, overriddenOwner)
+function revertField(fieldId)
+{
+    var field = Ext.getCmp(fieldId);
+    if (field)
+    {
+        field.setValue(field.overriddenValue);
+        field.focus(true);
+        field.form.updateButtons();
+    }
+}
+
+function navigateToDefinition(fieldId)
+{
+    var field = Ext.getCmp(fieldId);
+    if (field)
+    {
+        // This callback-after-delay is hackish, but the chain of things that
+        // we would otherwise need to wait for is long and complicated.  If the
+        // delay is not enough things still work, just without the convenience
+        // of highlighting the field.
+        navigateToOwner(field.inheritedFrom, field.form.path, function() {
+            window.setTimeout(function() {
+                var field = Ext.getCmp(fieldId);
+                if (field)
+                {
+                    field.focus(true);
+                }
+            }, 500);
+        });
+    }
+}
+
+function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, overriddenOwner, overriddenValue)
 {
     if (required)
     {
@@ -367,12 +399,28 @@ function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, o
 
     if (inheritedFrom)
     {
-        form.annotateField(field.getId(), 'inherited', window.baseUrl + '/images/inherited.gif', 'value inherited from ' + inheritedFrom);
+        field.inheritedFrom = inheritedFrom;
+        var menuId = form.annotateFieldWithMenu(field.getId(), 'inherited', 'value inherited from ' + inheritedFrom);
+        Zutubi.MenuManager.registerMenu(menuId, function() {
+            return [{
+                image: 'arrow_45.gif',
+                title: 'navigate to definition',
+                onclick: "navigateToDefinition('" + field.getId() + "'); Zutubi.MenuManager.toggleMenu(Ext.get('" + menuId + "-link')); return false"
+            }];
+        }, 'inherited');
     }
 
     if (overriddenOwner)
     {
-        form.annotateField(field.getId(), 'overridden', window.baseUrl + '/images/overridden.gif', 'overrides value defined by ' + overriddenOwner);
+        field.overriddenValue = overriddenValue;
+        var menuId = form.annotateFieldWithMenu(field.getId(), 'overridden', 'overrides value defined by ' + overriddenOwner + ' (click for actions)');
+        Zutubi.MenuManager.registerMenu(menuId, function() {
+            return [{
+                image: 'arrow_undo.gif',
+                title: 'revert to inherited value',
+                onclick: "revertField('" + field.getId() + "'); Zutubi.MenuManager.toggleMenu(Ext.get('" + menuId + "-link')); return false"
+            }];
+        }, 'overridden');
     }
 }
 

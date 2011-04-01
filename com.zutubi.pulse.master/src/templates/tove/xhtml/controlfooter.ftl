@@ -8,7 +8,7 @@ ${form.name}.items.last().on('render', function(field)
     </#list>
 </#if>
 
-    addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}');
+    addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}', '${parameters.overriddenValue!?js_string}');
 
 <#assign helpkey>${parameters.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>

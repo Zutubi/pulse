@@ -75,10 +75,11 @@ Zutubi.MenuManager = function() {
          * @param itemCallback a function that when called will return an array of item configs for
          *                     the menu (configs must contain an id, image and link, and may also
          *                     contain a title, href, and/or onclick)
+         * @param imageClass   if provided, the class of the button image (defaults to popdown)
          */
-        registerMenu: function(id, itemCallback)
+        registerMenu: function(id, itemCallback, imageClass)
         {
-            menusById[id] = {itemCallback: itemCallback};
+            menusById[id] = {itemCallback: itemCallback, imageClass: imageClass};
         },
         
         /**
@@ -92,8 +93,13 @@ Zutubi.MenuManager = function() {
         toggleMenu: function(link)
         {
             var id = link.id.replace(/-link$/, '');
-            renderMenu(id);
-            Zutubi.FloatManager.showHideFloat('menus', id, 'tl-bl?');
+            var buttonId = id + '-button';
+            var button = Ext.get(buttonId);
+            if (button && !button.hasClass('x-item-disabled'))
+            {
+                var menu = renderMenu(id);
+                Zutubi.FloatManager.showHideFloat('menus', id, 'tl-bl?', menu.imageClass);
+            }
         }
     }
 }();

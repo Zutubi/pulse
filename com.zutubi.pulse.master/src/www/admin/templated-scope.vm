@@ -56,7 +56,7 @@
             }
         }
         
-        function navigateToOwner(owner, originalPath)
+        function navigateToOwner(owner, originalPath, cb)
         {
             var pieces = originalPath.split('/');
             pieces[1] = owner;
@@ -90,6 +90,10 @@
                          visibleTree = configTree;
                          configTree.selectConfigPath(path, function() {
                              container.unmask();
+                             if (cb)
+                             {
+                                 cb();
+                             }
                          });
                      }
                      else
