@@ -93,7 +93,6 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
                 var actionDomEls = this.getFieldActionDomEls(id);
                 if (actionDomEls)
                 {
-                console.log(actionDomEls);
                     for(var i = 0; i < actionDomEls.length; i++)
                     {
                         Ext.get(actionDomEls[i]).addClass('x-item-disabled');
