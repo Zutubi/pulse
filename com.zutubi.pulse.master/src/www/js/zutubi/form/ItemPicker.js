@@ -586,5 +586,17 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         this.upButton.enable();
         this.downButton.enable();
         this.view.disabled = false;
+    },
+    
+    focus: function(select)
+    {
+        if(this.input)
+        {
+            this.input.focus(select);
+        }
+        else
+        {
+            this.combo.focus(select);
+        }    
     }
 });

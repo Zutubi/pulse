@@ -113,16 +113,16 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
         return Ext.get('x-form-row-' + id);
     },
 
-    createAnnotationCell: function(id)
+    createAnnotationCell: function(id, annotationName)
     {
         var rowEl = this.getFieldRowEl(id);
-        return cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation'});
+        return cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation', id: id + '.' + annotationName});
     },
     
     annotateField: function(id, annotationName, imageName, tooltip)
     {
-        var cellEl = this.createAnnotationCell(id);
-        var imageEl = cellEl.createChild({tag: 'img', src: imageName, id: id + '.' + annotationName});
+        var cellEl = this.createAnnotationCell(id, annotationName);
+        var imageEl = cellEl.createChild({tag: 'img', src: imageName});
         if(tooltip)
         {
             imageEl.dom.qtip = tooltip;
@@ -133,7 +133,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     
     annotateFieldWithMenu: function(id, annotationName, tooltip)
     {
-        var cellEl = this.createAnnotationCell(id);
+        var cellEl = this.createAnnotationCell(id, annotationName);
         var menuId = id + '-' + annotationName + '-menu';
         var linkEl = cellEl.createChild({
             tag: 'a',

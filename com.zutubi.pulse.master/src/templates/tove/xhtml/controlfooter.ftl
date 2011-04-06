@@ -8,7 +8,20 @@ ${form.name}.items.last().on('render', function(field)
     </#list>
 </#if>
 
-    addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}', '${parameters.overriddenValue!?js_string}');
+<#if parameters.overriddenValue?exists>
+  <#if parameters.overriddenValue?is_sequence>
+    var overriddenValue = [
+    <#list parameters.overriddenValue as item>
+        '${item?js_string}'<#if item_has_next>,</#if>
+    </#list>
+    ];
+  <#else>
+    var overriddenValue = '${parameters.overriddenValue?js_string}';
+  </#if>
+<#else>
+    var overriddenValue = '';
+</#if>
+    addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}', overriddenValue);
 
 <#assign helpkey>${parameters.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>

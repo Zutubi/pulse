@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -15,12 +16,13 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
 import com.zutubi.util.Sort;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.util.*;
-import static java.util.Arrays.asList;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -34,6 +36,8 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     
     private static final String PATH_EMAIL_SETTINGS = "settings/email";
 
+    private static final long DISABLE_TIMEOUT = 30000;
+    
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -619,13 +623,26 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testDoConfigAction() throws Exception
     {
         String agentName = randomName();
-        String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
+        final String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         try
         {
             rpcClient.RemoteApi.doConfigAction(path, ACTION_DISABLE);
-            Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
-            assertEquals(asList(AgentConfigurationActions.ACTION_ENABLE),
-                     new LinkedList<String>(actions));
+            final List<String> expectedActions = asList(AgentConfigurationActions.ACTION_ENABLE);
+            TestUtils.waitForCondition(new Condition()
+            {
+                public boolean satisfied()
+                {
+                    try
+                    {
+                        return rpcClient.RemoteApi.getConfigActions(path).equals(expectedActions);
+                    }
+                    catch (Exception e)
+                    {
+                        fail(e.getMessage());
+                        return false;
+                    }
+                }
+            }, DISABLE_TIMEOUT, "agent to be disabled");
         }
         finally
         {
