@@ -577,6 +577,17 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             }));
         }
 
+        public List<AgentSynchronisationMessage> queryMessages(AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType, final String description)
+        {
+            return copy(CollectionUtils.filter(messages, new Predicate<AgentSynchronisationMessage>()
+            {
+                public boolean satisfied(AgentSynchronisationMessage message)
+                {
+                    return message.getStatus() == status && message.getMessage().getTypeName().equals(taskType) && message.getDescription().equals(description);
+                }
+            }));
+        }
+
         public int deleteByAgentState(AgentState agentState)
         {
             List<AgentSynchronisationMessage> messages = getUnflushed();

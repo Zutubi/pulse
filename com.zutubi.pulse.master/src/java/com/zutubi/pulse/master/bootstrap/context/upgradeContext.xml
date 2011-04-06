@@ -155,6 +155,7 @@
                 <ref local="addConcurrentBuilds"/>
                 <ref local="setHibernateCacheProvider"/>
                 <ref local="addSubversionCleanOnUpdateFailure"/>
+                <ref local="agentSynchronisationMessageIndices"/>
                 <ref local="addServerHistoryColumnsPreference"/>
                 <ref local="addPerforceOptions"/>
             </list>
@@ -797,6 +798,10 @@
 
     <bean id="addSubversionCleanOnUpdateFailure" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionCleanOnUpdateFailureUpgradeTask">
         <property name="buildNumber" value="203006001"/>
+    </bean>
+
+    <bean id="agentSynchronisationMessageIndices" class="com.zutubi.pulse.master.upgrade.tasks.AgentSynchronisationMessageIndicesUpgradeTask">
+        <property name="buildNumber" value="203008001"/>
     </bean>
 
     <bean id="addServerHistoryColumnsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddServerHistoryColumnsPreferenceUpgradeTask">
