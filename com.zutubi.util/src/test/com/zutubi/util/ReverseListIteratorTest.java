@@ -1,35 +1,31 @@
 package com.zutubi.util;
 
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 
-import java.util.LinkedList;
-import java.util.Iterator;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class ReverseListIteratorTest extends ZutubiTestCase
 {
     public void testEmptyList()
     {
-        assertOrdering(list());
+        assertOrdering(Arrays.<String>asList());
     }
 
     public void testSingleItemInList()
     {
-        assertOrdering(list("A"), "A");
+        assertOrdering(asList("A"), "A");
     }
     
     public void testMultipleItemsInList()
     {
-        assertOrdering(list("A", "B"), "B", "A");
-        assertOrdering(list("A", "B", "C"), "C", "B", "A");
+        assertOrdering(asList("A", "B"), "B", "A");
+        assertOrdering(asList("A", "B", "C"), "C", "B", "A");
     }
 
-    private LinkedList<String> list(String... values)
-    {
-        return new LinkedList<String>(Arrays.asList(values));
-    }
-
-    private void assertOrdering(LinkedList<String> list, String... expectedReverse)
+    private void assertOrdering(List<String> list, String... expectedReverse)
     {
         Iterator<String> i = new ReverseListIterator<String>(list);
         for (String expected : expectedReverse)

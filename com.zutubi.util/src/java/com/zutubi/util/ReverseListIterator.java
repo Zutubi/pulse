@@ -2,40 +2,34 @@ package com.zutubi.util;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * An iterator that iterates over a linked list from last to first.
  *
- * @param <T>
+ * @param <T> type of the items in the list
  */
-public class ReverseListIterator<T> implements Iterable<T>, Iterator<T>
+public class ReverseListIterator<T> implements Iterator<T>
 {
-    private List<T> l;
-    private int index;
+    private ListIterator<T> it;
 
     public ReverseListIterator(List<T> l)
     {
-        this.l = l;
-        this.index =  l.size();
+        it = l.listIterator(l.size());
     }
 
     public boolean hasNext()
     {
-        return index != 0;
+        return it.hasPrevious();
     }
 
     public T next()
     {
-        return l.get(--index);
+        return it.previous();
     }
 
     public void remove()
     {
-        throw new UnsupportedOperationException();
-    }
-
-    public Iterator<T> iterator()
-    {
-        return this;
+        it.remove();
     }
 }

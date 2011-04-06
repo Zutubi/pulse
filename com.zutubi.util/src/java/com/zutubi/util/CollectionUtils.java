@@ -178,9 +178,15 @@ public class CollectionUtils
 
     public static <T> T find(Iterable<T> c, Predicate<T> p)
     {
-        for(T t: c)
+        return find(c.iterator(), p);
+    }
+
+    public static <T> T find(Iterator<T> c, Predicate<T> p)
+    {
+        while (c.hasNext())
         {
-            if(p.satisfied(t))
+            T t = c.next();
+            if (p.satisfied(t))
             {
                 return t;
             }
