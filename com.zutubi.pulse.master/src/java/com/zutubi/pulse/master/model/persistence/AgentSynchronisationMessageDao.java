@@ -20,11 +20,23 @@ public interface AgentSynchronisationMessageDao extends EntityDao<AgentSynchroni
 
     /**
      * Finds all messages with the given status, across all agents.
-     * 
+     *
      * @param status the status to find messages in
      * @return all messages with the given status
      */
     List<AgentSynchronisationMessage> findByStatus(AgentSynchronisationMessage.Status status);
+
+    /**
+     * Finds all messages for a given agent with a given status, task type and
+     * description.
+     *
+     * @param agentState  state of the agent to get messages for
+     * @param status      status to filter by
+     * @param taskType    type of tasks to filter by
+     * @param description description to filter by
+     * @return all messages for the given agent that meet the criteria
+     */
+    List<AgentSynchronisationMessage> queryMessages(AgentState agentState, AgentSynchronisationMessage.Status status, String taskType, String description);
 
     /**
      * Deleted all messages for the given agent.

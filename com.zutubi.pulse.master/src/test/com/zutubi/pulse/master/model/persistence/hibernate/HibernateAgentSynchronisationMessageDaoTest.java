@@ -4,10 +4,7 @@ import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
-import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
-import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
-import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
+import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.util.Collections;
@@ -70,6 +67,37 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
 
         assertEquals(asList(message11, message12), agentSynchronisationMessageDao.findByAgentState(agentState1));
         assertEquals(asList(message21, message22), agentSynchronisationMessageDao.findByAgentState(agentState2));
+    }
+
+    public void testQueryMessages()
+    {
+        AgentState agentState1 = new AgentState();
+        AgentState agentState2 = new AgentState();
+        agentStateDao.save(agentState1);
+        agentStateDao.save(agentState2);
+
+        SynchronisationMessage deleteMessage = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo", "bar", Collections.<String, String>emptyMap()));
+        SynchronisationMessage renameMessage = synchronisationTaskFactory.toMessage(new RenameDirectoryTask("foo", "bar"));
+
+        AgentSynchronisationMessage message1QueuedDeleteA = new AgentSynchronisationMessage(agentState1, deleteMessage, "desc A");
+        AgentSynchronisationMessage message1ProcessingDeleteA = new AgentSynchronisationMessage(agentState1, deleteMessage, "desc A");
+        message1ProcessingDeleteA.setStatus(AgentSynchronisationMessage.Status.PROCESSING);
+        AgentSynchronisationMessage message1QueuedDeleteB = new AgentSynchronisationMessage(agentState1, deleteMessage, "desc B");
+        AgentSynchronisationMessage message1QueuedRenameA = new AgentSynchronisationMessage(agentState1, renameMessage, "desc A");
+        AgentSynchronisationMessage message2QueuedDeleteA = new AgentSynchronisationMessage(agentState2, deleteMessage, "desc A");
+
+        agentSynchronisationMessageDao.save(message1QueuedDeleteA);
+        agentSynchronisationMessageDao.save(message1ProcessingDeleteA);
+        agentSynchronisationMessageDao.save(message1QueuedDeleteB);
+        agentSynchronisationMessageDao.save(message1QueuedRenameA);
+        agentSynchronisationMessageDao.save(message2QueuedDeleteA);
+
+        commitAndRefreshTransaction();
+
+        assertEquals(asList(message1QueuedDeleteA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, deleteMessage.getTypeName(), "desc A"));
+        assertEquals(asList(message1ProcessingDeleteA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.PROCESSING, deleteMessage.getTypeName(), "desc A"));
+        assertEquals(asList(message1QueuedDeleteB), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, deleteMessage.getTypeName(), "desc B"));
+        assertEquals(asList(message1QueuedRenameA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, renameMessage.getTypeName(), "desc A"));
     }
 
     public void testFindByStatus()

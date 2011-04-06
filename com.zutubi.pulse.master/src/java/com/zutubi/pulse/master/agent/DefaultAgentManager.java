@@ -319,10 +319,13 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             {
                 public Object process()
                 {
-                    for (Pair<SynchronisationMessage, String> pair: messageDescriptionPairs)
+                    for (final Pair<SynchronisationMessage, String> pair: messageDescriptionPairs)
                     {
-                        AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, pair.first, pair.second);
-                        agentSynchronisationMessageDao.save(agentMessage);
+                        if (!matchingMessageExists(agentState, pair.first, pair.second))
+                        {
+                            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, pair.first, pair.second);
+                            agentSynchronisationMessageDao.save(agentMessage);
+                        }
                     }
                     
                     agentSynchronisationMessageDao.flush();
@@ -331,6 +334,18 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 }
             });
         }
+    }
+
+    private boolean matchingMessageExists(AgentState agentState, final SynchronisationMessage message, String description)
+    {
+        List<AgentSynchronisationMessage> existing = agentSynchronisationMessageDao.queryMessages(agentState, AgentSynchronisationMessage.Status.QUEUED, message.getTypeName(), description);
+        return CollectionUtils.contains(existing, new Predicate<AgentSynchronisationMessage>()
+        {
+            public boolean satisfied(AgentSynchronisationMessage existingMessage)
+            {
+                return existingMessage.getMessage().equals(message);
+            }
+        });
     }
 
     public void dequeueSynchronisationMessages(List<AgentSynchronisationMessage> messages)

@@ -53,6 +53,7 @@ public class HostPingServiceTest extends PulseTestCase
 
         hostPingService = new HostPingService();
         hostPingService.setEventManager(eventManager);
+        hostPingService.setHostManager(mock(HostManager.class));
         hostPingService.setThreadFactory(new PulseThreadFactory());
         hostPingService.setMasterLocationProvider(new MasterLocationProvider()
         {
