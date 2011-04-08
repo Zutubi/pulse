@@ -2,21 +2,22 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
-import com.zutubi.pulse.core.util.process.LineHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
+import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,8 +40,7 @@ public class NativeGit
 
     private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
     
-    private ProcessBuilder git;
-    private int inactivityTimeout;
+    private ScmProcessRunner runner;
     private DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance();
     /**
      * The paths to be excluded from log requests.
@@ -63,8 +63,9 @@ public class NativeGit
      */
     public NativeGit(int inactivityTimeout)
     {
-        git = new ProcessBuilder();
-        this.inactivityTimeout = inactivityTimeout;
+        runner = new ScmProcessRunner("git");
+        runner.setCharset(CHARSET_UTF8);
+        runner.setInactivityTimeout(inactivityTimeout);
     }
 
     /**
@@ -78,54 +79,54 @@ public class NativeGit
         {
             throw new IllegalArgumentException("The working directory must be an existing directory.");
         }
-        git.directory(dir);
+        runner.setDirectory(dir);
     }
 
-    public void init(ScmFeedbackHandler handler) throws GitException
+    public void init(ScmFeedbackHandler handler) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_INIT);
     }
 
-    public void clone(ScmFeedbackHandler handler, String repository, String dir) throws GitException
+    public void clone(ScmFeedbackHandler handler, String repository, String dir) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
     }
 
-    public void remoteAdd(ScmFeedbackHandler handler, String name, String repository, String branch) throws GitException
+    public void remoteAdd(ScmFeedbackHandler handler, String name, String repository, String branch) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_REMOTE, ARG_ADD, FLAG_FETCH, FLAG_TRACK, branch, FLAG_SET_HEAD, branch, name, repository);
     }
 
-    public void merge(ScmFeedbackHandler handler, String remote) throws GitException
+    public void merge(ScmFeedbackHandler handler, String remote) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_MERGE, remote);
     }
     
-    public void pull(ScmFeedbackHandler handler) throws GitException
+    public void pull(ScmFeedbackHandler handler) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_PULL);
     }
 
-    public void fetch(ScmFeedbackHandler handler) throws GitException
+    public void fetch(ScmFeedbackHandler handler) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_FETCH);
     }
 
-    public String revisionParse(String revision) throws GitException
+    public String revisionParse(String revision) throws ScmException
     {
         OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
         runWithHandler(capturingHandler, null, true, getGitCommand(), COMMAND_REVISION_PARSE, revision);
         return capturingHandler.getSingleOutputLine();
     }
 
-    public String mergeBase(String commit1, String commit2) throws GitException
+    public String mergeBase(String commit1, String commit2) throws ScmException
     {
         OutputCapturingHandler capturingHandler = new OutputCapturingHandler();
         runWithHandler(capturingHandler, null, true, getGitCommand(), COMMAND_MERGE_BASE, commit1, commit2);
         return capturingHandler.getSingleOutputLine();
     }
 
-    public InputStream show(String revision, String object) throws GitException
+    public InputStream show(String revision, String object) throws ScmException
     {
         List<String> commands = new LinkedList<String>();
         commands.add(getGitCommand());
@@ -140,7 +141,7 @@ public class NativeGit
         }
 
         final StringBuffer buffer = new StringBuffer();
-        OutputHandlerAdapter handler = new OutputHandlerAdapter()
+        ScmOutputHandlerSupport handler = new ScmOutputHandlerSupport()
         {
             public void handleStdout(String line)
             {
@@ -153,22 +154,22 @@ public class NativeGit
         return new ByteArrayInputStream(buffer.toString().getBytes());
     }
 
-    public List<GitLogEntry> log() throws GitException
+    public List<GitLogEntry> log() throws ScmException
     {
         return log(null, null, -1);
     }
 
-    public List<GitLogEntry> log(int changes) throws GitException
+    public List<GitLogEntry> log(int changes) throws ScmException
     {
         return log(null, null, changes);
     }
 
-    public List<GitLogEntry> log(String from, String to) throws GitException
+    public List<GitLogEntry> log(String from, String to) throws ScmException
     {
         return log(from, to, -1);
     }
 
-    public List<GitLogEntry> log(String from, String to, int changes) throws GitException
+    public List<GitLogEntry> log(String from, String to, int changes) throws ScmException
     {
         List<String> command = new LinkedList<String>();
         command.add(getGitCommand());
@@ -201,22 +202,22 @@ public class NativeGit
         return handler.getEntries();
     }
 
-    public void checkout(ScmFeedbackHandler handler, String branch) throws GitException
+    public void checkout(ScmFeedbackHandler handler, String branch) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, branch);
     }
 
-    public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws GitException
+    public void checkout(ScmFeedbackHandler handler, String branch, String localBranch) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, FLAG_BRANCH, localBranch, branch);
     }
 
-    public void deleteBranch(String branch) throws GitException
+    public void deleteBranch(String branch) throws ScmException
     {
         run(getGitCommand(), COMMAND_BRANCH, FLAG_DELETE, branch);
     }
 
-    public List<GitBranchEntry> branch() throws GitException
+    public List<GitBranchEntry> branch() throws ScmException
     {
         String[] command = {getGitCommand(), COMMAND_BRANCH};
 
@@ -227,18 +228,18 @@ public class NativeGit
         return handler.getBranches();
     }
 
-    public void diff(ScmFeedbackHandler handler, Revision revA, Revision revB) throws GitException
+    public void diff(ScmFeedbackHandler handler, Revision revA, Revision revB) throws ScmException
     {
         String[] command = {getGitCommand(), COMMAND_DIFF, FLAG_NAME_STATUS, revA.getRevisionString(), revB.getRevisionString()};
         run(handler, command);
     }
 
-    public void lsRemote(OutputHandler handler, String repository, String refs) throws GitException
+    public void lsRemote(ScmOutputHandler handler, String repository, String refs) throws ScmException
     {
         runWithHandler(handler, null, true, getGitCommand(), COMMAND_LS_REMOTE, repository, refs);
     }
 
-    public void tag(Revision revision, String name, String message, boolean force) throws GitException
+    public void tag(Revision revision, String name, String message, boolean force) throws ScmException
     {
         List<String> commands = new LinkedList<String>();
         commands.add(getGitCommand());
@@ -255,31 +256,31 @@ public class NativeGit
         run(commands.toArray(new String[commands.size()]));
     }
 
-    public void push(String repository, String refspec) throws GitException
+    public void push(String repository, String refspec) throws ScmException
     {
         run(getGitCommand(), COMMAND_PUSH, repository, refspec);
     }
 
-    public void apply(ScmFeedbackHandler handler, File patch) throws GitException
+    public void apply(ScmFeedbackHandler handler, File patch) throws ScmException
     {
         run(handler, getGitCommand(), COMMAND_APPLY, FLAG_VERBOSE, patch.getAbsolutePath());
     }
 
-    public List<String> getConfig(String name) throws GitException
+    public List<String> getConfig(String name) throws ScmException
     {
         OutputCapturingHandler handler = new OutputCapturingHandler();
         runWithHandler(handler, null, false, getGitCommand(), COMMAND_CONFIG, name);
         return handler.getOutputLines();
     }
 
-    public List<ScmFile> lsTree(String treeish, String path) throws GitException
+    public List<ScmFile> lsTree(String treeish, String path) throws ScmException
     {
         LsTreeOutputHandler handler = new LsTreeOutputHandler();
         runWithHandler(handler, null, true, getGitCommand(), COMMAND_LS_TREE, treeish, path);
         return handler.getFiles();
     }
 
-    public String getSingleConfig(String name) throws GitException
+    public String getSingleConfig(String name) throws ScmException
     {
         List<String> lines = getConfig(name);
         if (lines.size() == 0)
@@ -302,7 +303,7 @@ public class NativeGit
         }
     }
 
-    public String getSingleConfig(String name, String defaultValue) throws GitException
+    public String getSingleConfig(String name, String defaultValue) throws ScmException
     {
         String value = getSingleConfig(name);
         if (value == null)
@@ -313,139 +314,31 @@ public class NativeGit
         return value;
     }
 
-    protected int run(String... commands) throws GitException
+    protected int run(String... commands) throws ScmException
     {
         return run(null, commands);
     }
 
-    protected int run(ScmFeedbackHandler scmHandler, String... commands) throws GitException
+    protected int run(ScmFeedbackHandler scmHandler, String... commands) throws ScmException
     {
-        OutputHandlerAdapter handler = new OutputHandlerAdapter(scmHandler);
+        ScmOutputHandlerSupport handler = new ScmOutputHandlerSupport(scmHandler);
         return runWithHandler(handler, null, true, commands);
     }
 
-    protected int runWithHandler(final OutputHandler handler, String input, boolean checkExitCode, String... commands) throws GitException
+    protected int runWithHandler(final ScmOutputHandler handler, String input, boolean checkExitCode, String... commands) throws ScmException
     {
-        String commandLine = StringUtils.join(" ", commands);
-        handler.handleCommandLine(commandLine);
-
-        Process child;
-
-        git.command(commands);
-
         long startTime = System.currentTimeMillis();
-        final AtomicLong lineCount = new AtomicLong(0);
         try
         {
-            child = git.start();
-        }
-        catch (IOException e)
-        {
-            throw new GitException("Could not start git process: " + e.getMessage(), e);
-        }
-
-        if (input != null)
-        {
-            try
-            {
-                OutputStream stdinStream = child.getOutputStream();
-
-                stdinStream.write(input.getBytes());
-                stdinStream.close();
-            }
-            catch (IOException e)
-            {
-                throw new GitException("Error writing to input of git process", e);
-            }
-        }
-
-        final AtomicBoolean activity = new AtomicBoolean(false);
-        final StringBuilder stderr = new StringBuilder();
-        AsyncProcess async = new AsyncProcess(child, new LineHandler()
-        {
-            public Charset getCharset()
-            {
-                return CHARSET_UTF8;
-            }
-
-            public void handle(String line, boolean error)
-            {
-                lineCount.incrementAndGet();
-                activity.set(true);
-                if (error)
-                {
-                    stderr.append(line);
-                    stderr.append('\n');
-                    handler.handleStderr(line);
-                }
-                else
-                {
-                    handler.handleStdout(line);
-                }
-            }
-        }, true);
-
-        try
-        {
-            long lastActivityTime = System.currentTimeMillis();
-
-            Integer exitCode;
-            do
-            {
-                handler.checkCancelled();
-                exitCode = async.waitFor(10, TimeUnit.SECONDS);
-                if (activity.getAndSet(false))
-                {
-                    lastActivityTime = System.currentTimeMillis();
-                }
-                else
-                {
-                    if (inactivityTimeout > 0)
-                    {
-                        long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / Constants.SECOND;
-                        if (secondsSinceActivity >= inactivityTimeout)
-                        {
-                            async.destroy();
-                            throw new GitException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
-                        }
-                    }
-                }
-            }
-            while (exitCode == null);
-
-            handler.handleExitCode(exitCode);
-
-            if (checkExitCode && exitCode != 0)
-            {
-                String message = "Git command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
-                String error = stderr.toString().trim();
-                if (StringUtils.stringSet(error))
-                {
-                    message += " (" + error + ")";
-                }
-                
-                throw new GitException(message);
-            }
-
-            return exitCode;
-        }
-        catch (InterruptedException e)
-        {
-            throw new GitException("Interrupted running git process", e);
-        }
-        catch (IOException e)
-        {
-            throw new GitException("Error reading output of git process", e);
+            return runner.runProcess(handler, input == null ? null : input.getBytes(), checkExitCode, commands);
         }
         finally
         {
-            async.destroy();
-
             if (LOG_COMMANDS.isLoggable(Level.FINEST))
             {
                 long currentTime = System.currentTimeMillis();
-                String workingDirectory = (git.directory() != null) ? git.directory().getAbsolutePath() + "\t" : "";
-                LOG_COMMANDS.finest(timeFormat.format(new Date(currentTime)) + "\t" + commandLine + "\t" + workingDirectory + (currentTime - startTime) + "\t" + lineCount + "\n");
+                String workingDirectory = (runner.getDirectory() != null) ? runner.getDirectory().getAbsolutePath() + "\t" : "";
+                LOG_COMMANDS.finest(timeFormat.format(new Date(currentTime)) + "\t" + runner.getLastCommandLine() + "\t" + workingDirectory + "\t" + (currentTime - startTime) + "\n");
             }
         }
     }
@@ -460,87 +353,10 @@ public class NativeGit
         this.excludedPaths = excludedPaths;
     }
 
-    interface OutputHandler
-    {
-        void handleCommandLine(String line);
-
-        void handleStdout(String line);
-
-        void handleStderr(String line);
-
-        void handleExitCode(int code) throws GitException;
-
-        void checkCancelled() throws GitOperationCancelledException;
-    }
-
-    private static class OutputHandlerAdapter implements OutputHandler
-    {
-        private int exitCode;
-        private ScmFeedbackHandler scmHandler;
-
-        public OutputHandlerAdapter()
-        {
-        }
-
-        public OutputHandlerAdapter(ScmFeedbackHandler scmHandler)
-        {
-            this.scmHandler = scmHandler;
-        }
-
-        public void handleCommandLine(String line)
-        {
-            if (scmHandler != null)
-            {
-                scmHandler.status(">> " + line);
-            }
-        }
-
-        public void handleStdout(String line)
-        {
-            if (scmHandler != null)
-            {
-                scmHandler.status(line);
-            }
-        }
-
-        public void handleStderr(String line)
-        {
-            if (scmHandler != null)
-            {
-                scmHandler.status(line);
-            }
-        }
-
-        public void handleExitCode(int code)
-        {
-            this.exitCode = code;
-        }
-
-        public int getExitCode()
-        {
-            return exitCode;
-        }
-
-        public void checkCancelled() throws GitOperationCancelledException
-        {
-            if (scmHandler != null)
-            {
-                try
-                {
-                    scmHandler.checkCancelled();
-                }
-                catch (ScmCancelledException e)
-                {
-                    throw new GitOperationCancelledException(e);
-                }
-            }
-        }
-    }
-
     /**
      * A simple output handler that just captures stdout and stderr line by line.
      */
-    static class OutputCapturingHandler implements OutputHandler
+    static class OutputCapturingHandler implements ScmOutputHandler
     {
         private List<String> outputLines = new LinkedList<String>();
         private List<String> errorLines = new LinkedList<String>();
@@ -589,7 +405,7 @@ public class NativeGit
         {
         }
 
-        public void checkCancelled() throws GitOperationCancelledException
+        public void checkCancelled()
         {
         }
     }
@@ -607,7 +423,7 @@ public class NativeGit
      *
      * This format is generated using --pretty=format:... (see {@link NativeGit#log})
      */
-    static class LogOutputHandler extends OutputHandlerAdapter
+    static class LogOutputHandler extends ScmOutputHandlerSupport
     {
         private List<GitLogEntry> entries;
 
@@ -736,44 +552,10 @@ public class NativeGit
     }
 
     /**
-     * An output handler that just captures stdout to a writer.
-     */
-    static class OutputWritingHandler implements OutputHandler
-    {
-        private PrintWriter writer;
-
-        OutputWritingHandler(PrintWriter writer)
-        {
-            this.writer = writer;
-        }
-
-        public void handleCommandLine(String line)
-        {
-        }
-
-        public void handleStdout(String line)
-        {
-            writer.println(line);
-        }
-
-        public void handleStderr(String line)
-        {
-        }
-
-        public void handleExitCode(int code) throws GitException
-        {
-        }
-
-        public void checkCancelled() throws GitOperationCancelledException
-        {
-        }
-    }
-
-    /**
      * Read the output from the git branch command, interpretting the information as
      * necessary.
      */
-    private class BranchOutputHandler extends OutputHandlerAdapter
+    private class BranchOutputHandler extends ScmOutputHandlerSupport
     {
         private List<GitBranchEntry> branches = new LinkedList<GitBranchEntry>();
 
@@ -795,7 +577,7 @@ public class NativeGit
         }
     }
 
-    static class LsTreeOutputHandler extends OutputHandlerAdapter
+    static class LsTreeOutputHandler extends ScmOutputHandlerSupport
     {
         private List<ScmFile> files = new LinkedList<ScmFile>();
 
@@ -827,7 +609,7 @@ public class NativeGit
             return;
         }
 
-        OutputHandlerAdapter outputHandler = new OutputHandlerAdapter()
+        ScmOutputHandlerSupport outputHandler = new ScmOutputHandlerSupport()
         {
             public void handleStdout(String line)
             {
@@ -849,7 +631,7 @@ public class NativeGit
             {
                 // use a tree map to provide ordering to the keys.
                 System.out.println("========= Execution Environment ============");
-                Map<String, String> env = new TreeMap<String, String>(git.git.environment());
+                Map<String, String> env = new TreeMap<String, String>(git.runner.getEnvironment());
                 for (String key : env.keySet())
                 {
                     String value = env.get(key);
@@ -861,7 +643,7 @@ public class NativeGit
             }
             git.runWithHandler(outputHandler, null, true, argv);
         }
-        catch (GitException e)
+        catch (ScmException e)
         {
             System.out.println("Exit Status: " + outputHandler.getExitCode());
             e.printStackTrace();

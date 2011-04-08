@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -15,8 +17,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 public abstract class GitWorkingCopyTestBase extends PulseTestCase
 {
@@ -79,7 +79,7 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
      * @throws java.io.IOException on error editing a file
      * @throws com.zutubi.pulse.core.scm.git.GitException on git error
      */
-    protected String otherPush() throws IOException, GitException
+    protected String otherPush() throws IOException, ScmException
     {
 
         editFile(otherDir, "file1");

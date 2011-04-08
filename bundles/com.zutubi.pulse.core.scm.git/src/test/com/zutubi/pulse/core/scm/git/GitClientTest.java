@@ -3,11 +3,16 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 public class GitClientTest extends GitClientTestBase
 {
@@ -211,7 +210,7 @@ public class GitClientTest extends GitClientTestBase
         }
     }
 
-    private void makeUpstreamCommit() throws IOException, GitException
+    private void makeUpstreamCommit() throws IOException, ScmException
     {
         NativeGit git = getNativeGitOnMaster();
 
@@ -220,7 +219,7 @@ public class GitClientTest extends GitClientTestBase
         git.run(git.getGitCommand(), COMMAND_COMMIT, FLAG_ADD, FLAG_MESSAGE, "Will need merging");
     }
 
-    private void rewriteUpstreamHistory() throws GitException, IOException
+    private void rewriteUpstreamHistory() throws ScmException, IOException
     {
         // Reset to delete the latest master commit
         NativeGit git = getNativeGitOnMaster();
@@ -228,7 +227,7 @@ public class GitClientTest extends GitClientTestBase
         makeUpstreamCommit();
     }
 
-    private NativeGit getNativeGitOnMaster() throws GitException
+    private NativeGit getNativeGitOnMaster() throws ScmException
     {
         // Add a new commit which requires merging
         NativeGit git = new NativeGit(0);
@@ -570,12 +569,12 @@ public class GitClientTest extends GitClientTestBase
         assertTrue(client.getCapabilities(scmContext).contains(ScmCapability.BROWSE));
     }
 
-    public void testTestConnectionOK() throws GitException
+    public void testTestConnectionOK() throws ScmException
     {
         client.testConnection();
     }
 
-    public void testTestConnectionBadRepo() throws GitException
+    public void testTestConnectionBadRepo()
     {
         client = new GitClient("file:///no/such/repo", "master", 0, false);
         try
@@ -583,13 +582,13 @@ public class GitClientTest extends GitClientTestBase
             client.testConnection();
             fail("Test of bad repo should fail");
         }
-        catch (GitException e)
+        catch (ScmException e)
         {
             assertThat(e.getMessage(), containsString("ls-remote file:///no/such/repo master' exited with non-zero exit code"));
         }
     }
 
-    public void testTestConnectionBadBranch() throws GitException
+    public void testTestConnectionBadBranch()
     {
         client = new GitClient(repository, "nosuchbranch", 0, false);
         try
@@ -597,7 +596,7 @@ public class GitClientTest extends GitClientTestBase
             client.testConnection();
             fail("Test of bad branch should fail");
         }
-        catch (GitException e)
+        catch (ScmException e)
         {
             assertThat(e.getMessage(), containsString("Branch 'nosuchbranch' does not exist"));
         }

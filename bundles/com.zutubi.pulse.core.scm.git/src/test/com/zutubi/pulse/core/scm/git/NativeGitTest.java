@@ -8,6 +8,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
-import static java.util.Arrays.asList;
 import java.util.List;
 
 public class NativeGitTest extends PulseTestCase
@@ -61,7 +61,7 @@ public class NativeGitTest extends PulseTestCase
             git.log();
             fail("Git should not run when a bad command is set");
         }
-        catch (GitException e)
+        catch (ScmException e)
         {
             assertTrue("Message '" + e.getMessage() + "' does not contain the invalid command", e.getMessage().contains(INVALID_COMMAND));
         }

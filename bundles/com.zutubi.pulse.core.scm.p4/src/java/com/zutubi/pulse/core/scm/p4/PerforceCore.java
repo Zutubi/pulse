@@ -2,22 +2,17 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
-import com.zutubi.pulse.core.util.process.LineHandlerSupport;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Core methods used for interaction with the p4 command.
@@ -28,7 +23,7 @@ public class PerforceCore
 
     public static final int DEFAULT_INACTIVITY_TIMEOUT = 300;
 
-    private static final long SYSTEM_INACTIVITY_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", DEFAULT_INACTIVITY_TIMEOUT);
+    private static final int SYSTEM_INACTIVITY_TIMEOUT = Integer.getInteger("pulse.p4.inactivity.timeout", DEFAULT_INACTIVITY_TIMEOUT);
     private static final int USE_SYSTEM_INACTIVITY_TIMEOUT = 0;
 
     private static final String DUMMY_CLIENT = "pulse";
@@ -37,8 +32,7 @@ public class PerforceCore
     private static final Pattern PATTERN_LINE_SPLITTER = Pattern.compile("\\r?\\n");
 
     private Map<String, String> p4Env = new HashMap<String, String>();
-    private ProcessBuilder p4Builder;
-    private long inactivityTimeout;
+    private ScmProcessRunner runner;
 
     public class P4Result
     {
@@ -60,8 +54,8 @@ public class PerforceCore
 
     public PerforceCore(int inactivityTimeout)
     {
-        this.inactivityTimeout = inactivityTimeout == USE_SYSTEM_INACTIVITY_TIMEOUT ? SYSTEM_INACTIVITY_TIMEOUT : inactivityTimeout;
-        p4Builder = new ProcessBuilder();
+        runner = new ScmProcessRunner("p4");
+        runner.setInactivityTimeout(inactivityTimeout == USE_SYSTEM_INACTIVITY_TIMEOUT ? SYSTEM_INACTIVITY_TIMEOUT : inactivityTimeout);
     }
 
     public Map<String, String> getEnv()
@@ -74,13 +68,13 @@ public class PerforceCore
         if (value != null)
         {
             p4Env.put(variable, value);
-            p4Builder.environment().put(variable, value);
+            runner.getEnvironment().put(variable, value);
         }
     }
 
     public void setWorkingDir(File dir)
     {
-        p4Builder.directory(dir);
+        runner.setDirectory(dir);
     }
 
     public P4Result runP4(String input, String... commands) throws ScmException
@@ -111,7 +105,7 @@ public class PerforceCore
         return result;
     }
 
-    public void runP4WithHandler(final PerforceFeedbackHandler handler, String input, String... commands) throws ScmException
+    public void runP4WithHandler(final ScmOutputHandler handler, String input, String... commands) throws ScmException
     {
         String commandLine = StringUtils.join(" ", commands);
         if (LOG.isLoggable(Level.FINE))
@@ -119,124 +113,7 @@ public class PerforceCore
             LOG.fine(commandLine);
         }
 
-        handler.handleCommandLine(commandLine);
-        p4Builder.command(commands);
-
-        Process child;
-        try
-        {
-            child = p4Builder.start();
-        }
-        catch (IOException e)
-        {
-            throw new ScmException(getProcessErrorMessage(e), e);
-        }
-
-        if (input != null)
-        {
-            try
-            {
-                OutputStream stdinStream = child.getOutputStream();
-
-                stdinStream.write(input.getBytes());
-                stdinStream.close();
-            }
-            catch (IOException e)
-            {
-                throw new ScmException("Error writing to input of p4 process", e);
-            }
-        }
-
-        final AtomicBoolean activity = new AtomicBoolean(false);
-        AsyncProcess async = new AsyncProcess(child, new LineHandlerSupport()
-        {
-            public void handle(String line, boolean error)
-            {
-                activity.set(true);
-                if (error)
-                {
-                    handler.handleStderr(line);
-                }
-                else
-                {
-                    handler.handleStdout(line);
-                }
-            }
-        }, true);
-
-        try
-        {
-            long lastActivityTime = System.currentTimeMillis();
-
-            Integer exitCode;
-            do
-            {
-                handler.checkCancelled();
-                exitCode = async.waitFor(10, TimeUnit.SECONDS);
-                if(activity.getAndSet(false))
-                {
-                    lastActivityTime = System.currentTimeMillis();
-                }
-                else
-                {
-                    long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
-                    if (secondsSinceActivity >= inactivityTimeout)
-                    {
-                        throw new ScmException("Timing out p4 process after " + secondsSinceActivity + " seconds of inactivity");
-                    }
-                }
-            }
-            while(exitCode == null);
-
-            handler.handleExitCode(exitCode);
-        }
-        catch (InterruptedException e)
-        {
-            // Do nothing
-        }
-        catch(IOException e)
-        {
-            throw new ScmException("Error reading output of p4 process", e);
-        }
-        finally
-        {
-            async.destroy();
-        }
-    }
-
-    private String getProcessErrorMessage(IOException e)
-    {
-        String message = "Could not start p4 process: " + e.getMessage() + " (";
-        Map<String, String> env = p4Builder.environment();
-        String pathKey = findPathKey(env);
-        if (pathKey == null)
-        {
-            message += "No PATH found in environment";
-        }
-        else
-        {
-            message += "PATH: '" + env.get(pathKey) + "'";
-        }
-
-        if (p4Builder.directory() != null)
-        {
-            message += "; Working Directory: '" + p4Builder.directory().getAbsolutePath() + "'";
-        }
-        message += ")";
-        return message;
-    }
-
-    private String findPathKey(Map<String, String> environment)
-    {
-        for (String key: environment.keySet())
-        {
-            if (key.equalsIgnoreCase("PATH"))
-            {
-                return key;
-            }
-        }
-
-        return null;
+        runner.runProcess(handler, input == null ? null : input.getBytes(), false, commands);
     }
 
     public List<String> getAllWorkspaceNames() throws ScmException

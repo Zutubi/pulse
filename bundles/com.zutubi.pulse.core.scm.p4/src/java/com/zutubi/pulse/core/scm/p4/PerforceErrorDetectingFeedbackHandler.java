@@ -2,11 +2,12 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
 
 /**
  * Perforce output handler that detects and reports errors.
  */
-public abstract class PerforceErrorDetectingFeedbackHandler implements PerforceFeedbackHandler
+public abstract class PerforceErrorDetectingFeedbackHandler implements ScmOutputHandler
 {
     /**
      * Perforce may report this error during a sync but it does not affect the

@@ -262,7 +262,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
-        assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, getPath(dashboardPath, "shownProjects", "0"), "remove reference");
+        assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS, getPath(dashboardPath, "shownProjects"), "remove reference");
         assertFalse(getBrowser().isTextPresent("A further"));
         confirmPage.clickCancel();
         hierarchyPage.waitFor();
