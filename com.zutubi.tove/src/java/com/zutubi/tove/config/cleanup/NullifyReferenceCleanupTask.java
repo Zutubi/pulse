@@ -19,7 +19,7 @@ public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
         this.hasTemplateParent = hasTemplateParent;
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         Record parentRecord = recordManager.select(parentPath);
@@ -38,6 +38,14 @@ public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
             }
 
             recordManager.update(parentPath, newValue);
+            return true;
         }
+        
+        return false;
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.PARENT_UPDATE;
     }
 }

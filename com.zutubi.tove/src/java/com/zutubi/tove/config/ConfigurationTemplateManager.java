@@ -1611,6 +1611,15 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         // Pile up the events before raising any, as the handlers may make
         // their own changes!
+        List<ConfigurationEvent> saveEvents = prepareDirectAndInheritedSaveEvents(path);
+        for (ConfigurationEvent e: saveEvents)
+        {
+            publishEvent(e);
+        }
+    }
+
+    public List<ConfigurationEvent> prepareDirectAndInheritedSaveEvents(String path)
+    {
         List<ConfigurationEvent> saveEvents = new LinkedList<ConfigurationEvent>();
         for (String concretePath : getDescendantPaths(path, false, true, false))
         {
@@ -1621,11 +1630,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 saveEvents.add(new PostSaveEvent(this, instance));
             }
         }
-
-        for (ConfigurationEvent e: saveEvents)
-        {
-            publishEvent(e);
-        }
+        return saveEvents;
     }
 
     private void synchroniseChildRecords(String path, Record existingRecord, MutableRecord record)
@@ -2207,7 +2212,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * of a larger operation that will restore the invariant that all paths in
      * a template parent are either present or hidden in all of its children.
      * 
-     * @param path                the path tro delete
+     * @param path                the path to delete
      * @param checkTemplateParent if true, verify invariants against the
      *                            template parent (in particular, do not allow
      *                            inherited composited to be deleted)
@@ -2231,8 +2236,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
-                List<ConfigurationEvent> events = prepareDeleteEvents(path);
-                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
+                List<ConfigurationEvent> events = configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
                 refreshCaches();
 
                 for(ConfigurationEvent e: events)
@@ -2245,22 +2249,20 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         });
     }
 
-    private List<ConfigurationEvent> prepareDeleteEvents(String path)
+    public List<ConfigurationEvent> prepareDirectDeleteEvents(String path)
     {
         List<ConfigurationEvent> result = new LinkedList<ConfigurationEvent>();
-        for (String concretePath : getDescendantPaths(path, false, true, false))
+        for (Object instance : instances.getAllDescendants(path, false))
         {
-            for (Object instance : instances.getAllDescendants(concretePath, false))
+            if (isComposite(instance))
             {
-                if (isComposite(instance))
-                {
-                    Configuration configuration = (Configuration) instance;
-                    boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
-                    result.add(new DeleteEvent(this, configuration, cascaded));
-                    result.add(new PostDeleteEvent(this, configuration, cascaded));
-                }
+                Configuration configuration = (Configuration) instance;
+                boolean cascaded = !path.equals(configuration.getConfigurationPath());
+                result.add(new DeleteEvent(this, configuration, cascaded));
+                result.add(new PostDeleteEvent(this, configuration, cascaded));
             }
         }
+
         return result;
     }
 

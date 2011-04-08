@@ -19,16 +19,14 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
         this.inheritedReferences = inheritedReferences;
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
-        // Note our referencing path is of the form:
-        //   <referencing collection>/<index>.
-        // Due to templating, the index isn't much use.  Instead, we seek and
-        // destroy the deleted handle, which may not exist at this level (it
-        // may be an inherited reference).
-        String collectionPath = PathUtils.getParentPath(getAffectedPath());
-        String parentPath = PathUtils.getParentPath(collectionPath);
-        String baseName = PathUtils.getBaseName(collectionPath);
+        // Note our referencing path is for the collection holding the
+        // reference.  We seek within the collection and destroy the deleted
+        // handle, which may not exist at this level (it may be an inherited
+        // reference).
+        String parentPath = PathUtils.getParentPath(getAffectedPath());
+        String baseName = PathUtils.getBaseName(getAffectedPath());
 
         Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)
@@ -50,8 +48,11 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
                 }
                 
                 recordManager.update(parentPath, newValues);
+                return true;
             }
         }
+        
+        return false;
     }
 
     private String[] filter(String[] references)
@@ -70,5 +71,10 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
                 }
             });
         }
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.PARENT_UPDATE;
     }
 }

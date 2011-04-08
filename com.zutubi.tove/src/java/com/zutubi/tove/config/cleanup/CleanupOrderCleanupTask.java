@@ -19,7 +19,7 @@ public class CleanupOrderCleanupTask extends RecordCleanupTaskSupport
         super(path);
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());
@@ -33,12 +33,20 @@ public class CleanupOrderCleanupTask extends RecordCleanupTaskSupport
                 MutableRecord mutableParent = parentRecord.copy(false, true);
                 CollectionType.setOrder(mutableParent, order);
                 recordManager.update(parentPath, mutableParent);
+                return true;
             }
         }
+        
+        return false;
     }
 
     public boolean isInternal()
     {
         return true;
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.NONE;
     }
 }

@@ -18,14 +18,19 @@ public class DeleteRecordCleanupTask extends RecordCleanupTaskSupport
         this.internal = internal;
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
-        recordManager.delete(getAffectedPath());
+        return recordManager.delete(getAffectedPath()) != null;
     }
 
     public boolean isInternal()
     {
         return internal;
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.DELETE;
     }
 
     public void getInvalidatedPaths(Set<String> paths)

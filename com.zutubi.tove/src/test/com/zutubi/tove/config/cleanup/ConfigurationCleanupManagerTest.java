@@ -96,7 +96,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         assertEquals(1, task.getCascaded().size());
         RecordCleanupTask cascaded = task.getCascaded().get(0);
         assertTrue(cascaded instanceof RemoveReferenceCleanupTask);
-        assertEquals(PathUtils.getPath(listRefererPath, "ees", "0"), cascaded.getAffectedPath());
+        assertEquals(PathUtils.getPath(listRefererPath, "ees"), cascaded.getAffectedPath());
     }
 
     @SymbolicName("noCustomTasks")
@@ -217,9 +217,15 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
             super(path);
         }
 
-        public void run(RecordManager recordManager)
+        public boolean run(RecordManager recordManager)
         {
             executingThread = Thread.currentThread();
+            return true;
+        }
+
+        public CleanupAction getCleanupAction()
+        {
+            return CleanupAction.NONE;
         }
 
         public boolean isComplete()

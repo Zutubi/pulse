@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.events.*;
 
 /**
  * A type listener is a convenient way to listen for all events that affect
@@ -31,7 +31,7 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         // know it has no ancestor of the same type to worry about.
         if(configurationClass.isInstance(instance))
         {
-            // Change occured directly to an instance of our type
+            // Change occurred directly to an instance of our type
             if (event instanceof InsertEvent)
             {
                 insert((T) event.getInstance());
@@ -61,9 +61,9 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         {
             // We ignore cascaded inserts/deleted as the event for the root
             // of the cascade is enough to trigger the desired event.
-            if(!cascaded(event))
+            if (!cascaded(event))
             {
-                // Change occured to a child path.  No matter what happened, it
+                // Change occurred to a child path.  No matter what happened, it
                 // is seen as a change to our own path.
                 T ancestor = event.getConfigurationTemplateManager().getAncestorOfType((Configuration) instance, configurationClass);
                 if (ancestor != null)

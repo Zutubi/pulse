@@ -73,7 +73,7 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
                 }
             }
             
-            return new RemoveReferenceCleanupTask(referencingPath, recordManager.select(deletedPath).getHandle(), inheritedValues);
+            return new RemoveReferenceCleanupTask(PathUtils.getParentPath(referencingPath), recordManager.select(deletedPath).getHandle(), inheritedValues);
         }
     }
 

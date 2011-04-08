@@ -26,8 +26,12 @@ import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
+import static java.util.Arrays.asList;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 public abstract class AbstractConfigurationSystemTestCase extends AbstractTransactionTestCase
@@ -58,8 +62,8 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         ReflectionValidatorProvider reflectionProvider = new ReflectionValidatorProvider();
         AnnotationValidatorProvider annotationProvider = new AnnotationValidatorProvider();
         annotationProvider.setObjectFactory(objectFactory);
-        validatorProvider.setDelegates(Arrays.asList(reflectionProvider, annotationProvider));
-        validationManager.setProviders(Arrays.asList((ValidatorProvider) validatorProvider));
+        validatorProvider.setDelegates(asList(reflectionProvider, annotationProvider));
+        validationManager.setProviders(asList((ValidatorProvider) validatorProvider));
 
         typeRegistry = new TypeRegistry();
         eventManager = new DefaultEventManager();
@@ -140,6 +144,7 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         configurationSecurityManager.setEventManager(eventManager);
 
         configurationCleanupManager = new ConfigurationCleanupManager();
+        configurationCleanupManager.setConfigurationTemplateManager(configurationTemplateManager);
         configurationCleanupManager.setObjectFactory(objectFactory);
         configurationCleanupManager.setEventManager(eventManager);
 
@@ -210,6 +215,37 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
         return listener;
     }
 
+    public EventSpec[] addPostEvents(EventSpec... events)
+    {
+        EventSpec[] result = new EventSpec[events.length * 2];
+        int i = 0;
+        for (EventSpec event: events)
+        {
+            result[i++] = event;
+            EventSpec postEvent = null;
+            if (event instanceof DeleteEventSpec)
+            {
+                postEvent = new PostDeleteEventSpec(event.path, event.cascaded);
+            }
+            else if (event instanceof InsertEventSpec)
+            {
+                postEvent = new PostInsertEventSpec(event.path, event.cascaded);
+            }
+            else if (event instanceof SaveEventSpec)
+            {
+                postEvent = new PostSaveEventSpec(event.path);
+            }
+            else
+            {
+                fail();
+            }
+            
+            result[i++] = postEvent;
+        }
+        
+        return result;
+    }
+    
     public static class Listener implements com.zutubi.events.EventListener
     {
         private List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
@@ -224,10 +260,12 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
             events.clear();
         }
 
-        public void assertEvents(TemplateRecordPersistenceTest.EventSpec... expectedEvents)
+        public void assertEvents(EventSpec... expectedEvents)
         {
-            assertEquals(expectedEvents.length, events.size());
-            for(final TemplateRecordPersistenceTest.EventSpec spec: expectedEvents)
+            assertEquals("Expected " + expectedEvents.length + " events:\n    " + asList(expectedEvents) + "\nbut got " + events.size() + ":\n    " + events,
+                    expectedEvents.length,
+                    events.size());
+            for(final EventSpec spec: expectedEvents)
             {
                 ConfigurationEvent matchingEvent = CollectionUtils.find(events, new Predicate<ConfigurationEvent>()
                 {

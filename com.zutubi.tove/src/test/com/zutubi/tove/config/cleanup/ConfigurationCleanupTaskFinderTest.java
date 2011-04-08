@@ -98,9 +98,15 @@ public class ConfigurationCleanupTaskFinderTest extends ZutubiTestCase
             super(path);
         }
 
-        public void run(RecordManager recordManager)
+        public boolean run(RecordManager recordManager)
         {
             // Do nothing
+            return true;
+        }
+
+        public CleanupAction getCleanupAction()
+        {
+            return CleanupAction.NONE;
         }
     }
 }

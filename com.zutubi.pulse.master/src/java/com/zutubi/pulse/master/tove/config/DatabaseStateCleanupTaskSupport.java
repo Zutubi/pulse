@@ -21,9 +21,9 @@ public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskS
         this.transactionContext = transactionContext;
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
-        transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
+        return (Boolean) transactionContext.executeInsideTransaction(new NullaryFunction<Object>()
         {
             public Object process()
             {
@@ -34,9 +34,14 @@ public abstract class DatabaseStateCleanupTaskSupport extends RecordCleanupTaskS
                         cleanupState();
                     }
                 });
-                return null;
+                return true;
             }
         });
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.NONE;
     }
 
     public abstract void cleanupState();

@@ -5,15 +5,16 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -23,6 +24,7 @@ public class ConfigurationCleanupManager implements EventListener
 
     private Map<Class, ConfigurationCleanupTaskFinder> findersByType = new HashMap<Class, ConfigurationCleanupTaskFinder>();
     private ConfigurationProvider configurationProvider;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private ObjectFactory objectFactory;
 
     public void addCustomCleanupTasks(RecordCleanupTaskSupport topTask)
@@ -48,13 +50,45 @@ public class ConfigurationCleanupManager implements EventListener
         }
     }
 
-    public void runCleanupTasks(RecordCleanupTask task, RecordManager recordManager)
+    public List<ConfigurationEvent> runCleanupTasks(RecordCleanupTask task, RecordManager recordManager)
     {
-        task.run(recordManager);
+        List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
+        runCleanupTasks(task, recordManager, events);
+        return events;
+    }
+
+    private void runCleanupTasks(RecordCleanupTask task, RecordManager recordManager, List<ConfigurationEvent> events)
+    {
+        // We need to prepare events in advance as if, e.g. the task deletes
+        // the path they cannot be determined afterwards.
+        List<ConfigurationEvent> possibleEvents = null;
+        switch (task.getCleanupAction())
+        {
+            case NONE:
+                possibleEvents = Collections.emptyList();
+                break;
+            case DELETE:
+                possibleEvents = configurationTemplateManager.prepareDirectDeleteEvents(task.getAffectedPath());
+                break;
+            case PARENT_UPDATE:
+                possibleEvents = configurationTemplateManager.prepareDirectAndInheritedSaveEvents(PathUtils.getParentPath(task.getAffectedPath()));
+                break;
+        }
+        
+        if (task.run(recordManager))
+        {
+            for (ConfigurationEvent event: possibleEvents)
+            {
+                if (!events.contains(event))
+                {
+                    events.add(event);
+                }
+            }
+        }
 
         for (RecordCleanupTask subTask : task.getCascaded())
         {
-            runCleanupTasks(subTask, recordManager);
+            runCleanupTasks(subTask, recordManager, events);
         }
     }
 
@@ -80,10 +114,16 @@ public class ConfigurationCleanupManager implements EventListener
         return new Class[]{ ConfigurationEventSystemStartedEvent.class };
     }
 
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
+    }
+
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
     }
+    
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);

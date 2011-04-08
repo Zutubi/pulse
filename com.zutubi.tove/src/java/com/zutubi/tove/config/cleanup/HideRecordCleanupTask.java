@@ -1,9 +1,6 @@
 package com.zutubi.tove.config.cleanup;
 
-import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.type.record.TemplateRecord;
+import com.zutubi.tove.type.record.*;
 
 import java.util.Set;
 
@@ -23,9 +20,13 @@ public class HideRecordCleanupTask extends RecordCleanupTaskSupport
         this.internal = internal;
     }
 
-    public void run(RecordManager recordManager)
+    public boolean run(RecordManager recordManager)
     {
-        recordManager.delete(getAffectedPath());
+        Record deleted = recordManager.delete(getAffectedPath());
+        if (deleted == null)
+        {
+            return false;
+        }
 
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());
@@ -33,11 +34,17 @@ public class HideRecordCleanupTask extends RecordCleanupTaskSupport
 
         TemplateRecord.hideItem(parent, baseName);
         recordManager.update(parentPath, parent);
+        return true;
     }
 
     public boolean isInternal()
     {
         return internal;
+    }
+
+    public CleanupAction getCleanupAction()
+    {
+        return CleanupAction.DELETE;
     }
 
     public void getInvalidatedPaths(Set<String> paths)
