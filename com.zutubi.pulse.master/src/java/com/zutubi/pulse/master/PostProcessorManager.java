@@ -44,6 +44,7 @@ public class PostProcessorManager implements EventListener
         "make output processor",
         "maven 1 output processor",
         "maven 2 output processor",
+        "maven 3 output processor",
         "msbuild output processor",
         "nant output processor",
         "nunit xml report processor",
