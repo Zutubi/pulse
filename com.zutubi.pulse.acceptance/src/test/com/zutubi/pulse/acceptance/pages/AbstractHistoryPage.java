@@ -23,7 +23,7 @@ public abstract class AbstractHistoryPage extends SeleniumPage
     public AbstractHistoryPage(SeleniumBrowser browser, Urls urls, String pageId, String componentId)
     {
         super(browser, urls, pageId);
-        builds = new BuildSummaryTable(browser, componentId +"-builds");
+        builds = new BuildSummaryTable(browser, componentId + "-builds");
         pager = new Pager(browser, componentId + "-pager");
     }
 

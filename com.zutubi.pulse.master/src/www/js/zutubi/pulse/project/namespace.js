@@ -325,6 +325,10 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return 'personal';
             }
+            else if (!revision && build.status == 'pending')
+            {
+                return '[floating]';
+            }
             else
             {
                 return Zutubi.pulse.project.renderers.revision(revision);
@@ -374,7 +378,14 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         stageName: function(name, stage)
         {
-            return Zutubi.pulse.project.renderers.link(name, {link: stage.buildLink + 'details/' + encodeURIComponent(stage.name) + '/'});
+            if (stage.buildLink)
+            {
+                return Zutubi.pulse.project.renderers.link(name, {link: stage.buildLink + 'details/' + encodeURIComponent(stage.name) + '/'});
+            }
+            else
+            {
+                return Ext.util.Format.htmlEncode(name);
+            }
         },
         
         stageRecipe: function(recipe)
@@ -384,7 +395,14 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
 
         stageAgent: function(agent)
         {
-            return agent ? Ext.util.Format.htmlEncode(agent) : '[pending]';
+            if (agent)
+            {
+                return Zutubi.pulse.project.renderers.link(agent, {link: 'agents/' + encodeURIComponent(agent) + '/'});
+            }
+            else
+            {
+                return '[pending]';
+            }
         },
 
         stageTests: function(testSummary, stage)
@@ -394,8 +412,15 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         stageLogs: function(dummy, stage)
         {
-            var url = window.baseUrl + '/' + stage.buildLink + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
-            return '<a title="view log" class="unadorned" href="' + url + '"><img src="' + window.baseUrl + '/images/script.gif" alt="view log"> log</a>';
+            if (stage.buildLink)
+            {
+                var url = window.baseUrl + '/' + stage.buildLink + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
+                return '<a title="view log" class="unadorned" href="' + url + '"><img src="' + window.baseUrl + '/images/script.gif" alt="view log"> log</a>';
+            }
+            else
+            {
+                return '&nbsp;';
+            }
         },
         
         COMMENT_TEMPLATE: new Ext.XTemplate(

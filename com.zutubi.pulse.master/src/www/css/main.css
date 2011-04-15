@@ -1069,12 +1069,12 @@ td.status-last
     background-color: #f2f2ff;
 }
 
-.xz-tblink
+.xz-tblink, .xz-tbicontext
 {
     margin: 7px;
 }
 
-.xz-tblink img
+.xz-tblink img, .xz-tbicontext img
 {
     margin-right: 5px;
 }

@@ -6,7 +6,7 @@
 </content>
 <html>
 <head>
-    <title>$!webwork.htmlEncode($project.name)</title>
+    <title>#wwtext("name=server.history")</title>
     <script type="text/javascript">
         var panel = null;
         

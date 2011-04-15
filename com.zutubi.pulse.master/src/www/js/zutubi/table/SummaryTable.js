@@ -192,7 +192,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
 
         for (i = 0, l = this.data.length; i < l; i++)
         {
-            this.tbodyEl.insertHtml('beforeEnd', this.generateRow('td', this.data[i]), true);
+            this.tbodyEl.insertHtml('beforeEnd', this.generateRow(this.data[i]), true);
         };
     },
     
@@ -216,7 +216,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         return html;
     },
     
-    generateRow: function(tag, data)
+    generateRow: function(data)
     {
         var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + ' xz-summary-data">';
         

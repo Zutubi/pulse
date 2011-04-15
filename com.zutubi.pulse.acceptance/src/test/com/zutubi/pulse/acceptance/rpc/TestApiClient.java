@@ -44,4 +44,9 @@ public class TestApiClient extends ApiClient
     {
         call("cancelActiveBuilds");
     }
+    
+    public void ensureRecipeQueueRunning() throws Exception
+    {
+        call("ensureRecipeQueueRunning");
+    }
 }

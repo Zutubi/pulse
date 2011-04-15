@@ -9,6 +9,8 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.SequenceManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.InstanceOfPredicate;
@@ -43,6 +45,7 @@ public class SchedulingController implements EventListener
     private ProjectManager projectManager;
     private BuildRequestRegistry buildRequestRegistry;
     private BuildQueue buildQueue;
+    private AccessManager accessManager;
 
     private Map<Long, BuildRequestHandler> handlers = new HashMap<Long, BuildRequestHandler>();
 
@@ -297,16 +300,6 @@ public class SchedulingController implements EventListener
         return affectedProjects;
     }
 
-    private BuildRequestHandler getRequestHandler(long id)
-    {
-        BuildRequestEvent request = buildQueue.getRequest(id);
-        if (request != null)
-        {
-            return handlers.get(request.getMetaBuildId());
-        }
-        return null;
-    }
-
     private BuildRequestHandler getRequestHandler(BuildRequestEvent request)
     {
         if (request.getMetaBuildId() != 0)
@@ -366,29 +359,36 @@ public class SchedulingController implements EventListener
 
     /**
      * Cancel the specified build request.  A build request can only be cancelled if it
-     * is currently queued.
+     * is currently queued.  Enforces the cancel build permission.
      *
      * @param id the id of the build request to be cancelled.
      * @return true if the request was cancelled, false otherwise.
      */
     public boolean cancelRequest(long id)
     {
-        BuildRequestHandler requestHandler = getRequestHandler(id);
-        if (requestHandler != null)
+        BuildRequestEvent request = buildQueue.getRequest(id);
+        if (request != null)
         {
-            lock.lock();
-            try
+            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, request);
+            
+            BuildRequestHandler requestHandler = handlers.get(request.getMetaBuildId());
+            if (requestHandler != null)
             {
-                List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-                List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
-                internalCompleteRequests(requestHandler, queuedRequests);
-                return queuedRequests.size() > 0;
-            }
-            finally
-            {
-                lock.unlock();
+                lock.lock();
+                try
+                {
+                    List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
+                    List<RequestHolder> queuedRequests = CollectionUtils.filter(requests, new InstanceOfPredicate<RequestHolder>(QueuedRequest.class));
+                    internalCompleteRequests(requestHandler, queuedRequests);
+                    return queuedRequests.size() > 0;
+                }
+                finally
+                {
+                    lock.unlock();
+                }
             }
         }
+        
         return false;
     }
 
@@ -445,5 +445,10 @@ public class SchedulingController implements EventListener
     public void setBuildQueue(BuildQueue buildQueue)
     {
         this.buildQueue = buildQueue;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

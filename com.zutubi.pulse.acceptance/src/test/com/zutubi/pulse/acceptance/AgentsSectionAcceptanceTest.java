@@ -11,11 +11,9 @@ import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import static java.util.Arrays.asList;
@@ -23,7 +21,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
-import java.util.Vector;
 
 /**
  * Acceptance test for basic agents section functionality.
@@ -65,19 +62,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         removeDirectory(tempDir);
 
         super.tearDown();
-    }
-
-    private void removeNonMasterAgents() throws Exception
-    {
-        // Ensure only the master agent is defined.
-        Vector<String> allAgents = rpcClient.RemoteApi.getAllAgentNames();
-        for (String agent: allAgents)
-        {
-            if (!agent.equals(AgentManager.MASTER_AGENT_NAME))
-            {
-                rpcClient.RemoteApi.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
-            }
-        }
     }
 
     public void testOfflineAgent() throws Exception

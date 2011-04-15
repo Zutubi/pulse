@@ -27,4 +27,26 @@ public class ContentTable extends Component
     {
         return browser.evalExpression(getComponentJS() + ".title");
     }
+
+    /**
+     * Returns the length of the data array.
+     * 
+     * @return the data length
+     */
+    public int getDataLength()
+    {
+        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.length"));
+    }
+
+    /**
+     * Returns the text content in the given cell.
+     * 
+     * @param row    zero-base row index
+     * @param column zero-based column index
+     * @return the contents of the given cell
+     */
+    public String getCellContents(int row, int column)
+    {
+        return browser.getCellContents(getId(), row, column);
+    }
 }

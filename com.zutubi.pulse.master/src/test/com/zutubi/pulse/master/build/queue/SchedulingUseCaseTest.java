@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -9,6 +9,7 @@ import static com.zutubi.pulse.master.model.Project.State;
 import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import static org.mockito.Matchers.eq;
@@ -57,6 +58,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
         controller = objectFactory.buildBean(SchedulingController.class);
         controller.setBuildQueue(objectFactory.buildBean(BuildQueue.class));
+        controller.setAccessManager(mock(AccessManager.class));
     }
 
     public void testBuildRequestForIsolatedProject()

@@ -1,10 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.components.pulse.server.ActiveBuildsTable;
+import com.zutubi.pulse.acceptance.components.pulse.server.QueuedBuildsTable;
+import com.zutubi.pulse.acceptance.components.table.ContentTable;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Pair;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,30 +25,28 @@ import java.util.Vector;
  */
 public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 {
-    private static final String ID_BUILD_QUEUE_TABLE = "server.activity.build.queue";
-    private static final String ID_ACTIVITY_TABLE = "server.activity.active.builds";
-    private static final String ID_RECIPE_QUEUE_TABLE = "server.activity.stage.queue";
     private static final String REVISION_WAIT_ANT = "29";
 
     private static final int TIMEOUT = 90000;
+    public static final String BUILD_REASON = "trigger via remote api by admin";
 
-    private Map<Integer, File> waitFiles = new HashMap<Integer, File>();
-    private int nextBuild = 1;
+    private Map<Pair<String, Integer>, File> waitFiles = new HashMap<Pair<String,Integer>, File>();
 
     protected void setUp() throws Exception
     {
         super.setUp();
         rpcClient.loginAsAdmin();
+        rpcClient.TestApi.ensureRecipeQueueRunning();
+        removeNonMasterAgents();
         getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        // finish any builds that are left over.
-        for (int i = 1; i < nextBuild; i++)
-        {
-            waitForBuildToComplete(i);
-        }
+        rpcClient.TestApi.ensureRecipeQueueRunning();
+
+        rpcClient.cancelIncompleteBuilds();
+        rpcClient.logout();
 
         for (File f: waitFiles.values())
         {
@@ -49,62 +55,89 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
                 f.deleteOnExit();
             }
         }
-        
-        rpcClient.logout();
+
         super.tearDown();
     }
 
     public void testEmptyActivityTables()
     {
-        getBrowser().openAndWaitFor(ServerActivityPage.class);
-        assertEmptyTable(ID_BUILD_QUEUE_TABLE, "build queue", BuildQueueTable.EMPTY_MESSAGE);
-        assertEmptyTable(ID_ACTIVITY_TABLE, "active builds", ActiveBuildsTable.EMPTY_MESSAGE);
-        assertEmptyTable(ID_RECIPE_QUEUE_TABLE, "stage queue", "no stages queued");
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        assertEquals(0, activityPage.getQueued().getRowCount());
+        assertEquals(0, activityPage.getActive().getBuildCount());
     }
 
-    private void assertEmptyTable(String id, String header, String message)
+    public void testToggleStageQueue()
     {
-        // we use contains here since the recipe queue table header gets merged with the
-        // pause action when returned by selenium.
-        assertTrue(new Table(id).getHeader().contains(header));
-        assertEquals(message, getBrowser().getCellContents(id, 2, 0));
+        final ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        assertEquals("running", activityPage.getStageQueueStatus());
+        assertTrue(activityPage.canPauseStageQueue());
+        activityPage.clickStageQueueToggle();
+        
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return activityPage.canResumeStageQueue();
+            }
+        }, TIMEOUT, "stage queue to pause");
+        
+        assertEquals("paused", activityPage.getStageQueueStatus());
+        
+        activityPage.clickStageQueueToggle();
+        
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return activityPage.canPauseStageQueue();
+            }
+        }, TIMEOUT, "stage queue to resume");
+        assertEquals("running", activityPage.getStageQueueStatus());
     }
-
-    /**
-     * Simple verification that active builds are correctly displayed in the
-     * active builds table.
-     *
-     * Single project.
-     *
-     * @throws Exception on error.
-     */
+    
     public void testActiveBuilds() throws Exception
     {
-        createAndTriggerProjectBuild();
+        String project1 = random + "1";
+        String project2 = random + "2";
+        
+        createAndTriggerProjectBuild(project1, true);
 
-        getBrowser().openAndWaitFor(ServerActivityPage.class);
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
 
-        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
-        assertEquals(1, activeBuildsTable.getRowCount());
-        assertEquals("trigger via remote api by admin", activeBuildsTable.getReason());
-        assertEquals(random, activeBuildsTable.getOwner());
-        assertEquals("1", activeBuildsTable.getBuildId());
-        assertEquals(random, activeBuildsTable.getProject());
-        assertEquals(REVISION_WAIT_ANT, activeBuildsTable.getRevision());
-        assertEquals("in progress", activeBuildsTable.getStatus());
+        ActiveBuildsTable active = activityPage.getActive();
+        assertEquals(1, active.getBuildCount());
+        ActiveBuildsTable.ActiveBuild build = active.getBuild(0);
+        assertActiveBuild(build, project1, 1, ResultState.IN_PROGRESS, REVISION_WAIT_ANT, BUILD_REASON, true);
+        assertEquals(1, build.stages.size());
+        ActiveBuildsTable.ActiveStage stage = build.stages.get(0);
+        assertActiveStage(stage, "default", ResultState.IN_PROGRESS, "[default]", AgentManager.MASTER_AGENT_NAME);
 
-        waitForBuildToComplete(1);
-        waitForQueueCount(activeBuildsTable, 0);
+        createAndTriggerProjectBuild(project2, false);
+
+        activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+
+        active = activityPage.getActive();
+        assertEquals(2, active.getBuildCount());
+        build = active.getBuild(0);
+        assertActiveBuild(build, project2, 1, ResultState.PENDING, "[floating]", BUILD_REASON, true);
+        assertEquals(1, build.stages.size());
+        stage = build.stages.get(0);
+        assertActiveStage(stage, "default", ResultState.PENDING, "[default]", null);
+        build = active.getBuild(1);
+        assertActiveBuild(build, project1, 1, ResultState.IN_PROGRESS, REVISION_WAIT_ANT, BUILD_REASON, true);
+        
+        waitForBuildToComplete(project1, 1);
+        waitForBuildToComplete(project2, 1);
+        
+        waitForQueueCount(activityPage, active, 0);
     }
 
     public void testCancelBuild() throws Exception
     {
-        createAndTriggerProjectBuild();
+        createAndTriggerProjectBuild(random, true);
 
-        getBrowser().openAndWaitFor(ServerActivityPage.class);
-
-        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
-        activeBuildsTable.clickCancel(random, 1);
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        activityPage.getActive().clickCancel(0);
 
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, 1L);
@@ -122,44 +155,100 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
     public void testBuildQueue() throws Exception
     {
         // build 1 becomes active.
-        createAndTriggerProjectBuild();
+        createAndTriggerProjectBuild(random, true);
         // build 2 goes into the build queue.
-        triggerBuild(false);
-
-        getBrowser().openAndWaitFor(ServerActivityPage.class);
+        triggerBuild(random, false);
 
         verifyQueuedBuildViaRemoteApi();
 
-        getBrowser().openAndWaitFor(ServerActivityPage.class);
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        ActiveBuildsTable active = activityPage.getActive();
+        waitForQueueCount(activityPage, active, 1);
 
-        ActiveBuildsTable activeBuildsTable = new ActiveBuildsTable();
-        waitForQueueCount(activeBuildsTable, 1);
+        QueuedBuildsTable queued = activityPage.getQueued();
+        waitForQueueCount(activityPage, queued, 1);
+        QueuedBuildsTable.QueuedBuild build = queued.getBuild(0);
+        assertEquals(random, build.owner);
+        assertEquals("[floating]", build.revision);
+        assertEquals(BUILD_REASON, build.reason);
+        assertTrue(build.cancelPermitted);
 
-        final BuildQueueTable buildQueueTable = new BuildQueueTable();
-        waitForQueueCount(buildQueueTable, 1);
-        assertEquals("trigger via remote api by admin", buildQueueTable.getReason());
-        assertEquals(random, buildQueueTable.getOwner());
-        assertEquals("[pending]", buildQueueTable.getBuildId());
-        assertEquals(random, buildQueueTable.getProject());
+        waitForBuildToComplete(random, 1);
 
-        waitForBuildToComplete(1);
+        waitForQueueCount(activityPage, queued, 0);
+        waitForQueueCount(activityPage, active, 1);
 
-        waitForQueueCount(buildQueueTable, 0);
-        waitForQueueCount(activeBuildsTable, 1);
-
-        waitForBuildToComplete(2);
+        waitForBuildToComplete(random, 2);
     }
 
+    public void testCancelQueuedBuild() throws Exception
+    {
+        createAndTriggerProjectBuild(random, true);
+        triggerBuild(random, false);
+        verifyQueuedBuildViaRemoteApi();
+
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        QueuedBuildsTable queued = activityPage.getQueued();
+        assertEquals(1, queued.getRowCount());
+
+        queued.clickCancel(0);
+
+        waitForQueueCount(activityPage, queued, 0);
+        waitForBuildToComplete(random, 1);
+    }
+    
     public void testCancelQueuedBuildViaRemoteApi() throws Exception
     {
-        createAndTriggerProjectBuild();
+        createAndTriggerProjectBuild(random, true);
         rpcClient.RemoteApi.triggerBuild(random);
 
         String id = verifyQueuedBuildViaRemoteApi();
         rpcClient.RemoteApi.cancelQueuedBuildRequest(id);
         assertEquals(0, rpcClient.RemoteApi.getBuildQueueSnapshot().size());
         
-        waitForBuildToComplete(1);
+        waitForBuildToComplete(random, 1);
+    }
+    
+    public void testActionPermissions() throws Exception
+    {
+        String project = random + "-project";
+        String user = random + "-user";
+        
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        createAndTriggerProjectBuild(project, true);
+        triggerBuild(project, false);
+        
+        getBrowser().logout();
+        getBrowser().login(user, "");
+
+        ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        assertFalse(activityPage.canPauseStageQueue());
+        assertFalse(activityPage.canResumeStageQueue());
+
+        assertFalse(activityPage.getQueued().getBuild(0).cancelPermitted);
+        ActiveBuildsTable.ActiveBuild activeBuild = activityPage.getActive().getBuild(0);
+        assertFalse(activeBuild.canCancel);
+
+        waitForBuildToComplete(project, 1);
+        waitForBuildToComplete(project, 2);
+    }
+
+    private void assertActiveBuild(ActiveBuildsTable.ActiveBuild build, String owner, int id, ResultState status, String revision, String reason, boolean cancelPermitted)
+    {
+        assertEquals(owner, build.owner);
+        assertEquals(id, build.id);
+        assertEquals(status, build.status);
+        assertEquals(revision, build.revision);
+        assertEquals(reason, build.reason);
+        assertEquals(cancelPermitted, build.canCancel);
+    }
+
+    private void assertActiveStage(ActiveBuildsTable.ActiveStage stage, String name, ResultState status, String recipe, String agent)
+    {
+        assertEquals(name, stage.name);
+        assertEquals(status, stage.status);
+        assertEquals(recipe, stage.recipe);
+        assertEquals(agent, stage.agent);
     }
 
     private String verifyQueuedBuildViaRemoteApi() throws Exception
@@ -187,7 +276,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         assertEquals(false, request.get("isPersonal"));
         assertEquals(false, request.get("isReplaceable"));
         assertEquals("", request.get("revision"));
-        assertEquals("trigger via remote api by admin", request.get("reason"));
+        assertEquals(BUILD_REASON, request.get("reason"));
         assertEquals("remote api", request.get("requestSource"));
 
         String id = (String) request.get("id");
@@ -195,214 +284,60 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         return id;
     }
 
-    private void createAndTriggerProjectBuild() throws Exception
+    private void createAndTriggerProjectBuild(String project, boolean waitForInProgress) throws Exception
     {
         Hashtable<String, Object> svn = rpcClient.RemoteApi.getSubversionConfig(Constants.WAIT_ANT_REPOSITORY);
         Hashtable<String,Object> ant = rpcClient.RemoteApi.getAntConfig();
         ant.put(Constants.Project.AntCommand.ARGUMENTS, getFileArgument());
-        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
+        rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svn, ant);
 
-        triggerBuild(true);
+        triggerBuild(project, waitForInProgress);
     }
 
-    private void triggerBuild(boolean waitForInProgress) throws Exception
+    private void triggerBuild(String project, boolean waitForInProgress) throws Exception
     {
-        int thisBuild = nextBuild++;
-
-        File waitFile = new File(FileSystemUtils.getSystemTempDir(), random + nextBuild);
+        int thisBuild = rpcClient.RemoteApi.getNextBuildNumber(project);
+        File waitFile = new File(FileSystemUtils.getSystemTempDir(), project + thisBuild);
         if (waitFile.exists() && !waitFile.delete())
         {
             throw new RuntimeException("Wait file '" + waitFile.getAbsolutePath() + "' already exists and can't be removed");
         }
-        waitFiles.put(thisBuild, waitFile);
+        waitFiles.put(asPair(project, thisBuild), waitFile);
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("wait.file", waitFile.getAbsolutePath().replace("\\", "/"));
-        rpcClient.RemoteApi.triggerBuild(random, "", properties);
+        rpcClient.RemoteApi.triggerBuild(project, "", properties);
 
         if (waitForInProgress)
         {
-            rpcClient.RemoteApi.waitForBuildInProgress(random, thisBuild, TIMEOUT);
+            rpcClient.RemoteApi.waitForBuildInProgress(project, thisBuild, TIMEOUT);
         }
     }
 
-    private void waitForQueueCount(final Table queueTable, final int count)
+    private void waitForQueueCount(final ServerActivityPage page, final ContentTable queueTable, final int count)
     {
         getBrowser().refreshUntil(TIMEOUT, new Condition()
         {
             public boolean satisfied()
             {
-                return queueTable.getRowCount() == count;
+                page.waitFor();
+                return queueTable.getDataLength() == count;
             }
         }, "queue to have " + count + " entries");
     }
 
-    private void waitForBuildToComplete(int buildId) throws Exception
+    private void waitForBuildToComplete(String project, int buildId) throws Exception
     {
-        File waitFile = waitFiles.get(buildId);
+        File waitFile = waitFiles.get(asPair(project, buildId));
         if (!waitFile.isFile())
         {
             FileSystemUtils.createFile(waitFile, "test");
         }
-
-        rpcClient.RemoteApi.waitForBuildToComplete(random, buildId);
+        rpcClient.RemoteApi.waitForBuildToComplete(project, buildId);
     }
 
     private String getFileArgument()
     {
         return "-Dfile=${wait.file}";
-    }
-
-    public class Table
-    {
-        protected String id;
-        protected String emptyMessage;
-
-        public Table(String id)
-        {
-            this(id, null);
-        }
-
-        public Table(String id, String emptyMessage)
-        {
-            this.id = id;
-            this.emptyMessage = emptyMessage;
-        }
-
-        public String getHeader()
-        {
-            return getBrowser().getCellContents(id, 0, 0);
-        }
-
-        /**
-         * Get the content of the table cell based at the specified row / column.
-         * @param row     row identifier, starting at 1 for the first data row.
-         * @param column  column identifier, starting at 1 for the left hand most column
-         * @return the content of the selected cell.
-         */
-        public String getCell(int row, int column)
-        {
-            try
-            {
-                return getBrowser().getCellContents(id, row + 1, column - 1);
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-        }
-
-        public int getRowCount()
-        {
-            int count = 0;
-            while (true)
-            {
-                try
-                {
-                    getBrowser().getCellContents(id, count + 2, 0);
-                    count++;
-                }
-                catch (Exception e)
-                {
-                    break;
-                }
-            }
-            if (count == 1 && isTableEmpty())
-            {
-                return 0;
-            }
-            return count;
-        }
-
-        public boolean isTableEmpty()
-        {
-            return getCell(1, 1).equals(emptyMessage);
-        }
-    }
-
-    /**
-     * The build queue table.
-     */
-    public class BuildQueueTable extends Table
-    {
-        private int row = 1;
-
-        private static final String EMPTY_MESSAGE = "no builds queued";
-
-        public BuildQueueTable()
-        {
-            super(ID_BUILD_QUEUE_TABLE, EMPTY_MESSAGE);
-        }
-
-        public String getReason()
-        {
-            return getCell(row, 6);
-        }
-
-        public String getOwner()
-        {
-            return getCell(row, 1);
-        }
-
-        public String getBuildId()
-        {
-            return getCell(row, 2);
-        }
-
-        public String getProject()
-        {
-            return getCell(row, 3);
-        }
-    }
-
-    /**
-     * The active builds table.
-     */
-    public class ActiveBuildsTable extends Table
-    {
-        private int row = 1;
-
-        public static final String EMPTY_MESSAGE = "no builds active";
-
-        public ActiveBuildsTable()
-        {
-            super(ID_ACTIVITY_TABLE, EMPTY_MESSAGE);
-        }
-
-        public String getOwner()
-        {
-            return getCell(row, 1);
-        }
-
-        public String getBuildId()
-        {
-            return getCell(row, 2);
-        }
-
-        public String getProject()
-        {
-            return getCell(row, 3);
-        }
-
-        public String getRevision()
-        {
-            return getCell(row, 4);
-        }
-
-        public String getStatus()
-        {
-            return getCell(row, 6);
-        }
-
-        public String getReason()
-        {
-            // skipped a cell because the status column has two cells.
-            return getCell(row, 8);
-        }
-
-        public void clickCancel(String owner, long number)
-        {
-            getBrowser().click("cancel.active." + owner + "." + Long.toString(number));
-        }
     }
 }

@@ -7,7 +7,8 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
      * @cfg {String} text  The text to be shown in the link.
      * @cfg {String} url   The URL to link to.
      */
-
+    enabled: true,
+    
     initComponent: function()
     {
         Zutubi.toolbar.LinkItem.superclass.initComponent.call(this);
@@ -26,6 +27,8 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
     // private
     onRender: function(ct, position)
     {
+        this.id = this.id || Ext.id();
+        
         this.autoEl = {
             tag: 'span',
             cls: 'xz-tblink',
@@ -40,6 +43,7 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
                 href: this.url || '#',
                 children: [{
                     tag: 'img',
+                    id: this.id + '-icon',
                     src: this.icon
                 }]
             });
@@ -49,17 +53,22 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
         {
             this.autoEl.children.push({
                 tag: 'a',
+                id: this.id + '-text',
                 href: this.url || '#',
                 html: this.text || ''
             });
         }
         Zutubi.toolbar.LinkItem.superclass.onRender.call(this, ct, position);
         this.mon(this.el, {scope: this, click: this.onClick});
+        if (!this.enabled)
+        {
+            this.disable();
+        }
     },
 
     handler: function(e)
     {
-        if (this.url)
+        if (this.enabled && this.url)
         {
             window.location.href = this.url;
         }
@@ -67,12 +76,53 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 
     onClick: function(e)
     {
-        if (e && !this.url)
+        if (e && (!this.enabled || !this.url))
         {
             e.preventDefault();
         }
 
-        this.fireEvent('click', this, e);
+        if (this.enabled)
+        {
+            this.fireEvent('click', this, e);
+        }
+    },
+    
+    enable: function()
+    {
+        this.enabled = true;
+        if (this.el)
+        {
+            this.el.show();
+        }
+    },
+    
+    disable: function()
+    {
+        this.enabled = false;
+        if (this.el)
+        {
+            this.el.hide();
+        }
+    },
+
+    setIcon: function(icon)
+    {
+        this.icon = icon;
+        var iconEl = Ext.get(this.id + '-icon');
+        if (iconEl)
+        {
+            iconEl.set({src: icon});
+        }
+    },
+
+    setText: function(text)
+    {
+        this.text = text;
+        var textEl = Ext.get(this.id + '-text');
+        if (textEl)
+        {
+            textEl.update(text);
+        }
     }
 });
 Ext.reg('xztblink', Zutubi.toolbar.LinkItem);

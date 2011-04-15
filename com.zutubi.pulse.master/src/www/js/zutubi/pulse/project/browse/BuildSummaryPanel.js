@@ -148,7 +148,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
                     id: this.id + '-actions',
                     title: 'actions',
                     handlers: {
-                        cancel: window.baseUrl + '/cancelBuild.action?buildId=' + this.buildId + '&fromBuild=true"',
+                        cancel: cancelBuild.createDelegate(window, [this.buildId]),
                         'delete': this.deleteBuild.createDelegate(this),
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),

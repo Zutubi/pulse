@@ -3,12 +3,16 @@ package com.zutubi.pulse.acceptance;
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.TimeStamps;
 import junit.framework.AssertionFailedError;
 
 import java.io.File;
+import java.util.Vector;
 
 /**
  * The base class for all acceptance level tests.  It provides some useful
@@ -126,6 +130,19 @@ public abstract class AcceptanceTestBase extends PulseTestCase
         {
             System.out.println(" " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - startTime));
             tearDown();
+        }
+    }
+
+    protected void removeNonMasterAgents() throws Exception
+    {
+        // Ensure only the master agent is defined.
+        Vector<String> allAgents = rpcClient.RemoteApi.getAllAgentNames();
+        for (String agent: allAgents)
+        {
+            if (!agent.equals(AgentManager.MASTER_AGENT_NAME))
+            {
+                rpcClient.RemoteApi.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
+            }
         }
     }
 }

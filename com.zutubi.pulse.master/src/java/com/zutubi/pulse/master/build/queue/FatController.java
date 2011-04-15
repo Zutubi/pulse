@@ -38,8 +38,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class FatController implements EventListener, Stoppable
 {
-    protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
-
     private static final Logger LOG = Logger.getLogger(FatController.class);
     private static final Messages I18N = Messages.getInstance(FatController.class);
 

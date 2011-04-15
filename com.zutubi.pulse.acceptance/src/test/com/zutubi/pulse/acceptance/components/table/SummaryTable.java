@@ -22,7 +22,7 @@ public class SummaryTable extends ContentTable
      */
     public int getRowCount()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.length"));
+        return getDataLength();
     }
 
     /**
@@ -41,7 +41,7 @@ public class SummaryTable extends ContentTable
         Map<String, String> result = new LinkedHashMap<String, String>();
         for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
         {
-            result.put(columnNames[columnIndex], browser.getCellContents(getId(), index + 2, columnIndex));
+            result.put(columnNames[columnIndex], getCellContents(index + 2, columnIndex));
         }
         return result;
     }

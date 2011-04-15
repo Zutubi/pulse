@@ -557,3 +557,45 @@ function refreshPanel(id, url, callback)
         }
     });
 }
+
+function handleCancelResponse(options, success, response)
+{
+    if (success)
+    {
+        var result = Ext.util.JSON.decode(response.responseText);
+        refresh(function() {
+            if (result.success)
+            {
+                showStatus(result.detail, 'success');
+            }
+            else
+            {
+                showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+            }
+        });
+    }
+    else
+    {
+        showStatus('Cannot contact server', 'failure');
+    }
+}
+
+function cancelQueuedBuild(id)
+{
+    showStatus('Cancelling queued build...', 'working');
+    Ext.Ajax.request({
+        url: window.baseUrl + '/ajax/cancelQueuedBuild.action',
+        params: { id: id },
+        callback: handleCancelResponse
+    });
+}
+
+function cancelBuild(id)
+{
+    showStatus('Requesting build termination...', 'working');
+    Ext.Ajax.request({
+        url: window.baseUrl + '/ajax/cancelBuild.action',
+        params: { buildId: id },
+        callback: handleCancelResponse
+    });
+}

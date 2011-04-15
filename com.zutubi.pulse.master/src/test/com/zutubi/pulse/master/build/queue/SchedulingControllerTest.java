@@ -8,10 +8,11 @@ import static com.zutubi.pulse.master.model.Project.State;
 import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
+import com.zutubi.tove.security.AccessManager;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 public class SchedulingControllerTest extends BaseQueueTestCase
 {
@@ -37,6 +38,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
 
         controller = objectFactory.buildBean(SchedulingController.class);
         controller.setBuildQueue(objectFactory.buildBean(BuildQueue.class));
+        controller.setAccessManager(mock(AccessManager.class));
     }
 
     // -- management of the project status.

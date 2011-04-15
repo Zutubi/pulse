@@ -37,17 +37,9 @@
             <result name="success" type="redirect">${redirect}</result>
         </action>
 
-        <action name="viewServerQueues" class="com.zutubi.pulse.master.xwork.actions.server.ViewServerQueuesAction">
+        <action name="serverActivity" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/view-server-queues.vm</result>
-        </action>
-
-        <action name="cancelBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelBuildAction">
-            <result name="success" type="redirect">${redirect}</result>
-        </action>
-
-        <action name="cancelQueuedBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelQueuedBuildAction">
-            <result name="success" type="redirect">/server/activity/</result>
+            <result name="success" type="velocity">/server-activity.vm</result>
         </action>
 
         <action name="serverHistory" class="com.zutubi.pulse.master.xwork.actions.server.ServerHistoryAction">
@@ -354,10 +346,6 @@
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
-        <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.admin.ToggleRecipeQueueAction">
-            <result name="success" type="redirect">/server/activity/</result>
-        </action>
-
         <action name="addSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doAdd">
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
@@ -460,10 +448,29 @@
             <result name="success" type="velocity">view-agents-panel.vm</result>
         </action>
 
-        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.master.xwork.actions.server.ViewServerQueuesAction">
-            <result name="success" type="velocity">view-server-queues-panel.vm</result>
+        <action name="serverActivityData" class="com.zutubi.pulse.master.xwork.actions.server.ServerActivityDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
         </action>
 
+        <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.server.ToggleRecipeQueueAction">
+            <result name="success" type="flexjson">result</result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+
+        <action name="cancelQueuedBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelQueuedBuildAction">
+            <result name="success" type="flexjson">result</result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+
+        <action name="cancelBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelBuildAction">
+            <result name="success" type="flexjson">result</result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+        
         <action name="xls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="flexjson">

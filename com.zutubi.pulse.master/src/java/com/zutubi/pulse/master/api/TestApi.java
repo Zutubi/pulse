@@ -10,20 +10,20 @@ import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Implements an XML-RPC API with testing-specific functionality.  Accepts
@@ -38,6 +38,7 @@ public class TestApi
     private TokenManager tokenManager;
     private PluginManager pluginManager;
     private BuildManager buildManager;
+    private RecipeQueue recipeQueue;
 
     public TestApi()
     {
@@ -141,6 +142,23 @@ public class TestApi
         return true;
     }
 
+    /**
+     * Ensures that the recipe queue is running.
+     *
+     * @param token authentication token
+     * @return true
+     */
+    public boolean ensureRecipeQueueRunning(String token)
+    {
+        tokenManager.verifyAdmin(token);
+        if (!recipeQueue.isRunning())
+        {
+            recipeQueue.start();
+        }
+        
+        return true;
+    }
+
     private Agent internalGetAgent(String name) throws IllegalArgumentException
     {
         Agent agent = agentManager.getAgent(name);
@@ -188,5 +206,10 @@ public class TestApi
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+    }
+
+    public void setRecipeQueue(RecipeQueue recipeQueue)
+    {
+        this.recipeQueue = recipeQueue;
     }
 }

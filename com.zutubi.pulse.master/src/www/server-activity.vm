@@ -1,0 +1,34 @@
+#helpTag("Server+Activity+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">server</content>
+<content tag="header.javascript">
+    zutubi/pulse/server/ActivityPanel.js
+</content>
+<html>
+<head>
+    <title>#wwtext("name=server.activity")</title>
+    <script type="text/javascript">
+        var panel = null;
+        
+        function refresh(callback)
+        {
+            panel.load(callback);
+        }
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.server.ActivityPanel({
+                id: 'server-activity',
+                url: window.baseUrl + '/ajax/serverActivityData.action',
+                loadingId: 'server-activity-loading',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval
+            });
+        });
+    </script>
+</head>
+<body>
+    #serverTabs("activity")
+
+    <div id='server-activity-loading'>
+    </div>
+</html>

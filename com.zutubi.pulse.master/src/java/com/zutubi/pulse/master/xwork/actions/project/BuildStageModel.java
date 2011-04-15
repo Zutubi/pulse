@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -41,7 +42,10 @@ public class BuildStageModel extends ResultModel
         recipe = recipeResult.getRecipeName();
         agent = stageResult.getHost();
         tests = recipeResult.getTestSummary().toString();
-        buildLink = Urls.getRelativeInstance().build(buildResult);
+        if (!buildResult.isPersonal() || buildResult.getOwnerName().equals(SecurityUtils.getLoggedInUsername()))
+        {
+            buildLink = Urls.getRelativeInstance().build(buildResult);
+        }
 
         if (collectArtifacts)
         {
