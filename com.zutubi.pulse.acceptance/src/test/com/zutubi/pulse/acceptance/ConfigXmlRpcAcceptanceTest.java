@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -36,7 +37,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     
     private static final String PATH_EMAIL_SETTINGS = "settings/email";
 
-    private static final long DISABLE_TIMEOUT = 30000;
+    private static final long AGENT_STATUS_TIMEOUT = 60000;
     
     protected void setUp() throws Exception
     {
@@ -611,6 +612,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String path = rpcClient.RemoteApi.insertSimpleAgent(agentName);
         try
         {
+            rpcClient.RemoteApi.waitForAgentStatus(agentName, AgentStatus.IDLE, AGENT_STATUS_TIMEOUT);
             Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
             assertEquals(asList(ACTION_DISABLE, ACTION_PING), new LinkedList<String>(actions));
         }
@@ -642,7 +644,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
                         return false;
                     }
                 }
-            }, DISABLE_TIMEOUT, "agent to be disabled");
+            }, AGENT_STATUS_TIMEOUT, "agent to be disabled");
         }
         finally
         {

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
@@ -821,23 +822,23 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
             IOUtils.joinStreams(new ByteArrayInputStream(oneMegabyte), out);
         }
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "-upstream");
-        projectA.getRecipe(DEFAULT_RECIPE).addArtifact("BIG ARTIFACT", largeArtifact.getCanonicalPath().replace('\\', '/'));
-        insertProject(projectA);
+        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        upstreamProject.getRecipe(DEFAULT_RECIPE).addArtifact("BIG ARTIFACT", largeArtifact.getCanonicalPath().replace('\\', '/'));
+        insertProject(upstreamProject);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "-downstream");
-        projectB.addDependency(projectA.getConfig());
-        projectB.addExpectedFiles("lib/BIGFILE");
-        insertProject(projectB);
+        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        downstreamProject.addDependency(upstreamProject.getConfig());
+        downstreamProject.addExpectedFiles("lib/BIGFILE");
+        insertProject(downstreamProject);
 
         // double the timeout to give pulse enough time to capture and upload the large file.
 
-        List<String> requestIds = buildRunner.triggerBuild(projectA);
+        List<String> requestIds = buildRunner.triggerBuild(upstreamProject);
         Hashtable<String, Object> request = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(requestIds.get(0));
         int buildNumber = Integer.valueOf(request.get("buildId").toString());
         
-        rpcClient.RemoteApi.waitForBuildToComplete(projectA.getName(), buildNumber, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
-        ResultState buildStatus = rpcClient.RemoteApi.getBuildStatus(projectA.getName(), buildNumber);
+        rpcClient.RemoteApi.waitForBuildToComplete(upstreamProject.getName(), buildNumber, RemoteApiClient.BUILD_TIMEOUT * 2);
+        ResultState buildStatus = rpcClient.RemoteApi.getBuildStatus(upstreamProject.getName(), buildNumber);
         assertEquals(ResultState.SUCCESS, buildStatus);
 
         // The completion of project A's build will trigger a build of project B.
@@ -856,10 +857,10 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
                     throw new RuntimeException(e);
                 }
             }
-        }, rpcClient.RemoteApi.BUILD_TIMEOUT, " build queue to clear");
+        }, RemoteApiClient.BUILD_TIMEOUT, " build queue to clear");
 
-        rpcClient.RemoteApi.waitForBuildInProgress(projectB.getName(), 1);
-        rpcClient.RemoteApi.waitForBuildToComplete(projectB.getName(), 1, rpcClient.RemoteApi.BUILD_TIMEOUT * 2);
+        rpcClient.RemoteApi.waitForBuildInProgress(downstreamProject.getName(), 1, RemoteApiClient.BUILD_TIMEOUT * 2);
+        rpcClient.RemoteApi.waitForBuildToComplete(downstreamProject.getName(), 1, RemoteApiClient.BUILD_TIMEOUT * 2);
     }
 
     public void testProjectDependsOnMultipleStagesOfUpstreamProject() throws Exception
