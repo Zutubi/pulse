@@ -6,8 +6,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -614,7 +613,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         {
             rpcClient.RemoteApi.waitForAgentStatus(agentName, AgentStatus.IDLE, AGENT_STATUS_TIMEOUT);
             Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
-            assertEquals(asList(ACTION_DISABLE, ACTION_PING), new LinkedList<String>(actions));
+            assertEquals(asList(ACTION_DISABLE, ACTION_PING, ACTION_GC), new LinkedList<String>(actions));
         }
         finally
         {
