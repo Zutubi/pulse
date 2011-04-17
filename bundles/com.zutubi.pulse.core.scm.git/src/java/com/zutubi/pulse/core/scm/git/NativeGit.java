@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+
+import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
 import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
@@ -140,18 +142,10 @@ public class NativeGit
             commands.add(revision + ":" + object);
         }
 
-        final StringBuffer buffer = new StringBuffer();
-        ScmOutputHandlerSupport handler = new ScmOutputHandlerSupport()
-        {
-            public void handleStdout(String line)
-            {
-                buffer.append(line);
-            }
-        };
-
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
         runWithHandler(handler, null, true, commands.toArray(new String[commands.size()]));
 
-        return new ByteArrayInputStream(buffer.toString().getBytes());
+        return new ByteArrayInputStream(handler.getOutput().getBytes());
     }
 
     public List<GitLogEntry> log() throws ScmException

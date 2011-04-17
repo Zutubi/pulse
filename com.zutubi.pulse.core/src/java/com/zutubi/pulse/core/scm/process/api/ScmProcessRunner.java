@@ -179,7 +179,8 @@ public class ScmProcessRunner
      * before being passed to the output handler.  If the current inactivity
      * timeout is non-zero, it will be applied to detect process hangs.
      * 
-     * @param handler       handler that will be notified of process output
+     * @param handler       handler that will be notified of process output,
+     *                      may be null in which case output is discarded
      * @param input         input bytes to feed to the process, may be null if
      *                      there are is no input to feed
      * @param checkExitCode if true, the exit code will be checked and an error
@@ -189,12 +190,14 @@ public class ScmProcessRunner
      * @return the exit code of the process
      * @throws ScmException on any error
      */
-    public int runProcess(final ScmOutputHandler handler, byte[] input, boolean checkExitCode, String... commands) throws ScmException
+    public int runProcess(ScmOutputHandler handler, byte[] input, boolean checkExitCode, String... commands) throws ScmException
     {
+        final ScmOutputHandler safeHandler = handler == null ?  new ScmOutputHandlerSupport() : handler;
+
         processBuilder.command(commands);
 
         String commandLine = getLastCommandLine();
-        handler.handleCommandLine(commandLine);
+        safeHandler.handleCommandLine(commandLine);
 
         Process child;
 
@@ -237,11 +240,11 @@ public class ScmProcessRunner
                 {
                     stderr.append(line);
                     stderr.append('\n');
-                    handler.handleStderr(line);
+                    safeHandler.handleStderr(line);
                 }
                 else
                 {
-                    handler.handleStdout(line);
+                    safeHandler.handleStdout(line);
                 }
             }
         }, true);
@@ -253,7 +256,7 @@ public class ScmProcessRunner
             Integer exitCode;
             do
             {
-                handler.checkCancelled();
+                safeHandler.checkCancelled();
                 exitCode = async.waitFor(10, TimeUnit.SECONDS);
                 if (activity.getAndSet(false))
                 {
@@ -274,7 +277,7 @@ public class ScmProcessRunner
             }
             while (exitCode == null);
 
-            handler.handleExitCode(exitCode);
+            safeHandler.handleExitCode(exitCode);
 
             if (checkExitCode && exitCode != 0)
             {

@@ -22,9 +22,9 @@ public enum ScmCapability
     REVISIONS,
 
     /**
-     * Defines whether the SCM supports defining the changes that have occured
+     * Defines whether the SCM supports defining the changes that have occurred
      * at each revision.  This is used by pulse to provide extra information
-     * about what changes have occured in a build.
+     * about what changes have occurred in a build.
      *
      * SCMs with this capability must also support {@link #REVISIONS}.
      */
@@ -35,7 +35,7 @@ public enum ScmCapability
      *
      * SCMs with this capability must also support {@link #REVISIONS}.
      *
-     * SCMs supporting this capabillity must have a configuration class which
+     * SCMs supporting this capability must have a configuration class which
      * implements {@link com.zutubi.pulse.core.scm.config.api.Pollable}.
      */
     POLL,

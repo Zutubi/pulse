@@ -45,6 +45,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.visualstudio" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.cvs" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.hg" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.noop" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.p4" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
