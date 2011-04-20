@@ -343,7 +343,7 @@ public class GitClientTest extends GitClientTestBase
     private void updateToRevisionHelper() throws ScmException, IOException
     {
         client.checkout(context, null, handler);
-        assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
+        assertEquals(CONTENT_A_TXT, IOUtils.fileToString(new File(workingDir, "a.txt")));
 
         Revision rev = client.update(context, new Revision(REVISION_MASTER_INTERMEDIATE), handler);
         assertEquals(REVISION_MASTER_INTERMEDIATE, rev.getRevisionString());

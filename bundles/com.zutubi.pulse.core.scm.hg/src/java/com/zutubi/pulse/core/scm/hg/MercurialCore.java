@@ -3,9 +3,10 @@ package com.zutubi.pulse.core.scm.hg;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
 import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.StringUtils;
 
@@ -13,9 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.*;
-
-import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 
 /**
  * A wrapper around the hg command line.
@@ -66,7 +66,7 @@ public class MercurialCore
 
     public InputStream cat(String path, String revision) throws ScmException
     {
-        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
         run(handler, COMMAND_CAT, FLAG_REVISION, revision, path);
         return new ByteArrayInputStream(handler.getOutput().getBytes());
     }
@@ -146,7 +146,7 @@ public class MercurialCore
         command.add(FLAG_REVISION);
         command.add(getRevisionArg(beginRevision, endRevision));
 
-        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
 
         run(handler, command.toArray(new String[command.size()]));
 
@@ -190,7 +190,7 @@ public class MercurialCore
     public Map<String, String> tags() throws ScmException
     {
         final Map<String, String> result = new HashMap<String, String>();
-        run(new ScmOutputHandlerSupport()
+        run(new ScmLineHandlerSupport()
         {
             @Override
             public void handleStdout(String line)
@@ -213,9 +213,9 @@ public class MercurialCore
 
     public String parents() throws ScmException
     {
-        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
         run(handler, COMMAND_PARENTS, FLAG_TEMPLATE, TEMPLATE_NODE);
-        return handler.getOutput().trim();
+        return handler.getOutput();
     }
 
     public void push(ScmOutputHandler handler, String branch) throws ScmException
@@ -262,7 +262,7 @@ public class MercurialCore
             return;
         }
 
-        ScmOutputHandlerSupport outputHandler = new ScmOutputHandlerSupport()
+        ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport()
         {
             public void handleStdout(String line)
             {

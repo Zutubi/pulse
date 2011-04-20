@@ -11,6 +11,10 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +23,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 
 public class MercurialClientTest extends PulseTestCase
 {
@@ -117,7 +116,7 @@ public class MercurialClientTest extends PulseTestCase
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
         repositoryBase = new File(tmp, "repo");
-        repository = "file://" + repositoryBase.getCanonicalPath();
+        repository = repositoryBase.getCanonicalPath();
 
         config = new MercurialConfiguration();
         config.setRepository(repository);

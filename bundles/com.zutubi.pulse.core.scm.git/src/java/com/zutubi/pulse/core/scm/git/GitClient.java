@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -634,7 +634,7 @@ public class GitClient implements ScmClient
         }
     }
 
-    private static class LsRemoteOutputHandler implements ScmOutputHandler
+    private static class LsRemoteOutputHandler implements ScmLineHandler
     {
         private String commandLine;
         private String stdout = "";

@@ -9,48 +9,33 @@ import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
  */
 public class ScmOutputHandlerSupport implements ScmOutputHandler
 {
-    private int exitCode;
     private ScmFeedbackHandler scmHandler;
+    private String commandLine;
+    private int exitCode;
 
-    /**
-     * Creates a handler with no underlying {@link ScmFeedbackHandler}.
-     */
     public ScmOutputHandlerSupport()
     {
     }
 
-    /**
-     * Creates a handler with the given underlying {@link ScmFeedbackHandler}.
-     * 
-     * @param feedbackHandler handler that will be passed status messages
-     */
-    public ScmOutputHandlerSupport(ScmFeedbackHandler feedbackHandler)
+    public ScmOutputHandlerSupport(ScmFeedbackHandler scmHandler)
     {
-        this.scmHandler = feedbackHandler;
+        this.scmHandler = scmHandler;
     }
 
     public void handleCommandLine(String line)
     {
-        if (scmHandler != null)
-        {
-            scmHandler.status(">> " + line);
-        }
+        commandLine = line;
+        status(">> " + line);
     }
 
-    public void handleStdout(String line)
+    /**
+     * Returns the command line used to run the external scm process.
+     * 
+     * @return the scm tool command line
+     */
+    public String getCommandLine()
     {
-        if (scmHandler != null)
-        {
-            scmHandler.status(line);
-        }
-    }
-
-    public void handleStderr(String line)
-    {
-        if (scmHandler != null)
-        {
-            scmHandler.status(line);
-        }
+        return commandLine;
     }
 
     public void handleExitCode(int code)
@@ -58,6 +43,11 @@ public class ScmOutputHandlerSupport implements ScmOutputHandler
         this.exitCode = code;
     }
 
+    /**
+     * Returns the exit code of external scm process.
+     * 
+     * @return the exit code captured from the external process
+     */
     public int getExitCode()
     {
         return exitCode;
@@ -68,6 +58,14 @@ public class ScmOutputHandlerSupport implements ScmOutputHandler
         if (scmHandler != null)
         {
             scmHandler.checkCancelled();
+        }
+    }
+    
+    protected void status(String status)
+    {
+        if (scmHandler != null)
+        {
+            scmHandler.status(status);
         }
     }
 }

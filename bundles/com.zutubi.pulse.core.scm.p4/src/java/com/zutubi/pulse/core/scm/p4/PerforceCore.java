@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -105,7 +105,7 @@ public class PerforceCore
         return result;
     }
 
-    public void runP4WithHandler(final ScmOutputHandler handler, String input, String... commands) throws ScmException
+    public void runP4WithHandler(final ScmLineHandler handler, String input, String... commands) throws ScmException
     {
         String commandLine = StringUtils.join(" ", commands);
         if (LOG.isLoggable(Level.FINE))

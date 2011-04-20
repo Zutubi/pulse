@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 
 /**
  * Adapts between the API callback interface {@link com.zutubi.pulse.core.scm.api.ScmFeedbackHandler}
- * and the SCM API's own equivalent {@link com.zutubi.pulse.core.scm.process.api.ScmOutputHandler}
+ * and the SCM API's own equivalent {@link com.zutubi.pulse.core.scm.process.api.ScmLineHandler}
  * to report feedback during checkout/update operations.
  */
 public class PerforceCheckoutFeedbackHandler extends PerforceErrorDetectingFeedbackHandler

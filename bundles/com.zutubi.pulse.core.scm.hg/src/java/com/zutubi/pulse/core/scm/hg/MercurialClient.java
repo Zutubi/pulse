@@ -3,21 +3,21 @@ package com.zutubi.pulse.core.scm.hg;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.*;
-
-import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -58,7 +58,7 @@ public class MercurialClient implements ScmClient
 
         hg.setWorkingDirectory(workingDir.getParentFile());
         handler.status("Initialising clone of repository '" + config.getRepository() + "'...");
-        ScmOutputHandlerSupport outputHandler = new ScmOutputHandlerSupport(handler);
+        ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport(handler);
         hg.clone(outputHandler, config.getRepository(), config.getBranch(), null, workingDir.getName());
         handler.status("Repository cloned.");
         hg.setWorkingDirectory(workingDir);
@@ -116,7 +116,7 @@ public class MercurialClient implements ScmClient
         // hg clone --noupdate [--branch <branch>] <repository> <dir>
         // cd <dir>
         // hg update --rev <revision>
-        ScmOutputHandler outputHandler = new ScmOutputHandlerSupport(handler);
+        ScmLineHandler outputHandler = new ScmLineHandlerSupport(handler);
         hg.setWorkingDirectory(workingDir.getParentFile());
         hg.clone(outputHandler, config.getRepository(), config.getBranch(), null, workingDir.getName());
 
@@ -134,7 +134,7 @@ public class MercurialClient implements ScmClient
             return checkout(context, revision, handler);
         }
 
-        ScmOutputHandlerSupport outputHandler = new ScmOutputHandlerSupport(handler);
+        ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport(handler);
         hg.setWorkingDirectory(workingDir);
         hg.pull(outputHandler, config.getBranch());
         hg.update(outputHandler, safeRevisionString(revision));
@@ -186,7 +186,7 @@ public class MercurialClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(ScmOutputHandler handler, File workingDir) throws ScmException
+    private void preparePersistentDirectory(ScmLineHandler handler, File workingDir) throws ScmException
     {
         if (!isMercurialRepository(workingDir))
         {
@@ -337,7 +337,7 @@ public class MercurialClient implements ScmClient
         try
         {
             tempDir = FileSystemUtils.createTempDir(getClass().getName());
-            ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
+            ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
             hg.clone(handler, config.getRepository(), config.getBranch(), REVISION_NULL, tempDir.getAbsolutePath());
 
             String stderr = handler.getError().trim();

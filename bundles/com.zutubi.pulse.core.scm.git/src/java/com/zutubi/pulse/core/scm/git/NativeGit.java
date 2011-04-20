@@ -2,11 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-
-import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
-import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
+import com.zutubi.pulse.core.scm.process.api.*;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
@@ -142,7 +138,7 @@ public class NativeGit
             commands.add(revision + ":" + object);
         }
 
-        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler();
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(CHARSET_UTF8);
         runWithHandler(handler, null, true, commands.toArray(new String[commands.size()]));
 
         return new ByteArrayInputStream(handler.getOutput().getBytes());
@@ -228,7 +224,7 @@ public class NativeGit
         run(handler, command);
     }
 
-    public void lsRemote(ScmOutputHandler handler, String repository, String refs) throws ScmException
+    public void lsRemote(ScmLineHandler handler, String repository, String refs) throws ScmException
     {
         runWithHandler(handler, null, true, getGitCommand(), COMMAND_LS_REMOTE, repository, refs);
     }
@@ -315,7 +311,7 @@ public class NativeGit
 
     protected int run(ScmFeedbackHandler scmHandler, String... commands) throws ScmException
     {
-        ScmOutputHandlerSupport handler = new ScmOutputHandlerSupport(scmHandler);
+        ScmLineHandlerSupport handler = new ScmLineHandlerSupport(scmHandler);
         return runWithHandler(handler, null, true, commands);
     }
 
@@ -350,7 +346,7 @@ public class NativeGit
     /**
      * A simple output handler that just captures stdout and stderr line by line.
      */
-    static class OutputCapturingHandler implements ScmOutputHandler
+    static class OutputCapturingHandler implements ScmLineHandler
     {
         private List<String> outputLines = new LinkedList<String>();
         private List<String> errorLines = new LinkedList<String>();
@@ -417,7 +413,7 @@ public class NativeGit
      *
      * This format is generated using --pretty=format:... (see {@link NativeGit#log})
      */
-    static class LogOutputHandler extends ScmOutputHandlerSupport
+    static class LogOutputHandler extends ScmLineHandlerSupport
     {
         private List<GitLogEntry> entries;
 
@@ -549,7 +545,7 @@ public class NativeGit
      * Read the output from the git branch command, interpretting the information as
      * necessary.
      */
-    private class BranchOutputHandler extends ScmOutputHandlerSupport
+    private class BranchOutputHandler extends ScmLineHandlerSupport
     {
         private List<GitBranchEntry> branches = new LinkedList<GitBranchEntry>();
 
@@ -571,7 +567,7 @@ public class NativeGit
         }
     }
 
-    static class LsTreeOutputHandler extends ScmOutputHandlerSupport
+    static class LsTreeOutputHandler extends ScmLineHandlerSupport
     {
         private List<ScmFile> files = new LinkedList<ScmFile>();
 
@@ -603,7 +599,7 @@ public class NativeGit
             return;
         }
 
-        ScmOutputHandlerSupport outputHandler = new ScmOutputHandlerSupport()
+        ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport()
         {
             public void handleStdout(String line)
             {

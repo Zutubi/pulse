@@ -2,14 +2,14 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.ui.api.UserInterface;
 
 /**
  * A handler for the p4 sync operation that just passes the output through to
  * the UI.
  */
-public class PerforceSyncFeedbackHandler implements ScmOutputHandler
+public class PerforceSyncFeedbackHandler implements ScmLineHandler
 {
     private UserInterface ui;
     private boolean resolveRequired = false;

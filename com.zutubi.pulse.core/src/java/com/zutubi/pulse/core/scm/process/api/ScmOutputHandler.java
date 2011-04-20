@@ -4,10 +4,9 @@ import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
 /**
- * Callback interface used for progress reporting when running an external SCM
- * tool.
- * 
- * @see ScmOutputHandlerSupport
+ * Common methods for callback interfaces used for handling events and output
+ * when running an external SCM tool.  See extensions of this interface if you
+ * actually need to capture the process output.
  */
 public interface ScmOutputHandler
 {
@@ -21,25 +20,11 @@ public interface ScmOutputHandler
     void handleCommandLine(String line);
 
     /**
-     * Called when a line of standard output is read from the process.
-     * 
-     * @param line the line of output (without the line terminator)
-     */
-    void handleStdout(String line);
-
-    /**
-     * Called when a line of error output is read from the process.
-     * 
-     * @param line the line of error (without the line terminator)
-     */
-    void handleStderr(String line);
-
-    /**
      * Called when the process has just exited, with the exit code it
      * returned.
      * 
      * @param code the exit code of the process
-     * @throws ScmException on any error
+     * @throws com.zutubi.pulse.core.scm.api.ScmException on any error
      */
     void handleExitCode(int code) throws ScmException;
 

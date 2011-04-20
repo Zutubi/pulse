@@ -24,7 +24,7 @@ public abstract class GitClientTestBase extends PulseTestCase
     protected static final String BRANCH_SIMPLE = "branch";
     protected static final String BRANCH_MERGES = "devbranch";
     protected static final String TEST_AUTHOR = "Jason Sankey";
-    protected static final String CONTENT_A_TXT = "another a edit";
+    protected static final String CONTENT_A_TXT = "another a edit\n";
     protected static final String EXTENSION_TXT = "txt";
 
     private File tmp;

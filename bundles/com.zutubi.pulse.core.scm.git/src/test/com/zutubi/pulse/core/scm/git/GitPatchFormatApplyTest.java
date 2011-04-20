@@ -29,7 +29,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
         patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
-        assertEquals(CONTENT_A_TXT + "\n", IOUtils.fileToString(new File(workingDir, "ren.txt")));
+        assertEquals(CONTENT_A_TXT, IOUtils.fileToString(new File(workingDir, "ren.txt")));
         assertCleanPatch();
     }
 

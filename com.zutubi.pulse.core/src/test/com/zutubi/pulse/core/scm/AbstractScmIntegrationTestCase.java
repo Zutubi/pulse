@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -189,7 +188,7 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
             input = client.retrieve(context, prefix + "project/src/com/package.properties", null);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             IOUtils.joinStreams(input, output);
-            assertEquals("key=value", output.toString());
+            assertEquals("key=value\n", output.toString());
         }
         finally
         {

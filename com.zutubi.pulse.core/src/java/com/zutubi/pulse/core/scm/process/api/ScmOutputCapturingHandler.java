@@ -1,40 +1,43 @@
 package com.zutubi.pulse.core.scm.process.api;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+
 /**
  * An SCM output handler that captures stdout and stderr into buffers.
  */
-public class ScmOutputCapturingHandler extends ScmOutputHandlerSupport
+public class ScmOutputCapturingHandler extends ScmOutputHandlerSupport implements ScmByteHandler
 {
-    private String commandLine;
     private StringBuilder stdout = new StringBuilder();
     private StringBuilder stderr = new StringBuilder();
 
-    @Override
-    public void handleCommandLine(String line)
+    private Charset charset;
+
+    public ScmOutputCapturingHandler(Charset charset)
     {
-        this.commandLine = line;
+        this.charset = charset;
     }
 
-    @Override
-    public void handleStdout(String line)
+    public void handleStdout(byte[] buffer, int n)
     {
-        stdout.append(line).append('\n');
+        stdout.append(convert(buffer, n));
     }
 
-    @Override
-    public void handleStderr(String line)
+    public void handleStderr(byte[] buffer, int n)
     {
-        stderr.append(line).append('\n');
+        stderr.append(convert(buffer, n));
     }
 
-    /**
-     * Returns the command line issued when running the SCM process.
-     *
-     * @return the command line issued
-     */
-    public String getCommandLine()
+    private String convert(byte[] buffer, int n)
     {
-        return commandLine;
+        try
+        {
+            return new String(buffer, 0, n, charset.name());
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return "";
+        }
     }
 
     /**

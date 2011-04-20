@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.process.api;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
+import com.zutubi.pulse.core.util.process.ByteHandler;
 import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides support for running an external SCM process.  Handles feeding input
- * to the process and sending output to an {@link ScmOutputHandler}.  Includes
+ * to the process and sending output to an {@link ScmLineHandler}.  Includes
  * optional support for checking exit codes and timing out on process
  * inactivity.
  */
@@ -28,7 +29,7 @@ public class ScmProcessRunner
     private Charset charset = Charset.defaultCharset();
 
     /**
-     * Creats a new runner which will run a command of the given name (e.g.
+     * Creates a new runner which will run a command of the given name (e.g.
      * svn, p4, git).
      * 
      * @param name name of the process to run, returned in feedback messages
@@ -147,7 +148,7 @@ public class ScmProcessRunner
      * 
      * @see #runProcess(ScmOutputHandler, byte[], boolean, String...) 
      */
-    public int runProcess(final ScmOutputHandler handler, String... commands) throws ScmException
+    public int runProcess(final ScmLineHandler handler, String... commands) throws ScmException
     {
         return runProcess(handler, true, commands);
     }
@@ -165,7 +166,7 @@ public class ScmProcessRunner
      * 
      * @see #runProcess(ScmOutputHandler, byte[], boolean, String...) 
      */
-    public int runProcess(final ScmOutputHandler handler, boolean checkExitCode, String... commands) throws ScmException
+    public int runProcess(final ScmLineHandler handler, boolean checkExitCode, String... commands) throws ScmException
     {
         return runProcess(handler, null, checkExitCode, commands);
     }
@@ -195,21 +196,46 @@ public class ScmProcessRunner
         final ScmOutputHandler safeHandler = handler == null ?  new ScmOutputHandlerSupport() : handler;
 
         processBuilder.command(commands);
-
         String commandLine = getLastCommandLine();
         safeHandler.handleCommandLine(commandLine);
 
-        Process child;
+        Process child = startProcess();
 
+        streamInput(child, input);
+
+        final AtomicBoolean activity = new AtomicBoolean(false);
+        final StringBuilder stderr = new StringBuilder();
+        int exitCode = completeProcess(wrapProcess(child, safeHandler, stderr, activity), safeHandler, activity);
+        
+        if (checkExitCode && exitCode != 0)
+        {
+            String message = name + " command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
+            String error = stderr.toString().trim();
+            if (StringUtils.stringSet(error))
+            {
+                message += " (" + error + ")";
+            }
+                
+            throw new ScmException(message);
+        }
+     
+        return exitCode;
+    }
+
+    private Process startProcess() throws ScmException
+    {
         try
         {
-            child = processBuilder.start();
+            return processBuilder.start();
         }
         catch (IOException e)
         {
             throw new ScmException(getProcessErrorMessage(e), e);
         }
+    }
 
+    private void streamInput(Process child, byte[] input) throws ScmException
+    {
         if (input != null)
         {
             try
@@ -223,36 +249,75 @@ public class ScmProcessRunner
                 throw new ScmException("Error writing to input of " + name + " process", e);
             }
         }
+    }
 
-        final AtomicBoolean activity = new AtomicBoolean(false);
-        final StringBuilder stderr = new StringBuilder();
-        AsyncProcess async = new AsyncProcess(child, new LineHandler()
+    private AsyncProcess wrapProcess(Process child, final ScmOutputHandler handler, final StringBuilder stderr, final AtomicBoolean activity)
+    {
+        AsyncProcess async;
+        if (handler instanceof ScmLineHandler)
         {
-            public Charset getCharset()
+            final ScmLineHandler lineHandler = (ScmLineHandler) handler;
+            async = new AsyncProcess(child, new LineHandler()
             {
-                return charset;
-            }
+                public Charset getCharset()
+                {
+                    return charset;
+                }
 
-            public void handle(String line, boolean error)
+                public void handle(String line, boolean error)
+                {
+                    activity.set(true);
+                    if (error)
+                    {
+                        stderr.append(line);
+                        stderr.append('\n');
+                        lineHandler.handleStderr(line);
+                    }
+                    else
+                    {
+                        lineHandler.handleStdout(line);
+                    }
+                }
+            }, true);
+        }
+        else if (handler instanceof ScmByteHandler)
+        {
+            async = new AsyncProcess(child, new ByteHandler()
             {
-                activity.set(true);
-                if (error)
+                final ScmByteHandler byteHandler = (ScmByteHandler) handler;
+                public void handle(byte[] buffer, int n, boolean error) throws Exception
                 {
-                    stderr.append(line);
-                    stderr.append('\n');
-                    safeHandler.handleStderr(line);
+                    activity.set(true);
+                    if (error)
+                    {
+                        stderr.append(new String(buffer, 0, n, charset.name()));
+                        byteHandler.handleStderr(buffer, n);
+                    }
+                    else
+                    {
+                        byteHandler.handleStdout(buffer, n);
+                    }
                 }
-                else
+            }, true);
+        }
+        else
+        {
+            async = new AsyncProcess(child, new ByteHandler()
+            {
+                public void handle(byte[] buffer, int n, boolean error) throws Exception
                 {
-                    safeHandler.handleStdout(line);
+                    activity.set(true);
                 }
-            }
-        }, true);
+            }, true);
+        }
+        return async;
+    }
 
+    private int completeProcess(AsyncProcess async, ScmOutputHandler safeHandler, AtomicBoolean activity) throws ScmException
+    {
         try
         {
             long lastActivityTime = System.currentTimeMillis();
-
             Integer exitCode;
             do
             {
@@ -278,19 +343,6 @@ public class ScmProcessRunner
             while (exitCode == null);
 
             safeHandler.handleExitCode(exitCode);
-
-            if (checkExitCode && exitCode != 0)
-            {
-                String message = name + " command: '" + commandLine + "' exited with non-zero exit code: " + exitCode;
-                String error = stderr.toString().trim();
-                if (StringUtils.stringSet(error))
-                {
-                    message += " (" + error + ")";
-                }
-                
-                throw new ScmException(message);
-            }
-
             return exitCode;
         }
         catch (InterruptedException e)
