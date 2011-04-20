@@ -8,6 +8,9 @@ import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.git.GitClient;
 import com.zutubi.pulse.core.scm.git.GitPatchFormat;
 import com.zutubi.pulse.core.scm.git.GitWorkingCopy;
+import com.zutubi.pulse.core.scm.hg.MercurialClient;
+import com.zutubi.pulse.core.scm.hg.MercurialPatchFormat;
+import com.zutubi.pulse.core.scm.hg.MercurialWorkingCopy;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
@@ -49,6 +52,7 @@ public class PersonalBuildRunner
             WorkingCopyFactory.registerType("svn", SubversionWorkingCopy.class);
             WorkingCopyFactory.registerType("git", GitWorkingCopy.class);
             WorkingCopyFactory.registerType("p4", PerforceWorkingCopy.class);
+            WorkingCopyFactory.registerType("hg", MercurialWorkingCopy.class);
         }
         catch (NoSuchMethodException e)
         {
@@ -69,6 +73,8 @@ public class PersonalBuildRunner
         patchFormatFactory.registerScm(SubversionClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
         patchFormatFactory.registerScm(PerforceClient.TYPE, DefaultPatchFormatFactory.FORMAT_STANDARD);
         patchFormatFactory.registerScm(GitClient.TYPE, "git");
+        patchFormatFactory.registerScm(MercurialClient.TYPE, "hg");
+        patchFormatFactory.registerFormatType("hg", MercurialPatchFormat.class);
         patchFormatFactory.registerFormatType("git", GitPatchFormat.class);
         patchFormatFactory.registerFormatType("unified", UnifiedPatchFormat.class);
         patchFormatFactory.setObjectFactory(new DefaultObjectFactory());

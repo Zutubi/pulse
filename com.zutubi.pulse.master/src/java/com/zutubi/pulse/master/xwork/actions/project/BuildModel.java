@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -64,7 +65,7 @@ public class BuildModel extends ResultModel
             stages.add(new BuildStageModel(buildResult, node, urls, collectArtifacts));
         }
         
-        if (!personal || buildResult.getOwnerName().equals(SecurityUtils.getLoggedInUsername()))
+        if (!personal || ((User) buildResult.getOwner()).getLogin().equals(SecurityUtils.getLoggedInUsername()))
         {
             link = Urls.getRelativeInstance().build(buildResult);
         }

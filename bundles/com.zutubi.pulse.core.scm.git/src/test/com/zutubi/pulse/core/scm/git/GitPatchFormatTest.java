@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.diff.*;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.git.diff.GitPatchParser;
+import com.zutubi.diff.git.GitPatchParser;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 
 import java.io.File;

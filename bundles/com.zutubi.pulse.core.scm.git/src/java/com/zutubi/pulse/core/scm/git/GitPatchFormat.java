@@ -4,11 +4,11 @@ import com.zutubi.diff.Patch;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.PatchParseException;
+import com.zutubi.diff.git.GitPatchParser;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import com.zutubi.pulse.core.scm.git.diff.GitPatchParser;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
@@ -16,9 +16,9 @@ import com.zutubi.pulse.core.util.process.ForwardingCharHandler;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 
 import java.io.*;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,30 +163,6 @@ public class GitPatchFormat implements PatchFormat
 
     public boolean isPatchFile(File patchFile)
     {
-        try
-        {
-            // Check the first hundred lines for anything that looks like a git
-            // diff header.
-            BufferedReader reader = new BufferedReader(new FileReader(patchFile));
-            for (int i = 0; i < 100; i++)
-            {
-                String line = reader.readLine();
-                if (line == null)
-                {
-                    break;
-                }
-
-                if (line.startsWith("diff --git"))
-                {
-                    return true;
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            // Fall through.
-        }
-
-        return false;
+        return new GitPatchParser().isPatchFile(patchFile);
     }
 }

@@ -1,8 +1,9 @@
-package com.zutubi.pulse.core.scm.git.diff;
+package com.zutubi.diff.git;
 
 import com.zutubi.diff.*;
 import com.zutubi.diff.unified.UnifiedHunk;
-import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
-public class GitPatchParserTest extends PulseTestCase
+public class GitPatchParserTest extends ZutubiTestCase
 {
     private static final String EXTENSION_TXT = "txt";
 
@@ -22,17 +23,17 @@ public class GitPatchParserTest extends PulseTestCase
         assertPatchDetails(patch, "README.txt", "README.txt", PatchType.EDIT);
 
         List<UnifiedHunk> hunks = ((GitUnifiedPatch) patch).getHunks();
-        assertEquals(1, hunks.size());
+        Assert.assertEquals(1, hunks.size());
 
         UnifiedHunk hunk = hunks.get(0);
-        assertEquals(1, hunk.getOldOffset());
-        assertEquals(6, hunk.getOldLength());
+        Assert.assertEquals(1, hunk.getOldOffset());
+        Assert.assertEquals(6, hunk.getOldLength());
         
         List<UnifiedHunk.Line> lines = hunk.getLines();
-        assertEquals(8, lines.size());
+        Assert.assertEquals(8, lines.size());
         UnifiedHunk.Line line = lines.get(3);
-        assertEquals("Here is an edit.", line.getContent());
-        assertEquals(UnifiedHunk.LineType.ADDED, line.getType());
+        Assert.assertEquals("Here is an edit.", line.getContent());
+        Assert.assertEquals(UnifiedHunk.LineType.ADDED, line.getType());
     }
 
     public void testSimpleAdd() throws IOException, PatchParseException
@@ -41,14 +42,14 @@ public class GitPatchParserTest extends PulseTestCase
         assertPatchDetails(patch, "launchers/newfile.txt", "launchers/newfile.txt", PatchType.ADD);
 
         List<UnifiedHunk> hunks = ((GitUnifiedPatch) patch).getHunks();
-        assertEquals(1, hunks.size());
+        Assert.assertEquals(1, hunks.size());
 
         UnifiedHunk hunk = hunks.get(0);
         List<UnifiedHunk.Line> lines = hunk.getLines();
-        assertEquals(2, lines.size());
+        Assert.assertEquals(2, lines.size());
         UnifiedHunk.Line line = lines.get(0);
-        assertEquals("this is a", line.getContent());
-        assertEquals(UnifiedHunk.LineType.ADDED, line.getType());
+        Assert.assertEquals("this is a", line.getContent());
+        Assert.assertEquals(UnifiedHunk.LineType.ADDED, line.getType());
     }
 
     public void testSimpleDelete() throws IOException, PatchParseException
@@ -81,28 +82,28 @@ public class GitPatchParserTest extends PulseTestCase
         assertPatchDetails(patch, "src/clojure/contrib/apply_macro.clj", "src/clojure/contrib/apply_micro.clj", PatchType.RENAME);
 
         List<UnifiedHunk> hunks = ((GitUnifiedPatch) patch).getHunks();
-        assertEquals(1, hunks.size());
+        Assert.assertEquals(1, hunks.size());
     }
 
     public void testBinaryAdd() throws PatchParseException
     {
         GitPatch patch = parseSinglePatch();
         assertPatchDetails(patch, "binfile", "binfile", PatchType.ADD);
-        assertTrue(patch instanceof GitBinaryPatch);
+        Assert.assertTrue(patch instanceof GitBinaryPatch);
     }
 
     public void testBinaryEdit() throws PatchParseException
     {
         GitPatch patch = parseSinglePatch();
         assertPatchDetails(patch, "binfile", "binfile", PatchType.EDIT);
-        assertTrue(patch instanceof GitBinaryPatch);
+        Assert.assertTrue(patch instanceof GitBinaryPatch);
     }
 
     public void testBinaryDelta() throws PatchParseException
     {
         GitPatch patch = parseSinglePatch();
         assertPatchDetails(patch, "binfile", "binfile", PatchType.EDIT);
-        assertTrue(patch instanceof GitBinaryPatch);
+        Assert.assertTrue(patch instanceof GitBinaryPatch);
     }
 
     public void testBinaryModeChange() throws IOException, PatchParseException
@@ -115,7 +116,7 @@ public class GitPatchParserTest extends PulseTestCase
     {
         PatchFile patchFile = parsePatchFile();
         List<Patch> patches = patchFile.getPatches();
-        assertEquals(9, patches.size());
+        Assert.assertEquals(9, patches.size());
         assertPatchDetails(patches.get(0), ".gitignore", ".gitignore", PatchType.DELETE);
         assertPatchDetails(patches.get(1), "binfile", "binfile", PatchType.EDIT);
         assertPatchDetails(patches.get(2), "src/clojure/contrib/bin.clj", "src/clojure/contrib/bin.clj", PatchType.ADD);
@@ -129,16 +130,16 @@ public class GitPatchParserTest extends PulseTestCase
 
     private void assertPatchDetails(Patch patch, String oldFile, String newFile, PatchType type)
     {
-        assertEquals(oldFile, patch.getOldFile());
-        assertEquals(newFile, patch.getNewFile());
-        assertEquals(type, patch.getType());
+        Assert.assertEquals(oldFile, patch.getOldFile());
+        Assert.assertEquals(newFile, patch.getNewFile());
+        Assert.assertEquals(type, patch.getType());
     }
 
     private GitPatch parseSinglePatch() throws PatchParseException
     {
         PatchFile patchFile = parsePatchFile();
         List<Patch> patches = patchFile.getPatches();
-        assertEquals(1, patches.size());
+        Assert.assertEquals(1, patches.size());
         return (GitPatch) patches.get(0);
     }
 

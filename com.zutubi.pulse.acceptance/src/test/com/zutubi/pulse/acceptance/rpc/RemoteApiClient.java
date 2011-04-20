@@ -423,6 +423,15 @@ public class RemoteApiClient extends ApiClient
         return gitConfig;
     }
 
+    public Hashtable<String, Object> getMercurialConfig(String repository)
+    {
+        Hashtable<String, Object> hgConfig = createEmptyConfig("zutubi.mercurialConfig");
+        hgConfig.put("repository", repository);
+        hgConfig.put("checkoutScheme", "CLEAN_CHECKOUT");
+        hgConfig.put("monitor", false);
+        return hgConfig;
+    }
+
     public Hashtable<String, Object> getAntConfig()
     {
         return getAntConfig("build.xml");

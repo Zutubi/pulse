@@ -10,10 +10,7 @@ import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -64,10 +61,22 @@ public class MercurialCore
         runner.setDirectory(dir);
     }
 
+    public void add(ScmOutputHandler handler, String filename) throws ScmException
+    {
+        run(handler, true, COMMAND_ADD, filename);
+    }
+
+    public String branch() throws ScmException
+    {
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
+        run(handler, true, COMMAND_BRANCH);
+        return handler.getOutput().trim();
+    }
+    
     public InputStream cat(String path, String revision) throws ScmException
     {
         ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
-        run(handler, COMMAND_CAT, FLAG_REVISION, revision, path);
+        run(handler, true, COMMAND_CAT, FLAG_REVISION, revision, path);
         return new ByteArrayInputStream(handler.getOutput().getBytes());
     }
 
@@ -92,18 +101,45 @@ public class MercurialCore
         command.add(repository);
         command.add(dir);
 
-        run(handler, command.toArray(new String[command.size()]));
+        run(handler, true, command.toArray(new String[command.size()]));
     }
+    
+    public void diff(ScmOutputHandler handler, String revision1, String revision2, String... files) throws ScmException
+    {
+        List<String> args = new LinkedList<String>();
+        args.add(COMMAND_DIFF);
+        args.add(FLAG_GIT_FORMAT);
+        
+        if (StringUtils.stringSet(revision1))
+        {
+            if (StringUtils.stringSet(revision2))
+            {
+                args.add(FLAG_REVISION);
+                args.add(revision1);
+                args.add(FLAG_REVISION);
+                args.add(revision2);
+            }
+            else
+            {
+                args.add(FLAG_CHANGE);
+                args.add(revision1);
+            }
+        }
+
+        args.addAll(Arrays.asList(files));
+        run(handler, true, args.toArray(new String[args.size()]));
+    }
+    
 
     public void update(ScmOutputHandler handler, String revision) throws ScmException
     {
         if (revision == null)
         {
-            run(handler, COMMAND_UPDATE);
+            run(handler, true, COMMAND_UPDATE);
         }
         else
         {
-            run(handler, COMMAND_UPDATE, FLAG_REVISION, revision);
+            run(handler, true, COMMAND_UPDATE, FLAG_REVISION, revision);
         }
     }
 
@@ -111,11 +147,11 @@ public class MercurialCore
     {
         if (StringUtils.stringSet(branch))
         {
-            run(handler, COMMAND_PULL, FLAG_BRANCH, branch);
+            run(handler, true, COMMAND_PULL, FLAG_BRANCH, branch);
         }
         else
         {
-            run(handler, COMMAND_PULL);
+            run(handler, true, COMMAND_PULL);
         }
     }
 
@@ -148,7 +184,7 @@ public class MercurialCore
 
         ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
 
-        run(handler, command.toArray(new String[command.size()]));
+        run(handler, true, command.toArray(new String[command.size()]));
 
         return LogParser.parse(handler.getOutput());
     }
@@ -184,7 +220,7 @@ public class MercurialCore
         commands.add(revision.getRevisionString());
         commands.add(name);
 
-        run(handler, commands.toArray(new String[commands.size()]));
+        run(handler, true, commands.toArray(new String[commands.size()]));
     }
 
     public Map<String, String> tags() throws ScmException
@@ -205,34 +241,87 @@ public class MercurialCore
                     }
                 }
             }
-        }, COMMAND_TAGS);
+        }, true, COMMAND_TAGS);
 
         return result;
     }
 
+    public String incoming(String branch) throws ScmException
+    {
+        ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
+        int exitCode = run(handler, false, FLAG_QUIET, COMMAND_INCOMING, FLAG_BRANCH, branch, FLAG_NEWEST_FIRST, FLAG_LIMIT, "1", FLAG_TEMPLATE, TEMPLATE_NODE);
+        if (exitCode == 0)
+        {
+            return handler.getOutput();
+        }
+        else
+        {
+            String error = filterWarnings(handler.getError());
+            if (StringUtils.stringSet(error))
+            {
+                throw new ScmException("hg command: '" + handler.getCommandLine() + "' returned exit code " + handler.getExitCode() + " with error output:\n" + error);
+            }
+            
+            return null;
+        }
+    }
+
+    private String filterWarnings(String error)
+    {
+        StringWriter writer = new StringWriter();
+        BufferedReader reader = new BufferedReader(new StringReader(error));
+        String line;
+        try
+        {
+            while ((line = reader.readLine()) != null)
+            {
+                if (!line.startsWith("warning:"))
+                {
+                    writer.write(line);
+                    writer.write('\n');
+                }
+            }
+            
+            return writer.toString();
+        }
+        catch (IOException e)
+        {
+            return error;
+        }
+    }
 
     public String parents() throws ScmException
     {
         ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
-        run(handler, COMMAND_PARENTS, FLAG_TEMPLATE, TEMPLATE_NODE);
+        run(handler, true, COMMAND_PARENTS, FLAG_TEMPLATE, TEMPLATE_NODE);
         return handler.getOutput();
+    }
+
+    public void patch(ScmOutputHandler handler, File patchFile) throws ScmException
+    {
+        run(handler, true, COMMAND_IMPORT, FLAG_NO_COMMIT, patchFile.getAbsolutePath());
     }
 
     public void push(ScmOutputHandler handler, String branch) throws ScmException
     {
         if (StringUtils.stringSet(branch))
         {
-            run(handler, COMMAND_PUSH, FLAG_BRANCH, branch);
+            run(handler, true, COMMAND_PUSH, FLAG_BRANCH, branch);
         }
         else
         {
-            run(handler, COMMAND_PUSH);
+            run(handler, true, COMMAND_PUSH);
         }
     }
 
-    protected int run(ScmOutputHandler handler, String... commands) throws ScmException
+    public void remove(ScmOutputHandler handler, String filename) throws ScmException
     {
-        return run(handler, null, true, commands);
+        run(handler, true, COMMAND_REMOVE, filename);
+    }
+
+    protected int run(ScmOutputHandler handler, boolean checkExitCode, String... commands) throws ScmException
+    {
+        return run(handler, null, checkExitCode, commands);
     }
 
     protected int run(ScmOutputHandler handler, String input, boolean checkExitCode, String... commands) throws ScmException

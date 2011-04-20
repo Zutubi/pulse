@@ -79,6 +79,16 @@ public class Constants
     }
 
     /**
+     * @return the location of the test mercurial repository
+     */
+    public static String getMercurialRepository() throws IOException
+    {
+        // located on the local file system in the work.dir/hg-repo directory
+        File workingDir = AcceptanceTestUtils.getWorkingDirectory();
+        return new File(workingDir, "hg-repo").getCanonicalPath();
+    }
+    
+    /**
      * The constants for the property names in the ProjectConfiguration class.
      */
     public static class Project

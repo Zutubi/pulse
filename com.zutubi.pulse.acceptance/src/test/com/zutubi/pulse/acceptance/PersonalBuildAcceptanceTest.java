@@ -1,11 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -13,6 +15,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -24,6 +27,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -32,12 +37,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -306,18 +305,43 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
     private void runGit(File working, String... args) throws IOException
     {
-        List<String> command = new LinkedList<String>();
-        command.add("git");
-        command.addAll(asList(args));
+        runCommand("git", working, args);
+    }
 
-        ProcessBuilder pd = new ProcessBuilder(command);
-        pd.redirectErrorStream(true);
-        if (working != null)
-        {
-            pd.directory(working);
-        }
+    private void runHg(File working, String... args) throws IOException
+    {
+        runCommand("hg", working, args);
+    }
 
-        SystemUtils.runCommandWithInput(null, pd);
+    public void testMercurialPersonalBuild() throws Exception
+    {
+        String repository = Constants.getMercurialRepository();
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getMercurialConfig(repository), rpcClient.RemoteApi.getAntConfig());
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+
+        removeDirectory(workingCopyDir);
+        runHg(null, "clone", repository, workingCopyDir.getAbsolutePath());
+        createConfigFile(random);
+
+        File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
+        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
+                "<project default=\"build\">\n" +
+                "  <target name=\"build\">\n" +
+                "    <fail message=\"Force build failure\"/>\n" +
+                "  </target>\n" +
+                "</project>");
+        runHg(workingCopyDir, "add", DEFAULT_ANT_BUILD_FILE);
+        
+        rpcClient.RemoteApi.waitForProjectToInitialise(random);
+
+        getBrowser().loginAsAdmin();
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
+        getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
+        assertTrue(getBrowser().isTextPresent("Force build failure"));
+        
+        PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
+        assertEquals("fe4571fd8bad5d556b26d1a05806074e67bbfa97", changesPage.getCheckedOutRevision());
+        assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
     }
 
     public void testPerforcePersonalBuild() throws Exception
@@ -371,7 +395,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
             PerforceUtils.deleteAllPulseWorkspaces(core);
         }
     }
-    
+
     private void runPerforcePersonalBuild(String buildFilePath, String clientName, String developerClientMapping) throws Exception
     {
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
@@ -482,6 +506,22 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         runPersonalBuild(ResultState.SUCCESS);
     }
 */
+
+    private void runCommand(String exe, File working, String... args) throws IOException
+    {
+        List<String> command = new LinkedList<String>();
+        command.add(exe);
+        command.addAll(asList(args));
+
+        ProcessBuilder pd = new ProcessBuilder(command);
+        pd.redirectErrorStream(true);
+        if (working != null)
+        {
+            pd.directory(working);
+        }
+
+        SystemUtils.runCommandWithInput(null, pd);
+    }
 
     private Hashtable<String, Object> insertHook(String hooksPath, Class<? extends BuildHookConfiguration> hookClass, String name, boolean runForPersonal) throws Exception
     {
@@ -642,5 +682,4 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
             return latestBuild.number == buildNumber && latestBuild.status.isCompleted();
         }
     }
-
 }

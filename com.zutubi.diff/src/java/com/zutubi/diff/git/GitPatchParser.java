@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.git.diff;
+package com.zutubi.diff.git;
 
 import com.zutubi.diff.PatchParseException;
 import com.zutubi.diff.PatchParser;
@@ -6,6 +6,9 @@ import com.zutubi.diff.PeekReader;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.diff.unified.UnifiedPatchParser;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +82,35 @@ public class GitPatchParser implements PatchParser
         return line.startsWith(HEADER_PREFIX);
     }
 
+    public boolean isPatchFile(File patchFile)
+    {
+        try
+        {
+            // Check the first hundred lines for anything that looks like a git
+            // diff header.
+            BufferedReader reader = new BufferedReader(new FileReader(patchFile));
+            for (int i = 0; i < 100; i++)
+            {
+                String line = reader.readLine();
+                if (line == null)
+                {
+                    break;
+                }
+
+                if (line.startsWith("diff --git"))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            // Fall through.
+        }
+
+        return false;
+    }
+    
     public GitPatch parse(PeekReader reader) throws IOException, PatchParseException
     {
         String headerLine = reader.next();

@@ -2,12 +2,8 @@ package com.zutubi.pulse.core.scm.hg;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
-import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
-import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
@@ -19,127 +15,23 @@ import static org.hamcrest.Matchers.greaterThan;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class MercurialClientTest extends PulseTestCase
+public class MercurialClientTest extends MercurialTestBase
 {
-    private static final String REVISION_DEFAULT_LATEST = "fe4571fd8bad5d556b26d1a05806074e67bbfa97";
-    private static final String REVISION_DEFAULT_PREVIOUS = "60d7c7d4e20cbb29e5bf9b56651fd9cd0255e3be";
-    private static final String REVISION_DEFAULT_TWO_PREVIOUS = "0040f780ba9a5905d059d26d777bb6cd78cdb96f";
-    private static final String REVISION_BRANCH_LATEST = "04010fd8851efebac7f36ad39d246a4970806109";
-    private static final String REVISION_BRANCH_PREVIOUS = "867f406a6a399c66e7f6a16e3a0a292b03484404";
-    private static final String REVISION_BRANCH_TWO_PREVIOUS = "805df7c8e75b6d9e2739a74fb5c69f35bdf9be3d";
-    private static final String REVISION_MULTILINE = "7e57b6bda144ef2688363ad58d250460cf6a422c";
-    private static final String REVISION_MULTILINE_PREVIOUS = "5ee4cf0fdf08fedc05a483253b087243481728dd";
-
-    private static final String BRANCH ="1.0";
-
-    private static final String CONTENT_FILE_PATH = "exercise1/hello.c";
-    private static final String CONTENT_DEFAULT_LATEST = "#include <stdio.h>\n" +
-            "\n" +
-            "int main(int argc, char **argv)\n" +
-            "{\n" +
-            "    int i;\n" +
-            "    for (i = 1; i < argc; i++)\n" +
-            "    {\n" +
-            "        printf(\"Why hello there, %s!\\n\", argv[i]);\n" +
-            "    }\n" +
-            "\n" +
-            "    return 0;\n" +
-            "}\n";
-
-    private static final String CONTENT_DEFAULT_PREVIOUS = "#include <stdio.h>\n" +
-            "\n" +
-            "int main(int argc, char **argv)\n" +
-            "{\n" +
-            "    if (argc < 2)\n" +
-            "    {\n" +
-            "        fprintf(stderr, \"Usage: %s <name>\\n\", argv[0]);\n" +
-            "        return 1;\n" +
-            "    }\n" +
-            "\n" +
-            "    printf(\"Why hello there, %s!\\n\", argv[1]);\n" +
-            "    return 0;\n" +
-            "}\n";
-
-    private static final String CONTENT_BRANCH_LATEST = "#include <stdio.h>\n" +
-            "\n" +
-            "int main(int argc, char **argv)\n" +
-            "{\n" +
-            "    if (argc < 2)\n" +
-            "    {\n" +
-            "        fprintf(stderr, \"Usage: %s <name>\\n\", argv[0]);\n" +
-            "        return 1;\n" +
-            "    }\n" +
-            "\n" +
-            "    printf(\"Hello, %s!\\n\", argv[1]);\n" +
-            "    return 0;\n" +
-            "}\n";
-
-    private static final String CONTENT_BRANCH_PREVIOUS = "#include <stdio.h>\n" +
-            "\n" +
-            "int main(int argc, char *argv[])\n" +
-            "{\n" +
-            "    if (argc < 2)\n" +
-            "    {\n" +
-            "        fprintf(stderr, \"Usage: %s <name>\\n\", argv[0]);\n" +
-            "        return 1;\n" +
-            "    }\n" +
-            "\n" +
-            "    printf(\"Hello, %s!\\n\", argv[1]);\n" +
-            "    return 0;\n" +
-            "}\n";
-
-    private static final String OUTPUT_NO_UPDATES = "0 files updated, 0 files merged, 0 files removed, 0 files unresolved";
-    private static final String OUTPUT_ONE_UPDATE = "1 files updated, 0 files merged, 0 files removed, 0 files unresolved";
-
-    private File tmp;
-    private File repositoryBase;
-    private File workingDir;
-    private String repository;
     private MercurialClient client;
     private MercurialConfiguration config;
-    private PulseExecutionContext context;
-    private RecordingScmFeedbackHandler handler;
-    private ScmContextImpl scmContext;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        tmp = createTempDirectory();
-
-        URL url = getClass().getResource("MercurialClientTest.repo.zip");
-        PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
-
-        repositoryBase = new File(tmp, "repo");
-        repository = repositoryBase.getCanonicalPath();
-
         config = new MercurialConfiguration();
         config.setRepository(repository);
         client = new MercurialClient(config);
-
-        workingDir = new File(tmp, "wd");
-        context = new PulseExecutionContext();
-        context.setWorkingDir(workingDir);
-
-        File persistentWorkingDir = new File(tmp, "scm");
-        assertTrue(persistentWorkingDir.mkdir());
-        scmContext = new ScmContextImpl();
-        scmContext.setPersistentWorkingDir(persistentWorkingDir);
-
-        handler = new RecordingScmFeedbackHandler();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        removeDirectory(tmp);
-
-        super.tearDown();
     }
 
     public void testGetUid() throws ScmException
@@ -166,12 +58,12 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testStoreConnectionDetails() throws IOException, ScmException
     {
-        client.storeConnectionDetails(new PulseExecutionContext(), workingDir);
+        client.storeConnectionDetails(new PulseExecutionContext(), baseDir);
     }
 
     public void testGetEOLStyle() throws ScmException
     {
-        assertEquals(EOLStyle.BINARY, client.getEOLPolicy(context));
+        assertEquals(EOLStyle.BINARY, client.getEOLPolicy(buildContext));
     }
 
     public void testGetProperties() throws ScmException
@@ -184,7 +76,7 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testCheckout() throws ScmException, ParseException, IOException
     {
-        Revision rev = client.checkout(context, null, handler);
+        Revision rev = client.checkout(buildContext, null, handler);
 
         assertEquals(REVISION_DEFAULT_LATEST, rev.getRevisionString());
         assertLatestCheckedOut();
@@ -193,7 +85,7 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testCheckoutRevision() throws ScmException, ParseException, IOException
     {
-        Revision rev = client.checkout(context, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
+        Revision rev = client.checkout(buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
 
         assertEquals(REVISION_DEFAULT_PREVIOUS, rev.getRevisionString());
         assertFileContent(CONTENT_DEFAULT_PREVIOUS, CONTENT_FILE_PATH);
@@ -203,7 +95,7 @@ public class MercurialClientTest extends PulseTestCase
     public void testCheckoutOnBranch() throws ScmException, ParseException, IOException
     {
         config.setBranch(BRANCH);
-        Revision rev = client.checkout(context, null, handler);
+        Revision rev = client.checkout(buildContext, null, handler);
 
         assertEquals(REVISION_BRANCH_LATEST, rev.getRevisionString());
         assertFileContent(CONTENT_BRANCH_LATEST, CONTENT_FILE_PATH);
@@ -213,7 +105,7 @@ public class MercurialClientTest extends PulseTestCase
     public void testCheckoutRevisionOnBranch() throws ScmException, ParseException, IOException
     {
         config.setBranch(BRANCH);
-        Revision rev = client.checkout(context, new Revision(REVISION_BRANCH_PREVIOUS), handler);
+        Revision rev = client.checkout(buildContext, new Revision(REVISION_BRANCH_PREVIOUS), handler);
 
         assertEquals(REVISION_BRANCH_PREVIOUS, rev.getRevisionString());
         assertFileContent(CONTENT_BRANCH_PREVIOUS, CONTENT_FILE_PATH);
@@ -290,12 +182,12 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testUpdateNoNewRevisions() throws ScmException
     {
-        client.checkout(context, null, handler);
+        client.checkout(buildContext, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, null, handler);
+        Revision rev = client.update(buildContext, null, handler);
         assertEquals(REVISION_DEFAULT_LATEST, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_NO_UPDATES, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -303,12 +195,12 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testUpdateNewRevision() throws ScmException, IOException
     {
-        client.checkout(context, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
+        client.checkout(buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, null, handler);
+        Revision rev = client.update(buildContext, null, handler);
         assertEquals(REVISION_DEFAULT_LATEST, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_ONE_UPDATE, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -317,12 +209,12 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testUpdateToRevision() throws ScmException, IOException
     {
-        client.checkout(context, new Revision(REVISION_DEFAULT_TWO_PREVIOUS), handler);
+        client.checkout(buildContext, new Revision(REVISION_DEFAULT_TWO_PREVIOUS), handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
+        Revision rev = client.update(buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), handler);
         assertEquals(REVISION_DEFAULT_PREVIOUS, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_ONE_UPDATE, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -332,12 +224,12 @@ public class MercurialClientTest extends PulseTestCase
     public void testUpdateOnBranchNoNewRevisions() throws ScmException
     {
         config.setBranch(BRANCH);
-        client.checkout(context, null, handler);
+        client.checkout(buildContext, null, handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, null, handler);
+        Revision rev = client.update(buildContext, null, handler);
         assertEquals(REVISION_BRANCH_LATEST, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_NO_UPDATES, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -346,12 +238,12 @@ public class MercurialClientTest extends PulseTestCase
     public void testUpdateOnBranchNewRevision() throws ScmException, IOException
     {
         config.setBranch(BRANCH);
-        client.checkout(context, new Revision(REVISION_BRANCH_PREVIOUS), handler);
+        client.checkout(buildContext, new Revision(REVISION_BRANCH_PREVIOUS), handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, null, handler);
+        Revision rev = client.update(buildContext, null, handler);
         assertEquals(REVISION_BRANCH_LATEST, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_ONE_UPDATE, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -361,12 +253,12 @@ public class MercurialClientTest extends PulseTestCase
     public void testUpdateOnBranchToRevision() throws ScmException, IOException
     {
         config.setBranch(BRANCH);
-        client.checkout(context, new Revision(REVISION_BRANCH_TWO_PREVIOUS), handler);
+        client.checkout(buildContext, new Revision(REVISION_BRANCH_TWO_PREVIOUS), handler);
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
 
         handler.reset();
 
-        Revision rev = client.update(context, new Revision(REVISION_BRANCH_PREVIOUS), handler);
+        Revision rev = client.update(buildContext, new Revision(REVISION_BRANCH_PREVIOUS), handler);
         assertEquals(REVISION_BRANCH_PREVIOUS, rev.getRevisionString());
         assertThat(handler.getStatusMessages().size(), greaterThan(0));
         assertEquals(OUTPUT_ONE_UPDATE, handler.getStatusMessages().get(handler.getStatusMessages().size() - 1));
@@ -375,7 +267,7 @@ public class MercurialClientTest extends PulseTestCase
 
     public void testUpdateNoCheckout() throws ScmException, IOException
     {
-        client.update(context, null, handler);
+        client.update(buildContext, null, handler);
         assertLatestCheckedOut();
     }
 
@@ -542,7 +434,7 @@ public class MercurialClientTest extends PulseTestCase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, context, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
+        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
 
         assertTag(TAG_NAME, REVISION_DEFAULT_PREVIOUS);
     }
@@ -552,8 +444,8 @@ public class MercurialClientTest extends PulseTestCase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, context, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
-        client.tag(scmContext, context, new Revision(REVISION_DEFAULT_LATEST), TAG_NAME, true);
+        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
+        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_LATEST), TAG_NAME, true);
 
         assertTag(TAG_NAME, REVISION_DEFAULT_LATEST);
     }
@@ -570,12 +462,12 @@ public class MercurialClientTest extends PulseTestCase
     private void assertLatestCheckedOut() throws IOException
     {
         assertFileContent(CONTENT_DEFAULT_LATEST, CONTENT_FILE_PATH);
-        assertMercurialDir(workingDir);
+        assertMercurialDir(baseDir);
     }
 
     private void assertFileContent(String expected, String path) throws IOException
     {
-        File file = new File(workingDir, path);
+        File file = new File(baseDir, path);
         assertTrue(file.isFile());
         String content = IOUtils.fileToString(file);
         assertEquals(normaliseLineEndings(expected), normaliseLineEndings(content));

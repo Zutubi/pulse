@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm.git.diff;
+package com.zutubi.diff.git;
 
 import com.zutubi.diff.PatchParseException;
 import com.zutubi.diff.unified.UnifiedHunk;

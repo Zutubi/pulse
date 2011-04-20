@@ -4,8 +4,13 @@
     <extension point="com.zutubi.pulse.core.config">
         <config class="com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.patchformats">
+        <patch-format name="hg" class="com.zutubi.pulse.core.scm.hg.MercurialPatchFormat"/>
+    </extension>
     <extension point="com.zutubi.pulse.core.scms">
         <scm name="hg"
-             factory-class="com.zutubi.pulse.core.scm.hg.MercurialClientFactory"/>
+             factory-class="com.zutubi.pulse.core.scm.hg.MercurialClientFactory"
+             working-copy-class="com.zutubi.pulse.core.scm.hg.MercurialWorkingCopy"
+             patch-format="hg"/>
     </extension>
 </plugin>
