@@ -194,6 +194,12 @@ public class ScmFile implements Comparable<ScmFile>
         return result;
     }
 
+    @Override
+    public String toString()
+    {
+        return path + (isDirectory() ? "/" : "");
+    }
+
     /**
      * Compares two files by their name only, so siblings can be sorted.
      *

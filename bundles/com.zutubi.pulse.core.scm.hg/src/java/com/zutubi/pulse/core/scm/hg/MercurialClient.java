@@ -7,7 +7,6 @@ import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
-import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
@@ -16,7 +15,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -30,7 +28,8 @@ public class MercurialClient implements ScmClient
      * Timeout for acquiring the ScmContext lock.
      */
     private static final int DEFAULT_TIMEOUT = 120;
-    private static final Set<ScmCapability> CAPABILITIES = EnumSet.complementOf(EnumSet.of(ScmCapability.BROWSE, ScmCapability.EMAIL));
+    private static final Set<ScmCapability> CAPABILITIES = EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
+    private static final String REPOSITORY_DIR = ".hg";
 
     private MercurialConfiguration config;
     private MercurialCore hg;
@@ -146,7 +145,7 @@ public class MercurialClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir());
+            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
             return hg.cat(path, getRevisionString(revision));
         }
         finally
@@ -170,7 +169,7 @@ public class MercurialClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir());
+            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
             String symbolicRevision = config.getBranch();
             if (!StringUtils.stringSet(symbolicRevision))
             {
@@ -186,7 +185,7 @@ public class MercurialClient implements ScmClient
         }
     }
 
-    private void preparePersistentDirectory(ScmLineHandler handler, File workingDir) throws ScmException
+    private void preparePersistentDirectory(ScmLineHandler handler, File workingDir, String revision) throws ScmException
     {
         if (!isMercurialRepository(workingDir))
         {
@@ -206,13 +205,13 @@ public class MercurialClient implements ScmClient
         {
             hg.setWorkingDirectory(workingDir);
             hg.pull(handler, config.getBranch());
-            hg.update(handler, null);
+            hg.update(handler, revision);
         }
     }
 
     private boolean isMercurialRepository(File dir)
     {
-        return new File(dir, ".hg").isDirectory();
+        return new File(dir, REPOSITORY_DIR).isDirectory();
     }
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
@@ -220,7 +219,7 @@ public class MercurialClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir());
+            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
 
             List<Changelist> changelists = hg.log(false, safeBranch(), safeRevisionString(from), safeRevisionString(to), -1);
             if (changelists.size() > 0)
@@ -262,7 +261,7 @@ public class MercurialClient implements ScmClient
         context.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir());
+            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
             String safeFromRevision = safeRevisionString(from);
             List<Changelist> changelists = hg.log(true, safeBranch(), safeFromRevision, safeRevisionString(to), -1);
             if (changelists.size() > 0 && !REVISION_ZERO.equals(safeFromRevision))
@@ -279,9 +278,43 @@ public class MercurialClient implements ScmClient
         }
     }
 
-    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, final String path, Revision revision) throws ScmException
     {
-        throw new ScmException("Operation not supported");
+        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        try
+        {
+            preparePersistentDirectory(null, context.getPersistentWorkingDir(), safeRevisionString(revision));
+            final File dir;
+            if (StringUtils.stringSet(path))
+            {
+                dir = new File(context.getPersistentWorkingDir(), path);
+            }
+            else
+            {
+                dir = context.getPersistentWorkingDir();
+            }
+            
+            if (!dir.isDirectory())
+            {
+                throw new ScmException("Cannot list contents of path '" + path + "': it does not refer to a directory");
+            }
+
+            List<ScmFile> files = new LinkedList<ScmFile>();
+            for (String name: FileSystemUtils.list(dir))
+            {
+                if (!REPOSITORY_DIR.equals(name))
+                {
+                    File f = new File(dir, name);
+                    files.add(new ScmFile(StringUtils.join("/", true, true, path, name), f.isDirectory()));
+                }
+            }
+            
+            return files;
+        }
+        finally
+        {
+            context.unlock();
+        }
     }
 
     public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
@@ -289,7 +322,7 @@ public class MercurialClient implements ScmClient
         scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, scmContext.getPersistentWorkingDir());
+            preparePersistentDirectory(null, scmContext.getPersistentWorkingDir(), null);
             hg.tag(null, revision, name, "[pulse] applying tag", moveExisting);
             hg.push(null, config.getBranch());
         }
@@ -337,10 +370,22 @@ public class MercurialClient implements ScmClient
         try
         {
             tempDir = FileSystemUtils.createTempDir(getClass().getName());
-            ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
+            final StringBuilder stderrBuilder = new StringBuilder();
+            ScmLineHandlerSupport handler = new ScmLineHandlerSupport()
+            {
+                @Override
+                public void handleStderr(String line)
+                {
+                    if (!line.startsWith("warning:"))
+                    {
+                        stderrBuilder.append(line).append('\n');
+                    }
+                }
+            };
+            
             hg.clone(handler, config.getRepository(), config.getBranch(), REVISION_NULL, tempDir.getAbsolutePath());
 
-            String stderr = handler.getError().trim();
+            String stderr = stderrBuilder.toString().trim();
             if (StringUtils.stringSet(stderr))
             {
                 throw new ScmException("Command '" + handler.getCommandLine() + "' output error: " + stderr);

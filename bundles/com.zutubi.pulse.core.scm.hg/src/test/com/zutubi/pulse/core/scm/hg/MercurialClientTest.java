@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -474,6 +475,68 @@ public class MercurialClientTest extends PulseTestCase
         }
     }
 
+    public void testBrowseRoot() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        List<ScmFile> files = client.browse(scmContext, "", null);
+        Collections.sort(files);
+        assertEquals(asList(
+                new ScmFile("bin", true),
+                new ScmFile("empty.txt", false),
+                new ScmFile("exercise1", true),
+                new ScmFile("file1.txt", false),
+                new ScmFile("file2.txt", false)
+        ), files);
+    }
+
+    public void testBrowseRootAtRevision() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        List<ScmFile> files = client.browse(scmContext, "", new Revision("1"));
+        Collections.sort(files);
+        assertEquals(asList(
+                new ScmFile("empty.txt", false),
+                new ScmFile("exercise1", true),
+                new ScmFile("file1.txt", false),
+                new ScmFile("file2.txt", false)
+        ), files);
+    }
+
+    public void testBrowseSubdirectoryAtRevision() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        List<ScmFile> files = client.browse(scmContext, "exercise1", null);
+        assertEquals(asList(new ScmFile("exercise1/hello.c", false)), files);
+    }
+
+    public void testBrowseNonExistant() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        try
+        {
+            client.browse(scmContext, "nosuchdir", null);
+            fail("Should not be able to browse bad directory");
+        }
+        catch (ScmException e)
+        {
+            assertThat(e.getMessage(), containsString("Cannot list contents of path"));
+        }
+    }
+    
+    public void testBrowseFile() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        try
+        {
+            client.browse(scmContext, "file1.txt", null);
+            fail("Should not be able to browse a file");
+        }
+        catch (ScmException e)
+        {
+            assertThat(e.getMessage(), containsString("Cannot list contents of path"));
+        }
+    }
+    
     public void testTagRevision() throws ScmException, IOException
     {
         final String TAG_NAME = "test-tag";
