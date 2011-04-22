@@ -13,9 +13,9 @@ import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
+import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.ServerRecipeService;
-import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
@@ -88,10 +88,10 @@ public class SlaveServiceImpl implements SlaveService
         return true;
     }
 
-    public SystemInfo getSystemInfo(String token) throws InvalidTokenException
+    public ServerInfoModel getSystemInfo(String token) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
-        return SystemInfo.getSystemInfo(configurationManager, startupManager);
+        return ServerInfoModel.getServerInfo(configurationManager, startupManager, true);
     }
 
     public List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException

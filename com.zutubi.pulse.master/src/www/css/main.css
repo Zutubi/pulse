@@ -748,6 +748,38 @@ div.xz-summary-tb
     background: #eee;
 }
 
+.xz-keyvalue-collapsed .xz-keyvalue-over
+{
+    display: none;
+}
+
+.xz-keyvalue-expanded .xz-keyvalue-over
+{
+    display: '';
+}
+
+.xz-keyvalue-more
+{
+    border-top: none;
+    color: #555;
+    font-style: italic;
+}
+
+.xz-keyvalue-more td
+{
+    padding-left: 10px;
+}
+ 
+.xz-keyvalue-collapsed .xz-keyvalue-more
+{
+    display: '';
+}
+
+.xz-keyvalue-expanded .xz-keyvalue-more
+{
+    display: none;
+}
+
 .project-row td
 {
     vertical-align: top;

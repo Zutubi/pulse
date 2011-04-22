@@ -1,8 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.server.ServerInfoPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
-import com.zutubi.util.SystemUtils;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
@@ -40,26 +38,6 @@ public class ServerSectionAcceptanceTest extends AcceptanceTestBase
         page.waitFor();
         assertPagingLinks(page, 10);
         assertTrue(getBrowser().isTextPresent("Test error message 59"));
-    }
-
-    public void testServerInfo() throws Exception
-    {
-        getBrowser().loginAsAdmin();
-        getBrowser().openAndWaitFor(ServerInfoPage.class);
-        assertTrue(getBrowser().isTextPresent("system information"));
-        assertTrue(getBrowser().isTextPresent("java vm"));
-        assertTrue(getBrowser().isTextPresent("version information"));
-        assertTrue(getBrowser().isTextPresent("version number"));
-        assertTrue(getBrowser().isTextPresent("pulse configuration"));
-        assertTrue(getBrowser().isTextPresent("data directory"));
-        assertTrue(getBrowser().isTextPresent("all system properties"));
-        assertTrue(getBrowser().isTextPresent("path.separator"));
-
-        assertTrue(getBrowser().isTextPresent("all environment variables"));
-        if (SystemUtils.IS_LINUX)
-        {
-            assertTrue(getBrowser().isTextPresent("PATH"));
-        }
     }
 
     private void assertPagingLinks(ServerMessagesPage page, int pageCount)

@@ -15,6 +15,6 @@ public class ServerActionResolver extends StaticMapActionResolver
         addMapping("activity", new ParameterisedActionResolver("serverActivity"));
         addMapping("history", new PagedActionResolver("serverHistory"));
         addMapping("messages", new PagedActionResolver("serverMessages"));
-        addMapping("info", new ParameterisedActionResolver("viewSystemInfo"));
+        addMapping("info", new ParameterisedActionResolver("serverInfo"));
     }
 }

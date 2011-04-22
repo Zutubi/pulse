@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
-import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
@@ -34,7 +34,7 @@ public interface HostService
      *
      * @return system information for the host machine
      */
-    SystemInfo getSystemInfo();
+    ServerInfoModel getSystemInfo();
 
     /**
      * Returns the most recent error and warning messages for the host.  The

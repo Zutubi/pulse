@@ -3,7 +3,7 @@ package com.zutubi.pulse.servercore.services;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
@@ -84,7 +84,7 @@ public interface SlaveService
 
     void terminateRecipe(String token, long agentHandle, long recipeId) throws InvalidTokenException;
 
-    SystemInfo getSystemInfo(String token) throws InvalidTokenException;
+    ServerInfoModel getSystemInfo(String token) throws InvalidTokenException;
 
     List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException;
 

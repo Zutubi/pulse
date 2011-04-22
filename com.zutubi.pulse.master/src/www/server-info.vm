@@ -1,0 +1,40 @@
+#if($agentName)
+    #helpTag("Agents+Section")
+#else
+    #helpTag("Server+Section")
+    <content tag="selectedTab">server</content>
+#end
+#authorisationTags($principle)
+#if($agentName)
+    #agentTags()
+#end
+<content tag="header.javascript">
+    zutubi/pulse/server/InfoPanel.js
+</content>
+<html>
+<head>
+    <title>#if($agentName) #wwtext("name=agents") #else #wwtext("name=server.info") #end</title>
+    <script type="text/javascript">
+        var panel = null;
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.server.InfoPanel({
+                id: 'server-info',
+                url: window.baseUrl + '/ajax/serverInfoData.action' #if($agentName) + '?agentName=' + encodeURIComponent('$agentName') #end ,
+                loadingId: 'server-info-loading',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval
+            });
+        });
+    </script>
+</head>
+<body>
+#if($agentName)
+    #agentTabs("info")
+#else
+    #serverTabs("info")
+#end
+
+    <div id="server-info-loading">
+    </div>
+</html>

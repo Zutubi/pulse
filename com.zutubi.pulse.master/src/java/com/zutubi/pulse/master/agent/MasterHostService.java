@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.ServerRecipeService;
-import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
@@ -38,9 +38,9 @@ public class MasterHostService implements HostService
         return new HostStatus(serverRecipeService.getBuildingRecipes(), false);
     }
 
-    public SystemInfo getSystemInfo()
+    public ServerInfoModel getSystemInfo()
     {
-        return SystemInfo.getSystemInfo(configurationManager, startupManager);
+        return ServerInfoModel.getServerInfo(configurationManager, startupManager, true);
     }
 
     public List<CustomLogRecord> getRecentMessages()

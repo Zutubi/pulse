@@ -47,6 +47,11 @@
             <result name="success" type="velocity">/server-history.vm</result>
         </action>
 
+        <action name="serverInfo" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionBase">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/server-info.vm</result>
+        </action>        
+        
         <action name="viewAgentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentStatusAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
@@ -256,11 +261,6 @@
             <result name="success" type="velocity">/view-triggers.vm</result>
         </action>
 
-        <action name="viewSystemInfo" class="com.zutubi.pulse.master.xwork.actions.agents.SystemInfoAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/view-systeminfo.vm</result>
-        </action>
-
         <action name="garbageCollect" class="com.zutubi.pulse.master.xwork.actions.console.GarbageCollectAction">
             <result name="success" type="redirect">/viewSystemInfo.action</result>
         </action>
@@ -452,6 +452,14 @@
             <result name="success" type="flexjson">
                 <param name="deep">true</param>
                 <param name="location">model</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+
+        <action name="serverInfoData" class="com.zutubi.pulse.master.xwork.actions.agents.ServerInfoDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">info</param>
             </result>
             <result name="error" type="httpheader">500</result>
         </action>
