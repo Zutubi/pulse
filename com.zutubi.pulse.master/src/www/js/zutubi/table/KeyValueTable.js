@@ -24,7 +24,7 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
     cls: 'content-table xz-keyvalue-collapsed',
     expanded: false,
     columnCount: 2,
-    rowLimit: 10,
+    rowLimit: 12,
     lengthLimit: 128,
     
     rowTemplate: new Ext.XTemplate(

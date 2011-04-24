@@ -46,6 +46,7 @@ public class ServerInfoModel
         info.serverProperties.put(I18N.format("memory.free"), Long.toString(freeMemory));
         info.serverProperties.put(I18N.format("memory.total"), Long.toString(totalMemory));
         info.serverProperties.put(I18N.format("default.locale"), Locale.getDefault().toString());
+        info.serverProperties.put(I18N.format("java.name"), properties.getProperty("java.vm.name"));
         info.serverProperties.put(I18N.format("java.vendor"), properties.getProperty("java.vm.vendor"));
         info.serverProperties.put(I18N.format("java.version"), properties.getProperty("java.vm.version"));
 

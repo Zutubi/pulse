@@ -56,7 +56,7 @@ public class ServerInfoAcceptanceTest extends AcceptanceTestBase
         Map<String, String> pairs;KeyValueTable serverProperties = infoPage.getServerProperties();
         assertTrue(serverProperties.isPresent());
         pairs = serverProperties.getKeyValuePairs();
-        assertEquals(10, pairs.size());
+        assertEquals(11, pairs.size());
         assertTrue(pairs.containsKey("system uptime"));
     }
 
@@ -65,7 +65,13 @@ public class ServerInfoAcceptanceTest extends AcceptanceTestBase
         KeyValueTable pulseProperties = infoPage.getPulseProperties();
         assertTrue(pulseProperties.isPresent());
         Map<String,String> pairs = pulseProperties.getKeyValuePairs();
-        assertEquals(10, pairs.size());
+        int expectedSize = 10;
+        if (pairs.containsKey("pulse home directory"))
+        {
+            expectedSize++;
+        }
+
+        assertEquals(expectedSize, pairs.size());
         assertTrue(pairs.containsKey("context path"));
     }
 
