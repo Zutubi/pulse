@@ -6,7 +6,9 @@ import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.ui.WebAuthenticationDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
+
 import static org.mockito.Mockito.*;
 
 public class CustomAuthenticationProviderTest extends PulseTestCase
@@ -76,6 +78,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
         stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(1, user.getLogin(), "pass"));
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
+        token.setDetails(mock(WebAuthenticationDetails.class));
         authenticationProvider.authenticate(token);
 
         verify(userManager, never()).insert((UserConfiguration)anyObject());
