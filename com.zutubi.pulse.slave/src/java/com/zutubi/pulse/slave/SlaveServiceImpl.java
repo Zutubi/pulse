@@ -88,10 +88,10 @@ public class SlaveServiceImpl implements SlaveService
         return true;
     }
 
-    public ServerInfoModel getSystemInfo(String token) throws InvalidTokenException
+    public ServerInfoModel getSystemInfo(String token, boolean includeDetailed) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
-        return ServerInfoModel.getServerInfo(configurationManager, startupManager, true);
+        return ServerInfoModel.getServerInfo(configurationManager, startupManager, includeDetailed);
     }
 
     public List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException

@@ -32,9 +32,11 @@ public interface HostService
     /**
      * Returns information about the machine the host is on.
      *
+     * @param includeDetailed if true, include full Java system property and
+     *                        environment information
      * @return system information for the host machine
      */
-    ServerInfoModel getSystemInfo();
+    ServerInfoModel getSystemInfo(boolean includeDetailed);
 
     /**
      * Returns the most recent error and warning messages for the host.  The

@@ -1,30 +1,47 @@
-#helpTag("Server+Section")
+#if($agentName)
+    #helpTag("Agents+Section")
+#else
+    #helpTag("Server+Section")
+    <content tag="selectedTab">server</content>
+#end
 #authorisationTags($principle)
-<content tag="selectedTab">server</content>
+#if($agentName)
+    #agentTags()
+#end
+<content tag="header.javascript">
+    zutubi/pulse/server/MessagesPanel.js
+</content>
 <html>
 <head>
-    <title>#wwtext("name=server.messages")</title>
+    <title>#if($agentName) #wwtext("name=agents") #else #wwtext("name=server.messages") #end</title>
+#if(!$action.hasErrors())
+    <script type="text/javascript">
+        var panel = null;
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.server.MessagesPanel({
+                id: 'server-messages-${startPage}',
+                url: window.baseUrl + '/ajax/serverMessagesData.action?startPage=$startPage' #if($agentName) + '&agentName=' + encodeURIComponent('$agentName') #end ,
+                loadingId: 'server-messages-loading',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval,
+                pagerUrl: #if($agent) '#jss($urls.agentMessages($agent))' #else '#jss($urls.serverMessages())' #end
+            });
+        });
+    </script>
+#end
 </head>
 <body>
+#if($agentName)
+    #agentTabs("messages")
+#else
     #serverTabs("messages")
+#end
 
 #if($action.hasErrors())
     #parse("/template/includes/actionerrors.vm")
 #else
-    <table id="server.messages.$pagingSupport.startPage" class="fill-content">
-        <tr><th class="content-centre" colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
-        #pagingRow("$urls.serverMessages()" "" $pagingSupport)
-    </table>
-
-    #foreach($record in $records)
-        #serverMessage($record)
-    #end
-
-    #if($records.size() > 0)
-    <table class="fill-content">
-        #pagingRow("$urls.serverMessages()" "" $pagingSupport)
-        <tr><th class="content-centre" id="messages.count" colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</th></tr>
-    </table>
-    #end
+    <div id="server-messages-loading">
+    </div>
 #end
 </html>

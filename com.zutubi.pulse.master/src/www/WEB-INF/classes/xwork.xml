@@ -47,29 +47,24 @@
             <result name="success" type="velocity">/server-history.vm</result>
         </action>
 
-        <action name="serverInfo" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionBase">
+        <action name="serverInfo" class="com.zutubi.pulse.master.xwork.actions.agents.ServerInfoAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/server-info.vm</result>
         </action>        
         
+        <action name="serverMessages" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/server-messages.vm</result>
+        </action>
+
         <action name="viewAgentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentStatusAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
         </action>
 
-        <action name="agentMessages" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/agent-messages.vm</result>
-        </action>
-
         <action name="agentStatistics" class="com.zutubi.pulse.master.xwork.actions.agents.AgentStatisticsAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/agent-statistics.vm</result>
-        </action>
-
-        <action name="serverMessages" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/server-messages.vm</result>
         </action>
 
         <action name="internalError" class="com.zutubi.pulse.master.xwork.actions.InternalErrorAction">
@@ -460,6 +455,14 @@
             <result name="success" type="flexjson">
                 <param name="deep">true</param>
                 <param name="location">info</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+
+        <action name="serverMessagesData" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
             </result>
             <result name="error" type="httpheader">500</result>
         </action>

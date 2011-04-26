@@ -32,9 +32,9 @@ public class SlaveHostService implements HostService
         return service.getStatus(serviceTokenManager.getToken(), masterLocation);
     }
 
-    public ServerInfoModel getSystemInfo()
+    public ServerInfoModel getSystemInfo(boolean includeDetailed)
     {
-        return service.getSystemInfo(serviceTokenManager.getToken());
+        return service.getSystemInfo(serviceTokenManager.getToken(), includeDetailed);
     }
 
     public List<CustomLogRecord> getRecentMessages()

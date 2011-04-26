@@ -84,7 +84,7 @@ public interface SlaveService
 
     void terminateRecipe(String token, long agentHandle, long recipeId) throws InvalidTokenException;
 
-    ServerInfoModel getSystemInfo(String token) throws InvalidTokenException;
+    ServerInfoModel getSystemInfo(String token, boolean includeDetailed) throws InvalidTokenException;
 
     List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException;
 

@@ -1,83 +1,41 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
-import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.master.agent.HostManager;
-import com.zutubi.pulse.master.agent.HostService;
-import com.zutubi.pulse.master.xwork.actions.PagingSupport;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
-import com.zutubi.util.logging.Logger;
-
-import java.util.Collections;
-import java.util.List;
+import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 
 /**
- * Looks up recent server log messages for the server->messages page.
+ * Action for the server and agent messages tabs.
  */
-public class ServerMessagesAction extends ServerMessagesActionSupport
+public class ServerMessagesAction extends AgentActionBase
 {
-    private static final Logger LOG = Logger.getLogger(ServerMessagesAction.class);
-    
-    private List<CustomLogRecord> records = null;
-    private PagingSupport pagingSupport = new PagingSupport(10);
+    private int startPage;
 
-    private HostManager hostManager;
-
-    public List<CustomLogRecord> getRecords()
+    public int getStartPage()
     {
-        return records;
+        return startPage;
     }
 
-    public void setStartPage(int page)
+    public void setStartPage(int startPage)
     {
-        pagingSupport.setStartPage(page);
+        this.startPage = startPage;
     }
 
-    public PagingSupport getPagingSupport()
-    {
-        return pagingSupport;
-    }
-
+    @Override
     public String execute() throws Exception
     {
-        Agent agent = getAgent();
-        if (agent == null)
+        try
         {
-            records = serverMessagesHandler.takeSnapshot();
-        }
-        else
-        {
-            if (agent.isOnline())
-            {
-                HostService hostService = hostManager.getServiceForHost(agent.getHost());
-                try
-                {
-                    records = hostService.getRecentMessages();
-                }
-                catch(HessianRuntimeException e)
-                {
-                    LOG.warning(e);
-                    addActionError("Unable to contact agent: " + e.getMessage());
-                }
-            }
-            else
+            Agent agent = getAgent();
+            if (agent != null && !agent.isOnline())
             {
                 addActionError("Agent is not online.");
             }
         }
-
-        if(records != null)
+        catch (LookupErrorException e)
         {
-            Collections.reverse(records);
-            pagingSupport.setTotalItems(records.size());
-            records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+            addActionError(e.getMessage());
         }
 
         return SUCCESS;
-    }
-
-    public void setHostManager(HostManager hostManager)
-    {
-        this.hostManager = hostManager;
     }
 }

@@ -64,7 +64,7 @@ public class UncontactableSlaveService implements SlaveService
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }
 
-    public ServerInfoModel getSystemInfo(String token) throws InvalidTokenException
+    public ServerInfoModel getSystemInfo(String token, boolean includeDetailed) throws InvalidTokenException
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

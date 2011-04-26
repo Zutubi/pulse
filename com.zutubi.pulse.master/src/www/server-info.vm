@@ -14,6 +14,7 @@
 <html>
 <head>
     <title>#if($agentName) #wwtext("name=agents") #else #wwtext("name=server.info") #end</title>
+#if(!$action.hasErrors())
     <script type="text/javascript">
         var panel = null;
         
@@ -27,6 +28,7 @@
             });
         });
     </script>
+#end
 </head>
 <body>
 #if($agentName)
@@ -35,6 +37,10 @@
     #serverTabs("info")
 #end
 
+#if($action.hasErrors())
+    #parse("/template/includes/actionerrors.vm")
+#else
     <div id="server-info-loading">
     </div>
+#end
 </html>

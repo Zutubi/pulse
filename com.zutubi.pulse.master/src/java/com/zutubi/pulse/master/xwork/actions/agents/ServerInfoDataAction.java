@@ -30,9 +30,9 @@ public class ServerInfoDataAction extends AgentActionBase
     public String execute()
     {
         Agent agent = getAgent();
+        boolean includeDetailed = accessManager.hasPermission(ServerPermission.ADMINISTER.name(), null);
         if(agent == null)
         {
-            boolean includeDetailed = accessManager.hasPermission(ServerPermission.ADMINISTER.name(), null);
             info = ServerInfoModel.getServerInfo(configurationManager, startupManager, includeDetailed);
         }
         else
@@ -42,7 +42,7 @@ public class ServerInfoDataAction extends AgentActionBase
                 HostService hostService = hostManager.getServiceForHost(agent.getHost());
                 try
                 {
-                    info = hostService.getSystemInfo();
+                    info = hostService.getSystemInfo(includeDetailed);
                 }
                 catch (RuntimeException e)
                 {

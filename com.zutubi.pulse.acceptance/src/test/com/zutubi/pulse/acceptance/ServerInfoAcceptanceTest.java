@@ -51,6 +51,43 @@ public class ServerInfoAcceptanceTest extends AcceptanceTestBase
         checkEnvironment(infoPage);
     }
 
+    public void testAgentInfoAgentOffline() throws Exception
+    {
+        rpcClient.loginAsAdmin();
+        String agentPath = rpcClient.RemoteApi.insertSimpleAgent(random, "localhost", 555666777);
+        try
+        {
+            getBrowser().loginAsAdmin();
+            AgentInfoPage page = getBrowser().createPage(AgentInfoPage.class, random);
+            page.open();
+            getBrowser().waitForPageToLoad();
+            assertTrue(getBrowser().isTextPresent("Agent is not online"));
+        }
+        finally
+        {
+            rpcClient.RemoteApi.deleteConfig(agentPath);
+            rpcClient.logout();
+        }
+    }
+
+    public void testAgentInfoAsNonAdmin() throws Exception
+    {
+        rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.insertTrivialUser(random);
+        rpcClient.logout();
+
+        getBrowser().login(random, "");
+        AgentInfoPage infoPage = getBrowser().openAndWaitFor(AgentInfoPage.class, AgentManager.MASTER_AGENT_NAME);
+        checkPulseProperties(infoPage);
+        checkServerProperties(infoPage);
+
+        KeyValueTable jvmProperties = infoPage.getJvmProperties();
+        assertFalse(jvmProperties.isPresent());
+
+        KeyValueTable environment = infoPage.getEnvironment();
+        assertFalse(environment.isPresent());
+    }
+
     private void checkServerProperties(ServerInfoPage infoPage)
     {
         Map<String, String> pairs;KeyValueTable serverProperties = infoPage.getServerProperties();

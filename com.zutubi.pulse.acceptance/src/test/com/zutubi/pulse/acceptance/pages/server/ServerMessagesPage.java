@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.server;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.Pager;
+import com.zutubi.pulse.acceptance.components.pulse.server.LogMessagesTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -9,19 +11,16 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ServerMessagesPage extends SeleniumPage
 {
-    private static final String ID_MESSAGES_COUNT = "messages.count";
-
+    private LogMessagesTable entries;
+    private Pager pager;
     private int page = 1;
-
-    public ServerMessagesPage(SeleniumBrowser browser, Urls urls)
-    {
-        super(browser, urls, "server.messages.0", "server messages");
-    }
 
     public ServerMessagesPage(SeleniumBrowser browser, Urls urls, int page)
     {
-        super(browser, urls, "server.messages." + Integer.toString(page - 1), "server messages");
+        super(browser, urls, "server-messages-" + Integer.toString(page - 1));
         this.page = page;
+        entries = new LogMessagesTable(browser, getId() + "-entries");
+        pager = new Pager(browser, getId() + "-pager");
     }
 
     public String getUrl()
@@ -36,25 +35,23 @@ public class ServerMessagesPage extends SeleniumPage
         }
     }
 
-    public String getPageId(int i)
-    {
-        return "page." + i;
-    }
-
-    public int getPageNumber()
+    public int getPage()
     {
         return page;
     }
 
-    public ServerMessagesPage clickPage(int page)
+    public LogMessagesTable getEntries()
     {
-        browser.click(getPageId(page));
-        return browser.createPage(ServerMessagesPage.class, page);
+        return entries;
     }
 
-    public String getMessagesCountText()
+    public Pager getPager()
     {
-        browser.waitForElement(ID_MESSAGES_COUNT);
-        return browser.getText(ID_MESSAGES_COUNT);
+        return pager;
+    }
+
+    public ServerMessagesPage createNextPage()
+    {
+        return new ServerMessagesPage(browser, urls, page + 1);
     }
 }

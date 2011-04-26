@@ -110,7 +110,7 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
                 }
             },
 
-            failure: function(/*transport, options*/)
+            failure: function(transport /*, options*/)
             {
                 // Stop trying to refresh.
                 if (panel.runner)
@@ -121,7 +121,14 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
                 // If we never initialised the view, show an error message.
                 if (!panel.initialised)
                 {
-                    Ext.fly(panel.loadingId).update(panel.failureMessage);
+                    console.dir(transport);
+                    var message = panel.failureMessage;
+                    if (transport.statusText)
+                    {
+                        message += ' (' + unescape(transport.statusText.replace(/\+/g, ' ')) + ')';
+                    }
+                        
+                    Ext.fly(panel.loadingId).update(message);
                 }
 
                 if (callback)

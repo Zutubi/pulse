@@ -47,7 +47,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
                         '<tpl if="currentPage &gt; 0"></a></tpl>' +
                     '</td>' +
                     '<td>' +
-                        '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage-1}/{extraParams}" id="{id}-previous"></tpl>' +
+                        '<tpl if="currentPage &gt; 0"><a href="{url}{currentPage - 1}/{extraParams}" id="{id}-previous"></tpl>' +
                             '<img alt="{labelPrevious}" src="{[window.baseUrl]}/images/resultset_previous.gif"/> {labelPrevious}' +
                         '<tpl if="currentPage &gt; 0"></a></tpl>' +
                     '</td>' +

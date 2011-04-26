@@ -38,9 +38,9 @@ public class MasterHostService implements HostService
         return new HostStatus(serverRecipeService.getBuildingRecipes(), false);
     }
 
-    public ServerInfoModel getSystemInfo()
+    public ServerInfoModel getSystemInfo(boolean includeDetailed)
     {
-        return ServerInfoModel.getServerInfo(configurationManager, startupManager, true);
+        return ServerInfoModel.getServerInfo(configurationManager, startupManager, includeDetailed);
     }
 
     public List<CustomLogRecord> getRecentMessages()
