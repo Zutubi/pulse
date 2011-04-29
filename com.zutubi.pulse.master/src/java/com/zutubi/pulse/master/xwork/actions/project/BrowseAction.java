@@ -29,7 +29,7 @@ public class BrowseAction extends ActionSupport
         {
             BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
             columnCount = browseConfig.getColumns().size();
-            throw new RuntimeException("Bang");
+            return SUCCESS;
         }
         else
         {
