@@ -10,18 +10,14 @@ import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
-import org.springframework.security.access.AccessDeniedException;
-
-import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.*;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -29,6 +25,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.util.*;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -486,86 +485,86 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(parentClone.getHandle(), configurationTemplateManager.getTemplateParentRecord(childClonePath).getHandle());
     }
 
-    public void testCanExtractParentTemplateInvalidParentPath()
+    public void testCanIntroduceParentTemplateInvalidParentPath()
     {
-        assertFalse(configurationRefactoringManager.canExtractParentTemplate("nosuchscope/foo"));
+        assertFalse(configurationRefactoringManager.canIntroduceParentTemplate("nosuchscope/foo"));
     }
 
-    public void testCanExtractParentTemplateParentPathNotAMap()
+    public void testCanIntroduceParentTemplateParentPathNotAMap()
     {
-        assertFalse(configurationRefactoringManager.canExtractParentTemplate(rootPath + "/foo"));
+        assertFalse(configurationRefactoringManager.canIntroduceParentTemplate(rootPath + "/foo"));
     }
 
-    public void testCanExtractParentTemplateParentPathNotATemplatedScope()
+    public void testCanIntroduceParentTemplateParentPathNotATemplatedScope()
     {
-        assertFalse(configurationRefactoringManager.canExtractParentTemplate(SAMPLE_SCOPE + "/foo"));
+        assertFalse(configurationRefactoringManager.canIntroduceParentTemplate(SAMPLE_SCOPE + "/foo"));
     }
 
-    public void testCanExtractParentTemplateInvalidItem()
+    public void testCanIntroduceParentTemplateInvalidItem()
     {
-        assertFalse(configurationRefactoringManager.canExtractParentTemplate(TEMPLATE_SCOPE + "/nope"));
+        assertFalse(configurationRefactoringManager.canIntroduceParentTemplate(TEMPLATE_SCOPE + "/nope"));
     }
 
-    public void testCanExtractParentTemplateRootTemplate()
+    public void testCanIntroduceParentTemplateRootTemplate()
     {
-        assertFalse(configurationRefactoringManager.canExtractParentTemplate(rootPath));
+        assertFalse(configurationRefactoringManager.canIntroduceParentTemplate(rootPath));
     }
 
-    public void testCanExtractParentTemplate() throws TypeException
+    public void testCanIntroduceParentTemplate() throws TypeException
     {
         String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
-        assertTrue(configurationRefactoringManager.canExtractParentTemplate(aPath));
+        assertTrue(configurationRefactoringManager.canIntroduceParentTemplate(aPath));
     }
 
-    public void testExtractParentTemplateInvalidParentPath()
+    public void testIntroduceParentTemplateInvalidParentPath()
     {
-        extractParentTemplateErrorHelper("nosuchscope", Collections.<String>emptyList(), "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
+        introduceParentTemplateErrorHelper("nosuchscope", Collections.<String>emptyList(), "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
     }
 
-    public void testExtractParentTemplateParentPathNotAMap()
+    public void testIntroduceParentTemplateParentPathNotAMap()
     {
-        extractParentTemplateErrorHelper(rootPath, Collections.<String>emptyList(), "foo", "Invalid parent path '" + rootPath + "': does not refer to a templated collection");
+        introduceParentTemplateErrorHelper(rootPath, Collections.<String>emptyList(), "foo", "Invalid parent path '" + rootPath + "': does not refer to a templated collection");
     }
 
-    public void testExtractParentTemplateParentPathNotATemplatedScope()
+    public void testIntroduceParentTemplateParentPathNotATemplatedScope()
     {
-        extractParentTemplateErrorHelper(SAMPLE_SCOPE, Collections.<String>emptyList(), "foo", "Invalid parent path '" + SAMPLE_SCOPE + "': does not refer to a templated collection");
+        introduceParentTemplateErrorHelper(SAMPLE_SCOPE, Collections.<String>emptyList(), "foo", "Invalid parent path '" + SAMPLE_SCOPE + "': does not refer to a templated collection");
     }
 
-    public void testExtractParentTemplateInvalidChildKey()
+    public void testIntroduceParentTemplateInvalidChildKey()
     {
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("nope"), "foo", "Invalid child key 'nope': does not refer to an element of the templated collection");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("nope"), "foo", "Invalid child key 'nope': does not refer to an element of the templated collection");
     }
 
-    public void testExtractParentTemplateRootTemplate()
+    public void testIntroduceParentTemplateRootTemplate()
     {
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList(getBaseName(rootPath)), "foo", "Invalid child key 'root': cannot extract parent from the root of a template hierarchy");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList(getBaseName(rootPath)), "foo", "Invalid child key 'root': cannot extract parent from the root of a template hierarchy");
     }
 
-    public void testExtractParentTemplateChildKeysNotSiblings() throws TypeException
+    public void testIntroduceParentTemplateChildKeysNotSiblings() throws TypeException
     {
         String parentPath = insertTemplateA(rootPath, "parent", true);
         insertTemplateA(parentPath, "child", false);
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("parent", "child"), "foo", "Invalid child keys: all child keys must refer to siblings in the template hierarchy");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("parent", "child"), "foo", "Invalid child keys: all child keys must refer to siblings in the template hierarchy");
     }
 
-    public void testExtractParentTemplateParentNameEmpty() throws TypeException
+    public void testIntroduceParentTemplateParentNameEmpty() throws TypeException
     {
         insertTemplateA(rootPath, "a", true);
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "", "Parent template name is required");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "", "Parent template name is required");
     }
 
-    public void testExtractParentTemplateParentNameNotUnique() throws TypeException
+    public void testIntroduceParentTemplateParentNameNotUnique() throws TypeException
     {
         insertTemplateA(rootPath, "a", true);
-        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "name is already in use, please select another name");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "name is already in use, please select another name");
     }
 
-    private void extractParentTemplateErrorHelper(String parentPath, List<String> childKeys, String parentTemplateName, String expectedError)
+    private void introduceParentTemplateErrorHelper(String parentPath, List<String> childKeys, String parentTemplateName, String expectedError)
     {
         try
         {
-            configurationRefactoringManager.extractParentTemplate(parentPath, childKeys, parentTemplateName);
+            configurationRefactoringManager.introduceParentTemplate(parentPath, childKeys, parentTemplateName, true);
             fail();
         }
         catch (Exception e)
@@ -577,7 +576,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testExtractParentTemplateSimple() throws TypeException
     {
         String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("a"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, asList("a"), "extracted", true);
 
         // Ensure the instances both look as expected
         ConfigA extractedInstance = configurationTemplateManager.getInstance(extractedPath, ConfigA.class);
@@ -598,14 +597,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/extracted", node.getTemplatePath());
 
         // Now assert that the fields have really been pulled up.
-        assertAllValuesExtracted("a");
+        assertAllValuesOwnedBy("a", "extracted");
     }
 
     public void testExtractParentTemplateIdenticalSiblings() throws TypeException
     {
         String path1 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("1"), rootPath, false);
         String path2 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("2"), rootPath, false);
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "extracted", true);
 
         // Ensure parent has all fields pulled up
         ConfigA extractedInstance = configurationTemplateManager.getInstance(extractedPath, ConfigA.class);
@@ -639,8 +638,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("2", children.get(1));
 
         // Now assert that the fields have really been pulled up.
-        assertAllValuesExtracted("1");
-        assertAllValuesExtracted("2");
+        assertAllValuesOwnedBy("1", "extracted");
+        assertAllValuesOwnedBy("2", "extracted");
     }
 
     public void testExtractParentTemplateReferenceToExtracted() throws TypeException
@@ -662,7 +661,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         referer.getListOfRefs().add(referee.getRef());
         String refererPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, referer, rootPath, false);
 
-        configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList(extractKey), "extracted");
+        configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList(extractKey), "extracted", true);
 
         referee = configurationTemplateManager.getInstance(refereePath, ConfigA.class);
         referer = configurationTemplateManager.getInstance(refererPath, ConfigA.class);
@@ -675,7 +674,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         final String EXTRACTED_NAME = "extracted";
 
         String aPath = insertAInstanceWithInternalReference("a");
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), EXTRACTED_NAME);
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), EXTRACTED_NAME, true);
 
         assertExtractedInternalReference(aPath, extractedPath);
         assertExtractedInternalReference(extractedPath, extractedPath);
@@ -684,7 +683,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testExtractParentTemplateInternalReferenceList() throws TypeException
     {
         String aPath = insertAInstanceWithInternalReferenceList("a");
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted", true);
 
         assertExtractedInternalReferenceList(aPath, extractedPath);
         assertExtractedInternalReferenceList(extractedPath, extractedPath);
@@ -705,7 +704,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         a2.setRefToRef(referee.getRef());
         configurationTemplateManager.save(a2);
 
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted", true);
 
         referee = configurationTemplateManager.getInstance(refereePath, ConfigA.class);
         a1 = configurationTemplateManager.getInstance(path1, ConfigA.class);
@@ -721,7 +720,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         String path1 = insertAInstanceWithInternalReference("one");
         String path2 = insertAInstanceWithInternalReference("two");
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted", true);
 
         assertExtractedInternalReference(path1, extractedPath);
         assertExtractedInternalReference(path2, extractedPath);
@@ -732,7 +731,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         String path1 = insertAInstanceWithInternalReferenceList("one");
         String path2 = insertAInstanceWithInternalReferenceList("two");
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("one", "two"), "extracted", true);
 
         assertExtractedInternalReferenceList(path1, extractedPath);
         assertExtractedInternalReferenceList(path2, extractedPath);
@@ -782,23 +781,91 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         ConfigA a = createAInstance("a");
         a.getBmap().put("b", new ConfigB("b"));
         configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, a, rootPath, false);
-        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted");
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, Arrays.asList("a"), "extracted", true);
 
         ConfigA extracted = configurationTemplateManager.getInstance(extractedPath, ConfigA.class);
         assertNull(extracted.getBmap().get("b").getRefToRef());
     }
 
-    private void assertAllValuesExtracted(String key)
+    public void testAddEmptyParentTemplateSimple() throws TypeException
+    {
+        String aPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, false);
+        String extractedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, asList("a"), "added", false);
+
+        ConfigA addedInstance = configurationTemplateManager.getInstance(extractedPath, ConfigA.class);
+        assertDefaultAInstance(addedInstance, "added");
+        assertFalse(addedInstance.isConcrete());
+
+        ConfigA aInstance = configurationTemplateManager.getInstance(aPath, ConfigA.class);
+        assertAInstance(aInstance, "a");
+        assertTrue(aInstance.isConcrete());
+
+        // Assert the expected shape of the hierarchy
+        TemplateNode node = configurationTemplateManager.getTemplateNode(aPath);
+        assertNotNull(node);
+        assertEquals("root/added/a", node.getTemplatePath());
+
+        node = configurationTemplateManager.getTemplateNode(extractedPath);
+        assertNotNull(node);
+        assertEquals("root/added", node.getTemplatePath());
+
+        // Now assert that the fields have not been pulled up.
+        assertAllValuesOwnedBy("a", "a");
+    }
+
+    public void testAddEmptyParentTemplateIdenticalSiblings() throws TypeException
+    {
+        String path1 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("1"), rootPath, false);
+        String path2 = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("2"), rootPath, false);
+        String addedPath = configurationRefactoringManager.introduceParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "added", false);
+
+        // Ensure parent has no fields pulled up
+        ConfigA addedInstance = configurationTemplateManager.getInstance(addedPath, ConfigA.class);
+        assertDefaultAInstance(addedInstance, "added");
+        assertFalse(addedInstance.isConcrete());
+
+        // And both children look good too
+        ConfigA instance1 = configurationTemplateManager.getInstance(path1, ConfigA.class);
+        assertAInstance(instance1, "1");
+        assertTrue(instance1.isConcrete());
+
+        ConfigA instance2 = configurationTemplateManager.getInstance(path2, ConfigA.class);
+        assertAInstance(instance2, "2");
+        assertTrue(instance2.isConcrete());
+
+        // Assert the expected shape of the hierarchy
+        TemplateNode node = configurationTemplateManager.getTemplateNode(addedPath);
+        assertNotNull(node);
+        assertEquals("root/added", node.getTemplatePath());
+
+        assertEquals(2, node.getChildren().size());
+        List<String> children = map(node.getChildren(), new Mapping<TemplateNode, String>()
+        {
+            public String map(TemplateNode templateNode)
+            {
+                return templateNode.getId();
+            }
+        });
+        Collections.sort(children);
+        assertEquals("1", children.get(0));
+        assertEquals("2", children.get(1));
+
+        // Now assert that the fields really haven't been pulled up.
+        assertAllValuesOwnedBy("1", "1");
+        assertAllValuesOwnedBy("2", "2");
+    }
+    
+    private void assertAllValuesOwnedBy(String key, String owner)
     {
         String path = getPath(TEMPLATE_SCOPE, key);
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(path);
         assertEquals(key, record.getOwner("name"));
         assertEquals("10", record.get("x"));
-        assertEquals("extracted", record.getOwner("x"));
+        assertEquals(owner, record.getOwner("x"));
 
         TemplateRecord bRecord = (TemplateRecord) record.get("b");
         assertEquals("44", bRecord.get("y"));
-        assertEquals("extracted", bRecord.getOwner("y"));
+        assertEquals(owner, bRecord.getOwner("y"));
 
         TemplateRecord blistRecord = (TemplateRecord) record.get("blist");
         TemplateRecord lisbyRecord = (TemplateRecord) blistRecord.get(blistRecord.nestedKeySet().iterator().next());
@@ -807,7 +874,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         TemplateRecord bmapRecord = (TemplateRecord) record.get("bmap");
         TemplateRecord colbyRecord = (TemplateRecord) bmapRecord.get("colby");
         assertEquals("1", colbyRecord.get("y"));
-        assertEquals("extracted", colbyRecord.getOwner("y"));
+        assertEquals(owner, colbyRecord.getOwner("y"));
     }
 
     public void testSmartCloneWithInheritedReferenceExtractedParentNameHasOriginalNameAsPrefix()
@@ -2551,6 +2618,15 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         Referee cloneRef = instance.getRef();
         assertNotNull(cloneRef);
         assertEquals("ee", cloneRef.getName());
+    }
+
+    private void assertDefaultAInstance(ConfigA instance, String name)
+    {
+        assertEquals(name, instance.getName());
+        assertEquals(0, instance.getX());
+        assertNull(instance.getB());
+        assertEquals(0, instance.getBlist().size());
+        assertEquals(0, instance.getBmap().size());
     }
 
     private void invalidCloneNameHelper(String path, String cloneName, String expectedError) throws TypeException

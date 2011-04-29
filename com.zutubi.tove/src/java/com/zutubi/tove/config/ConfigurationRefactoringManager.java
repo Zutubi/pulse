@@ -155,17 +155,17 @@ public class ConfigurationRefactoringManager
     }
 
     /**
-     * Tests if the given path can have a template parent extracted from it.
-     * Parents can be extracted from items of templated collections,
-     * excepting the root of the template tree.
+     * Tests if the given path can have a template parent introduced above it.
+     * Parents can be introduced above items of templated collections excepting
+     * the root of the template tree.
      *
-     * @see #extractParentTemplate(String, java.util.List, String)
+     * @see #introduceParentTemplate(String, java.util.List, String, boolean) 
      *
      * @param path the path to test
-     * @return true iff a parent template may be extracted from the given
+     * @return true iff a parent template may be introduced above the given
      *         path
      */
-    public boolean canExtractParentTemplate(final String path)
+    public boolean canIntroduceParentTemplate(final String path)
     {
         return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Boolean>()
         {
@@ -177,27 +177,31 @@ public class ConfigurationRefactoringManager
     }
 
     /**
-     * Extracts the common values from a set of siblings into a parent
-     * template.  After the operation is complete, the final values of all
-     * fields (in the deep sense) of each sibling is unchanged, but any value
-     * that is identical in all siblings is now inherited from the new
-     * template parent.
+     * Introduces a new parent template over a set of siblings.  The new
+     * template may be empty, or include all common configuration from the
+     * siblings.  After the operation is complete, the final values of all
+     * fields (in the deep sense) of each sibling is unchanged.  If pullUp is
+     * true, all values common to every sibling will be inherited from the
+     * new parent.
      *
      * @param parentPath         path of the templated collection that the
      *                           siblings are items of
-     * @param keys               keys of the sibling items to extract the
-     *                           parent from (all keys must refer to items
+     * @param keys               keys of the sibling items to introduce the
+     *                           parent above (all keys must refer to items
      *                           with the same template parent)
      * @param parentTemplateKey  key for the new template parent
+     * @param pullUp             if true, pull up all common values from
+     *                           the children into the new parent; otherwise
+     *                           create a new empty parent
      * @return the path of the new template parent
      * @throws IllegalArgumentException if the the parent path is not a
      *         templated collection; if no keys are specified; if the keys do
      *         not share a common, non-null template parent; if the parent
      *         template name is invalid or in use
      */
-    public String extractParentTemplate(final String parentPath, final List<String> keys, final String parentTemplateKey)
+    public String introduceParentTemplate(final String parentPath, final List<String> keys, final String parentTemplateKey, boolean pullUp)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ExtractParentTemplateAction(parentPath, parentTemplateKey, keys));
+        return configurationTemplateManager.executeInsideTransaction(new IntroduceParentTemplateAction(parentPath, parentTemplateKey, keys, pullUp));
     }
 
     /**
@@ -216,7 +220,7 @@ public class ConfigurationRefactoringManager
         {
             public Boolean process()
             {
-                return canExtractParentTemplate(path) && canClone(path);
+                return canIntroduceParentTemplate(path) && canClone(path);
             }
         });
     }
@@ -1098,37 +1102,36 @@ public class ConfigurationRefactoringManager
                 throw new IllegalArgumentException("Root key must be present in original to clone key map.");
             }
 
-            extractParentTemplate(parentPath, Arrays.asList(rootKey), parentKey);
+            introduceParentTemplate(parentPath, Arrays.asList(rootKey), parentKey, true);
             ConfigurationRefactoringManager.this.clone(parentPath, originalKeyToCloneKey);
             return PathUtils.getPath(parentPath, originalKeyToCloneKey.get(rootKey));
         }
 
     }
 
-    private class ExtractParentTemplateAction implements NullaryFunction<String>
+    private class IntroduceParentTemplateAction implements NullaryFunction<String>
     {
         private final String parentPath;
         private final String parentTemplateName;
         private final List<String> keys;
+        private final boolean pullUp;
 
-        public ExtractParentTemplateAction(String parentPath, String parentTemplateName, List<String> keys)
+        public IntroduceParentTemplateAction(String parentPath, String parentTemplateName, List<String> keys, boolean pullUp)
         {
             this.parentPath = parentPath;
             this.parentTemplateName = parentTemplateName;
             this.keys = keys;
+            this.pullUp = pullUp;
         }
 
         public String process()
         {
-            // First: what happens to references?  And state?  They want to stay
-            // pointing at the same handles, so best to keep the current records
-            // 'as-is' and pull the values up.
-            if(!configurationTemplateManager.isTemplatedCollection(parentPath))
+            if (!configurationTemplateManager.isTemplatedCollection(parentPath))
             {
                 throw new IllegalArgumentException("Invalid parent path '" + parentPath + "': does not refer to a templated collection");
             }
 
-            if(!StringUtils.stringSet(parentTemplateName))
+            if (!StringUtils.stringSet(parentTemplateName))
             {
                 throw new IllegalArgumentException("Parent template name is required");
             }
@@ -1191,23 +1194,36 @@ public class ConfigurationRefactoringManager
             {
                 // Extract and save the new parent.
                 MapType parentType = configurationTemplateManager.getType(parentPath, MapType.class);
-                MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
-                common.put(mapType.getKeyProperty(), parentTemplateName);
-                configurationTemplateManager.markAsTemplate(common);
-                configurationTemplateManager.setParentTemplate(common, recordManager.select(templateParentNode.getPath()).getHandle());
-                String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, common);
+                MutableRecord newParent;
+                
+                if (pullUp)
+                {
+                    newParent = extractCommon(records, parentPath, parentType.getTargetType());
+                }
+                else
+                {
+                    newParent = new MutableRecordImpl();
+                    newParent.setSymbolicName(records.get(0).second.getSymbolicName());
+                }
+
+                newParent.put(mapType.getKeyProperty(), parentTemplateName);
+                configurationTemplateManager.markAsTemplate(newParent);
+                configurationTemplateManager.setParentTemplate(newParent, recordManager.select(templateParentNode.getPath()).getHandle());
+                String newParentTemplatePath = configurationTemplateManager.insertRecord(parentPath, newParent);
                 TemplateRecord newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
                 long newParentTemplateHandle = newParentTemplateRecord.getHandle();
 
-                // Fix internal references which were pulled up (note we need to
-                // refresh the record after saving).
-                MutableRecord newParentTemplateCopy = newParentTemplateRecord.getMoi().copy(true, true);
-                newParentTemplateCopy.forEach(new PullUpReferencesFunction(mapType.getTargetType(), newParentTemplateCopy, newParentTemplatePath, PathUtils.getPath(parentPath, keys.get(0))));
-                newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
+                if (pullUp)
+                {
+                    // Fix internal references which were pulled up (note we need to
+                    // refresh the record after saving).
+                    MutableRecord newParentTemplateCopy = newParentTemplateRecord.getMoi().copy(true, true);
+                    newParentTemplateCopy.forEach(new PullUpReferencesFunction(mapType.getTargetType(), newParentTemplateCopy, newParentTemplatePath, PathUtils.getPath(parentPath, keys.get(0))));
+                    newParentTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(newParentTemplatePath);
+                }
 
-                // Reparent all the children.  Note we need to scrub all the
-                // values we just pulled up and then do a deep update.  No events
-                // need to be sent as no concrete instance is changed.
+                // Reparent all the children.  No events need to be sent as no
+                // concrete instance is changed.
                 for (String key: keys)
                 {
                     String path = getPath(parentPath, key);
@@ -1217,11 +1233,15 @@ public class ConfigurationRefactoringManager
                     configurationTemplateManager.setParentTemplate(copy, newParentTemplateHandle);
                     recordManager.update(path, copy);
 
-                    // Fix references, scrub and apply updates.
-                    copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true, true);
-                    copy.forEach(new CanonicaliseReferencesFunction(mapType.getTargetType(), copy, path));
-                    configurationTemplateManager.scrubInheritedValues(newParentTemplateRecord, copy, true);
-                    copy.forEach(new DeepUpdateFunction(path));
+                    if (pullUp)
+                    {
+                        // Fix references we just pulled up, scrub and apply
+                        // updates.
+                        copy = ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi().copy(true, true);
+                        copy.forEach(new CanonicaliseReferencesFunction(mapType.getTargetType(), copy, path));
+                        configurationTemplateManager.scrubInheritedValues(newParentTemplateRecord, copy, true);
+                        copy.forEach(new DeepUpdateFunction(path));
+                    }
                 }
 
                 return newParentTemplatePath;
