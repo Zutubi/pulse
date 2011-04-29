@@ -681,6 +681,12 @@
             <result name="input" type="flexjson">newPanel</result>
         </action>
 
+        <action name="introduceparent" class="com.zutubi.pulse.master.tove.webwork.IntroduceParentAction">
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="input" type="flexjson">newPanel</result>
+        </action>
+
         <action name="move" class="com.zutubi.pulse.master.tove.webwork.MoveAction">
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>

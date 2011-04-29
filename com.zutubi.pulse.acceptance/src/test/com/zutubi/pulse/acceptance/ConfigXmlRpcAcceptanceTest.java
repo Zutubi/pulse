@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
@@ -29,6 +30,7 @@ import java.util.*;
  * tests deal with specific configuration types, this test just concentrates
  * on the general capabilities and boundaries of the config functions.
  */
+@SuppressWarnings({"unchecked"})
 public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_PROJECT_NAME = "config-xml-rpc";
@@ -113,14 +115,14 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetConfig() throws Exception
     {
         Hashtable<String, Object> emailConfig = new Hashtable<String, Object>();
-        emailConfig.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        emailConfig.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         emailConfig.put("host", "localhost");
         emailConfig.put("from", "pulse@zutubi.com");
         emailConfig.put("ssl", true);
         rpcClient.RemoteApi.saveConfig("settings/email", emailConfig, false);
 
         emailConfig = rpcClient.RemoteApi.getConfig(PATH_EMAIL_SETTINGS);
-        assertEquals("zutubi.emailConfig", emailConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertEquals("localhost", emailConfig.get("host"));
         assertEquals("pulse@zutubi.com", emailConfig.get("from"));
         assertEquals(true, emailConfig.get("ssl"));
@@ -133,7 +135,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals("localhost", agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -164,7 +166,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetRawConfig() throws Exception
     {
         Hashtable<String, Object> emailConfig = rpcClient.RemoteApi.getRawConfig(PATH_EMAIL_SETTINGS);
-        assertEquals("zutubi.emailConfig", emailConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertTrue(emailConfig.containsKey("host"));
         assertTrue(emailConfig.containsKey("port"));
         assertTrue(emailConfig.containsKey("username"));
@@ -184,7 +186,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> agentConfig = rpcClient.RemoteApi.getRawConfig(path);
         try
         {
-            assertEquals("zutubi.agentConfig", agentConfig.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+            assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals("localhost", agentConfig.get("host"));
             assertEquals(8890, agentConfig.get("port"));
@@ -214,7 +216,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertConfigExistingPath() throws Exception
     {
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("record already exists", "insertConfig", PATH_EMAIL_SETTINGS, config);
     }
 
@@ -229,7 +231,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
+        config.put(SYMBOLIC_NAME_KEY, "zutubi.nosuchConfig");
         callAndExpectError("Unrecognised symbolic name", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
@@ -237,7 +239,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
+        config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
         callAndExpectError("Expected type: class com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
@@ -245,7 +247,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         rpcClient.RemoteApi.ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
-        config.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        config.put(SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         callAndExpectError("name requires a value", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
@@ -253,13 +255,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
-        stage.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
+        stage.put(SYMBOLIC_NAME_KEY, "zutubi.stageConfig");
         stage.put("name", "my stage");
         stage.put("recipe", "a recipe");
         String stagePath = rpcClient.RemoteApi.insertConfig(projectPath + "/stages", stage);
         
         Hashtable<String, Object> loadedStage = rpcClient.RemoteApi.getConfig(stagePath);
-        assertEquals("zutubi.stageConfig", loadedStage.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.stageConfig", loadedStage.get(SYMBOLIC_NAME_KEY));
         assertEquals("my stage", loadedStage.get("name"));
         assertEquals("a recipe", loadedStage.get("recipe"));
     }
@@ -271,13 +273,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertEquals(true, rpcClient.RemoteApi.deleteConfig(scmPath));
 
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
         scm.put("url", "svn://localhost/test/trunk");
         scm.put("monitor", false);
         rpcClient.RemoteApi.insertConfig(scmPath, scm);
 
         Hashtable<String, Object> loadedScm = rpcClient.RemoteApi.getConfig(scmPath);
-        assertEquals("zutubi.subversionConfig", loadedScm.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", loadedScm.get(SYMBOLIC_NAME_KEY));
         assertEquals("svn://localhost/test/trunk", loadedScm.get("url"));
         assertEquals(false, loadedScm.get("monitor"));
     }
@@ -309,20 +311,20 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName);
         
         Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
-        assertEquals("zutubi.projectConfig", project.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.projectConfig", project.get(SYMBOLIC_NAME_KEY));
         assertEquals(projectName, project.get("name"));
         Hashtable<String, Object> scm = (Hashtable<String, Object>) project.get("scm");
         assertNotNull(scm);
-        assertEquals("zutubi.subversionConfig", scm.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", scm.get(SYMBOLIC_NAME_KEY));
     }
 
     public void testInsertTemplatedConfigValidates() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
@@ -333,10 +335,10 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertTemplatedConfigValidatesAsTemplate() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
         project.put("scm", scm);
@@ -350,7 +352,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testInsertTemplatedConfigTemplate() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         String projectName = randomName();
         project.put("name", projectName);
 
@@ -380,7 +382,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> options = new Hashtable<String, Object>();
-        options.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "invalid");
+        options.put(SYMBOLIC_NAME_KEY, "invalid");
         callAndExpectError("Expecting type 'zutubi.buildOptionsConfig', found 'invalid'", "saveConfig", projectPath + "/options", options, false);
     }
 
@@ -520,7 +522,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testDeleteInheritedFrom() throws Exception
     {
         Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
         project.put("name", randomName());
         String parentPath = rpcClient.RemoteApi.insertTemplatedConfig("projects/global project template", project, true);
 
@@ -769,7 +771,6 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         
         String childHookPath = hookPath.replace(parentProject, childProject);
         Hashtable<String, Object> childHook = rpcClient.RemoteApi.getConfig(childHookPath);
-        @SuppressWarnings({"unchecked"})
         Vector<String> stages = (Vector<String>) childHook.get("stages");
         assertEquals(getPath(childPath, Constants.Project.STAGES, "default"), stages.get(0));
     }
@@ -841,6 +842,20 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(rpcClient.RemoteApi.configPathExists(pushedDownToPath));
     }
 
+    public void testIntroduceParentTemplateConfig() throws Exception
+    {
+        String random = randomName();
+        String originalProject = random + "-original";
+        String newTemplateParentProject = random + "-new-parent";
+
+        String childProjectPath = rpcClient.RemoteApi.insertProject(originalProject, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(Constants.getGitUrl()), rpcClient.RemoteApi.createVersionedConfig("path"));
+
+        String result = rpcClient.RemoteApi.introduceParentTemplateConfig(childProjectPath, newTemplateParentProject, true);
+        
+        assertEquals(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, newTemplateParentProject), result);
+        assertEquals(newTemplateParentProject, rpcClient.RemoteApi.getTemplateParent(childProjectPath));
+    }
+    
     public void testPreviewMoveConfig() throws Exception
     {
         String random = randomName();
@@ -848,7 +863,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String newTemplateParentProject = random + "-new-parent";
 
         String childProjectPath = rpcClient.RemoteApi.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(Constants.getGitUrl()), rpcClient.RemoteApi.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
         Hashtable<String, Object> result = rpcClient.RemoteApi.previewMoveConfig(childProjectPath, newTemplateParentProject);
         
@@ -869,7 +884,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String newTemplateParentProject = random + "-new-parent";
 
         String childProjectPath = rpcClient.RemoteApi.insertProject(childProject, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getGitConfig(Constants.getGitUrl()), rpcClient.RemoteApi.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
         rpcClient.RemoteApi.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
         Hashtable<String, Object> result = rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
@@ -898,7 +913,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String childProjectPath = rpcClient.RemoteApi.insertTrivialProject(childProject, true);
         String grandchild1ProjectPath = rpcClient.RemoteApi.insertSimpleProject(grandchild1Project, childProject, false);
         String grandchild2ProjectPath = rpcClient.RemoteApi.insertProject(grandchild2Project, childProject, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("path"));
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
         rpcClient.RemoteApi.insertProjectProperty(newTemplateParentProject, "prop", "val");
 
         Hashtable<String, Object> result = rpcClient.RemoteApi.moveConfig(childProjectPath, newTemplateParentProject);
@@ -930,7 +945,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String newTemplateParentProject = random + "-new-parent";
 
         String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, false);
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
         String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         String groupPath = rpcClient.RemoteApi.insertGroup(group, asList(userPath));
@@ -952,7 +967,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String newTemplateParentProject = random + "-new-parent";
 
         String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, false);
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
         rpcClient.RemoteApi.insertTrivialUser(user);
         rpcClient.logout();
@@ -979,7 +994,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         String childProjectPath = rpcClient.RemoteApi.insertSimpleProject(childProject, true);
         String grandChildProjectPath = rpcClient.RemoteApi.insertTrivialProject(grandChildProject, childProject, false);
-        String newTemplateParentProjectPath = rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
+        rpcClient.RemoteApi.insertSimpleProject(newTemplateParentProject, true);
 
         String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         String groupPath = rpcClient.RemoteApi.insertGroup(group, asList(userPath));
@@ -1032,7 +1047,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     private void checkPathType(String path, String expectedType) throws Exception
     {
         Hashtable<String, Object> config = rpcClient.RemoteApi.getConfig(path);
-        assertEquals(expectedType, config.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals(expectedType, config.get(SYMBOLIC_NAME_KEY));
     }
 
     private void checkExpectedDeletedPaths(Hashtable<String, Object> result, String... expected)

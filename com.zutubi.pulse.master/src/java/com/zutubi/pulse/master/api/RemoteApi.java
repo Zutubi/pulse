@@ -1132,6 +1132,45 @@ public class RemoteApi
     }
 
     /**
+     * Introduces a new parent template above an element of a templated
+     * collection.  The new parent template may be empty, or include all
+     * existing values from the original configuration.  In the latter case,
+     * the original configuration will inherit the values from the new template
+     * parent.
+     *
+     * @param token        authentication token (see {@link #login})
+     * @param path         path of the templated collection item to introduce
+     *                     the template above
+     * @param newParentKey key for the new template parent
+     * @param pullUp       if true, pull up all existing values from the path
+     *                     into the new parent; otherwise create a new empty
+     *                     parent
+     * @return the path of the new template parent
+     * @throws IllegalArgumentException if the the path does not refer to an
+     *         item of a templated collection; if the parent template name is
+     *         invalid or in use
+     * @access requires create permission for the given path
+     */
+    public String introduceParentTemplateConfig(String token, String path, String newParentKey, boolean pullUp)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            if (!configurationRefactoringManager.canIntroduceParentTemplate(path))
+            {
+                throw new IllegalArgumentException("Cannot introduce a parent of path '" + path + "': path must refer to an item of a templated collection");
+            }
+            
+            accessManager.ensurePermission(AccessManager.ACTION_CREATE, path);
+            return configurationRefactoringManager.introduceParentTemplate(PathUtils.getParentPath(path), Arrays.asList(PathUtils.getBaseName(path)), newParentKey, pullUp);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }        
+    }
+    
+    /**
      * Previews a move of an item in a templated collection to a new parent,
      * without making any actual changes.  This allows the caller to examine
      * the result of a move before going ahead.  An example use-case is warning

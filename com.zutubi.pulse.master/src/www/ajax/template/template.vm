@@ -22,6 +22,10 @@
         #actionHeader("smartclone" "smart clone" "smart-clone" "actionPath('#jss(${path})', 'smartclone', false, false)")
         <td>smart clone this #i18n("key=label") by extracting a template parent and optionally clone its descendants</td>
     </tr>
+    <tr>
+        #actionHeader("introduceparent" "introduce parent" "introduce-parent-template" "actionPath('#jss(${path})', 'introduceparent', false, false)")
+        <td>introduce a new template above this #i18n("key=label"), optionally pulling up existing configuration</td>
+    </tr>
 #end
 #auth("path=$path" "action=write")
     <tr>

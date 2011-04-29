@@ -201,6 +201,11 @@ public class RemoteApiClient extends ApiClient
         return call("pushDownConfig", path, childKeys);
     }
 
+    public String introduceParentTemplateConfig(String path, String newParentKey, boolean pullUp) throws Exception
+    {
+        return call("introduceParentTemplateConfig", path, newParentKey, pullUp);
+    }
+
     public Hashtable<String, Object> previewMoveConfig(String path, String newTemplateParentKey) throws Exception
     {
         return call("previewMoveConfig", path, newTemplateParentKey);
@@ -1349,12 +1354,12 @@ public class RemoteApiClient extends ApiClient
     {
         return call("getCustomFieldsInBuild", projectName, buildId);
     }
-    
+
     public Hashtable<String, Object> getReportData(String projectName, String reportGroup, String report, int timeFrame, String timeUnit) throws Exception
     {
         return call("getReportData", projectName, reportGroup, report, timeFrame, timeUnit);
     }
-    
+
     public Vector<Hashtable<String, Object>> getBuildComments(String projectName, int buildId) throws Exception
     {
         return call("getBuildComments", projectName, buildId);
@@ -1369,7 +1374,7 @@ public class RemoteApiClient extends ApiClient
     {
         return (Boolean) call("deleteBuildComment", projectName, buildId, commentId);
     }
-    
+
     public String threadDump() throws Exception
     {
         return (String) call("threadDump");

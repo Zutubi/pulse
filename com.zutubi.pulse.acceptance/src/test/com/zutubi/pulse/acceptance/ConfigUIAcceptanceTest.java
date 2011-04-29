@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
 import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
 import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
@@ -603,7 +604,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
         Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(projectTypePath);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(RemoteApiClient.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingMultiRecipeProject() throws Exception
@@ -631,7 +632,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
         Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(childTypePath);
-        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals(SYMBOLIC_NAME_MULTI_RECIPE, type.get(RemoteApiClient.SYMBOLIC_NAME_KEY));
     }
 
     public void testCustomProject() throws Exception
@@ -661,7 +662,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String projectTypePath = getPath(PROJECTS_SCOPE, random, Constants.Project.TYPE);
         Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(projectTypePath);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(RemoteApiClient.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingCustomProject() throws Exception
@@ -694,7 +695,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         String childTypePath = getPath(PROJECTS_SCOPE, child, Constants.Project.TYPE);
         Hashtable<String, Object> type = rpcClient.RemoteApi.getConfig(childTypePath);
-        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals(SYMBOLIC_NAME_CUSTOM, type.get(RemoteApiClient.SYMBOLIC_NAME_KEY));
     }
 
     public void testWizardOverridingScrubRequired() throws Exception
@@ -957,6 +958,81 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
         configPage.clickBuildOptionsAndWait();
+    }
+    
+    public void testIntroduceParentLinkPresence() throws Exception
+    {
+        String random = randomName();
+        String user = random + "-user";
+        String template = random + "-template";
+        String concrete = random + "-concrete";
+        
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.RemoteApi.insertTrivialProject(template, true);
+        rpcClient.RemoteApi.insertTrivialProject(concrete, false);
+
+        getBrowser().loginAsAdmin();
+
+        ProjectHierarchyPage globalPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        assertFalse(globalPage.isIntroduceParentPresent());
+
+        ProjectHierarchyPage templatePage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, template, true);
+        assertTrue(templatePage.isIntroduceParentPresent());
+
+        ProjectHierarchyPage concretePage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, concrete, false);
+        assertTrue(concretePage.isIntroduceParentPresent());
+
+        getBrowser().logout();
+        assertTrue(getBrowser().login(user, ""));
+
+        templatePage.openAndWaitFor();
+        assertFalse(templatePage.isIntroduceParentPresent());
+        
+        concretePage.openAndWaitFor();
+        assertFalse(concretePage.isIntroduceParentPresent());
+    }
+    
+    public void testIntroduceParent() throws Exception
+    {
+        String random = randomName();
+        String original = random + "-original";
+        String newTemplateParent = random + "-newtp";
+
+        String originalPath = rpcClient.RemoteApi.insertSimpleProject(original, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        getBrowser().loginAsAdmin();
+
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, original, false);
+        hierarchyPage.clickIntroduceParent();
+        
+        IntroduceParentForm form = new IntroduceParentForm(getBrowser());
+        form.waitFor();
+        form.okFormElements(newTemplateParent, "false");
+        
+        hierarchyPage = getBrowser().createPage(ProjectHierarchyPage.class, newTemplateParent, false);
+        hierarchyPage.waitFor();
+        assertTrue(hierarchyPage.isTreeItemPresent(newTemplateParent));
+        assertEquals(newTemplateParent, rpcClient.RemoteApi.getTemplateParent(originalPath));
+    }
+    
+    public void testIntroduceParentValidation() throws Exception
+    {
+        String random = randomName();
+        rpcClient.RemoteApi.insertSimpleProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false);
+
+        getBrowser().loginAsAdmin();
+
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
+        hierarchyPage.clickIntroduceParent();
+        
+        IntroduceParentForm form = new IntroduceParentForm(getBrowser());
+        form.waitFor();
+        form.okFormElements(random, "true");
+        
+        form.waitFor();
+        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        form.cancelFormElements(random, "false");
+        hierarchyPage.waitFor();
     }
     
     public void testMoveLinkPresence() throws Exception

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -44,14 +45,14 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);
-        assertEquals("zutubi.subversionConfig", createdScm.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", createdScm.get(SYMBOLIC_NAME_KEY));
         assertEquals(Constants.TRIVIAL_ANT_REPOSITORY, createdScm.get("url"));
         assertEquals("CLEAN_CHECKOUT", createdScm.get("checkoutScheme"));
         assertEquals(false, createdScm.get("monitor"));
 
         Hashtable<String, Object> createdType = (Hashtable<String, Object>) createdProject.get("type");
         assertNotNull(createdType);
-        assertEquals("zutubi.multiRecipeTypeConfig", createdType.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.multiRecipeTypeConfig", createdType.get(SYMBOLIC_NAME_KEY));
         assertEquals("default", createdType.get("defaultRecipe"));
 
         Hashtable<String, Object> recipes = (Hashtable<String, Object>) createdType.get("recipes");
@@ -66,7 +67,7 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> command = (Hashtable<String, Object>) commands.get("build");
         assertNotNull(command);
-        assertEquals("zutubi.antCommandConfig", command.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.antCommandConfig", command.get(SYMBOLIC_NAME_KEY));
         assertEquals("build.xml", command.get("buildFile"));
     }
 
@@ -153,7 +154,7 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private void assertProject(Hashtable<String, Object> struct, String name)
     {
-        assertEquals("zutubi.projectConfig", struct.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.projectConfig", struct.get(SYMBOLIC_NAME_KEY));
         assertEquals(name, struct.get("name"));
     }
 
@@ -161,7 +162,7 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
         assertNotNull(options);
-        assertEquals("zutubi.buildOptionsConfig", options.get(rpcClient.RemoteApi.SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.buildOptionsConfig", options.get(SYMBOLIC_NAME_KEY));
         assertEquals(false, options.get("isolateChangelists"));
         assertEquals(false, options.get("prompt"));
         assertEquals(0, options.get("timeout"));
