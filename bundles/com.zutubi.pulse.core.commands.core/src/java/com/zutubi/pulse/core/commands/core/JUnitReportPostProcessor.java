@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 /**
  * Post-processor for junit (and compatible) XML reports.
@@ -87,7 +88,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         nextTagOrEnd(reader);
     }
 
-    private String getTestSuiteName(Map<String, String> attributes)
+    protected String getTestSuiteName(Map<String, String> attributes)
     {
         String name = "";
         String attr = attributes.get(getConfig().getPackageAttribute());
@@ -109,7 +110,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         expectStartTag(getConfig().getCaseElement(), reader);
 
         Map<String, String> attributes = getAttributes(reader);
-        String name = attributes.get(getConfig().getNameAttribute());
+        String name = getTestCaseName(attributes);
         if (name == null)
         {
             nextElement(reader);
@@ -123,7 +124,7 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
         }
 
         long duration = getDuration(attributes);
-        TestCaseResult caseResult = new TestCaseResult(name, duration, TestStatus.PASS);
+        TestCaseResult caseResult = new TestCaseResult(name, duration, getTestCaseImmediateStatus(attributes));
         suite.addCase(caseResult);
         nextTagOrEnd(reader);
 
@@ -157,6 +158,16 @@ public class JUnitReportPostProcessor extends StAXTestReportPostProcessorSupport
 
         expectEndTag(getConfig().getCaseElement(), reader);
         nextTagOrEnd(reader);
+    }
+
+    protected String getTestCaseName(Map<String, String> attributes)
+    {
+        return attributes.get(getConfig().getNameAttribute());
+    }
+
+    protected TestStatus getTestCaseImmediateStatus(Map<String, String> attributes)
+    {
+        return TestStatus.PASS;
     }
 
     private String getMessage(XMLStreamReader reader) throws XMLStreamException
