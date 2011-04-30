@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.googletest;
 
 import com.zutubi.pulse.core.postprocessors.api.*;
+
+import java.io.IOException;
+
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 public class GoogleTestReportPostProcessorTest extends XMLTestPostProcessorTestCase
@@ -30,6 +33,25 @@ public class GoogleTestReportPostProcessorTest extends XMLTestPostProcessorTestC
                 "java.lang.RuntimeException: random message\n" +
                         "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)"),
                 children[2]);
+    }
+
+    public void testItself() throws IOException
+    {
+        TestPostProcessorContext context = runProcessor(pp);
+        TestSuiteResult tests = context.getTestSuiteResult();
+        assertEquals(419, tests.getTotal());
+        assertEquals(13, tests.getTotalWithStatus(SKIPPED));
+
+        TestSuiteResult suite = tests.findSuite("DisabledTest");
+        assertNotNull(suite);
+
+        TestCaseResult disabledCase = suite.findCase("TestShouldNotRun");
+        assertNotNull(disabledCase);
+        assertEquals(TestStatus.SKIPPED, disabledCase.getStatus());
+
+        TestCaseResult notDisabledCase = suite.findCase("NotDISABLED_TestShouldRun");
+        assertNotNull(notDisabledCase);
+        assertEquals(TestStatus.PASS, notDisabledCase.getStatus());
     }
 
     private void checkWarning(TestResult testResult, String name, long duration, String contents)
