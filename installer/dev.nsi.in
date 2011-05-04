@@ -6,11 +6,6 @@
   !include "MUI.nsh"
 
 ;--------------------------------
-;Variables
-
-  Var STARTMENU_FOLDER
-
-;--------------------------------
 ;General
 
   ;Name and file
@@ -39,11 +34,6 @@
 ;  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
 
-  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\Pulse Developer Tools"
-  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-  
-  !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
   !insertmacro MUI_PAGE_INSTFILES
   
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -113,11 +103,6 @@ Section "Pulse" SecMain
   ;Store installation folder
   WriteRegStr HKCU "Software\Zutubi\Pulse Developer Tools" "" $INSTDIR
   
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  !insertmacro MUI_STARTMENU_WRITE_END
-
   ; Record in Windows Add/Remove (and equivalents).
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "DisplayName" "Zutubi Pulse Developer Tools"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "Publisher" "Zutubi Pty Ltd"
@@ -147,12 +132,6 @@ Section "un.Uninstall"
 
   Push "PULSE_HOME"
   Call un.DeleteEnvStr
-
-  !insertmacro MUI_STARTMENU_GETFOLDER Application $STARTMENU_FOLDER
-  DetailPrint "$STARTMENU_FOLDER"
-
-  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk"
-  RMDir "$SMPROGRAMS\$STARTMENU_FOLDER"
 
   RMDir /r "$INSTDIR"
 
