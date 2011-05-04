@@ -568,10 +568,18 @@ public class DefaultBuildManager implements BuildManager
         buildResultDao.delete(build);
     }
 
-    public void terminateBuild(BuildResult buildResult, String reason)
+    public void terminateBuild(BuildResult buildResult, String reason, boolean kill)
     {
-        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
-        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason));
+        if (kill)
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+        }
+        else
+        {
+            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult);
+        }
+
+        eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason, kill));
     }
 
     private List<File> getRepositoryDirectoriesFor(final Project project) throws Exception

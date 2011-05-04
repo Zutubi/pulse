@@ -14,12 +14,18 @@ public class CancelBuildAction extends ActionSupport
     private static final Messages I18N = Messages.getInstance(CancelBuildAction.class);
     
     private long buildId;
+    private boolean kill;
     private SimpleResult result;
     private BuildManager buildManager;
 
     public void setBuildId(long buildId)
     {
         this.buildId = buildId;
+    }
+
+    public void setKill(boolean kill)
+    {
+        this.kill = kill;
     }
 
     public SimpleResult getResult()
@@ -36,7 +42,7 @@ public class CancelBuildAction extends ActionSupport
         }
 
         String user = getPrinciple();
-        buildManager.terminateBuild(build, user == null ? null : "requested by '" + user + "'");
+        buildManager.terminateBuild(build, user == null ? null : "requested by '" + user + "'", kill);
         pauseForDramaticEffect();
         result = new SimpleResult(true, I18N.format("termination.requested"));
         return SUCCESS;

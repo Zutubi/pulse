@@ -156,12 +156,12 @@ public interface BuildManager
     BuildResult getByUserAndNumber(User user, long id);
 
     /**
-     * Analogous to {@link #getByProjectAndVirtualId} , but used to find a
+     * Analogous to {@link #getByProjectAndVirtualId(Project, String)} , but used to find a
      * personal rather than a project build.
      *
      * @param user    the user to find the personal build for
      * @param buildId the real or virtual build id (see
-     *                {@link #getByProjectAndVirtualId})
+     *                {@link #getByProjectAndVirtualId(Project, String)})
      * @return the described build, or null if there is no such build
      */
     @SecureResult
@@ -307,6 +307,8 @@ public interface BuildManager
      *
      * @param buildResult   the build to terminate
      * @param reason        the human readable reason for the termination request.
+     * @param kill          if true, kill teh build as quickly as possible with
+     *                      no graceful cleanup
      */
-    void terminateBuild(BuildResult buildResult, String reason);
+    void terminateBuild(BuildResult buildResult, String reason, boolean kill);
 }

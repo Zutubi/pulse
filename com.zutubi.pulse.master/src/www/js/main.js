@@ -590,12 +590,12 @@ function cancelQueuedBuild(id)
     });
 }
 
-function cancelBuild(id)
+function cancelBuild(id, kill)
 {
     showStatus('Requesting build termination...', 'working');
     Ext.Ajax.request({
         url: window.baseUrl + '/ajax/cancelBuild.action',
-        params: { buildId: id },
+        params: { buildId: id, kill: kill },
         callback: handleCancelResponse
     });
 }

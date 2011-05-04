@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -29,7 +28,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
@@ -43,7 +41,6 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -53,7 +50,6 @@ import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepositoryBootstrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -64,6 +60,11 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -386,14 +387,14 @@ public class DefaultBuildController implements EventListener, BuildController
         catch (BuildException e)
         {
             buildResult.error(e);
-            completeBuild();
+            completeBuild(true);
         }
         catch (Exception e)
         {
             LOG.severe(e);
             buildResult.error();
             recordUnexpectedError(Feature.Level.ERROR, e, "Handling " + evt.getClass().getSimpleName());
-            completeBuild();
+            completeBuild(true);
         }
         finally
         {
@@ -462,7 +463,7 @@ public class DefaultBuildController implements EventListener, BuildController
         if (executingControllers.size() == 0)
         {
             handleBuildCommenced();
-            completeBuild();
+            completeBuild(false);
         }
     }
 
@@ -496,7 +497,7 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         if (event.isTerminationRequested(buildResult.getId()))
         {
-            terminateBuild(event.getMessage(), I18N.format("terminate.stage.request"));
+            terminateBuild(event.getMessage(), I18N.format("terminate.stage.request"), event.isKill());
         }
     }
 
@@ -514,20 +515,28 @@ public class DefaultBuildController implements EventListener, BuildController
         });
     }
 
-    private void terminateBuild(String buildMessage, final String recipeMessage)
+    private void terminateBuild(String buildMessage, final String recipeMessage, boolean kill)
     {
-        // Tell every running recipe to stop, and mark the build terminating
-        // (so it will go into the error state on completion).
+        // Mark the build terminating (so it will go into the terminated state
+        // on completion).
         buildResult.terminate(buildMessage);
         buildManager.save(buildResult);
 
-        handleControllerTermination(new UnaryProcedure<RecipeController>()
+        if (kill)
         {
-            public void run(RecipeController recipeController)
+            completeBuild(true);
+        }
+        else
+        {
+            // Allow the recipe controllers to terminate gracefully.
+            handleControllerTermination(new UnaryProcedure<RecipeController>()
             {
-                recipeController.terminateRecipe(recipeMessage);
-            }
-        });
+                public void run(RecipeController recipeController)
+                {
+                    recipeController.terminateRecipe(recipeMessage);
+                }
+            });
+        }
     }
 
     private void handleControllerTermination(UnaryProcedure<RecipeController> terminationProcedure)
@@ -552,7 +561,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         if (executingControllers.size() == 0)
         {
-            completeBuild();
+            completeBuild(false);
         }
     }
 
@@ -580,7 +589,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 executingControllers.remove(found);
                 if (executingControllers.size() == 0)
                 {
-                    completeBuild();
+                    completeBuild(false);
                 }
                 else
                 {
@@ -848,7 +857,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
             if (executingControllers.size() == 0)
             {
-                completeBuild();
+                completeBuild(false);
             }
             else
             {
@@ -911,7 +920,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private void completeBuild()
+    private void completeBuild(boolean hard)
     {
         abortUnfinishedRecipes();
 
@@ -923,7 +932,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            if (buildResult.getRoot().getWorstState(ResultState.SUCCESS) == ResultState.SUCCESS && !buildResult.isPersonal())
+            if (!hard && buildResult.getRoot().getWorstState(ResultState.SUCCESS) == ResultState.SUCCESS && !buildResult.isPersonal())
             {
                 try
                 {
@@ -940,14 +949,17 @@ public class DefaultBuildController implements EventListener, BuildController
             buildResult.complete();
             buildLogger.completed(buildResult);
 
-            // The timing of this event is important: handlers of this event
-            // are allowed to add information to and modify the state of the
-            // build result.  Hence it is crucial that indexing and a final
-            // save are done afterwards.
-            MasterBuildProperties.addCompletedBuildProperties(buildContext, buildResult, configurationManager);
-            buildLogger.postBuild();
-            publishEvent(new PostBuildEvent(this, buildResult, buildContext));
-            buildLogger.postBuildCompleted();
+            if (!hard)
+            {
+                // The timing of this event is important: handlers of this event
+                // are allowed to add information to and modify the state of the
+                // build result.  Hence it is crucial that indexing and a final
+                // save are done afterwards.
+                MasterBuildProperties.addCompletedBuildProperties(buildContext, buildResult, configurationManager);
+                buildLogger.postBuild();
+                publishEvent(new PostBuildEvent(this, buildResult, buildContext));
+                buildLogger.postBuildCompleted();
+            }
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.

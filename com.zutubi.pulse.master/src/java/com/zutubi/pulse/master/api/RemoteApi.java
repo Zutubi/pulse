@@ -35,7 +35,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -64,6 +63,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3797,7 +3798,44 @@ public class RemoteApi
             }
             else
             {
-                buildManager.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API");
+                buildManager.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API", false);
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Request that the given active build is killed as quickly as possible.
+     * Killing does not allow for any graceful cleanup.  This function returns
+     * when the request is made, which is likely to be before the build is
+     * killed.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param projectName the name of the project that is building
+     * @param id          the ID of the build to kill
+     * @return true if kill was requested, false if the build was not found or
+     *         was not in progress
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires administration permission for the server
+     */
+    public boolean killBuild(String token, String projectName, int id)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = buildManager.getByProjectAndNumber(project, id);
+            if (build == null || !build.inProgress())
+            {
+                return false;
+            }
+            else
+            {
+                buildManager.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API", true);
                 return true;
             }
         }

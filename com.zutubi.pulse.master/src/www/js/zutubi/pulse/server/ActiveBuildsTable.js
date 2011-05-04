@@ -137,7 +137,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
         var actions;
         if (data.cancelPermitted)
         {
-            var link = ' href="#" onclick="cancelBuild(' + data.id + '); return false"';
+            var link = ' href="#" onclick="cancelBuild(' + data.id + ', false); return false"';
             actions = '<a class="unadorned" id="cancel-' + data.id + '-image-button"' + link + '><img alt="cancel" src="' + window.baseUrl + '/images/cancel.gif"/></a> ' +
                       '<a id="cancel-' + data.id + '-button"' + link + '>cancel</a>';
         }

@@ -19,6 +19,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 {
     public static final String ACTION_ADD_COMMENT = "addComment";
     public static final String ACTION_CANCEL = "cancel";
+    public static final String ACTION_KILL = "kill";
 
     private BuildReason reason;
     private Project project;

@@ -4,7 +4,6 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
-import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.model.Project;
@@ -25,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
@@ -85,6 +86,11 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
             if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, buildResult))
             {
                 model.addAction(ToveUtils.getActionLink(BuildResult.ACTION_CANCEL, messages, contentRoot));
+            }
+
+            if (accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null))
+            {
+                model.addAction(ToveUtils.getActionLink(BuildResult.ACTION_KILL, messages, contentRoot));
             }
         }
 

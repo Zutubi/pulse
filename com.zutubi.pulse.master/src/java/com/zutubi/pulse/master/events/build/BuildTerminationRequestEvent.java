@@ -22,6 +22,10 @@ public class BuildTerminationRequestEvent extends Event
      */
     private String reason;
     /**
+     * If true, kill the build as quickly as possible without any graceful cleanup.
+     */
+    private boolean kill;
+    /**
      * Milliseconds since the epoch at the time of this request.
      */
     private long timestamp;
@@ -35,14 +39,15 @@ public class BuildTerminationRequestEvent extends Event
      */
     public BuildTerminationRequestEvent(Object source, String reason)
     {
-        this(source, ALL_BUILDS, reason);
+        this(source, ALL_BUILDS, reason, false);
     }
 
-    public BuildTerminationRequestEvent(Object source, long buildId, String reason)
+    public BuildTerminationRequestEvent(Object source, long buildId, String reason, boolean kill)
     {
         super(source);
         this.buildId = buildId;
         this.reason = reason;
+        this.kill = kill;
         timestamp = System.currentTimeMillis();
     }
 
@@ -71,6 +76,11 @@ public class BuildTerminationRequestEvent extends Event
         return reason;
     }
 
+    public boolean isKill()
+    {
+        return kill;
+    }
+
     public long getTimestamp()
     {
         return timestamp;
@@ -90,6 +100,6 @@ public class BuildTerminationRequestEvent extends Event
 
     public String toString()
     {
-        return String.format("Build Termination Request Event[build: %s, message: %s]", (isTerminateAllBuilds() ? "all" : buildId), getMessage());
+        return String.format("Build Termination Request Event[build: %s, message: %s, kill: %s]", (isTerminateAllBuilds() ? "all" : buildId), getMessage(), kill ? "yes" : "no");
     }
 }
