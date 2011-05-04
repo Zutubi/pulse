@@ -118,6 +118,12 @@ Section "Pulse" SecMain
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   !insertmacro MUI_STARTMENU_WRITE_END
 
+  ; Record in Windows Add/Remove (and equivalents).
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "DisplayName" "Zutubi Pulse Developer Tools"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "Publisher" "Zutubi Pty Ltd"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "DisplayVersion" "__VERSION__"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
@@ -151,5 +157,6 @@ Section "un.Uninstall"
   RMDir /r "$INSTDIR"
 
   DeleteRegKey /ifempty HKCU "Software\Zutubi\Pulse Developer Tools"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulseDevTools"
 
 SectionEnd

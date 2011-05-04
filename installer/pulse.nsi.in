@@ -157,6 +157,12 @@ ServiceOK:
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   !insertmacro MUI_STARTMENU_WRITE_END
 
+  ; Record in Windows Add/Remove (and equivalents).
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "DisplayName" "Zutubi __SERVICE_NAME__"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "Publisher" "Zutubi Pty Ltd"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "DisplayVersion" "__VERSION__"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
@@ -194,5 +200,6 @@ Section "un.Uninstall"
   RMDir /r "$INSTDIR"
 
   DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__"
 
 SectionEnd
