@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.opensymphony.util.TextUtils;
-import static com.opensymphony.util.TextUtils.htmlEncode;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
@@ -10,7 +9,6 @@ import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
-import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration.*;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.variables.GenericVariable;
@@ -19,7 +17,6 @@ import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
 import com.zutubi.util.TimeStamps;
@@ -27,6 +24,10 @@ import flexjson.JSON;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.opensymphony.util.TextUtils.htmlEncode;
+import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * JSON-encodable object representing a single build result.  The configurable
@@ -39,6 +40,7 @@ public class ProjectBuildModel
     private static final String LABEL_TIME = "time";
 
     private static final String REASON_NONE = "none";
+    private static final String MATURITY_NONE = "none";
     private static final String REVISION_PERSONAL = "personal";
     private static final String REVISION_NONE = "none";
     private static final String TESTS_NONE = "none";
@@ -240,6 +242,14 @@ public class ProjectBuildModel
         else if (column.equals(KEY_WARNINGS))
         {
             content = Integer.toString(buildResult.getWarningFeatureCount());
+        }
+        else if (column.equals(KEY_MATURITY))
+        {
+            content = buildResult.getStatus();
+            if (content == null)
+            {
+                content = MATURITY_NONE;
+            }
         }
         else
         {

@@ -559,6 +559,11 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Zutubi.pulse.project.renderers.buildTests
             },
 
+            maturity: {
+                name: 'maturity',
+                renderer: Ext.util.Format.htmlEncode
+            },
+
             stages: {
                 name: 'stages',
                 cls: 'nowrap',

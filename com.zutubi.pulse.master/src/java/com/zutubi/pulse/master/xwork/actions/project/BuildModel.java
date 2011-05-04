@@ -26,9 +26,10 @@ public class BuildModel extends ResultModel
     private RevisionModel revision;
     private String link;
     private String tests;
+    private String maturity;
     private List<BuildStageModel> stages = new LinkedList<BuildStageModel>();
 
-    public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision)
+    public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision, String maturity)
     {
         super(id, status);
         this.number = number;
@@ -37,7 +38,7 @@ public class BuildModel extends ResultModel
         this.owner = owner;
         this.prettyQueueTime = prettyQueueTime;
         this.reason = reason;
-        this.revision = revision;
+        this.maturity = maturity;
     }
 
     public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts)
@@ -69,6 +70,8 @@ public class BuildModel extends ResultModel
         {
             link = Urls.getRelativeInstance().build(buildResult);
         }
+
+        maturity = buildResult.getStatus();
     }
 
     public long getNumber()
@@ -119,6 +122,11 @@ public class BuildModel extends ResultModel
     public String getTests()
     {
         return tests;
+    }
+
+    public String getMaturity()
+    {
+        return maturity;
     }
 
     @JSON

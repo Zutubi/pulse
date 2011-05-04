@@ -25,6 +25,7 @@ public abstract class ProjectsSummaryConfiguration extends AbstractConfiguration
     public static final String KEY_TESTS = "tests";
     public static final String KEY_VERSION = "version";
     public static final String KEY_WARNINGS = "warnings";
+    public static final String KEY_MATURITY = "maturity";
 
     @ControllingCheckbox(checkedFields = "hiddenHierarchyLevels")
     private boolean hierarchyShown = true;

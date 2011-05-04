@@ -282,7 +282,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
                 revisionModel = new RevisionModel(revision, changeViewerConfig);
             }
             
-            return new BuildModel(requestEvent.getId(), -1, false, projectName, projectName, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel);
+            return new BuildModel(requestEvent.getId(), -1, false, projectName, projectName, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel, requestEvent.getStatus());
         }
     }
 

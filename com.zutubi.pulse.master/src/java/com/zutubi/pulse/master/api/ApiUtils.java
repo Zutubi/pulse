@@ -50,6 +50,7 @@ public class ApiUtils
         buildDetails.put("tests", convertTests(build.getTestSummary()));
         buildDetails.put("version", getBuildVersion(build));
         buildDetails.put("reason", build.getReason().getSummary());
+        buildDetails.put("maturity", build.getStatus());
         addResultFields(build, buildDetails);
 
         if (includeStages)
