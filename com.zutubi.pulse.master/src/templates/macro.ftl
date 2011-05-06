@@ -553,7 +553,7 @@ list.
             [#if !renderer.featureLimitReached(buildMessageCount)]
         <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre>
                 [#if feature.isPlain()]
-                <a class="unadorned" href="${externalUrls.commandArtifacts(result, command)}${artifact.pathUrl}/#${feature.firstLine?c}">
+                <a class="unadorned" href="${externalUrls.commandArtifacts(result, command)}${artifact.pathUrl}/#${feature.lineNumber?c}">
                     <span class="small">jump to &gt;&gt;</span>
                 </a>
                 [/#if]

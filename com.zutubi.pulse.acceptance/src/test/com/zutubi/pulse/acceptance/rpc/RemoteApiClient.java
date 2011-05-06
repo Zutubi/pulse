@@ -236,6 +236,11 @@ public class RemoteApiClient extends ApiClient
         call("doConfigActionWithArgument", path, action, argument);
     }
 
+    public Hashtable<String, String> getConfigState(String path) throws Exception
+    {
+        return call("getConfigState", path);
+    }
+    
     public int getUserCount() throws Exception
     {
         return (Integer) call("getUserCount");

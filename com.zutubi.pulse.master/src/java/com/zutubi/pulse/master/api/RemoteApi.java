@@ -42,6 +42,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
+import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -97,6 +98,7 @@ public class RemoteApi
     private BuildResultDao buildResultDao;
     private BuildRequestRegistry buildRequestRegistry;
     private PluginManager pluginManager;
+    private StateDisplayManager stateDisplayManager;
 
     public RemoteApi()
     {
@@ -1517,6 +1519,43 @@ public class RemoteApi
 
     }
 
+    /**
+     * Returns all state fields for a given configuration path.  Fields are dependent on the
+     * configuration type.  For example, triggers have a single field named "state" that may
+     * be "paused", "scheduled" etc.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the configuration to retrieve the state for
+     * @return state fields for the given configuration path
+     * @throws IllegalArgumentException if the given path does not exist
+     * @access available to users with view permission for the given path
+     */
+    public Hashtable<String, String> getConfigState(String token, String path)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Configuration instance = configurationProvider.get(path, Configuration.class);
+            if (instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+
+            List<String> fields = stateDisplayManager.getDisplayFields(instance);
+            Hashtable<String, String> result = new Hashtable<String, String>();
+            for (String field: fields)
+            {
+                result.put(field, stateDisplayManager.format(field, instance).toString());
+            }
+            
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+    
     /**
      * Indicates the number of users configured on this server.
      *
@@ -4354,5 +4393,10 @@ public class RemoteApi
     public void setPluginManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+    }
+
+    public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
+    {
+        this.stateDisplayManager = stateDisplayManager;
     }
 }
