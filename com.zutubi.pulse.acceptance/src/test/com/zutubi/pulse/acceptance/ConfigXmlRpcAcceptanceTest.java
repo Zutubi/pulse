@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
@@ -16,11 +17,11 @@ import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Sort;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.util.*;
-import static java.util.Arrays.asList;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -1113,6 +1114,16 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
         childStage = rpcClient.RemoteApi.getConfig(getPath(childStagesPath, STAGE_OTHER));
         assertEquals(NEW_NAME, childStage.get(Constants.Project.Stage.RECIPE));
+    }
+    
+    public void testGetConfigState() throws Exception
+    {
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, Object> trigger = rpcClient.RemoteApi.createEmptyConfig(ScmBuildTriggerConfiguration.class);
+        trigger.put("name", "test");
+        String triggerPath = rpcClient.RemoteApi.insertConfig(getPath(projectPath, "triggers"), trigger);
+        Hashtable<String, String> state = rpcClient.RemoteApi.getConfigState(triggerPath);
+        assertEquals("scheduled", state.get("state"));
     }
 
     private String renameRecipe(String projectPath, String originalName, String newName) throws Exception
