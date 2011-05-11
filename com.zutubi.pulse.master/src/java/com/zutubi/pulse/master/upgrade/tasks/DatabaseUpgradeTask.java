@@ -94,6 +94,20 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         runUpdate(con, sql);
     }
 
+    protected void addIndex(Connection con, String table, String indexName, String column, int prefixLength) throws SQLException
+    {
+        String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
+        if (databaseProductName.contains("mysql"))
+        {
+            String sql = "CREATE INDEX " + indexName + " ON " + table + " (" + column + "(" + prefixLength + "))";
+            runUpdate(con, sql);
+        }
+        else
+        {
+            addIndex(con, table, indexName, column);
+        }
+    }
+    
     protected void dropIndex(Connection con, String table, String indexName) throws SQLException
     {
         String sql;
