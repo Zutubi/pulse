@@ -30,7 +30,11 @@ public class TriggerConditionsUpgradeTask extends AbstractUpgradeTask
         Map<String,Record> triggerRecords = recordManager.selectAll(getPath(SCOPE_PROJECTS, WILDCARD_ANY_ELEMENT, PROPERTY_TRIGGERS, WILDCARD_ANY_ELEMENT));
         for (Map.Entry<String, Record> pathRecord: triggerRecords.entrySet())
         {
-            recordManager.insert(getPath(pathRecord.getKey(), PROPERTY_CONDITIONS), new MutableRecordImpl());
+            String conditionsPath = getPath(pathRecord.getKey(), PROPERTY_CONDITIONS);
+            if (!recordManager.containsRecord(conditionsPath))
+            {
+                recordManager.insert(conditionsPath, new MutableRecordImpl());
+            }
         }
     }
 
