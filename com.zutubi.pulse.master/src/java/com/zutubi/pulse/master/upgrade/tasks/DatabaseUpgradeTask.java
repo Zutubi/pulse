@@ -73,59 +73,17 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
 
     protected void addIndex(Connection con, String table, String indexName, String... columns) throws SQLException
     {
-        String sql = "CREATE INDEX " + indexName + " ON " + table + " (";
-        boolean first = true;
-        for (String column : columns)
-        {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                sql += ",";
-            }
-
-            sql += column;
-        }
-
-        sql += ")";
-
-        runUpdate(con, sql);
+        JDBCUtils.executeUpdate(con, JDBCUtils.sqlAddIndex(con, table, indexName, columns));
     }
 
     protected void addIndex(Connection con, String table, String indexName, String column, int prefixLength) throws SQLException
     {
-        String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
-        if (databaseProductName.contains("mysql"))
-        {
-            String sql = "CREATE INDEX " + indexName + " ON " + table + " (" + column + "(" + prefixLength + "))";
-            runUpdate(con, sql);
-        }
-        else
-        {
-            addIndex(con, table, indexName, column);
-        }
+        JDBCUtils.executeUpdate(con, JDBCUtils.sqlAddIndex(con, table, indexName, column, prefixLength));
     }
     
     protected void dropIndex(Connection con, String table, String indexName) throws SQLException
     {
-        String sql;
-        String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
-        if (databaseProductName.contains("postgres"))
-        {
-            sql = "DROP INDEX " + indexName;
-        }
-        else if (databaseProductName.contains("mysql"))
-        {
-            sql = "DROP INDEX " + indexName + " ON " + table;
-        }
-        else
-        {
-            sql = "DROP INDEX " + indexName + " IF EXISTS";
-        }
-
-        runUpdate(con, sql);
+        JDBCUtils.executeUpdate(con, JDBCUtils.sqlDropIndex(con, table, indexName));
     }
 
     protected void runUpdate(Connection con, String sql) throws SQLException
