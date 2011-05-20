@@ -23,11 +23,32 @@ Zutubi.KeyValue = function(config) {
     
     if (!this.key)
     {
-        this.key = this.name;
+        this.key = this.autoKey(this.name);
     }
 };
 
 Zutubi.KeyValue.prototype = {
+    autoKey: function(name)
+    {
+        var result = '';
+        var previousLower = false;
+        for (var i = 0; i < name.length; i++)
+        {
+            var c = name.charAt(i);
+            var lower = c.toLowerCase();
+            var isUpper = c != lower;
+            if (i != 0 && isUpper && previousLower)
+            {
+                result += ' ';
+            }
+    
+            previousLower = !isUpper;
+            result += lower;
+        }
+        
+        return result;
+    },
+    
     getRenderedValue: function(data)
     {
         return this.renderer(data[this.name], data, this.component);

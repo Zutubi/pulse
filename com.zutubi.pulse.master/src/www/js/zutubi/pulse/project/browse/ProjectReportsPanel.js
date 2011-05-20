@@ -91,10 +91,10 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
             var items = [];
             for (var i = 0, l = this.data.reports.length; i < l; i++)
             {
-                var report = this.data.reports[i];
-                items.push(Ext.apply({
-                    xtype: 'xzgraph'
-                }, report));
+                items.push({
+                    xtype: 'xzgraph',
+                    data: this.data.reports[i]
+                });
             }
 
             this.add({

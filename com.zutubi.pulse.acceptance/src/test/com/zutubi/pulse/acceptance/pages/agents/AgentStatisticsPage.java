@@ -9,10 +9,10 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class AgentStatisticsPage extends SeleniumPage
 {
-    public static final String ID_PAGE = "agent.statistics";
-    public static final String ID_RECIPE_STATS = "recipe.stats";
-    public static final String ID_USAGE_STATS = "usage.stats";
-    public static final String ID_USAGE_CHART = "usage.chart";
+    public static final String ID_PAGE = "agent-statistics";
+    public static final String ID_RECIPE_STATS = ID_PAGE + "-recipes";
+    public static final String ID_USAGE_STATS = ID_PAGE + "-utilisation";
+    public static final String ID_USAGE_CHART = ID_PAGE + "-usageGraph";
 
     private String agent;
 

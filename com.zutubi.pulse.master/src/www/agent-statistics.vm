@@ -1,53 +1,28 @@
 #helpTag("Agents+Section")
 #authorisationTags($principle)
 #agentTags()
+<content tag="header.javascript">
+    zutubi/pulse/agent/AgentStatisticsPanel.js
+</content>
 <html>
 <head>
     <title>#wwtext("name=agent.statistics")</title>
+    <script type="text/javascript">
+        var panel = null;
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.agent.AgentStatisticsPanel({
+                id: 'agent-statistics',
+                url: window.baseUrl + '/ajax/agentStatisticsData.action?agentName=' + encodeURIComponent('$agentName'),
+                loadingId: 'agent-statistics-loading',
+                containerId: 'nested-center',
+                refreshInterval: 0
+            });
+        });
+    </script>
 </head>
 <body>
     #agentTabs("statistics")
-
-#if($action.hasErrors())
-    #parse("/agent-error.vm")
-#else
-    #if($statistics.empty)
-    <p id="agent.statistics">
-        #wwtext("name=statistics.empty")
-    </p>
-    #else
-    <table id="agent.statistics" class="columns">
-        <tr>
-            <td class="columns">
-                <p>
-                    $action.blurb
-                </p>
-                <table id="recipe.stats" class="content" width="100%">
-                    #headingRow("recipes.executed" 2)
-                    #dynamicRow("total.recipes" $statistics.totalRecipes)
-                    #dynamicRow("recipes.per.day" $action.renderValue($statistics.recipesPerDay))
-        #if($statistics.totalRecipes > 0)
-                    #dynamicRow("busy.per.recipe" $action.renderTime($statistics.busyTimePerRecipe))
-        #end
-                </table>
-
-                <table id="usage.stats" class="content"  width="100%">
-                    #headingRow("utilisation.statistics" 2)
-                    #dynamicRow("time.disabled" $action.renderTime($statistics.totalDisabledTime, $statistics.percentDisabledTime))
-                    #dynamicRow("time.offline" $action.renderTime($statistics.totalOfflineTime, $statistics.percentOfflineTime))
-                    #dynamicRow("time.synchronising" $action.renderTime($statistics.totalSynchronisingTime, $statistics.percentSynchronisingTime))
-                    #dynamicRow("time.idle" $action.renderTime($statistics.totalIdleTime, $statistics.percentIdleTime))
-                    #dynamicRow("time.busy" $action.renderTime($statistics.totalBusyTime, $statistics.percentBusyTime))
-                </table>
-            </td>
-            <td class="columns">
-                <div id ="usage.chart" style="margin-left: 20px; margin-top: 10px">
-                    ${usageChart.imageMap}
-                    <img style="border:none" src="${base}/chart?filename=${usageChart.location}" border="1" height="${usageChart.height}" width="${usageChart.width}" usemap="${usageChart.imageMapName}"/>
-                </div>
-            </td>
-        </tr>
-    </table>
-    #end
-#end
+    <div id="agent-statistics-loading">
+    </div>
 </html>

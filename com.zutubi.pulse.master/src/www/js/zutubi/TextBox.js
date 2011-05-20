@@ -2,19 +2,23 @@
 // dependency: ext/package.js
 
 /**
- * A simple box of text decorated with a title and border style.
+ * A simple box of text.  May optionally have a title, in which case a border
+ * is also added.
  *
  * @cfg {String} id    id to use for the rendered element
- * @cfg {String} title title for the box
+ * @cfg {String} title title for the box (optional)
  */
 Zutubi.TextBox = Ext.extend(Ext.BoxComponent, {
     initComponent: function()
     {
         Ext.applyIf(this, {
+            title: '',
             template: new Ext.XTemplate(
                 '<div id="{id}">' +
-                    '<h3 class="content-heading">{title}</h3>' +
-                    '<div id="{id}-text" class="content-box"></div>' +
+                    '<tpl if="title">' +
+                        '<h3 class="content-heading">{title}</h3>' +
+                    '</tpl>' +
+                    '<div id="{id}-text" <tpl if="title">class="content-box"</tpl>></div>' +
                 '</div>'
             )
         });

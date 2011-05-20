@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.tove.config.project.reports.CustomFieldSource;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
+import com.zutubi.pulse.master.xwork.actions.GraphModel;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class ProjectReportsDataAction extends ProjectReportsAction
                 CustomFieldSource fieldSource = new DefaultCustomFieldSource(configurationManager.getDataDirectory());
                 for (ReportConfiguration report: reportGroups.get(group).getReports().values())
                 {
-                    model.addReport(new ProjectReportsModel.ReportModel(ChartUtils.renderForWeb(report, builds, fieldSource)));
+                    model.addReport(new GraphModel(ChartUtils.renderForWeb(report, builds, fieldSource)));
                 }
             }
         }

@@ -22,16 +22,31 @@ Zutubi.pulse.Graph = Ext.extend(Ext.BoxComponent, {
     
     onRender: function(container, position)
     {
-        if (position)
+        this.el = container.createChild({tag: 'div', id: this.id});
+        this.renderGraph();
+        Zutubi.pulse.Graph.superclass.onRender.apply(this, arguments);
+    },
+    
+    renderGraph: function()
+    {
+        if (this.data)
         {
-            this.el = this.template.insertBefore(position, this, true);    
+            this.template.overwrite(this.el, this.data);
+            this.el.setDisplayed(true);            
         }
         else
         {
-            this.el = this.template.append(container, this, true);
+            this.el.setDisplayed(false);
+        }    
+    },
+    
+    update: function(data)
+    {
+        this.data = data;
+        if (this.rendered)
+        {
+            this.renderGraph();
         }
-        
-        Zutubi.pulse.Graph.superclass.onRender.apply(this, arguments);
     }
 });
 
