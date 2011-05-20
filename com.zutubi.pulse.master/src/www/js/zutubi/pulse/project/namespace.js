@@ -534,6 +534,13 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Zutubi.pulse.project.renderers.buildId
             },
             
+            numberLeft: {
+                name: 'number',
+                key: 'build id',
+                cls: 'nowrap',
+                renderer: Zutubi.pulse.project.renderers.buildId
+            },
+            
             project: {
                 name: 'project',
                 renderer: Zutubi.pulse.project.renderers.project

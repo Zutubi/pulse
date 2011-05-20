@@ -1,12 +1,11 @@
 package com.zutubi.pulse.acceptance.components.table;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.Component;
 
 /**
  * Corresponds to the Zutubi.table.PropertyTable component.
  */
-public class PropertyTable extends Component
+public class PropertyTable extends ContentTable
 {
     public PropertyTable(SeleniumBrowser browser, String id)
     {

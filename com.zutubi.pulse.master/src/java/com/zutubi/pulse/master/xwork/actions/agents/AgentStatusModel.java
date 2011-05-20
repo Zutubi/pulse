@@ -1,75 +1,127 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
-import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.Pair;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Model for the agent status tab.
+ * JSON model for the agent status tab.
  */
 public class AgentStatusModel
 {
-    private Agent agent;
-    private String location;
-    private List<Pair<String, String>> statusInfo = new LinkedList<Pair<String, String>>();
-    private BuildResult executingBuild;
-    private RecipeResultNode executingNode;
-    private List<AgentSynchronisationMessage> synchronisationMessages;
+    private AgentModel info;
+    private Map<String, String> status = new LinkedHashMap<String, String>();
+    private ExecutingStageModel executingStage;
+    private List<SynchronisationMessageModel> synchronisationMessages = new LinkedList<SynchronisationMessageModel>();
 
-    public AgentStatusModel(Agent agent, String location)
+    public AgentStatusModel(String name, String location)
     {
-        this.agent = agent;
-        this.location = location;
+        info = new AgentModel(name, location);
     }
 
-    public Agent getAgent()
+    public AgentModel getInfo()
     {
-        return agent;
+        return info;
     }
 
-    public String getLocation()
+    public Map<String, String> getStatus()
     {
-        return location;
+        return status;
     }
 
-    public List<Pair<String, String>> getStatusInfo()
+    public void addStatus(String name, String value)
     {
-        return statusInfo;
+        status.put(name, value);
     }
 
-    public void addStatusInfo(String name, String value)
+    public ExecutingStageModel getExecutingStage()
     {
-        statusInfo.add(new Pair<String, String>(name, value));
+        return executingStage;
     }
 
-    public BuildResult getExecutingBuild()
+    public void setExecutingStage(ExecutingStageModel executingStage)
     {
-        return executingBuild;
+        this.executingStage = executingStage;
     }
 
-    public RecipeResultNode getExecutingNode()
-    {
-        return executingNode;
-    }
-
-    public void setExecutingStage(BuildResult build, RecipeResultNode node)
-    {
-        executingBuild = build;
-        executingNode = node;
-    }
-
-    public List<AgentSynchronisationMessage> getSynchronisationMessages()
+    public List<SynchronisationMessageModel> getSynchronisationMessages()
     {
         return synchronisationMessages;
     }
 
-    public void setSynchronisationMessages(List<AgentSynchronisationMessage> synchronisationMessages)
+    public void addSynchronisationMessages(List<AgentSynchronisationMessage> messages)
     {
-        this.synchronisationMessages = synchronisationMessages;
+        for (AgentSynchronisationMessage message: messages)
+        {
+            synchronisationMessages.add(new SynchronisationMessageModel(message));
+        }
+    }
+    
+    public static class AgentModel
+    {
+        private String name;
+        private String location;
+
+        public AgentModel(String name, String location)
+        {
+            this.name = name;
+            this.location = location;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public String getLocation()
+        {
+            return location;
+        }
+    }
+    
+    public static class SynchronisationMessageModel
+    {
+        private long id;
+        private String type;
+        private String description;
+        private String status;
+        private String statusMessage;
+        
+        public SynchronisationMessageModel(AgentSynchronisationMessage message)
+        {
+            id = message.getId();
+            type = message.getMessage().getType().getPrettyString();
+            description = message.getDescription();
+            status = message.getStatus().getPrettyString();
+            statusMessage = message.getStatusMessage();
+        }
+
+        public long getId()
+        {
+            return id;
+        }
+
+        public String getType()
+        {
+            return type;
+        }
+
+        public String getDescription()
+        {
+            return description;
+        }
+
+        public String getStatus()
+        {
+            return status;
+        }
+
+        public String getStatusMessage()
+        {
+            return statusMessage;
+        }
     }
 }

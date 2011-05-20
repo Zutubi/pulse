@@ -7,6 +7,8 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import flexjson.JSON;
 
 import java.util.LinkedList;
@@ -133,5 +135,16 @@ public class BuildModel extends ResultModel
     public List<BuildStageModel> getStages()
     {
         return stages;
+    }
+
+    public BuildStageModel getStage(final String stageName)
+    {
+        return CollectionUtils.find(stages, new Predicate<BuildStageModel>()
+        {
+            public boolean satisfied(BuildStageModel buildStageModel)
+            {
+                return buildStageModel.getName().equals(stageName);
+            }
+        });
     }
 }

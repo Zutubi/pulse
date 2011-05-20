@@ -57,7 +57,7 @@
             <result name="success" type="velocity">/server-messages.vm</result>
         </action>
 
-        <action name="viewAgentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentStatusAction">
+        <action name="agentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionBase">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
         </action>
@@ -441,6 +441,14 @@
 
         <action name="viewAgentsPanel" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">
             <result name="success" type="velocity">view-agents-panel.vm</result>
+        </action>
+
+        <action name="agentStatusData" class="com.zutubi.pulse.master.xwork.actions.agents.AgentStatusDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
         </action>
 
         <action name="serverActivityData" class="com.zutubi.pulse.master.xwork.actions.server.ServerActivityDataAction">

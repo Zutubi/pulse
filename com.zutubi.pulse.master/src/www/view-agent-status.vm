@@ -1,111 +1,31 @@
 #helpTag("Agents+Section")
 #authorisationTags($principle)
 #agentTags()
+<content tag="header.javascript">
+    zutubi/pulse/agent/AgentStatusPanel.js
+</content>
 <html>
 <head>
     <title>#wwtext("name=agent.status")</title>
+#if(!$action.hasErrors())
+    <script type="text/javascript">
+        var panel = null;
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.agent.AgentStatusPanel({
+                id: 'agent-status',
+                url: window.baseUrl + '/ajax/agentStatusData.action?agentName=' + encodeURIComponent('$agentName'),
+                loadingId: 'agent-status-loading',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval
+            });
+        });
+    </script>
+#end
 </head>
 <body>
     #agentTabs("status")
-
-    <table class="columns" width="98%">
-        <tr>
-
-            ##-----------------------------------------------------------------
-            ## Left Column: status and running stage
-            ##-----------------------------------------------------------------
-            <td class="columns">
-                <table id="agent.status" class="content" width="100%">
-                    #headingRow("agent.status" 2)
-                    #dynamicRow("agent.name" $agent.config.name)
-                    #dynamicRow("agent.location" $model.location)
-
-                #foreach($pair in $model.statusInfo)
-                    #dynamicRow($pair.first $pair.second)
-                #end
-                </table>
-
-            #if($model.executingBuild)
-                <table id="executing.build.stage" class="content" width="100%">
-                    #headingRow("executing.build.stage" 2)
-                    <tr>
-                        <th class="content-row">#wwtext("name=build.project")</th>
-                        #dynamicLinkCell($model.executingBuild.project.name $urls.projectHome($model.executingBuild.project))
-                    </tr>
-                    <tr>
-                        <th class="content-row">#wwtext("name=build.owner")</th>
-                        #ownerCell($model.executingBuild "content")
-                    </tr>
-                    <tr>
-                        <th class="content-row">#wwtext("name=build.id")</th>
-                        #dynamicRightLinkCell($model.executingBuild.number $urls.build($model.executingBuild))
-                    </tr>
-                    <tr>
-                        <th class="content-row">#wwtext("name=build.elapsed")</th>
-                        #elapsedCell($model.executingBuild)
-                    </tr>
-                    <tr>
-                        <th class="content-row">#wwtext("name=build.stage")</th>
-                        #dynamicLinkCell($model.executingNode.stageName $urls.stageDetails($model.executingBuild, $model.executingNode))
-                    </tr>
-                    #dynamicRow("build.recipe" $model.executingNode.result.recipeNameSafe)
-                    <tr>
-                        <th class="content-row">#wwtext("name=stage.elapsed")</th>
-                        #elapsedCell($model.executingNode.result)
-                    </tr>
-                </table>
-            #end
-            </td>
-
-            ##-----------------------------------------------------------------
-            ## Right Column: synchronisation messages
-            ##-----------------------------------------------------------------
-            <td class="columns">
-                <table id="synchronisation.messages" class="content" width="100%">
-                    #headingRow("synchronisation.messages" 3)
-        #if($model.synchronisationMessages.size() > 0)
-                    <tr>
-                        #contentHeading("message.type" 1)
-                        #contentHeading("message.description" 1)
-                        #contentHeading("message.status" 1)
-                    </tr>
-            #foreach($message in $model.synchronisationMessages)
-                    <tr id="synchronisation.message.${velocityCount}">
-                        <td class="content fit-width">$message.message.type.prettyString</td>
-                        #wrapCell($message.description)
-                        <td class="content fit-width">
-                            <img alt="$message.status" src="$base/images/synch/${message.status}.gif"/>
-                            $message.status.prettyString
-            #if($message.statusMessage)
-                            #showHideButton("synch" "status.popup.${velocityCount}" "tr-br?")
-                            <div id="status.popup.${velocityCount}" style="display: none">
-                                <table class="content" style="margin: 0">
-                                    <tr>
-                                        <th class="heading">
-                                            <span class="action">
-                                                <a href="#" onclick="Zutubi.FloatManager.showHideFloat('synch', 'status.popup.${velocityCount}'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
-                                            </span>
-                                            #wwtext("name=message.status.message")
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <td><pre id="status.message.${velocityCount}">$action.htmlEncode($message.statusMessage)</pre></td>
-                                    </tr>
-                                </table>
-                            </div>
-            #end
-                        </td>
-                    </tr>
-            #end
-        #else
-                    <tr>
-                        #contentCell("synchronisation.messages.none")
-                    </tr>
-        #end
-                </table>
-            </td>
-
-        </tr>
-    </table>
+    <div id="agent-status-loading">
+    </div>
 </body>
 </html>

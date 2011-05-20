@@ -3,23 +3,28 @@ package com.zutubi.pulse.master.xwork.actions.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.DefaultAgent;
 import com.zutubi.pulse.master.agent.Host;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.TimeStamps;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Action to view the status of a single agent.
  */
-public class ViewAgentStatusAction extends AgentActionBase
+public class AgentStatusDataAction extends AgentActionBase
 {
-    private static final Messages I18N = Messages.getInstance(ViewAgentStatusAction.class);
+    private static final Messages I18N = Messages.getInstance(AgentStatusDataAction.class);
 
     private AgentStatusModel model;
     private BuildManager buildManager;
-
+    private MasterConfigurationManager configurationManager;
+    
     public AgentStatusModel getModel()
     {
         return model;
@@ -29,7 +34,8 @@ public class ViewAgentStatusAction extends AgentActionBase
     {
         DefaultAgent agent = (DefaultAgent) getRequiredAgent();
         Host host = agent.getHost();
-        model = new AgentStatusModel(agent, host.getLocation());
+        model = new AgentStatusModel(agent.getName(), host.getLocation());
+
         if (agent.isEnabled())
         {
             String status;
@@ -42,37 +48,37 @@ public class ViewAgentStatusAction extends AgentActionBase
                 status = agent.getStatus().getPrettyString();
             }
 
-            model.addStatusInfo("agent.status", status);
+            model.addStatus(I18N.format("agent.status"), status);
 
             if (host.isUpgrading())
             {
                 if (host.getPersistentUpgradeState() == HostState.PersistentUpgradeState.FAILED_UPGRADE)
                 {
-                    model.addStatusInfo("host.status", I18N.format("host.failed.upgrade.verbose"));
+                    model.addStatus(I18N.format("host.status"), I18N.format("host.failed.upgrade.verbose"));
                     if (host.getUpgradeMessage() != null)
                     {
-                        model.addStatusInfo("host.upgrade.message", host.getUpgradeMessage());
+                        model.addStatus(I18N.format("host.upgrade.message"), host.getUpgradeMessage());
                     }
                 }
                 else
                 {
-                    model.addStatusInfo("host.status", I18N.format("host.upgrade.inprogress"));
-                    model.addStatusInfo("host.upgrade.status", EnumUtils.toPrettyString(host.getUpgradeState()));
+                    model.addStatus(I18N.format("host.status"), I18N.format("host.upgrade.inprogress"));
+                    model.addStatus(I18N.format("host.upgrade.status"), EnumUtils.toPrettyString(host.getUpgradeState()));
 
                     int progress = host.getUpgradeProgress();
                     if (progress > 0)
                     {
-                        model.addStatusInfo("host.upgrade.progress", Integer.toString(progress) + "%");
+                        model.addStatus(I18N.format("host.upgrade.progress"), Integer.toString(progress) + "%");
                     }
                 }
             }
             else if (agent.hasBeenPinged())
             {
-                model.addStatusInfo("agent.last.ping", TimeStamps.getPrettyDate(agent.getLastPingTime(), getLocale()));
-                model.addStatusInfo("agent.since.last.ping", Long.toString(agent.getSecondsSincePing()) + " seconds");
+                model.addStatus(I18N.format("agent.last.ping"), TimeStamps.getPrettyDate(agent.getLastPingTime(), getLocale()));
+                model.addStatus(I18N.format("agent.since.last.ping"), Long.toString(agent.getSecondsSincePing()) + " seconds");
                 if (agent.getPingError() != null)
                 {
-                    model.addStatusInfo("agent.ping.error", agent.getPingError());
+                    model.addStatus(I18N.format("agent.ping.error"), agent.getPingError());
                 }
 
                 long recipeId = agent.getRecipeId();
@@ -84,7 +90,8 @@ public class ViewAgentStatusAction extends AgentActionBase
                         RecipeResultNode node = buildResult.findResultNodeByRecipeId(recipeId);
                         if (node != null)
                         {
-                            model.setExecutingStage(buildResult, node);
+                            Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+                            model.setExecutingStage(new ExecutingStageModel(buildResult, node, urls));
                         }
                     }
                 }
@@ -92,11 +99,12 @@ public class ViewAgentStatusAction extends AgentActionBase
         }
         else
         {
-            model.addStatusInfo("agent.status", agent.getStatus().getPrettyString());
+            model.addStatus(I18N.format("agent.status"), agent.getStatus().getPrettyString());
         }
 
-        List<AgentSynchronisationMessage> synchronisationMessages = agentManager.getSynchronisationMessages(agent.getId());
-        model.setSynchronisationMessages(synchronisationMessages);
+        List<AgentSynchronisationMessage> synchronisationMessages = new LinkedList<AgentSynchronisationMessage>(agentManager.getSynchronisationMessages(agent.getId()));
+        Collections.reverse(synchronisationMessages);
+        model.addSynchronisationMessages(synchronisationMessages);
 
         return SUCCESS;
     }
@@ -104,5 +112,10 @@ public class ViewAgentStatusAction extends AgentActionBase
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

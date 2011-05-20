@@ -30,6 +30,7 @@ public class DevAcceptanceTestSuite
 
         //---( web ui acceptance tests )---
         suite.addTestSuite(AgentsSectionAcceptanceTest.class);
+        suite.addTestSuite(AgentStatusAcceptanceTest.class);
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
         suite.addTestSuite(CloneAcceptanceTest.class);

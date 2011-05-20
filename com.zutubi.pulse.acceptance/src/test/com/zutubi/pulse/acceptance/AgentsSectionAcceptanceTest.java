@@ -3,22 +3,16 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
-import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
-import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
-import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 
@@ -30,7 +24,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     private static final String LOCAL_AGENT = "local-agent";
     private static final String HOST_LOCALHOST = "localhost";
     private static final String STATUS_DISABLE_ON_IDLE = "disable on idle";
-    private static final String TEST_DESCRIPTION = "test description";
 
     private ConfigurationHelper configurationHelper;
     private ProjectConfigurations projects;
@@ -202,7 +195,12 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         final AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
         assertFalse(agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME));
 
-        WaitProject project = startBuildOnAgent(random, AgentManager.MASTER_AGENT_NAME);
+        WaitProject project = projects.createWaitAntProject(random, tempDir, false);
+        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
+        configurationHelper.insertProject(project.getConfig(), false);
+        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+        rpcClient.RemoteApi.triggerBuild(project.getName());
+        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
         getBrowser().refreshUntil(SeleniumBrowser.REFRESH_TIMEOUT, new Condition()
         {
@@ -218,34 +216,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
     }
 
-    public void testAgentStatusExecutingBuild() throws Exception
-    {
-        getBrowser().loginAsAdmin();
-        final AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, AgentManager.MASTER_AGENT_NAME);
-        if (statusPage.isExecutingBuildPresent())
-        {
-            getBrowser().refreshUntil(SeleniumBrowser.REFRESH_TIMEOUT, new Condition()
-            {
-                public boolean satisfied()
-                {
-                    return !statusPage.isExecutingBuildPresent();
-                }
-            }, "executing build to stop on master agent");
-        }
-
-        WaitProject project = startBuildOnAgent(random, AgentManager.MASTER_AGENT_NAME);
-
-        getBrowser().refreshUntilElement(AgentStatusPage.ID_BUILD_TABLE);
-        assertEquals(project.getName(), statusPage.getExecutingProject());
-        assertEquals(project.getName(), statusPage.getExecutingOwner());
-        assertEquals("1", statusPage.getExecutingId());
-        assertEquals("default", statusPage.getExecutingStage());
-        assertEquals("[default]", statusPage.getExecutingRecipe());
-
-        project.releaseBuild();
-        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
-    }
-
     public void testStatistics() throws Exception
     {
         getBrowser().loginAsAdmin();
@@ -253,134 +223,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertTrue(statisticsPage.isRecipeStatisticsPresent());
         assertTrue(statisticsPage.isUsageStatisticsPresent());
         assertTrue(statisticsPage.isUsageChartPresent());
-    }
-
-    public void testNoSynchronisationMessages() throws Exception
-    {
-        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
-        assertTrue(statusPage.isSynchronisationTablePresent());
-        assertEquals(0, statusPage.getSynchronisationMessageCount());
-        assertTrue(getBrowser().isTextPresent("no synchronisation messages found"));
-    }
-
-    public void testSimpleSynchronisationMessage() throws Exception
-    {
-        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-        rpcClient.TestApi.enqueueSynchronisationMessage(random, true, "test message", true);
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
-        assertEquals(1, statusPage.getSynchronisationMessageCount());
-        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "test message", AgentSynchronisationMessage.Status.SUCCEEDED);
-        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
-    }
-
-    public void testAsyncSynchronisationMessage() throws Exception
-    {
-        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-        rpcClient.TestApi.enqueueSynchronisationMessage(random, false, "test async message", true);
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
-        assertEquals(1, statusPage.getSynchronisationMessageCount());
-        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST_ASYNC, "test async message", AgentSynchronisationMessage.Status.SUCCEEDED);
-        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
-    }
-    
-    public void testFailedSynchronisationMessage() throws Exception
-    {
-        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-        rpcClient.TestApi.enqueueSynchronisationMessage(random, true, TEST_DESCRIPTION, false);
-        rpcClient.RemoteApi.waitForAgentToBeIdle(random);
-
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
-        assertEquals(1, statusPage.getSynchronisationMessageCount());
-        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.FAILED_PERMANENTLY);
-        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
-        String statusMessage = statusPage.clickAndWaitForSynchronisationMessageStatus(0);
-        assertThat(statusMessage, containsString("Test failure."));
-    }
-
-    public void testSynchronisationMessageQueuedWhileBuilding() throws Exception
-    {
-        String agentName = random + "-agent";
-        String projectName = random + "-project";
-
-        rpcClient.RemoteApi.insertSimpleAgent(agentName, "localhost");
-
-        WaitProject project = startBuildOnAgent(projectName, agentName);
-
-        rpcClient.TestApi.enqueueSynchronisationMessage(agentName, true, TEST_DESCRIPTION, true);
-
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
-        assertEquals(1, statusPage.getSynchronisationMessageCount());
-        AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.QUEUED);
-        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
-
-        project.releaseBuild();
-        rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
-        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
-
-        statusPage.openAndWaitFor();
-        assertEquals(1, statusPage.getSynchronisationMessageCount());
-        expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, TEST_DESCRIPTION, AgentSynchronisationMessage.Status.SUCCEEDED);
-        assertEquals(expectedMessage, statusPage.getSynchronisationMessage(0));
-    }
-
-    public void testMultipleSynchronisationMessages() throws Exception
-    {
-        final int MESSAGE_COUNT = 12;
-
-        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
-        multipleMessageHelper(random, MESSAGE_COUNT);
-    }
-
-    public void testMultipleSynchronisationMessagesOnMaster() throws Exception
-    {
-        final int MESSAGE_COUNT = 12;
-
-        rpcClient.RemoteApi.insertLocalAgent(random);
-        multipleMessageHelper(random, MESSAGE_COUNT);
-    }
-
-    private void multipleMessageHelper(String agentName, int messageCount) throws Exception
-    {
-        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
-        for (int i = 0; i < messageCount; i++)
-        {
-            rpcClient.TestApi.enqueueSynchronisationMessage(agentName, true, "Description " + i, true);
-        }
-        rpcClient.RemoteApi.waitForAgentToBeIdle(agentName);
-
-        getBrowser().loginAsAdmin();
-        AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
-        assertEquals(COMPLETED_MESSAGE_LIMIT, statusPage.getSynchronisationMessageCount());
-        int offset = messageCount - COMPLETED_MESSAGE_LIMIT;
-        for (int i = 0; i < COMPLETED_MESSAGE_LIMIT; i++)
-        {
-            AgentStatusPage.SynchronisationMessage expectedMessage = new AgentStatusPage.SynchronisationMessage(SynchronisationTask.Type.TEST, "Description " + (i + offset), AgentSynchronisationMessage.Status.SUCCEEDED);
-            assertEquals(expectedMessage, statusPage.getSynchronisationMessage(i));
-        }
-    }
-
-    private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
-    {
-        WaitProject project = projects.createWaitAntProject(projectName, tempDir, false);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
-        configurationHelper.insertProject(project.getConfig(), false);
-        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
-        rpcClient.RemoteApi.triggerBuild(project.getName());
-        rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
-        return project;
     }
 
     private void assertBuildingStatus(String status)

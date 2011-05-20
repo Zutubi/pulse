@@ -145,7 +145,7 @@ public class BuildStageModel extends ResultModel
         return tests;
     }
 
-    public String getBuildLink()
+    public String getLink()
     {
         return buildLink;
     }

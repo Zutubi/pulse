@@ -18,6 +18,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
+import com.zutubi.pulse.acceptance.pages.agents.SynchronisationMessageTable;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
@@ -1566,7 +1567,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             assertTrue(getBrowser().isTextPresent("build.xml"));
 
             AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
-            AgentStatusPage.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessage(0);
+            SynchronisationMessageTable.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessagesTable().getMessage(0);
             assertEquals("clean up stage '" + DEFAULT_STAGE + "' of project '" + projectName + "'", synchronisationMessage.description);
         }
         finally
