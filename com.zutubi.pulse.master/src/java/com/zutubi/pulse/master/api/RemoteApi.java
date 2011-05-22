@@ -19,6 +19,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
@@ -35,7 +36,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -65,6 +65,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -4091,6 +4093,40 @@ public class RemoteApi
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns gathered statistics for the given agent.  Statistics are gathered over a 30 day
+     * window and record the time the agent spends in various states.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param name  the name of the agent to retrieve the statistics for
+     * @return gathered statistics for the given agent
+     * @access available to users with view permission for the given agent.
+     */
+    public Hashtable getAgentStatistics(String token, String name)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Hashtable<String, Object> result = new Hashtable<String, Object>();
+            AgentStatistics statistics = agentManager.getAgentStatistics(internalGetAgent(name));
+            result.put("firstDayStamp", Long.toString(statistics.getFirstDayStamp()));
+            result.put("totalRecipes", statistics.getTotalRecipes());
+            result.put("recipesPerDay", statistics.getRecipesPerDay());
+            result.put("busyTimePerRecipe", statistics.getBusyTimePerRecipe());
+            result.put("totalBusyTime", Long.toString(statistics.getTotalBusyTime()));
+            result.put("totalDisabledTime", Long.toString(statistics.getTotalDisabledTime()));
+            result.put("totalIdleTime", Long.toString(statistics.getTotalIdleTime()));
+            result.put("totalOfflineTime", Long.toString(statistics.getTotalOfflineTime()));
+            result.put("totalSynchronisingTime", Long.toString(statistics.getTotalSynchronisingTime()));
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
     }
 
     private Agent internalGetAgent(String name) throws IllegalArgumentException
