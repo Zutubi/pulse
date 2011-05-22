@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
@@ -18,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
@@ -304,10 +305,11 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                 revision = getLatestRevision(workspace);
             }
 
-            PerforceCheckoutFeedbackHandler perforceHandler = new PerforceCheckoutFeedbackHandler(force, handler);
+            PerforceCheckoutFeedbackHandler perforceHandler = new PerforceCheckoutFeedbackHandler(false, handler);
 
             if (force)
             {
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_FLUSH), FLAG_CLIENT, workspace.getName(), COMMAND_FLUSH, "#" + REVISION_NONE);
                 core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + revision.getRevisionString());
             }
             else
