@@ -32,6 +32,7 @@ public class PerforceConstants
     public static final String COMMAND_EDIT = "edit";
     public static final String COMMAND_INFO = "info";
     public static final String COMMAND_INTEGRATE = "integrate";
+    public static final String COMMAND_FLUSH = "flush";
     public static final String COMMAND_FSTAT = "fstat";
     public static final String COMMAND_LABEL = "label";
     public static final String COMMAND_LABELS = "labels";

@@ -1,14 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
@@ -23,15 +14,25 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.ToStringMapping;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.util.Arrays;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * Tests for the remote API, primarily the reporting functionality.
@@ -599,6 +600,13 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> status = rpcClient.RemoteApi.getBuildRequestStatus(id);
         assertEquals("REJECTED", status.get("status"));
         assertEquals("project state (paused) does not allow building", status.get("rejectionReason"));
+    }
+
+    public void testGetAgentStatistics() throws Exception
+    {
+        Hashtable<String, Object> statistics = rpcClient.RemoteApi.getAgentStatistics(AgentManager.MASTER_AGENT_NAME);
+        assertTrue(statistics.containsKey("firstDayStamp"));
+        assertTrue(statistics.containsKey("totalSynchronisingTime"));
     }
 
     private Vector<String> insertAndTriggerProject(String projectName) throws Exception
