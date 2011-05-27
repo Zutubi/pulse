@@ -871,8 +871,14 @@ td.monitoring-stopped, td.monitoring-paused, td.monitoring-none, td.monitoring-p
     padding-left: 0;
     padding-right: 0;
     background-repeat: no-repeat;
+    background-position: 0 4px;
+}
+
+td.monitoring-stopped, td.monitoring-paused, td.monitoring-none, td.monitoring-polling
+{
     background-position: 1px 4px;
 }
+
 
 td.group-header
 {
