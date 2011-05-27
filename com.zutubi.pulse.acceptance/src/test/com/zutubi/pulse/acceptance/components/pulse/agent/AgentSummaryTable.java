@@ -13,7 +13,7 @@ import java.util.*;
 public class AgentSummaryTable extends SummaryTable
 {
     private static final String EXPRESSION_MENU = "var menu = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.get('menus-window');";
-    private static final Set<String> TABS = new HashSet<String>(Arrays.asList("status", "statistics", "info", "messages"));
+    private static final Set<String> TABS = new HashSet<String>(Arrays.asList("status", "statistics", "info", "messages", "configuration"));
     
     public AgentSummaryTable(SeleniumBrowser browser, String id)
     {
