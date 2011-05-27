@@ -1,27 +1,29 @@
 package com.zutubi.pulse.acceptance.pages.agents;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.pulse.agent.AgentSummaryTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
+import com.zutubi.util.Condition;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The front page of the "agents" section, listing all agents.
  */
 public class AgentsPage extends SeleniumPage
 {
-    private static final String ID_AGENTS_TABLE = "agents-table";
-    private static final String EXECUTING_NONE = "none";
+    private static final String ID_AGENTS_TABLE = "agents-agents";
 
+    private AgentSummaryTable agentSummaryTable;
+    
     public AgentsPage(SeleniumBrowser browser, Urls urls)
     {
         super(browser, urls, ID_AGENTS_TABLE, "agents");
+        agentSummaryTable = new AgentSummaryTable(browser, ID_AGENTS_TABLE);
     }
 
     public String getUrl()
@@ -29,75 +31,30 @@ public class AgentsPage extends SeleniumPage
         return urls.agents();
     }
 
-    public String getStatusId(String agent)
+    @Override
+    public void waitFor()
     {
-        return "agent." + agent + ".status";
+        super.waitFor();
+        browser.waitForVariable("panel");
+        browser.waitForVariable("panel.initialised");
+    }
+    
+    public AgentSummaryTable getAgentSummaryTable()
+    {
+        return agentSummaryTable;
     }
 
-    public String getStatus(String agent)
+    public void refreshUntilStatus(final String agent, final String... candidateStatuses)
     {
-        return browser.getText(getStatusId(agent));
-    }
-
-    public String getActionId(String agent, String action)
-    {
-        return "agent." + agent + ".action." + action;
-    }
-
-    public List<String> getActions(final String agent)
-    {
-        String[] allLinks = browser.getAllLinks();
-        List<String> actions = CollectionUtils.filter(allLinks, new Predicate<String>()
+        final Set<String> candidateSet = new HashSet<String>(Arrays.asList(candidateStatuses));
+        TestUtils.waitForCondition(new Condition()
         {
-            public boolean satisfied(String s)
+            public boolean satisfied()
             {
-                return s.startsWith("agent." + agent + ".action.");
+                openAndWaitFor();
+                final String currentStatus = agentSummaryTable.getStatus(agent);
+                return candidateSet.contains(currentStatus);
             }
-        });
-
-        actions = CollectionUtils.map(actions, new Mapping<String, String>()
-        {
-            public String map(String s)
-            {
-                return s.split("\\.")[3];
-            }
-        });
-
-        Collections.sort(actions, new Sort.StringComparator());
-        return actions;
-    }
-
-    public boolean isActionAvailable(String agent, String action)
-    {
-        return browser.isElementIdPresent(getActionId(agent, action));
-    }
-
-    public void clickAction(String agent, String action)
-    {
-        browser.click(getActionId(agent, action));
-        browser.waitForPageToLoad();
-    }
-
-    /**
-     * Indicates if there is info about an executing build on the given agent.
-     * 
-     * @param agentName name of the agent to test
-     * @return true if there is a build executing on the agent, false otherwise
-     */
-    public boolean isExecutingBuildPresent(String agentName)
-    {
-        String details = getExecutingBuildDetails(agentName);
-        return !EXECUTING_NONE.equals(details);
-    }
-
-    /**
-     * Returns details of an executing build on the given agent.
-     * 
-     * @param agentName name of the agent to get the info for
-     * @return text of the executing build stage cell for the agent
-     */
-    public String getExecutingBuildDetails(String agentName)
-    {
-        return browser.getText("agent." + agentName + ".build");
+        }, SeleniumBrowser.REFRESH_TIMEOUT, "agent status to be in " + candidateSet);        
     }
 }

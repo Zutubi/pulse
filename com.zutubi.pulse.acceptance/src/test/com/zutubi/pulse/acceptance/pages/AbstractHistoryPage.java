@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.Pager;
+import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;

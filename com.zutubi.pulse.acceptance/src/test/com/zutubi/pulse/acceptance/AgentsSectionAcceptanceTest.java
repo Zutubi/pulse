@@ -1,11 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.components.pulse.agent.AgentInfo;
+import com.zutubi.pulse.acceptance.components.pulse.agent.AgentSummaryTable;
 import com.zutubi.pulse.acceptance.forms.admin.AgentForm;
 import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -64,32 +67,37 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertAgent(new AgentConfiguration(AGENT, HOST_LOCALHOST, 8899));
 
         getBrowser().loginAsAdmin();
-        AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        getBrowser().refreshUntilText(agentsPage.getStatusId(AGENT), OFFLINE.getPrettyString());
-        assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getActions(AGENT));
+        final AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
+        agentsPage.refreshUntilStatus(AGENT, OFFLINE.getPrettyString());
+
+        long agentId = rpcClient.TestApi.getAgentId(AGENT);
+        assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getAgentSummaryTable().getActions(agentId));
     }
 
     public void testDisableEnable() throws Exception
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
         rpcClient.RemoteApi.waitForAgentToBeIdle(LOCAL_AGENT);
+        long agentId = rpcClient.TestApi.getAgentId(LOCAL_AGENT);
         
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_DISABLE));
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
+        final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        assertTrue(summaryTable.areActionsAvailable(agentId, ACTION_DISABLE));
+        summaryTable.clickAction(agentId, ACTION_DISABLE);
 
-        getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), DISABLED.getPrettyString());
-
-        assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_ENABLE));
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_ENABLE);
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, DISABLED.getPrettyString());
         
-        getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), IDLE.getPrettyString());
+        assertTrue(summaryTable.areActionsAvailable(agentId, ACTION_ENABLE));
+        summaryTable.clickAction(agentId, ACTION_ENABLE);
+        
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, IDLE.getPrettyString());
     }
 
     public void testDisableOnIdle() throws Exception
     {
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
+        long agentId = rpcClient.TestApi.getAgentId(LOCAL_AGENT);
 
         WaitProject project = projects.createWaitAntProject(randomName(), tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
@@ -101,22 +109,23 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
+        AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        summaryTable.clickAction(agentId, ACTION_DISABLE);
 
-        getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), STATUS_DISABLE_ON_IDLE);
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, STATUS_DISABLE_ON_IDLE);
 
-        assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_ENABLE));
-        assertTrue(agentsPage.isActionAvailable(LOCAL_AGENT, ACTION_DISABLE_NOW));
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_ENABLE);
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_PING);
+        assertTrue(summaryTable.areActionsAvailable(agentId, ACTION_ENABLE, ACTION_DISABLE_NOW));
+        summaryTable.clickAction(agentId, ACTION_ENABLE);
+        agentsPage.openAndWaitFor();
+        summaryTable.clickAction(agentId, ACTION_PING);
 
-        getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
 
         assertTrue(rpcClient.RemoteApi.getAgentEnableState(LOCAL_AGENT).isEnabled());
 
-        agentsPage.clickAction(LOCAL_AGENT, ACTION_DISABLE);
+        summaryTable.clickAction(agentId, ACTION_DISABLE);
 
-        getBrowser().refreshUntilText(agentsPage.getStatusId(LOCAL_AGENT), STATUS_DISABLE_ON_IDLE);
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, STATUS_DISABLE_ON_IDLE);
 
         assertTrue(rpcClient.RemoteApi.getAgentEnableState(LOCAL_AGENT).isDisabling());
 
@@ -149,15 +158,15 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        assertBuildingStatus(agentsPage.getStatus(agent1));
-        assertBuildingStatus(agentsPage.getStatus(agent2));
+        final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        assertBuildingStatus(summaryTable.getStatus(agent1));
+        assertBuildingStatus(summaryTable.getStatus(agent2));
 
         project2.releaseBuild();
         rpcClient.RemoteApi.waitForBuildToComplete(project2.getName(), 1);
 
-        getBrowser().refresh();
-        agentsPage.waitFor();
-        assertBuildingStatus(agentsPage.getStatus(agent1));
+        agentsPage.openAndWaitFor();
+        assertBuildingStatus(summaryTable.getStatus(agent1));
         rpcClient.RemoteApi.waitForAgentToBeIdle(agent2);
 
         project1.releaseBuild();
@@ -193,7 +202,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
         final AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        assertFalse(agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME));
+        final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        assertNull(summaryTable.getAgent(AgentManager.MASTER_AGENT_NAME).executingOwner);
 
         WaitProject project = projects.createWaitAntProject(random, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
@@ -202,15 +212,19 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
-        getBrowser().refreshUntil(SeleniumBrowser.REFRESH_TIMEOUT, new Condition()
+        TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
             {
-                return agentsPage.isExecutingBuildPresent(AgentManager.MASTER_AGENT_NAME);
+                agentsPage.openAndWaitFor();
+                return summaryTable.getAgent(AgentManager.MASTER_AGENT_NAME).executingOwner != null;
             }
-        }, "executing build to appear on master agent");
-        
-        assertEquals(project.getName() + " :: build 1 :: default", agentsPage.getExecutingBuildDetails(AgentManager.MASTER_AGENT_NAME));
+        }, SeleniumBrowser.REFRESH_TIMEOUT, "executing build to appear on master agent");
+
+        AgentInfo info = summaryTable.getAgent(AgentManager.MASTER_AGENT_NAME);
+        assertEquals(project.getName(), info.executingOwner);
+        assertEquals("1", info.executingNumber);
+        assertEquals("default", info.executingStage);
 
         project.releaseBuild();
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);

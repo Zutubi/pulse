@@ -16,15 +16,14 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static java.util.Arrays.asList;
 
 /**
  * Implements an XML-RPC API with testing-specific functionality.  Accepts
@@ -69,6 +68,27 @@ public class TestApi
         tokenManager.verifyAdmin(token);
         LOG.warning(message);
         return true;
+    }
+
+    /**
+     * @internal Gets the state (DB) id for the given agent.
+     * 
+     * @param token authentication token
+     * @param name  name of the agent
+     * @return the id converted to a string
+     */
+    public String getAgentId(String token, String name)
+    {
+        tokenManager.verifyAdmin(token);
+        tokenManager.loginUser(token);
+        try
+        {
+            return Long.toString(internalGetAgent(name).getId());   
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     /**

@@ -1,8 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
-import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 
 import java.util.LinkedList;
@@ -13,25 +10,24 @@ import java.util.List;
  */
 public class AgentRowModel
 {
-    private Agent agent;
+    private long id;
     private String name;
     private String location;
     private String status;
+    private ExecutingStageModel executingStage;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
-    private BuildResult executingBuild;
-    private RecipeResultNode executingNode;
 
-    public AgentRowModel(Agent agent, String name, String location, String status)
+    public AgentRowModel(long id, String name, String location, String status)
     {
-        this.agent = agent;
+        this.id = id;
         this.name = name;
         this.location = location;
         this.status = status;
     }
 
-    public Agent getAgent()
+    public long getId()
     {
-        return agent;
+        return id;
     }
 
     public String getName()
@@ -39,19 +35,9 @@ public class AgentRowModel
         return name;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public String getLocation()
     {
         return location;
-    }
-
-    public void setLocation(String location)
-    {
-        this.location = location;
     }
 
     public String getStatus()
@@ -59,32 +45,16 @@ public class AgentRowModel
         return status;
     }
 
-    public void setStatus(String status)
+    public ExecutingStageModel getExecutingStage()
     {
-        this.status = status;
+        return executingStage;
     }
 
-    public BuildResult getExecutingBuild()
+    public void setExecutingStage(ExecutingStageModel executingStage)
     {
-        return executingBuild;
+        this.executingStage = executingStage;
     }
 
-    public RecipeResultNode getExecutingNode()
-    {
-        return executingNode;
-    }
-
-    public void setExecutingStage(BuildResult buildResult, RecipeResultNode node)
-    {
-        this.executingBuild = buildResult;
-        this.executingNode = node;
-    }
-
-    public boolean hasActions()
-    {
-        return actions.size() > 0;
-    }
-    
     public List<ActionLink> getActions()
     {
         return actions;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.TextBox;
+import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.pulse.project.StatusBox;
 import com.zutubi.pulse.acceptance.components.table.LinkTable;
 import com.zutubi.pulse.acceptance.components.table.PropertyTable;

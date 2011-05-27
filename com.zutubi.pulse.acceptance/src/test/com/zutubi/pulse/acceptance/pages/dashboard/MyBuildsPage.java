@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.pulse.acceptance.components.BuildSummaryTable;
+import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.master.webwork.Urls;

@@ -36,6 +36,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -65,8 +66,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -713,6 +712,7 @@ public class RemoteApi
      * This function is only used for inserting into the top level of a templated collection.  To
      * insert at any other path, use {@link #insertConfig(String, String, java.util.Hashtable)}.
      *
+     * @param token              authentication token (see {@link #login})
      * @param token              authentication token (see {@link #login})
      * @param templateParentPath the path of the template parent that this new config should inherit
      *                           from, this also determines which templated collection the config is

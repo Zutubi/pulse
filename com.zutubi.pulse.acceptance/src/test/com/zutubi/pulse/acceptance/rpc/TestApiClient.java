@@ -25,6 +25,11 @@ public class TestApiClient extends ApiClient
         call("logWarning", message);
     }
 
+    public long getAgentId(String agent) throws Exception
+    {
+        return Long.parseLong(this.<String>call("getAgentId", agent));
+    }
+    
     public void enqueueSynchronisationMessage(String agent, boolean synchronous, String description, boolean succeed) throws Exception
     {
         call("enqueueSynchronisationMessage", agent, synchronous, description, succeed);

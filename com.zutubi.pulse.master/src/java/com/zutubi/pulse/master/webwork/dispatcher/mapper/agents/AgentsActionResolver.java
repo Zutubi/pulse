@@ -12,7 +12,7 @@ public class AgentsActionResolver extends ActionResolverSupport
 {
     public AgentsActionResolver()
     {
-        super("viewAgents");
+        super("agents");
     }
 
     public List<String> listChildren()

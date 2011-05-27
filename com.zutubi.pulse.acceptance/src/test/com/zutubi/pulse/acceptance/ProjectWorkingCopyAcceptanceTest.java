@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.components.pulse.agent.AgentSummaryTable;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
@@ -7,8 +8,7 @@ import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentStatus.DISABLED;
-import static com.zutubi.pulse.master.agent.AgentStatus.IDLE;
+import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
@@ -174,23 +174,27 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         enableAgent(AGENT_NAME);
     }
 
-    private void disableAgent(String name)
+    private void disableAgent(String name) throws Exception
     {
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        if(agentsPage.isActionAvailable(name, ACTION_DISABLE))
+        long agentId = rpcClient.TestApi.getAgentId(name);
+        final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        if (summaryTable.areActionsAvailable(agentId, ACTION_DISABLE))
         {
-            agentsPage.clickAction(name, ACTION_DISABLE);
-            getBrowser().refreshUntilText(agentsPage.getStatusId(name), DISABLED.getPrettyString());
+            summaryTable.clickAction(agentId, ACTION_DISABLE);
+            agentsPage.refreshUntilStatus(name, AgentStatus.DISABLED.getPrettyString());
         }
     }
 
-    private void enableAgent(String name)
+    private void enableAgent(String name) throws Exception
     {
         AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
-        if (agentsPage.isActionAvailable(name, ACTION_ENABLE))
+        long agentId = rpcClient.TestApi.getAgentId(name);
+        final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
+        if (summaryTable.areActionsAvailable(agentId, ACTION_ENABLE))
         {
-            agentsPage.clickAction(name, ACTION_ENABLE);
-            getBrowser().refreshUntilText(agentsPage.getStatusId(name), IDLE.getPrettyString());
+            summaryTable.clickAction(agentId, ACTION_ENABLE);
+            agentsPage.refreshUntilStatus(name, AgentStatus.IDLE.getPrettyString());
         }
     }
 

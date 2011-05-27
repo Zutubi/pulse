@@ -28,9 +28,9 @@
             <result name="success" type="redirect">/default.action</result>
         </action>
 
-        <action name="viewAgents" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">
+        <action name="agents" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/view-agents.vm</result>
+            <result name="success" type="velocity">/agents.vm</result>
         </action>
 
         <action name="agentAction" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionAction">
@@ -439,8 +439,12 @@
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
-        <action name="viewAgentsPanel" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">
-            <result name="success" type="velocity">view-agents-panel.vm</result>
+        <action name="agentsData" class="com.zutubi.pulse.master.xwork.actions.agents.AgentsDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
         </action>
 
         <action name="agentStatusData" class="com.zutubi.pulse.master.xwork.actions.agents.AgentStatusDataAction">

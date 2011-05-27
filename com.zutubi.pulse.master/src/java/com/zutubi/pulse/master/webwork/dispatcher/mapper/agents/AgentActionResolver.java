@@ -10,7 +10,7 @@ public class AgentActionResolver extends StaticMapActionResolver
 {
     public AgentActionResolver(String agent)
     {
-        super("viewAgentStatus");
+        super("agentStatus");
         addParameter("agentName", agent);
         addMapping("actions", new AgentActionsActionResolver());
         addMapping("status", new ParameterisedActionResolver("agentStatus"));

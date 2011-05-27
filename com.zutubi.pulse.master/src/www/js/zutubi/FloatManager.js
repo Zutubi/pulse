@@ -147,6 +147,11 @@ Zutubi.FloatManager = function() {
                 var linkEl = Ext.get(id + ID_SUFFIX_LINK);
                 windowEl.anchorTo(linkEl, align);
             }
+        },
+        
+        hideAll: function()
+        {
+            hideAll();
         }
     };
 }();
