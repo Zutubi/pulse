@@ -5,9 +5,7 @@ import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Corresponds to the Zutubi.pulse.agent.AgentSummaryTable component.
@@ -15,7 +13,7 @@ import java.util.List;
 public class AgentSummaryTable extends SummaryTable
 {
     private static final String EXPRESSION_MENU = "var menu = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.get('menus-window');";
-    
+    private static final Set<String> TABS = new HashSet<String>(Arrays.asList("status", "statistics", "info", "messages"));
     
     public AgentSummaryTable(SeleniumBrowser browser, String id)
     {
@@ -84,7 +82,11 @@ public class AgentSummaryTable extends SummaryTable
         for (String id: ids)
         {
             int index = id.indexOf('-');
-            result.add(id.substring(0, index));
+            id = id.substring(0, index);
+            if (!TABS.contains(id))
+            {
+                result.add(id);
+            }
         }
         
         Collections.sort(result);

@@ -10,9 +10,26 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             '</a>'
         ),
 
+        getAgentTabMenuItem: function(agentUrl, tab, image)
+        {
+            return {
+                id: tab,
+                title: tab,
+                image: image,
+                url: agentUrl + tab + '/'
+            }
+        },
+        
         getAgentMenuItems: function(agent) {
-            var result = [];
-            var actionsUrl = 'agents/' + encodeURIComponent(agent.name) + '/actions/';
+            var agentUrl = 'agents/' + encodeURIComponent(agent.name) + '/';
+            var actionsUrl = agentUrl + 'actions/';
+            var result = [
+                Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'status', 'magnifier.gif'),
+                Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'statistics', 'chart_bar.gif'),
+                Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'info', 'information.gif'),
+                Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'messages', 'script.gif')
+            ];
+            
             for (var i = 0, len = agent.actions.length; i < len; i++)
             {
                 var action = agent.actions[i];
@@ -36,8 +53,37 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             });
         },
 
+        STATUS_TEMPLATE: new Ext.XTemplate('<img src="{[window.baseUrl]}/images/agent/{statusType}.gif" alt="{status}"/> {status}'),
+
         agentStatus: function(status, agent) {
-            return status;
+            var statusType;
+            if (status == 'synchronising' ||
+                status == 'synchronised' || 
+                status.indexOf('host upgrading') >= 0)
+            {
+                statusType = 'upgrading';
+            }
+            else if (status == 'offline' ||
+                     status.indexOf('upgrade failed') >= 0 ||
+                     status.indexOf('mismatch') >= 0 ||
+                     status.indexOf('invalid') >= 0)
+            {
+                statusType = 'offline';
+            }
+            else if (status == 'disabled')
+            {
+                statusType = 'disabled';
+            }
+            else if (status == 'idle')
+            {
+                statusType = 'idle';
+            }
+            else
+            {
+                statusType = 'building';
+            }
+             
+            return Zutubi.pulse.agent.renderers.STATUS_TEMPLATE.apply({status: status, statusType: statusType});
         },
         
         agentExecutingStage: function(stage, agent) {
