@@ -2,7 +2,7 @@
 // dependency: ext/StatusBar.js
 // dependency: zutubi.js
 
-Zutubi.PROJECT_CELLS = '<td class="health-{health}" rowspan="{rowspan}">&nbsp;</td>' +
+Zutubi.PROJECT_CELLS = '<td class="monitoring-{monitoring}" rowspan="{rowspan}"><img src="{base}/images/health/{health}.gif"/></td>' +
                        '<td class="fit-width" rowspan="{rowspan}">' +
                            '<img alt="-" src="{base}/images/default/s.gif" class="project-name" style="width: {indent}px; height: 16px;"/> ' +
                            '<span class="nowrap"><a href="{homeLink}">{name:htmlEncode}</a></span>' +
@@ -63,6 +63,7 @@ Zutubi.ConcreteProject.prototype = {
         var templateData = {
             id: this.data.id,
             health: this.data.health,
+            monitoring: this.data.monitoring.toLowerCase(),
             responsibleMessage: this.data.responsibleMessage,
             responsibleComment: this.data.responsibleComment,
             rowspan: this.data.built ? this.data.buildRows.length : 1,

@@ -156,7 +156,7 @@ public class ProjectsModelsHelper
             for (Project p : projects)
             {
                 boolean prompt = p.getConfig().getOptions().getPrompt();
-                ConcreteProjectModel child = new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p), ProjectHealth.getHealth(buildManager, p));
+                ConcreteProjectModel child = new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p), ProjectHealth.getHealth(buildManager, p), ProjectMonitoring.getMonitoring(p));
                 model.getRoot().addChild(child);
             }
         }
@@ -184,7 +184,7 @@ public class ProjectsModelsHelper
                             builds = getBuilds(project, configuration, buildCache);
                             prompt = project.getConfig().getOptions().getPrompt();
                         }
-                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project), ProjectHealth.getHealth(buildManager, project));
+                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project), ProjectHealth.getHealth(buildManager, project), ProjectMonitoring.getMonitoring(project));
                     }
                     else
                     {

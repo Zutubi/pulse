@@ -864,9 +864,12 @@ span.error
     margin-left: 15px;
 }
 
-td.health-unknown, td.health-ok, td.health-broken, td.health-warnings
+td.health-unknown, td.health-ok, td.health-broken, td.health-warnings,
+td.monitoring-stopped, td.monitoring-paused, td.monitoring-none, td.monitoring-polling
 {
-    width: 10px;
+    width: 18px;
+    padding-left: 0;
+    padding-right: 0;
     background-repeat: no-repeat;
     background-position: 1px 4px;
 }
@@ -908,6 +911,31 @@ td.health-warnings
 {
     color: #960;
     border-color: #960;
+}
+
+td.monitoring-stopped
+{
+    background-image: url(../images/monitor/stopped.gif);
+}
+
+td.monitoring-paused
+{
+    background-image: url(../images/monitor/paused.gif);
+}
+
+td.monitoring-none
+{
+    background-image: url(../images/s.gif);
+}
+
+td.monitoring-polling
+{
+    background-image: url(../images/monitor/polling.gif);
+}
+
+td.monitoring-template
+{
+    background-image: url(../images/s.gif);
 }
 
 .project-highlighted, .project-highlighted td

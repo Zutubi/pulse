@@ -27,6 +27,7 @@ public class ConcreteProjectModel extends ProjectModel
 
     private String projectName;
     private ProjectHealth health = ProjectHealth.UNKNOWN;
+    private ProjectMonitoring monitoring;
     private String responsibleMessage;
     private String responsibleComment;
     private boolean built;
@@ -37,7 +38,7 @@ public class ConcreteProjectModel extends ProjectModel
     private boolean canViewSource;
     private long projectId;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions, ProjectHealth projectHealth)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions, ProjectHealth projectHealth, ProjectMonitoring monitoring)
     {
         super(group, project.getName());
 
@@ -72,6 +73,7 @@ public class ConcreteProjectModel extends ProjectModel
         canViewSource = availableActions.contains(ACTION_VIEW_SOURCE);
 
         this.health = projectHealth;
+        this.monitoring = monitoring;
     }
 
     public String getName()
@@ -87,6 +89,11 @@ public class ConcreteProjectModel extends ProjectModel
     public ProjectHealth latestHealth()
     {
         return health;
+    }
+
+    public ProjectMonitoring getMonitoring()
+    {
+        return monitoring;
     }
 
     public String getResponsibleMessage()
