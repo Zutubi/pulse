@@ -3,4 +3,4 @@ Bundle-SymbolicName: com.zutubi.pulse.core.postprocessors.boosttest; singleton:=
 Bundle-Description: A post-processor that reads test results from Boost.Test XML reports.
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.3.0
-Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.3.0,2.4.0)"
+Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.4.0,2.5.0)"

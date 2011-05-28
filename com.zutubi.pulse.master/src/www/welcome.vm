@@ -14,11 +14,11 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.3 beta!  This page provides information on common next steps and important
-        new features in the 2.3 release.
+        Welcome to Pulse 2.4 beta!  This page provides information on common next steps and important
+        new features in the 2.4 release.
     </p>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2.3" link in the top left
+        You can return to this page at any time by clicking on the "pulse 2.4" link in the top left
         corner.
     </p>
     <h1> :: getting started :: </h1>
@@ -80,91 +80,99 @@
 
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.3 is packed with new features, with a major focus on both build throughput and the
-        user interface.  Among the most important updates are:
+        Pulse 2.4 brings further usability improvements throughout both the reporting and
+        administration interfaces, along with built in support for new tools.  Key updates
+        include:
     </p>
     <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
         <tr>
-            <th class="category" colspan="2">new in 2.3</th>
+            <th class="category" colspan="2">new in 2.4</th>
         </tr>
         <tr>
-            #actionHeader("concurrent" "concurrent project builds" "accept" false)
+            #actionHeader("mercurial" "mercurial support" "accept" false)
             <td>
-                Pulse can now run multiple builds of the same project in parallel.  The maximum
-                number of concurrent builds for a project is controlled by a new build option.
+                Pulse now has built-in support for the Mercurial SCM, in the form of a new plugin.
+                All SCM capabilities, including personal builds, are supported.
             </td>
         </tr>
         <tr>
-            #actionHeader("priorities" "project and stage priorities" "accept" false)
+            #actionHeader("maven3" "maven 3 support" "accept" false)
             <td>
-                Projects (or individual build stages) may now be assigned priorities, controlling
-                how they are scheduled.  Higher priority stages take precedence in the queue.
+                Pulse now has built-in support for Maven 3, via a new maven3 command, maven3.pp
+                post-processor and updated maven resource discovery.
             </td>
         </tr>
         <tr>
-            #actionHeader("home" "project home tab" "accept" false)
+            #actionHeader("agents" "agents page" "accept" false)
             <td>
-                The project home tab has been overhauled to show key information about project
-                health and activity more prominently.  Featured artifacts from the latest build are
-                now shown in the right column.
+                The main page of the agents section has been completely overhauled.  It now shows
+                a graphical indication of the agent status, provides quick access to all agent tabs,
+                and shows more information about builds running on agents.
             </td>
         </tr>
         <tr>
-            #actionHeader("history" "project history tab" "accept" false)
+            #actionHeader("agentstatus" "agent status tab" "accept" false)
             <td>
-                The project history tab has been reworked, with a new build summary table that
-                shows more information.  The table is also more easily customised than before.
+                The agent status tab has been rewritten to show more information about the
+                build stage running on the agent, and to update all status details efficiently.
             </td>
         </tr>
         <tr>
-            #actionHeader("summary" "build summary tab" "accept" false)
+            #actionHeader("serverhistory" "server history tab" "accept" false)
             <td>
-                Building on changes in Pulse 2.2, the build summary tab has been further improved.
-                As with the project home tab, key build status is now more obvious.  More
-                information is also displayed for each build stage.
+                A new history tab has been added to the server section of the UI.  This tab
+                shows build history across all projects.
             </td>
         </tr>
         <tr>
-            #actionHeader("mybuilds" "my builds tab" "accept" false)
+            #actionHeader("activity" "server activity tab" "accept" false)
             <td>
-                The my builds tab, which displays personal builds, has been restyled.  Similar to
-                the history tab, a new build summary table is used with superior customisability. 
+                The server activity tab has been overhauled to show more information in
+                less vertical space.  Queued and running build stages are now shown nested
+                under the builds they are part of.
             </td>
         </tr>
         <tr>
-            #actionHeader("sync" "plugin synchronisation" "accept" false)
+            #actionHeader("info" "server info and messages tabs" "accept" false)
             <td>
-                Plugins are now automatically synchronised among all of your Pulse installations.
-                When a plugin is installed on the master, it is automatically deployed to agents,
-                and even to tool installs on developer machines.
+                The server and agent info and messages tabs have also been restyled to
+                match the new look of these sections.
             </td>
         </tr>
         <tr>
-            #actionHeader("disable" "stage/command disabling" "accept" false)
+            #actionHeader("killbuild" "kill build action" "accept" false)
             <td>
-                All build stages and commands now have an "enabled" flag.  You can toggle this flag
-                to temporarily disable the stage or command without losing its configuration.
+                A new kill build action has been added for Pulse administrators, allowing
+                builds to be terminated quickly without full cleanup.
             </td>
         </tr>
         <tr>
-            #actionHeader("term" "terminated status" "accept" false)
+            #actionHeader("templatedfields" "templated field actions" "accept" false)
             <td>
-                Builds that are explicitly killed by a user or timeout now finish in a distinct
-                "terminated" state.  This allows them to be differentiated from other build errors.
+                Overridden configuration values are now easier to revert, and it is also
+                easier to navigate to where an inherited configuration value is defined.
             </td>
         </tr>
         <tr>
-            #actionHeader("uiperf" "ui performance" "accept" false)
+            #actionHeader("introduceparent" "introduce parent refactoring" "accept" false)
             <td>
-                The most important live views in the Pulse web UI have been updated to use less
-                bandwidth when refreshing.  Pulse JavaScript has also been repackaged to save space.
+                The templated configuration system now supports a new introduce parent
+                refactoring.  This allows you to adjust your hierarchy over time to take
+                full advantage of templates.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("pluggablediscovery" "pluggable resource discovery" "accept" false)
+            <td>
+                Automatic tool discovery and configuration is now pluggable, so if you use a tool
+                not yet supported by Pulse you can choose to add support yourself.
             </td>
         </tr>
         <tr>
             #actionHeader("more" "and more..." "accept" false)
             <td>
-                This release also includes numerous smaller improvements and fixes.  Notably,
-                significant libraries in the Pulse server have also been updated in this release.
+                This release also includes numerous smaller improvements and fixes. These include
+                extra touches in the UI, new support for common plugin implementations and much more.
             </td>
         </tr>
     </table>

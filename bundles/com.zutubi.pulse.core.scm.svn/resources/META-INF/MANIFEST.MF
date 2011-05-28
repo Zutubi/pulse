@@ -3,4 +3,4 @@ Bundle-SymbolicName: com.zutubi.pulse.core.scm.svn; singleton:=true
 Bundle-Description: Support for SVN
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.3.0
-Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.3.0,2.4.0)"
+Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.4.0,2.5.0)"
