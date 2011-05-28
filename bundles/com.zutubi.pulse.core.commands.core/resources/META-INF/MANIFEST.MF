@@ -2,5 +2,5 @@ Bundle-Name: Core Commands
 Bundle-SymbolicName: com.zutubi.pulse.core.commands.core; singleton:=true
 Bundle-Description: Fundamental pulse commands and post-processors, upon which several other commands are based.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.3.0
+Bundle-Version: 2.4.0
 Export-Package: com.zutubi.pulse.core.commands.core
