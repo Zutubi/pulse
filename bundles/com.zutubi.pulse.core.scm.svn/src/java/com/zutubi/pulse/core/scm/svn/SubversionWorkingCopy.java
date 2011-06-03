@@ -206,24 +206,32 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         }
     }
 
-    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... paths) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         File base = context.getBase();
-        File[] files = pathsToFiles(base, paths);
-        if (files == null)
+        if(spec.length == 1 && spec[0].startsWith(":"))
         {
-            return getStatus(context, base);
+            String changelist = spec[0].substring(1);
+            return getStatus(context, changelist, base);
         }
         else
         {
-            return getStatus(context, files);
+            File[] files = pathsToFiles(base, spec);
+            if (files == null)
+            {
+                return getStatus(context, null, base);
+            }
+            else
+            {
+                return getStatus(context, null, files);
+            }
         }
     }
 
-    private WorkingCopyStatus getStatus(WorkingCopyContext context, File... files) throws ScmException
+    private WorkingCopyStatus getStatus(WorkingCopyContext context, String changelist, File... files) throws ScmException
     {
         SVNClientManager clientManager = getClientManager(context, false);
-        StatusHandler handler = new StatusHandler(context);
+        StatusHandler handler = new StatusHandler(context, changelist);
 
         try
         {
@@ -478,13 +486,15 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
         private WorkingCopyContext context;
+        private String changelist;
         private ConfigSupport configSupport;
         private WorkingCopyStatus status;
         private List<String> propertyChangedPaths = new LinkedList<String>();
 
-        public StatusHandler(WorkingCopyContext context)
+        public StatusHandler(WorkingCopyContext context, String changelist)
         {
             this.context = context;
+            this.changelist = changelist;
             configSupport = new ConfigSupport(context.getConfig());
             status = new WorkingCopyStatus(context.getBase());
         }
@@ -505,7 +515,7 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         public void handleStatus(SVNStatus svnStatus)
         {
             FileStatus fs = convertStatus(context.getBase(), configSupport, svnStatus, propertyChangedPaths);
-            if (fs.isInteresting())
+            if (fs.isInteresting() && (changelist == null || changelist.equals(svnStatus.getChangelistName())))
             {
                 context.getUI().status(fs.toString());
                 status.addFileStatus(fs);

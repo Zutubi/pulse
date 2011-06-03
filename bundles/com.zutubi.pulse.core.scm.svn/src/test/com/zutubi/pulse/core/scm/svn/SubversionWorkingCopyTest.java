@@ -346,6 +346,21 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertAdded(status, "moveddir2/file2", false);
     }
 
+    public void testGetLocalStatusChangelist() throws Exception
+    {
+        File file1 = new File(base, "textfile1");
+        File file2 = new File(base, "textfile2");
+        FileSystemUtils.createFile(file1, getName());
+        FileSystemUtils.createFile(file2, getName());
+        clientManager.getChangelistClient().doAddToChangelist(new File[]{file1}, SVNDepth.INFINITY, "cl", null);
+
+        WorkingCopyStatus wcs = wc.getLocalStatus(context, ":cl");
+        assertEquals(1, wcs.getFileStatuses().size());
+        FileStatus fs = wcs.getFileStatus("textfile1");
+        assertEquals(FileStatus.State.MODIFIED, fs.getState());
+        assertFalse(fs.isDirectory());
+    }
+
     public void getLocalStatusMergeEdited() throws Exception
     {
         long rev = branchEdit("file1");
