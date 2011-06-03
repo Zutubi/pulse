@@ -24,7 +24,7 @@ public class PersonalBuildChangesPage extends SeleniumPage
 
     public String getCheckedOutRevision()
     {
-        String text = browser.getText("checked.out.revision");
+        String text = browser.getText("checked-out-revision");
         text = text.trim();
         String[] pieces = text.split(" ");
         return pieces[pieces.length - 1];

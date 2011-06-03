@@ -10,29 +10,29 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <h3 id="checked.out.revision">
+    <div class="build-page-header" id="checked-out-revision">
         #wwtext("name=checked.out.revision")
         $action.updateChangeUrl($buildResult.project, $buildResult.revision)
         #set($url = $action.getChangeUrl())
         #if($url)<a href="$url">#end${buildResult.revision}#if($url)</a>#end
-    </h3>
-    <br/>
-    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="content">
-        #headingRow("patch.changes" 2)
+    </div>
+
+    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="two-content">
+        <tr><th colspan="2" class="two-heading leftmost rightmost">#wwtext("name=patch.changes")</th></tr>
 #if($fileStatuses.size() > 0)
         <tr>
-            #contentHeading("patch.path" 1)
-            #contentHeading("patch.status" 1)
+            <th class="content leftmost">#wwtext("name=patch.path")</th>
+            <th class="content rightmost">#wwtext("name=patch.status")</th>
         </tr>
     #foreach($fileStatus in $fileStatuses)
         <tr>
-            #dynamicCell($fileStatus.path)
-            #dynamicCell($fileStatus.state.toString().toLowerCase())
+            <td class="content leftmost">$!webwork.htmlEncode($fileStatus.path)</td>
+            <td class="content rightmost">$!webwork.htmlEncode($fileStatus.state.toString().toLowerCase())</td>
         </tr>
     #end
 #else
     <tr>
-        <td class="content" colspan="2">#wwtext("name=personal.changes.none")</td>
+        <td class="content leftmost rightmost" colspan="2">#wwtext("name=personal.changes.none")</td>
     </tr>
 #end
     </table>
