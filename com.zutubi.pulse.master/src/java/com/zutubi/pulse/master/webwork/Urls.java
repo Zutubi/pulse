@@ -542,6 +542,11 @@ public class Urls
         return agent(agent) + "statistics/";
     }
 
+    public String agentHistory(Object agent)
+    {
+        return agent(agent) + "history/";
+    }
+
     public String agentMessages(Object agent)
     {
         return agent(agent) + "messages/";

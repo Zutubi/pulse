@@ -67,6 +67,11 @@
             <result name="success" type="velocity">/agent-statistics.vm</result>
         </action>
 
+        <action name="agentHistory" class="com.zutubi.pulse.master.xwork.actions.agents.AgentHistoryAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/agent-history.vm</result>
+        </action>
+
         <action name="internalError" class="com.zutubi.pulse.master.xwork.actions.InternalErrorAction">
             <result name="success" type="velocity">/internal-error.vm</result>
             <result name="input" type="velocity">/internal-error.vm</result>

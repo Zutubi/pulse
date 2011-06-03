@@ -567,6 +567,65 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public int getBuildCount(final String agent, final ResultState[] states)
+    {
+        Long count = (Long) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery(
+                        "select count(distinct result) from BuildResult result " +
+                                "  join result.root.children child " +
+                                "where child.host = :agent" +
+                                (states == null ? "" : " and result.stateName in (:states)"));
+
+                queryObject.setString("agent", agent);
+                if (states != null)
+                {
+                    queryObject.setParameterList("states", getStateNames(states));
+                }
+
+                return queryObject.uniqueResult();
+            }
+        });
+        
+        return count.intValue();
+    }
+
+    public List<BuildResult> findLatestByAgentName(final String agent, final ResultState[] states, final int first, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery(
+                        "select distinct result from BuildResult result " +
+                        "  join result.root.children child " +
+                        "where child.host = :agent " +
+                        (states == null ? "" : "and result.stateName in (:states) ") +
+                        "order by id desc");
+
+                queryObject.setString("agent", agent);
+                if (states != null)
+                {
+                    queryObject.setParameterList("states", getStateNames(states));
+                }
+
+                if (first >= 0)
+                {
+                    queryObject.setFirstResult(first);
+                }
+                
+                if (max >= 0)
+                {
+                    queryObject.setMaxResults(max);
+                }
+
+                return queryObject.list();
+            }
+        });
+    }
+
     public List<BuildResult> findByBeforeBuild(final long buildId, final int maxResults, final ResultState... states)
     {
         final BuildResult result = findById(buildId);

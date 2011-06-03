@@ -19,6 +19,8 @@
 Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
     autoScroll: true,
+    projectId: '0',
+    agentId: '0',
     
     dataKeys: ['builds', 'pager'],
     
@@ -72,7 +74,8 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                     }, '->', {
                         xtype: 'xztblink',
                         icon: window.baseUrl + '/images/feed-icon-16x16.gif',
-                        url: window.baseUrl + '/rss.action' + (this.projectId == '0' ? '' : '?projectId=' + this.projectId)
+                        url: window.baseUrl + '/rss.action' + (this.projectId == '0' ? '' : '?projectId=' + this.projectId),
+                        hidden: this.agentId != '0'
                     }]
                 },
                 items: [{

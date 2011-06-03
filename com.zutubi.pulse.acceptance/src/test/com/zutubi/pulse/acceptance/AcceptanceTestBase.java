@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -12,7 +11,13 @@ import com.zutubi.util.TimeStamps;
 import junit.framework.AssertionFailedError;
 
 import java.io.File;
+import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * The base class for all acceptance level tests.  It provides some useful
@@ -144,5 +149,13 @@ public abstract class AcceptanceTestBase extends PulseTestCase
                 rpcClient.RemoteApi.deleteConfig(PathUtils.getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent));
             }
         }
+    }
+
+    protected void assignStageToAgent(String projectName, String stageName, String agentName) throws Exception
+    {
+        String stagePath = getPath(PROJECTS_SCOPE, projectName, "stages", stageName);
+        Hashtable<String, Object> defaultStage = rpcClient.RemoteApi.getConfig(stagePath);
+        defaultStage.put("agent", getPath(AGENTS_SCOPE, agentName));
+        rpcClient.RemoteApi.saveConfig(stagePath, defaultStage, false);
     }
 }

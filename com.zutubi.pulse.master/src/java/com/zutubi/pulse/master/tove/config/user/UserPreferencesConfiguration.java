@@ -58,6 +58,8 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private String projectHistoryColumns = defaultProjectColumns();
     @Internal
     private String serverHistoryColumns = defaultGlobalColumns();
+    @Internal
+    private String agentHistoryColumns = defaultGlobalColumns();
 
     @Internal
     private ProjectDependencyGraphBuilder.TransitiveMode dependencyTransitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.FULL;
@@ -180,6 +182,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setServerHistoryColumns(String serverHistoryColumns)
     {
         this.serverHistoryColumns = serverHistoryColumns;
+    }
+
+    public String getAgentHistoryColumns()
+    {
+        return agentHistoryColumns;
+    }
+
+    public void setAgentHistoryColumns(String agentHistoryColumns)
+    {
+        this.agentHistoryColumns = agentHistoryColumns;
     }
 
     public ProjectDependencyGraphBuilder.TransitiveMode getDependencyTransitiveMode()

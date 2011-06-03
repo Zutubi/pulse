@@ -263,6 +263,7 @@
     #openTabs()
         #agentTab("status" $selected)
         #agentTab("statistics" $selected)
+        #agentTab("history" $selected)
         #agentTab("messages" $selected)
         #agentTab("info" $selected)
     #closeTabs()

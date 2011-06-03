@@ -27,6 +27,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             var result = [
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'status', 'magnifier.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'statistics', 'chart_bar.gif'),
+                Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'history', 'time.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'info', 'information.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'messages', 'script.gif')
             ];

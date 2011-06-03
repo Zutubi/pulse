@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.master.agent.Agent;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,7 @@ import java.util.List;
 public class HistoryPage
 {
     private Project project;
+    private Agent agent;
     private int totalBuilds;
     private int first;
     private int max;
@@ -19,9 +22,21 @@ public class HistoryPage
         this.max = max;
     }
 
+    public HistoryPage(Agent agent, int first, int max)
+    {
+        this.agent = agent;
+        this.first = first;
+        this.max = max;
+    }
+
     public Project getProject()
     {
         return project;
+    }
+
+    public Agent getAgent()
+    {
+        return agent;
     }
 
     public int getTotalBuilds()

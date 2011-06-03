@@ -10,9 +10,10 @@ import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 
 /**
@@ -1002,6 +1003,75 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertNull(buildResultDao.findByRecipeId(11223344L));
     }
 
+    public void testCountByAgent()
+    {
+        BuildResult result1 = createCompletedBuild(projectA, 1);
+        result1.getRoot().addChild(createResultNode("stage1", 1, "test1", "agent1"));
+        result1.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+
+        BuildResult result2 = createCompletedBuild(projectA, 1);
+        result2.setState(ResultState.FAILURE);
+        result2.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+        result2.getRoot().addChild(createResultNode("stage3", 3, "test3", "agent3"));
+
+        BuildResult result3 = createCompletedBuild(projectA, 1);
+        result3.getRoot().addChild(createResultNode("stage2", 2, "test2", "agentx"));
+        result3.getRoot().addChild(createResultNode("stage3", 3, "test3", "agentx"));
+        result3.getRoot().addChild(createResultNode("stage4", 4, "test4", "agentx"));
+
+        buildResultDao.save(result1);
+        buildResultDao.save(result2);
+        buildResultDao.save(result3);
+
+        assertEquals(1, buildResultDao.getBuildCount("agent1", null));
+        assertEquals(2, buildResultDao.getBuildCount("agent2", null));
+        assertEquals(1, buildResultDao.getBuildCount("agent2", new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(1, buildResultDao.getBuildCount("agent3", null));
+        assertEquals(1, buildResultDao.getBuildCount("agentx", null));
+        assertEquals(0, buildResultDao.getBuildCount("agent4", null));
+    }
+
+    public void testFindByAgent()
+    {
+        BuildResult result1 = createCompletedBuild(projectA, 1);
+        result1.getRoot().addChild(createResultNode("stage1", 1, "test1", "agent1"));
+        result1.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+
+        BuildResult result2 = createCompletedBuild(projectA, 1);
+        result2.setState(ResultState.FAILURE);
+        result2.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+        result2.getRoot().addChild(createResultNode("stage3", 3, "test3", "agent3"));
+
+        BuildResult result3 = createCompletedBuild(projectA, 1);
+        result3.getRoot().addChild(createResultNode("stage2", 2, "test2", "agentx"));
+        result3.getRoot().addChild(createResultNode("stage3", 3, "test3", "agentx"));
+        result3.getRoot().addChild(createResultNode("stage4", 4, "test4", "agentx"));
+
+        buildResultDao.save(result1);
+        buildResultDao.save(result2);
+        buildResultDao.save(result3);
+
+        List<BuildResult> found = buildResultDao.findLatestByAgentName("agent1", null, -1, -1);
+        assertEquals(asList(result1), found);
+
+        found = buildResultDao.findLatestByAgentName("agent2", null, -1, -1);
+        assertEquals(asList(result2, result1), found);
+        found = buildResultDao.findLatestByAgentName("agent2", null, 1, -1);
+        assertEquals(asList(result1), found);
+        found = buildResultDao.findLatestByAgentName("agent2", new ResultState[]{ResultState.SUCCESS}, -1, -1);
+        assertEquals(asList(result1), found);
+        found = buildResultDao.findLatestByAgentName("agent2", null, 0, 1);
+        assertEquals(asList(result2), found);
+
+        found = buildResultDao.findLatestByAgentName("agent3", null, -1, -1);
+        assertEquals(asList(result2), found);
+
+        found = buildResultDao.findLatestByAgentName("agentx", null, -1, -1);
+        assertEquals(asList(result3), found);
+
+        assertEquals(0, buildResultDao.findLatestByAgentName("agent4", null, -1, -1).size());
+    }
+
     public void testFindByProjectAndMetabuildId()
     {
         BuildResult result = createResultWithRecipes();
@@ -1173,7 +1243,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
             buildResultDao.save(result);
         }
         commitAndRefreshTransaction();
-        return Arrays.asList(results);
+        return asList(results);
     }
 
     private void assertBuild(Project expectedProject, long expectedNumber, BuildResult build)
@@ -1185,9 +1255,16 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private BuildResult createResultWithRecipes()
     {
         BuildResult result = createCompletedBuild(projectA, 1);
-        result.getRoot().addChild(new RecipeResultNode("stage1", 1, new RecipeResult("test1")));
-        result.getRoot().addChild(new RecipeResultNode("stage2", 2, new RecipeResult("test2")));
+        result.getRoot().addChild(createResultNode("stage1", 1, "test1", null));
+        result.getRoot().addChild(createResultNode("stage2", 2, "test2", null));
         return result;
+    }
+
+    private RecipeResultNode createResultNode(String stageName, long stageHandle, String recipeName, String hostName)
+    {
+        RecipeResultNode node = new RecipeResultNode(stageName, stageHandle, new RecipeResult(recipeName));
+        node.setHost(hostName);
+        return node;
     }
 
     private long getRecipeId(BuildResult result, int recipeIndex)

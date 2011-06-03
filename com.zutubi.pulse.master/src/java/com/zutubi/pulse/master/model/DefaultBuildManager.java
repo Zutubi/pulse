@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
@@ -122,10 +123,25 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.getBuildCount(project, after, upTo);
     }
 
+    public int getBuildCount(Agent agent, ResultState[] states)
+    {
+        return buildResultDao.getBuildCount(agent.getName(), states);
+    }
+
     public void fillHistoryPage(HistoryPage page, ResultState[] states)
     {
-        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states));
-        page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, page.getFirst(), page.getMax()));
+        Agent agent = page.getAgent();
+        if (agent != null)
+        {
+            page.setTotalBuilds(buildResultDao.getBuildCount(agent.getName(), states));
+            page.setResults(buildResultDao.findLatestByAgentName(agent.getName(), states, page.getFirst(), page.getMax()));
+        }
+        else
+        {
+            Project project = page.getProject();
+            page.setTotalBuilds(buildResultDao.getBuildCount(project, states));
+            page.setResults(buildResultDao.findLatestByProject(project, states, page.getFirst(), page.getMax()));
+        }
     }
 
     public BuildResult getLatestCompletedBuildResult(Project project)

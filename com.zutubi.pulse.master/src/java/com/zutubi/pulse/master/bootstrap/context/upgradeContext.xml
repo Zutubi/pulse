@@ -158,6 +158,7 @@
                 <ref local="agentSynchronisationMessageIndices"/>
                 <ref local="addServerHistoryColumnsPreference"/>
                 <ref local="addPerforceOptions"/>
+                <ref local="addAgentHistoryColumnsPreference"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -810,5 +811,9 @@
 
     <bean id="addPerforceOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceOptionsUpgradeTask">
         <property name="buildNumber" value="203999002"/>
+    </bean>
+
+    <bean id="addAgentHistoryColumnsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentHistoryColumnsPreferenceUpgradeTask">
+        <property name="buildNumber" value="204000001"/>
     </bean>
 </beans>

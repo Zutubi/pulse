@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.HistoryPage;
 import com.zutubi.pulse.master.model.Project;
@@ -44,16 +46,23 @@ public class HistoryDataAction extends ActionSupport
     }
 
     private long projectId = 0;
+    private long agentId = 0;
     private int startPage;
     private String stateFilter = STATE_ANY;
     private HistoryModel model;
 
     private ConfigurationManager configurationManager;
     private BuildManager buildManager;
+    private AgentManager agentManager;
 
     public void setProjectId(long projectId)
     {
         this.projectId = projectId;
+    }
+
+    public void setAgentId(long agentId)
+    {
+        this.agentId = agentId;
     }
 
     public void setStartPage(int page)
@@ -83,6 +92,16 @@ public class HistoryDataAction extends ActionSupport
             }
         }
 
+        Agent agent = null;
+        if (agentId != 0)
+        {
+            agent = agentManager.getAgentById(agentId);
+            if (agent == null)
+            {
+                throw new LookupErrorException("Unknown agent [" + agentId + "]");
+            }
+        }
+
         ResultState[] states = NAME_TO_STATES.get(stateFilter);
         if (states == null)
         {
@@ -90,7 +109,7 @@ public class HistoryDataAction extends ActionSupport
             states = ResultState.getCompletedStates();
         }
         
-        int totalBuilds = buildManager.getBuildCount(project, states);
+        int totalBuilds = agent == null ? buildManager.getBuildCount(project, states) : buildManager.getBuildCount(agent, states);
         int pageCount = (totalBuilds + BUILDS_PER_PAGE - 1) / BUILDS_PER_PAGE;
 
         if (startPage >= pageCount)
@@ -103,7 +122,16 @@ public class HistoryDataAction extends ActionSupport
             startPage = 0;
         }
 
-        HistoryPage page = new HistoryPage(project, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
+        HistoryPage page;
+        if (agent == null)
+        {
+            page = new HistoryPage(project, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
+        }
+        else
+        {
+            page = new HistoryPage(agent, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
+        }
+
         buildManager.fillHistoryPage(page, states);
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
@@ -131,5 +159,10 @@ public class HistoryDataAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

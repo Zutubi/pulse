@@ -104,6 +104,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     BuildResult findLatestSuccessful();
 
+    int getBuildCount(String agent, ResultState[] states);
+    List<BuildResult> findLatestByAgentName(String agent, ResultState[] states, int first, int max);
+
     /**
      * Finds the build result that contains the recipe with the given id.
      *

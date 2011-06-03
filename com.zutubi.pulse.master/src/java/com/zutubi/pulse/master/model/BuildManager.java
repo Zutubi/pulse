@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
 import com.zutubi.tove.security.AccessManager;
@@ -83,6 +84,8 @@ public interface BuildManager
      */
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     int getBuildCount(Project project, long after, long upTo);
+
+    int getBuildCount(Agent agent, ResultState[] states);
 
     /**
      * Fills out the list in the given history page based on the given

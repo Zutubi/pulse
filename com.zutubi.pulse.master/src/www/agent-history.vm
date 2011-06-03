@@ -1,0 +1,34 @@
+#helpTag("Agents+Section")
+#authorisationTags($principle)
+#agentTags()
+<content tag="header.javascript">
+    zutubi/pulse/project/HistoryPanel.js
+</content>
+<html>
+<head>
+    <title>#wwtext("name=agent.history")</title>
+    <script type="text/javascript">
+        var panel = null;
+        
+        Ext.onReady(function() {
+            panel = new Zutubi.pulse.project.HistoryPanel({
+                id: 'agent-history',
+                url: window.baseUrl + '/ajax/historyData.action?agentId=$agent.id&startPage=$startPage&stateFilter=' + encodeURIComponent('$stateFilter'),
+                loadingId: '#id("agent-history-$agent.name")',
+                containerId: 'nested-center',
+                refreshInterval: $refreshInterval,
+                agentId: '$agent.id',
+                columns: '#jss($columns)'.split(','),
+                pagerUrl: '#jss($urls.agentHistory($agent))',
+                stateFilter: '#jss($stateFilter)',
+                anonymous: #if($principle) false #else true #end
+            });
+        });
+    </script>
+</head>
+<body>
+    #agentTabs("history")
+
+    <div id='#id("agent-history-$agent.name")'>
+    </div>
+</html>
