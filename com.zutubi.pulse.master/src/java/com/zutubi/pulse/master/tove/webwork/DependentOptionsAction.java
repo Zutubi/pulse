@@ -10,7 +10,6 @@ import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.bean.ObjectFactory;
 import flexjson.JSON;
 
 import java.util.Arrays;
@@ -30,7 +29,6 @@ public class DependentOptionsAction extends ActionSupport
 {
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
-    private ObjectFactory objectFactory;
 
     /**
      * The path to the object that contains the field whose options
@@ -112,10 +110,4 @@ public class DependentOptionsAction extends ActionSupport
     {
         this.configurationTemplateManager = configurationTemplateManager;
     }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
 }

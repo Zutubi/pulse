@@ -1,14 +1,13 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.zutubi.pulse.master.model.BuildResult;
 import flexjson.JSON;
 
-import java.util.List;
 import java.util.LinkedList;
-
-import com.zutubi.pulse.master.model.BuildResult;
+import java.util.List;
 
 /**
- * The viewport is the data prepresented the build navigation UI.
+ * The viewport is the data representing the build navigation UI.
  */
 public class Viewport
 {

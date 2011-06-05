@@ -7,7 +7,6 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.*;
-import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.*;
 
@@ -18,7 +17,6 @@ public class BrowseDataAction extends ProjectActionSupport
 {
     private BrowseModel model = new BrowseModel();
 
-    private ObjectFactory objectFactory;
     private ConfigurationManager configurationManager;
     private TransactionManager pulseTransactionManager;
 
@@ -66,11 +64,6 @@ public class BrowseDataAction extends ProjectActionSupport
                 return SUCCESS;
             }
         });
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

@@ -17,7 +17,6 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.*;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -36,7 +35,6 @@ public class DashboardDataAction extends ActionSupport
 
     private BuildManager buildManager;
     private ResultNotifier resultNotifier;
-    private ObjectFactory objectFactory;
     private ConfigurationManager configurationManager;
     private TransactionManager pulseTransactionManager;
     
@@ -229,11 +227,6 @@ public class DashboardDataAction extends ActionSupport
     public void setResultNotifier(ResultNotifier resultNotifier)
     {
         this.resultNotifier = resultNotifier;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

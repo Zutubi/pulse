@@ -13,7 +13,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -29,8 +28,6 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     protected TypeRegistry typeRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
-
-    protected ObjectFactory objectFactory;
 
     protected Record record;
     private CompositeType type;
@@ -192,10 +189,5 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 }

@@ -8,22 +8,18 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.xwork.TextProviderSupport;
+import com.zutubi.pulse.master.xwork.actions.project.Viewport;
 import com.zutubi.pulse.master.xwork.interceptor.Cancelable;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.Constants;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.TimeStamps;
-import com.zutubi.util.WebUtils;
+import com.zutubi.util.*;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
 import org.springframework.security.access.AccessDeniedException;
@@ -60,6 +56,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected UserManager userManager;
     protected ConfigurationSecurityManager configurationSecurityManager;
     protected ChangelistDao changelistDao;
+    protected ObjectFactory objectFactory;
     protected String changeUrl;
     private User loggedInUser = null;
 
@@ -328,6 +325,53 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         }
     }
 
+    public Viewport loadBuildNavViewport(long buildId)
+    {
+        Viewport viewport = new Viewport();
+
+        BuildViewport buildViewport = objectFactory.buildBean(BuildViewport.class,
+                new Class[]{Long.TYPE}, new Object[]{buildId}
+        );
+
+        List<BuildResult> builds = buildViewport.getVisibleBuilds();
+        viewport.addAll(CollectionUtils.map(builds, new Mapping<BuildResult, Viewport.Data>()
+        {
+            public Viewport.Data map(BuildResult result)
+            {
+                return new Viewport.Data(result);
+            }
+        }));
+
+        // provide the details for the links.
+        BuildResult nextBrokenBuild = buildViewport.getNextBrokenBuild();
+        if (nextBrokenBuild != null)
+        {
+            viewport.setNextBroken(new Viewport.Data(nextBrokenBuild));
+        }
+        BuildResult nextSuccessfulBuild = buildViewport.getNextSuccessfulBuild();
+        if (nextSuccessfulBuild != null)
+        {
+            viewport.setNextSuccessful(new Viewport.Data(nextSuccessfulBuild));
+        }
+        BuildResult previousBrokenBuild = buildViewport.getPreviousBrokenBuild();
+        if (previousBrokenBuild != null)
+        {
+            viewport.setPreviousBroken(new Viewport.Data(previousBrokenBuild));
+        }
+        BuildResult previousSuccessfulBuild = buildViewport.getPreviousSuccessfulBuild();
+        if (previousSuccessfulBuild != null)
+        {
+            viewport.setPreviousSuccessful(new Viewport.Data(previousSuccessfulBuild));
+        }
+        BuildResult latestBuild = buildViewport.getLatestBuild();
+        if (latestBuild != null && latestBuild.getId() != buildId)
+        {
+            viewport.setLatest(new Viewport.Data(latestBuild));
+        }
+
+        return viewport;
+    }
+
     public String execute() throws Exception
     {
         return super.execute();
@@ -356,5 +400,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

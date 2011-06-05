@@ -13,7 +13,6 @@ import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.bean.ObjectFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
@@ -35,7 +34,6 @@ public class OptionsAction extends ActionSupport
 
     private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
-    private ObjectFactory objectFactory;
 
     public void setParentPath(String parentPath)
     {
@@ -171,10 +169,5 @@ public class OptionsAction extends ActionSupport
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 }

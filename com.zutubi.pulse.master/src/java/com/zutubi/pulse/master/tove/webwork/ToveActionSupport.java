@@ -18,7 +18,6 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
@@ -60,7 +59,6 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     protected MasterConfigurationRegistry configurationRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationProvider configurationProvider;
-    protected ObjectFactory objectFactory;
 
     protected Record record;
     
@@ -309,10 +307,5 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 }

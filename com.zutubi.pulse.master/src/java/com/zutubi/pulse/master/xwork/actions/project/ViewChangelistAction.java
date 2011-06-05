@@ -61,6 +61,8 @@ public class ViewChangelistAction extends ActionSupport
      */
     private List<BuildResult> buildResults;
 
+    private Viewport viewport;
+
     private boolean changeViewerFound;
     private String changeUrl;
     private List<FileModel> fileModels = new LinkedList<FileModel>();
@@ -155,6 +157,15 @@ public class ViewChangelistAction extends ActionSupport
     public void setStartPage(int startPage)
     {
         pagingSupport.setStartPage(startPage);
+    }
+
+    public Viewport getViewport()
+    {
+        if (buildResult != null && viewport == null)
+        {
+            viewport = loadBuildNavViewport(buildResult.getId());
+        }
+        return viewport;
     }
 
     public String execute()

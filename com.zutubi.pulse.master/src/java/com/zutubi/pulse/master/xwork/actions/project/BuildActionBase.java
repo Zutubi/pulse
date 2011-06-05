@@ -3,13 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.model.BuildViewport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-
-import java.util.List;
 
 /**
  * Helper base class for actions under:
@@ -114,54 +109,8 @@ public class BuildActionBase extends ProjectActionBase
     {
         if (viewport == null)
         {
-            loadBuildNavViewport();
+            viewport = loadBuildNavViewport(getBuildId());
         }
         return viewport;
     }
-
-    private void loadBuildNavViewport()
-    {
-        viewport = new Viewport();
-
-        BuildViewport buildViewport = objectFactory.buildBean(BuildViewport.class,
-                new Class[]{Long.TYPE}, new Object[]{getBuildId()}
-        );
-
-        List<BuildResult> builds = buildViewport.getVisibleBuilds();
-        viewport.addAll(CollectionUtils.map(builds, new Mapping<BuildResult, Viewport.Data>()
-        {
-            public Viewport.Data map(BuildResult result)
-            {
-                return new Viewport.Data(result);
-            }
-        }));
-
-        // provide the details for the links.
-        BuildResult nextBrokenBuild = buildViewport.getNextBrokenBuild();
-        if (nextBrokenBuild != null)
-        {
-            viewport.setNextBroken(new Viewport.Data(nextBrokenBuild));
-        }
-        BuildResult nextSuccessfulBuild = buildViewport.getNextSuccessfulBuild();
-        if (nextSuccessfulBuild != null)
-        {
-            viewport.setNextSuccessful(new Viewport.Data(nextSuccessfulBuild));
-        }
-        BuildResult previousBrokenBuild = buildViewport.getPreviousBrokenBuild();
-        if (previousBrokenBuild != null)
-        {
-            viewport.setPreviousBroken(new Viewport.Data(previousBrokenBuild));
-        }
-        BuildResult previousSuccessfulBuild = buildViewport.getPreviousSuccessfulBuild();
-        if (previousSuccessfulBuild != null)
-        {
-            viewport.setPreviousSuccessful(new Viewport.Data(previousSuccessfulBuild));
-        }
-        BuildResult latestBuild = buildViewport.getLatestBuild();
-        if (latestBuild != null && latestBuild.getId() != getBuildId())
-        {
-            viewport.setLatest(new Viewport.Data(latestBuild));
-        }
-    }
-
 }
