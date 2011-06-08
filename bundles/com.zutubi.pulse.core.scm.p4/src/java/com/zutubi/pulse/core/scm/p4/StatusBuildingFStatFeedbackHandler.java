@@ -66,6 +66,10 @@ public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFee
                     {
                         fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, EOLStyle.TEXT.toString());
                     }
+                    else
+                    {
+                        fs.setPayloadType(FileStatus.PayloadType.FULL);
+                    }
 
                     resolveExecutableProperty(fs, type, headType);
                 }

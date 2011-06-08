@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.util.FileSystemUtils;
@@ -23,8 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceWorkingCopyTest extends PerforceTestBase
 {
@@ -368,27 +367,30 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
     }
 
-    public void testCanDiffText() throws ScmException
-    {
-        assertTrue(wc.canDiff(context, "file1"));
-    }
-
-    public void testCanDiffTextOpenForEdit() throws ScmException
-    {
-        openForEdit("file1");
-        assertTrue(wc.canDiff(context, "file1"));
-    }
-
-    public void testCanDiffBinary() throws ScmException
-    {
-        assertFalse(wc.canDiff(context, "bin1"));
-    }
-
-    public void testCanDiffBinaryOpenForEdit() throws ScmException
-    {
-        openForEdit("bin1");
-        assertFalse(wc.canDiff(context, "bin1"));
-    }
+    // These tests have been disabled thanks to a performance hack.
+    // see PerforceWorkingCopy.canDiff for details.
+    
+//    public void testCanDiffText() throws ScmException
+//    {
+//        assertTrue(wc.canDiff(context, "file1"));
+//    }
+//
+//    public void testCanDiffTextOpenForEdit() throws ScmException
+//    {
+//        openForEdit("file1");
+//        assertTrue(wc.canDiff(context, "file1"));
+//    }
+//
+//    public void testCanDiffBinary() throws ScmException
+//    {
+//        assertFalse(wc.canDiff(context, "bin1"));
+//    }
+//
+//    public void testCanDiffBinaryOpenForEdit() throws ScmException
+//    {
+//        openForEdit("bin1");
+//        assertFalse(wc.canDiff(context, "bin1"));
+//    }
 
     public void testDiffTextFile() throws ScmException, PatchParseException, IOException
     {
