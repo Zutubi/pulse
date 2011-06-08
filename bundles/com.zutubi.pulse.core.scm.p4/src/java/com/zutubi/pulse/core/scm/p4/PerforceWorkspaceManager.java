@@ -82,9 +82,19 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         return getWorkspacePrefix() + projectHandle;
     }
 
+    private static boolean isPersonalBuild(ExecutionContext context)
+    {
+        return context.getBoolean(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PERSONAL_BUILD, false);
+    }
+
     static String getSyncWorkspaceName(PerforceConfiguration configuration, ExecutionContext context)
     {
-        return context.resolveVariables(configuration.getSyncWorkspacePattern());
+        String name = context.resolveVariables(configuration.getSyncWorkspacePattern());
+        if (isPersonalBuild(context))
+        {
+            name += "-personal";
+        }
+        return name;
     }
 
     static String getSyncWorkspaceDescription(ExecutionContext context)
@@ -92,7 +102,8 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         String projectName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
         String stageName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_STAGE);
         String agentName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
-        return "Sync workspace for project '" + projectName + "', stage '" + stageName + "' on agent '" + agentName + "'.";
+        String personal = isPersonalBuild(context) ? "personal builds of " : "";
+        return "Sync workspace for " + personal + "project '" + projectName + "', stage '" + stageName + "' on agent '" + agentName + "'.";
     }
 
     /**

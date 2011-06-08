@@ -29,7 +29,7 @@ public class Maven2HomeDirectoryLocator implements FileLocator
         // Search order:
         //   - M2_HOME (the standard env var), verified by running $M2_HOME/bin/mvn{.bat}
         //   - M2, verified by running $M2
-        //   - MAVEN3_HOME, our non-standard version of M2_HOME
+        //   - MAVEN2_HOME, our non-standard version of M2_HOME
         //   - mvn on the path
         Predicate<File> scriptFilePredicate = new Predicate<File>()
         {
