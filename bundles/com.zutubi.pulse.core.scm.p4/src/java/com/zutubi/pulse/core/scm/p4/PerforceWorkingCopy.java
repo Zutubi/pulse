@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.ui.api.UserInterface;
@@ -19,8 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Implementation of {@link WorkingCopy} that interfaces with Perforce by
@@ -43,6 +42,8 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     private static final int GUESS_REVISION_RETRIES = 5;
 
+    private File cachedClientRoot;
+    
     public Set<WorkingCopyCapability> getCapabilities()
     {
         return EnumSet.allOf(WorkingCopyCapability.class);
@@ -231,7 +232,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
     public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         PerforceCore core = createCore(context);
-        WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
+        WorkingCopyStatus status = new WorkingCopyStatus(getClientRoot(core));
         StatusBuildingFStatFeedbackHandler handler = new StatusBuildingFStatFeedbackHandler(context.getUI(), status);
 
         ConfigSupport configSupport = new ConfigSupport(context.getConfig());
@@ -285,17 +286,20 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
     public boolean canDiff(WorkingCopyContext context, String path) throws ScmException
     {
-        FileTypeFStatFeedbackHandler handler = new FileTypeFStatFeedbackHandler();
-        PerforceCore core = createCore(context);
-        File f = new File(core.getClientRoot(), path);
-        core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, f.getAbsolutePath());
-        return handler.isText();
+        // Performance hack: we know this is only called for FileStatuses with
+        // payload type diff, and we earlier ensured that only text files have
+        // that payload type.
+        //
+        // A change of API would allow efficiency without this hack (by batching
+        // files to test for diffable-ness, and/or passing the FileStatus in to
+        // this method rather than just the path).
+        return true;
     }
 
     public void diff(WorkingCopyContext context, String path, OutputStream output) throws ScmException
     {
         PerforceCore core = createCore(context);
-        File f = new File(core.getClientRoot(), path);
+        File f = new File(getClientRoot(core), path);
         final PrintWriter writer = new PrintWriter(output);
 
         // p4 outputs only hunks, no header, so we output a header ourselves
@@ -344,6 +348,16 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         transferPropertyIfSet(config, core, PROPERTY_PORT, ENV_PORT);
         transferPropertyIfSet(config, core, PROPERTY_USER, ENV_USER);
         return core;
+    }
+
+    private File getClientRoot(PerforceCore core) throws ScmException
+    {
+        if (cachedClientRoot == null)
+        {
+            cachedClientRoot = core.getClientRoot();
+        }
+
+        return cachedClientRoot;
     }
 
     private void transferPropertyIfSet(Config config, PerforceCore core, String property, String environmentVariable)
