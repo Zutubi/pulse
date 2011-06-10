@@ -378,9 +378,9 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         stageName: function(name, stage)
         {
-            if (stage.buildLink)
+            if (stage.link)
             {
-                return Zutubi.pulse.project.renderers.link(name, {link: stage.buildLink + 'details/' + encodeURIComponent(stage.name) + '/'});
+                return Zutubi.pulse.project.renderers.link(name, {link: stage.link + 'details/' + encodeURIComponent(stage.name) + '/'});
             }
             else
             {
@@ -407,14 +407,14 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
 
         stageTests: function(testSummary, stage)
         {
-            return Zutubi.pulse.project.renderers.link(testSummary, {link: stage.buildLink + 'tests/' + encodeURIComponent(stage.name) + '/'});
+            return Zutubi.pulse.project.renderers.link(testSummary, {link: stage.link + 'tests/' + encodeURIComponent(stage.name) + '/'});
         },
         
         stageLogs: function(dummy, stage)
         {
-            if (stage.buildLink)
+            if (stage.link)
             {
-                var url = window.baseUrl + '/' + stage.buildLink + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
+                var url = window.baseUrl + '/' + stage.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
                 return '<a title="view log" class="unadorned" href="' + url + '"><img src="' + window.baseUrl + '/images/script.gif" alt="view log"> log</a>';
             }
             else
