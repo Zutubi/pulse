@@ -349,7 +349,7 @@
 ##
 #macro(noteRow $key $span)
     <tr>
-        <th id="$key" class="note" colspan="$span">#wwtext("name=$key")</th>
+        <th id="$key" class="note leftmost rightmost" colspan="$span">#wwtext("name=$key")</th>
     </tr>
 #end
 
@@ -871,7 +871,7 @@
 #end
 
 #macro(buildTestFailures $buildResult)
-    #if($buildResult.hasBrokenTests())
+    #if($buildResult.completed() && $buildResult.hasBrokenTests())
     <table id="failed-tests" class="two-content spaced">
         <tr>
             <th class="two-heading" colspan="5">#wwtext("name=failed.tests")</th>
