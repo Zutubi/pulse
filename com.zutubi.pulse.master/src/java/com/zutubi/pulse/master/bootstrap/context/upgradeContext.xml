@@ -159,6 +159,7 @@
                 <ref local="addServerHistoryColumnsPreference"/>
                 <ref local="addPerforceOptions"/>
                 <ref local="addAgentHistoryColumnsPreference"/>
+                <ref local="removeChangeViewerDetails"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -804,7 +805,7 @@
     <bean id="agentSynchronisationMessageIndices" class="com.zutubi.pulse.master.upgrade.tasks.AgentSynchronisationMessageIndicesUpgradeTask">
         <property name="buildNumber" value="203008001"/>
     </bean>
-
+        
     <bean id="addServerHistoryColumnsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddServerHistoryColumnsPreferenceUpgradeTask">
         <property name="buildNumber" value="203999001"/>
     </bean>
@@ -815,5 +816,9 @@
 
     <bean id="addAgentHistoryColumnsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentHistoryColumnsPreferenceUpgradeTask">
         <property name="buildNumber" value="204000001"/>
+    </bean>
+
+    <bean id="removeChangeViewerDetails" class="com.zutubi.pulse.master.upgrade.tasks.RemoveChangeViewerDetailsUpgradeTask">
+        <property name="buildNumber" value="204000002"/>
     </bean>
 </beans>
