@@ -53,7 +53,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     @Internal
     private String myBuildsColumns = defaultMyBuildsColumns();
     @Internal
-    private String projectRecentColumns = defaultShortProjectColumns();
+    private String projectRecentColumns = defaultProjectColumns();
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
     @Internal
@@ -247,11 +247,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setBrowseView(BrowseViewConfiguration browseView)
     {
         this.browseView = browseView;
-    }
-
-    public static String defaultShortProjectColumns()
-    {
-        return StringUtils.join(",", COLUMN_NUMBER, COLUMN_REVISION, COLUMN_STATUS, COLUMN_REASON, COLUMN_WHEN);
     }
 
     public static String defaultMyBuildsColumns()

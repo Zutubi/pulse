@@ -344,9 +344,6 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             '<li>' +
                 '<img alt="{status}" src="{source}"/> ' +
                 '<a href="{detailsLink}">{name:htmlEncode}</a> ' +
-                '<span class="understated">//</span> ' +
-                '<a class="unadorned" href="{logLink}"><img alt="view stage log" src="{[window.baseUrl]}/images/script.gif"/></a> ' +
-                '<a href="{logLink}">log</a>' +
             '</li>'
         ),
         
@@ -360,8 +357,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                     var stage = stages[i];
                     result += Zutubi.pulse.project.renderers.STAGE_TEMPLATE.apply({
                         name: stage.name,
-                        detailsLink: window.baseUrl + '/' + build.link + 'details/' + encodeURIComponent(stage.name) + '/',
-                        logLink: window.baseUrl + '/' + build.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/',
+                        detailsLink: window.baseUrl + '/' + stage.link + 'details/' + encodeURIComponent(stage.name) + '/',
                         status: stage.status,
                         source: Zutubi.pulse.project.imageSource('status', stage.status)
                     });

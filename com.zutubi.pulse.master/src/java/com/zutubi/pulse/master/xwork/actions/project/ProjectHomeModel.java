@@ -17,7 +17,6 @@ public class ProjectHomeModel
     private ProjectResponsibilityModel responsibility;
     private StatusModel status;
     private List<BuildModel> activity = new LinkedList<BuildModel>();
-    private BuildModel latest;
     private List<BuildModel> recent = new LinkedList<BuildModel>();
     private List<ChangelistModel> changes = new LinkedList<ChangelistModel>();
     private String description;
@@ -51,16 +50,6 @@ public class ProjectHomeModel
         return activity;
     }
     
-    public BuildModel getLatest()
-    {
-        return latest;
-    }
-
-    public void setLatest(BuildModel latest)
-    {
-        this.latest = latest;
-    }
-
     @JSON
     public List<BuildModel> getRecent()
     {
@@ -122,8 +111,9 @@ public class ProjectHomeModel
         private StateModel state;
         private int successRate;
         private StatisticsModel statistics;
+        private List<BuildStageModel> brokenStages;
 
-        public StatusModel(String name, String health, StateModel state, StatisticsModel statistics)
+        public StatusModel(String name, String health, StateModel state, StatisticsModel statistics, List<BuildStageModel> brokenStages)
         {
             this.name = name;
             this.health = health;
@@ -131,6 +121,7 @@ public class ProjectHomeModel
             // errors / terminated states are excluded from the success rate statistic
             this.successRate = (int) Math.round((statistics.getOk()) * 100.0 / (statistics.getFailed() + statistics.getOk()));
             this.statistics = statistics;
+            this.brokenStages = brokenStages;
         }
 
         public String getName()
@@ -156,6 +147,12 @@ public class ProjectHomeModel
         public StatisticsModel getStatistics()
         {
             return statistics;
+        }
+
+        @JSON
+        public List<BuildStageModel> getBrokenStages()
+        {
+            return brokenStages;
         }
     }
 

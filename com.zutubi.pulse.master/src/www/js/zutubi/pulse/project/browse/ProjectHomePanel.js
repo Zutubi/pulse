@@ -20,7 +20,6 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         responsibility: 'responsibility',
         status: 'status',
         activity: 'activity',
-        latest: 'latest',
         recent: 'recent',
         changes: 'changes',
         description: 'description',
@@ -58,14 +57,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         titleTemplate: '{name:htmlEncode}',
                         fields: [
                             {name: 'health'},
+                            {name: 'brokenStages', renderer: Zutubi.pulse.project.renderers.buildStages},
                             {name: 'state', renderer: Zutubi.pulse.project.renderers.projectState},
-                            {name: 'successRate', key: 'success rate', renderer: Zutubi.pulse.project.renderers.projectSuccessRate},
+                            {name: 'successRate', renderer: Zutubi.pulse.project.renderers.projectSuccessRate},
                             {name: 'statistics', renderer: Zutubi.pulse.project.renderers.projectStatistics}
                         ]
                     }, {
                         xtype: 'box'
-                    },
-                    {
+                    }, {
                         xtype: 'xzsummarytable',
                         id: this.id + '-activity',
                         title: 'current activity',
@@ -81,35 +80,13 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                     xtype: 'xzsectionheading',
                     text: 'builds'
                 }, {
-                    xtype: 'container',
-                    layout: 'htable',
-                    items: [{
-                        xtype: 'xzpropertytable',
-                        id: this.id + '-latest',
-                        title: 'latest completed build',
-                        rows: [
-                            Zutubi.pulse.project.configs.build.numberLeft,
-                            Zutubi.pulse.project.configs.result.status,
-                            Zutubi.pulse.project.configs.build.reason,
-                            Zutubi.pulse.project.configs.build.revision,
-                            Zutubi.pulse.project.configs.build.tests,
-                            Zutubi.pulse.project.configs.result.errors,
-                            Zutubi.pulse.project.configs.result.warnings,
-                            Zutubi.pulse.project.configs.result.when,
-                            Zutubi.pulse.project.configs.result.elapsed,
-                            Zutubi.pulse.project.configs.build.stages
-                        ],
-                        emptyMessage: 'no completed builds found'
-                    }, {
-                        xtype: 'box'
-                    }, {
-                        xtype: 'xzbuildsummarytable',
-                        id: this.id + '-recent',
-                        title: 'recently completed builds',
-                        selectedColumns: this.recentColumns,
-                        emptyMessage: 'no historic builds found',
-                        customisable: !this.anonymous
-                    }]
+                    xtype: 'xzbuildsummarytable',
+                    id: this.id + '-recent',
+                    cellCls: 'hpad',
+                    title: 'recently completed builds',
+                    selectedColumns: this.recentColumns,
+                    emptyMessage: 'no historic builds found',
+                    customisable: !this.anonymous
                 }, {
                     xtype: 'xzsectionheading',
                     text: 'changes'

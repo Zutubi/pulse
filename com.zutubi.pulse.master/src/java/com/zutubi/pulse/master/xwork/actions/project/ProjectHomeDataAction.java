@@ -10,11 +10,9 @@ import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.build.queue.QueuedRequest;
 import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.BuildResultToNumberMapping;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectResponsibility;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -25,14 +23,12 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
-import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -65,8 +61,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         BuildQueueSnapshot snapshot = schedulingController.getSnapshot();
         List<QueuedRequest> queued = snapshot.getQueuedRequestsByOwner(project);
         List<BuildResult> inProgress = buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, -1, true, false);
-        List<BuildResult> completed = buildManager.getLatestCompletedBuildResults(project, 11);
-        BuildResult latestCompleted = completed.isEmpty() ? null : completed.remove(0);
+        List<BuildResult> latestCompleted = buildManager.getLatestCompletedBuildResults(project, 10);
         
         // Race detection: anything in our queue snapshot that corresponds to a
         // build number (in progress or even completed) should be filtered out,
@@ -74,7 +69,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         // querying the builds.
         final Set<Long> activatedBuilds = new HashSet<Long>();
         CollectionUtils.map(inProgress, new BuildResultToNumberMapping(), activatedBuilds);
-        CollectionUtils.map(completed, new BuildResultToNumberMapping(), activatedBuilds);
+        CollectionUtils.map(latestCompleted, new BuildResultToNumberMapping(), activatedBuilds);
         queued = CollectionUtils.filter(queued, new Predicate<QueuedRequest>()
         {
             public boolean satisfied(QueuedRequest queuedRequest)
@@ -87,10 +82,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfig = project.getConfig();
         BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(urls, projectConfig.getChangeViewer());
 
-        model = new ProjectHomeModel(createStatusModel(latestCompleted));
+        model = new ProjectHomeModel(createStatusModel(latestCompleted.isEmpty() ? null : latestCompleted.get(0), urls));
         addActivity(queued, inProgress, buildMapping);
-        addLatest(latestCompleted, urls);
-        addRecent(completed, buildMapping);
+        addRecent(latestCompleted, buildMapping);
         addChanges();
         addDescription(projectConfig);
         addLinks(urls);
@@ -99,7 +93,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private ProjectHomeModel.StatusModel createStatusModel(BuildResult latestCompleted)
+    private ProjectHomeModel.StatusModel createStatusModel(final BuildResult latestCompleted, final Urls urls)
     {
         Project project = getProject();
 
@@ -117,7 +111,30 @@ public class ProjectHomeDataAction extends ProjectActionBase
                 buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
         );
         
-        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(latestCompleted)), state, statistics);
+        List<BuildStageModel> brokenStages = null;
+        if (latestCompleted != null)
+        {
+            List<RecipeResultNode> brokenNodes = CollectionUtils.filter(latestCompleted.getRoot().getChildren(), new Predicate<RecipeResultNode>()
+            {
+                public boolean satisfied(RecipeResultNode recipeResultNode)
+                {
+                    return !recipeResultNode.getResult().succeeded();
+                }
+            });
+
+            if (!brokenNodes.isEmpty())
+            {
+                brokenStages = CollectionUtils.map(brokenNodes, new Mapping<RecipeResultNode, BuildStageModel>()
+                {
+                    public BuildStageModel map(RecipeResultNode recipeResultNode)
+                    {
+                        return new BuildStageModel(latestCompleted, recipeResultNode, urls, false);
+                    }
+                });
+            }
+        }
+        
+        return new ProjectHomeModel.StatusModel(project.getName(), EnumUtils.toPrettyString(ProjectHealth.getHealth(latestCompleted)), state, statistics, brokenStages);
     }
 
     private Project.Transition getKeyTransition(Project project, Project.State projectState)
@@ -148,14 +165,6 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfig = getProject().getConfig();
         CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
         CollectionUtils.map(inProgress, buildMapping, model.getActivity());
-    }
-
-    private void addLatest(BuildResult latest, Urls urls)
-    {
-        if (latest != null)
-        {
-            model.setLatest(new BuildModel(latest, urls, true));
-        }
     }
 
     private void addRecent(List<BuildResult> completed, BuildResultToModelMapping buildMapping)

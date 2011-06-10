@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
  */
 public class ProjectHomeAction extends ProjectActionBase
 {
-    private String projectRecentColumns = UserPreferencesConfiguration.defaultShortProjectColumns();
+    private String projectRecentColumns = UserPreferencesConfiguration.defaultProjectColumns();
 
     public String getProjectRecentColumns()
     {
