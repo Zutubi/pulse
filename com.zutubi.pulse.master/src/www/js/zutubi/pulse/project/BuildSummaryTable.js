@@ -15,20 +15,23 @@
 Zutubi.pulse.project.BuildSummaryTable = Ext.extend(Zutubi.table.SummaryTable, {
     initComponent: function()
     {
-        var columns = [];
-        for (var key in Zutubi.pulse.project.configs.result)
-        {
-            columns.push(Zutubi.pulse.project.configs.result[key]);
-        }
-        
-        for (var key in Zutubi.pulse.project.configs.build)
-        {
-            columns.push(Zutubi.pulse.project.configs.build[key]);
-        }
-        
         Ext.applyIf(this, {
             customisable: true,
-            columns: columns,
+            columns: [
+                Zutubi.pulse.project.configs.result.status,
+                Zutubi.pulse.project.configs.result.errors,
+                Zutubi.pulse.project.configs.result.warnings,
+                Zutubi.pulse.project.configs.result.when,
+                Zutubi.pulse.project.configs.result.completed,
+                Zutubi.pulse.project.configs.result.elapsed,
+                Zutubi.pulse.project.configs.build.number,
+                Zutubi.pulse.project.configs.build.project,
+                Zutubi.pulse.project.configs.build.owner,
+                Zutubi.pulse.project.configs.build.reason,
+                Zutubi.pulse.project.configs.build.revision,
+                Zutubi.pulse.project.configs.build.tests,
+                Zutubi.pulse.project.configs.build.maturity            
+            ],
             saveUrl: window.baseUrl + '/ajax/customiseBuildColumns.action',
             saveParams: {
                 tableId: this.id
