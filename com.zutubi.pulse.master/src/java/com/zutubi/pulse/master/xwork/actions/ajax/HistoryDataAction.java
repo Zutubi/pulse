@@ -24,8 +24,6 @@ import java.util.TreeMap;
  */
 public class HistoryDataAction extends ActionSupport
 {
-    public static final int BUILDS_PER_PAGE = 10;
-    
     public static final String STATE_ANY = "";
     public static final String STATE_BROKEN = "broken";
     public static final String STATE_FAILURE = "failure";
@@ -108,9 +106,10 @@ public class HistoryDataAction extends ActionSupport
             stateFilter = STATE_ANY;
             states = ResultState.getCompletedStates();
         }
-        
+
         int totalBuilds = agent == null ? buildManager.getBuildCount(project, states) : buildManager.getBuildCount(agent, states);
-        int pageCount = (totalBuilds + BUILDS_PER_PAGE - 1) / BUILDS_PER_PAGE;
+        int buildsPerPage = HistoryContext.getBuildsPerPage(getLoggedInUser());
+        int pageCount = (totalBuilds + buildsPerPage - 1) / buildsPerPage;
 
         if (startPage >= pageCount)
         {
@@ -125,11 +124,11 @@ public class HistoryDataAction extends ActionSupport
         HistoryPage page;
         if (agent == null)
         {
-            page = new HistoryPage(project, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
+            page = new HistoryPage(project, startPage * buildsPerPage, buildsPerPage);
         }
         else
         {
-            page = new HistoryPage(agent, startPage * BUILDS_PER_PAGE, BUILDS_PER_PAGE);
+            page = new HistoryPage(agent, startPage * buildsPerPage, buildsPerPage);
         }
 
         buildManager.fillHistoryPage(page, states);
@@ -146,7 +145,7 @@ public class HistoryDataAction extends ActionSupport
         }
 
         List<BuildModel> builds = CollectionUtils.map(page.getResults(), toModelMapping);
-        model = new HistoryModel(builds, new PagerModel(page.getTotalBuilds(), BUILDS_PER_PAGE, startPage));
+        model = new HistoryModel(builds, new PagerModel(page.getTotalBuilds(), buildsPerPage, startPage));
 
         return SUCCESS;
     }

@@ -160,6 +160,7 @@
                 <ref local="addPerforceOptions"/>
                 <ref local="addAgentHistoryColumnsPreference"/>
                 <ref local="removeChangeViewerDetails"/>
+                <ref local="addHistoryBuildsPreference"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -820,5 +821,9 @@
 
     <bean id="removeChangeViewerDetails" class="com.zutubi.pulse.master.upgrade.tasks.RemoveChangeViewerDetailsUpgradeTask">
         <property name="buildNumber" value="204000002"/>
+    </bean>
+
+    <bean id="addHistoryBuildsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddHistoryBuildsPreferenceUpgradeTask">
+        <property name="buildNumber" value="204000003"/>
     </bean>
 </beans>

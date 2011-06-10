@@ -4,13 +4,13 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.server.ServerHistoryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
+import static java.util.Arrays.asList;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
@@ -87,26 +87,26 @@ public class ServerHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ServerHistoryPage historyPage = getBrowser().openAndWaitFor(ServerHistoryPage.class);
-        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, DEFAULT_HISTORY_BUILDS_PER_PAGE), historyPage.getBuilds());
 
         // Step forward
         historyPage.getPager().clickNext();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(BUILD_COUNT - HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(BUILD_COUNT - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertLastPage(historyPage, 2, BUILD_COUNT);
-        assertEquals(builds.subList(HistoryDataAction.BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
+        assertEquals(builds.subList(DEFAULT_HISTORY_BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
 
         // Step backward
         historyPage.getPager().clickFirst();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, DEFAULT_HISTORY_BUILDS_PER_PAGE), historyPage.getBuilds());
     }
 }

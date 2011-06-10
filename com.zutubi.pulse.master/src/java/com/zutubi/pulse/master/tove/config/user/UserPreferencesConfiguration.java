@@ -31,6 +31,8 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public static final String COLUMN_WHEN = "when";
     public static final String COLUMN_ELAPSED = "elapsed";
     
+    public static final int DEFAULT_HISTORY_BUILDS_PER_PAGE = 10;
+
     @StringList
     private List<String> aliases = new LinkedList<String>();
     @Select(optionProvider = "DefaultActionOptionProvider")
@@ -60,7 +62,9 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private String serverHistoryColumns = defaultGlobalColumns();
     @Internal
     private String agentHistoryColumns = defaultGlobalColumns();
-
+    @Internal
+    private int historyBuildsPerPage = DEFAULT_HISTORY_BUILDS_PER_PAGE;
+    
     @Internal
     private ProjectDependencyGraphBuilder.TransitiveMode dependencyTransitiveMode = ProjectDependencyGraphBuilder.TransitiveMode.FULL;
 
@@ -192,6 +196,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setAgentHistoryColumns(String agentHistoryColumns)
     {
         this.agentHistoryColumns = agentHistoryColumns;
+    }
+
+    public int getHistoryBuildsPerPage()
+    {
+        return historyBuildsPerPage;
+    }
+
+    public void setHistoryBuildsPerPage(int historyBuildsPerPage)
+    {
+        this.historyBuildsPerPage = historyBuildsPerPage;
     }
 
     public ProjectDependencyGraphBuilder.TransitiveMode getDependencyTransitiveMode()

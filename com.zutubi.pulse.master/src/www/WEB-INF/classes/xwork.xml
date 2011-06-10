@@ -542,6 +542,11 @@
             <result name="success" type="httpheader">200</result>
         </action>
 
+        <action name="customiseHistoryBuilds" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseHistoryBuildsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="httpheader">200</result>
+        </action>
+
         <action name="setDependenciesTransitiveMode" class="com.zutubi.pulse.master.xwork.actions.user.SetDependenciesTransitiveModeAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">result</result>

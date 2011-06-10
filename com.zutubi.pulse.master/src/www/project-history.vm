@@ -21,6 +21,7 @@
                 columns: '#jss($columns)'.split(','),
                 pagerUrl: '#jss($urls.projectHistory($project))',
                 stateFilter: '#jss($stateFilter)',
+                buildsPerPage: $buildsPerPage,
                 anonymous: #if($principle) false #else true #end
             });
         });

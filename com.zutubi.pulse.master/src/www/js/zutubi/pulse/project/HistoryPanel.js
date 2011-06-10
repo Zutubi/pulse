@@ -71,6 +71,31 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                                 panel.setFilter();
                             }
                         }
+                    }, ' ', ' ', ' ', ' ', {
+                        xtype: 'label',
+                        text: 'builds per page:'
+                    }, ' ', {
+                        xtype: 'textfield',
+                        id: 'builds-per-page',
+                        width: 30,
+                        value: this.buildsPerPage,
+                        listeners: {
+                            specialkey: function(c, e) {
+                                if (e.getKey() == e.RETURN)
+                                {
+                                    panel.updateBuildsPerPage();
+                                }
+                            }
+                        }
+                    }, {
+                        xtype: 'xztblink',
+                        icon: window.baseUrl + '/images/arrow_refresh.gif',
+                        text: 'update',
+                        listeners: {
+                            click: function() {
+                                panel.updateBuildsPerPage();
+                            }
+                        }
                     }, '->', {
                         xtype: 'xztblink',
                         icon: window.baseUrl + '/images/feed-icon-16x16.gif',
@@ -113,5 +138,24 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
         }
         
         window.location.href = location;
+    },
+    
+    updateBuildsPerPage: function()
+    {
+        var panel = this;
+        var toolbar = Ext.get('build-toolbar');
+        toolbar.mask();
+        Ext.Ajax.request({
+            url: window.baseUrl + '/ajax/customiseHistoryBuilds.action',
+            params: {'buildsPerPage': Ext.get('builds-per-page').getValue() },
+            success: function() {
+                panel.load(function() {
+                    toolbar.unmask();
+                });
+            },
+            failure: function() {
+                toolbar.unmask();
+            }
+        });
     }
 });

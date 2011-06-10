@@ -3,11 +3,10 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.components.Pager;
 import com.zutubi.pulse.acceptance.pages.AbstractHistoryPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import static java.util.Arrays.asList;
 
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * Helper base class for build history acceptance tests.
@@ -46,7 +45,7 @@ public class HistoryAcceptanceTestBase extends AcceptanceTestBase
     protected void assertBuildHistory(AbstractHistoryPage historyPage, List<BuildInfo> builds)
     {
         assertEquals(builds.size(), historyPage.getBuildCount());
-        if (builds.size() <= HistoryDataAction.BUILDS_PER_PAGE)
+        if (builds.size() <= UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE)
         {
             assertNoPaging(historyPage, builds.size());
         }

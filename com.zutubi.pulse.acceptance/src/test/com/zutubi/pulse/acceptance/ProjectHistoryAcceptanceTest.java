@@ -1,8 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
@@ -11,13 +18,6 @@ import com.zutubi.util.Predicate;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 
 public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 {
@@ -103,27 +103,27 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ProjectHistoryPage historyPage = getBrowser().openAndWaitFor(ProjectHistoryPage.class, random);
-        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, DEFAULT_HISTORY_BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Step forward
         historyPage.getPager().clickNext();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(BUILD_COUNT - HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(BUILD_COUNT - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertLastPage(historyPage, 2, BUILD_COUNT);
-        assertEquals(builds.subList(HistoryDataAction.BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
+        assertEquals(builds.subList(DEFAULT_HISTORY_BUILDS_PER_PAGE, builds.size()), historyPage.getBuilds());
 
         // Step backward
         historyPage.getPager().clickFirst();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, BUILD_COUNT);
-        assertEquals(builds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(builds.subList(0, DEFAULT_HISTORY_BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Filter to broken
         setFilterAndWait(historyPage, HistoryDataAction.STATE_BROKEN);
@@ -149,17 +149,17 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
             }
         });
         
-        assertEquals(HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertFirstPage(historyPage, successfulBuilds.size());
-        assertEquals(successfulBuilds.subList(0, HistoryDataAction.BUILDS_PER_PAGE), historyPage.getBuilds());
+        assertEquals(successfulBuilds.subList(0, DEFAULT_HISTORY_BUILDS_PER_PAGE), historyPage.getBuilds());
         
         // Step forward, ensure the filter is maintained.
         historyPage.getPager().clickLast();
         getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
-        assertEquals(successfulBuilds.size() - HistoryDataAction.BUILDS_PER_PAGE, historyPage.getBuildCount());
+        assertEquals(successfulBuilds.size() - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
         assertLastPage(historyPage, 2, successfulBuilds.size());
-        assertEquals(successfulBuilds.subList(HistoryDataAction.BUILDS_PER_PAGE, successfulBuilds.size()), historyPage.getBuilds());
+        assertEquals(successfulBuilds.subList(DEFAULT_HISTORY_BUILDS_PER_PAGE, successfulBuilds.size()), historyPage.getBuilds());
     }
 }

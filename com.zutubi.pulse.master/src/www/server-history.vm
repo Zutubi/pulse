@@ -21,6 +21,7 @@
                 columns: '#jss($columns)'.split(','),
                 pagerUrl: '#jss($urls.serverHistory())',
                 stateFilter: '#jss($stateFilter)',
+                buildsPerPage: $buildsPerPage,
                 anonymous: #if($principle) false #else true #end
             });
         });
