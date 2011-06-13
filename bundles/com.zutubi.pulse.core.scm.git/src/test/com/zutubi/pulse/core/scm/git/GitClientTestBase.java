@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 
@@ -48,7 +49,7 @@ public abstract class GitClientTestBase extends PulseTestCase
         repositoryBase = new File(tmp, "repo");
         repository = "file://" + repositoryBase.getCanonicalPath();
 
-        client = new GitClient(repository, "master", 0, false);
+        client = new GitClient(repository, "master", 0, GitConfiguration.CloneType.NORMAL);
 
         workingDir = new File(tmp, "wd");
         context = new PulseExecutionContext();

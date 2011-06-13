@@ -8,9 +8,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +16,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class NativeGitTest extends PulseTestCase
 {
@@ -81,7 +82,7 @@ public class NativeGitTest extends PulseTestCase
     public void testClone() throws ScmException, IOException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(new RecordingScmFeedbackHandler(), repository, "base");
+        git.clone(new RecordingScmFeedbackHandler(), repository, "base", false);
 
         File cloneBase = new File(tmp, "base");
         assertTrue(new File(cloneBase, ".git").isDirectory());
@@ -95,7 +96,7 @@ public class NativeGitTest extends PulseTestCase
     {
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         git.setWorkingDirectory(tmp);
-        git.clone(handler,  repository, "base");
+        git.clone(handler,  repository, "base", false);
 
         assertThat(handler.getStatusMessages().size(), greaterThan(1));
         assertThat(handler.getStatusMessages(), hasItem(startsWith("Initialized empty Git repository")));
@@ -104,7 +105,7 @@ public class NativeGitTest extends PulseTestCase
     public void testLog() throws ScmException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
         git.setWorkingDirectory(new File(tmp, "base"));
 
         assertEquals(2, git.log().size());
@@ -113,7 +114,7 @@ public class NativeGitTest extends PulseTestCase
     public void testLogHead() throws ScmException, ParseException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
         git.setWorkingDirectory(new File(tmp, "base"));
 
         List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
@@ -125,7 +126,7 @@ public class NativeGitTest extends PulseTestCase
     public void testLogCount() throws ScmException, ParseException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
         git.setWorkingDirectory(new File(tmp, "base"));
 
         List<GitLogEntry> entries = git.log(1);
@@ -148,7 +149,7 @@ public class NativeGitTest extends PulseTestCase
     public void testBranchOnCloneRepository() throws ScmException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
         git.setWorkingDirectory(new File(tmp, "base"));
 
         List<GitBranchEntry> branches = git.branch();
@@ -161,7 +162,7 @@ public class NativeGitTest extends PulseTestCase
     public void testCheckoutBranch() throws ScmException, IOException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
 
         File cloneBase = new File(tmp, "base");
         git.setWorkingDirectory(cloneBase);
@@ -270,7 +271,7 @@ public class NativeGitTest extends PulseTestCase
     public void testPull() throws ScmException, IOException
     {
         git.setWorkingDirectory(tmp);
-        git.clone(null, repository, "base");
+        git.clone(null, repository, "base", false);
 
         git.setWorkingDirectory(new File(tmp, "base"));
         git.pull(null);

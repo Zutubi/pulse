@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.scm.ExpectedTestResults;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackAdapter;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 
 import java.io.File;
@@ -30,7 +31,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         URL url = getClass().getResource("GitClientIntegrationTest.git.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
-        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, false);
+        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, GitConfiguration.CloneType.NORMAL);
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 

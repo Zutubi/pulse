@@ -44,6 +44,7 @@ public class GitConstants
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
+    public static final String FLAG_MIRROR = "--mirror";
     public static final String FLAG_NAME_STATUS = "--name-status";
     public static final String FLAG_PRETTY = "--pretty";
     public static final String FLAG_CHANGES = "-n";
@@ -99,4 +100,7 @@ public class GitConstants
      * File has been deleted
      */
     public static final String ACTION_DELETED =  "D";
+
+    public static final String CONFIG_TYPE_BOOLEAN = "--bool";
+    public static final String CONFIG_BARE = "core.bare";
 }

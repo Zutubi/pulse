@@ -3,16 +3,12 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +18,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class GitClientTest extends GitClientTestBase
 {
@@ -90,8 +92,20 @@ public class GitClientTest extends GitClientTestBase
 
     public void testCheckoutSelectedBranch() throws ScmException, ParseException
     {
-        client.setTrackSelectedBranch(true);
+        client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
         checkoutBranchHelper();
+    }
+
+    public void testCheckoutFullMirror() throws ScmException, ParseException
+    {
+        client.setCloneType(GitConfiguration.CloneType.FULL_MIRROR);
+        Revision rev = client.checkout(context, null, handler);
+
+        assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
+
+        assertLatestCheckedOut();
+
+        assertThat(handler.getStatusMessages().size(), greaterThan(0));
     }
 
     private void checkoutBranchHelper() throws ScmException
@@ -124,7 +138,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testCheckoutToRevisionSelectedBranch() throws ScmException, ParseException
     {
-        client.setTrackSelectedBranch(true);
+        client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
         checkoutBranchToRevisionHelper();
     }
 
@@ -287,7 +301,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testUpdateSelectedBranch() throws ScmException
     {
-        client.setTrackSelectedBranch(true);
+        client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
         updateOnBranchHelper();
     }
 
@@ -312,7 +326,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testUpdateToLatestSelectedBranch() throws ScmException, IOException, ParseException
     {
-        client.setTrackSelectedBranch(true);
+        client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
         updateToLatestOnBranchHelper();
     }
 
@@ -336,7 +350,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testUpdateToRevisionSelectedBranch() throws ScmException, IOException, ParseException
     {
-        client.setTrackSelectedBranch(true);
+        client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
         updateToRevisionHelper();
     }
 
@@ -576,7 +590,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testTestConnectionBadRepo()
     {
-        client = new GitClient("file:///no/such/repo", "master", 0, false);
+        client = new GitClient("file:///no/such/repo", "master", 0, GitConfiguration.CloneType.NORMAL);
         try
         {
             client.testConnection();
@@ -590,7 +604,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testTestConnectionBadBranch()
     {
-        client = new GitClient(repository, "nosuchbranch", 0, false);
+        client = new GitClient(repository, "nosuchbranch", 0, GitConfiguration.CloneType.NORMAL);
         try
         {
             client.testConnection();

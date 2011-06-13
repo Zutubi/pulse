@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.process.api.*;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
@@ -19,6 +18,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
@@ -85,9 +86,14 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_INIT);
     }
 
-    public void clone(ScmFeedbackHandler handler, String repository, String dir) throws ScmException
+    public void clone(ScmFeedbackHandler handler, String repository, String dir, boolean mirror) throws ScmException
     {
-        run(handler, getGitCommand(), COMMAND_CLONE, FLAG_NO_CHECKOUT, repository, dir);
+        run(handler, getGitCommand(), COMMAND_CLONE, mirror ? FLAG_MIRROR : FLAG_NO_CHECKOUT, repository, dir);
+    }
+
+    public void config(ScmFeedbackHandler handler, String name, boolean value) throws ScmException
+    {
+        run(handler, getGitCommand(), COMMAND_CONFIG, CONFIG_TYPE_BOOLEAN, name, Boolean.toString(value));
     }
 
     public void remoteAdd(ScmFeedbackHandler handler, String name, String repository, String branch) throws ScmException

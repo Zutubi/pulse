@@ -161,6 +161,7 @@
                 <ref local="addAgentHistoryColumnsPreference"/>
                 <ref local="removeChangeViewerDetails"/>
                 <ref local="addHistoryBuildsPreference"/>
+                <ref local="addGitCloneType"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -825,5 +826,9 @@
 
     <bean id="addHistoryBuildsPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddHistoryBuildsPreferenceUpgradeTask">
         <property name="buildNumber" value="204000003"/>
+    </bean>
+
+    <bean id="addGitCloneType" class="com.zutubi.pulse.master.upgrade.tasks.AddGitCloneTypeUpgradeTask">
+        <property name="buildNumber" value="204000004"/>
     </bean>
 </beans>

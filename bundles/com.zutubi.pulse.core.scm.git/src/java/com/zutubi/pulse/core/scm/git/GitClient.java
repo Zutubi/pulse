@@ -4,18 +4,20 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -84,25 +86,18 @@ public class GitClient implements ScmClient
      * no timeout should be applied.
      */
     private int inactivityTimeout;
-    /**
-     * If true, only the specified branch will be tracked from the remote
-     * repository.  The default behaviour when checking out is to perform a
-     * full clone of the remote repository.  When this option is true, however,
-     * a cut-down clone is done using remote-add to only track the specified
-     * branch.
-     */
-    private boolean trackSelectedBranch;
+    private GitConfiguration.CloneType cloneType;
     /**
      * The list of scm paths to be excluded from log requests.
      */
     private List<String> excludedPaths = new LinkedList<String>();
 
-    public GitClient(String repository, String branch, int inactivityTimeout, boolean trackSelectedBranch)
+    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType)
     {
         this.repository = repository;
         this.branch = branch;
         this.inactivityTimeout = inactivityTimeout;
-        this.trackSelectedBranch = trackSelectedBranch;
+        this.cloneType = cloneType;
     }
 
     /**
@@ -126,7 +121,7 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
-        git.clone(handler, repository, workingDir.getName());
+        git.clone(handler, repository, workingDir.getName(), false);
         handler.status("Repository cloned.");
     }
 
@@ -192,27 +187,45 @@ public class GitClient implements ScmClient
 
         NativeGit git = new NativeGit(inactivityTimeout);
 
-        if (trackSelectedBranch)
+        switch (cloneType)
         {
-            if (!workingDir.mkdir())
+            case SELECTED_BRANCH_ONLY:
             {
-                throw new ScmException("Could not create directory '" + workingDir.getAbsolutePath() + "'");
-            }
+                if (!workingDir.mkdir())
+                {
+                    throw new ScmException("Could not create directory '" + workingDir.getAbsolutePath() + "'");
+                }
 
-            git.setWorkingDirectory(workingDir);
-            // git init
-            // git remote add -f -t <branch> -m <branch> origin <repository>
-            // git merge origin
-            git.init(handler);
-            git.remoteAdd(handler, REMOTE_ORIGIN, repository, branch);
-            git.merge(handler, REMOTE_ORIGIN);
-        }
-        else
-        {
-            // git clone -n <repository> dir
-            git.setWorkingDirectory(workingDir.getParentFile());
-            git.clone(handler, repository, workingDir.getName());
-            git.setWorkingDirectory(workingDir);
+                git.setWorkingDirectory(workingDir);
+                // git init
+                // git remote add -f -t <branch> -m <branch> origin <repository>
+                // git merge origin
+                git.init(handler);
+                git.remoteAdd(handler, REMOTE_ORIGIN, repository, branch);
+                git.merge(handler, REMOTE_ORIGIN);
+                break;
+            }
+            case NORMAL:
+            {
+                // git clone -n <repository> <dir>
+                git.setWorkingDirectory(workingDir.getParentFile());
+                git.clone(handler, repository, workingDir.getName(), false);
+                git.setWorkingDirectory(workingDir);
+                break;
+            }
+            case FULL_MIRROR:
+            {
+                // git clone --mirror <repository> <dir>/.git
+                if (!workingDir.mkdir())
+                {
+                    throw new ScmException("Could not create directory '" + workingDir.getAbsolutePath() + "'");
+                }
+
+                git.setWorkingDirectory(workingDir);
+                git.clone(handler, repository, GIT_REPOSITORY_DIRECTORY, true);
+                git.config(handler, CONFIG_BARE, false);
+                break;
+            }
         }
 
         git.checkout(handler, getRemoteBranchRef(), LOCAL_BRANCH_NAME);
@@ -581,7 +594,14 @@ public class GitClient implements ScmClient
 
     private String getRemoteBranchRef()
     {
-        return REMOTE_ORIGIN + "/" + branch;
+        if (cloneType == GitConfiguration.CloneType.FULL_MIRROR)
+        {
+            return branch;
+        }
+        else
+        {
+            return REMOTE_ORIGIN + "/" + branch;
+        }
     }
 
     private String getRevisionString(Revision revision)
@@ -611,9 +631,9 @@ public class GitClient implements ScmClient
         this.excludedPaths = excludedPaths;
     }
 
-    public void setTrackSelectedBranch(boolean trackSelectedBranch)
+    public void setCloneType(GitConfiguration.CloneType cloneType)
     {
-        this.trackSelectedBranch = trackSelectedBranch;
+        this.cloneType = cloneType;
     }
 
     public void testConnection() throws ScmException

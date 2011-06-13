@@ -13,11 +13,19 @@ import com.zutubi.validation.annotations.Required;
 @Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
+    public enum CloneType
+    {
+        SELECTED_BRANCH_ONLY,
+        NORMAL,
+        FULL_MIRROR
+    }
+
     @Required
     private String repository;
     @Required
     private String branch = "master";
-    private boolean trackSelectedBranch = false;
+    @Required
+    private CloneType cloneType = GitConfiguration.CloneType.NORMAL;
     @ControllingCheckbox(checkedFields = "inactivityTimeoutSeconds") @Wizard.Ignore
     private boolean inactivityTimeoutEnabled = false;
     @Wizard.Ignore
@@ -49,14 +57,14 @@ public class GitConfiguration extends PollableScmConfiguration
         return branch;
     }
 
-    public boolean isTrackSelectedBranch()
+    public CloneType getCloneType()
     {
-        return trackSelectedBranch;
+        return cloneType;
     }
 
-    public void setTrackSelectedBranch(boolean trackSelectedBranch)
+    public void setCloneType(CloneType cloneType)
     {
-        this.trackSelectedBranch = trackSelectedBranch;
+        this.cloneType = cloneType;
     }
 
     public boolean isInactivityTimeoutEnabled()
