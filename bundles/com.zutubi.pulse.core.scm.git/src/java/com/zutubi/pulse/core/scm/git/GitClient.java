@@ -121,7 +121,7 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
-        git.clone(handler, repository, workingDir.getName(), false);
+        git.clone(handler, repository, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR);
         handler.status("Repository cloned.");
     }
 
