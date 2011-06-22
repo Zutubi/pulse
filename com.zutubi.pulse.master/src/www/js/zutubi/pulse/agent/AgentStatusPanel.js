@@ -72,7 +72,8 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
                     }, {
                         id: this.id + '-status',
                         xtype: 'xzkeyvaluetable',
-                        title: 'agent status'
+                        title: 'agent status',
+                        lengthLimit: 196
                     }, {
                         id: this.id + '-executingStage',
                         xtype: 'xzexecutingstagetable',

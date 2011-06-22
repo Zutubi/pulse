@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.agent.DefaultAgent;
 import com.zutubi.pulse.master.agent.Host;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -38,17 +39,17 @@ public class AgentStatusDataAction extends AgentActionBase
 
         if (agent.isEnabled())
         {
-            String status;
+            String prettyStatus;
             if (agent.isDisabling())
             {
-                status = I18N.format("disable.on.idle");
+                prettyStatus = I18N.format("disable.on.idle");
             }
             else
             {
-                status = agent.getStatus().getPrettyString();
+                prettyStatus = agent.getStatus().getPrettyString();
             }
 
-            model.addStatus(I18N.format("agent.status"), status);
+            addAgentStatus(agent.getStatus(), prettyStatus);
 
             if (host.isUpgrading())
             {
@@ -99,7 +100,7 @@ public class AgentStatusDataAction extends AgentActionBase
         }
         else
         {
-            model.addStatus(I18N.format("agent.status"), agent.getStatus().getPrettyString());
+            addAgentStatus(agent.getStatus(), agent.getStatus().getPrettyString());
         }
 
         List<AgentSynchronisationMessage> synchronisationMessages = new LinkedList<AgentSynchronisationMessage>(agentManager.getSynchronisationMessages(agent.getId()));
@@ -107,6 +108,16 @@ public class AgentStatusDataAction extends AgentActionBase
         model.addSynchronisationMessages(synchronisationMessages);
 
         return SUCCESS;
+    }
+
+    private void addAgentStatus(AgentStatus status, String prettyStatus)
+    {
+        model.addStatus(I18N.format("agent.status"), prettyStatus);
+        String descriptionKey = status.name() + ".description";
+        if (I18N.isKeyDefined(descriptionKey))
+        {
+            model.addStatus(I18N.format("agent.status.description"), I18N.format(descriptionKey));
+        }
     }
 
     public void setBuildManager(BuildManager buildManager)
