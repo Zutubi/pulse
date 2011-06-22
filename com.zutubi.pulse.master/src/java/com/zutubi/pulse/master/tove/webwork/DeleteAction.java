@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.tove.config.cleanup.HideRecordCleanupTask;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.type.CollectionType;
+import com.zutubi.tove.type.ComplexType;
+import com.zutubi.tove.type.ListType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -13,11 +15,19 @@ import com.zutubi.validation.i18n.TextProvider;
  */
 public class DeleteAction extends ToveActionSupport
 {
+    private static final String ACTION_CANCEL_DIRECT = "canceldirect";
+    private static final String ACTION_CONFIRM_DIRECT = "confirmdirect";
+    
     private RecordCleanupTask task;
     private String parentPath;
     private ConfigurationPanel newPanel;
 
     private TextProvider textProvider;
+
+    public boolean isDirect()
+    {
+        return isSelected(ACTION_CONFIRM_DIRECT);
+    }
 
     public boolean isHide()
     {
@@ -44,11 +54,37 @@ public class DeleteAction extends ToveActionSupport
         return textProvider;
     }
 
+    @Override
+    public boolean isCancelled()
+    {
+        return super.isCancelled() || isSelected(ACTION_CANCEL_DIRECT);
+    }
+
+    @Override
+    public boolean isConfirmSelected()
+    {
+        return isSelected(ACTION_CONFIRM) || isSelected(ACTION_CONFIRM_DIRECT);
+    }
+
     public void doCancel()
     {
+        boolean isListItem = false;
         parentPath = PathUtils.getParentPath(path);
-        response = new ConfigurationResponse(parentPath, configurationTemplateManager.getTemplatePath(path));
-        path = response.getNewPath();
+        if (parentPath != null)
+        {
+            ComplexType parentType = configurationTemplateManager.getType(parentPath);
+            isListItem = parentType instanceof ListType;
+        }
+        
+        if (!isListItem && isSelected(ACTION_CANCEL_DIRECT))
+        {
+            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));            
+        }
+        else
+        {
+            response = new ConfigurationResponse(parentPath, configurationTemplateManager.getTemplatePath(path));
+            path = response.getNewPath();
+        }
     }
 
     public String execute() throws Exception

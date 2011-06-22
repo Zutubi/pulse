@@ -113,7 +113,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         return isSelected(ACTION_FINISH);
     }
 
-    private boolean isSelected(String s)
+    public boolean isSelected(String s)
     {
         return s.equals(submitField);
     }
