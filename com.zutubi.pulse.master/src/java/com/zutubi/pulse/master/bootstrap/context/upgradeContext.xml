@@ -162,6 +162,7 @@
                 <ref local="removeChangeViewerDetails"/>
                 <ref local="addHistoryBuildsPreference"/>
                 <ref local="addGitCloneType"/>
+                <ref local="updateTimeReportLabel"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -830,5 +831,9 @@
 
     <bean id="addGitCloneType" class="com.zutubi.pulse.master.upgrade.tasks.AddGitCloneTypeUpgradeTask">
         <property name="buildNumber" value="204000004"/>
+    </bean>
+
+    <bean id="updateTimeReportLabel" class="com.zutubi.pulse.master.upgrade.tasks.UpdateTimeReportLabelUpgradeTask">
+        <property name="buildNumber" value="204000005"/>
     </bean>
 </beans>

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.master.upgrade.UpgradeException;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
@@ -37,6 +37,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
 {
     protected RecordManager recordManager;
     protected TransactionManager transactionManager;
+    protected PersistentScopes persistentScopes;
 
     public void execute() throws UpgradeException
     {
@@ -69,11 +70,10 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     {
         // Create the details lazily as it takes some time and will not
         // be necessary for all tasks.
-        PersistentScopes scopes = new PersistentScopes(recordManager);
-        wireScopes(recordLocator, scopes);
+        wireScopes(recordLocator, persistentScopes);
         for (RecordUpgrader upgrader: recordUpgraders)
         {
-            wireScopes(upgrader, scopes);
+            wireScopes(upgrader, persistentScopes);
         }
     }
 
@@ -109,6 +109,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+        persistentScopes = new PersistentScopes(recordManager);
     }
 
     public void setPulseTransactionManager(TransactionManager transactionManager)
