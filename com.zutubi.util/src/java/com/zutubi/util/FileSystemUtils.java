@@ -1269,7 +1269,7 @@ public class FileSystemUtils
         }
     }
 
-    static void javaCopy(File dest, File... src) throws IOException
+    public static void javaCopy(File dest, File... src) throws IOException
     {
         if (src.length == 1)
         {
@@ -1291,7 +1291,7 @@ public class FileSystemUtils
             else if (singleSource.isDirectory())
             {
                 ensureEmptyDirectory(dest);
-                internalCopy(singleSource, dest);
+                recursiveCopy(dest, singleSource);
             }
             else
             {
@@ -1306,16 +1306,21 @@ public class FileSystemUtils
             for (File f : src)
             {
                 // copy into dest directory.
-                internalCopy(f, new File(dest, f.getName()));
+                recursiveCopy(new File(dest, f.getName()), f);
             }
         }
     }
 
     // WARNING: will not handle recursive symlinks
-    protected static void internalCopy(File src, File dest) throws IOException
+    public static void recursiveCopy(File dest, File src, String... excludeDirs) throws IOException
     {
         if (src.isDirectory())
         {
+            if (CollectionUtils.contains(excludeDirs, src.getName()))
+            {
+                return;
+            }
+
             if (!dest.isDirectory() && !dest.mkdirs())
             {
                 throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getAbsolutePath()));
@@ -1323,7 +1328,7 @@ public class FileSystemUtils
 
             for (String file : list(src))
             {
-                internalCopy(new File(src, file), new File(dest, file));
+                recursiveCopy(new File(dest, file), new File(src, file), excludeDirs);
             }
         }
         else

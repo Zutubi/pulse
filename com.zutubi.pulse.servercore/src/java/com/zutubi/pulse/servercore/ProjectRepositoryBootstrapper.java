@@ -6,15 +6,16 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.copy;
-import static com.zutubi.util.FileSystemUtils.getNormalisedAbsolutePath;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.util.FileSystemUtils.*;
 
 /**
  * The Project Repository Bootstrapper checks out a project into the project recipes
@@ -55,12 +56,14 @@ public class ProjectRepositoryBootstrapper extends BootstrapperSupport
 
         childBootstrapper = selectBootstrapper(bootstrapperPaths.getBaseDir());
 
+        String ignoreDirs;
         context.push();
         try
         {
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, bootstrapperPaths);
             context.setWorkingDir(bootstrapperPaths.getBaseDir());
             childBootstrapper.bootstrap(commandContext);
+            ignoreDirs = context.getString(NAMESPACE_INTERNAL, PROPERTY_IGNORE_DIRS);
         }
         finally
         {
@@ -72,13 +75,21 @@ public class ProjectRepositoryBootstrapper extends BootstrapperSupport
         // to the base, this implies a CLEAN_UPDATE checkout scheme.
         if(!paths.getBaseDir().equals(bootstrapperPaths.getBaseDir()))
         {
+            writeFeedback("Copying source from " + getNormalisedAbsolutePath(bootstrapperPaths.getBaseDir()) +
+                    " to " + getNormalisedAbsolutePath(paths.getBaseDir()) + ".  This may take some time.");
             try
             {
-                // log this action to the build log.
-                writeFeedback("Copying source from " + getNormalisedAbsolutePath(bootstrapperPaths.getBaseDir()) +
-                        " to " + getNormalisedAbsolutePath(paths.getBaseDir()) + ".  This may take some time.");
-
-                copy(paths.getBaseDir(), bootstrapperPaths.getBaseDir());
+                if (StringUtils.stringSet(ignoreDirs))
+                {
+                    writeFeedback("Excluding directories with names: '" + ignoreDirs + "'.");
+                    String[] excludes = StringUtils.split(ignoreDirs, ',');
+                    ensureEmptyDirectory(paths.getBaseDir());
+                    recursiveCopy(paths.getBaseDir(), bootstrapperPaths.getBaseDir(), excludes);
+                }
+                else
+                {
+                    copy(paths.getBaseDir(), bootstrapperPaths.getBaseDir());
+                }
             }
             catch (IOException e)
             {

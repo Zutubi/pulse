@@ -206,6 +206,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_HOST_ID                 = "host.id";
     /**
+     * Comma-separated names of directories to ignore when copying source.
+     */
+    public static final String PROPERTY_IGNORE_DIRS            = "ignore.dirs";
+    /**
      * An internal property used to create patch formats.
      */
     public static final String PROPERTY_PATCH_FORMAT_FACTORY    = "patch.format.factory";

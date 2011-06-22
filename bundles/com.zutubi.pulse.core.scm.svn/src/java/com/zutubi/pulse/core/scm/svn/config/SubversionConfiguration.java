@@ -201,7 +201,7 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     {
         if (useExport)
         {
-            if (getCheckoutScheme() != CheckoutScheme.CLEAN_CHECKOUT)
+            if (getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
             {
                 context.addFieldError("checkoutScheme", I18N.format("useExport.bad.scheme"));
             }

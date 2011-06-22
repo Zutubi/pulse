@@ -26,6 +26,8 @@ import org.tmatesoft.svn.core.wc.*;
 import java.io.*;
 import java.util.*;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+
 /**
  * A connection to a subversion server.
  */
@@ -385,12 +387,17 @@ public class SubversionClient implements ScmClient
 
         try
         {
-            if (useExport)
+            if (!context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, false) && useExport)
             {
                 updateClient.doExport(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, null, true, SVNDepth.INFINITY);
             }
             else
             {
+                if (useExport)
+                {
+                    addIgnoreDirs(context);
+                }
+                
                 updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, SVNDepth.INFINITY, false);
                 updateExternals(context.getWorkingDir(), revision, updateClient, handler);
             }
@@ -729,6 +736,11 @@ public class SubversionClient implements ScmClient
         {
             rev = getLatestRevision(null);
         }
+
+        if (useExport)
+        {
+            addIgnoreDirs(context);
+        }
         
         try
         {
@@ -753,6 +765,11 @@ public class SubversionClient implements ScmClient
             }
         }
         return rev;
+    }
+
+    private void addIgnoreDirs(ExecutionContext context)
+    {
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_IGNORE_DIRS, ".svn");
     }
 
     private void cleanup(ExecutionContext context) throws ScmException
