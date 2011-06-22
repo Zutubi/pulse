@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <response number="$number">
 #foreach($error in $responseErrors)
-    <error>#xml($warning)</error>
+    <error>#xml($error)</error>
 #end
 #foreach($warning in $responseWarnings)
     <warning>#xml($warning)</warning>
