@@ -102,7 +102,7 @@
                 </#if>
                 onclick="${clickAction}Path('${row.path?js_string?html}'); return false">
             <#elseif actionLink.action == "delete">
-                onclick="deletePath('${row.path?js_string?html}'); return false;">
+                onclick="deletePath('${row.path?js_string?html}', false); return false;">
             <#else>
                 onclick="actionPath('${row.path?js_string?html}', '${actionLink.action}', true, false); return false;">
             </#if>

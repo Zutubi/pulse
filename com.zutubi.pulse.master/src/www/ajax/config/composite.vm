@@ -114,7 +114,7 @@
             <ul class="config-actions">
         #foreach($action in $config.actions)
             #if($action.action == "delete")
-                #set($onclick = "deletePath('#jss(${path})'); return false;")
+                #set($onclick = "deletePath('#jss(${path})', true); return false;")
             #else
                 #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, false); return false;")
             #end

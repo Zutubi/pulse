@@ -326,9 +326,9 @@ function actionPath(path, action, fromParent, onDescendants)
     runAjaxRequest(url);
 }
 
-function deletePath(path)
+function deletePath(path, direct)
 {
-    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?delete=confirm');
+    runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?delete=confirm' + (direct ? 'direct' : ''));
 }
 
 function showHelp(path, type)

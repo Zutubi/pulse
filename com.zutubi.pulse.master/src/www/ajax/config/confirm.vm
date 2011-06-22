@@ -41,9 +41,14 @@
     <tr>
         <td class="submit" colspan="2">
     #set($prefix = "runAjaxRequest('$base/ajax/config/' + encodeURIPath('#jss($path)') + '?delete=")
+    #if($direct)
+        #set($cancelAction = "canceldirect")
+    #else
+        #set($cancelAction = "cancel")
+    #end
             <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="#html($prefix)delete'); return false;"/>$label</a>
             &nbsp;&nbsp;
-            <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="#html($prefix)cancel'); return false;"/>cancel</a>
+            <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="#html($prefix)$cancelAction'); return false;"/>cancel</a>
         </td>
     </tr>
 </table>

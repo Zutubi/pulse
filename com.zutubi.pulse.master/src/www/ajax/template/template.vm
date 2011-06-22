@@ -45,7 +45,7 @@
 #if(!$permanent && $node.children.size() == 0)
 #auth("path=$path" "action=delete")
     <tr>
-        #actionHeader("delete" "delete" "delete" "deletePath('#jss($path)')")
+        #actionHeader("delete" "delete" "delete" "deletePath('#jss($path)', true)")
         <td>delete this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #end
