@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
+import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
@@ -39,6 +40,7 @@ public class TestApi
     private PluginManager pluginManager;
     private BuildManager buildManager;
     private RecipeQueue recipeQueue;
+    private SchedulingController schedulingController;
 
     public TestApi()
     {
@@ -169,9 +171,14 @@ public class TestApi
      * @param token authentication token
      * @return true
      */
-    public boolean ensureRecipeQueueRunning(String token)
+    public boolean ensureQueuesRunning(String token)
     {
         tokenManager.verifyAdmin(token);
+        if (!schedulingController.isRunning())
+        {
+            schedulingController.resume();
+        }
+
         if (!recipeQueue.isRunning())
         {
             recipeQueue.start();
@@ -232,5 +239,10 @@ public class TestApi
     public void setRecipeQueue(RecipeQueue recipeQueue)
     {
         this.recipeQueue = recipeQueue;
+    }
+
+    public void setSchedulingController(SchedulingController schedulingController)
+    {
+        this.schedulingController = schedulingController;
     }
 }

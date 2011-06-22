@@ -50,8 +50,8 @@ public class TestApiClient extends ApiClient
         call("cancelActiveBuilds");
     }
     
-    public void ensureRecipeQueueRunning() throws Exception
+    public void ensureQueuesRunning() throws Exception
     {
-        call("ensureRecipeQueueRunning");
+        call("ensureQueuesRunning");
     }
 }

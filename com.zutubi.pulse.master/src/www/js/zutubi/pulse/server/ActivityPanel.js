@@ -35,6 +35,25 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
                     style: 'margin: 0',
                     items: [{
                         xtype: 'label',
+                        text: 'build queue:'
+                    }, ' ', {
+                        xtype: 'xztbicontext',
+                        id: 'build-queue-state',
+                        icon: window.baseUrl + '/images/cog.gif',
+                        text: 'running'
+                    }, {
+                        xtype: 'xztblink',
+                        id: 'build-queue-toggle',
+                        icon: window.baseUrl + '/images/config/actions/pause.gif',
+                        text: 'pause',
+                        style: 'margin-left: 0',
+                        listeners: {
+                            click: function() {
+                                panel.toggleQueue('build');
+                            }
+                        }
+                    }, ' ', ' ', ' ', ' ', ' ', ' ', ' ', {
+                        xtype: 'label',
                         text: 'stage queue:'
                     }, ' ', {
                         xtype: 'xztbicontext',
@@ -49,7 +68,7 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
                         style: 'margin-left: 0',
                         listeners: {
                             click: function() {
-                                panel.toggleStageQueue();
+                                panel.toggleQueue('stage');
                             }
                         }
                     }]
@@ -80,11 +99,11 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
         return this.items.get(0).getTopToolbar().el;
     },
     
-    updateToolbar: function(data)
+    updateQueue: function(queuePrefix, queueRunning, togglePermitted)
     {
-        var stateItem = Ext.getCmp('stage-queue-state');
-        var toggleItem = Ext.getCmp('stage-queue-toggle');
-        if (data.stageQueueRunning)
+        var stateItem = Ext.getCmp(queuePrefix + '-queue-state');
+        var toggleItem = Ext.getCmp(queuePrefix + '-queue-toggle');
+        if (queueRunning)
         {
             stateItem.setIcon(window.baseUrl + '/images/cog.gif');
             stateItem.setText('running');
@@ -94,14 +113,14 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
         else
         {
             stateItem.setIcon(window.baseUrl + '/images/stop.gif');
-            stateItem.setText('paused');
+            stateItem.setText(queuePrefix == 'build' ? 'ignoring all triggers' : 'paused');
             toggleItem.setIcon(window.baseUrl + '/images/config/actions/resume.gif');
             toggleItem.setText('resume');
         }
         
-        if (data.stageQueueTogglePermitted != toggleItem.enabled)
+        if (togglePermitted != toggleItem.enabled)
         {
-            if (data.stageQueueTogglePermitted)
+            if (togglePermitted)
             {
                 toggleItem.enable();
             }
@@ -110,13 +129,21 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
                 toggleItem.disable();
             }
         }
+    
     },
     
-    toggleStageQueue: function()
+    updateToolbar: function(data)
+    {
+        this.updateQueue('build', data.buildQueueRunning, data.buildQueueTogglePermitted);
+        this.updateQueue('stage', data.stageQueueRunning, data.stageQueueTogglePermitted);
+    },
+    
+    toggleQueue: function(queueName)
     {
         this.getToolbarEl().mask();
         Ext.Ajax.request({
-            url: window.baseUrl + '/ajax/toggleRecipeQueue.action',
+            url: window.baseUrl + '/ajax/toggleQueue.action',
+            params: { queueName: queueName },
             callback: this.handleToggleResponse.createDelegate(this)
         });
     },

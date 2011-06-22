@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
 import com.zutubi.pulse.master.build.control.BuildController;
-import com.zutubi.pulse.master.build.queue.ActivatedRequest;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
-import com.zutubi.pulse.master.build.queue.FatController;
-import com.zutubi.pulse.master.build.queue.RecipeQueue;
+import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -34,6 +31,7 @@ public class ServerActivityDataAction extends ActionSupport
     private ConfigurationManager configurationManager;
     private FatController fatController;
     private RecipeQueue recipeQueue;
+    private SchedulingController schedulingController;
 
     public ServerActivityModel getModel()
     {
@@ -46,7 +44,10 @@ public class ServerActivityDataAction extends ActionSupport
         Actor actor = accessManager.getActor();
 
         model = new ServerActivityModel();
-        model.setStageQueueTogglePermitted(accessManager.hasPermission(actor, ServerPermission.ADMINISTER.name(), null));
+        final boolean isAdmin = accessManager.hasPermission(actor, ServerPermission.ADMINISTER.name(), null);
+        model.setBuildQueueTogglePermitted(isAdmin);
+        model.setBuildQueueRunning(schedulingController.isRunning());
+        model.setStageQueueTogglePermitted(isAdmin);
         model.setStageQueueRunning(recipeQueue.isRunning());
         
         final List<BuildRequestEvent> queuedBuilds = new LinkedList<BuildRequestEvent>();
@@ -138,5 +139,10 @@ public class ServerActivityDataAction extends ActionSupport
     public void setRecipeQueue(RecipeQueue recipeQueue)
     {
         this.recipeQueue = recipeQueue;
+    }
+
+    public void setSchedulingController(SchedulingController schedulingController)
+    {
+        this.schedulingController = schedulingController;
     }
 }

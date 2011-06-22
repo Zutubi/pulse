@@ -36,14 +36,14 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
         rpcClient.loginAsAdmin();
-        rpcClient.TestApi.ensureRecipeQueueRunning();
+        rpcClient.TestApi.ensureQueuesRunning();
         removeNonMasterAgents();
         getBrowser().loginAsAdmin();
     }
 
     protected void tearDown() throws Exception
     {
-        rpcClient.TestApi.ensureRecipeQueueRunning();
+        rpcClient.TestApi.ensureQueuesRunning();
 
         rpcClient.cancelIncompleteBuilds();
         rpcClient.logout();
@@ -66,6 +66,35 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         assertEquals(0, activityPage.getActive().getBuildCount());
     }
 
+    public void testToggleBuildQueue()
+    {
+        final ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
+        assertEquals("running", activityPage.getBuildQueueStatus());
+        assertTrue(activityPage.canPauseBuildQueue());
+        activityPage.clickBuildQueueToggle();
+        
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return activityPage.canResumeBuildQueue();
+            }
+        }, TIMEOUT, "build queue to pause");
+        
+        assertEquals("ignoring all triggers", activityPage.getBuildQueueStatus());
+        
+        activityPage.clickBuildQueueToggle();
+        
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return activityPage.canPauseBuildQueue();
+            }
+        }, TIMEOUT, "build queue to resume");
+        assertEquals("running", activityPage.getBuildQueueStatus());
+    }
+    
     public void testToggleStageQueue()
     {
         final ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);

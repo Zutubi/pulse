@@ -492,7 +492,7 @@
             <result name="error" type="httpheader">500</result>
         </action>
 
-        <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.server.ToggleRecipeQueueAction">
+        <action name="toggleQueue" class="com.zutubi.pulse.master.xwork.actions.server.ToggleQueueAction">
             <result name="success" type="flexjson">result</result>
             <result name="error" type="httpheader">500</result>
         </action>

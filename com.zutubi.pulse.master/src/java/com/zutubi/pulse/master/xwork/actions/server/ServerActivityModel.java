@@ -16,10 +16,32 @@ import java.util.List;
  */
 public class ServerActivityModel
 {
+    private boolean buildQueueTogglePermitted;
+    private boolean buildQueueRunning;
     private boolean stageQueueTogglePermitted;
     private boolean stageQueueRunning;
     private List<QueuedBuildModel> queued = new LinkedList<QueuedBuildModel>();
     private List<ActiveBuildModel> active = new LinkedList<ActiveBuildModel>();
+
+    public boolean isBuildQueueTogglePermitted()
+    {
+        return buildQueueTogglePermitted;
+    }
+
+    public void setBuildQueueTogglePermitted(boolean buildQueueTogglePermitted)
+    {
+        this.buildQueueTogglePermitted = buildQueueTogglePermitted;
+    }
+
+    public boolean isBuildQueueRunning()
+    {
+        return buildQueueRunning;
+    }
+
+    public void setBuildQueueRunning(boolean buildQueueRunning)
+    {
+        this.buildQueueRunning = buildQueueRunning;
+    }
 
     public boolean isStageQueueTogglePermitted()
     {

@@ -11,6 +11,9 @@ import com.zutubi.pulse.master.webwork.Urls;
  */
 public class ServerActivityPage extends SeleniumPage
 {
+    private static final String QUEUE_BUILD = "build";
+    private static final String QUEUE_STAGE = "stage";
+    
     private QueuedBuildsTable queued;
     private ActiveBuildsTable active;
     
@@ -47,13 +50,51 @@ public class ServerActivityPage extends SeleniumPage
     }
 
     /**
+     * Returns the displayed state of the build queue.
+     * 
+     * @return the build queue state, e.g. "running", "ignoring all triggers"
+     */
+    public String getBuildQueueStatus()
+    {
+        return browser.evalExpression(getQueueStatusExpression(QUEUE_BUILD));
+    }
+
+    /**
+     * Indicates if the current user can pause the build queue.
+     * 
+     * @return true if an enabled pause link is present 
+     */
+    public boolean canPauseBuildQueue()
+    {
+        return canToggleQueue(QUEUE_BUILD, "pause");
+    }
+
+    /**
+     * Indicates if the current user can resume the build queue.
+     * 
+     * @return true if an enabled resume link is present 
+     */
+    public boolean canResumeBuildQueue()
+    {
+        return canToggleQueue(QUEUE_BUILD, "resume");
+    }
+
+    /**
+     * Clicks the build queue toggle link.
+     */
+    public void clickBuildQueueToggle()
+    {
+        browser.click("build-queue-toggle-text");
+    }
+    
+    /**
      * Returns the displayed state of the stage queue.
      * 
      * @return the stage queue state, e.g. "running", "paused"
      */
     public String getStageQueueStatus()
     {
-        return browser.evalExpression(getStageQueueStateExpression() + ".text");
+        return browser.evalExpression(getQueueStatusExpression(QUEUE_STAGE));
     }
 
     /**
@@ -63,7 +104,7 @@ public class ServerActivityPage extends SeleniumPage
      */
     public boolean canPauseStageQueue()
     {
-        return canToggleStageQueue("pause");
+        return canToggleQueue(QUEUE_STAGE, "pause");
     }
 
     /**
@@ -73,14 +114,7 @@ public class ServerActivityPage extends SeleniumPage
      */
     public boolean canResumeStageQueue()
     {
-        return canToggleStageQueue("resume");
-    }
-
-    private boolean canToggleStageQueue(String text)
-    {
-        String toggleText = browser.evalExpression(getStageQueueToggleExpression() + ".text");
-        String toggleEnabled = browser.evalExpression(getStageQueueToggleExpression() + ".enabled");
-        return Boolean.parseBoolean(toggleEnabled) && toggleText.equals(text);
+        return canToggleQueue(QUEUE_STAGE, "resume");
     }
 
     /**
@@ -91,13 +125,20 @@ public class ServerActivityPage extends SeleniumPage
         browser.click("stage-queue-toggle-text");
     }
     
-    private String getStageQueueStateExpression()
+    private boolean canToggleQueue(String queuePrefix, String text)
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('stage-queue-state')";
+        String toggleText = browser.evalExpression(getQueueToggleExpression(queuePrefix) + ".text");
+        String toggleEnabled = browser.evalExpression(getQueueToggleExpression(queuePrefix) + ".enabled");
+        return Boolean.parseBoolean(toggleEnabled) && toggleText.equals(text);
     }
 
-    private String getStageQueueToggleExpression()
+    private String getQueueStatusExpression(String queuePrefix)
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('stage-queue-toggle')";
+        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + queuePrefix + "-queue-state').text";
+    }
+
+    private String getQueueToggleExpression(String queuePrefix)
+    {
+        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + queuePrefix + "-queue-toggle')";
     }
 }

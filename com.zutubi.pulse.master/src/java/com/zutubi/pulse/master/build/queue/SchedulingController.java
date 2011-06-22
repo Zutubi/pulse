@@ -39,7 +39,9 @@ public class SchedulingController implements EventListener
     private static final Messages I18N = Messages.getInstance(SchedulingController.class);
 
     private final Lock lock = new ReentrantLock();
-
+    
+    private boolean running = true;
+    
     private ObjectFactory objectFactory;
     private SequenceManager sequenceManager;
     private ProjectManager projectManager;
@@ -49,61 +51,107 @@ public class SchedulingController implements EventListener
 
     private Map<Long, BuildRequestHandler> handlers = new HashMap<Long, BuildRequestHandler>();
 
+    public boolean isRunning()
+    {
+        lock.lock();
+        try
+        {
+            return running;
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    public void pause()
+    {
+        lock.lock();
+        try
+        {
+            running = false;
+        }
+        finally
+        {
+            lock.unlock();
+        }        
+    }
+
+    public void resume()
+    {
+        lock.lock();
+        try
+        {
+            running = true;
+        }
+        finally
+        {
+            lock.unlock();
+        }        
+    }
+    
     protected void handleBuildRequest(final BuildRequestEvent request)
     {
         BuildRequestHandler requestHandler = getRequestHandler(request);
         lock.lock();
         try
         {
-            final List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
-
-            List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestMapping<QueuedRequest>());
-            projectManager.runUnderProjectLocks(new Runnable()
+            if (running)
             {
-                public void run()
+                final List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
+    
+                List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestMapping<QueuedRequest>());
+                projectManager.runUnderProjectLocks(new Runnable()
                 {
-                    CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
-
-                    List<QueuedRequest> accepted = filterCanBuildRequestsInPlace(candidates);
-                    List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
-
-                    // can only proceed if the original request was accepted.
-                    boolean canProceed = CollectionUtils.contains(accepted, new HasIdPredicate<QueuedRequest>(request.getId()));
-                    if (!canProceed)
+                    public void run()
                     {
-                        rejected.addAll(accepted);
-                        accepted.clear();
-                    }
-
-                    if (accepted.size() > 0)
-                    {
-                        buildQueue.enqueue(accepted);
-
-                        for (QueuedRequest acceptedRequest : accepted)
+                        CanBuildPredicate canBuild = objectFactory.buildBean(CanBuildPredicate.class);
+    
+                        List<QueuedRequest> accepted = filterCanBuildRequestsInPlace(candidates);
+                        List<QueuedRequest> rejected = new LinkedList<QueuedRequest>(candidates);
+    
+                        // can only proceed if the original request was accepted.
+                        boolean canProceed = CollectionUtils.contains(accepted, new HasIdPredicate<QueuedRequest>(request.getId()));
+                        if (!canProceed)
                         {
-                            Project project = getProject(acceptedRequest.getRequest());
-                            if (buildQueue.hasRequest(acceptedRequest.getOwner()) && !acceptedRequest.isPersonal())
+                            rejected.addAll(accepted);
+                            accepted.clear();
+                        }
+    
+                        if (accepted.size() > 0)
+                        {
+                            buildQueue.enqueue(accepted);
+    
+                            for (QueuedRequest acceptedRequest : accepted)
                             {
-                                transitionProjectState(project, Project.Transition.BUILDING);
+                                Project project = getProject(acceptedRequest.getRequest());
+                                if (buildQueue.hasRequest(acceptedRequest.getOwner()) && !acceptedRequest.isPersonal())
+                                {
+                                    transitionProjectState(project, Project.Transition.BUILDING);
+                                }
+                            }
+                        }
+    
+                        for (QueuedRequest rejectedRequest : rejected)
+                        {
+                            BuildRequestEvent event = rejectedRequest.getRequest();
+                            Project project = projectManager.getProject(event.getProjectId(), false);
+                            if (canBuild.satisfied(rejectedRequest))
+                            {
+                                buildRequestRegistry.requestRejected(event, I18N.format("rejected.related.project.state"));
+                            }
+                            else
+                            {
+                                buildRequestRegistry.requestRejected(event, I18N.format("rejected.project.state", project.getState().toString()));
                             }
                         }
                     }
-
-                    for (QueuedRequest rejectedRequest : rejected)
-                    {
-                        BuildRequestEvent event = rejectedRequest.getRequest();
-                        Project project = projectManager.getProject(event.getProjectId(), false);
-                        if (canBuild.satisfied(rejectedRequest))
-                        {
-                            buildRequestRegistry.requestRejected(event, I18N.format("rejected.related.project.state"));
-                        }
-                        else
-                        {
-                            buildRequestRegistry.requestRejected(event, I18N.format("rejected.project.state", project.getState().toString()));
-                        }
-                    }
-                }
-            }, getAffectedProjectIds(allRequests));
+                }, getAffectedProjectIds(allRequests));
+            }
+            else
+            {
+                buildRequestRegistry.requestRejected(request, I18N.format("rejected.paused"));
+            }
         }
         finally
         {
