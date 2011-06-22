@@ -130,7 +130,7 @@ public interface ProjectManager extends EntityManager<Project>
      * 
      * @param projectConfig configuration of the project to clean up after
      */
-    @SecureParameter(action = AccessManager.ACTION_WRITE)
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER)
     void cleanupWorkDirs(ProjectConfiguration projectConfig);
     
     void delete(Project project);
