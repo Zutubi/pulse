@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.BinaryFunction;
-import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -15,7 +14,7 @@ public enum BuildMetric
     /**
      * The time the build took to execute, in seconds.
      */
-    ELAPSED_TIME
+    ELAPSED_TIME(true)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -23,7 +22,7 @@ public enum BuildMetric
             {
                 public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
                 {
-                    return (double)buildResult.getStamps().getElapsed() / Constants.SECOND;
+                    return (double)buildResult.getStamps().getElapsed();
                 }
             };
         }
@@ -31,7 +30,7 @@ public enum BuildMetric
     /**
      * The total number of tests in the build.
      */
-    TEST_TOTAL_COUNT
+    TEST_TOTAL_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -47,7 +46,7 @@ public enum BuildMetric
     /**
      * The total number of passed tests in the build.
      */
-    TEST_PASS_COUNT
+    TEST_PASS_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -63,7 +62,7 @@ public enum BuildMetric
     /**
      * The total number of expected failure tests in the build.
      */
-    TEST_EXPECTED_FAIL_COUNT
+    TEST_EXPECTED_FAIL_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -79,7 +78,7 @@ public enum BuildMetric
     /**
      * The total number of failed tests in the build.
      */
-    TEST_FAIL_COUNT
+    TEST_FAIL_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -95,7 +94,7 @@ public enum BuildMetric
     /**
      * The total number of errored tests in the build.
      */
-    TEST_ERROR_COUNT
+    TEST_ERROR_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -111,7 +110,7 @@ public enum BuildMetric
     /**
      * The total number of skipped tests in the build.
      */
-    TEST_SKIPPED_COUNT
+    TEST_SKIPPED_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -127,7 +126,7 @@ public enum BuildMetric
     /**
      * The total number of broken (failed or errored) tests in the build.
      */
-    TEST_BROKEN_COUNT
+    TEST_BROKEN_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -143,7 +142,7 @@ public enum BuildMetric
     /**
      * The percentage of tests that succeeded.
      */
-    TEST_SUCCESS_PERCENTAGE
+    TEST_SUCCESS_PERCENTAGE(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -159,7 +158,7 @@ public enum BuildMetric
     /**
      * The percentage of tests that were broken.
      */
-    TEST_BROKEN_PERCENTAGE
+    TEST_BROKEN_PERCENTAGE(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -175,7 +174,7 @@ public enum BuildMetric
     /**
      * The number of error features detected.
      */
-    ERROR_COUNT
+    ERROR_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -191,7 +190,7 @@ public enum BuildMetric
     /**
      * The number of warning features detected.
      */
-    WARNING_COUNT
+    WARNING_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -207,7 +206,7 @@ public enum BuildMetric
     /**
      * Returns 1 for broken builds, 0 for successful ones (useful to accumulate over a day).
      */
-    BROKEN_COUNT
+    BROKEN_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -223,7 +222,7 @@ public enum BuildMetric
     /**
      * Returns 1 for successful builds, 0 for broken ones (useful to accumulate over a day).
      */
-    SUCCESS_COUNT
+    SUCCESS_COUNT(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
         {
@@ -239,7 +238,7 @@ public enum BuildMetric
     /**
      * The value of a custom field whose name is specified in the {@link BuildReportSeriesConfiguration}.
      */
-    CUSTOM_FIELD
+    CUSTOM_FIELD(false)
     {
         public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(final BuildReportSeriesConfiguration config)
         {
@@ -268,6 +267,12 @@ public enum BuildMetric
     };
 
     private static final Logger LOG = Logger.getLogger(BuildMetric.class);
+    private boolean timeBased;
+
+    BuildMetric(boolean timeBased)
+    {
+        this.timeBased = timeBased;
+    }
     
     /**
      * Returns a function that can extract a value for this metric from a build
@@ -278,4 +283,9 @@ public enum BuildMetric
      * @return a function that can extract the metric value from build results
      */
     public abstract BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config);
+
+    public boolean isTimeBased()
+    {
+        return timeBased;
+    }
 }

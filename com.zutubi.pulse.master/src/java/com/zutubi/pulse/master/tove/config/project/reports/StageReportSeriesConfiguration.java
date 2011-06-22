@@ -23,6 +23,12 @@ public class StageReportSeriesConfiguration extends ReportSeriesConfiguration
     {
     }
 
+    @Override
+    public boolean timeBased()
+    {
+        return metric.isTimeBased();
+    }
+
     public StageReportSeriesConfiguration(String name, StageMetric metric, boolean successfulOnly)
     {
         super(name, successfulOnly);

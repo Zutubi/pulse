@@ -18,6 +18,12 @@ public class BuildReportSeriesConfiguration extends ReportSeriesConfiguration
     {
     }
 
+    @Override
+    public boolean timeBased()
+    {
+        return metric.isTimeBased();
+    }
+
     public BuildReportSeriesConfiguration(String name, BuildMetric metric, boolean successfulOnly)
     {
         super(name, successfulOnly);

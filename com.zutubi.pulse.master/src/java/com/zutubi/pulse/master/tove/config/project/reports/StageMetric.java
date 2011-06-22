@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.util.BinaryFunction;
-import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -15,7 +14,7 @@ public enum StageMetric
     /**
      * The time taken to execute the stage, in seconds.
      */
-    ELAPSED_TIME
+    ELAPSED_TIME(true)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -23,7 +22,7 @@ public enum StageMetric
             {
                 public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
                 {
-                    return (double)recipeResult.getStamps().getElapsed() / Constants.SECOND;
+                    return (double)recipeResult.getStamps().getElapsed();
                 }
             };
         }
@@ -31,7 +30,7 @@ public enum StageMetric
     /**
      * The total number of tests run in the stage.
      */
-    TEST_TOTAL_COUNT
+    TEST_TOTAL_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -47,7 +46,7 @@ public enum StageMetric
     /**
      * The number of passed tests in the stage.
      */
-    TEST_PASS_COUNT
+    TEST_PASS_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -63,7 +62,7 @@ public enum StageMetric
     /**
      * The number of expected failure tests in the stage.
      */
-    TEST_EXPECTED_FAIL_COUNT
+    TEST_EXPECTED_FAIL_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -79,7 +78,7 @@ public enum StageMetric
     /**
      * The number of failed tests in the stage.
      */
-    TEST_FAIL_COUNT
+    TEST_FAIL_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -95,7 +94,7 @@ public enum StageMetric
     /**
      * The number of errored tests in the stage.
      */
-    TEST_ERROR_COUNT
+    TEST_ERROR_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -111,7 +110,7 @@ public enum StageMetric
     /**
      * The number of skipped tests in the stage.
      */
-    TEST_SKIPPED_COUNT
+    TEST_SKIPPED_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -127,7 +126,7 @@ public enum StageMetric
     /**
      * The number of broken (failed or errored) tests in the stage.
      */
-    TEST_BROKEN_COUNT
+    TEST_BROKEN_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -143,7 +142,7 @@ public enum StageMetric
     /**
      * The percentage of tests that succeeded.
      */
-    TEST_SUCCESS_PERCENTAGE
+    TEST_SUCCESS_PERCENTAGE(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -159,7 +158,7 @@ public enum StageMetric
     /**
      * The percentage of tests that failed.
      */
-    TEST_FAILED_PERCENTAGE
+    TEST_FAILED_PERCENTAGE(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -175,7 +174,7 @@ public enum StageMetric
     /**
      * The number of error features detected in the stage.
      */
-    ERROR_COUNT
+    ERROR_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -191,7 +190,7 @@ public enum StageMetric
     /**
      * The number of warning features detected in the stage.
      */
-    WARNING_COUNT
+    WARNING_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -207,7 +206,7 @@ public enum StageMetric
     /**
      * Returns 1 for broken stages, 0 for successful ones (useful to accumulate).
      */
-    BROKEN_COUNT
+    BROKEN_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -223,7 +222,7 @@ public enum StageMetric
     /**
      * Returns 0 for broken stages, 1 for successful ones (useful to accumulate).
      */
-    SUCCESS_COUNT
+    SUCCESS_COUNT(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -239,7 +238,7 @@ public enum StageMetric
     /**
      * The value of a custom field whose name is specified in the {@link StageReportSeriesConfiguration}.
      */
-    CUSTOM_FIELD
+    CUSTOM_FIELD(false)
     {
         public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
         {
@@ -267,7 +266,13 @@ public enum StageMetric
         }
     };
     private static final Logger LOG = Logger.getLogger(StageMetric.class);
+    private boolean timeBased;
 
+    StageMetric(boolean timeBased)
+    {
+        this.timeBased = timeBased;
+    }
+    
     /**
      * Returns a function that can extract a value for this metric from a
      * recipe result.  The returned function may return null if passed a result
@@ -277,4 +282,9 @@ public enum StageMetric
      * @return a function that can extract the metric value from recipe results
      */
     public abstract BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(StageReportSeriesConfiguration config);
+
+    public boolean isTimeBased()
+    {
+        return timeBased;
+    }
 }

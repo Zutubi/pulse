@@ -65,7 +65,7 @@
         <dependency org="javax.transaction" name="javax.transaction" rev="1.1.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.json" name="org.json" rev="1.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="net.sourceforge.flexjson" name="net.sf.flexjson" rev="1.6.0" conf="external,build,release->default;src->src"/>
-        <dependency org="org.jfree.chart" name="org.jfree.chart" rev="1.0.2" conf="external,build,release->default;src->src"/>
+        <dependency org="org.jfree.chart" name="org.jfree.chart" rev="1.0.13" conf="external,build,release->default;src->src"/>
         <dependency org="zutubi" name="jsdeps" rev="0.2" conf="external,build,release->default;src->src"/>
 
         <!-- Test dependencies-->

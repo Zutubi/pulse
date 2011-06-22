@@ -9,13 +9,16 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.*;
+import org.jfree.chart.util.RelativeDateFormat;
 import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -49,14 +52,32 @@ public abstract class CustomChart implements Chart
         ReportData reportData = builder.build(builds);
         XYDataset xyDataset = generateDataSet(reportData);
 
-        NumberAxis rangeAxis = new NumberAxis(configuration.getRangeLabel());
-        if (configuration.getType() == ChartType.LINE_CHART && configuration.isZoomRange() && !reportData.isEmpty())
+        ValueAxis rangeAxis;
+        if (allMetricsTimeBased(configuration))
         {
-            Pair<Number, Number> minMax = reportData.getRangeLimits();
+            DateAxis dateAxis = new DateAxis(configuration.getRangeLabel());
+            RelativeDateFormat rdf = new RelativeDateFormat();
+            rdf.setShowZeroDays(false);
+            rdf.setMinuteFormatter(new DecimalFormat("00"));
+            rdf.setSecondFormatter(new DecimalFormat("00"));
+            dateAxis.setDateFormatOverride(rdf);
+            
+            rangeAxis = dateAxis;
+        }
+        else
+        {
+            NumberAxis numberAxis = new NumberAxis(configuration.getRangeLabel());
 
-            double buffer = Math.max(minMax.second.doubleValue() / 15, 5);
-            rangeAxis.setLowerBound(Math.max(0, minMax.first.doubleValue() - buffer));
-            rangeAxis.setUpperBound(minMax.second.doubleValue() + buffer);
+            if (configuration.getType() == ChartType.LINE_CHART && configuration.isZoomRange() && !reportData.isEmpty())
+            {
+                Pair<Number, Number> minMax = reportData.getRangeLimits();
+
+                double buffer = Math.max(minMax.second.doubleValue() / 15, 5);
+                numberAxis.setLowerBound(Math.max(0, minMax.first.doubleValue() - buffer));
+                numberAxis.setUpperBound(minMax.second.doubleValue() + buffer);
+            }
+            
+            rangeAxis = numberAxis;
         }
 
         XYPlot plot = new XYPlot(xyDataset, createDomainAxis(), rangeAxis, configureRenderer(xyDataset));
@@ -66,6 +87,19 @@ public abstract class CustomChart implements Chart
         chart.setBorderVisible(false);
 
         return chart;
+    }
+
+    private boolean allMetricsTimeBased(ReportConfiguration configuration)
+    {
+        for (ReportSeriesConfiguration series: configuration.getSeriesMap().values())
+        {
+            if (!series.timeBased())
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     private XYItemRenderer configureRenderer(XYDataset dataset)

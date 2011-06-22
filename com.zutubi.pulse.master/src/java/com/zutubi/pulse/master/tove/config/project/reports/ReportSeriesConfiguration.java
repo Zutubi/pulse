@@ -39,6 +39,13 @@ public abstract class ReportSeriesConfiguration extends AbstractNamedConfigurati
         this.customColour = customColour;
     }
 
+    /**
+     * Indicates if this series measures a time-based metric.
+     * 
+     * @return true if this series is time-based
+     */
+    public abstract boolean timeBased();
+    
     public String getField()
     {
         return field;
