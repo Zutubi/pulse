@@ -17,6 +17,7 @@ public class WorkingCopyStatus
 {
     private File base;
     private List<FileStatus> fileStatuses = new LinkedList<FileStatus>();
+    private String specDescription;
 
     /**
      * Create a new working copy status for files based at the given directory.  This directory is
@@ -100,5 +101,26 @@ public class WorkingCopyStatus
                 return fileStatus.getPath().equals(path);
             }
         });
+    }
+
+    /**
+     * Gives a human-readable description of the spec specified by the user to
+     * indicate the status to find.
+     *
+     * @return a description of the spec, may be null
+     */
+    public String getSpecDescription()
+    {
+        return specDescription;
+    }
+
+    /**
+     * Sets the description of the spec used in generating this status.
+     *
+     * @param specDescription a human-readable spec description
+     */
+    public void setSpecDescription(String specDescription)
+    {
+        this.specDescription = specDescription;
     }
 }

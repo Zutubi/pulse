@@ -8,20 +8,22 @@ import com.zutubi.diff.git.GitPatchParser;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ForwardingCharHandler;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static java.util.Arrays.asList;
 
 /**
  * A {@link com.zutubi.pulse.core.scm.patch.api.PatchFormat} implementation for
@@ -50,20 +52,25 @@ public class GitPatchFormat implements PatchFormat
         args.add(FLAG_BINARY);
         args.add(FLAG_FIND_COPIES);
 
+        String specDescription = "working copy";
+        boolean filesSpecified = false;
         if (scope.length > 0 && scope[0].startsWith(":"))
         {
             String range = scope[0].substring(1);
             if (range.length() == 0)
             {
+                specDescription = "staging index";
                 args.add(FLAG_CACHED);
             }
             else
             {
+                specDescription = "specified commit range";
                 args.add(range);
             }
 
             if (scope.length > 1)
             {
+                filesSpecified = true;
                 args.add(FLAG_SEPARATOR);
                 args.addAll(asList(scope).subList(1, scope.length));
             }
@@ -74,6 +81,7 @@ public class GitPatchFormat implements PatchFormat
             args.add(gitWorkingCopy.getRemoteRef(git));
             if (scope.length > 0)
             {
+                filesSpecified = true;
                 args.add(FLAG_SEPARATOR);
                 args.addAll(asList(scope));
             }
@@ -117,7 +125,8 @@ public class GitPatchFormat implements PatchFormat
 
         if (patchFile.length() == 0)
         {
-            context.getUI().status("No changes found.");
+            context.getUI().status("Git command '" + StringUtils.join(" ", args) + "' created an empty patch file.");
+            context.getUI().status("i.e. no changes were found in the " + (filesSpecified ? "given files in the " : "") + specDescription + ".");
             if (!patchFile.delete())
             {
                 throw new GitException("Can't remove empty patch '" + patchFile.getAbsolutePath() + "'");

@@ -243,6 +243,22 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
             }
 
             WorkingCopyStatus wcs = handler.getStatus();
+            String description = "";
+            if (files.length != 1  || files[0] != context.getBase())
+            {
+                description = "the specified files in ";
+            }
+            
+            if (changelist == null)
+            {
+                description += "the working copy";
+            }
+            else
+            {
+                description += "the specified changelist";
+            }
+
+            wcs.setSpecDescription(description);
 
             // Now find out if any changed files have an eol-style
             getProperties(clientManager, wcs, handler.propertyChangedPaths);

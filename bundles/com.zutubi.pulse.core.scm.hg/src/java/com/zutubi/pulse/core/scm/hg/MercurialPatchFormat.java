@@ -43,12 +43,14 @@ public class MercurialPatchFormat implements PatchFormat
         String revision2 = null;
         String[] files;
         
+        String specDescription = "working copy";
         if (scope.length > 0 && scope[0].startsWith(":"))
         {
             String range = scope[0].substring(1);
             int separatorIndex = range.indexOf(":");
             if (separatorIndex > 0 && separatorIndex < range.length() - 1)
             {
+                specDescription = "specified revision range";
                 revision1 = range.substring(0, separatorIndex);
                 revision2 = range.substring(separatorIndex + 1);
             }
@@ -59,6 +61,7 @@ public class MercurialPatchFormat implements PatchFormat
             }
             else
             {
+                specDescription = "specified revision";
                 revision1 = range;
             }
 
@@ -71,10 +74,11 @@ public class MercurialPatchFormat implements PatchFormat
         }
 
         FileOutputStream os = null;
+        String commandLine;
         try
         {
             os = new FileOutputStream(patchFile);
-            runDiff(context, os, revision1, revision2, files);
+            commandLine = runDiff(context, os, revision1, revision2, files);
         }
         catch (Exception e)
         {
@@ -88,7 +92,8 @@ public class MercurialPatchFormat implements PatchFormat
         
         if (patchFile.length() == 0)
         {
-            context.getUI().status("No changes found.");
+            context.getUI().status("Mercurial command '" + commandLine + "' created an empty patch file.");
+            context.getUI().status("i.e. no changes were found in the " + (files.length > 0 ? "given files in the " : "") + specDescription + ".");
             if (!patchFile.delete())
             {
                 throw new ScmException("Can't remove empty patch '" + patchFile.getAbsolutePath() + "'");
@@ -100,8 +105,9 @@ public class MercurialPatchFormat implements PatchFormat
         return true;
     }
 
-    private void runDiff(WorkingCopyContext context, final FileOutputStream os, String revision1, String revision2, String[] files) throws ScmException
+    private String runDiff(WorkingCopyContext context, final FileOutputStream os, String revision1, String revision2, String[] files) throws ScmException
     {
+        final String[] commandLine = new String[1];
         MercurialCore core = new MercurialCore();
         core.setWorkingDirectory(context.getBase());
         
@@ -125,6 +131,7 @@ public class MercurialPatchFormat implements PatchFormat
 
             public void handleCommandLine(String line)
             {
+                commandLine[0] = line;
             }
 
             public void handleExitCode(int code) throws ScmException
@@ -135,6 +142,8 @@ public class MercurialPatchFormat implements PatchFormat
             {
             }
         }, revision1, revision2, files);
+
+        return commandLine[0];
     }
 
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException

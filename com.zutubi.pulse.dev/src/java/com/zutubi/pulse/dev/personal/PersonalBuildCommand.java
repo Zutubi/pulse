@@ -57,6 +57,7 @@ public class PersonalBuildCommand implements Command
 
                 if (!client.preparePatch(context, patchFile, config.getFiles()))
                 {
+                    client.getUI().error("Aborting personal build as there is no patch to apply.");
                     return 1;
                 }
             }

@@ -239,6 +239,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
         // Spec can be either a changelist # or a list of files
         String changelist;
+        String description;
         if(spec.length == 1 && spec[0].startsWith(":"))
         {
             if (pre2004_2)
@@ -248,6 +249,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
 
             // It's a changelist
             changelist = spec[0].substring(1);
+            description = "the specified changelist";
             if(changelist.length() == 0)
             {
                 throw new ScmException("Empty changelist name specified (" + spec[0] + ")");
@@ -258,6 +260,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         else if(spec.length > 0)
         {
             // Then it is a list of files
+            description = "the specified files";
             String[] commands = new String[spec.length + 4];
             commands[0] = getP4Command(COMMAND_FSTAT);
             commands[1] = COMMAND_FSTAT;
@@ -270,6 +273,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
         else
         {
             // Emulate submit behaviour: default changelist
+            description = "the default changelist";
             if (pre2004_2)
             {
                 core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, "//...");
@@ -280,6 +284,7 @@ public class PerforceWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilde
             }
         }
 
+        status.setSpecDescription(description);
         return status;
     }
 

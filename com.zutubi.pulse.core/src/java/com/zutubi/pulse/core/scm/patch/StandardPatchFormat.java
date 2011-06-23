@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -44,7 +45,14 @@ public class StandardPatchFormat implements PatchFormat
 
         if (!status.hasStatuses())
         {
-            context.getUI().status("No changes found.");
+            if (StringUtils.stringSet(status.getSpecDescription()))
+            {
+                context.getUI().status("No changes found in " + status.getSpecDescription() + ".");
+            }
+            else
+            {
+                context.getUI().status("No changes found.");
+            }
             return false;
         }
 
