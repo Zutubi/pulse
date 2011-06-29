@@ -956,6 +956,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 // build result.  Hence it is crucial that indexing and a final
                 // save are done afterwards.
                 MasterBuildProperties.addCompletedBuildProperties(buildContext, buildResult, configurationManager);
+                addCommonScmProperties();
                 buildLogger.postBuild();
                 publishEvent(new PostBuildEvent(this, buildResult, buildContext));
                 buildLogger.postBuildCompleted();
@@ -990,6 +991,27 @@ public class DefaultBuildController implements EventListener, BuildController
         // this must be last since we are in fact stopping the thread running this method.., we are
         // after all responding to an event on this listener.
         asyncListener.stop(true);
+    }
+
+    private void addCommonScmProperties()
+    {
+        Iterator<RecipeController> recipeIt = tree.iterator();
+        if (!recipeIt.hasNext())
+        {
+            return;
+        }
+
+        final List<ResourceProperty> commonProperties = new LinkedList<ResourceProperty>(recipeIt.next().getScmProperties());
+        while (recipeIt.hasNext())
+        {
+            final List<ResourceProperty> properties = recipeIt.next().getScmProperties();
+            CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
+        }
+
+        for (ResourceProperty property: commonProperties)
+        {
+            buildContext.add(property);
+        }
     }
 
     /**
@@ -1167,6 +1189,21 @@ public class DefaultBuildController implements EventListener, BuildController
     private static interface BootstrapperCreator
     {
         Bootstrapper create();
+    }
+
+    private static class ContainsMatchingPropertyPredicate implements Predicate<ResourceProperty>
+    {
+        private final List<ResourceProperty> properties;
+
+        public ContainsMatchingPropertyPredicate(List<ResourceProperty> properties)
+        {
+            this.properties = properties;
+        }
+
+        public boolean satisfied(final ResourceProperty commonProperty)
+        {
+            return properties.contains(commonProperty);
+        }
     }
 
     private class RecipeTimeoutCallback implements NullaryProcedure

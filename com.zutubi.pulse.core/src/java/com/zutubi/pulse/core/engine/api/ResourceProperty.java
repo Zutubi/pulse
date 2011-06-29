@@ -80,4 +80,53 @@ public class ResourceProperty
     {
         this.resolveVariables = resolveVariables;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ResourceProperty that = (ResourceProperty) o;
+
+        if (addToEnvironment != that.addToEnvironment)
+        {
+            return false;
+        }
+        if (addToPath != that.addToPath)
+        {
+            return false;
+        }
+        if (resolveVariables != that.resolveVariables)
+        {
+            return false;
+        }
+        if (!name.equals(that.name))
+        {
+            return false;
+        }
+        if (value != null ? !value.equals(that.value) : that.value != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = name.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (addToEnvironment ? 1 : 0);
+        result = 31 * result + (addToPath ? 1 : 0);
+        result = 31 * result + (resolveVariables ? 1 : 0);
+        return result;
+    }
 }

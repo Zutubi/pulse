@@ -3,9 +3,7 @@ package com.zutubi.pulse.master.build.control;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
@@ -16,7 +14,6 @@ import com.zutubi.pulse.core.model.ResultCustomFields;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -30,20 +27,25 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  *
@@ -61,6 +63,7 @@ public class RecipeController
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
     private RecipeResultCollector collector;
+    private List<ResourceProperty> scmProperties;
     private BuildManager buildManager;
     /**
      * An explicit flag set on receipt of the recipe commenced event.  We don't
@@ -122,6 +125,11 @@ public class RecipeController
     public RecipeAssignmentRequest getAssignmentRequest()
     {
         return assignmentRequest;
+    }
+
+    public List<ResourceProperty> getScmProperties()
+    {
+        return scmProperties;
     }
 
     public boolean matchesRecipeEvent(RecipeEvent event)
@@ -217,7 +225,12 @@ public class RecipeController
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
         agentContext.addValue(NAMESPACE_INTERNAL, PROPERTY_HOST_ID, agent.getHost().getId());
 
-        addScmProperties(agentContext);
+        scmProperties = getScmProperties(agentContext);
+        for (ResourceProperty property: scmProperties)
+        {
+            agentContext.add(property);
+            recipeContext.add(property);
+        }
 
         // update the context to be used for the post build actions with version details.
         addRevisionProperties(recipeContext, buildResult);
@@ -227,27 +240,24 @@ public class RecipeController
         recipeDispatchService.dispatch(event);
     }
 
-    private void addScmProperties(final ExecutionContext agentContext)
+    private List<ResourceProperty> getScmProperties(final ExecutionContext agentContext)
     {
         try
         {
-            List<ResourceProperty> scmProperties = withScmClient(projectConfiguration.getScm(), scmManager, new ScmAction<List<ResourceProperty>>()
+            return withScmClient(projectConfiguration.getScm(), scmManager, new ScmAction<List<ResourceProperty>>()
             {
                 public List<ResourceProperty> process(ScmClient scmClient) throws ScmException
                 {
                     return scmClient.getProperties(agentContext);
                 }
             });
-
-            for (ResourceProperty property: scmProperties)
-            {
-                agentContext.add(property);
-            }
         }
         catch (ScmException e)
         {
             LOG.warning("Unable to add SCM properties: " + e.getMessage(), e);
         }
+
+        return Collections.emptyList();
     }
 
     private void handleRecipeDispatched(RecipeDispatchedEvent event)
