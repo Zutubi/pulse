@@ -8,13 +8,14 @@ import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 public class MercurialPatchFormatTest extends MercurialTestBase
 {
@@ -63,7 +64,7 @@ public class MercurialPatchFormatTest extends MercurialTestBase
     {
         assertFalse(patchFormat.writePatchFile(workingCopy, devContext, patchFile));
         assertFalse(patchFile.exists());
-        assertThat(ui.getStatusMessages(), hasItem(containsString("No changes found")));
+        assertThat(ui.getStatusMessages(), hasItem(containsString("created an empty patch file")));
     }
 
     public void testSimpleChange() throws ScmException, IOException
