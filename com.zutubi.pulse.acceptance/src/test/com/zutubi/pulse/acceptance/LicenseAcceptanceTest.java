@@ -2,7 +2,10 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
-import com.zutubi.pulse.acceptance.pages.admin.*;
+import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.admin.LicensePage;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.admin.UsersPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -10,11 +13,12 @@ import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.Hashtable;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Test for managing the server license and ensuring the licenses are
@@ -446,7 +450,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         {
             Thread.sleep(Constants.SECOND);
             assertFalse(home.hasBuildActivity());
-            assertFalse(home.hasLatestCompletedBuild());
+            assertFalse(home.hasCompletedBuild());
         }
         else
         {

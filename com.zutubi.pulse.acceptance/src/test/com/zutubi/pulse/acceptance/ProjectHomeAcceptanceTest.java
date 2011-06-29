@@ -1,5 +1,24 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.util.Condition;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
+import org.tmatesoft.svn.core.SVNException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Hashtable;
+
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
@@ -10,26 +29,8 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
-import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
-import org.tmatesoft.svn.core.SVNException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Hashtable;
 
 public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 {
@@ -96,7 +97,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         assertEquals(0, homePage.getSuccessRate());
         assertFalse(homePage.hasStatistics());
         assertFalse(homePage.hasBuildActivity());
-        assertFalse(homePage.hasLatestCompletedBuild());
+        assertFalse(homePage.hasCompletedBuild());
         assertEquals(0, homePage.getRecentBuildsCount());
         assertEquals(0, homePage.getChangesCount());
         assertFalse(homePage.hasDescription());
@@ -163,10 +164,8 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         assertEquals("idle", homePage.getState());
         assertEquals(67, homePage.getSuccessRate());
 
-        assertEquals(fixedBuildNumber, homePage.getLatestCompletedBuildId());
-        assertEquals(ResultState.SUCCESS, homePage.getLatestCompletedBuildStatus());
-
         assertEquals(asList(
+                new BuildInfo(fixedBuildNumber, ResultState.SUCCESS, fixedRevision),
                 new BuildInfo(brokenBuildNumber, ResultState.FAILURE, brokenRevision),
                 new BuildInfo(initialBuildNumber, ResultState.SUCCESS, initialRevision)
         ), homePage.getRecentBuilds());
@@ -183,12 +182,12 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
-        assertFalse(homePage.hasLatestCompletedBuild());
+        assertFalse(homePage.hasCompletedBuild());
         assertFalse(homePage.hasFeaturedArtifacts());
 
         rpcClient.RemoteApi.runBuild(random);
         homePage.openAndWaitFor();
-        assertTrue(homePage.hasLatestCompletedBuild());
+        assertTrue(homePage.hasCompletedBuild());
         assertFalse(homePage.hasFeaturedArtifacts());
         
         Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(FileArtifactConfiguration.class);
@@ -199,7 +198,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
         int buildNumber = rpcClient.RemoteApi.runBuild(random);
         homePage.openAndWaitFor();
-        assertTrue(homePage.hasLatestCompletedBuild());
+        assertTrue(homePage.hasCompletedBuild());
         assertTrue(homePage.hasFeaturedArtifacts());
         assertEquals(buildNumber, homePage.getFeaturedArtifactsBuild());
         assertEquals(asList("stage :: default", "buildfile"), homePage.getFeaturedArtifactsRows());

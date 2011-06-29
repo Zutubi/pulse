@@ -37,4 +37,5 @@
 
     <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-summary")'>
     </div>
+</body>
 </html>

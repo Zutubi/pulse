@@ -1,41 +1,46 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import com.zutubi.pulse.acceptance.components.Pager;
+import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
+import com.zutubi.pulse.acceptance.components.table.PropertyTable;
+import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.Pair;
+import com.zutubi.util.EnumUtils;
 import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Page for viewing details of a single changelist.
  */
 public class ViewChangelistPage extends SeleniumPage
 {
-    private static final String ID_DETAILS_TABLE = "changelist.details";
-    private static final String ID_BUILDS_TABLE  = "changelist.builds";
-    private static final String ID_FILES_TABLE   = "changelist.files";
-    private static final String ID_NEXT_PAGE     = "page.next";
-    private static final String ID_PREVIOUS_PAGE = "page.previous";
-
-    private static final String FORMAT_ID_CHANGELIST_BUILDS = "changelist.build.%d";
-    private static final String FORMAT_ID_CHANGELIST_FILES = "changelist.file.%d";
-
     private String projectName;
     private long buildId;
     private long changeId;
+    private PropertyTable detailsTable;
+    private BuildSummaryTable buildsTable;
+    private SummaryTable filesTable;
+    private Pager pager;
 
     public ViewChangelistPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, long changeId, String revisionString)
     {
-        super(browser, urls, "changelist." + revisionString, "changelist " + revisionString);
+        super(browser, urls, "changelist-" + revisionString, "changelist " + revisionString);
         this.projectName = projectName;
         this.buildId = buildId;
         this.changeId = changeId;
+
+        detailsTable = new PropertyTable(browser, "changelist-changelist");
+        buildsTable = new BuildSummaryTable(browser, "changelist-builds");
+        filesTable = new SummaryTable(browser, "changelist-files");
+        pager = new Pager(browser, "changelist-pager");
     }
 
     public String getUrl()
@@ -43,19 +48,26 @@ public class ViewChangelistPage extends SeleniumPage
         return urls.buildChangelist(WebUtils.uriComponentEncode(projectName), Long.toString(buildId), changeId);
     }
 
+    @Override
+    public void waitFor()
+    {
+        super.waitFor();
+        browser.waitForVariable("panel.initialised");
+    }
+
     public String getRevision()
     {
-        return browser.getCellContents(ID_DETAILS_TABLE, 1, 1);
+        return detailsTable.getValue("revision");
     }
 
     public String getAuthor()
     {
-        return browser.getCellContents(ID_DETAILS_TABLE, 2, 1);
+        return detailsTable.getValue("who");
     }
 
     public String getComment()
     {
-        return browser.getCellContents(ID_DETAILS_TABLE, 4, 1);
+        return detailsTable.getValue("comment");
     }
 
     /**
@@ -65,44 +77,23 @@ public class ViewChangelistPage extends SeleniumPage
      */
     public int getBuildsCount()
     {
-        return getCount(FORMAT_ID_CHANGELIST_BUILDS);
+        return buildsTable.getRowCount();
     }
 
     /**
      * Returns details of all builds affected by this change, in the order that
      * they are found on the page.
      * 
-     * @return the affected builds, each pair is a project name and build
-     *         number
+     * @return info about the affected builds
      */
-    public List<Pair<String, Long>> getBuilds()
+    public List<BuildInfo> getBuilds()
     {
-        List<Pair<String, Long>> builds = new LinkedList<Pair<String, Long>>();
-        int count = getBuildsCount();
-        for (int i = 0; i < count; i++)
-        {
-            String project = browser.getCellContents(ID_BUILDS_TABLE, i + 2, 0);
-            String numberString = browser.getCellContents(ID_BUILDS_TABLE, i + 2, 1);
-            builds.add(new Pair<String, Long>(project, Long.parseLong(numberString)));
-        }
-        
-        return builds;
+        return buildsTable.getBuilds();
     }
 
     public int getFilesCount()
     {
-        return getCount(FORMAT_ID_CHANGELIST_FILES);
-    }
-
-    private int getCount(String idFormatString)
-    {
-        int count = 1;
-        while (browser.isElementIdPresent(String.format(idFormatString, count)))
-        {
-            count++;
-        }
-
-        return count - 1;
+        return filesTable.getRowCount();
     }
 
     public Changelist getChangelist()
@@ -111,10 +102,11 @@ public class ViewChangelistPage extends SeleniumPage
         int filesCount = getFilesCount();
         for (int i = 0; i < filesCount; i++)
         {
+            Map<String,String> row = filesTable.getRow(i);
             fileChanges.add(new FileChange(
-                    browser.getCellContents(ID_FILES_TABLE, i + 2, 0),
-                    new Revision(browser.getCellContents(ID_FILES_TABLE, i + 2, 1)),
-                    FileChange.Action.fromString(browser.getCellContents(ID_FILES_TABLE, i + 2, 2))
+                    row.get("fileName"),
+                    new Revision(row.get("revision")),
+                    EnumUtils.fromPrettyString(FileChange.Action.class, row.get("action"))
             ));
         }
 
@@ -123,16 +115,16 @@ public class ViewChangelistPage extends SeleniumPage
 
     public boolean isNextLinkPresent()
     {
-        return browser.isElementPresent(ID_NEXT_PAGE);
+        return pager.hasNextLink();
     }
 
     public void clickNext()
     {
-        browser.click(ID_NEXT_PAGE);
+        pager.clickNext();
     }
 
     public boolean isPreviousLinkPresent()
     {
-        return browser.isElementPresent(ID_PREVIOUS_PAGE);
+        return pager.hasPreviousLink();
     }
 }

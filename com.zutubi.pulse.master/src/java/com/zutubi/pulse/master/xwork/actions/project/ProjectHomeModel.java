@@ -1,8 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import flexjson.JSON;
 
@@ -207,75 +204,4 @@ public class ProjectHomeModel
         }
     }
 
-    public static class ChangelistCommentModel
-    {
-        private static final int COMMENT_LINE_LENGTH = 80;
-        private static final int COMMENT_TRIM_LIMIT = 60;
-
-        private String abbreviated;
-        private String comment;
-
-        public ChangelistCommentModel(CommitMessageSupport commitMessageSupport)
-        {
-            if (commitMessageSupport.getLength() > COMMENT_TRIM_LIMIT)
-            {
-                abbreviated = commitMessageSupport.trim(COMMENT_TRIM_LIMIT);
-            }
-
-            this.comment = commitMessageSupport.wrap(COMMENT_LINE_LENGTH);
-        }
-
-        public String getAbbreviated()
-        {
-            return abbreviated;
-        }
-
-        public String getComment()
-        {
-            return comment;
-        }
-    }
-
-    public static class ChangelistModel
-    {
-        private long id;
-        private RevisionModel revision;
-        private String who;
-        private DateModel when;
-        private ChangelistCommentModel comment;
-
-        public ChangelistModel(PersistentChangelist changelist, ProjectConfiguration projectConfig)
-        {
-            id = changelist.getId();
-            revision = new RevisionModel(changelist.getRevision(), projectConfig.getChangeViewer());
-            who = changelist.getAuthor();
-            when = new DateModel(changelist.getTime());
-            comment = new ChangelistCommentModel(new CommitMessageSupport(changelist.getComment(), projectConfig.getCommitMessageTransformers().values()));
-        }
-
-        public long getId()
-        {
-            return id;
-        }
-
-        public RevisionModel getRevision()
-        {
-            return revision;
-        }
-
-        public String getWho()
-        {
-            return who;
-        }
-
-        public DateModel getWhen()
-        {
-            return when;
-        }
-
-        public ChangelistCommentModel getComment()
-        {
-            return comment;
-        }
-    }
 }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.user;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.notifications.ResultNotifier;
 import com.zutubi.pulse.master.security.SecurityUtils;
@@ -167,10 +168,49 @@ public class DashboardDataAction extends ActionSupport
         {
             public ChangelistModel map(PersistentChangelist persistentChangelist)
             {
-                updateChangeUrl(persistentChangelist);
-                return new ChangelistModel(persistentChangelist, getChangeUrl(), getChangelistResults(persistentChangelist), getCommitMessageSupport(persistentChangelist));
+                return new ChangelistModel(persistentChangelist, getChangeUrl(persistentChangelist), getChangelistResults(persistentChangelist), getCommitMessageSupport(persistentChangelist));
             }
         });
+    }
+
+    private String getChangeUrl(PersistentChangelist changelist)
+    {
+        // We cache the URL as velocity null handling is brain dead
+        try
+        {
+            if (changelist != null)
+            {
+                Revision revision = changelist.getRevision();
+                if (revision != null)
+                {
+                    for (long id: changelistDao.getAllAffectedProjectIds(changelist))
+                    {
+                        try
+                        {
+                            ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
+                            if (p != null && p.getChangeViewer() != null)
+                            {
+                                String url = p.getChangeViewer().getRevisionURL(revision);
+                                if(url != null)
+                                {
+                                    return url;
+                                }
+                            }
+                        }
+                        catch (AccessDeniedException e)
+                        {
+                            // User cannot view this project
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+        }
+
+        return null;
     }
 
     private List<BuildResult> getChangelistResults(PersistentChangelist changelist)

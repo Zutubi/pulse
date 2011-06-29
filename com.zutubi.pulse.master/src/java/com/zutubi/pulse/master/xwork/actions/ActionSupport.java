@@ -6,12 +6,10 @@ import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.security.SecurityUtils;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.xwork.TextProviderSupport;
 import com.zutubi.pulse.master.xwork.actions.project.Viewport;
@@ -22,7 +20,6 @@ import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.utility.StringUtil;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -57,7 +54,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected ConfigurationSecurityManager configurationSecurityManager;
     protected ChangelistDao changelistDao;
     protected ObjectFactory objectFactory;
-    protected String changeUrl;
     private User loggedInUser = null;
 
     public boolean isCancelled()
@@ -205,75 +201,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public ProjectManager getProjectManager()
     {
         return projectManager;
-    }
-
-    public void updateChangeUrl(Project project, Revision revision)
-    {
-        try
-        {
-            ProjectConfiguration projectConfig = null;
-            if (project != null)
-            {
-                projectConfig = projectManager.getProjectConfig(project.getId(), false);
-            }
-            if(revision != null && projectConfig != null && projectConfig.getChangeViewer() != null)
-            {
-                changeUrl = projectConfig.getChangeViewer().getRevisionURL(revision);
-                return;
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-        }
-
-        changeUrl = null;
-    }
-
-    public String getChangeUrl()
-    {
-        return changeUrl;
-    }
-
-    
-    public void updateChangeUrl(PersistentChangelist changelist)
-    {
-        // We cache the URL as velocity null handling is brain dead
-        try
-        {
-            if (changelist != null)
-            {
-                Revision revision = changelist.getRevision();
-                if (revision != null)
-                {
-                    for (long id: changelistDao.getAllAffectedProjectIds(changelist))
-                    {
-                        try
-                        {
-                            ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
-                            if (p != null && p.getChangeViewer() != null)
-                            {
-                                String url = p.getChangeViewer().getRevisionURL(revision);
-                                if(url != null)
-                                {
-                                    changeUrl = url;
-                                    return;
-                                }
-                            }
-                        }
-                        catch (AccessDeniedException e)
-                        {
-                            // User cannot view this project
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-        }
-        changeUrl = null;
     }
 
     public String getMessage(Object instance, String key)

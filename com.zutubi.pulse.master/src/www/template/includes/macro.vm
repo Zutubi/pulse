@@ -871,7 +871,14 @@
 #end
 
 #macro(buildTestFailures $buildResult)
-    #if($buildResult.completed() && $buildResult.hasBrokenTests())
+    #set($failuresFound = false)
+    #foreach($recipeNode in $buildResult.root.children)
+        #if($recipeNode.result.completed() && $recipeNode.hasBrokenTests())
+            #set($failuresFound = true)
+        #end
+    #end
+
+    #if($failuresFound)
     <table id="failed-tests" class="two-content spaced">
         <tr>
             <th class="two-heading" colspan="5">#wwtext("name=failed.tests")</th>
@@ -883,7 +890,7 @@
             #contentClassHeading("test.duration" 1 "rightmost")
         </tr>
         #foreach($recipeNode in $buildResult.root.children)
-            #if($recipeNode.hasBrokenTests())
+            #if($recipeNode.result.completed() && $recipeNode.hasBrokenTests())
         <tr id='#id("stage-${recipeNode.stageName}-failed")'>
             <td class="content leftmost">
                 <a href="$urls.stageTests($buildResult, $recipeNode)">#wwtext("name=build.stage") $!webwork.htmlEncode($recipeNode.stageName)</a>

@@ -12,9 +12,7 @@
 
     <div class="build-page-header" id="checked-out-revision">
         #wwtext("name=checked.out.revision")
-        $action.updateChangeUrl($buildResult.project, $buildResult.revision)
-        #set($url = $action.getChangeUrl())
-        #if($url)<a href="$url">#end${buildResult.revision}#if($url)</a>#end
+        #if($changeUrl)<a href="$changeUrl">#end${buildResult.revision}#if($changeUrl)</a>#end
     </div>
 
     <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-changes")' class="two-content">

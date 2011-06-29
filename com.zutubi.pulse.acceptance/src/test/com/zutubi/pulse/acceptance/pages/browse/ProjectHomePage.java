@@ -5,7 +5,6 @@ import com.zutubi.pulse.acceptance.components.TextBox;
 import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.components.pulse.project.StatusBox;
 import com.zutubi.pulse.acceptance.components.table.LinkTable;
-import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -13,11 +12,9 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -25,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -39,15 +39,11 @@ public class ProjectHomePage extends ResponsibilityPage
 
     private static final String COLUMN_ACTIVITY_STATUS = "status";
 
-    private static final String ID_LATEST_NUMBER = "number";
-    private static final String ID_LATEST_STATUS = "status";
-
     private static final Pattern BUILD_NUMBER_PATTERN = Pattern.compile("build (\\d+)");
     
     private String projectName;
     private StatusBox statusBox;
     private SummaryTable activityTable;
-    private PropertyTable latestCompleteTable;
     private BuildSummaryTable recentTable;
     private SummaryTable changesTable;
     private TextBox descriptionBox;
@@ -61,7 +57,6 @@ public class ProjectHomePage extends ResponsibilityPage
         this.projectName = projectName;
         statusBox = new StatusBox(browser, "project-home-status");
         activityTable = new SummaryTable(browser, "project-home-activity");
-        latestCompleteTable = new PropertyTable(browser, "project-home-latest");
         recentTable = new BuildSummaryTable(browser, "project-home-recent");
         changesTable = new SummaryTable(browser, "project-home-changes");
         descriptionBox = new TextBox(browser, "project-home-description");
@@ -210,13 +205,13 @@ public class ProjectHomePage extends ResponsibilityPage
     }
 
     /**
-     * Indicates if the latest completed build table is populated with a build.
+     * Indicates if the recent builds table is populated with at least one build.
      *
-     * @return true if a latest completed build is present, false otherwise
+     * @return true if the recent builds table is non-empty
      */
-    public boolean hasLatestCompletedBuild()
+    public boolean hasCompletedBuild()
     {
-        return latestCompleteTable.isRowPresent(ID_LATEST_NUMBER);
+        return recentTable.getRowCount() > 0;
     }
 
     /**
@@ -226,9 +221,7 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public int getLatestCompletedBuildId()
     {
-        String text = latestCompleteTable.getValue(ID_LATEST_NUMBER);
-        String[] pieces = text.trim().split("\\s+");
-        return Integer.parseInt(pieces[1]);
+        return recentTable.getBuilds().get(0).number;
     }
 
     /**
@@ -238,7 +231,7 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public ResultState getLatestCompletedBuildStatus()
     {
-        return ResultState.fromPrettyString(latestCompleteTable.getValue(ID_LATEST_STATUS));
+        return recentTable.getBuilds().get(0).status;
     }
 
     /**
@@ -256,7 +249,7 @@ public class ProjectHomePage extends ResponsibilityPage
             public boolean satisfied()
             {
                 waitFor();
-                return hasLatestCompletedBuild() && getLatestCompletedBuildId() == id;
+                return hasCompletedBuild() && getLatestCompletedBuildId() == id;
             }
         }, "build " + id + " to complete");
 

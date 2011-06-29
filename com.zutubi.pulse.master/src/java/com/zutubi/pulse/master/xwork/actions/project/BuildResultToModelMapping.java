@@ -5,6 +5,9 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConf
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Mapping;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Maps from build results to JSON build models.
  */
@@ -12,6 +15,7 @@ public class BuildResultToModelMapping implements Mapping<BuildResult, BuildMode
 {
     private Urls urls;
     private ChangeViewerConfiguration changeViewerConfig;
+    private Set<Long> collectIds = new HashSet<Long>();
 
     public BuildResultToModelMapping(Urls urls)
     {
@@ -26,13 +30,19 @@ public class BuildResultToModelMapping implements Mapping<BuildResult, BuildMode
 
     public BuildModel map(BuildResult buildResult)
     {
+        boolean collectArtifacts = collectIds.contains(buildResult.getId());
         if (changeViewerConfig == null)
         {
-            return new BuildModel(buildResult, urls, false);
+            return new BuildModel(buildResult, urls, collectArtifacts);
         }
         else
         {
-            return new BuildModel(buildResult, urls, false, changeViewerConfig);
+            return new BuildModel(buildResult, urls, collectArtifacts, changeViewerConfig);
         }
+    }
+
+    public void collectArtifactsForBuildId(long id)
+    {
+        collectIds.add(id);
     }
 }

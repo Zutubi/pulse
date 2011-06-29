@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -23,6 +25,7 @@ public class ViewChangesAction extends BuildActionBase
     private BuildResult previousSuccessful;
     private BuildResult previousUnsuccessful;
     private BuildResult sinceResult;
+    private String changeUrl;
     private List<ChangelistModel> changelists;
 
     public long getSinceBuild()
@@ -53,6 +56,25 @@ public class ViewChangesAction extends BuildActionBase
     public BuildResult getPreviousUnsuccessful()
     {
         return previousUnsuccessful;
+    }
+
+    public String getChangeUrl()
+    {
+        return changeUrl;
+    }
+
+    public void updateChangeUrl(PersistentChangelist changelist)
+    {
+        changeUrl = null;
+        if (changelist != null && changelist.getRevision() != null)
+        {
+            Project project = getProject();
+            ChangeViewerConfiguration changeViewer = project.getConfig().getChangeViewer();
+            if (changeViewer != null)
+            {
+                changeUrl = changeViewer.getRevisionURL(changelist.getRevision());
+            }
+        }
     }
 
     public List<ChangelistModel> getChangelists()

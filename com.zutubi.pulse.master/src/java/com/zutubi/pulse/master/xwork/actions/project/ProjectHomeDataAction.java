@@ -12,8 +12,8 @@ import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -23,12 +23,15 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
-import static java.util.Arrays.asList;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -80,9 +83,14 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectConfiguration projectConfig = project.getConfig();
+        BuildResult latestCompletedResult = latestCompleted.isEmpty() ? null : latestCompleted.get(0);
         BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(urls, projectConfig.getChangeViewer());
+        if (latestCompletedResult != null)
+        {
+            buildMapping.collectArtifactsForBuildId(latestCompletedResult.getId());
+        }
 
-        model = new ProjectHomeModel(createStatusModel(latestCompleted.isEmpty() ? null : latestCompleted.get(0), urls));
+        model = new ProjectHomeModel(createStatusModel(latestCompletedResult, urls));
         addActivity(queued, inProgress, buildMapping);
         addRecent(latestCompleted, buildMapping);
         addChanges();
@@ -252,11 +260,14 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private void addChanges()
     {
         List<PersistentChangelist> latestChanges = buildManager.getLatestChangesForProject(getProject(), 10);
-        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ProjectHomeModel.ChangelistModel>()
+        ProjectConfiguration projectConfiguration = getProject().getConfig();
+        final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
+        final Collection<CommitMessageTransformerConfiguration> transformers = projectConfiguration.getCommitMessageTransformers().values();
+        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ChangelistModel>()
         {
-            public ProjectHomeModel.ChangelistModel map(PersistentChangelist persistentChangelist)
+            public ChangelistModel map(PersistentChangelist persistentChangelist)
             {
-                return new ProjectHomeModel.ChangelistModel(persistentChangelist, getProject().getConfig());
+                return new ChangelistModel(persistentChangelist, changeViewer, transformers);
             }
         }, model.getChanges());
     }

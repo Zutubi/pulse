@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -20,6 +21,7 @@ public class ViewPersonalChangesAction extends BuildActionBase
 {
     private static final Logger LOG = Logger.getLogger(ViewPersonalChangesAction.class);
     private long id;
+    private String changeUrl;
     private List<FileStatus> fileStatuses;
     private MasterConfigurationManager configurationManager;
     private PatchFormatFactory patchFormatFactory;
@@ -41,6 +43,15 @@ public class ViewPersonalChangesAction extends BuildActionBase
         {
             addActionError("Build [" + id + "] is not a personal build");
             return ERROR;
+        }
+
+        if (result.getRevision() != null)
+        {
+            ChangeViewerConfiguration changeViewer = result.getProject().getConfig().getChangeViewer();
+            if (changeViewer != null)
+            {
+                changeUrl = changeViewer.getRevisionURL(result.getRevision());
+            }
         }
 
         User loggedInUser = getLoggedInUser();

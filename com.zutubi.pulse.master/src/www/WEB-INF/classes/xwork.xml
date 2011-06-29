@@ -444,6 +444,14 @@
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
+        <action name="changelistData" class="com.zutubi.pulse.master.xwork.actions.project.ChangelistDataAction">
+            <result name="success" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">model</param>
+            </result>
+            <result name="error" type="httpheader">500</result>
+        </action>
+
         <action name="agentsData" class="com.zutubi.pulse.master.xwork.actions.agents.AgentsDataAction">
             <result name="success" type="flexjson">
                 <param name="deep">true</param>

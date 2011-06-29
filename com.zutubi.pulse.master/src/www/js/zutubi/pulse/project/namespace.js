@@ -464,6 +464,18 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
         },
 
+        changelistFullComment: function(comment, changelist)
+        {
+            if (comment.comment)
+            {
+                return '<pre>' + comment.comment + '</pre>';
+            }
+            else
+            {
+                return '<span class="understated">no comment</span>';
+            }
+        },
+
         changelistActions: function(id)
         {
             return '<a href="../changes/' + id + '">view</a>';
@@ -621,6 +633,11 @@ Ext.apply(Zutubi.pulse.project, {
             comment: {
                 name: 'comment',
                 renderer: Zutubi.pulse.project.renderers.changelistComment
+            },
+
+            fullComment: {
+                name: 'comment',
+                renderer: Zutubi.pulse.project.renderers.changelistFullComment
             },
 
             actions: {

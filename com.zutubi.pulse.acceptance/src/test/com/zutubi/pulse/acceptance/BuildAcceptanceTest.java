@@ -263,6 +263,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         changelistPage.clickNext();
         getBrowser().waitForPageToLoad();
+        changelistPage.waitFor();
         changelist = changelistPage.getChangelist();
         assertEquals(CHANGE_COUNT - 100, changelist.getChanges().size());
         assertFalse(changelistPage.isNextLinkPresent());
@@ -300,11 +301,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
         ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class, viewableProject, viewableBuildNumber, changeIds.get(0), revisionString);
-        List<Pair<String, Long>> builds = changelistPage.getBuilds();
+        List<BuildInfo> builds = changelistPage.getBuilds();
         assertEquals(2, builds.size());
-        assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
-        assertThat(builds, hasItem(new Pair<String, Long>(unviewableProject, unviewableBuildNumber)));
-        
+        assertThat(builds, hasItem(new BuildInfo(viewableProject, (int) viewableBuildNumber, ResultState.SUCCESS, null)));
+        assertThat(builds, hasItem(new BuildInfo(unviewableProject, (int) unviewableBuildNumber, ResultState.SUCCESS, null)));
+
         // Dashboard project changes table should show popup for multiple
         // builds.
         DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
@@ -319,7 +320,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         changelistPage.openAndWaitFor();
         builds = changelistPage.getBuilds();
         assertEquals(1, builds.size());
-        assertThat(builds, hasItem(new Pair<String, Long>(viewableProject, viewableBuildNumber)));
+        assertThat(builds, hasItem(new BuildInfo(viewableProject, (int) viewableBuildNumber, ResultState.SUCCESS, null)));
         
         // Check other pages that we can view where the changelist appears.
         getBrowser().openAndWaitFor(ProjectHomePage.class, viewableProject);

@@ -25,7 +25,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         description: 'description',
         actions: 'actions',
         links: 'links',
-        artifacts: 'latest.stages'
+        artifacts: 'recent.0.stages'
     },
     
     initComponent: function(container, position)
@@ -169,9 +169,10 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
             return table.dataExists();
         });
 
-        if (data.latest)
+        if (data.recent && data.recent.length > 0)
         {
-            var title = 'latest featured artifacts :: <a href="' + window.baseUrl + '/' + data.latest.link + '">build ' + data.latest.number + '</a>';
+            var latest = data.recent[0];
+            var title = 'latest featured artifacts :: <a href="' + window.baseUrl + '/' + latest.link + '">build ' + latest.number + '</a>';
             Ext.getCmp(this.id + '-artifacts').setTitle(title);
         }
         
