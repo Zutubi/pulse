@@ -260,7 +260,14 @@ public class FileDeletionService extends BackgroundServiceSupport
                     }
                     else // target.isDirectory()
                     {
-                        return FileSystemUtils.rmdir(target);
+                        try
+                        {
+                            FileSystemUtils.rmdir(target);
+                        }
+                        catch (IOException e)
+                        {
+                            return false;
+                        }
                     }
                 }
                 finally

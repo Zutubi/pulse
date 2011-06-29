@@ -83,7 +83,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             FileSystemUtils.setPermissions(tmpDir, 0);
             int permissions = FileSystemUtils.getPermissions(tmpDir);
             junit.framework.Assert.assertEquals(permissions, 0);
-            Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+            FileSystemUtils.rmdir(tmpDir);
         }
     }
 
@@ -845,7 +845,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         File dir = new File(tmpDir, "dir");
         createDirectoryLayout(dir);
 
-        assertTrue(FileSystemUtils.rmdir(dir));
+        FileSystemUtils.rmdir(dir);
         assertFalse(dir.exists());
     }
 
@@ -863,7 +863,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             FileSystemUtils.createSymlink(link, linkTarget);
 
             File underLink = new File(link, "dir");
-            assertTrue(FileSystemUtils.rmdir(underLink));
+            FileSystemUtils.rmdir(underLink);
             assertFalse(underLink.exists());
             assertFalse(dir.exists());
             assertTrue(link.exists());
@@ -884,7 +884,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(dir, "link");
             FileSystemUtils.createSymlink(link, linkTarget);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(link.exists());
             assertFalse(dir.exists());
             assertTrue(linkTarget.exists());
@@ -904,7 +904,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(dir, "link");
             FileSystemUtils.createSymlink(link, linkTarget);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
         }
     }
@@ -924,7 +924,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(dir, "link");
             FileSystemUtils.createSymlink(link, linkTarget);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
         }
     }
@@ -942,7 +942,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(parent, "link");
             FileSystemUtils.createSymlink(link, parent);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
         }
     }
@@ -962,7 +962,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(parent, "link");
             FileSystemUtils.createSymlink(link, ancestor);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
         }
     }
@@ -980,7 +980,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File link = new File(parent, "link");
             FileSystemUtils.createSymlink(link, dir);
 
-            assertTrue(FileSystemUtils.rmdir(dir));
+            FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
         }
     }

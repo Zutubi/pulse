@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
-import junit.framework.Assert;
 import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,15 +10,15 @@ import java.io.IOException;
  */
 public class RemoveDirectoryTest extends ZutubiTestCase
 {
-    public void testRemoveNonExistant()
+    public void testRemoveNonExistant() throws IOException
     {
-        Assert.assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
+        FileSystemUtils.rmdir(new File("/this/directory/does/not/exist"));
     }
 
     public void testRemoveEmpty() throws IOException
     {
         File tmpDir = createTmpDir();
-        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        FileSystemUtils.rmdir(tmpDir);
         Assert.assertFalse(tmpDir.exists());
     }
 
@@ -31,7 +31,7 @@ public class RemoveDirectoryTest extends ZutubiTestCase
         FileSystemUtils.createFile(aFile, "content");
         FileSystemUtils.createFile(anotherFile, "content");
 
-        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        FileSystemUtils.rmdir(tmpDir);
         Assert.assertFalse(tmpDir.exists());
         Assert.assertFalse(aFile.exists());
         Assert.assertFalse(anotherFile.exists());
@@ -50,7 +50,7 @@ public class RemoveDirectoryTest extends ZutubiTestCase
         File nestedFile = new File(nestedDir, "aFile");
         FileSystemUtils.createFile(nestedFile, "data");
 
-        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        FileSystemUtils.rmdir(tmpDir);
         Assert.assertFalse(tmpDir.exists());
         Assert.assertFalse(nestedDir.exists());
     }
@@ -63,7 +63,7 @@ public class RemoveDirectoryTest extends ZutubiTestCase
 
         if (FileSystemUtils.createSymlink(symlink, linkDestination))
         {
-            Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+            FileSystemUtils.rmdir(tmpDir);
             Assert.assertTrue(linkDestination.isDirectory());
         }
         else
@@ -71,7 +71,7 @@ public class RemoveDirectoryTest extends ZutubiTestCase
             FileSystemUtils.rmdir(tmpDir);
         }
 
-        Assert.assertTrue(FileSystemUtils.rmdir(linkDestination));
+        FileSystemUtils.rmdir(linkDestination);
     }
 
     private File createTmpDir() throws IOException

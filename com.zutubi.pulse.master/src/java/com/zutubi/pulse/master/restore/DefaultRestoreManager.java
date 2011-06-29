@@ -127,9 +127,14 @@ public class DefaultRestoreManager implements RestoreManager
         }
 
         // cleanup the extracted archive.
-        if (!FileSystemUtils.rmdir(archive.getBase()))
+        try
+        {
+            FileSystemUtils.rmdir(archive.getBase());
+        }
+        catch (IOException e)
         {
             // Failed to cleanup the extracted archive file.  This is not desired, but not fatal.
+            LOG.warning(e);
         }
     }
 

@@ -10,8 +10,9 @@ import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
-import java.io.File;
 import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Utility class that provides assistance when working with an svn workspace.
@@ -105,7 +106,7 @@ public class SubversionWorkspace implements Closeable
      * Cleanup resources held by this instance.  This includes cleaning up the working
      * directory.
      */
-    public void close()
+    public void close() throws IOException
     {
         clientManager.dispose();
         FileSystemUtils.rmdir(workingDir);

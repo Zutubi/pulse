@@ -130,7 +130,14 @@ public class SlaveAgentService implements AgentService
 
             if (tempDir != null)
             {
-                FileSystemUtils.rmdir(tempDir);
+                try
+                {
+                    FileSystemUtils.rmdir(tempDir);
+                }
+                catch (IOException e)
+                {
+                    // Ignore.
+                }
             }
         }
     }

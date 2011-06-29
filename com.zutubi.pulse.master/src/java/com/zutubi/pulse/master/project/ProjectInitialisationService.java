@@ -14,6 +14,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,7 +129,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                 eventManager.publish(completedEvent);
             }
 
-            private void cleanupScmDirectoryIfRequired(File dir)
+            private void cleanupScmDirectoryIfRequired(File dir) throws IOException
             {
                 if (dir.exists())
                 {

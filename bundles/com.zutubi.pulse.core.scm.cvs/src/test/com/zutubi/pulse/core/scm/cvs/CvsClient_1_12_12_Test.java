@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.Revision;
 
-import java.util.Set;
 import java.text.ParseException;
+import java.util.Set;
 
 /**
  * This test case is to test version specific cvs features.
@@ -54,7 +54,7 @@ public class CvsClient_1_12_12_Test extends AbstractCvsClientTestCase
         assertFileExists("base/sample.txt");
     }
 
-    public void testCheckoutToDateOnBranch() throws ScmException, ParseException
+    public void testCheckoutToDateOnBranch() throws Exception
     {
         client.checkout(exeContext, new Revision(":BRANCH:" + localTime("2009-02-11 07:08:00 GMT")), null);
         assertFileExists("base/README_BRANCHED.txt");

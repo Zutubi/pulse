@@ -85,9 +85,13 @@ public class MasterAgentService implements AgentService
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File recipeRoot = recipePaths.getRecipeRoot();
 
-        if (!FileSystemUtils.rmdir(recipeRoot))
+        try
         {
-            throw new BuildException("Unable to remove recipe directory '" + recipeRoot.getAbsolutePath() + "'");
+            FileSystemUtils.rmdir(recipeRoot);
+        }
+        catch (IOException e)
+        {
+            throw new BuildException("Unable to remove recipe directory: " + e.getMessage(), e);
         }
     }
 

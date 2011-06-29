@@ -78,9 +78,9 @@ public class AbstractCvsClientTestCase extends PulseTestCase
         return dateFormat.format(serverDate.parse(time));
     }
 
-    protected void cleanWorkDir()
+    protected void cleanWorkDir() throws IOException
     {
-        assertTrue(FileSystemUtils.rmdir(exeContext.getWorkingDir()));
+        FileSystemUtils.rmdir(exeContext.getWorkingDir());
         assertTrue(exeContext.getWorkingDir().mkdirs());
     }
 }

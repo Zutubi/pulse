@@ -25,9 +25,16 @@ public abstract class AbstractPredefinedRecordsUpgradeTask extends AbstractUpgra
     public void execute() throws TaskException
     {
         File tempDir = new File(systemPaths.getTmpRoot(), getClass().getName());
-        if (tempDir.exists() && !FileSystemUtils.rmdir(tempDir))
+        if (tempDir.exists())
         {
-            throw new TaskException("Unable to create clean up old temp directory '" + tempDir.getAbsolutePath() + "'");
+            try
+            {
+                FileSystemUtils.rmdir(tempDir);
+            }
+            catch (IOException e)
+            {
+                throw new TaskException("Unable to create clean up old temp directory: " + e.getMessage(), e);
+            }
         }
 
         if (!tempDir.mkdirs())
@@ -41,7 +48,14 @@ public abstract class AbstractPredefinedRecordsUpgradeTask extends AbstractUpgra
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            try
+            {
+                FileSystemUtils.rmdir(tempDir);
+            }
+            catch (IOException e)
+            {
+                // Ignore.
+            }
         }
     }
 

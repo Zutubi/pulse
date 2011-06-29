@@ -815,7 +815,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         boolean deleteSuccessful;
         if (file.isDirectory())
         {
-            deleteSuccessful = FileSystemUtils.rmdir(file);
+            try
+            {
+                FileSystemUtils.rmdir(file);
+                deleteSuccessful = true;
+            }
+            catch (IOException e)
+            {
+                deleteSuccessful = false;
+            }
         }
         else
         {

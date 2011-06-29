@@ -112,9 +112,16 @@ public class GitClient implements ScmClient
         File workingDir = context.getPersistentWorkingDir();
 
         // git does not like to clone 'into' existing directories.
-        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+        if (workingDir.exists())
         {
-            throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
+            try
+            {
+                FileSystemUtils.rmdir(workingDir);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException("Init failed: " + e.getMessage(), e);
+            }
         }
 
         NativeGit git = new NativeGit(inactivityTimeout);
@@ -180,9 +187,16 @@ public class GitClient implements ScmClient
 
         // Git likes to create the directory we clone into, so we need to ensure that it can do so.
         // This also cleans up any previous partial checkout.
-        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+        if (workingDir.exists())
         {
-            throw new ScmException("Could not delete directory '" + workingDir.getAbsolutePath() + "'");
+            try
+            {
+                FileSystemUtils.rmdir(workingDir);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException(e.getMessage(), e);
+            }
         }
 
         NativeGit git = new NativeGit(inactivityTimeout);

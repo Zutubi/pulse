@@ -821,9 +821,13 @@ public class SubversionClient implements ScmClient
                 handler.status(I18N.format("update.error.attempting.clean"));
             }
 
-            if (!FileSystemUtils.rmdir(wcDir))
+            try
             {
-                throw new ScmException(I18N.format("update.error.cannot.remove.dir", wcDir.getAbsolutePath()));
+                FileSystemUtils.rmdir(wcDir);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException(I18N.format("update.error.cannot.remove.dir", e.getMessage()), e);
             }
 
             if (!wcDir.mkdirs())

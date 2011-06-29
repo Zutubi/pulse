@@ -46,7 +46,11 @@ public class DriverRegistryTest extends PulseTestCase
     {
         unregisterAllDriversFromDriverManager();
 
-        if (!FileSystemUtils.rmdir(tmp))
+        try
+        {
+            FileSystemUtils.rmdir(tmp);
+        }
+        catch (IOException e)
         {
             // By loading the classfile from the postgresql jar, we cause problems with the
             // deletion of that file, someone keeps an open file handle.

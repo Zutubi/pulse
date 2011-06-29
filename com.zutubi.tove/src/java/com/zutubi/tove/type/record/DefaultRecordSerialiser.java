@@ -4,15 +4,19 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 
 /**
  * Used to (de)serialise records to permanent storage.
  */
 public class DefaultRecordSerialiser implements RecordSerialiser
 {
+    private static final Logger LOG = Logger.getLogger(DefaultRecordSerialiser.class);
+
     private static final int UNLIMITED = -1;
 
     private File baseDirectory;
@@ -65,7 +69,14 @@ public class DefaultRecordSerialiser implements RecordSerialiser
                 File[] childDirs = storageDir.listFiles(new SubrecordDirFileFilter());
                 for (File childDir : childDirs)
                 {
-                    FileSystemUtils.rmdir(childDir);
+                    try
+                    {
+                        FileSystemUtils.rmdir(childDir);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.severe(e);
+                    }
                 }
 
                 for (String key : record.keySet())

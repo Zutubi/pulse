@@ -72,16 +72,16 @@ public class FileSystemUtils
      * @param dir the directory to delete
      * @return true iff the whole directory was successfully deleted
      */
-    public static boolean rmdir(File dir)
+    public static void rmdir(File dir) throws IOException
     {
         if (dir == null)
         {
-            return false;
+            throw new IllegalArgumentException("dir cannot be null");
         }
 
         if (!dir.exists())
         {
-            return true;
+            return;
         }
 
         if (dir.isFile())
@@ -89,22 +89,7 @@ public class FileSystemUtils
             throw new IllegalArgumentException(String.format("removeDirectory can only be used on directories. %s is not a directory.", dir));
         }
 
-        if (!dir.isDirectory())
-        {
-            return false;
-        }
-
-        String canonicalDir;
-
-        try
-        {
-            canonicalDir = dir.getCanonicalPath();
-        }
-        catch (IOException e)
-        {
-            return false;
-        }
-
+        String canonicalDir = dir.getCanonicalPath();
         String[] contents = list(dir);
         if (contents.length > 0)
         {
@@ -115,14 +100,7 @@ public class FileSystemUtils
 
                 // The canonical path lets us distinguish symlinks from actual
                 // directories.
-                try
-                {
-                    canonicalFile = file.getCanonicalPath();
-                }
-                catch (IOException e)
-                {
-                    return false;
-                }
+                canonicalFile = file.getCanonicalPath();
 
                 // We don't want to traverse symbolic links to directories.
                 // The canonical path tells us where the file really is, and we
@@ -130,22 +108,22 @@ public class FileSystemUtils
                 // path for the directory too).
                 if (file.isDirectory() && canonicalFile.equals(composeFilename(canonicalDir, file.getName())))
                 {
-                    if (!rmdir(file))
-                    {
-                        return false;
-                    }
+                    rmdir(file);
                 }
                 else
                 {
                     if (!robustDelete(file))
                     {
-                        return false;
+                        throw new IOException("Unabled to remove file '" + file.getAbsolutePath() + "'");
                     }
                 }
             }
         }
 
-        return robustDelete(dir);
+        if (!robustDelete(dir))
+        {
+            throw new IOException("Unable to remove directory '" + dir.getAbsolutePath() + "'");
+        }
     }
 
     private static boolean robustFn(File f, Predicate<File> fn)
@@ -198,9 +176,9 @@ public class FileSystemUtils
     }
 
     /**
-     * A more robust version of {@link File#renameTo} which retries a few times
-     * on failure.  Most useful on Windows where renaming can fail due to
-     * external forces beyond our control.
+     * A more robust version of {@link File#renameTo(java.io.File)} which
+     * retries a few times on failure.  Most useful on Windows where renaming
+     * can fail due to external forces beyond our control.
      *
      * @param src  source file to be renamed
      * @param dest destination to rename the file to
@@ -254,10 +232,7 @@ public class FileSystemUtils
     {
         if (output.isDirectory())
         {
-            if (!FileSystemUtils.rmdir(output))
-            {
-                throw new IOException("Unable to remove existing output directory '" + output.getPath() + "'");
-            }
+            FileSystemUtils.rmdir(output);
         }
 
         if (!output.mkdirs())
@@ -1164,14 +1139,11 @@ public class FileSystemUtils
         {
             if (f.isDirectory())
             {
-                if (!rmdir(f))
-                {
-                    throw new IOException("Cannot remove existing directory '" + f.getAbsolutePath() + "'");
-                }
+                rmdir(f);
             }
             else
             {
-                if (!f.delete())
+                if (!robustDelete(f))
                 {
                     throw new IOException("Cannot remove existing file '" + f.getAbsolutePath() + "'");
                 }

@@ -8,9 +8,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.IOAssertions;
 import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -22,6 +19,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 public class SubversionClientTest extends PulseTestCase
 {
@@ -412,7 +413,7 @@ public class SubversionClientTest extends PulseTestCase
         client.setCleanOnUpdateFailure(true);
         client.checkout(context, createRevision(1), null);
         File rootSvnDir = new File(gotDir, ".svn");
-        assertTrue(FileSystemUtils.rmdir(rootSvnDir));
+        FileSystemUtils.rmdir(rootSvnDir);
         
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         Revision revision = client.update(context, null, handler);
@@ -427,7 +428,7 @@ public class SubversionClientTest extends PulseTestCase
         client.setCleanOnUpdateFailure(false);
         client.checkout(context, createRevision(1), null);
         File rootSvnDir = new File(gotDir, ".svn");
-        assertTrue(FileSystemUtils.rmdir(rootSvnDir));
+        FileSystemUtils.rmdir(rootSvnDir);
         
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         try

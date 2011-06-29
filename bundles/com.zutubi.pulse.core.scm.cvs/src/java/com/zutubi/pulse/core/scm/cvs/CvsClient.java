@@ -8,7 +8,6 @@ import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.createFile;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.CleanupInputStream;
@@ -19,6 +18,8 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.*;
 import java.util.*;
+
+import static com.zutubi.util.FileSystemUtils.createFile;
 
 /**
  * The CvsClient provides all interactions with a cvs repository.
@@ -440,10 +441,7 @@ public class CvsClient implements ScmClient
             {
                 public void execute()
                 {
-                    if (!FileSystemUtils.rmdir(tmpDir[0]))
-                    {
-                        LOG.severe("failed to remove temporary directory " + tmpDir[0]);
-                    }
+                    removeTempDir(tmpDir[0]);
                 }
             });
         }
@@ -454,9 +452,21 @@ public class CvsClient implements ScmClient
         }
         finally
         {
-            if (tmpDir[0] != null && !FileSystemUtils.rmdir(tmpDir[0]))
+            removeTempDir(tmpDir[0]);
+        }
+    }
+
+    private void removeTempDir(File dir)
+    {
+        if (dir != null)
+        {
+            try
             {
-                LOG.severe("failed to remove temporary directory " + tmpDir[0]);
+                FileSystemUtils.rmdir(dir);
+            }
+            catch (IOException e)
+            {
+                LOG.severe("Failed to remove temporary directory: " + e.getMessage());
             }
         }
     }
@@ -649,7 +659,14 @@ public class CvsClient implements ScmClient
         finally
         {
             // and lets not forget to clean up after ourselves.
-            FileSystemUtils.rmdir(tmpDir);
+            try
+            {
+                FileSystemUtils.rmdir(tmpDir);
+            }
+            catch (IOException e)
+            {
+                // Ignore.
+            }
         }
     }
 

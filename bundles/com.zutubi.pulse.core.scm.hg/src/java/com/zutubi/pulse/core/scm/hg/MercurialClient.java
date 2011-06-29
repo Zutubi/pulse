@@ -3,19 +3,20 @@ package com.zutubi.pulse.core.scm.hg;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -50,9 +51,16 @@ public class MercurialClient implements ScmClient
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getPersistentWorkingDir();
-        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+        if (workingDir.exists())
         {
-            throw new ScmException("Init failed. Could not delete directory: " + workingDir.getAbsolutePath());
+            try
+            {
+                FileSystemUtils.rmdir(workingDir);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException("Init failed: " + e.getMessage(), e);
+            }
         }
 
         hg.setWorkingDirectory(workingDir.getParentFile());
@@ -107,9 +115,16 @@ public class MercurialClient implements ScmClient
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
         File workingDir = context.getWorkingDir();
-        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+        if (workingDir.exists())
         {
-            throw new ScmException("Could not delete directory '" + workingDir.getAbsolutePath() + "'");
+            try
+            {
+                FileSystemUtils.rmdir(workingDir);
+            }
+            catch (IOException e)
+            {
+                throw new ScmException(e.getMessage(), e);
+            }
         }
 
         // hg clone --noupdate [--branch <branch>] <repository> <dir>
@@ -399,7 +414,14 @@ public class MercurialClient implements ScmClient
         {
             if (tempDir != null)
             {
-                FileSystemUtils.rmdir(tempDir);
+                try
+                {
+                    FileSystemUtils.rmdir(tempDir);
+                }
+                catch (IOException e)
+                {
+                    // Ignore.
+                }
             }
         }
     }

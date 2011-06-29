@@ -149,9 +149,13 @@ public class PatchArchive
                 File f = checkTargetFile(fileStatus, base, features);
                 if (fileStatus.isDirectory())
                 {
-                    if (!FileSystemUtils.rmdir(f))
+                    try
                     {
-                        features.add(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory '" + fileStatus.getTargetPath() + "'"));
+                        FileSystemUtils.rmdir(f);
+                    }
+                    catch (IOException e)
+                    {
+                        features.add(new Feature(Feature.Level.WARNING, "Problem applying patch: Unable to delete target directory: " + e.getMessage()));
                     }
                 }
                 else

@@ -7,6 +7,7 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  */
@@ -26,9 +27,13 @@ public class CleanupRecipeCommand implements Runnable
     {
         ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
-        if (!FileSystemUtils.rmdir(recipeRoot))
+        try
         {
-            LOG.warning("Unable to remove recipe directory '" + recipeRoot + "'");
+            FileSystemUtils.rmdir(recipeRoot);
+        }
+        catch (IOException e)
+        {
+            LOG.warning("Unable to remove recipe directory: " + e.getMessage(), e);
         }
     }
 

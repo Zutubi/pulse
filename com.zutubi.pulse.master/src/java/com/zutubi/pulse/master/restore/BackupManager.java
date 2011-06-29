@@ -188,7 +188,14 @@ public class BackupManager
             factory.exportArchive(archive, backupDir);
 
             // cleanup the archive now that it has been exported to the persistent backup directory.
-            FileSystemUtils.rmdir(archive.getBase());
+            try
+            {
+                FileSystemUtils.rmdir(archive.getBase());
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
         }
         catch (ArchiveException e)
         {

@@ -195,7 +195,14 @@ public class UpdateCommand implements Runnable
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            try
+            {
+                FileSystemUtils.rmdir(tempDir);
+            }
+            catch (IOException e)
+            {
+                // Ignore
+            }
         }
     }
 

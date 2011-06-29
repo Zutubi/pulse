@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -58,7 +57,7 @@ public class CvsClient_1_11_17_Test extends AbstractCvsClientTestCase
 */
     }
 
-    public void testCheckoutToDateOnBranch() throws ScmException, ParseException
+    public void testCheckoutToDateOnBranch() throws Exception
     {
         client.checkout(exeContext, new Revision(":BRANCH:" + localTime("2009-02-11 07:08:00 GMT")), null);
         assertFileExists("base/README_BRANCHED.txt");

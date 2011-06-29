@@ -45,8 +45,8 @@ public class DirectoryPlugin extends LocalPlugin
         }
     }
 
-    protected boolean delete()
+    protected void delete() throws IOException
     {
-        return FileSystemUtils.rmdir(source);
+        FileSystemUtils.rmdir(source);
     }
 }

@@ -61,10 +61,7 @@ public class Repository
         
         if (base.isDirectory())
         {
-            if (!FileSystemUtils.rmdir(base))
-            {
-                throw new IOException("Failed to remove dir: " + base.getCanonicalPath());
-            }
+            FileSystemUtils.rmdir(base);
         }
         if (!base.mkdirs())
         {

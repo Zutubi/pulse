@@ -213,7 +213,14 @@ public class PulseZipUtils
                 {
                     if (tmpDir != null)
                     {
-                        FileSystemUtils.rmdir(tmpDir);
+                        try
+                        {
+                            FileSystemUtils.rmdir(tmpDir);
+                        }
+                        catch (IOException e)
+                        {
+                            // Ignore.
+                        }
                     }
                 }
             }
@@ -472,7 +479,14 @@ public class PulseZipUtils
                 {
                     if (tmpDir != null)
                     {
-                        FileSystemUtils.rmdir(tmpDir);
+                        try
+                        {
+                            FileSystemUtils.rmdir(tmpDir);
+                        }
+                        catch (IOException e)
+                        {
+                            // Ignore.
+                        }
                     }
                 }
             }
