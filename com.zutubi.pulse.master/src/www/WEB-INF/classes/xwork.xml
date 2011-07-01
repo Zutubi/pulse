@@ -573,6 +573,10 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
+        <action name="togglePin" class="com.zutubi.pulse.master.xwork.actions.ajax.TogglePinAction">
+            <result name="success" type="flexjson">result</result>
+        </action>
+
         <action name="reference" class="com.zutubi.pulse.master.tove.webwork.help.ReferenceAction">
             <result name="builtin" type="velocity">reference/builtins/${baseName}.vm</result>
             <result name="element" type="velocity">reference/element.vm</result>

@@ -20,6 +20,8 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
     public static final String ACTION_ADD_COMMENT = "addComment";
     public static final String ACTION_CANCEL = "cancel";
     public static final String ACTION_KILL = "kill";
+    public static final String ACTION_PIN = "pin";
+    public static final String ACTION_UNPIN = "unpin";
 
     private BuildReason reason;
     private Project project;
@@ -57,6 +59,11 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
      * Descriptive comments left by users on this build.
      */
     private List<Comment> comments = new LinkedList<Comment>();
+    /**
+     * Pinned builds cannot be deleted and are immune from cleanup.
+     * They may be unpinned, though, and then deleted.
+     */
+    private boolean pinned;
 
     public BuildResult()
     {
@@ -192,6 +199,16 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
     public boolean removeComment(Comment comment)
     {
         return comments.remove(comment);
+    }
+
+    public boolean isPinned()
+    {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned)
+    {
+        this.pinned = pinned;
     }
 
     /**

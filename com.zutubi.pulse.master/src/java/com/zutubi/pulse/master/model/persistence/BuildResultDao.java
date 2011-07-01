@@ -20,7 +20,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     void save(CommandResult result);
 
-    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] statuses, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst);
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] statuses, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst, boolean includePinned);
 
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst);
 
@@ -66,7 +66,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getBuildCount(Project project, ResultState[] states);
 
-    int getBuildCount(Project project, ResultState[] states, String[] statuses);
+    int getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned);
 
     int getBuildCount(Project project, long after, long upTo);
 

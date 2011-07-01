@@ -19,7 +19,7 @@
 Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     template: new Ext.XTemplate(
         '<table class="status-box {health}-box" id="{id}">' +
-            '<tr><th colspan="2"></th></tr>' +
+            '<tr><th colspan="2" id="{id}-title"></th></tr>' +
         '</table>'),
 
     rowTemplate: new Ext.XTemplate(

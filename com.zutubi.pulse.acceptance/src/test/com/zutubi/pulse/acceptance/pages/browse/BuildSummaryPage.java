@@ -10,6 +10,7 @@ import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.webwork.Urls;
+
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -84,7 +85,12 @@ public class BuildSummaryPage extends ResponsibilityPage
     {
         return Boolean.valueOf(browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('build-summary-right').isVisible()"));
     }
-    
+
+    public String getBuildTitle()
+    {
+        return statusBox.getTitle();
+    }
+
     public ResultState getBuildStatus()
     {
         return ResultState.fromPrettyString(statusBox.getValue(PROPERTY_STATUS));

@@ -845,6 +845,25 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(5, buildResultDao.getBuildCount(p1, 0, 100));
     }
 
+    public void testGetBuildCountPinned()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        buildResultDao.save(createCompletedBuild(p1, 1));
+        BuildResult build = createCompletedBuild(p1, 2);
+        build.setPinned(true);
+        buildResultDao.save(build);
+        buildResultDao.save(createCompletedBuild(p1, 3));
+        build = createCompletedBuild(p1, 4);
+        build.setPinned(true);
+        buildResultDao.save(build);
+        buildResultDao.save(createCompletedBuild(p1, 5));
+
+        assertEquals(5, buildResultDao.getBuildCount(p1, null, null, true));
+        assertEquals(3, buildResultDao.getBuildCount(p1, null, null, false));
+    }
+
     public void testQueryBuilds()
     {
         Project p1 = new Project();
@@ -982,6 +1001,25 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(p2, results.get(0).getProject());
         assertEquals(1, results.get(1).getNumber());
         assertEquals(p2, results.get(1).getProject());
+    }
+
+    public void testQueryBuildsPinned()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        buildResultDao.save(createCompletedBuild(p1, 1));
+        BuildResult build = createCompletedBuild(p1, 2);
+        build.setPinned(true);
+        buildResultDao.save(build);
+        buildResultDao.save(createCompletedBuild(p1, 3));
+        build = createCompletedBuild(p1, 4);
+        build.setPinned(true);
+        buildResultDao.save(build);
+        buildResultDao.save(createCompletedBuild(p1, 5));
+
+        assertEquals(5, buildResultDao.queryBuilds(new Project[]{p1}, null, null, -1, -1, -1, -1, true, true).size());
+        assertEquals(3, buildResultDao.queryBuilds(new Project[]{p1}, null, null, -1, -1, -1, -1, true, false).size());
     }
 
     public void testFindByRecipeId()

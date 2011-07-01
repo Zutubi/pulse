@@ -71,6 +71,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(BuildNavigationAcceptanceTest.class);
         suite.addTestSuite(BuildCommentAcceptanceTest.class);
         suite.addTestSuite(BuildResponsibilityAcceptanceTest.class);
+        suite.addTestSuite(BuildPinningAcceptanceTest.class);
         suite.addTestSuite(MavenAcceptanceTest.class);
         suite.addTestSuite(PerforceAcceptanceTest.class);
         suite.addTestSuite(BuildHookAcceptanceTest.class);

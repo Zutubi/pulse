@@ -163,6 +163,8 @@
                 <ref local="addHistoryBuildsPreference"/>
                 <ref local="addGitCloneType"/>
                 <ref local="updateTimeReportLabel"/>
+                <ref local="pinnedBuilds"/>
+                <ref local="buildResultPinnedIndex"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -835,5 +837,18 @@
 
     <bean id="updateTimeReportLabel" class="com.zutubi.pulse.master.upgrade.tasks.UpdateTimeReportLabelUpgradeTask">
         <property name="buildNumber" value="204000005"/>
+    </bean>
+
+    <bean id="pinnedBuilds" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="204001001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.4.1-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="buildResultPinnedIndex" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultPinnedIndexUpgradeTask">
+        <property name="buildNumber" value="204001002"/>
     </bean>
 </beans>

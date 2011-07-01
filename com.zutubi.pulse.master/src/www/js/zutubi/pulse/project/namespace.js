@@ -579,6 +579,11 @@ Ext.apply(Zutubi.pulse.project, {
                 renderer: Ext.util.Format.htmlEncode
             },
 
+            pinned: {
+                name: 'pinned',
+                renderer: function(pinned) { return pinned ? 'yes' : 'no'; }
+            },
+
             stages: {
                 name: 'stages',
                 cls: 'nowrap',

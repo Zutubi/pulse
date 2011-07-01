@@ -7,11 +7,12 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -254,6 +255,33 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         assertBuildLogsNotPresentViaUI(projectName, 1);
         assertStageLogsNotPresentViaUI(projectName, 1, "default");
         assertFalse(utils.hasBuildLog(projectName, 1));
+    }
+
+    public void testPinnedBuildsImmune() throws Exception
+    {
+        final String projectName = random;
+
+        utils.addCleanupRule(projectName, "everything");
+
+        rpcClient.RemoteApi.runBuild(projectName);
+        rpcClient.RemoteApi.pinBuild(projectName, 1);
+        rpcClient.RemoteApi.runBuild(projectName);
+        rpcClient.RemoteApi.runBuild(projectName);
+
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuild(projectName, 2);
+            }
+        });
+
+        assertTrue(utils.hasBuild(projectName, 1));
+        assertTrue(isBuildPresentViaUI(projectName, 1));
+        assertFalse(utils.hasBuild(projectName, 2));
+        assertFalse(isBuildPresentViaUI(projectName, 2));
+        assertTrue(utils.hasBuild(projectName, 3));
+        assertTrue(isBuildPresentViaUI(projectName, 3));
     }
 
     private String renameProject(String projectName) throws Exception

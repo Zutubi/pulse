@@ -30,7 +30,8 @@ Zutubi.pulse.project.BuildSummaryTable = Ext.extend(Zutubi.table.SummaryTable, {
                 Zutubi.pulse.project.configs.build.reason,
                 Zutubi.pulse.project.configs.build.revision,
                 Zutubi.pulse.project.configs.build.tests,
-                Zutubi.pulse.project.configs.build.maturity            
+                Zutubi.pulse.project.configs.build.maturity,
+                Zutubi.pulse.project.configs.build.pinned
             ],
             saveUrl: window.baseUrl + '/ajax/customiseBuildColumns.action',
             saveParams: {

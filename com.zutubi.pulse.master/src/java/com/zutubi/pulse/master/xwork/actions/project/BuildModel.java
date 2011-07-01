@@ -29,6 +29,7 @@ public class BuildModel extends ResultModel
     private String link;
     private String tests;
     private String maturity;
+    private boolean pinned;
     private List<BuildStageModel> stages = new LinkedList<BuildStageModel>();
 
     public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision, String maturity)
@@ -74,6 +75,7 @@ public class BuildModel extends ResultModel
         }
 
         maturity = buildResult.getStatus();
+        pinned = buildResult.isPinned();
     }
 
     public long getNumber()
@@ -129,6 +131,16 @@ public class BuildModel extends ResultModel
     public String getMaturity()
     {
         return maturity;
+    }
+
+    public boolean isPinned()
+    {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned)
+    {
+        this.pinned = pinned;
     }
 
     @JSON

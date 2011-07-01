@@ -963,6 +963,16 @@ public class RemoteApiClient extends ApiClient
         return null;
     }
 
+    public boolean pinBuild(String projectName, int number) throws Exception
+    {
+        return (Boolean)call("pinBuild", projectName, number);
+    }
+
+    public boolean unpinBuild(String projectName, int number) throws Exception
+    {
+        return (Boolean)call("unpinBuild", projectName, number);
+    }
+
     public boolean deleteBuild(String projectName, int number) throws Exception
     {
         return (Boolean)call("deleteBuild", projectName, number);

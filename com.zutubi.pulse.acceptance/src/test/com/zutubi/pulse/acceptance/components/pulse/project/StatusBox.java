@@ -14,6 +14,16 @@ public class StatusBox extends Component
     }
 
     /**
+     * Returns the title at the top of the box.
+     *
+     * @return the box title
+     */
+    public String getTitle()
+    {
+        return browser.getText(getId() + "-title");
+    }
+
+    /**
      * Indicates if a property with the given name is present.
      *
      * @param propertyName name of the property to check for

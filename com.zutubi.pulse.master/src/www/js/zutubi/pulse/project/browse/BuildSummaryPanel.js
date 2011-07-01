@@ -67,7 +67,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
                     items: [{
                         xtype: 'xzstatusbox',
                         id: this.id + '-status',
-                        titleTemplate: 'build {number}',
+                        titleTemplate: 'build {number} <tpl if="pinned">[pinned]</tpl>',
                         fields: [
                             Zutubi.pulse.project.configs.result.status,
                             Zutubi.pulse.project.configs.build.tests,
@@ -152,6 +152,8 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
                         cancel: cancelBuild.createDelegate(window, [this.buildId, false]),
                         kill: cancelBuild.createDelegate(window, [this.buildId, true]),
                         'delete': this.deleteBuild.createDelegate(this),
+                        pin: this.togglePin.createDelegate(this, [true]),
+                        unpin: this.togglePin.createDelegate(this, [false]),
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
                         addComment:this.addComment.createDelegate(this)
@@ -203,6 +205,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         if (this.rendered)
         {
             this.updateRows();
+            this.el.unmask();
         }
     },
 
@@ -217,7 +220,21 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         var ownerArg = this.personal ? 'personal=true' : 'projectName=' + encodeURIComponent(this.projectName);
         confirmUrl('Are you sure you wish to delete this build?', window.baseUrl + '/deleteBuild.action?' + ownerArg + '&buildVID=' + this.buildNumber);
     },
-    
+
+    togglePin: function(pin)
+    {
+        this.getEl().mask((pin ? 'Pinning' : 'Unpinning') + ' build...', 'working');
+
+        Ext.Ajax.request({
+            url: window.baseUrl + '/ajax/togglePin.action',
+            params: {
+                buildId: this.buildId,
+                pin: pin
+            },
+            callback: handleDialogResponse
+        });
+    },
+
     addComment: function()
     {
         showPromptDialog('Add Comment',

@@ -17,7 +17,6 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -32,8 +31,6 @@ import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.proce
  */
 public class BuildSummaryDataAction extends BuildStatusActionBase
 {
-    private static final Logger LOG = Logger.getLogger(BuildSummaryDataAction.class);
-    
     private BuildSummaryModel model;
     
     private SystemPaths systemPaths;
@@ -78,7 +75,15 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
         {
             if (canWrite)
             {
-                model.addAction(ToveUtils.getActionLink(AccessManager.ACTION_DELETE, messages, contentRoot));
+                if (buildResult.isPinned())
+                {
+                    model.addAction(ToveUtils.getActionLink(BuildResult.ACTION_UNPIN, messages, contentRoot));
+                }
+                else
+                {
+                    model.addAction(ToveUtils.getActionLink(BuildResult.ACTION_PIN, messages, contentRoot));
+                    model.addAction(ToveUtils.getActionLink(AccessManager.ACTION_DELETE, messages, contentRoot));
+                }
             }
         }
         else

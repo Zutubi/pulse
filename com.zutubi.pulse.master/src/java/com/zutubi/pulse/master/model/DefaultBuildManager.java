@@ -422,6 +422,19 @@ public class DefaultBuildManager implements BuildManager
         cleanup(result, new BuildCleanupOptions(true));
     }
 
+    public boolean togglePin(BuildResult buildResult, boolean pin)
+    {
+        buildResult = getBuildResult(buildResult.getId());
+        if (buildResult != null && buildResult.isPinned() != pin)
+        {
+            buildResult.setPinned(pin);
+            buildResultDao.save(buildResult);
+            return true;
+        }
+
+        return false;
+    }
+
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
         List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{project}, ResultState.getIncompleteStates(), -1, -1, -1, -1, true);
@@ -517,6 +530,12 @@ public class DefaultBuildManager implements BuildManager
     public void cleanup(BuildResult build, BuildCleanupOptions options)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+
+        if (!build.isPersonal() && build.isPinned())
+        {
+            LOG.warning("Ignoring attempt to delete pinned build " + build.getOwnerName() + ": " + build.getNumber());
+            return;
+        }
 
         if (options.isCleanupAll()) // then we are cleaning up everything in the build directory.
         {

@@ -35,6 +35,10 @@
             <one-to-many class="com.zutubi.pulse.master.model.Comment"/>
         </list>
 
+        <property name="pinned" type="boolean">
+            <column name="PINNED" not-null="true" default="false" index="idx_buildresult_pinned"/>
+        </property>
+        
         <property name="number" type="long">
             <column name="NUMBER" not-null="true" index="idx_buildresult_number"/>
         </property>

@@ -271,13 +271,17 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses)
+    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final boolean includePinned)
     {
         return (Integer) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
+                if (!includePinned)
+                {
+                    criteria.add(Restrictions.eq("pinned", false));
+                }
                 addStatusesToCriteria(statuses, criteria);
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
@@ -302,10 +306,10 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
     {
-        return queryBuilds(projects, states, null, earliestStartTime, latestStartTime, first, max, mostRecentFirst);
+        return queryBuilds(projects, states, null, earliestStartTime, latestStartTime, first, max, mostRecentFirst, true);
     }
 
-    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] statuses, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(final Project[] projects, final ResultState[] states, final String[] statuses, final long earliestStartTime, final long latestStartTime, final int first, final int max, final boolean mostRecentFirst, final boolean includePinned)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
@@ -313,6 +317,10 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Criteria criteria = session.createCriteria(BuildResult.class);
                 criteria.add(Restrictions.isNull("user"));
+                if (!includePinned)
+                {
+                    criteria.add(Restrictions.eq("pinned", false));
+                }
                 addProjectsToCriteria(projects, criteria);
                 addStatesToCriteria(states, criteria);
                 addStatusesToCriteria(statuses, criteria);
@@ -485,7 +493,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
     {
-        int total = getBuildCount(project, states, null);
+        int total = getBuildCount(project, states, null, true);
         if (total > limit)
         {
             // Clean out the difference

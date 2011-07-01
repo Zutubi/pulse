@@ -36,7 +36,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -66,6 +65,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1916,13 +1917,66 @@ public class RemoteApi
     }
 
     /**
-     * Deletes the build result for the given project and id, if such a build exists.  All details
-     * of the build, including artifacts, are permanently removed and may not be recoevered.
+     * Pins the build result for the given project and id, if such a build exists.
+     * Pinned builds cannot be deleted, and are immune to cleanup rules.
+     *
+     * A pinned build may, however, be unpinned, allowing it to be deleted afterwards.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build to pin
+     * @param id          ID of the build to pin
+     * @return true if the build was found and pinned, false if the build does not exist
+     *         or was already pinned
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires write permission for the given project
+     */
+    public boolean pinBuild(String token, String projectName, int id)
+    {
+        return togglePin(token, projectName, id, true);
+    }
+
+    /**
+     * Unpins the build result for the given project and id, if such a build exists.
+     * Has no effect if the build is not currently pinned.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project that owns the build to unpin
+     * @param id          ID of the build to unpin
+     * @return true if the build was found and unpinned, false if the build does not exist
+     *         or was not pinned
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires write permission for the given project
+     */
+    public boolean unpinBuild(String token, String projectName, int id)
+    {
+        return togglePin(token, projectName, id, false);
+    }
+
+    private boolean togglePin(String token, String projectName, int id, boolean pin)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = buildManager.getByProjectAndNumber(project, id);
+            return build != null && buildManager.togglePin(build, pin);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Deletes the build result for the given project and id, if such a build exists
+     * and is not pinned.  All details of the build, including artifacts, are
+     * permanently removed and may not be recovered.
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project that owns the build to delete
      * @param id          ID of the build to delete
      * @return true if the build was found and deleted, false if the build does not exist
+     *         or is pinned
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires write permission for the given project
      */
@@ -1934,7 +1988,7 @@ public class RemoteApi
             Project project = internalGetProject(projectName, true);
             accessManager.ensurePermission(AccessManager.ACTION_WRITE, project);
             BuildResult build = buildManager.getByProjectAndNumber(project, id);
-            if (build == null)
+            if (build == null || build.isPinned())
             {
                 return false;
             }

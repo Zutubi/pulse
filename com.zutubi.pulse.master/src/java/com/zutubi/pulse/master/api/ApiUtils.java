@@ -51,6 +51,7 @@ public class ApiUtils
         buildDetails.put("version", getBuildVersion(build));
         buildDetails.put("reason", build.getReason().getSummary());
         buildDetails.put("maturity", build.getStatus());
+        buildDetails.put("pinned", build.isPinned());
         addResultFields(build, buildDetails);
 
         if (includeStages)
