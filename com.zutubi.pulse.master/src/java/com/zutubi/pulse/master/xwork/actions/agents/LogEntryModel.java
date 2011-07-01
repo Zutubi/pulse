@@ -9,11 +9,14 @@ import com.zutubi.util.StringUtils;
  */
 public class LogEntryModel
 {
+    private static final int MAX_LINE_LENGTH = 120;
+
     private DateModel when;
     private String level;
     private int count;
     private String sourceClass;
     private String sourceMethod;
+    private String messagePreview;
     private String message;
     private String stackPreview;
     private String stackTrace;
@@ -26,8 +29,16 @@ public class LogEntryModel
         sourceClass = record.getSourceClassName();
         sourceMethod = record.getSourceMethodName();
         message = record.getMessage();
+        if (StringUtils.stringSet(message) && message.length() > MAX_LINE_LENGTH)
+        {
+            messagePreview = StringUtils.trimmedString(message, MAX_LINE_LENGTH);
+        }
+
         stackTrace = record.getStackTrace();
-        stackPreview = StringUtils.stringSet(stackTrace) ? StringUtils.getLine(stackTrace, 1) : null;
+        if (StringUtils.stringSet(stackTrace))
+        {
+            stackPreview = StringUtils.trimmedString(StringUtils.getLine(stackTrace, 1), MAX_LINE_LENGTH);
+        }
     }
 
     public DateModel getWhen()
@@ -53,6 +64,11 @@ public class LogEntryModel
     public String getSourceMethod()
     {
         return sourceMethod;
+    }
+
+    public String getMessagePreview()
+    {
+        return messagePreview;
     }
 
     public String getMessage()

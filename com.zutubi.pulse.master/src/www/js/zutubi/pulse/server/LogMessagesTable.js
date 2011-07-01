@@ -39,14 +39,21 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
             '<tpl if="message">' +
                 '<tr id="{id}-message-{index}">' +
                     '<td class="leftmost rightmost" colspan="4">' +
-                        '<pre>{message:htmlEncode}</pre>' +
+                        '<tpl if="messagePreview">' +
+                            '<pre><span title="{message:htmlEncode}">{messagePreview:htmlEncode}</span></pre>' +
+                        '</tpl>' +
+                        '<tpl if="!messagePreview">' +
+                            '<pre>{message:htmlEncode}</pre>' +
+                        '</tpl>' +
                     '</td>' +
                 '</tr>' +
             '</tpl>' +
             '<tpl if="stackTrace">' +
                 '<tr id="{id}-preview-{index}">' +
                     '<td class="leftmost rightmost" colspan="4">' +
-                        '<pre>{stackPreview:htmlEncode} <span style="font-size: 0.8em; color: #555">(click to reveal full trace)</span></pre>' +
+                        '<pre>{stackPreview:htmlEncode}\n' +
+                              '<span style="color: #555">(click to reveal full trace)</span>' +
+                          '</pre>' +
                     '</td>' +
                 '</tr>' +
                 '<tr id="{id}-trace-{index}" style="display: none">' +
@@ -147,6 +154,7 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
                 level: entry.level,
                 sourceClass: entry.sourceClass,
                 sourceMethod: entry.sourceMethod,
+                messagePreview: entry.messagePreview,
                 message: entry.message,
                 stackPreview: entry.stackPreview,
                 stackTrace: entry.stackTrace,
