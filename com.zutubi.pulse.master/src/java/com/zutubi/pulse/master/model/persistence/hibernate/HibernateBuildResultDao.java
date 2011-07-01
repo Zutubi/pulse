@@ -603,7 +603,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                         "  join result.root.children child " +
                         "where child.host = :agent " +
                         (states == null ? "" : "and result.stateName in (:states) ") +
-                        "order by id desc");
+                        "order by result.id desc");
 
                 queryObject.setString("agent", agent);
                 if (states != null)
