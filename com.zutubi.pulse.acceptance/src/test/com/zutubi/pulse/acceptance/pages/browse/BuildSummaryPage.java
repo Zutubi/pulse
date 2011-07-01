@@ -169,6 +169,7 @@ public class BuildSummaryPage extends ResponsibilityPage
     @Override
     public boolean isActionPresent(String actionName)
     {
+        browser.waitForElement(actionsTable.getId());
         return actionsTable.isLinkPresent(actionName);
     }
 
