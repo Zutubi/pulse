@@ -71,26 +71,27 @@
     font-size: 13px;
     line-height: 20px;
     padding-left: 24px;
+    padding-right: 8px;
     list-style: none;
 }
 
 li.task-inprogress {
     font-weight: bold;
-    background: url( ../images/inprogress.gif ) no-repeat 4px 6px #dde;
+    background: url( ../images/inprogress.gif ) no-repeat 4px 2px #dde;
 }
 
 li.task-complete {
-    background: url( ../images/accept.gif ) no-repeat 4px 6px;
+    background: url( ../images/accept.gif ) no-repeat 4px 2px;
 }
 
 li.task-successful {
-    background: url( ../images/accept.gif ) no-repeat 4px 6px;
+    background: url( ../images/accept.gif ) no-repeat 4px 2px;
 }
 
 li.task-failed {
-    background: url( ../images/exclamation.gif ) no-repeat 4px 6px;
+    background: url( ../images/exclamation.gif ) no-repeat 4px 2px;
 }
 
 li.task-aborted {
-    background: url( ../images/exclamation-bw.gif ) no-repeat 4px 6px;
+    background: url( ../images/exclamation-bw.gif ) no-repeat 4px 2px;
 }
