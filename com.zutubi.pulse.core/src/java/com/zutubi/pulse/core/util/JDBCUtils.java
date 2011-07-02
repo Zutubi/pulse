@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * Utilities for talking to databases via JDBC.
  */
 public class JDBCUtils
 {
@@ -240,6 +240,21 @@ public class JDBCUtils
         {
             return false;
         }
+    }
+
+    public static String sqlAddIndex(Connection con, String tableName, String indexName, String[] columns) throws SQLException
+    {
+        return getMiniDialect(con).sqlAddIndex(tableName, indexName, columns);
+    }
+
+    public static String sqlAddIndex(Connection con, String tableName, String indexName, String column, int prefixLength) throws SQLException
+    {
+        return getMiniDialect(con).sqlAddIndex(tableName, indexName, column, prefixLength);
+    }
+
+    public static String sqlDropIndex(Connection con, String tableName, String indexName) throws SQLException
+    {
+        return getMiniDialect(con).sqlDropIndex(tableName, indexName);
     }
 
     public static void dropAllTablesFromSchema(Connection con) throws SQLException
@@ -643,7 +658,7 @@ public class JDBCUtils
 
     /**
      * The mini dialect is used to define the differences between the databases
-     * when dealing with dropping tables.
+     * SQL syntax.
      */
     private static interface MiniDialect
     {
@@ -652,7 +667,7 @@ public class JDBCUtils
          * @param con connection on which the tables will be dropped.
          * @throws SQLException on error.
          */
-        public void preDrop(Connection con) throws SQLException;
+        void preDrop(Connection con) throws SQLException;
 
         /**
          * Generate a drop table sql statement for the specified tablename
@@ -660,35 +675,73 @@ public class JDBCUtils
          * @param tableName of the table being dropped.
          * @return the sql statement that will drop the named table.
          */
-        public String sqlDropTable(String tableName);
+        String sqlDropTable(String tableName);
 
         /**
          * This method is called after all the sql drop table statements have been executed.
          * @param con connetion on which the tables are dropped.
          * @throws SQLException on error
          */
-        public void postDrop(Connection con) throws SQLException;
+        void postDrop(Connection con) throws SQLException;
+        
+        String sqlAddIndex(String tableName, String indexName, String... columns);
+
+        String sqlAddIndex(String tableName, String indexName, String column, int prefixLength);
+        
+        String sqlDropIndex(String tableName, String indexName);
     }
 
-    private static class HSQLMiniDialect implements MiniDialect
+    private static abstract class MiniDialectSupport implements MiniDialect
     {
-        public void preDrop(Connection con)
+        public void preDrop(Connection con) throws SQLException
         {
-
         }
 
-        public void postDrop(Connection con)
+        public void postDrop(Connection con) throws SQLException
         {
-
         }
 
+        public String sqlAddIndex(String tableName, String indexName, String... columns)
+        {
+            String sql = "CREATE INDEX " + indexName + " ON " + tableName + " (";
+            boolean first = true;
+            for (String column : columns)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    sql += ",";
+                }
+
+                sql += column;
+            }
+
+            sql += ")";
+            return sql;
+        }
+
+        public String sqlAddIndex(String tableName, String indexName, String column, int prefixLength)
+        {
+            return sqlAddIndex(tableName, indexName, column);
+        }
+    }
+    private static class HSQLMiniDialect extends MiniDialectSupport
+    {
         public String sqlDropTable(String tableName)
         {
             return "DROP TABLE " + tableName + " IF EXISTS CASCADE";
         }
+
+        public String sqlDropIndex(String tableName, String indexName)
+        {
+            return "DROP INDEX " + indexName + " IF EXISTS";            
+        }
     }
 
-    private static class MySQLMiniDialect implements MiniDialect
+    private static class MySQLMiniDialect extends MiniDialectSupport
     {
         public void preDrop(Connection con) throws SQLException
         {
@@ -704,23 +757,28 @@ public class JDBCUtils
         {
             JDBCUtils.execute(con, "SET FOREIGN_KEY_CHECKS=1");
         }
+
+        public String sqlAddIndex(String tableName, String indexName, String column, int prefixLength)
+        {
+            return "CREATE INDEX " + indexName + " ON " + tableName + " (" + column + "(" + prefixLength + "))";
+        }
+
+        public String sqlDropIndex(String tableName, String indexName)
+        {
+            return "DROP INDEX " + indexName + " ON " + tableName;
+        }
     }
 
-    private static class PostgresMiniDialect implements MiniDialect
+    private static class PostgresMiniDialect extends MiniDialectSupport
     {
-        public void preDrop(Connection con)
-        {
-
-        }
-
-        public void postDrop(Connection con)
-        {
-
-        }
-
         public String sqlDropTable(String tableName)
         {
             return "DROP TABLE " + tableName + " CASCADE";
+        }
+
+        public String sqlDropIndex(String tableName, String indexName)
+        {
+            return "DROP INDEX " + indexName;
         }
     }
 }

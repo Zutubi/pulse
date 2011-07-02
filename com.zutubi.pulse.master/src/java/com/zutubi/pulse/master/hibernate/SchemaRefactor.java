@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.hibernate;
 
 import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.database.SchemaCustomisations;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
@@ -13,10 +14,10 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.hbm2ddl.TableMetadata;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.io.IOException;
 
 public class SchemaRefactor
 {
@@ -301,6 +302,7 @@ public class SchemaRefactor
             public Object execute(Connection con) throws SQLException
             {
                 String[] sql = config.generateSchemaCreationScript(dialect);
+                sql = SchemaCustomisations.customiseSchemaCreationScript(con, sql);
                 for (String s : sql)
                 {
                     LOG.info(s);

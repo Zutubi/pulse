@@ -86,13 +86,13 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
     {
         try
         {
-            DatabaseMetaData meta = dataSource.getConnection().getMetaData();
+            Connection connection = dataSource.getConnection();
 
-            // For Postgres, we manually force indexes for all foreign key
-            // contraints.
-            if(meta.getDatabaseProductName().contains("ostgre"))
+            // For PostgreSQL, we manually force indexes for all foreign key
+            // constraints.
+            if (JDBCUtils.getDBType(connection) == JDBCUtils.DbType.POSTGRESQL)
             {
-                checkIndices(meta);
+                checkIndices(connection.getMetaData());
             }
         }
         catch (SQLException e)

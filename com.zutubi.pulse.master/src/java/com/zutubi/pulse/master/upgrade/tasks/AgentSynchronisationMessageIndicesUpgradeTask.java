@@ -14,7 +14,7 @@ public class AgentSynchronisationMessageIndicesUpgradeTask extends AbstractSchem
     protected void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException
     {
         addIndex(con, "AGENT_SYNCH_MESSAGE", "AGENT_SYNCH_MESSAGE_TYPE_NAME", "TYPE_NAME");
-        addIndex(con, "AGENT_SYNCH_MESSAGE", "AGENT_SYNCH_MESSAGE_DESCRIPTION", "DESCRIPTION");
+        addIndex(con, "AGENT_SYNCH_MESSAGE", "AGENT_SYNCH_MESSAGE_DESCRIPTION", "DESCRIPTION", 127);
         addIndex(con, "AGENT_SYNCH_MESSAGE", "AGENT_SYNCH_MESSAGE_STATUS_NAME", "STATUS_NAME");
     }
 }
