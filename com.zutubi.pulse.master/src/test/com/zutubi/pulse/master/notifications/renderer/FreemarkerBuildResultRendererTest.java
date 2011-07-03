@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.notifications.renderer;
 
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -18,17 +16,20 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import static java.util.Arrays.asList;
 import java.util.*;
+
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
-    private boolean generate = false;
+    private boolean generate = true;
 
     private FreemarkerBuildResultRenderer renderer;
 
@@ -256,19 +257,18 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         BuildResult result = createBuildWithChanges(changes);
         result.error("test error message");
         result.addFeature(Feature.Level.WARNING, "warning message on result");
-        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
-        firstNode.getResult().error("test recipe error message");
+        RecipeResultNode firstStage = result.getStages().get(0);
+        firstStage.getResult().error("test recipe error message");
+        RecipeResultNode secondStage = result.getStages().get(1);
+        secondStage.getResult().failure("test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long");
 
-        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
-        nestedNode.getResult().failure("test recipe failure message with the unfortunate need to wrap because it is really quite ridiculously long");
-
-        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
-        RecipeResult secondResult = secondNode.getResult();
+        RecipeResultNode thirdStages = result.getStages().get(2);
+        RecipeResult thirdResult = thirdStages.getResult();
 
         CommandResult command = new CommandResult("test command");
         command.setId(200);
         command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
-        secondResult.add(command);
+        thirdResult.add(command);
 
         command = new CommandResult("artifact command");
         command.setId(101);
@@ -286,7 +286,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         artifact.addFeature(new PersistentFeature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
-        secondResult.add(command);
+        thirdResult.add(command);
         return result;
     }
 
@@ -295,14 +295,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         BuildResult result = createSuccessfulBuild();
         result.failure("test failed tests");
 
-        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
-        firstNode.getResult().failure("tests failed dude");
+        RecipeResultNode firstStage = result.getStages().get(0);
+        firstStage.getResult().failure("tests failed dude");
 
-        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
-        nestedNode.getResult().failure("tests failed nested dude");
+        RecipeResultNode secondStage = result.getStages().get(1);
+        secondStage.getResult().failure("tests failed second dude");
 
-        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
-        RecipeResult secondResult = secondNode.getResult();
+        RecipeResultNode thirdStage = result.getStages().get(2);
+        RecipeResult thirdResult = thirdStage.getResult();
 
         CommandResult command = new CommandResult("failing tests");
         command.setId(100);
@@ -327,15 +327,15 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
-        secondResult.add(command);
-        secondResult.setFailedTestResults(tests);
+        thirdResult.add(command);
+        thirdResult.setFailedTestResults(tests);
         TestResultSummary summary = tests.getSummary();
         if(excessFailures)
         {
             summary.setFailures(summary.getFailures() + 123);
         }
 
-        secondResult.setTestSummary(summary);
+        thirdResult.setTestSummary(summary);
         createAndVerify((excessFailures ? "excess" : "") + "failures", type, "http://host.url", result);
     }
 
@@ -344,8 +344,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         BuildResult result = createSuccessfulBuild();
         result.failure("a stage failed");
 
-        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
-        RecipeResult secondResult = secondNode.getResult();
+        RecipeResultNode secondStage = result.getStages().get(1);
+        RecipeResult secondResult = secondStage.getResult();
 
         CommandResult command = new CommandResult("failing tests");
         command.setId(23);
@@ -365,14 +365,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         result.failure("test failed tests");
 
-        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
-        firstNode.getResult().failure("tests failed dude");
+        RecipeResultNode firstStage = result.getStages().get(0);
+        firstStage.getResult().failure("tests failed dude");
 
-        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
-        nestedNode.getResult().failure("tests failed nested dude");
+        RecipeResultNode secondStage = result.getStages().get(1);
+        secondStage.getResult().failure("tests failed second dude");
 
-        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
-        RecipeResult secondResult = secondNode.getResult();
+        RecipeResultNode thirdStage = result.getStages().get(2);
+        RecipeResult thirdResult = thirdStage.getResult();
 
         CommandResult command = new CommandResult("failing tests");
         command.setId(22);
@@ -397,10 +397,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
-        secondResult.add(command);
-        secondResult.setFailedTestResults(tests);
+        thirdResult.add(command);
+        thirdResult.setFailedTestResults(tests);
         TestResultSummary summary = tests.getSummary();
-        secondResult.setTestSummary(summary);
+        thirdResult.setTestSummary(summary);
         createAndVerify("personal", type, "http://host.url", result);
     }
 
@@ -453,21 +453,21 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         recipeResult.complete();
         recipeResult.getStamps().setEndTime(99998);
         RecipeResultNode node = new RecipeResultNode("first stage", 1, recipeResult);
-        result.getRoot().addChild(node);
+        result.addStage(node);
 
         recipeResult = new RecipeResult("second recipe");
         recipeResult.commence(10001);
         recipeResult.complete();
         recipeResult.getStamps().setEndTime(99998);
         node = new RecipeResultNode("second stage", 2, recipeResult);
-        result.getRoot().addChild(node);
+        result.addStage(node);
 
-        recipeResult = new RecipeResult("nested recipe");
+        recipeResult = new RecipeResult("third recipe");
         recipeResult.commence(10002);
         recipeResult.complete();
-        node = new RecipeResultNode("nested stage", 3, recipeResult);
+        node = new RecipeResultNode("third stage", 3, recipeResult);
         recipeResult.getStamps().setEndTime(99999);
-        result.getRoot().getChildren().get(0).addChild(node);
+        result.addStage(node);
 
         result.complete();
         result.getStamps().setEndTime(100000);

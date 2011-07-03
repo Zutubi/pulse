@@ -12,6 +12,7 @@ Build reason: trigger 'scm trigger'.
 Build stages:
   * first stage :: first recipe@[pending] :: failure
   * second stage :: second recipe@[pending] :: failure
+  * third stage :: third recipe@[pending] :: failure
 
 There were no new changes in this build.
 
@@ -19,17 +20,16 @@ Error messages:
   * test failed tests
   - stage first stage :: first recipe@[pending]
     * tests failed dude
-  - stage first stage :: first recipe@[pending] :: stage nested
-    stage :: nested recipe@[pending]
-    * tests failed nested dude
   - stage second stage :: second recipe@[pending]
+    * tests failed second dude
+  - stage third stage :: third recipe@[pending]
     * Command 'failing tests' failed
-  - stage second stage :: second recipe@[pending] :: failing tests
+  - stage third stage :: third recipe@[pending] :: failing tests
     * tests let me down
 
 
 Test summary: total: 5, errors: 2, failures: 126, skipped: 0
-  - second stage :: second recipe@[pending]
+  - third stage :: third recipe@[pending]
     Test summary: total: 5, errors: 2, failures: 126, skipped: 0
     NOTE: This recipe has 123 more failures, see the full test report
     for details.

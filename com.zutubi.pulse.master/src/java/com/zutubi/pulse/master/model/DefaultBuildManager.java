@@ -736,7 +736,6 @@ public class DefaultBuildManager implements BuildManager
         for (RecipeResultNode node : nodes)
         {
             cleanup.cleanup(node.getResult());
-            runCleanupForRecipes(node.getChildren(), cleanup);
         }
     }
 
@@ -748,7 +747,7 @@ public class DefaultBuildManager implements BuildManager
     private void cleanupBuildArtifacts(final BuildResult build)
     {
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipes(build.getStages(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {
@@ -774,7 +773,7 @@ public class DefaultBuildManager implements BuildManager
         final MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         new BuildLogFile(build, paths).scheduleCleanup(fileDeletionService);
 
-        runCleanupForRecipes(build.getRoot().getChildren(), new RecipeCleanup()
+        runCleanupForRecipes(build.getStages(), new RecipeCleanup()
         {
             public void cleanup(RecipeResult recipe)
             {

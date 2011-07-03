@@ -135,7 +135,8 @@ pre.feature {
     <p style="font-size: 85%">
         stage logs ::
         <a href="/browse/projects/test%20project/builds/101/logs/stage/first%20stage/">first stage</a> |
-        <a href="/browse/projects/test%20project/builds/101/logs/stage/second%20stage/">second stage</a> 
+        <a href="/browse/projects/test%20project/builds/101/logs/stage/second%20stage/">second stage</a> |
+        <a href="/browse/projects/test%20project/builds/101/logs/stage/third%20stage/">third stage</a> 
     </p>
 <table>
 <tr><td>
@@ -171,9 +172,9 @@ trigger 'scm trigger'</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 <a href="/browse/projects/test%20project/builds/101/tests/">128 of 5 broken</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:00:10</td>
+1/01/70 10:00:10</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:01:40</td>
+1/01/70 10:01:40</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 1 min 30 secs</td>
         </tr>
@@ -216,9 +217,9 @@ failure</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 <a href="/browse/projects/test%20project/builds/101/tests/first%20stage/">none</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:00:10</td>
+1/01/70 10:00:10</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:01:39</td>
+1/01/70 10:01:39</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 1 min 29 secs</td>
         </tr>
@@ -232,11 +233,29 @@ second recipe</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 failure</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-<a href="/browse/projects/test%20project/builds/101/tests/second%20stage/">128 of 5 broken</a></td>
+<a href="/browse/projects/test%20project/builds/101/tests/second%20stage/">none</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:00:10</td>
+1/01/70 10:00:10</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-1/01/70 1:01:39</td>
+1/01/70 10:01:39</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1 min 29 secs</td>
+        </tr>
+        <tr>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+<a href="/browse/projects/test%20project/builds/101/details/third%20stage/">third stage</a></td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+third recipe</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+[pending]</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+failure</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+<a href="/browse/projects/test%20project/builds/101/tests/third%20stage/">128 of 5 broken</a></td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:00:10</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:01:39</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 1 min 29 secs</td>
         </tr>
@@ -283,14 +302,14 @@ no changes in this build</td>
 <li class="header">stage first stage :: first recipe@[pending]
     <ul>
 <li class="error"><pre class="feature">tests failed dude</pre></li>
-<li class="header">stage nested stage :: nested recipe@[pending]
-    <ul>
-<li class="error"><pre class="feature">tests failed nested dude</pre></li>
-    </ul>
-</li>
     </ul>
 </li>
 <li class="header">stage second stage :: second recipe@[pending]
+    <ul>
+<li class="error"><pre class="feature">tests failed second dude</pre></li>
+    </ul>
+</li>
+<li class="header">stage third stage :: third recipe@[pending]
     <ul>
 <li class="error"><pre class="feature">Command 'failing tests' failed</pre></li>
 <li class="header">command :: failing tests
@@ -310,7 +329,7 @@ no changes in this build</td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
     <tr>
         <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
-            stage second stage :: broken tests (total: 5, errors: 2, failures: 126, skipped: 0)
+            stage third stage :: broken tests (total: 5, errors: 2, failures: 126, skipped: 0)
         </th>
     </tr>
                         <tr><th colspan="3" style="background-color: #ffffc0">This recipe has 123 further test failures, see the full test report for details.</th></tr>

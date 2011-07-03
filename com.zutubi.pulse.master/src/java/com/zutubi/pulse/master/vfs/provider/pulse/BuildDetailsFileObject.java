@@ -46,7 +46,7 @@ public class BuildDetailsFileObject extends AbstractResultDetailsFileObject impl
         BuildResult result = getResult();
         if (result != null)
         {
-            List<RecipeResultNode> nodes = result.getRoot().getChildren();
+            List<RecipeResultNode> nodes = result.getStages();
             return CollectionUtils.mapToArray(nodes, new Mapping<RecipeResultNode, String>()
             {
                 public String map(RecipeResultNode recipeResultNode)

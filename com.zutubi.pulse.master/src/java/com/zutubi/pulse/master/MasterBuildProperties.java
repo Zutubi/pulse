@@ -110,7 +110,7 @@ public class MasterBuildProperties extends BuildProperties
     {
         context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, result.getState().getString());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_TEST_SUMMARY, result.getTestSummary().format(I18N));
-        for(RecipeResultNode node: result.getRoot().getChildren())
+        for (RecipeResultNode node: result.getStages())
         {
             addStageProperties(context, result, node, configurationManager, true);
         }
@@ -134,7 +134,7 @@ public class MasterBuildProperties extends BuildProperties
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
         
-        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getHostSafe());
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getAgentNameSafe());
         if (result != null)
         {
             BuildStageConfiguration stage = result.getProject().getConfig().getStage(node.getStageName());

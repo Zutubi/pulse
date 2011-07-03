@@ -57,7 +57,7 @@ public class ApiUtils
         if (includeStages)
         {
             Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
-            for (RecipeResultNode rrn : build.getRoot().getChildren())
+            for (RecipeResultNode rrn : build.getStages())
             {
                 stages.add(convertStage(rrn));
             }
@@ -100,7 +100,7 @@ public class ApiUtils
         Hashtable<String, Object> stage = new Hashtable<String, Object>();
         stage.put("name", recipeResultNode.getStageName());
         stage.put("recipe", recipeResultNode.getResult().getRecipeNameSafe());
-        stage.put("agent", recipeResultNode.getHostSafe());
+        stage.put("agent", recipeResultNode.getAgentNameSafe());
         stage.put("tests", convertTests(recipeResultNode.getResult().getTestSummary()));
         stage.put("commands", convertCommands(recipeResultNode));
 

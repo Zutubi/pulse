@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.engine.api;
 
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.indexOf;
 import com.zutubi.util.EnumUtils;
+
+import static com.zutubi.util.CollectionUtils.indexOf;
 
 /**
  * The possible states for a build, stage or command result.  Indicates what
@@ -74,7 +75,7 @@ public enum ResultState
     private static final ResultState[] TERMINATED_STATES = new ResultState[]{CANCELLED, TERMINATED};
     private static final ResultState[] TERMINATING_STATES = new ResultState[]{CANCELLING, TERMINATING};
 
-    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{CANCELLED, SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED};
+    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{SKIPPED, SUCCESS, CANCELLED, FAILURE, ERROR, TERMINATED};
 
     /**
      * @return the set of states that return true from {@link #isBroken()}

@@ -165,7 +165,7 @@ public abstract class CustomChart implements Chart
         Set<String> stages = new HashSet<String>();
         for (BuildResult buildResult: builds)
         {
-            for (RecipeResultNode node: buildResult.getRoot().getChildren())
+            for (RecipeResultNode node: buildResult.getStages())
             {
                 stages.add(node.getStageName());
             }

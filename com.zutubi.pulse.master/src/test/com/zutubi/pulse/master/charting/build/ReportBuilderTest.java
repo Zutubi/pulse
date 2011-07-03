@@ -80,10 +80,9 @@ public class ReportBuilderTest extends PulseTestCase
 
             long time = calendar.getTimeInMillis();
 
-            RecipeResultNode root = result.getRoot();
-            root.addChild(createRecipe(STAGE_LINUX, time));
-            root.addChild(createRecipe(STAGE_WINDOWS, time));
-            root.addChild(createRecipe(STAGE_MAC, time));
+            result.addStage(createRecipe(STAGE_LINUX, time));
+            result.addStage(createRecipe(STAGE_WINDOWS, time));
+            result.addStage(createRecipe(STAGE_MAC, time));
 
             result.commence(time);
             if (i % 2 == 0)

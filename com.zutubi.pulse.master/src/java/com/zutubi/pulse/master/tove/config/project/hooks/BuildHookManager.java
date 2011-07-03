@@ -4,7 +4,6 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
@@ -81,7 +80,7 @@ public class BuildHookManager
                         }
                     }
 
-                    result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+                    result.forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
                         public void run(RecipeResultNode recipeResultNode)
                         {

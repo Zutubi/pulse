@@ -8,10 +8,11 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Builds reports by combining configuration with a set of build results.
@@ -101,7 +102,7 @@ public class ReportBuilder
 
         for (BuildResult build: dataSet)
         {
-            List<Number> values = CollectionUtils.map(build.getRoot().getChildren(), new Mapping<RecipeResultNode, Number>()
+            List<Number> values = CollectionUtils.map(build.getStages(), new Mapping<RecipeResultNode, Number>()
             {
                 public Number map(RecipeResultNode node)
                 {
@@ -126,7 +127,7 @@ public class ReportBuilder
 
         for (BuildResult build: dataSet)
         {
-            for (RecipeResultNode node: build.getRoot().getChildren())
+            for (RecipeResultNode node: build.getStages())
             {
                 String stageName = node.getStageName();
                 SeriesData series = seriesByStage.get(stageName);

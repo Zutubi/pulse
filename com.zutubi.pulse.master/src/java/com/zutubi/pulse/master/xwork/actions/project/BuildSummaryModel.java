@@ -43,7 +43,7 @@ public class BuildSummaryModel
         if(buildResult.hasBrokenTests())
         {
             failures = new LinkedList<BuildStageTestFailuresModel>();
-            for (RecipeResultNode stageResult: buildResult.getRoot().getChildren())
+            for (RecipeResultNode stageResult: buildResult.getStages())
             {
                 if (stageResult.hasBrokenTests())
                 {

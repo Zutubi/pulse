@@ -103,7 +103,7 @@ public class TailBuildLogAction extends StageActionBase
         {
             // By default, go to the first stage (if any) as this is generally
             // more useful than the overall build log.
-            List<RecipeResultNode> recipeResultNodes = buildResult.getRoot().getChildren();
+            List<RecipeResultNode> recipeResultNodes = buildResult.getStages();
             if (recipeResultNodes.size() > 0)
             {
                 RecipeResultNode resultNode = recipeResultNodes.get(0);
@@ -120,7 +120,7 @@ public class TailBuildLogAction extends StageActionBase
             }
         }
 
-        List<String> stageNames = CollectionUtils.map(buildResult.getRoot().getChildren(), new Mapping<RecipeResultNode, String>()
+        List<String> stageNames = CollectionUtils.map(buildResult.getStages(), new Mapping<RecipeResultNode, String>()
         {
             public String map(RecipeResultNode recipeResultNode)
             {

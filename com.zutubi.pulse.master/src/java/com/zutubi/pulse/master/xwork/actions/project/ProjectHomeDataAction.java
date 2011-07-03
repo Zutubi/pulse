@@ -122,7 +122,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         List<BuildStageModel> brokenStages = null;
         if (latestCompleted != null)
         {
-            List<RecipeResultNode> brokenNodes = CollectionUtils.filter(latestCompleted.getRoot().getChildren(), new Predicate<RecipeResultNode>()
+            List<RecipeResultNode> brokenNodes = CollectionUtils.filter(latestCompleted.getStages(), new Predicate<RecipeResultNode>()
             {
                 public boolean satisfied(RecipeResultNode recipeResultNode)
                 {

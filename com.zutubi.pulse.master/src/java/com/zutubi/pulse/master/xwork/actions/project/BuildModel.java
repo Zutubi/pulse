@@ -64,7 +64,7 @@ public class BuildModel extends ResultModel
         }
         tests = buildResult.getTestSummary().toString();
         
-        for (RecipeResultNode node: buildResult.getRoot().getChildren())
+        for (RecipeResultNode node: buildResult.getStages())
         {
             stages.add(new BuildStageModel(buildResult, node, urls, collectArtifacts));
         }

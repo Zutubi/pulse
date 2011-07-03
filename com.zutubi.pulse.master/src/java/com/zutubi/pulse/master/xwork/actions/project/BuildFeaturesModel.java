@@ -28,7 +28,7 @@ public class BuildFeaturesModel
             features = CollectionUtils.map(buildResult.getFeatures(level), new SimpleFeatureMapping());
         }
         
-        for (RecipeResultNode stageResult: buildResult.getRoot().getChildren())
+        for (RecipeResultNode stageResult: buildResult.getStages())
         {
             if (stageResult.hasMessages(level))
             {
@@ -67,7 +67,7 @@ public class BuildFeaturesModel
             
             name = stageResult.getStageName();
             recipeName = recipeResult.getRecipeNameSafe();
-            agentName = stageResult.getHostSafe();
+            agentName = stageResult.getAgentNameSafe();
             complete = recipeResult.completed();
             
             if (recipeResult.hasDirectMessages(level))

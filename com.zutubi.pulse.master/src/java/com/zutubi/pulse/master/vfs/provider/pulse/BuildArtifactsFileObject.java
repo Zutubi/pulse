@@ -69,8 +69,7 @@ public class BuildArtifactsFileObject extends AbstractPulseFileObject implements
         BuildResult result = getBuildResult();
         if (result != null)
         {
-            RecipeResultNode node = getBuildResult().getRoot();
-            for (final RecipeResultNode child : node.getChildren())
+            for (final RecipeResultNode child : getBuildResult().getStages())
             {
                 results.add(Long.toString(child.getResult().getId()));
             }

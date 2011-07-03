@@ -60,7 +60,7 @@
                         #contentHeading("test.skipped" 1)
                         #contentClassHeading("test.success.rate" 1 "rightmost")
                     </tr>
-                    #foreach($node in $result.root.children)
+                    #foreach($node in $result.stages)
                     <tr>
                         #if($node.result.completed())
                             <td id='#id("stage-${node.stageName}")' class="content leftmost"><a href="$urls.stageTests($result, $node)">#html($node.stageName)</a></td>

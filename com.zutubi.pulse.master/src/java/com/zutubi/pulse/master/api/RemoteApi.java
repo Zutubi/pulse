@@ -2787,7 +2787,7 @@ public class RemoteApi
                 final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
                 final BuildResult build = buildRetrievingFn.process();
 
-                build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+                build.forEachNode(new UnaryProcedure<RecipeResultNode>()
                 {
                     public void run(RecipeResultNode recipeResultNode)
                     {
@@ -2977,7 +2977,7 @@ public class RemoteApi
                         result.add(convertFeature(null, null, null, null, f));
                     }
 
-                    build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+                    build.forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
                         public void run(RecipeResultNode recipeResultNode)
                         {
@@ -3158,7 +3158,7 @@ public class RemoteApi
             final Hashtable<String, Object> result = new Hashtable<String, Object>();
             result.put("", loadCustomFields(buildResult.getAbsoluteOutputDir(dataDir)));
             
-            for (RecipeResultNode node: buildResult.getRoot().getChildren())
+            for (RecipeResultNode node: buildResult.getStages())
             {
                 result.put(node.getStageName(), loadCustomFields(node.getResult().getAbsoluteOutputDir(dataDir)));
             }

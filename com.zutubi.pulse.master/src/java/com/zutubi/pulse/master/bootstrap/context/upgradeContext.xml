@@ -165,6 +165,9 @@
                 <ref local="updateTimeReportLabel"/>
                 <ref local="pinnedBuilds"/>
                 <ref local="buildResultPinnedIndex"/>
+                <ref local="stageResults"/>
+                <ref local="removeBuildNodeHierarchy"/>
+                <ref local="dropBuildNodeTable"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -850,5 +853,27 @@
 
     <bean id="buildResultPinnedIndex" class="com.zutubi.pulse.master.upgrade.tasks.BuildResultPinnedIndexUpgradeTask">
         <property name="buildNumber" value="204001002"/>
+    </bean>
+
+    <bean id="stageResults" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="204001003"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.4.1-patch-02.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="removeBuildNodeHierarchy" class="com.zutubi.pulse.master.upgrade.tasks.RemoveBuildNodeHierarchyUpgradeTask">
+        <property name="buildNumber" value="204001004"/>
+    </bean>
+
+    <bean id="dropBuildNodeTable" class="com.zutubi.pulse.master.upgrade.tasks.DropBuildNodeTableUpgradeTask">
+        <property name="buildNumber" value="204001005"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.4.1-patch-03.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

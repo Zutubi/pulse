@@ -87,10 +87,10 @@ public class DefaultBuildController implements EventListener, BuildController
     private MasterConfigurationManager configurationManager;
     private RecipeQueue recipeQueue;
     private RecipeResultCollector collector;
-    private BuildTree tree;
+    private List<RecipeController> controllers;
+    private List<RecipeController> executingControllers = new LinkedList<RecipeController>();
     private BuildResult buildResult;
     private AsynchronousDelegatingListener asyncListener;
-    private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
     private CallbackService callbackService;
 
@@ -165,8 +165,8 @@ public class DefaultBuildController implements EventListener, BuildController
                 buildContext.add(requestProperty);
             }
             activateBuildAuthenticationToken();
-            tree = new BuildTree();
-            configure(tree.getRoot(), buildResult.getRoot());
+            controllers = new LinkedList<RecipeController>();
+            createControllers();
 
             buildResult.queue();
             buildManager.save(buildResult);
@@ -211,16 +211,16 @@ public class DefaultBuildController implements EventListener, BuildController
         repositoryAuthenticationProvider.deactivate(token);
     }
 
-    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)
+    private void createControllers()
     {
         PulseFileProvider pulseFileProvider = getPulseFileSource();
 
         for (BuildStageConfiguration stageConfig : projectConfig.getStages().values())
         {
             RecipeResult recipeResult = new RecipeResult(stageConfig.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stageConfig, recipeResult);
-            resultNode.addChild(childResultNode);
-            buildManager.save(resultNode);
+            RecipeResultNode stageResult = new RecipeResultNode(stageConfig, recipeResult);
+            buildResult.addStage(stageResult);
+            buildManager.save(stageResult);
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
@@ -260,7 +260,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
 
                 RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
-                RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector);
+                RecipeController rc = new RecipeController(projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector);
                 rc.setRecipeQueue(recipeQueue);
                 rc.setBuildManager(buildManager);
                 rc.setEventManager(eventManager);
@@ -270,8 +270,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 rc.setRecipeDispatchService(recipeDispatchService);
                 rc.setScmManager(scmManager);
 
-                TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
-                rcNode.add(child);
+                controllers.add(rc);
                 pendingRecipes++;
             }
             else
@@ -434,9 +433,12 @@ public class DefaultBuildController implements EventListener, BuildController
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
         buildLogger.preBuildCompleted();
 
-        tree.prepare(buildResult);
+        for (RecipeController controller: controllers)
+        {
+            controller.prepare(buildResult);
+        }
 
-        initialiseNodes(new BootstrapperCreator()
+        initialiseControllers(new BootstrapperCreator()
         {
             public Bootstrapper create()
             {
@@ -455,7 +457,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
                 return initialBootstrapper;
             }
-        }, tree.getRoot().getChildren());
+        });
 
         // If there are no executing controllers, then there is nothing more to be done.
         // Complete the build now as we will not be receiving event triggered callbacks
@@ -541,18 +543,17 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void handleControllerTermination(UnaryProcedure<RecipeController> terminationProcedure)
     {
-        List<TreeNode<RecipeController>> terminatedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
+        List<RecipeController> terminatedNodes = new ArrayList<RecipeController>(executingControllers.size());
 
         if (executingControllers.size() > 0)
         {
-            for (TreeNode<RecipeController> controllerNode : executingControllers)
+            for (RecipeController controller: executingControllers)
             {
-                RecipeController controller = controllerNode.getData();
                 terminationProcedure.run(controller);
 
-                if (checkControllerStatus(controller, false))
+                if (handleIfFinished(controller, false))
                 {
-                    terminatedNodes.add(controllerNode);
+                    terminatedNodes.add(controller);
                 }
             }
 
@@ -568,13 +569,12 @@ public class DefaultBuildController implements EventListener, BuildController
     private void handleRecipeTimeout(RecipeTimeoutEvent event)
     {
         LOG.debug("Recipe timeout event received for build " + event.getBuildId() + ", recipe " + event.getRecipeId());
-        TreeNode<RecipeController> found = null;
-        for (TreeNode<RecipeController> controllerNode : executingControllers)
+        RecipeController found = null;
+        for (RecipeController controller: executingControllers)
         {
-            RecipeController controller = controllerNode.getData();
             if (controller.getResult().getId() == event.getRecipeId())
             {
-                found = controllerNode;
+                found = controller;
                 break;
             }
         }
@@ -582,9 +582,8 @@ public class DefaultBuildController implements EventListener, BuildController
         if (found != null)
         {
             LOG.debug("Terminating recipe for build " + event.getBuildId() + ", recipe " + event.getRecipeId());
-            RecipeController controller = found.getData();
-            controller.terminateRecipe("Timed out");
-            if (checkControllerStatus(controller, false))
+            found.terminateRecipe("Timed out");
+            if (handleIfFinished(found, false))
             {
                 executingControllers.remove(found);
                 if (executingControllers.size() == 0)
@@ -593,29 +592,26 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
                 else
                 {
-                    checkForTermination(controller);
+                    checkForTermination(found);
                 }
             }
         }
     }
 
-    private void initialiseNodes(BootstrapperCreator bootstrapperCreator, List<TreeNode<RecipeController>> nodes)
+    private void initialiseControllers(BootstrapperCreator bootstrapperCreator)
     {
         // Important to add them all first as a failure during initialisation
         // will test if there are other executing controllers (if not the
         // build is finished).
-        for (TreeNode<RecipeController> node : nodes)
-        {
-            executingControllers.add(node);
-        }
+        executingControllers.addAll(controllers);
 
-        List<TreeNode<RecipeController>> sortedNodes = new LinkedList<TreeNode<RecipeController>>(nodes);
-        Collections.sort(sortedNodes, new AssignmentRequestPriorityComparator());
+        List<RecipeController> sortedControllers = new LinkedList<RecipeController>(controllers);
+        Collections.sort(sortedControllers, new AssignmentRequestPriorityComparator());
 
-        for (TreeNode<RecipeController> node : sortedNodes)
+        for (RecipeController controller : sortedControllers)
         {
-            node.getData().initialise(bootstrapperCreator.create());
-            checkNodeStatus(node);
+            controller.initialise(bootstrapperCreator.create());
+            checkContollerStatus(controller);
         }
     }
 
@@ -627,20 +623,17 @@ public class DefaultBuildController implements EventListener, BuildController
             return;
         }
 
-        RecipeController controller;
-        TreeNode<RecipeController> foundNode = null;
-
-        for (TreeNode<RecipeController> node : executingControllers)
+        RecipeController controller = null;
+        for (RecipeController c: executingControllers)
         {
-            controller = node.getData();
-            if (controller.matchesRecipeEvent(e))
+            if (c.matchesRecipeEvent(e))
             {
-                foundNode = node;
+                controller = c;
                 break;
             }
         }
 
-        if (foundNode != null)
+        if (controller != null)
         {
             // If we got here we are sure that the event was for one of our
             // recipes.
@@ -681,8 +674,8 @@ public class DefaultBuildController implements EventListener, BuildController
                 }
             }
 
-            foundNode.getData().handleRecipeEvent(e);
-            checkNodeStatus(foundNode);
+            controller.handleRecipeEvent(e);
+            checkContollerStatus(controller);
         }
     }
 
@@ -690,14 +683,31 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         // We can now make a more accurate estimate of our remaining running
         // time, as there are no more queued recipes.
-        long longestRemaining = tree.getMaximumEstimatedTimeRemaining();
-
+        long longestRemaining = getMaximumEstimatedTimeRemaining();
         TimeStamps buildStamps = buildResult.getStamps();
         long estimatedEnd = System.currentTimeMillis() + longestRemaining;
         if (estimatedEnd > buildStamps.getStartTime())
         {
             buildStamps.setEstimatedRunningTime(estimatedEnd - buildStamps.getStartTime());
         }
+    }
+
+    public long getMaximumEstimatedTimeRemaining()
+    {
+        long longestRemaining = 0;
+        for (RecipeController controller : controllers)
+        {
+            TimeStamps stamps = controller.getResult().getStamps();
+            if (stamps.hasEstimatedEndTime())
+            {
+                long remaining = stamps.getEstimatedTimeRemaining();
+                if (remaining > longestRemaining)
+                {
+                    longestRemaining = remaining;
+                }
+            }
+        }
+        return longestRemaining;
     }
 
     /**
@@ -813,7 +823,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private boolean checkControllerStatus(RecipeController controller, boolean collect)
+    private boolean handleIfFinished(RecipeController controller, boolean collect)
     {
         if (controller.isFinished())
         {
@@ -836,12 +846,11 @@ public class DefaultBuildController implements EventListener, BuildController
         return false;
     }
 
-    private void checkNodeStatus(TreeNode<RecipeController> node)
+    private void checkContollerStatus(RecipeController controller)
     {
-        final RecipeController controller = node.getData();
-        if (checkControllerStatus(controller, true))
+        if (handleIfFinished(controller, true))
         {
-            executingControllers.remove(node);
+            executingControllers.remove(controller);
 
             RecipeResult result = controller.getResult();
             if (result.failed())
@@ -904,7 +913,7 @@ public class DefaultBuildController implements EventListener, BuildController
         else
         {
             final int[] failures = new int[]{0};
-            buildResult.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+            buildResult.forEachNode(new UnaryProcedure<RecipeResultNode>()
             {
                 public void run(RecipeResultNode recipeResultNode)
                 {
@@ -932,7 +941,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            if (!hard && buildResult.getRoot().getWorstState(ResultState.SUCCESS) == ResultState.SUCCESS && !buildResult.isPersonal())
+            if (!hard && buildResult.getWorstStageState() == ResultState.SUCCESS && !buildResult.isPersonal())
             {
                 try
                 {
@@ -995,7 +1004,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void addCommonScmProperties()
     {
-        Iterator<RecipeController> recipeIt = tree.iterator();
+        Iterator<RecipeController> recipeIt = controllers.iterator();
         if (!recipeIt.hasNext())
         {
             return;
@@ -1066,9 +1075,9 @@ public class DefaultBuildController implements EventListener, BuildController
     private void abortUnfinishedRecipes()
     {
         buildResult.abortUnfinishedRecipes();
-        for (TreeNode<RecipeController> controllerNode : executingControllers)
+        for (RecipeController controller : executingControllers)
         {
-            eventManager.publish(new RecipeAbortedEvent(this, controllerNode.getData().getResult().getId()));
+            eventManager.publish(new RecipeAbortedEvent(this, controller.getResult().getId()));
         }
     }
 
@@ -1223,12 +1232,12 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private class AssignmentRequestPriorityComparator implements Comparator<TreeNode<RecipeController>>
+    private class AssignmentRequestPriorityComparator implements Comparator<RecipeController>
     {
-        public int compare(TreeNode<RecipeController> node1, TreeNode<RecipeController> node2)
+        public int compare(RecipeController controller1, RecipeController controller2)
         {
-            int priority1 = node1.getData().getAssignmentRequest().getPriority();
-            int priority2 = node2.getData().getAssignmentRequest().getPriority();
+            int priority1 = controller1.getAssignmentRequest().getPriority();
+            int priority2 = controller2.getAssignmentRequest().getPriority();
             if (priority1 > priority2)
             {
                 return -1;

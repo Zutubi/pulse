@@ -188,7 +188,7 @@ public class ModuleDescriptorFactory
     {
         final Collection<ArtifactDetail> artifacts = new LinkedList<ArtifactDetail>();
 
-        result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
+        result.forEachNode(new UnaryProcedure<RecipeResultNode>()
         {
             public void run(RecipeResultNode node)
             {

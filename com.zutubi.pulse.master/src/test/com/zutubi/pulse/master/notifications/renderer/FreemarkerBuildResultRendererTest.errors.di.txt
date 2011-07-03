@@ -7,7 +7,8 @@ Build reason: trigger 'scm trigger'.
 
 Build stages:
   * first stage :: first recipe@[pending] :: error
-  * second stage :: second recipe@[pending] :: error
+  * second stage :: second recipe@[pending] :: failure
+  * third stage :: third recipe@[pending] :: error
 
 New changes in this build:
   * 655 by test author:

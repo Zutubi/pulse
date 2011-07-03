@@ -133,9 +133,6 @@ results as a flat list but with context.
             [#local nestedContext = "stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
-        [#list node.children as child]
-            [@recipeNodeMessages node=child level=level context=nestedContext/]
-        [/#list]
     [/#if]
 [/#macro]
 
@@ -154,7 +151,7 @@ ${level?lower_case?cap_first} messages:
   been reported as the feature limit has been reached.
         [/#if]
         [@resultMessages result=result level=level/]
-        [#list result.root.children as child]
+        [#list result.stages as child]
             [@recipeNodeMessages node=child level=level/]
         [/#list]
     [/#if]
@@ -164,7 +161,7 @@ ${level?lower_case?cap_first} messages:
 Outputs a list of build stage results for the given build.
 ----------------------------------------------------------------------------]
 [#macro buildStages result]
-    [#list result.root.children as child]
+    [#list result.stages as child]
   * ${child.stageName} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
     [/#list]
 [/#macro]
@@ -257,9 +254,6 @@ tests as a flat plain text list.
     [#if node.result?exists]
         [@recipeTestSummary result=node.result context=nestedContext/]
     [/#if]
-    [#list node.children as child]
-        [@recipeNodeTestSummary node=child context=nestedContext/]
-    [/#list]
 [/#macro]
 
 [#---------------------------------------------------------------------------
@@ -272,7 +266,7 @@ tests as a flat plain text list.
 Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}, skipped: ${summary.skipped}
     [/#if]
     [#if summary.hasBroken()]
-        [#list result.root.children as child]
+        [#list result.stages as child]
             [@recipeNodeTestSummary node=child/]
         [/#list]
     [/#if]
@@ -455,7 +449,7 @@ Shows a list of links to build stage logs.
 [#macro stageLogLinksHTML result]
     <p style="font-size: 85%">
         stage logs ::
-    [#list result.root.children as child]
+    [#list result.stages as child]
         <a href="${externalUrls.stageLog(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
     [/#list]
     </p>
@@ -477,7 +471,7 @@ Shows a summary for each stage in a build.
             [@contentHeader cc="end time"/]
             [@contentHeader cc="elapsed"/]
         </tr>
-    [#list result.root.children as child]
+    [#list result.stages as child]
         <tr>
             [#assign class = child.result.state.string]
             [@linkCell cc=child.stageName url="${stageDetailsLink(result, child)}" class=class/]
@@ -612,9 +606,6 @@ results as a HTML nested list.
 <li class="header">stage ${node.stageName?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
     <ul>
         [@recipeResultMessagesHTML result=result recipe=node.result level=level/]
-        [#list node.children as child]
-            [@recipeNodeMessagesHTML result=result node=child level=level/]
-        [/#list]
     </ul>
 </li>
     [/#if]
@@ -635,7 +626,7 @@ results as a HTML nested list.
     <li class="header">NOTE: This build has ${excess} more ${level?lower_case} messages that have not been reported as the feature limit has been reached.</li>
         [/#if]
         [@resultMessagesHTML result=result level=level/]
-        [#list result.root.children as child]
+        [#list result.stages as child]
             [@recipeNodeMessagesHTML result=result node=child level=level/]
         [/#list]
 </ul>
@@ -707,16 +698,13 @@ Outputs failing test cases for the given recipe node.
                 </td></tr>
         [/#if]
     [/#if]
-    [#list node.children as child]
-        [@recipeNodeFailedTestsHTML node=child/]
-    [/#list]
 [/#macro]
 
 [#---------------------------------------------------------------------------
 Outputs failing test cases for the given build.
 ----------------------------------------------------------------------------]
 [#macro buildFailedTestsHTML result]
-    [#list result.root.children as child]
+    [#list result.stages as child]
         [@recipeNodeFailedTestsHTML node=child/]
     [/#list]
 [/#macro]

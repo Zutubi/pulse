@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 
 import java.io.File;
 import java.util.Iterator;
@@ -40,7 +41,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
      */
     private boolean userRevision;
     private Revision revision;
-    private RecipeResultNode root;
+    private List<RecipeResultNode> stages;
     private String version;
     
     private String status;
@@ -87,7 +88,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
         this.number = number;
         this.userRevision = userRevision;
         this.state = ResultState.PENDING;
-        this.root = new RecipeResultNode(null, 0, null);
+        stages = new LinkedList<RecipeResultNode>();
     }
 
     public BuildResult(BuildReason reason, User user, Project project, long number)
@@ -146,14 +147,19 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
         this.userRevision = userRevision;
     }
 
-    public RecipeResultNode getRoot()
+    public List<RecipeResultNode> getStages()
     {
-        return root;
+        return stages;
     }
 
-    private void setRoot(RecipeResultNode root)
+    public void setStages(List<RecipeResultNode> stages)
     {
-        this.root = root;
+        this.stages = stages;
+    }
+
+    public void addStage(RecipeResultNode stage)
+    {
+        stages.add(stage);
     }
 
     public long getMetaBuildId()
@@ -233,7 +239,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 
     public void abortUnfinishedRecipes()
     {
-        for (RecipeResultNode node : root.getChildren())
+        for (RecipeResultNode node : stages)
         {
             node.abort();
         }
@@ -243,7 +249,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
     {
         List<String> errors = super.collectErrors();
 
-        for (RecipeResultNode node : root.getChildren())
+        for (RecipeResultNode node : stages)
         {
             errors.addAll(node.collectErrors());
         }
@@ -258,7 +264,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
             return true;
         }
 
-        for (RecipeResultNode node : root.getChildren())
+        for (RecipeResultNode node : stages)
         {
             if (node.hasMessages(level))
             {
@@ -271,7 +277,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 
     public boolean hasArtifacts()
     {
-        for (RecipeResultNode node : root.getChildren())
+        for (RecipeResultNode node : stages)
         {
             if (node.hasArtifacts())
             {
@@ -310,18 +316,12 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
     
     public RecipeResultNode findResultNode(final long id)
     {
-        return root.findNode(new Predicate<RecipeResultNode>()
-        {
-            public boolean satisfied(RecipeResultNode recipeResultNode)
-            {
-                return recipeResultNode.getId() == id;
-            }
-        });
+        return CollectionUtils.find(stages, new EntityWithIdPredicate<RecipeResultNode>(id));
     }
 
     public RecipeResultNode findResultNodeByHandle(final long handle)
     {
-        return root.findNode(new Predicate<RecipeResultNode>()
+        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
         {
             public boolean satisfied(RecipeResultNode recipeResultNode)
             {
@@ -332,7 +332,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 
     public RecipeResultNode findResultNode(final String stageName)
     {
-        return root.findNode(new Predicate<RecipeResultNode>()
+        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
         {
             public boolean satisfied(RecipeResultNode recipeResultNode)
             {
@@ -350,34 +350,30 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
      */
     public RecipeResultNode findResultNodeByRecipeId(final long recipeId)
     {
-        return root.findNode(new Predicate<RecipeResultNode>()
+        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
         {
             public boolean satisfied(RecipeResultNode recipeResultNode)
             {
-                RecipeResult recipeResult = recipeResultNode.getResult();
-                return recipeResult != null && recipeResult.getId() == recipeId;
+                return recipeResultNode.getResult().getId() == recipeId;
             }
         });
     }
 
     public RecipeResultNode findResultNode(final CommandResult commandResult)
     {
-        return root.findNode(new Predicate<RecipeResultNode>()
+        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
         {
             public boolean satisfied(RecipeResultNode recipeResultNode)
             {
                 RecipeResult result = recipeResultNode.getResult();
-                if (result != null)
+                for (CommandResult command : result.getCommandResults())
                 {
-                    for (CommandResult command : result.getCommandResults())
+                    if (command.equals(commandResult))
                     {
-                        if (command.equals(commandResult))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
-                
+
                 return false;
             }
         });
@@ -385,7 +381,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 
     public StoredArtifact findArtifact(String artifactName)
     {
-        for (RecipeResultNode child : root.getChildren())
+        for (RecipeResultNode child : stages)
         {
             StoredArtifact artifact = child.findArtifact(artifactName);
             if (artifact != null)
@@ -396,18 +392,29 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
         return null;
     }
 
+    public ResultState getWorstStageState()
+    {
+        ResultState state = ResultState.SUCCESS;
+        for (RecipeResultNode stage: stages)
+        {
+            state = ResultState.getWorseState(state, stage.getResult().getState());
+        }
+
+        return state;
+    }
+
     public void complete()
     {
         super.complete();
 
-        // Check the recipe results, if there are any failures/errors
-        // then take on the worst result from ourselves or any recipe.
-        state = ResultState.getWorseState(state, root.getWorstState(state));
+        // Check the stage results, if there are any failures/errors
+        // then take on the worst result from ourselves or any stage.
+        state = ResultState.getWorseState(state, getWorstStageState());
     }
 
     public Iterator<RecipeResultNode> iterator()
     {
-        return new ResultIterator();
+        return stages.iterator();
     }
 
     public boolean isPersonal()
@@ -441,12 +448,18 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
 
     public void loadFeatures(File dataRoot)
     {
-        root.loadFeatures(dataRoot);
+        for (RecipeResultNode stage: stages)
+        {
+            stage.loadFeatures(dataRoot);
+        }
     }
 
     public void loadFailedTestResults(File dataRoot, int limitPerRecipe)
     {
-        root.loadFailedTestResults(dataRoot, limitPerRecipe);
+        for (RecipeResultNode stage: stages)
+        {
+            stage.loadFailedTestResults(dataRoot, limitPerRecipe);
+        }
     }
 
     public String getVersion()
@@ -469,36 +482,15 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
         this.status = status;
     }
 
-    private class ResultIterator implements Iterator<RecipeResultNode>
-    {
-        List<RecipeResultNode> remaining;
-
-        public ResultIterator()
-        {
-            remaining = new LinkedList<RecipeResultNode>(root.getChildren());
-        }
-
-        public boolean hasNext()
-        {
-            return remaining.size() > 0;
-        }
-
-        public RecipeResultNode next()
-        {
-            RecipeResultNode next = remaining.remove(0);
-            remaining.addAll(next.getChildren());
-            return next;
-        }
-
-        public void remove()
-        {
-            throw new UnsupportedOperationException("Build result may not have recipes removed");
-        }
-    }
-
     public TestResultSummary getTestSummary()
     {
-        return root.getTestSummary();
+        TestResultSummary summary = new TestResultSummary();
+        for (RecipeResultNode stage: stages)
+        {
+            stage.getResult().accumulateTestSummary(summary);
+        }
+
+        return summary;
     }
 
     public boolean hasTests()
@@ -515,26 +507,20 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>
     {
         super.calculateFeatureCounts();
 
-        // determine the feature counts for the attached node hierarchy.
-        calculateNodeFeatureCounts(root);
-    }
-
-    private void calculateNodeFeatureCounts(RecipeResultNode node)
-    {
-        // extract the information from the current node.
-        RecipeResult result = node.getResult();
-        if (result != null)
+        for (RecipeResultNode stage: stages)
         {
+            RecipeResult result = stage.getResult();
             result.calculateFeatureCounts();
-
             warningFeatureCount += result.getWarningFeatureCount();
             errorFeatureCount += result.getErrorFeatureCount();
         }
+    }
 
-        // recurse to the child nodes.
-        for (RecipeResultNode child : node.getChildren())
+    public void forEachNode(UnaryProcedure<RecipeResultNode> fn)
+    {
+        for (RecipeResultNode stage: stages)
         {
-            calculateNodeFeatureCounts(child);
+            fn.run(stage);
         }
     }
 }

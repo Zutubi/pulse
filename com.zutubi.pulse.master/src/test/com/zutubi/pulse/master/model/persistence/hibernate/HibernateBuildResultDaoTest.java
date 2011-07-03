@@ -86,8 +86,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildResult.commence();
         buildResult.setRevision(revision);
         RecipeResultNode recipeNode = new RecipeResultNode("stage name", 123, recipeResult);
-        recipeNode.setHost("test host");
-        buildResult.getRoot().addChild(recipeNode);
+        recipeNode.setAgentName("test host");
+        buildResult.addStage(recipeNode);
 
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();
@@ -1044,18 +1044,18 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     public void testCountByAgent()
     {
         BuildResult result1 = createCompletedBuild(projectA, 1);
-        result1.getRoot().addChild(createResultNode("stage1", 1, "test1", "agent1"));
-        result1.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+        result1.addStage(createResultNode("stage1", 1, "test1", "agent1"));
+        result1.addStage(createResultNode("stage2", 2, "test2", "agent2"));
 
         BuildResult result2 = createCompletedBuild(projectA, 1);
         result2.setState(ResultState.FAILURE);
-        result2.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
-        result2.getRoot().addChild(createResultNode("stage3", 3, "test3", "agent3"));
+        result2.addStage(createResultNode("stage2", 2, "test2", "agent2"));
+        result2.addStage(createResultNode("stage3", 3, "test3", "agent3"));
 
         BuildResult result3 = createCompletedBuild(projectA, 1);
-        result3.getRoot().addChild(createResultNode("stage2", 2, "test2", "agentx"));
-        result3.getRoot().addChild(createResultNode("stage3", 3, "test3", "agentx"));
-        result3.getRoot().addChild(createResultNode("stage4", 4, "test4", "agentx"));
+        result3.addStage(createResultNode("stage2", 2, "test2", "agentx"));
+        result3.addStage(createResultNode("stage3", 3, "test3", "agentx"));
+        result3.addStage(createResultNode("stage4", 4, "test4", "agentx"));
 
         buildResultDao.save(result1);
         buildResultDao.save(result2);
@@ -1072,18 +1072,18 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     public void testFindByAgent()
     {
         BuildResult result1 = createCompletedBuild(projectA, 1);
-        result1.getRoot().addChild(createResultNode("stage1", 1, "test1", "agent1"));
-        result1.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
+        result1.addStage(createResultNode("stage1", 1, "test1", "agent1"));
+        result1.addStage(createResultNode("stage2", 2, "test2", "agent2"));
 
         BuildResult result2 = createCompletedBuild(projectA, 1);
         result2.setState(ResultState.FAILURE);
-        result2.getRoot().addChild(createResultNode("stage2", 2, "test2", "agent2"));
-        result2.getRoot().addChild(createResultNode("stage3", 3, "test3", "agent3"));
+        result2.addStage(createResultNode("stage2", 2, "test2", "agent2"));
+        result2.addStage(createResultNode("stage3", 3, "test3", "agent3"));
 
         BuildResult result3 = createCompletedBuild(projectA, 1);
-        result3.getRoot().addChild(createResultNode("stage2", 2, "test2", "agentx"));
-        result3.getRoot().addChild(createResultNode("stage3", 3, "test3", "agentx"));
-        result3.getRoot().addChild(createResultNode("stage4", 4, "test4", "agentx"));
+        result3.addStage(createResultNode("stage2", 2, "test2", "agentx"));
+        result3.addStage(createResultNode("stage3", 3, "test3", "agentx"));
+        result3.addStage(createResultNode("stage4", 4, "test4", "agentx"));
 
         buildResultDao.save(result1);
         buildResultDao.save(result2);
@@ -1293,21 +1293,21 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private BuildResult createResultWithRecipes()
     {
         BuildResult result = createCompletedBuild(projectA, 1);
-        result.getRoot().addChild(createResultNode("stage1", 1, "test1", null));
-        result.getRoot().addChild(createResultNode("stage2", 2, "test2", null));
+        result.addStage(createResultNode("stage1", 1, "test1", null));
+        result.addStage(createResultNode("stage2", 2, "test2", null));
         return result;
     }
 
     private RecipeResultNode createResultNode(String stageName, long stageHandle, String recipeName, String hostName)
     {
         RecipeResultNode node = new RecipeResultNode(stageName, stageHandle, new RecipeResult(recipeName));
-        node.setHost(hostName);
+        node.setAgentName(hostName);
         return node;
     }
 
     private long getRecipeId(BuildResult result, int recipeIndex)
     {
-        return result.getRoot().getChildren().get(recipeIndex).getResult().getId();
+        return result.getStages().get(recipeIndex).getResult().getId();
     }
 
     private void addMessageBuild(Project p1, Feature.Level level, int number)

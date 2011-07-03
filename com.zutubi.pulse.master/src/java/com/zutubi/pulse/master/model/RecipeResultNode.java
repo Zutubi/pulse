@@ -1,17 +1,13 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryProcedure;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,9 +16,8 @@ public class RecipeResultNode extends Entity
 {
     private long stageHandle;
     private String stageName;
-    private String host;
+    private String agentName;
     private RecipeResult result;
-    private List<RecipeResultNode> children;
 
     public RecipeResultNode()
     {
@@ -33,7 +28,6 @@ public class RecipeResultNode extends Entity
         this.stageName = stage.getName();
         this.stageHandle = stage.getHandle();
         this.result = result;
-        children = new LinkedList<RecipeResultNode>();
     }
     
     public RecipeResultNode(String stageName, long stageHandle, RecipeResult result)
@@ -41,7 +35,6 @@ public class RecipeResultNode extends Entity
         this.stageName = stageName;
         this.stageHandle = stageHandle;
         this.result = result;
-        children = new LinkedList<RecipeResultNode>();
     }
 
     public String getStageName()
@@ -77,25 +70,25 @@ public class RecipeResultNode extends Entity
         this.stageHandle = stageHandle;
     }
 
-    public String getHost()
+    public String getAgentName()
     {
-        return host;
+        return agentName;
     }
 
-    public void setHost(String host)
+    public void setAgentName(String agentName)
     {
-        this.host = host;
+        this.agentName = agentName;
     }
 
-    public String getHostSafe()
+    public String getAgentNameSafe()
     {
-        if (host == null)
+        if (agentName == null)
         {
             return "[pending]";
         }
         else
         {
-            return host;
+            return agentName;
         }
     }
 
@@ -109,21 +102,6 @@ public class RecipeResultNode extends Entity
         this.result = result;
     }
 
-    public List<RecipeResultNode> getChildren()
-    {
-        return children;
-    }
-
-    private void setChildren(List<RecipeResultNode> children)
-    {
-        this.children = children;
-    }
-
-    public void addChild(RecipeResultNode child)
-    {
-        children.add(child);
-    }
-
     public void abort()
     {
         if (!result.completed())
@@ -132,59 +110,21 @@ public class RecipeResultNode extends Entity
             result.abortUnfinishedCommands();
             result.complete();
         }
-
-        for (RecipeResultNode child : children)
-        {
-            child.abort();
-        }
     }
 
     public List<String> collectErrors()
     {
-        List<String> errors = new LinkedList<String>();
-        errors.addAll(result.collectErrors());
-        for (RecipeResultNode child : children)
-        {
-            errors.addAll(child.collectErrors());
-        }
-
-        return errors;
+        return result.collectErrors();
     }
 
     public boolean hasMessages(Feature.Level level)
     {
-        if (result.hasMessages(level))
-        {
-            return true;
-        }
-
-        for (RecipeResultNode child : children)
-        {
-            if (child.hasMessages(level))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return result.hasMessages(level);
     }
 
     public boolean hasArtifacts()
     {
-        if (result.hasArtifacts())
-        {
-            return true;
-        }
-
-        for (RecipeResultNode child : children)
-        {
-            if (child.hasArtifacts())
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return result.hasArtifacts();
     }
 
     public boolean hasBrokenTests()
@@ -201,102 +141,21 @@ public class RecipeResultNode extends Entity
 
     public void accumulateTestSummary(TestResultSummary summary)
     {
-        if (result != null)
-        {
-            result.accumulateTestSummary(summary);
-        }
-
-        for (RecipeResultNode r : children)
-        {
-            r.accumulateTestSummary(summary);
-        }
-    }
-
-    public RecipeResultNode findNode(Predicate<RecipeResultNode> p)
-    {
-        if(p.satisfied(this))
-        {
-            return this;
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            RecipeResultNode found = child.findNode(p);
-            if(found != null)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
-    public ResultState getWorstState(ResultState worst)
-    {
-        if(result != null)
-        {
-            worst = ResultState.getWorseState(worst, result.getState());
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            worst = child.getWorstState(worst);
-        }
-
-        return worst;
+        result.accumulateTestSummary(summary);
     }
 
     public void loadFeatures(File dataRoot)
     {
-        if(result != null)
-        {
-            result.loadFeatures(dataRoot);
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            child.loadFeatures(dataRoot);
-        }
+        result.loadFeatures(dataRoot);
     }
 
     public void loadFailedTestResults(File dataRoot, int limit)
     {
-        if(result != null)
-        {
-            result.loadFailedTestResults(dataRoot, limit);
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            child.loadFailedTestResults(dataRoot, limit);
-        }
+        result.loadFailedTestResults(dataRoot, limit);
     }
 
     public StoredArtifact findArtifact(String artifactName)
     {
-        StoredArtifact artifact = result.getArtifact(artifactName);
-        if (artifact != null)
-        {
-            return artifact;
-        }
-        for(RecipeResultNode child: children)
-        {
-            artifact = child.findArtifact(artifactName);
-            if (artifact != null)
-            {
-                return artifact;
-            }
-        }
-        return null;
-    }
-
-    public void forEachNode(UnaryProcedure<RecipeResultNode> fn)
-    {
-        fn.run(this);
-
-        for(RecipeResultNode child: children)
-        {
-            child.forEachNode(fn);
-        }
+        return result.getArtifact(artifactName);
     }
 }

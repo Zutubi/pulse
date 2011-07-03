@@ -40,7 +40,7 @@ public class BuildStageModel extends ResultModel
         name = stageResult.getStageName();
         RecipeResult recipeResult = stageResult.getResult();
         recipe = recipeResult.getRecipeName();
-        agent = stageResult.getHost();
+        agent = stageResult.getAgentName();
         tests = recipeResult.getTestSummary().toString();
         if (!buildResult.isPersonal() || buildResult.getOwnerName().equals(SecurityUtils.getLoggedInUsername()))
         {

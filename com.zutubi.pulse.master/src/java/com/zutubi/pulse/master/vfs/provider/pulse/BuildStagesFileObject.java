@@ -42,7 +42,7 @@ public class BuildStagesFileObject extends AbstractPulseFileObject
             BuildResult result = provider.getBuildResult();
             if (result != null)
             {
-                List<RecipeResultNode> nodes = result.getRoot().getChildren();
+                List<RecipeResultNode> nodes = result.getStages();
                 return CollectionUtils.mapToArray(nodes, new Mapping<RecipeResultNode, String>()
                 {
                     public String map(RecipeResultNode recipeResultNode)

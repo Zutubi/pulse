@@ -75,12 +75,12 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         BuildResult buildResult = buildManager.getByRecipeId(recipeId);
         ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
 
-        if (node.getHost() == null)
+        if (node.getAgentName() == null)
         {
             throw new FileSystemException("host.not.assigned");
         }
 
-        Agent agent = agentManager.getAgent(node.getHost());
+        Agent agent = agentManager.getAgent(node.getAgentName());
         if (!agent.isAvailable())
         {
             throw new FileSystemException("host.not.available");
@@ -98,7 +98,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         BuildResult buildResult = buildManager.getByRecipeId(recipeId);
         ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
 
-        Agent agent = agentManager.getAgent(node.getHost());
+        Agent agent = agentManager.getAgent(node.getAgentName());
         AgentConfiguration agentConfig = agent.getConfig();
 
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
@@ -127,7 +127,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
     public String getDisplayName()
     {
         RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
-        return String.format(STAGE_FORMAT, node.getStageName(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
+        return String.format(STAGE_FORMAT, node.getStageName(), node.getResult().getRecipeNameSafe(), node.getAgentNameSafe());
     }
 
     public RecipeResult getRecipeResult()

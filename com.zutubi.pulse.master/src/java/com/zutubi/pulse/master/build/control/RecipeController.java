@@ -205,7 +205,7 @@ public class RecipeController
         logger.log(event);
         Agent agent = event.getAgent();
         agentService = agent.getService();
-        recipeResultNode.setHost(agent.getName());
+        recipeResultNode.setAgentName(agent.getName());
         buildManager.save(recipeResultNode);
 
         ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);

@@ -11,7 +11,8 @@ Build reason: trigger 'scm trigger'.
 
 Build stages:
   * first stage :: first recipe@[pending] :: error
-  * second stage :: second recipe@[pending] :: error
+  * second stage :: second recipe@[pending] :: failure
+  * third stage :: third recipe@[pending] :: error
 
 New changes in this build:
   * 655 by test author:
@@ -27,28 +28,26 @@ Error messages:
   * test error message
   - stage first stage :: first recipe@[pending]
     * test recipe error message
-  - stage first stage :: first recipe@[pending] :: stage nested
-    stage :: nested recipe@[pending]
+  - stage second stage :: second recipe@[pending]
     * test recipe failure message with the unfortunate need to wrap
       because it is really quite ridiculously long
-  - stage second stage :: second recipe@[pending]
+  - stage third stage :: third recipe@[pending]
     * Error executing command 'test command'
-  - stage second stage :: second recipe@[pending] :: test command
+  - stage third stage :: third recipe@[pending] :: test command
     * bad stuff happened, so wrap this:
       0000000000000000000000000000000000000000000000000000000000
       00000000000
-  - stage second stage :: second recipe@[pending] :: artifact
-    command
+  - stage third stage :: third recipe@[pending] :: artifact command
     * artifacts let me down
-  - stage second stage :: second recipe@[pending] :: artifact
-    command :: first-artifact
+  - stage third stage :: third recipe@[pending] :: artifact command
+    :: first-artifact
     first-artifact/testpath
     * error message
 
 Warning messages:
   * warning message on result
-  - stage second stage :: second recipe@[pending] :: artifact
-    command :: first-artifact
+  - stage third stage :: third recipe@[pending] :: artifact command
+    :: first-artifact
     first-artifact/testpath
     * warning message
 

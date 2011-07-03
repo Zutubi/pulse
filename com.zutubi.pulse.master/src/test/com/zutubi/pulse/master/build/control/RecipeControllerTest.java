@@ -49,8 +49,8 @@ public class RecipeControllerTest extends PulseTestCase
     private BuildManager buildManager;
     private AgentService buildService;
 
-    private RecipeResult rootResult;
-    private RecipeResultNode rootNode;
+    private RecipeResult recipeResult;
+    private RecipeResultNode stageResult;
     private RecipeAssignmentRequest assignmentRequest;
     private RecipeController recipeController;
     private RecipeDispatchService recipeDispatchService;
@@ -66,17 +66,12 @@ public class RecipeControllerTest extends PulseTestCase
         buildService = mock(AgentService.class);
         RecipeLogger logger = mock(RecipeLogger.class);
 
-        rootResult = new RecipeResult("root recipe");
-        rootResult.setId(100);
-        rootNode = new RecipeResultNode("root stage", 1, rootResult);
-        rootNode.setId(101);
-        RecipeResult childResult = new RecipeResult("child recipe");
-        childResult.setId(102);
-        RecipeResultNode childNode = new RecipeResultNode("child stage", 2, childResult);
-        childNode.setId(103);
-        rootNode.addChild(childNode);
+        recipeResult = new RecipeResult("root recipe");
+        recipeResult.setId(100);
+        stageResult = new RecipeResultNode("root stage", 1, recipeResult);
+        stageResult.setId(101);
 
-        RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
+        RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", recipeResult.getId(), recipeResult.getRecipeName()));
         Project project = new Project();
         ProjectConfiguration projectConfig = new ProjectConfiguration();
         projectConfig.setType(new CustomTypeConfiguration());
@@ -101,7 +96,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         ScmManager scmManager = mock(ScmManager.class);
         stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new TestScmClient());
-        recipeController = new RecipeController(projectConfig, build, rootNode, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
+        recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -119,7 +114,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     public void testIgnoresOtherRecipes()
     {
-        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, rootResult.getId() + 1, "yay", 0)));
+        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, recipeResult.getId() + 1, "yay", 0)));
     }
 
     public void testDispatchRequest()
@@ -127,8 +122,8 @@ public class RecipeControllerTest extends PulseTestCase
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
         Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new BuildRevision());
         recipeController.initialise(bootstrapper);
-        assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
-        RecipeAssignmentRequest dispatched = recipeQueue.getRequest(rootResult.getId());
+        assertTrue(recipeQueue.hasDispatched(recipeResult.getId()));
+        RecipeAssignmentRequest dispatched = recipeQueue.getRequest(recipeResult.getId());
         assertSame(assignmentRequest, dispatched);
         assertSame(assignmentRequest.getRequest().getBootstrapper(), bootstrapper);
     }
@@ -149,12 +144,12 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), agent);
+        RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", recipeResult.getId(), "test")), agent);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
-        assertEquals(agent.getName(), rootNode.getHost());
+        assertEquals(agent.getName(), stageResult.getAgentName());
 
-        verify(buildManager, times(1)).save(rootNode);
+        verify(buildManager, times(1)).save(stageResult);
         verify(recipeDispatchService, times(1)).dispatch(event);
     }
 
@@ -164,10 +159,10 @@ public class RecipeControllerTest extends PulseTestCase
 
         // A recipe commence event should change the result state, and record
         // the start time.
-        RecipeCommencedEvent event = new RecipeCommencedEvent(this, rootResult.getId(), rootResult.getRecipeName(), 10101);
+        RecipeCommencedEvent event = new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), 10101);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
-        assertEquals(ResultState.IN_PROGRESS, rootResult.getState());
+        assertEquals(ResultState.IN_PROGRESS, recipeResult.getState());
     }
 
     public void testCommandCommencedEvent()
@@ -176,11 +171,11 @@ public class RecipeControllerTest extends PulseTestCase
 
         // A command commenced event should result in a new command result
         // with the correct name, state and start time.
-        CommandCommencedEvent event = new CommandCommencedEvent(this, rootResult.getId(), "test command", 555);
+        CommandCommencedEvent event = new CommandCommencedEvent(this, recipeResult.getId(), "test command", 555);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
 
-        List<CommandResult> commandResults = rootResult.getCommandResults();
+        List<CommandResult> commandResults = recipeResult.getCommandResults();
         assertTrue(commandResults.size() > 0);
         CommandResult result = commandResults.get(commandResults.size() - 1);
         result.setOutputDir("dummy");
@@ -198,11 +193,11 @@ public class RecipeControllerTest extends PulseTestCase
         commandResult.commence();
         commandResult.setOutputDir("dummy");
         commandResult.complete();
-        CommandCompletedEvent event = new CommandCompletedEvent(this, rootResult.getId(), commandResult);
+        CommandCompletedEvent event = new CommandCompletedEvent(this, recipeResult.getId(), commandResult);
 
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
-        List<CommandResult> commandResults = rootResult.getCommandResults();
+        List<CommandResult> commandResults = recipeResult.getCommandResults();
         assertTrue(commandResults.size() > 0);
         CommandResult result = commandResults.get(commandResults.size() - 1);
         assertTrue(result.completed());
@@ -216,15 +211,15 @@ public class RecipeControllerTest extends PulseTestCase
         // A recipe completed event should result in the recipe result
         // details being applied, and the controller should then be
         // finished
-        RecipeResult result = new RecipeResult(rootResult.getRecipeName());
-        result.setId(rootResult.getId());
+        RecipeResult result = new RecipeResult(recipeResult.getRecipeName());
+        result.setId(recipeResult.getId());
         result.commence(1234);
         result.complete();
         RecipeCompletedEvent event = new RecipeCompletedEvent(this, result);
 
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
-        assertEquals(ResultState.SUCCESS, rootResult.getState());
+        assertEquals(ResultState.SUCCESS, recipeResult.getState());
         assertTrue(recipeController.isFinished());
     }
 
@@ -234,9 +229,9 @@ public class RecipeControllerTest extends PulseTestCase
 
         sendError();
 
-        assertNull(rootNode.getHost());
-        assertTrue(rootResult.getStamps().started());
-        assertTrue(rootResult.getStamps().ended());
+        assertNull(stageResult.getAgentName());
+        assertTrue(recipeResult.getStamps().started());
+        assertTrue(recipeResult.getStamps().ended());
     }
 
     public void testErrorBeforeCommenced()
@@ -245,8 +240,8 @@ public class RecipeControllerTest extends PulseTestCase
 
         sendError();
 
-        assertTrue(rootResult.getStamps().started());
-        assertTrue(rootResult.getStamps().ended());
+        assertTrue(recipeResult.getStamps().started());
+        assertTrue(recipeResult.getStamps().ended());
     }
 
     public void testErrorAfterCommenced()
@@ -256,8 +251,8 @@ public class RecipeControllerTest extends PulseTestCase
         sendError();
 
         // Should have start and end times.
-        assertTrue(rootResult.getStamps().started());
-        assertTrue(rootResult.getStamps().ended());
+        assertTrue(recipeResult.getStamps().started());
+        assertTrue(recipeResult.getStamps().ended());
     }
 
     public void testErrorMidCommand()
@@ -267,7 +262,7 @@ public class RecipeControllerTest extends PulseTestCase
         sendError();
 
         // Command should be aborted
-        List<CommandResult> results = rootResult.getCommandResults();
+        List<CommandResult> results = recipeResult.getCommandResults();
         assertTrue(results.size() > 0);
         CommandResult lastResult = results.get(results.size() - 1);
         assertEquals(ResultState.ERROR, lastResult.getState());
@@ -280,7 +275,7 @@ public class RecipeControllerTest extends PulseTestCase
         sendError();
 
         // Command should not be affected
-        List<CommandResult> results = rootResult.getCommandResults();
+        List<CommandResult> results = recipeResult.getCommandResults();
         assertTrue(results.size() > 0);
         CommandResult lastResult = results.get(results.size() - 1);
         assertEquals(ResultState.SUCCESS, lastResult.getState());
@@ -297,7 +292,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private RecipeErrorEvent sendError()
     {
-        RecipeErrorEvent error = new RecipeErrorEvent(this, rootResult.getId(), "test error message");
+        RecipeErrorEvent error = new RecipeErrorEvent(this, recipeResult.getId(), "test error message");
         assertTrue(recipeController.matchesRecipeEvent(error));
         recipeController.handleRecipeEvent(error);
         assertErrorDetailsSaved(error);
@@ -306,9 +301,9 @@ public class RecipeControllerTest extends PulseTestCase
 
     private void assertErrorDetailsSaved(RecipeErrorEvent error)
     {
-        assertEquals(ResultState.ERROR, rootResult.getState());
-        assertEquals(error.getErrorMessage(), rootResult.getFeatures(Feature.Level.ERROR).get(0).getSummary());
-        verify(buildManager, atLeastOnce()).save(rootResult);
+        assertEquals(ResultState.ERROR, recipeResult.getState());
+        assertEquals(error.getErrorMessage(), recipeResult.getFeatures(Feature.Level.ERROR).get(0).getSummary());
+        verify(buildManager, atLeastOnce()).save(recipeResult);
     }
 
     class RecordingRecipeResultCollector implements RecipeResultCollector

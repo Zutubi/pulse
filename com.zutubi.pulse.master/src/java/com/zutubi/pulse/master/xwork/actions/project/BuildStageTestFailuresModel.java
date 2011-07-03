@@ -34,7 +34,7 @@ public class BuildStageTestFailuresModel
         testsUrl = urls.stageTests(buildResult, stageResult);
         RecipeResult recipeResult = stageResult.getResult();
         recipeName = recipeResult.getRecipeNameSafe();
-        agentName = stageResult.getHostSafe();
+        agentName = stageResult.getAgentNameSafe();
         testSummary = stageResult.getTestSummary().toString();
         excessFailureCount = recipeResult.getExcessFailureCount();
 

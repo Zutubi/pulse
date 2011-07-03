@@ -823,7 +823,7 @@
 ##
 #macro(nodeMessageSummary $build $node $level)
     #if($node.hasMessages($level))
-        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")
+        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.agentNameSafe")
             <ul>
             #recipeMessageSummary($build $node.result $level false)
             #foreach($child in $node.children)
@@ -845,7 +845,7 @@
         <td class="content leftmost rightmost">
             <ul>
                 #resultMessageItems($buildResult $level)
-        #foreach($node in $buildResult.root.children)
+        #foreach($node in $buildResult.stages)
                 #nodeMessageSummary($buildResult $node $level)
         #end
             </ul>
@@ -872,7 +872,7 @@
 
 #macro(buildTestFailures $buildResult)
     #set($failuresFound = false)
-    #foreach($recipeNode in $buildResult.root.children)
+    #foreach($recipeNode in $buildResult.stages)
         #if($recipeNode.result.completed() && $recipeNode.hasBrokenTests())
             #set($failuresFound = true)
         #end
@@ -889,7 +889,7 @@
             #contentHeading("test.details" 1)
             #contentClassHeading("test.duration" 1 "rightmost")
         </tr>
-        #foreach($recipeNode in $buildResult.root.children)
+        #foreach($recipeNode in $buildResult.stages)
             #if($recipeNode.result.completed() && $recipeNode.hasBrokenTests())
         <tr id='#id("stage-${recipeNode.stageName}-failed")'>
             <td class="content leftmost">
@@ -897,7 +897,7 @@
             </td>
             <td class="content"><img src="$base/images/exclamation.gif"/></td>
             <td class="content">$recipeNode.result.testSummary</td>
-            #dynamicCell("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
+            #dynamicCell("$recipeNode.result.recipeNameSafe@$recipeNode.agentNameSafe")
             <td class="content rightmost">&nbsp;</td>
         </tr>
         #set($broken = $recipeNode.result.loadedTestFailures)

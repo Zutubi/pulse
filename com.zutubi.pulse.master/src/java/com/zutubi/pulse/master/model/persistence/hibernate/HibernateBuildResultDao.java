@@ -567,7 +567,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("select result from BuildResult result join result.root.children child where child = :node");
+                Query queryObject = session.createQuery("select result from BuildResult result join result.stages stage where stage = :node");
                 queryObject.setEntity("node", node);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.uniqueResult();
@@ -583,8 +583,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery(
                         "select count(distinct result) from BuildResult result " +
-                                "  join result.root.children child " +
-                                "where child.host = :agent" +
+                                "  join result.stages stage " +
+                                "where stage.host = :agent" +
                                 (states == null ? "" : " and result.stateName in (:states)"));
 
                 queryObject.setString("agent", agent);
@@ -608,8 +608,8 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery(
                         "select distinct result from BuildResult result " +
-                        "  join result.root.children child " +
-                        "where child.host = :agent " +
+                        "  join result.stages stage " +
+                        "where stage.host = :agent " +
                         (states == null ? "" : "and result.stateName in (:states) ") +
                         "order by result.id desc");
 

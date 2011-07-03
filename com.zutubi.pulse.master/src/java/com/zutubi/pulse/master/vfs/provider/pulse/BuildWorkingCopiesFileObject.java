@@ -45,7 +45,7 @@ public class BuildWorkingCopiesFileObject extends AbstractPulseFileObject
             throw new FileSystemException("buildResult.not.available");
         }
 
-        List<RecipeResultNode> stages = result.getRoot().getChildren();
+        List<RecipeResultNode> stages = result.getStages();
         return CollectionUtils.mapToArray(stages, new Mapping<RecipeResultNode, String>()
         {
             public String map(RecipeResultNode node)

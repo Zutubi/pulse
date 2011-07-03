@@ -85,9 +85,9 @@ public class BuildResultTest extends PulseTestCase
     {
         BuildResult buildResult = createBuildResult();
         buildResult.commence();
-        buildResult.getRoot().addChild(createRecipeResultNode(ResultState.SUCCESS));
-        buildResult.getRoot().addChild(createRecipeResultNode(ResultState.ERROR));
-        buildResult.getRoot().addChild(createRecipeResultNode(ResultState.FAILURE));
+        buildResult.addStage(createRecipeResultNode(ResultState.SUCCESS));
+        buildResult.addStage(createRecipeResultNode(ResultState.ERROR));
+        buildResult.addStage(createRecipeResultNode(ResultState.FAILURE));
         buildResult.complete();
         assertEquals(ResultState.ERROR, buildResult.getState());
     }
@@ -97,7 +97,7 @@ public class BuildResultTest extends PulseTestCase
         BuildResult buildResult = createBuildResult();
         buildResult.commence();
         buildResult.failure("fail");
-        buildResult.getRoot().addChild(createRecipeResultNode(ResultState.SUCCESS));
+        buildResult.addStage(createRecipeResultNode(ResultState.SUCCESS));
         buildResult.complete();
         assertEquals(ResultState.FAILURE, buildResult.getState());
     }

@@ -6,5 +6,6 @@ Completed with status: failure
 Build stages:
   * first stage :: first recipe@[pending] :: failure
   * second stage :: second recipe@[pending] :: failure
+  * third stage :: third recipe@[pending] :: failure
 
 Test summary: 5 of 5 broken (/dashboard/my/12/tests/)

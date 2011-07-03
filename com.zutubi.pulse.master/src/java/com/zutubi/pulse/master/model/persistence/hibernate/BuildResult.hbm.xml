@@ -57,9 +57,6 @@
 
         <many-to-one name="user" column="LOCAL_USER" class="com.zutubi.pulse.master.model.User" cascade="none" not-null="false"/>
 
-        <many-to-one name="root" class="com.zutubi.pulse.master.model.RecipeResultNode" column="RECIPE_RESULT_ID"
-                     cascade="all"/>
-
         <property name="version" column="VERSION" type="string" length="255"/>
         
         <property name="status" column="STATUS" type="string" length="255"/>
@@ -68,6 +65,11 @@
 
         <property name="metaBuildId" column="META_BUILD_ID" type="long"/>
 
+        <list name="stages" cascade="all,delete-orphan" lazy="false">
+            <key column="BUILD_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.master.model.RecipeResultNode"/>
+        </list>
     </class>
 
     <class name="com.zutubi.pulse.master.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">
@@ -104,24 +106,18 @@
         <subclass name="com.zutubi.pulse.master.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
     </class>
 
-    <class name="com.zutubi.pulse.master.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
+    <class name="com.zutubi.pulse.master.model.RecipeResultNode" table="STAGE_RESULT" lazy="false">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <property name="host" type="string" length="255"/>
+        <property name="agentName" column="AGENT_NAME" type="string" length="255"/>
 
-        <property name="stageName" type="string" length="255"/>
+        <property name="stageName" column="STAGE_NAME" type="string" length="255"/>
 
         <property name="stageHandle" column="STAGE_HANDLE" type="long"/>
 
         <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID" cascade="all" unique="true"/>
-
-        <list name="children" cascade="all,delete-orphan" lazy="false">
-            <key column="PARENT_ID"/>
-            <index column="ORDINAL"/>
-            <one-to-many class="com.zutubi.pulse.master.model.RecipeResultNode"/>
-        </list>
     </class>
 
     <class name="com.zutubi.pulse.core.model.RecipeResult" table="RECIPE_RESULT" lazy="false">
