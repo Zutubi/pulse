@@ -626,7 +626,7 @@ public class Project extends Entity implements NamedEntity
      *
      * @see com.zutubi.pulse.master.model.ProjectManager#makeStateTransition(long, com.zutubi.pulse.master.model.Project.Transition) 
      */
-    State stateTransition(Transition transition)
+    public State stateTransition(Transition transition)
     {
         Map<Transition, State> validTransitions = state.getValidTransitions();
         State newState = validTransitions.get(transition);

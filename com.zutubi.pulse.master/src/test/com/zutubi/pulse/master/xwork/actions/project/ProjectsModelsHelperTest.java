@@ -14,11 +14,12 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
+
+import static org.mockito.Mockito.*;
 
 public class ProjectsModelsHelperTest extends ProjectsModelTestBase
 {
@@ -390,9 +391,22 @@ public class ProjectsModelsHelperTest extends ProjectsModelTestBase
         assertProjectsModelLists(expectedModels, helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p2, p3, cp1, cp2), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_ODD)), true));
     }
 
-    public void testBuildCountApplied()
+    public void testBuildCountAppliedIdle()
     {
         config.setBuildsPerProject(3);
+
+        helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
+        verify(buildManager).getLatestBuildResultsForProject(p1, 3);
+        verify(buildManager).getLatestCompletedBuildResult(p1);
+        verifyNoMoreInteractions(buildManager);
+    }
+
+    public void testBuildCountAppliedBuilding()
+    {
+        config.setBuildsPerProject(3);
+        p1.stateTransition(Project.Transition.INITIALISE);
+        p1.stateTransition(Project.Transition.INITIALISE_SUCCESS);
+        p1.stateTransition(Project.Transition.BUILDING);
 
         helper.createProjectsModels(null, config, Collections.<LabelProjectTuple>emptySet(), urls, new InCollectionPredicate<Project>(p1), new InCollectionPredicate<ProjectGroup>(groups.get(LABEL_LONELY)), true);
         verify(buildManager).queryBuilds(p1, ResultState.getIncompleteStates(), -1, -1, -1, 3, true, false);
