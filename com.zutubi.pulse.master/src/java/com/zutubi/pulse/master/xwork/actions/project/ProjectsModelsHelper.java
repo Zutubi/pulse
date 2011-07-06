@@ -156,7 +156,9 @@ public class ProjectsModelsHelper
             for (Project p : projects)
             {
                 boolean prompt = p.getConfig().getOptions().getPrompt();
-                ConcreteProjectModel child = new ConcreteProjectModel(model, p, getBuilds(p, configuration, buildCache), loggedInUser, configuration, urls, prompt, getAvailableActions(p), ProjectHealth.getHealth(buildManager, p), ProjectMonitoring.getMonitoring(p));
+                List<BuildResult> builds = getBuilds(p, configuration, buildCache);
+                ProjectHealth health = getHealth(p, builds);
+                ConcreteProjectModel child = new ConcreteProjectModel(model, p, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(p), health, ProjectMonitoring.getMonitoring(p));
                 model.getRoot().addChild(child);
             }
         }
@@ -172,19 +174,18 @@ public class ProjectsModelsHelper
             {
                 if (includedInGroup.contains(node.getId()))
                 {
-                    ProjectModel model;
+                    ProjectModel model = null;
                     String name = node.getId();
                     if (node.isConcrete())
                     {
-                        List<BuildResult> builds = Collections.emptyList();
-                        boolean prompt = false;
                         Project project = projectManager.getProject(name, true);
                         if (project != null)
                         {
-                            builds = getBuilds(project, configuration, buildCache);
-                            prompt = project.getConfig().getOptions().getPrompt();
+                            List<BuildResult> builds = getBuilds(project, configuration, buildCache);
+                            boolean prompt = project.getConfig().getOptions().getPrompt();
+                            ProjectHealth health = getHealth(project, builds);
+                            model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project), health, ProjectMonitoring.getMonitoring(project));
                         }
-                        model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project), ProjectHealth.getHealth(buildManager, project), ProjectMonitoring.getMonitoring(project));
                     }
                     else
                     {
@@ -194,13 +195,29 @@ public class ProjectsModelsHelper
                         model = template;
                     }
 
-                    parentModel.addChild(model);
+                    if (model != null)
+                    {
+                        parentModel.addChild(model);
+                    }
                 }
             }
             else
             {
                 processLevel(group, parentModel, node.getChildren(), depth + 1, includedInGroup, loggedInUser, configuration, collapsed, buildCache, urls);
             }
+        }
+    }
+
+    private ProjectHealth getHealth(Project project, List<BuildResult> builds)
+    {
+        BuildResult latestCompleted = CollectionUtils.find(builds, new CompletedBuildPredicate());
+        if (latestCompleted == null)
+        {
+            return ProjectHealth.getHealth(buildManager, project);
+        }
+        else
+        {
+            return ProjectHealth.getHealth(latestCompleted);
         }
     }
 
@@ -229,11 +246,18 @@ public class ProjectsModelsHelper
         if (result == null)
         {
             int count = configuration.getBuildsPerProject();
-            result = new LinkedList<BuildResult>();
-            result.addAll(buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, count, true, false));
-            if (result.size() < count)
+            if (project.getState().isBuilding())
             {
-                result.addAll(buildManager.getLatestCompletedBuildResults(project, count - result.size()));
+                result = new LinkedList<BuildResult>();
+                result.addAll(buildManager.queryBuilds(project, ResultState.getIncompleteStates(), -1, -1, -1, count, true, false));
+                if (result.size() < count)
+                {
+                    result.addAll(buildManager.getLatestCompletedBuildResults(project, count - result.size()));
+                }
+            }
+            else
+            {
+                result = new LinkedList<BuildResult>(buildManager.getLatestBuildResultsForProject(project, count));
             }
             
             cache.put(project, result);
