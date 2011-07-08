@@ -29,7 +29,7 @@ import static org.mockito.Mockito.stub;
 
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
-    private boolean generate = true;
+    private boolean generate = false;
 
     private FreemarkerBuildResultRenderer renderer;
 

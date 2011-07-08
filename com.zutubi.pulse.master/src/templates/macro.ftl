@@ -128,9 +128,9 @@ results as a flat list but with context.
 [#macro recipeNodeMessages node level context=""]
     [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
         [#if context?length &gt; 0]
-            [#local nestedContext = "${context} :: stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "${context} :: stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.agentNameSafe}"]
         [#else]
-            [#local nestedContext = "stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.agentNameSafe}"]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
     [/#if]
@@ -162,7 +162,7 @@ Outputs a list of build stage results for the given build.
 ----------------------------------------------------------------------------]
 [#macro buildStages result]
     [#list result.stages as child]
-  * ${child.stageName} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
+  * ${child.stageName} :: ${child.result.recipeNameSafe}@${child.agentNameSafe} :: ${child.result.state.prettyString}
     [/#list]
 [/#macro]
 
@@ -247,9 +247,9 @@ tests as a flat plain text list.
 ----------------------------------------------------------------------------]
 [#macro recipeNodeTestSummary node context=""]
     [#if context?length &gt; 0]
-        [#local nestedContext = "${context} :: ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = "${context} :: ${node.stageName} :: ${node.result.recipeNameSafe}@${node.agentNameSafe}"]
     [#else]
-        [#local nestedContext = "${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = "${node.stageName} :: ${node.result.recipeNameSafe}@${node.agentNameSafe}"]
     [/#if]
     [#if node.result?exists]
         [@recipeTestSummary result=node.result context=nestedContext/]
@@ -476,7 +476,7 @@ Shows a summary for each stage in a build.
             [#assign class = child.result.state.string]
             [@linkCell cc=child.stageName url="${stageDetailsLink(result, child)}" class=class/]
             [@classCell cc=child.result.recipeNameSafe/]
-            [@classCell cc=child.hostSafe/]
+            [@classCell cc=child.agentNameSafe/]
             [@classCell cc=child.result.stateName?lower_case/]
             [@linkCell cc=child.testSummary url="${stageTestsLink(result, child)}" class=class/]
             [@classCell cc=child.result.stamps.prettyStartDate/]
@@ -603,7 +603,7 @@ results as a HTML nested list.
 ----------------------------------------------------------------------------]
 [#macro recipeNodeMessagesHTML result node level]
     [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
-<li class="header">stage ${node.stageName?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
+<li class="header">stage ${node.stageName?html} :: ${node.result.recipeNameSafe?html}@${node.agentNameSafe?html}
     <ul>
         [@recipeResultMessagesHTML result=result recipe=node.result level=level/]
     </ul>
