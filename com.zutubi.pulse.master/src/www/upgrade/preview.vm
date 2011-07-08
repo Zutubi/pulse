@@ -24,7 +24,7 @@
         <tr>
             <td class="columns" width="45%">
                 <table id="upgrade.target.details" class="fill-content">
-                    <th colspan="2">Existing installation</th>
+                    <th class="content" colspan="2">Existing installation</th>
                     #dynamicRow("install.builddate" $targetVersion.buildDate)
                     #dynamicRow("install.buildnumber" $targetVersion.buildNumber)
                     #dynamicRow("install.versionnumber" $targetVersion.versionNumber)
@@ -32,7 +32,7 @@
             </td>
             <td class="columns" width="45%">
                 <table id="upgrade.new.details" class="fill-content">
-                    <th colspan="2">New installation</th>
+                    <th class="content" colspan="2">New installation</th>
                     #dynamicRow("install.builddate" $newVersion.buildDate)
                     #dynamicRow("install.buildnumber" $newVersion.buildNumber)
                     #dynamicRow("install.versionnumber" $newVersion.versionNumber)

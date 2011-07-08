@@ -15,8 +15,7 @@ import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.hbm2ddl.TableMetadata;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class SchemaRefactor
@@ -200,14 +199,14 @@ public class SchemaRefactor
     /**
      * When a schema change is made to a column, hibernates alter will not update the column. This method handles
      * what hibernate avoids, by synchronising the definition of the column in the database with the definition
-     * in the hibernate mapping. Tricky. 
+     * in the hibernate mapping. Tricky.
      *
      * NOTE: The mapping definition should represent what you want to column to look like AFTER the refresh.  This is
      * a little different from the other methods which need to know what the mappings are BEFORE the refactor.
      *
      * @param tableName     the name of the table containing the column to be refreshed
      * @param columnName    the name of the column to be refreshed
-     * 
+     *
      * @throws SQLException is thrown on error
      */
     public void refreshColumn(final String tableName, final String columnName) throws SQLException
@@ -254,7 +253,7 @@ public class SchemaRefactor
                 {
                     Table table = getTable(tableName);
                     Column column = getColumn(table, columnName);
-                    dropColumnConstraints(con, table, column);
+                    metaDropColumnConstraints(con, table, column);
                     sqlDropColumn(con, table, columnName);
                 }
                 return null;
@@ -401,7 +400,7 @@ public class SchemaRefactor
         }
         finally
         {
-            column.setName(columnName);            
+            column.setName(columnName);
         }
 
         // copy data to the temporary column.
@@ -415,7 +414,7 @@ public class SchemaRefactor
 
         // recreate column - with the refreshed schema.
         updateTableSchema(table, connection);
-        
+
         // copy the data back to the refreshed column.
         sqlCopyColumn(connection, table.getName(), columnName, tmpColumnName);
 
@@ -424,6 +423,120 @@ public class SchemaRefactor
 
         // drop the temporary column.
         sqlDropColumn(connection, table, tmpColumnName);
+    }
+
+    private void metaDropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
+    {
+        JDBCUtils.DbType dbType = JDBCUtils.getDBType(connection);
+        if (dbType == JDBCUtils.DbType.HSQL)
+        {
+            hsqlDropColumnConstraints(connection, table, column);
+        }
+        else
+        {
+            String[] tableNames = JDBCUtils.getSchemaTableNames(connection);
+            String metaTableName = null;
+            for (String tableName: tableNames)
+            {
+                if (tableName.equalsIgnoreCase(table.getName()))
+                {
+                    metaTableName = tableName;
+                }
+            }
+
+            if (metaTableName == null)
+            {
+                throw new RuntimeException("Could not find table of name '" + table.getName() + "' in schema");
+            }
+
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet rs = metaData.getIndexInfo(null, null, metaTableName, false, false);
+            try
+            {
+                while (rs.next())
+                {
+                    if (column.getName().equalsIgnoreCase(rs.getString("COLUMN_NAME")))
+                    {
+                        String indexName = rs.getString("INDEX_NAME");
+                        if (indexName.startsWith("FK") && dbType == JDBCUtils.DbType.MYSQL)
+                        {
+                            tryDropForeignKey(connection, metaTableName, indexName);
+                        }
+
+                        tryDropIndex(connection, metaTableName, indexName);
+                    }
+                }
+            }
+            finally
+            {
+                JDBCUtils.close(rs);
+            }
+        }
+    }
+
+    private void hsqlDropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = connection.prepareStatement("select FK_NAME from INFORMATION_SCHEMA.SYSTEM_CROSSREFERENCE where FKTABLE_NAME = ? and FKCOLUMN_NAME = ?");
+            stmt.setString(1, table.getName());
+            stmt.setString(2, column.getName());
+            rs = stmt.executeQuery();
+            while (rs.next())
+            {
+                String constraintName = rs.getString(1);
+                tryDropConstraint(connection, table.getName(), constraintName);
+            }
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(stmt);
+        }
+    }
+
+    private void tryDropForeignKey(Connection connection, String tableName, String keyName)
+    {
+        String sql = "ALTER TABLE " + tableName + " DROP FOREIGN KEY " + keyName;
+        try
+        {
+            LOG.info(sql);
+            JDBCUtils.execute(connection, sql);
+        }
+        catch (SQLException e)
+        {
+            LOG.warning("Unable to execute statement '" + sql + "'", e);
+        }
+    }
+
+    private void tryDropConstraint(Connection connection, String tableName, String constraintName)
+    {
+        String sql = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
+        try
+        {
+            LOG.info(sql);
+            JDBCUtils.execute(connection, sql);
+        }
+        catch (SQLException e)
+        {
+            LOG.warning("Unable to execute statement '" + sql + "'", e);
+        }
+    }
+
+    private void tryDropIndex(Connection connection, String tableName, String indexName) throws SQLException
+    {
+        String sql = JDBCUtils.sqlDropIndex(connection, tableName, indexName);
+        try
+        {
+            LOG.info(sql);
+            JDBCUtils.execute(connection, sql);
+        }
+        catch (SQLException e)
+        {
+            LOG.warning("Unable to execute statement '" + sql + "'", e);
+        }
     }
 
     private List<ForeignKey> dropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
