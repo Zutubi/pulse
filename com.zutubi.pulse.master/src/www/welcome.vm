@@ -14,7 +14,7 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.4 beta!  This page provides information on common next steps and important
+        Welcome to Pulse 2.4!  This page provides information on common next steps and important
         new features in the 2.4 release.
     </p>
     <p>
@@ -118,6 +118,12 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("agenthistory" "agent history tab" "accept" false)
+            <td>
+                A new agent history tab has added showing all builds that have involved the agent.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("serverhistory" "server history tab" "accept" false)
             <td>
                 A new history tab has been added to the server section of the UI.  This tab
@@ -133,10 +139,31 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("pauseserver" "pause server action" "accept" false)
+            <td>
+                The server may now be paused, such that all new build triggers are ignored.
+                This is especially useful for maintenance on large installations.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("info" "server info and messages tabs" "accept" false)
             <td>
                 The server and agent info and messages tabs have also been restyled to
                 match the new look of these sections.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("changelistpages" "changelist pages" "accept" false)
+            <td>
+                Personal build changes and changelist pages have been reworked to match the
+                styling in other parts of the UI.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("pinnedbuilds" "pinned builds" "accept" false)
+            <td>
+                Builds may now be pinned: so they may not be deleted and are exempt from
+                cleanup rules. This is useful for ensuring important builds are retained.
             </td>
         </tr>
         <tr>
@@ -166,6 +193,13 @@
             <td>
                 Automatic tool discovery and configuration is now pluggable, so if you use a tool
                 not yet supported by Pulse you can choose to add support yourself.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("svnchangelist" "subversion changelist support" "accept" false)
+            <td>
+                When submitting a personal build you can now tell pulse to use the changes in a
+                specific Subversion changelist.
             </td>
         </tr>
         <tr>
