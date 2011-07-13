@@ -54,9 +54,16 @@ public class ProcessControlTest extends PulseTestCase
             });
             killer.start();
 
-            InputStream is = p.getInputStream();
-            byte[] buffer = new byte[1024];
-            while (is.read(buffer) > 0);
+            try
+            {
+                InputStream is = p.getInputStream();
+                byte[] buffer = new byte[1024];
+                while (is.read(buffer) > 0) {}
+            }
+            catch (IOException e)
+            {
+                // Can be raised when the process is killed.
+            }
 
             p.waitFor();
             killer.join();

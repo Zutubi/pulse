@@ -143,7 +143,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             if (readerComplete)
             {
                 IOException ioe = reader.getIoError();
-                if (ioe != null)
+                if (!terminated && ioe != null)
                 {
                     throw new BuildException(ioe);
                 }
@@ -162,7 +162,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
                 if (writer.waitFor(10))
                 {
                     IOException ioe = writer.getIoError();
-                    if (ioe != null)
+                    if (!terminated && ioe != null)
                     {
                         throw new BuildException(ioe);
                     }
