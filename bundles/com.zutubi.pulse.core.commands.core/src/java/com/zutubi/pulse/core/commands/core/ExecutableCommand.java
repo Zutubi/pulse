@@ -108,7 +108,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         }
 
         pid = ProcessControl.getPid(child);
-        
+
         try
         {
             InputStream input = child.getInputStream();

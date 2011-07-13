@@ -45,13 +45,9 @@ public class ProcessControl
                 {
                     LOG.warning("Unable to load Kernel32: " + e.getMessage(), e);
                 }
-                catch (NoSuchFieldException e)
+                catch (Throwable e)
                 {
                     LOG.warning("Unable to get handle field of Process: " + e.getMessage(), e);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    LOG.warning("Unable to load Process class: " + e.getMessage(), e);
                 }
             }
             else
@@ -110,9 +106,10 @@ public class ProcessControl
                     return pidField.getInt(p);
                 }
             }
-            catch (IllegalAccessException e)
+            catch (Throwable e)
             {
                 // Fall through.
+                LOG.warning(e);
             }
         }
         
