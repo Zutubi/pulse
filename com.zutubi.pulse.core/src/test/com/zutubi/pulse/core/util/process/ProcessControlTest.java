@@ -16,7 +16,6 @@ public class ProcessControlTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        System.setProperty(ProcessControl.NATIVE_PROCESS_KILL, "true");
         tempDir = FileSystemUtils.createTempDir(getName(), "");
     }
 

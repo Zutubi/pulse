@@ -1,10 +1,13 @@
 package com.zutubi.pulse.core.util.process;
 
-import com.zutubi.pulse.command.PulseCtl;
+import com.jezhumble.javasysmon.JavaSysMon;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.File;
 import java.lang.reflect.Field;
 
 /**
@@ -15,16 +18,11 @@ public class ProcessControl
 {
     private static final Logger LOG = Logger.getLogger(ProcessControl.class);
 
-    static final String NATIVE_PROCESS_KILL = "pulse.use.native.process.kill";
-    
-    private static boolean nativeDestroyAvailable = false;
-    /**
-     * On Windows, the PID is held in a long in the ProcessImpl class. 
-     */
-    private static Field handleField;
+    private static Kernel32 KERNEL32;
     /**
      * On UNIX-like platforms, the PID is held in a pid field in the
-     * UNIXProcess class.
+     * UNIXProcess class.  On Windows this is a handle field on the
+     * ProcessImpl class.
      */
     private static Field pidField;
     private static boolean initialised;
@@ -33,32 +31,27 @@ public class ProcessControl
     {
         if (!initialised)
         {
-            File dll = findDLL();
             if (SystemUtils.IS_WINDOWS)
             {
-                if (SystemUtils.getBooleanProperty(NATIVE_PROCESS_KILL, true) && dll != null)
+                try
                 {
-                    try
-                    {
-                        System.load(dll.getAbsolutePath());
-                        Class clazz = ProcessControl.class.getClassLoader().loadClass("java.lang.ProcessImpl");
-                        handleField = clazz.getDeclaredField("handle");
-                        handleField.setAccessible(true);
-                        nativeDestroyAvailable = true;
-                        LOG.info("Using native process destruction");
-                    }
-                    catch (UnsatisfiedLinkError e)
-                    {
-                        LOG.warning("Unable to load native component: " + e.getMessage(), e);
-                    }
-                    catch (NoSuchFieldException e)
-                    {
-                        LOG.warning("Unable to get handle field of Process: " + e.getMessage(), e);
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                        LOG.warning("Unable to load Process class: " + e.getMessage(), e);
-                    }
+                    KERNEL32 = (Kernel32)Native.loadLibrary("kernel32", Kernel32.class);
+
+                    Class clazz = ProcessControl.class.getClassLoader().loadClass("java.lang.ProcessImpl");
+                    pidField = clazz.getDeclaredField("handle");
+                    pidField.setAccessible(true);
+                }
+                catch (UnsatisfiedLinkError e)
+                {
+                    LOG.warning("Unable to load Kernel32: " + e.getMessage(), e);
+                }
+                catch (NoSuchFieldException e)
+                {
+                    LOG.warning("Unable to get handle field of Process: " + e.getMessage(), e);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    LOG.warning("Unable to load Process class: " + e.getMessage(), e);
                 }
             }
             else
@@ -77,45 +70,6 @@ public class ProcessControl
 
             initialised = true;
         }
-    }
-
-    private static File findDLL()
-    {
-        File dll = null;
-        String homePath = System.getProperty(PulseCtl.VERSION_HOME);
-        if (homePath == null)
-        {
-            // Development version?
-            dll = new File("com.zutubi.pulse.core/etc/pulse.dll");
-        }
-        else
-        {
-            File lib = new File(homePath, "lib");
-            if (lib.isDirectory())
-            {
-                dll = new File(lib, "pulse.dll");
-            }
-        }
-
-        if (dll == null || !dll.exists())
-        {
-            return null;
-        }
-
-        return dll;
-    }
-
-    /**
-     * Indicates if platform-specific code for process destruction is
-     * available.  Most clients can just call {@link #destroyProcess(Process)}
-     * and let it determine the best method of destruction available.
-     * 
-     * @return true if native destruction is available
-     */
-    public static boolean isNativeDestroyAvailable()
-    {
-        init();
-        return nativeDestroyAvailable;
     }
 
     /**
@@ -146,7 +100,15 @@ public class ProcessControl
         {
             try
             {
-                return pidField.getInt(p);
+                if (SystemUtils.IS_WINDOWS)
+                {
+                    long handle = pidField.getLong(p);
+                    return KERNEL32.GetProcessId(new WinNT.HANDLE(new Pointer(handle)));
+                }
+                else
+                {
+                    return pidField.getInt(p);
+                }
             }
             catch (IllegalAccessException e)
             {
@@ -155,6 +117,16 @@ public class ProcessControl
         }
         
         return 0;
+    }
+
+    /**
+     * Indicates if native destroy is available.
+     *
+     * @return true if native destroy code is available
+     */
+    public static boolean isNativeDestroyAvailable()
+    {
+        return isPidAvailable() && new JavaSysMon().supportedPlatform();
     }
 
     /**
@@ -169,21 +141,20 @@ public class ProcessControl
     public static boolean destroyProcess(Process p)
     {
         init();
-
         boolean usingNative = false;
         if (p != null)
         {
-            if (nativeDestroyAvailable)
+            if (isPidAvailable())
             {
-                try
+                int pid = getPid(p);
+                if (pid != 0)
                 {
-                    long handle = handleField.getLong(p);
-                    destroy(handle);
-                    usingNative = true;
-                }
-                catch (IllegalAccessException e)
-                {
-                    // Fall through
+                    JavaSysMon monitor = new JavaSysMon();
+                    if (monitor.supportedPlatform())
+                    {
+                        monitor.killProcessTree(pid, false);
+                        usingNative = true;
+                    }
                 }
             }
 
@@ -193,6 +164,4 @@ public class ProcessControl
         
         return usingNative;
     }
-
-    private static native boolean destroy(long handle);
 }
