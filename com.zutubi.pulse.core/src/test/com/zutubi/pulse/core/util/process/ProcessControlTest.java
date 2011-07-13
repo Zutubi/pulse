@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.util.process;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +32,8 @@ public class ProcessControlTest extends PulseTestCase
         if (ProcessControl.isNativeDestroyAvailable())
         {
             File buildFile = copyInputToDirectory("xml", tempDir);
-            ProcessBuilder processBuilder = new ProcessBuilder("ant.bat", "-f", buildFile.getAbsolutePath(), "doit");
+            String ant = SystemUtils.IS_WINDOWS ? "ant.bat" : "ant";
+            ProcessBuilder processBuilder = new ProcessBuilder(ant, "-f", buildFile.getAbsolutePath(), "doit");
             processBuilder.redirectErrorStream(true);
             final Process p = processBuilder.start();
 
