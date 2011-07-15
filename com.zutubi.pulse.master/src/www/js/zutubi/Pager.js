@@ -108,9 +108,6 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
         var pageCount = Math.floor((data.totalItems + data.itemsPerPage - 1) / data.itemsPerPage);
         if (pageCount > 1)
         {
-            var firstPage = this.getFirstPage(data.currentPage, pageCount);
-            var lastPage = this.getLastPage(data.currentPage, pageCount);
-
             var args = Ext.apply({
                 id: this.id,
                 url: this.url,
@@ -120,11 +117,13 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
                 labelPrevious: this.labels.previous,
                 labelNext: this.labels.next,
                 labelLast: this.labels.last,
-                lastPage: lastPage,
+                lastPage: pageCount - 1,
                 pages: []
             }, data);
 
-            for (var i = firstPage; i <= lastPage; i++)
+            var firstPageInWindow = this.getFirstPageInWindow(data.currentPage, pageCount);
+            var lastPageInWindow = this.getLastPageInWindow(data.currentPage, pageCount);
+            for (var i = firstPageInWindow; i <= lastPageInWindow; i++)
             {
                 args.pages.push({index: i});
             }
@@ -133,7 +132,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
         }
     },
 
-    getFirstPage: function(currentPage, pageCount)
+    getFirstPageInWindow: function(currentPage, pageCount)
     {
         var offset = Math.floor(this.surroundingPages / 2);
         if (currentPage + offset + 1 > pageCount)
@@ -144,7 +143,7 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
         return Math.max(0, currentPage - offset);
     },
 
-    getLastPage: function(currentPage, pageCount)
+    getLastPageInWindow: function(currentPage, pageCount)
     {
         var offset = Math.floor(this.surroundingPages / 2);
         if (currentPage - offset < 0)
