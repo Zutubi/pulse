@@ -92,7 +92,7 @@ import static org.hamcrest.Matchers.hasItem;
  */
 public class BuildAcceptanceTest extends AcceptanceTestBase
 {
-    private static final int BUILD_TIMEOUT = 90000;
+    private static final int BUILD_TIMEOUT = 120000;
 
     private static final String CHANGE_AUTHOR = "pulse";
     private static final String CHANGE_COMMENT = "Edit build file.";
