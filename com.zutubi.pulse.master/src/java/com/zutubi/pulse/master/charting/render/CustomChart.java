@@ -8,11 +8,14 @@ import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.xy.*;
 import org.jfree.chart.util.RelativeDateFormat;
 import org.jfree.data.xy.XYDataset;
@@ -34,6 +37,13 @@ public abstract class CustomChart implements Chart
     private List<BuildResult> builds;
     private CustomFieldSource customFieldSource;
 
+    static
+    {
+        ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
+        BarRenderer.setDefaultShadowsVisible(false);
+        XYBarRenderer.setDefaultShadowsVisible(false);
+    }
+    
     public CustomChart(ReportConfiguration configuration, List<BuildResult> builds, CustomFieldSource customFieldSource)
     {
         this.builds = builds;

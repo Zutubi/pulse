@@ -51,12 +51,18 @@ public class AgentStatisticsModel
     
     private JFreeChart createChart(AgentStatistics statistics)
     {
+        String disabled = I18N.format("disabled");
+        String offline = I18N.format("offline");
+        String synchronising = I18N.format("synchronising");
+        String idle = I18N.format("idle");
+        String busy = I18N.format("busy");
+
         DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue(I18N.format("disabled"), statistics.getTotalDisabledTime());
-        dataset.setValue(I18N.format("offline"), statistics.getTotalOfflineTime());
-        dataset.setValue(I18N.format("synchronising"), statistics.getTotalSynchronisingTime());
-        dataset.setValue(I18N.format("idle"), statistics.getTotalIdleTime());
-        dataset.setValue(I18N.format("busy"), statistics.getTotalBusyTime());
+        dataset.setValue(disabled, statistics.getTotalDisabledTime());
+        dataset.setValue(offline, statistics.getTotalOfflineTime());
+        dataset.setValue(synchronising, statistics.getTotalSynchronisingTime());
+        dataset.setValue(idle, statistics.getTotalIdleTime());
+        dataset.setValue(busy, statistics.getTotalBusyTime());
 
         JFreeChart chart = ChartFactory.createPieChart(I18N.format("utilisation.chart"), dataset, true, false, false);
         chart.setBorderVisible(false);
@@ -64,10 +70,11 @@ public class AgentStatisticsModel
         chart.getTitle().setPaint(Color.DARK_GRAY);
         
         LegendTitle legend = chart.getLegend();
-        legend.setBorder(new BlockBorder(Color.LIGHT_GRAY));
+        legend.setFrame(new BlockBorder(Color.LIGHT_GRAY));
         legend.setMargin(0, 4, 0, 4);
 
         PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.WHITE);
         plot.setShadowPaint(null);
         plot.setOutlinePaint(Color.LIGHT_GRAY);
         plot.setLabelGap(0.04);
@@ -76,11 +83,11 @@ public class AgentStatisticsModel
         plot.setLabelGenerator(labelGenerator);
         plot.setLabelShadowPaint(null);
 
-        plot.setSectionPaint(0, ChartColours.DISABLED_FILL.asColor());
-        plot.setSectionPaint(1, ChartColours.FAIL_FILL.asColor());
-        plot.setSectionPaint(2, ChartColours.WARNING_FILL.asColor());
-        plot.setSectionPaint(3, ChartColours.SUCCESS_FILL.asColor());
-        plot.setSectionPaint(4, ChartColours.BUSY_FILL.asColor());
+        plot.setSectionPaint(disabled, ChartColours.DISABLED_FILL.asColor());
+        plot.setSectionPaint(offline, ChartColours.FAIL_FILL.asColor());
+        plot.setSectionPaint(synchronising, ChartColours.WARNING_FILL.asColor());
+        plot.setSectionPaint(idle, ChartColours.SUCCESS_FILL.asColor());
+        plot.setSectionPaint(busy, ChartColours.BUSY_FILL.asColor());
 
         return chart;
     }
