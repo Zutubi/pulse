@@ -57,7 +57,7 @@
 </#if>
 
 <#if !parameters.suppressDefault?exists>
-    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}__default', value: ''}));
 </#if>
 
     var picker = new Zutubi.form.ItemPicker(fc);

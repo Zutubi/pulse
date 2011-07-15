@@ -38,7 +38,7 @@
     fc.size = ${parameters.size};
 </#if>
 
-    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}__default', value: ''}));
 
     var select = new Zutubi.form.Select(fc);
     ${form.name}.add(select);

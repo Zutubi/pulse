@@ -102,7 +102,7 @@ public class ToveUtils
             String[] parameterValue = parameters.get(propertyName);
             if (parameterValue == null)
             {
-                parameterValue = parameters.get(propertyName + ".default");
+                parameterValue = parameters.get(propertyName + "__default");
                 if (parameterValue == null)
                 {
                     continue;
