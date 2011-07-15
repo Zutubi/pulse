@@ -1014,7 +1014,10 @@ public class DefaultBuildController implements EventListener, BuildController
         while (recipeIt.hasNext())
         {
             final List<ResourceProperty> properties = recipeIt.next().getScmProperties();
-            CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
+            if (properties != null)
+            {
+                CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
+            }
         }
 
         for (ResourceProperty property: commonProperties)
