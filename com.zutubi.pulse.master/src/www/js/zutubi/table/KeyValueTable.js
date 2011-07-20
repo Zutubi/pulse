@@ -79,7 +79,7 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
             {
                 renderedValue = this.clippedTemplate.apply({
                     clippedValue: Ext.util.Format.htmlEncode(value.substring(0, this.lengthLimit - 3)) + '...',
-                    value: Ext.util.Format.htmlEncode(value),
+                    value: Ext.util.Format.htmlEncode(value)
                 });
             }
             else
