@@ -509,7 +509,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     var extraAttributes = node.attributes.extraAttributes;
                     if (extraAttributes && extraAttributes.size)
                     {
-                        return extraAttributes.size;
+                        return parseInt(extraAttributes.size);
                     }
                     else
                     {
