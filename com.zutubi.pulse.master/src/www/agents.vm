@@ -14,7 +14,7 @@
             panel = new Zutubi.pulse.agent.AgentsPanel({
                 id: 'agents',
                 url: window.baseUrl + '/ajax/agentsData.action',
-                version: '#jss($version)',
+                version: '#jss($version_number)',
                 loadingId: 'agents-loading',
                 containerId: 'nested-center',
                 refreshInterval: $refreshInterval
