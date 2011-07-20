@@ -546,18 +546,8 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         terminated = true;
         if (child != null)
         {
-            boolean usingNative = ProcessControl.destroyProcess(child);
-
-            String message = "Terminating child process for command '" + getConfig().getName() + "' (";
-            if (usingNative)
-            {
-                message += "using native termination";
-            }
-            else
-            {
-                message += "using Java APIs";
-            }
-
+            String terminateMethod = ProcessControl.destroyProcess(child);
+            String message = "Terminating child process for command '" + getConfig().getName() + "' (using " + terminateMethod;
             if (pid != 0)
             {
                 message += ", pid: " + pid;

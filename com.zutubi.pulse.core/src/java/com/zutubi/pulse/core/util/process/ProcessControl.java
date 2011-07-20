@@ -8,6 +8,7 @@ import com.sun.jna.platform.win32.WinNT;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -18,7 +19,15 @@ public class ProcessControl
 {
     private static final Logger LOG = Logger.getLogger(ProcessControl.class);
 
+    private static final String COMMAND_TASKKILL = "taskkill";
+    private static final String FLAG_PID = "/PID";
+    private static final String FLAG_FORCE = "/F";
+    private static final String FLAG_TREE = "/T";
+
+    private static boolean javasysmonAvailable;
+
     private static Kernel32 KERNEL32;
+    private static boolean taskkillAvailable;
     /**
      * On UNIX-like platforms, the PID is held in a pid field in the
      * UNIXProcess class.  On Windows this is a handle field on the
@@ -31,6 +40,8 @@ public class ProcessControl
     {
         if (!initialised)
         {
+            javasysmonAvailable = new JavaSysMon().supportedPlatform();
+
             if (SystemUtils.IS_WINDOWS)
             {
                 try
@@ -49,6 +60,8 @@ public class ProcessControl
                 {
                     LOG.warning("Unable to get handle field of Process: " + e.getMessage(), e);
                 }
+
+                taskkillAvailable = SystemUtils.findInPath(COMMAND_TASKKILL) != null;
             }
             else
             {
@@ -123,7 +136,7 @@ public class ProcessControl
      */
     public static boolean isNativeDestroyAvailable()
     {
-        return isPidAvailable() && new JavaSysMon().supportedPlatform();
+        return isPidAvailable() && (taskkillAvailable || javasysmonAvailable);
     }
 
     /**
@@ -133,12 +146,13 @@ public class ProcessControl
      * on the process.
      * 
      * @param p the process to destroy (if null, this method is a no-op)
-     * @return true if native process termination is being used
+     * @return returns a short string indicating the method used to terminate
+     *         the process (e.g. "Java APIs", "taskkill").
      */
-    public static boolean destroyProcess(Process p)
+    public static String destroyProcess(Process p)
     {
         init();
-        boolean usingNative = false;
+        String method = "Java APIs";
         if (p != null)
         {
             if (isPidAvailable())
@@ -146,11 +160,16 @@ public class ProcessControl
                 int pid = getPid(p);
                 if (pid != 0)
                 {
-                    JavaSysMon monitor = new JavaSysMon();
-                    if (monitor.supportedPlatform())
+                    if (taskkillAvailable)
                     {
+                        method = "taskkill utility";
+                        killWithTaskkill(pid);
+                    }
+                    else if (javasysmonAvailable)
+                    {
+                        method = "native code";
+                        JavaSysMon monitor = new JavaSysMon();
                         monitor.killProcessTree(pid, false);
-                        usingNative = true;
                     }
                 }
             }
@@ -159,6 +178,18 @@ public class ProcessControl
             p.destroy();
         }
         
-        return usingNative;
+        return method;
+    }
+
+    private static void killWithTaskkill(int pid)
+    {
+        try
+        {
+            SystemUtils.runCommand(0, COMMAND_TASKKILL, FLAG_PID, Integer.toString(pid), FLAG_FORCE, FLAG_TREE);
+        }
+        catch (IOException e)
+        {
+            LOG.warning("Unable to kill process " + pid + " with taskkill: " + e.getMessage(), e);
+        }
     }
 }
