@@ -19,7 +19,7 @@ mkdir -p "$unpackDir"
 unpack "$top/com.zutubi.pulse.acceptance/src/test/misc/apacheds-1.5.7.tar.gz" "$unpackDir"
 
 # update the server.xml configuration file with necessary paths.
-sed -i "s#\$UNPACK_DIR#$unpackDir#g" $unpackDir/conf/server.xml
+sed -i -e "s#\$UNPACK_DIR#$unpackDir#g" $unpackDir/conf/server.xml
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
