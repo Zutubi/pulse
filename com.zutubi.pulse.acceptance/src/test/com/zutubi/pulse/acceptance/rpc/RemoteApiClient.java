@@ -347,6 +347,11 @@ public class RemoteApiClient extends ApiClient
         return call("getArtifactsInPersonalBuild", buildNumber);
     }
 
+    public Vector<Hashtable<String, Object>> getArtifactsInPersonalBuildForUser(String user, int id) throws Exception
+    {
+        return call("getArtifactsInPersonalBuildForUser", user, id);
+    }
+
     public Vector<String> getArtifactFileListingPersonal(int id, final String stageName, final String commandName, final String artifactName, final String path) throws Exception
     {
         return call("getArtifactFileListingPersonal", id, stageName, commandName, artifactName, path);
@@ -875,6 +880,19 @@ public class RemoteApiClient extends ApiClient
         }
     }
 
+    public Hashtable<String, Object> getPersonalBuildForUser(String user, int number) throws Exception
+    {
+        Vector<Hashtable<String, Object>> build = call("getPersonalBuildForUser", user, number);
+        if(build.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return build.get(0);
+        }
+    }
+
     /**
      * Wait for a personal build to complete.  The build is identified by the
      * user that is currently logged in and the specified build number.
@@ -898,6 +916,16 @@ public class RemoteApiClient extends ApiClient
                 }
             }
         }, BUILD_TIMEOUT, "build " + buildNumber + " for current user to complete");
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(boolean completedOnly, int maxResults) throws Exception
+    {
+        return call("getLatestPersonalBuilds", completedOnly, maxResults);
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuildsForUser(String user, boolean completedOnly, int maxResults) throws Exception
+    {
+        return call("getLatestPersonalBuildsForUser", user, completedOnly, maxResults);
     }
 
     public Hashtable<String, Object> getBuild(String projectName, int number) throws Exception

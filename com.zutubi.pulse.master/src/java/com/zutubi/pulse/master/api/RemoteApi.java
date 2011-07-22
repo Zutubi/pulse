@@ -2501,33 +2501,68 @@ public class RemoteApi
      * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
      *         specified personal build, or an empty array if no such build exists
      * @access available to all users (users can only access their own personal builds)
+     * @see #getPersonalBuildForUser(String, String, int)
      * @see #getLatestPersonalBuilds(String, boolean, int)
      */
-    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, final int id)
+    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id)
     {
         final User user = tokenManager.loginAndReturnUser(token);
         try
         {
-            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
-            {
-                public Vector<Hashtable<String, Object>> process()
-                {
-                    Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
-                    BuildResult build = buildManager.getByUserAndNumber(user, id);
-                    if (build == null)
-                    {
-                        return result;
-                    }
-
-                    result.add(ApiUtils.convertBuild(build, true));
-                    return result;
-                }
-            });
+            return getPersonalBuild(user, id);
         }
         finally
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns the given personal build result for the given user, if such a build exists.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param user  login of the user to get the build for
+     * @param id    ID of the personal build to retrieve
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the
+     *         specified personal build, or an empty array if no such build exists
+     * @access available to all users (admins can access all personal builds, normal users can
+     *         only access their own personal builds)
+     * @see #getPersonalBuild(String, int)
+     * @see #getLatestPersonalBuildsForUser(String, String, boolean, int)
+     */
+    public Vector<Hashtable<String, Object>> getPersonalBuildForUser(String token, String user, int id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return getPersonalBuild(internalGetUser(user), id);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<Hashtable<String, Object>> getPersonalBuild(final User user, final int id)
+    {
+        return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+        {
+            public Vector<Hashtable<String, Object>> process()
+            {
+                Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
+                BuildResult build = buildManager.getByUserAndNumber(user, id);
+                if (build == null)
+                {
+                    return result;
+                }
+
+                result.add(ApiUtils.convertBuild(build, true));
+                return result;
+            }
+        });
     }
 
     /**
@@ -2542,43 +2577,78 @@ public class RemoteApi
      *         calling user, ordered most recent first
      * @access available to all users (users can only access their own personal builds)
      * @see #getPersonalBuild(String, int)
+     * @see #getLatestPersonalBuildsForUser(String, String, int)
      */
-    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, final boolean completedOnly, final int maxResults)
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
     {
         final User user = tokenManager.loginAndReturnUser(token);
         try
         {
-            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
-            {
-                public Vector<Hashtable<String, Object>> process()
-                {
-                    List<BuildResult> builds = buildManager.getPersonalBuilds(user);
-                    if (completedOnly)
-                    {
-                        Iterator<BuildResult> it = builds.iterator();
-                        while (it.hasNext())
-                        {
-                            BuildResult b = it.next();
-                            if (!b.completed())
-                            {
-                                it.remove();
-                            }
-                        }
-                    }
-
-                    if (maxResults >= 0 && builds.size() > maxResults)
-                    {
-                        builds = builds.subList(0, maxResults);
-                    }
-
-                    return ApiUtils.mapBuilds(builds, true);
-                }
-            });
+            return getLatestPersonalBuilds(user, completedOnly, maxResults);
         }
         finally
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns the latest personal build results for the given user that meet the given criteria,
+     * ordered most recent first.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param user          login of the user to get the build for
+     * @param completedOnly if true, only completed builds will be considered, if false the result
+     *                      may contain in progress builds
+     * @param maxResults    the maximum number of builds to return
+     * @return {@xtype array<[RemoteApi.BuildResult]>} the latest personal build results for the
+     *         calling user, ordered most recent first
+     * @access available to all users (admins can access all personal builds, normal users can
+     *         only access their own personal builds)
+     * @see #getPersonalBuildForUser(String, String, int)
+     * @see #getLatestPersonalBuilds(String, int)
+     */
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuildsForUser(String token, String user, boolean completedOnly, int maxResults)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return getLatestPersonalBuilds(internalGetUser(user), completedOnly, maxResults);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<Hashtable<String, Object>> getLatestPersonalBuilds(final User user, final boolean completedOnly, final int maxResults)
+    {
+        return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+        {
+            public Vector<Hashtable<String, Object>> process()
+            {
+                List<BuildResult> builds = buildManager.getPersonalBuilds(user);
+                if (completedOnly)
+                {
+                    Iterator<BuildResult> it = builds.iterator();
+                    while (it.hasNext())
+                    {
+                        BuildResult b = it.next();
+                        if (!b.completed())
+                        {
+                            it.remove();
+                        }
+                    }
+                }
+
+                if (maxResults >= 0 && builds.size() > maxResults)
+                {
+                    builds = builds.subList(0, maxResults);
+                }
+
+                return ApiUtils.mapBuilds(builds, true);
+            }
+        });
     }
 
     /**
@@ -2596,10 +2666,35 @@ public class RemoteApi
      *         if no such build exists
      * @access available to all users (users can only access their own personal builds)
      * @see #getPersonalBuild(String, int)
+     * @see #getLatestPersonalBuildForUser(String, String, boolean)
      */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuild(String token, boolean completedOnly)
     {
         return getLatestPersonalBuilds(token, completedOnly, 1);
+    }
+
+    /**
+     * Equivalent to calling {@link #getLatestPersonalBuildsForUser(String, String, boolean, int)}
+     * with maxResults set to one.
+     * <p/>
+     * The result of this function is either a single-element array, or an empty array if no such
+     * build exists.
+     *
+     * @param token         authentication token, see {@link #login}
+     * @param user          the user to get the build for
+     * @param completedOnly if true, only completed builds will be considered, if false the result
+     *                      may be an in progress build
+     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
+     *         personal build for the calling user that meets the given criteria, or an empty array
+     *         if no such build exists
+     * @access available to all users (admins can access all personal builds, normal users can
+     *         only access their own personal builds)
+     * @see #getPersonalBuildForUser(String, String, int)
+     * @see #getLatestPersonalBuild(String, boolean)
+     */
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuildForUser(String token, String user, boolean completedOnly)
+    {
+        return getLatestPersonalBuildsForUser(token, user, completedOnly, 1);
     }
 
     private Hashtable<String, Object> convertProject(Project project)
@@ -2758,6 +2853,7 @@ public class RemoteApi
      * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
      * @throws IllegalArgumentException if the given build ID is invalid
      * @access available to all users (users can only access their own personal builds)
+     * @see #getArtifactsInPersonalBuildForUser(String, String, int)
      */
     public Vector<Hashtable<String, Object>> getArtifactsInPersonalBuild(String token, final int id)
     {
@@ -2769,6 +2865,39 @@ public class RemoteApi
                 public BuildResult process()
                 {
                     return internalGetPersonalBuild(user, id);
+                }
+            });
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Returns an array of all artifacts captured in a personal build for the given user.
+     * Artifacts from all stages are returned.  The returned structures indicate the context (stage
+     * and command) in which each artifact was captured.
+     *
+     * @param token       authentication token, see {@link #login(String, String)}
+     * @param user        the user that owns the personal build
+     * @param id          ID of the personal build to retrieve the artifacts for
+     * @return {@xtype array<[RemoteApi.Artifact]>} all artifacts captured in the given build
+     * @throws IllegalArgumentException if the given build ID is invalid
+     * @access available to all users (admins can access all personal builds, normal users can
+     *         only access their own personal builds)
+     * @see #getArtifactsInPersonalBuild(String, int)
+     */
+    public Vector<Hashtable<String, Object>> getArtifactsInPersonalBuildForUser(String token, final String user, final int id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return internalGetArtifactsInBuild(new NullaryFunction<BuildResult>()
+            {
+                public BuildResult process()
+                {
+                    return internalGetPersonalBuild(internalGetUser(user), id);
                 }
             });
         }
@@ -2878,26 +3007,69 @@ public class RemoteApi
      * @throws IllegalArgumentException if the given build ID, stage name, command name or artifact
      *         name is invalid
      * @access available to all users (users can only access their own personal builds)
+     * @see #getArtifactFileListingPersonalForUser(String, String, int, String, String, String, String)
      */
-    public Vector<String> getArtifactFileListingPersonal(String token, final int id, final String stageName, final String commandName, final String artifactName, final String path)
+    public Vector<String> getArtifactFileListingPersonal(String token, int id, String stageName, String commandName, String artifactName, String path)
     {
         final User user = tokenManager.loginAndReturnUser(token);
         try
         {
-            NullaryFunction<BuildResult> buildRetrievalFn = new NullaryFunction<BuildResult>()
-            {
-                public BuildResult process()
-                {
-                    return internalGetPersonalBuild(user, id);
-                }
-            };
-
-            return internalGetArtifactFileListing(buildRetrievalFn, stageName, commandName, artifactName, path, "Personal build '" + id + "'");
+            return getArtifactFileListingPersonal(user, id, stageName, commandName, artifactName, path);
         }
         finally
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns an array of all artifact file paths for files nested under the given path in the
+     * given artifact captured in a personal build for the given user.  The returned paths are
+     * relative to the given path.  Note that all files nested anywhere under the path, even under
+     * child directories, are returned.  Directories themselves are not returned as separate entries
+     * (although they can be inferred from the file paths).  All paths use forward slashes (/) as
+     * separators.  The path may be empty to list all files captured in the artifact.  If the path
+     * matches no files in the artifact, an empty array will be returned.
+     *
+     * @param token        authentication token, see {@link #login(String, String)}
+     * @param user         user that owns the personal build
+     * @param id           ID of the personal build result
+     * @param stageName    name of the stage that captured the artifact
+     * @param commandName  name of the command that captured the artifact
+     * @param artifactName name of the artifact to list files under
+     * @param path         path of a directory within the artifact to restrict the result to, may be
+     *                     empty to list all files in the artifact
+     * @return an array of files captured in the given artifact that fall under the given path
+     * @throws IllegalArgumentException if the given build ID, stage name, command name or artifact
+     *         name is invalid
+     * @access available to all users (admins can access all personal builds, normal users can
+     *         only access their own personal builds)
+     * @see #getArtifactFileListingPersonal(String, int, String, String, String, String)
+     */
+    public Vector<String> getArtifactFileListingPersonalForUser(String token, String user, int id, String stageName, String commandName, String artifactName, String path)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return getArtifactFileListingPersonal(internalGetUser(user), id, stageName, commandName, artifactName, path);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<String> getArtifactFileListingPersonal(final User user, final int id, String stageName, String commandName, String artifactName, String path)
+    {
+        NullaryFunction<BuildResult> buildRetrievalFn = new NullaryFunction<BuildResult>()
+        {
+            public BuildResult process()
+            {
+                return internalGetPersonalBuild(user, id);
+            }
+        };
+
+        return internalGetArtifactFileListing(buildRetrievalFn, stageName, commandName, artifactName, path, "Personal build '" + id + "'");
     }
 
     private Vector<String> internalGetArtifactFileListing(final NullaryFunction<BuildResult> buildRetrievalFn, final String stageName, final String commandName, final String artifactName, final String path, final String messagePrefix)
@@ -4353,6 +4525,17 @@ public class RemoteApi
         }
 
         return build;
+    }
+
+    private User internalGetUser(String login)
+    {
+        User user = userManager.getUser(login);
+        if (user == null)
+        {
+            throw new IllegalArgumentException("User '" + login + "' does not exist");
+        }
+
+        return user;
     }
 
     private BuildResult internalGetPersonalBuild(User user, int id)
