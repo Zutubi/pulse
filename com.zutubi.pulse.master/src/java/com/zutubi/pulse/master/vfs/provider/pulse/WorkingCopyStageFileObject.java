@@ -29,7 +29,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
 
     private static final String NO_WORKING_COPY_AVAILABLE = I18N.format("no.working.copy.available");
 
-    private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
+    private static final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
     private final long recipeId;
 
@@ -81,7 +81,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         }
 
         Agent agent = agentManager.getAgent(node.getAgentName());
-        if (!agent.isAvailable())
+        if (!agent.isOnline())
         {
             throw new FileSystemException("host.not.available");
         }
@@ -89,7 +89,14 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         AgentConfiguration agentConfig = agent.getConfig();
         AgentRecipeDetails details = getAgentRecipeDetails(node, buildResult, projectConfig, agentConfig);
 
-        return agent.getService().getFileListing(details, path);
+        try
+        {
+            return agent.getService().getFileListing(details, path);
+        }
+        catch (Exception e)
+        {
+            throw new FileSystemException(e);
+        }
     }
 
     public FileInfo getFileInfo(String path)
