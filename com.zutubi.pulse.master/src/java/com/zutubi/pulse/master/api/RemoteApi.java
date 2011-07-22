@@ -2934,12 +2934,14 @@ public class RemoteApi
 
     private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, BuildResult build, String stage, CommandResult command)
     {
+        File artifactDir = new File(command.getOutputDir(), artifact.getName());
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         result.put("id", Long.toString(artifact.getId()));
         result.put("stage", stage);
         result.put("command", command.getCommandName());
         result.put("name", artifact.getName());
         result.put("permalink", Urls.getBaselessInstance().commandDownload(build, command, artifact.getName()) + "/");
+        result.put("dataPath", artifactDir.getPath());
         return result;
     }
 
