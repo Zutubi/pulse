@@ -2577,7 +2577,7 @@ public class RemoteApi
      *         calling user, ordered most recent first
      * @access available to all users (users can only access their own personal builds)
      * @see #getPersonalBuild(String, int)
-     * @see #getLatestPersonalBuildsForUser(String, String, int)
+     * @see #getLatestPersonalBuildsForUser(String, String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults)
     {
@@ -2606,7 +2606,7 @@ public class RemoteApi
      * @access available to all users (admins can access all personal builds, normal users can
      *         only access their own personal builds)
      * @see #getPersonalBuildForUser(String, String, int)
-     * @see #getLatestPersonalBuilds(String, int)
+     * @see #getLatestPersonalBuilds(String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> getLatestPersonalBuildsForUser(String token, String user, boolean completedOnly, int maxResults)
     {
