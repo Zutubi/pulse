@@ -15,10 +15,8 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.ToStringMapping;
 import com.zutubi.util.io.IOUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.io.File;
+import java.util.*;
 
 import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
@@ -484,23 +482,10 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     public void testGetArtifactFileListing() throws Exception
     {
-        String project = randomName();
-        Hashtable<String, Object> svnConfig = rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
-        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
-        antConfig.put(TARGETS, "test");
-
-        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
-
-        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
-        artifactConfig.put(NAME, "reports");
-        artifactConfig.put(BASE, "build/reports");
-        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
-
-        int buildId = rpcClient.RemoteApi.runBuild(project);
-
-        Vector<String> files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "");
-        Collections.sort(files, new Sort.StringComparator());
-        assertEquals(asList(
+        final String STAGE_NAME = "default";
+        final String COMMAND_NAME = "build";
+        final String ARTIFACT_NAME = "reports";
+        final List<String> EXPECTED_FILES = asList(
                 "html/allclasses-frame.html",
                 "html/all-tests.html",
                 "html/alltests-errors.html",
@@ -515,19 +500,58 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
                 "html/stylesheet.css",
                 "TEST-com.zutubi.testant.UnitTest.xml",
                 "xml/TESTS-TestSuites.xml"
-        ), files);
+        );
 
-        files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "html/com/zutubi/testant");
+        final List<String> EXPECTED_TOP = asList(
+                  "html",
+                  "TEST-com.zutubi.testant.UnitTest.xml",
+                  "xml"
+          );
+
+        String project = randomName();
+        Hashtable<String, Object> svnConfig = rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY);
+        Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
+        antConfig.put(TARGETS, "test");
+
+        String projectPath = rpcClient.RemoteApi.insertSingleCommandProject(project, ProjectManager.GLOBAL_PROJECT_NAME, false, svnConfig, antConfig);
+
+        Hashtable<String, Object> artifactConfig = rpcClient.RemoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
+        artifactConfig.put(NAME, ARTIFACT_NAME);
+        artifactConfig.put(BASE, COMMAND_NAME + "/" + ARTIFACT_NAME);
+        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), artifactConfig);
+
+        int buildId = rpcClient.RemoteApi.runBuild(project);
+
+        List<String> files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, ARTIFACT_NAME, "");
+        Collections.sort(files, new Sort.StringComparator());
+        assertEquals(EXPECTED_FILES, files);
+
+        Hashtable<String, Object> artifact = CollectionUtils.find(rpcClient.RemoteApi.getArtifactsInBuild(project, buildId), new Predicate<Hashtable<String, Object>>()
+        {
+            public boolean satisfied(Hashtable<String, Object> artifactStruct)
+            {
+                return ARTIFACT_NAME.equals(artifactStruct.get("name"));
+            }
+        });
+        assertNotNull(artifact);
+
+        File artifactDir = new File(AcceptanceTestUtils.getDataDirectory(), (String) artifact.get("dataPath"));
+        assertTrue(artifactDir.isDirectory());
+        files = asList(artifactDir.list());
+        Collections.sort(files, new Sort.StringComparator());
+        assertEquals(EXPECTED_TOP, files);
+
+        files = rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, ARTIFACT_NAME, "html/com/zutubi/testant");
         Collections.sort(files, new Sort.StringComparator());
         assertEquals(asList("0_UnitTest.html", "0_UnitTest-fails.html", "package-frame.html", "package-summary.html"), files);
 
-        assertEquals(Arrays.<String>asList(), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xm"));
-        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml"));
-        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "reports", "xml/"));
+        assertEquals(Arrays.<String>asList(), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, ARTIFACT_NAME, "xm"));
+        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, ARTIFACT_NAME, "xml"));
+        assertEquals(asList("TESTS-TestSuites.xml"), rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, ARTIFACT_NAME, "xml/"));
 
         try
         {
-            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "nosuchstage", "build", "reports", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "nosuchstage", COMMAND_NAME, ARTIFACT_NAME, "");
             fail("Shouldn't work for invalid stage name");
         }
         catch (Exception e)
@@ -537,7 +561,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "nosuchcommand", "reports", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, "nosuchcommand", ARTIFACT_NAME, "");
             fail("Shouldn't work for invalid command name");
         }
         catch (Exception e)
@@ -547,7 +571,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         try
         {
-            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, "default", "build", "nosuchartifact", "");
+            rpcClient.RemoteApi.getArtifactFileListing(project, buildId, STAGE_NAME, COMMAND_NAME, "nosuchartifact", "");
             fail("Shouldn't work for invalid artifact name");
         }
         catch (Exception e)

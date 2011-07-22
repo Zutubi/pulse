@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -12,8 +11,6 @@ import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 import freemarker.template.utility.StringUtil;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +20,10 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -72,8 +73,18 @@ public class SeleniumBrowser
         }
         if (browser == null)
         {
-            // defaults
-            browser = (SystemUtils.IS_WINDOWS) ? "*iexploreproxy" : "*firefox";
+            if (SystemUtils.IS_WINDOWS)
+            {
+                return "*iexploreproxy";
+            }
+            else if (SystemUtils.IS_MAC)
+            {
+                return "*safari";
+            }
+            else
+            {
+                return "*firefox";
+            }
         }
         return browser;
     }
