@@ -24,7 +24,8 @@ Ext.extend(Zutubi.form.Form, Ext.form.BasicForm, {
         if(errors && errors.length > 0)
         {
             var listEl = statusEl.createChild({tag: 'ul', cls: 'validation-error'});
-            for(var i = 0; i < errors.length; i++)
+            var i;
+            for(i = 0; i < errors.length; i++)
             {
                 listEl.createChild({tag: 'li', html: Ext.util.Format.htmlEncode(errors[i])});
             }

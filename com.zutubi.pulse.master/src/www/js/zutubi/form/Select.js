@@ -110,8 +110,10 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
     {
         var value = this.getValue();
         var valueMap = {};
+        var i;
+        var key;
 
-        for(var i = 0; i < value.length; i++)
+        for(i = 0; i < value.length; i++)
         {
             var iv = value[i];
             valueMap[iv] = true;
@@ -121,7 +123,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
             }
         }
 
-        for(var key in this.hiddenFields)
+        for(key in this.hiddenFields)
         {
             if(!valueMap[key])
             {
@@ -156,7 +158,8 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
     {
         var value = [];
         var selections = this.view.getSelectedIndexes();
-        for(var i = 0; i < selections.length; i++)
+        var i;
+        for(i = 0; i < selections.length; i++)
         {
             value.push(this.store.getAt(selections[i]).get(this.valueField));
         }
@@ -169,14 +172,17 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
     setValue: function(value)
     {
+        var key;
+        var i;
+        
         this.view.clearSelections();
-        for(var key in this.hiddenFields)
+        for(key in this.hiddenFields)
         {
             this.hiddenFields[key].remove();
         }
         this.hiddenFields = {};
 
-        for(var i = 0; i < value.length; i++)
+        for(i = 0; i < value.length; i++)
         {
             var record = this.findRecord(this.valueField, value[i]);
             if (record)

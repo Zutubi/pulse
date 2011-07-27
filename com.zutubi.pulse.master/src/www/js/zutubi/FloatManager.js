@@ -1,7 +1,7 @@
 //dependency: ext/package.js
 //dependency: ./namespace.js
 
-Zutubi.FloatManager = function() {
+Zutubi.FloatManager = (function() {
     var ID_SUFFIX_BUTTON = '-button';
     var ID_SUFFIX_LINK = '-link';
     var ID_SUFFIX_WINDOW = '-window';
@@ -53,7 +53,8 @@ Zutubi.FloatManager = function() {
 
     function hideAll()
     {
-        for (var category in idByCategory)
+        var category;
+        for (category in idByCategory)
         {
             var id = idByCategory[category];
             var cls = clsByCategory[category];
@@ -154,4 +155,4 @@ Zutubi.FloatManager = function() {
             hideAll();
         }
     };
-}();
+}());

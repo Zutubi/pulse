@@ -102,7 +102,7 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
                                 status: status,
                                 squashedStatus: status.replace(/\s+/, ''),
                                 statusMessage: message.statusMessage
-                            })
+                            });
                         }
                     }]
                 }]

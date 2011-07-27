@@ -85,9 +85,10 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             var html = '';
             html += this.simpleFeatures(this.data.features);
             var stages = this.data.stages;
+            var i, l;
             if (stages)
             {
-                for (var i = 0, l = stages.length; i < l; i++)
+                for (i = 0, l = stages.length; i < l; i++)
                 {
                     html += this.stageFeatures(stages[i]);
                 }
@@ -105,9 +106,10 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     simpleFeatures: function(features)
     {
         var html = '';
+        var i, l;
         if (features)
         {
-            for (var i = 0, l = features.length; i < l; i++)
+            for (i = 0, l = features.length; i < l; i++)
             {
                 html += this.featureTemplate.apply({level: this.level, summary: features[i].summary});
             }
@@ -122,10 +124,11 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
         var agent = stage.agentName ? Ext.util.Format.htmlEncode(stage.agentName) : '[pending]';
         var html = '<li class="header">build stage :: ' + Ext.util.Format.htmlEncode(stage.name) + ' :: ' + recipe + '@' + agent + '<ul>';
         html += this.simpleFeatures(stage.features);
-        
+        var i, l;
+
         if (stage.commands)
         {
-            for (var i = 0, l = stage.commands.length; i < l; i++)
+            for (i = 0, l = stage.commands.length; i < l; i++)
             {
                 html += this.commandFeatures(stage.commands[i], stage.complete);
             }
@@ -139,10 +142,11 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     {
         var html = '<li class="header">command :: ' + Ext.util.Format.htmlEncode(command.name) + '<ul>';
         html += this.simpleFeatures(command.features);
-        
+        var i, l;
+
         if (command.artifacts)
         {
-            for (var i = 0, l = command.artifacts.length; i < l; i++)
+            for (i = 0, l = command.artifacts.length; i < l; i++)
             {
                 html += this.artifactFeatures(command.artifacts[i], command.artifactsUrl, stageComplete);
             }
@@ -155,7 +159,8 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     artifactFeatures: function(artifact, artifactsUrl, stageComplete)
     {
         var html = '';
-        for (var i = 0, l = artifact.files.length; i < l; i++)
+        var i, l;
+        for (i = 0, l = artifact.files.length; i < l; i++)
         {
             html += this.fileFeatures(artifact.files[i], artifactsUrl, stageComplete);
         }
@@ -167,7 +172,8 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     {
         var fileUrl = artifactsUrl + encodeURIPath(file.path);
         var html = '<li class="header">artifact :: ' + Ext.util.Format.htmlEncode(file.path) + '<ul>';
-        for (var i = 0, l = file.features.length; i < l; i++)
+        var i, l;
+        for (i = 0, l = file.features.length; i < l; i++)
         {
             html += '<li class="' + this.level + '">';
             var feature = file.features[i];
@@ -175,7 +181,8 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
             {
                 html += '<span class="context">';
                 var lines = feature.summaryLines;
-                for (var lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
+                var lineIndex, lineCount;
+                for (lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
                 {
                     var line = lines[lineIndex];
                     if (lineIndex == feature.lineOffset - 1)

@@ -54,24 +54,26 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
     
     update: function(data)
     {
+        var i, l;
+        var key;
         this.data = data;
         
         if (this.dataKeys)
         {
-            for (var i = 0, l = this.dataKeys.length; i < l; i++)
+            for (i = 0, l = this.dataKeys.length; i < l; i++)
             {
-                var key = this.dataKeys[i];
+                key = this.dataKeys[i];
                 Ext.getCmp(this.id + '-' + key).update(l == 1 ? data : data[key]);    
             }
         }
         else
         {
-            for (var key in this.dataMapping)
+            for (key in this.dataMapping)
             {
                 var path = this.dataMapping[key];
                 var properties = path.split('.');
                 var componentData = data;
-                for (var i = 0, l = properties.length; componentData && i < l; i++)
+                for (i = 0, l = properties.length; componentData && i < l; i++)
                 {
                     componentData = componentData[properties[i]];
                 }

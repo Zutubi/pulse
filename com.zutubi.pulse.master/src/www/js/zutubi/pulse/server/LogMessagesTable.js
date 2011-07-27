@@ -122,7 +122,8 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
 
     renderData: function()
     {
-        for (var i = 0, len = this.data.length; i < len; i++)
+        var i, len;
+        for (i = 0, len = this.data.length; i < len; i++)
         {
             var entry = this.data[i];
             var messageCls;

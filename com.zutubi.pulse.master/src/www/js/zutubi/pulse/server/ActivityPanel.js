@@ -75,7 +75,7 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
                 },
                 items: [{
                     id: this.id + '-queued',
-                    xtype: 'xzqueuedbuildstable',
+                    xtype: 'xzqueuedbuildstable'
                 }, {
                     id: this.id + '-active',
                     title: 'active builds',

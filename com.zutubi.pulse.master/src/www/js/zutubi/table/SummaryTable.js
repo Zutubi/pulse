@@ -27,6 +27,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     
     initComponent: function()
     {
+        var i;
+
         Ext.applyIf(this, {
             cellTemplate: new Ext.XTemplate(
                 '<td class="idx-{index} ' +
@@ -45,7 +47,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         
         
         this.keyValues = new Array(this.columns.length);
-        for (var i = 0; i < this.columns.length; i++)
+        for (i = 0; i < this.columns.length; i++)
         {
             var keyValue = new Zutubi.KeyValue(this.columns[i]);
             keyValue.component = this;
@@ -84,8 +86,9 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     
     getKeyValueByName: function(name)
     {
+        var i;
         var kv;
-        for (var i = 0; i < this.keyValues.length; i++)
+        for (i = 0; i < this.keyValues.length; i++)
         {
             kv = this.keyValues[i];
             if (kv.name == name)
@@ -104,7 +107,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     {
         var match = cellDom.className.match(this.indexRegex);
         if (match && match[1]){
-            return parseInt(match[1]);
+            return parseInt(match[1], 10);
         }
         
         return -1;
@@ -122,6 +125,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         var low;
         var high;
         var shift;
+        var i, l;
         if (fromIndex < toIndex)
         {
             low = fromIndex;
@@ -136,7 +140,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         }
         
         var newColumns = new Array(this.activeColumns.length);
-        for (var i = 0, l = this.activeColumns.length; i < l; i++)
+        for (i = 0, l = this.activeColumns.length; i < l; i++)
         {
             if (i < low || i > high)
             {
@@ -178,7 +182,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     renderData: function()
     {
         var data = {};
-        for (var i = 0; i < this.activeColumns.length; i++)
+        var i;
+        for (i = 0; i < this.activeColumns.length; i++)
         {
             var column = this.activeColumns[i];
             data[column.name] = column.key;
@@ -193,14 +198,15 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         for (i = 0, l = this.data.length; i < l; i++)
         {
             this.tbodyEl.insertHtml('beforeEnd', this.generateRow(this.data[i]), true);
-        };
+        }
     },
     
     generateHeader: function()
     {
         var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + '">';
+        var i;
         var columnCount = this.activeColumns.length;
-        for (var i = 0; i < columnCount; i++)
+        for (i = 0; i < columnCount; i++)
         {
             var column = this.activeColumns[i];
             html += this.headerTemplate.apply({
@@ -219,9 +225,9 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     generateRow: function(data)
     {
         var html = '<tr class="' + Zutubi.table.CLASS_DYNAMIC + ' xz-summary-data">';
-        
+        var i;
         var columnCount = this.activeColumns.length;
-        for (var i = 0; i < columnCount; i++)
+        for (i = 0; i < columnCount; i++)
         {
             var column = this.activeColumns[i];
             html += this.cellTemplate.apply({
@@ -239,9 +245,10 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
 
     getAvailableColumnStore: function()
     {
+        var i;
         var columnCount = this.keyValues.length;
         var store = new Array(columnCount);
-        for (var i = 0; i < columnCount; i++)
+        for (i = 0; i < columnCount; i++)
         {
             var column = this.keyValues[i];
             store[i] = [column.name, column.key];
@@ -267,8 +274,9 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     getColumnNames: function()
     {
         var names = '';
+        var i;
         var columnCount = this.activeColumns.length;
-        for (var i = 0; i < columnCount; i++)
+        for (i = 0; i < columnCount; i++)
         {
             var column = this.activeColumns[i];
             if (i > 0)
@@ -311,7 +319,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         }
         
         var columnsString = '';
-        for (var i = 0, l = this.activeColumns.length; i < l; i++)
+        var i, l;
+        for (i = 0, l = this.activeColumns.length; i < l; i++)
         {
             if (columnsString.length > 0)
             {

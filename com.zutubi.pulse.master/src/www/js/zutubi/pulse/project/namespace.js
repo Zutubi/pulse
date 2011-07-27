@@ -182,7 +182,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
 
         projectSuccessRate: function(value) {
-            return '' + value + '% (errors excluded)';
+            return String(value) + '% (errors excluded)';
         },
         
         STATISTICS_TEMPLATE: new Ext.XTemplate(
@@ -273,7 +273,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
             else
             {
-                return '' + count;
+                return String(count);
             }
         },
         
@@ -352,7 +352,8 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             if (stages && stages.length > 0)
             {
                 var result = '<ul class="actions">';
-                for (var i = 0, l = stages.length; i < l; i++)
+                var i, l;
+                for (i = 0, l = stages.length; i < l; i++)
                 {
                     var stage = stages[i];
                     result += Zutubi.pulse.project.renderers.STAGE_TEMPLATE.apply({

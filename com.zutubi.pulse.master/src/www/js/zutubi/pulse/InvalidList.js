@@ -53,10 +53,11 @@ Zutubi.pulse.InvalidList = Ext.extend(Ext.BoxComponent, {
     
     renderData: function()
     {
+        var i, len;
         this.el.select('li').remove();
         if (this.data && this.data.length > 0)
         {
-            for (var i = 0, len = this.data.length; i < len; i++)
+            for (i = 0, len = this.data.length; i < len; i++)
             {
                 var item = this.data[i];
                 this.itemTemplate.append(this.el, {

@@ -33,8 +33,9 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         this.titleTemplate = new Ext.XTemplate(this.titleTemplate);
 
         var fieldConfigs = this.fields;
+        var i;
         this.fields = [];
-        for (var i = 0; i < fieldConfigs.length; i++)
+        for (i = 0; i < fieldConfigs.length; i++)
         {
             this.fields.push(new Zutubi.KeyValue(fieldConfigs[i]));
         }
@@ -100,8 +101,9 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     
     renderData: function(/*data*/)
     {
+        var i, l;
         this.titleTemplate.overwrite(this.titleEl, this.data);
-        for (var i = 0, l = this.fields.length; i < l; i++)
+        for (i = 0, l = this.fields.length; i < l; i++)
         {
             var field = this.fields[i];
             if (this.data.hasOwnProperty(field.name) && this.data[field.name] != null)

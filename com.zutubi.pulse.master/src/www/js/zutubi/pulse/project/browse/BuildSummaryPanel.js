@@ -261,7 +261,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         }
         else
         {
-             params.projectName = this.projectName
+             params.projectName = this.projectName;
         }
 
         Ext.Ajax.request({

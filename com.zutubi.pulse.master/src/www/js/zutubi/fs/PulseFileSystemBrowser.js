@@ -166,12 +166,18 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
     onSelectionChange: function(selectionModel, node) {
         if (node)
         {
-            this.submitButton.disabled && this.submitButton.enable();
+            if (this.submitButton.disabled)
+            {
+                this.submitButton.enable();
+            }
             node.ensureVisible();
         }
         else
         {
-            this.submitButton.disabled || this.submitButton.disable();
+            if (!this.submitButton.disabled)
+            {
+                this.submitButton.disable();
+            }
         }
     },
 

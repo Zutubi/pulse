@@ -34,7 +34,8 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     add: function()
     {
         var a = arguments;
-        for(var i = 0, len = a.length; i < len; i++)
+        var i, len;
+        for(i = 0, len = a.length; i < len; i++)
         {
             a[i].form = this;
         }
@@ -66,9 +67,10 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
                 Ext.get(rowEl).removeClass('x-item-disabled');
 
                 var actionDomEls = this.getFieldActionDomEls(id);
+                var i;
                 if (actionDomEls)
                 {
-                    for(var i = 0; i < actionDomEls.length; i++)
+                    for(i = 0; i < actionDomEls.length; i++)
                     {
                         Ext.get(actionDomEls[i]).removeClass('x-item-disabled');
                     }
@@ -91,9 +93,10 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
                 Ext.get(rowEl).addClass('x-item-disabled');
 
                 var actionDomEls = this.getFieldActionDomEls(id);
+                var i;
                 if (actionDomEls)
                 {
-                    for(var i = 0; i < actionDomEls.length; i++)
+                    for(i = 0; i < actionDomEls.length; i++)
                     {
                         Ext.get(actionDomEls[i]).addClass('x-item-disabled');
                     }
@@ -116,7 +119,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     createAnnotationCell: function(id, annotationName)
     {
         var rowEl = this.getFieldRowEl(id);
-        return cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation', id: id + '.' + annotationName});
+        return rowEl.createChild({tag: 'td', cls: 'x-form-annotation', id: id + '.' + annotationName});
     },
     
     annotateField: function(id, annotationName, imageName, tooltip)
@@ -163,12 +166,13 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
         if(this.displayMode)
         {
             var dirty = this.form.isDirty();
+            var i;
             if(!dirty)
             {
                 this.form.clearInvalid();
             }
 
-            for(var i = 0; i < this.buttons.length; i++)
+            for(i = 0; i < this.buttons.length; i++)
             {
                 if(dirty)
                 {

@@ -17,7 +17,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
                 title: tab,
                 image: image,
                 url: agentUrl + tab + '/'
-            }
+            };
         },
         
         getAgentMenuItems: function(agent) {
@@ -31,8 +31,9 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'info', 'information.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'messages', 'script.gif')
             ];
+            var i, len;
             
-            for (var i = 0, len = agent.actions.length; i < len; i++)
+            for (i = 0, len = agent.actions.length; i < len; i++)
             {
                 var action = agent.actions[i];
                 result.push({

@@ -45,9 +45,10 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
     getKeys: function()
     {
         var keys = [];
+        var key;
         if (this.data)
         {
-            for (var key in this.data)
+            for (key in this.data)
             {
                 keys.push(key);
             }

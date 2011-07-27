@@ -32,7 +32,8 @@ Zutubi.KeyValue.prototype = {
     {
         var result = '';
         var previousLower = false;
-        for (var i = 0; i < name.length; i++)
+        var i;
+        for (i = 0; i < name.length; i++)
         {
             var c = name.charAt(i);
             var lower = c.toLowerCase();

@@ -18,7 +18,8 @@ Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
 
     markInvalid: function(errors)
     {
-        for(var i = 0; i < errors.length; i++)
+        var i;
+        for(i = 0; i < errors.length; i++)
         {
             var fieldError = errors[i];
             var id = fieldError.id;
@@ -44,8 +45,8 @@ Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
     {
         var params = options.params || {};
         var mainParams = this.mainForm.getValues(false);
-
-        for(var param in mainParams)
+        var param;
+        for(param in mainParams)
         {
            params[param + '_check'] = mainParams[param];
         }

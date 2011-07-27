@@ -269,7 +269,8 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
 
     getTotalColumnWidth : function() {
         var total = 0;
-        for(var i = 0, cs = this.getVisibleColumns(), len = cs.length; i<len; i++) {
+        var i, cs, len;
+        for(i = 0, cs = this.getVisibleColumns(), len = cs.length; i<len; i++) {
             total += cs[i].width;
         }
         return total;
@@ -283,13 +284,13 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
     // private
     handleHdDown : function(e, t){
         var hd = e.getTarget('.x-treegrid-hd');
-
+        var index;
         if(hd && Ext.fly(t).hasClass('x-grid3-hd-btn')){
             var ms = this.hmenu.items,
                 cs = this.columns,
-                index = this.findHeaderIndex(hd),
                 c = cs[index];
 
+            index = this.findHeaderIndex(hd);
             e.stopEvent();
             Ext.fly(hd).addClass('x-grid3-hd-menu-open');
             this.hdCtxIndex = index;
@@ -303,7 +304,7 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
             this.hmenu.show(t, 'tl-bl?');
         }
         else if(hd) {
-            var index = this.findHeaderIndex(hd);
+            index = this.findHeaderIndex(hd);
             this.fireEvent('headerclick', this.columns[index], hd, index);
         }
     },
@@ -341,8 +342,9 @@ Ext.ux.tree.TreeGrid = Ext.extend(Ext.tree.TreePanel, {
     findHeaderIndex : function(hd){
         hd = hd.dom || hd;
         var cs = hd.parentNode.childNodes;
-        for(var i = 0, c; c = cs[i]; i++){
-            if(c == hd){
+        var i;
+        for(i = 0; i < cs.length; i++) {
+            if(cs[i] == hd){
                 return i;
             }
         }

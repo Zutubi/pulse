@@ -52,7 +52,8 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
         }
 
         var cs = node.childNodes;
-        for(var i = 0, len = cs.length; i < len; i++)
+        var i, len;
+        for(i = 0, len = cs.length; i < len; i++)
         {
             var found = this.findNodeByAttribute(attribute, value, cs[i]);
             if (found)

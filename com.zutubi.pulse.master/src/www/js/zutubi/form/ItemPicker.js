@@ -191,9 +191,10 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
      */
     refreshOptions: function()
     {
+        var value;
         if (!this.allowDuplicates)
         {
-            for (var value in this.optionRecordCache)
+            for (value in this.optionRecordCache)
             {
                 if (this.store.find('value', value) < 0)
                 {
@@ -358,7 +359,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         {
             var selectedRecord = this.store.getAt(selected);
             this.store.remove(selectedRecord);
-            var value = selectedRecord.get('value')
+            var value = selectedRecord.get('value');
 
             if (this.optionStore && !this.allowDuplicates)
             {
@@ -525,7 +526,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         }
         else
         {
-            var record = this.optionRecordCache[value]
+            var record = this.optionRecordCache[value];
             if(record)
             {
                 return record.get(this.displayField);

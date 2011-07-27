@@ -51,7 +51,7 @@ Zutubi.pulse.agent.AgentStatisticsPanel = Ext.extend(Zutubi.ActivePanel, {
                 }, {
                     id: this.id + '-usageGraph',
                     xtype: 'xzgraph',
-                    style: 'margin: 24px',
+                    style: 'margin: 24px'
                 }]
             }]
         });

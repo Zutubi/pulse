@@ -17,7 +17,9 @@ Ext.extend(Zutubi.fs.FSTreeLoader, Ext.tree.TreeLoader, {
     {
         var buf = [];
         var bp = this.baseParams;
-        for (var key in bp)
+        var key;
+
+        for (key in bp)
         {
             if (typeof bp[key] != "function")
             {

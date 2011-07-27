@@ -50,8 +50,8 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     renderData: function()
     {
        var builds = [];
-       
-       for (var i = 0, len = this.data.length; i < len; i++)
+       var i, len;
+       for (i = 0, len = this.data.length; i < len; i++)
        {
            var item = this.data[i];
            if (item.hidden)
@@ -72,7 +72,8 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     
     findBuild: function(id)
     {
-        for (var i = 0, len = this.builds.length; i < len; i++)
+        var i, len;
+        for (i = 0, len = this.builds.length; i < len; i++)
         {
             var build = this.builds[i];
             if (build.data.id == id)
@@ -86,7 +87,8 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     
     expandAll: function()
     {
-        for (var i = 0, len = this.builds.length; i < len; i++)
+        var i, len;
+        for (i = 0, len = this.builds.length; i < len; i++)
         {
             this.builds[i].expand();
         }
@@ -94,7 +96,8 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     
     collapseAll: function()
     {
-        for (var i = 0, len = this.builds.length; i < len; i++)
+        var i, len;
+        for (i = 0, len = this.builds.length; i < len; i++)
         {
             this.builds[i].collapse();
         }
@@ -135,6 +138,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
         var renderers = Zutubi.pulse.project.renderers;
         var data = this.data;
         var actions;
+        var i;
         if (data.cancelPermitted)
         {
             var link = ' href="#" onclick="cancelBuild(' + data.id + ', false); return false"';
@@ -153,7 +157,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
             status: renderers.resultStatus(data.status, data),
             details: 'revision: ' + renderers.buildRevision(data.revision, data) + ' <span class="understated">//</span> reason: ' + Ext.util.Format.htmlEncode(data.reason),
             actions: actions
-        }
+        };
        
         this.el = this.buildTemplate.append(tbodyEl, args, true);
         this.el.addClassOnOver('project-highlighted');
@@ -161,10 +165,10 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
        
         // Reverse the stages so that the stage queue is visible in order (pending
         // stages form the queue, with the head at the bottom of the page).
-        for (var i = data.stages.length - 1; i >= 0; i--)
+        for (i = data.stages.length - 1; i >= 0; i--)
         {
             var stage = data.stages[i];
-            var args = {
+            args = {
                 base: window.baseUrl,
                 display: collapsed ? 'none' : '',
                 indent: '<img src="' + window.baseUrl + '/images/default/s.gif" style="width: 18px; height: 12px" alt="-" class="group-name"/>',
@@ -172,7 +176,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
                 status: renderers.resultStatus(stage.status, stage),
                 details: 'recipe: ' + renderers.stageRecipe(stage.recipe) + (stage.agent ? ' <span class="understated">//</span> agent: ' + renderers.stageAgent(stage.agent) : ''),
                 actions: renderers.stageLogs(null, stage)
-            }
+            };
            
             this.childRows.push(this.stageTemplate.append(tbodyEl, args, true));
         }
@@ -218,7 +222,8 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
     
     setChildDisplays: function(value)
     {
-        for (var i = 0, len = this.childRows.length; i < len; i++)
+        var i, len;
+        for (i = 0, len = this.childRows.length; i < len; i++)
         {
             this.childRows[i].setStyle('display', value);
         }

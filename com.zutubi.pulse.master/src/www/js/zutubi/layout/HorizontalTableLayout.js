@@ -22,7 +22,7 @@ Zutubi.layout.HorizontalTableLayout = Ext.extend(Ext.layout.TableLayout, {
         Ext.apply(this.tableAttrs.style, {
             'width': this.width,
             'border-collapse': 'separate',
-            'border-spacing': '' + this.spacing + 'px 0'
+            'border-spacing': String(this.spacing) + 'px 0'
         });
         
         Zutubi.layout.HorizontalTableLayout.superclass.onLayout.apply(this, arguments);        

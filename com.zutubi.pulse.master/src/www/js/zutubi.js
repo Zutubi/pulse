@@ -307,7 +307,7 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
             listeners: {
                 afterLayout: {
                     fn: function() {
-                        new Ext.KeyNav(this.getForm().getEl(), {
+                        var nav = new Ext.KeyNav(this.getForm().getEl(), {
                             'enter': function() {
                                 tailWindow.apply();
                             },
@@ -353,6 +353,7 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
                         break;
                     case Ext.form.Action.SERVER_INVALID:
                        Ext.Msg.alert('Server error.', 'failure');
+                       break;
                }
             }
         });
@@ -509,7 +510,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                     var extraAttributes = node.attributes.extraAttributes;
                     if (extraAttributes && extraAttributes.size)
                     {
-                        return parseInt(extraAttributes.size);
+                        return parseInt(extraAttributes.size, 10);
                     }
                     else
                     {
@@ -583,7 +584,8 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         var firstWidth = columns[0].width;
         var remainingWidth = 0;
         var count = columns.length;
-        for (var i = 1; i < count; i++)
+        var i;
+        for (i = 1; i < count; i++)
         {
             remainingWidth += columns[i].width;
         }
@@ -613,7 +615,8 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
         {
             var children = node.childNodes;
             var count = children.length;
-            for (var i = 0; i < count; i++)
+            var i;
+            for (i = 0; i < count; i++)
             {
                 var child = children[i];
                 if (this.selectedId != 0 && this.selectedId == child.attributes.baseName)

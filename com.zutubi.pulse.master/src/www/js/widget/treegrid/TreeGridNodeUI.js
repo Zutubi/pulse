@@ -28,7 +28,7 @@ Ext.ux.tree.TreeGridNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
                         '<span class="x-tree-node-indent">', this.indentMarkup, "</span>",
                         '<img src="', this.emptyIcon, '" class="x-tree-ec-icon x-tree-elbow">',
                         '<img src="', a.icon || this.emptyIcon, '" class="x-tree-node-icon', (a.icon ? " x-tree-node-inline-icon" : ""), (a.iconCls ? " "+a.iconCls : ""), '" unselectable="on">',
-                        '<a hidefocus="on" class="x-tree-node-anchor" href="', a.href ? a.href : '#', '" tabIndex="1" ',
+                        '<a hidefocus="on" class="x-tree-node-anchor" href="', a.href || '#', '" tabIndex="1" ',
                             a.hrefTarget ? ' target="'+a.hrefTarget+'"' : '', '>',
                         '<span unselectable="on">', (c.tpl ? c.tpl.apply(a) : a[c.dataIndex] || c.text), '</span></a>',
                     '</td>'
@@ -37,7 +37,7 @@ Ext.ux.tree.TreeGridNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
         for(i = 1, len = cols.length; i < len; i++){
             c = cols[i];
             buf.push(
-                    '<td class="x-treegrid-col ', (c.cls ? c.cls : ''), '">',
+                    '<td class="x-treegrid-col ', (c.cls || ''), '">',
                         '<div unselectable="on" class="x-treegrid-text"', (c.align ? ' style="text-align: ' + c.align + ';"' : ''), '>',
                             (c.tpl ? c.tpl.apply(a) : a[c.dataIndex]),
                         '</div>',
@@ -95,7 +95,7 @@ Ext.ux.tree.TreeGridRootNodeUI = Ext.extend(Ext.tree.TreeNodeUI, {
             ct.style.tableLayout = null;
             (function() {
                 ct.style.tableLayout = 'fixed';
-            }).defer(1);
+            }.defer(1));
         }
     },
 

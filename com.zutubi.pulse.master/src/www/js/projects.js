@@ -51,7 +51,7 @@ Zutubi.ConcreteProject.prototype = {
     noProjectTemplate: new Ext.XTemplate('<tr class="project-row" id="{buildId}">' + Zutubi.BUILD_CELLS + '</tr>').compile(),
 
     addBuildData: function(templateData, build, index) {
-        templateData.buildId = 'b' + (index + 1) + '.' + templateData.id;
+        templateData.buildId = 'b' + String(index + 1) + '.' + templateData.id;
         templateData.buildNumber = build.number;
         templateData.buildLink = window.baseUrl + '/browse/projects/' + encodeURIComponent(templateData.name) + '/builds/' + build.number + '/';
         templateData.status = build.status;
@@ -80,12 +80,13 @@ Zutubi.ConcreteProject.prototype = {
         if (this.data.built)
         {
             var builds = this.data.buildRows;
+            var i;
 
             this.addBuildData(templateData, builds[0], 0);
             this.el = this.buildTemplate.insertAfter(previousRowEl, templateData, true);
             this.rows.push(this.el);
 
-            for (var i = 0; i < builds.length; i++)
+            for (i = 0; i < builds.length; i++)
             {
                 var build = builds[i];
                 this.addBuildData(templateData, build, i);
@@ -110,7 +111,8 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     setRowDisplay: function(display) {
-        for (var i = 0; i < this.rows.length; i++)
+        var i;
+        for (i = 0; i < this.rows.length; i++)
         {
             this.rows[i].setStyle('display', display);
         }
@@ -224,13 +226,16 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     destroy: function() {
-        for (var i = 0; i < this.rows.length; i++)
+        var i;
+        var key;
+
+        for (i = 0; i < this.rows.length; i++)
         {
             this.rows[i].select('a').removeAllListeners();
             this.rows[i].select('span').removeAllListeners();
         }
 
-        for (var key in this.renderedMenus)
+        for (key in this.renderedMenus)
         {
             this.renderedMenus[key].remove();
         }
@@ -254,7 +259,8 @@ Zutubi.ProjectContainer.prototype = {
         if (children)
         {
             var previousRowEl = this.el;
-            for (var i = 0; i < children.length; i++)
+            var i;
+            for (i = 0; i < children.length; i++)
             {
                 var childData = children[i];
                 var child;
@@ -300,8 +306,9 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     collapseAll: function() {
+        var i;
         this.collapse();
-        for (var i = 0; i < this.children.length; i++)
+        for (i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
             if (!child.data.concrete)
@@ -325,7 +332,8 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     hideDescendants: function() {
-        for (var i = 0; i < this.children.length; i++)
+        var i;
+        for (i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
             child.hide();
@@ -347,8 +355,9 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     expandAll: function() {
+        var i;
         this.expand();
-        for (var i = 0; i < this.children.length; i++)
+        for (i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
             if (!child.data.concrete)
@@ -372,7 +381,8 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     showDescendants: function() {
-        for(var i = 0; i < this.children.length; i++)
+        var i;
+        for(i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
             child.show();
@@ -380,8 +390,9 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     destroy: function() {
+        var i;
         this.el.removeAllListeners();
-        for (var i = 0; i < this.children.length; i++)
+        for (i = 0; i < this.children.length; i++)
         {
             var child = this.children[i];
             child.destroy();
@@ -567,12 +578,13 @@ Zutubi.ProjectsTable.prototype = {
         tb.showBusy('Expanding...');
         var groups = this.groups;
         (function() {
-            for(var group in groups)
+            var group;
+            for(group in groups)
             {
                 groups[group].expandAll();
             }
             tb.clearStatus({useDefaults: true});
-        }).defer(1);
+        }.defer(1));
     },
 
     collapseAll: function() {
@@ -580,17 +592,19 @@ Zutubi.ProjectsTable.prototype = {
         tb.showBusy('Collapsing...');
         var groups = this.groups;
         (function() {
-            for(var group in groups)
+            var group;
+            for(group in groups)
             {
                 groups[group].collapseAll();
             }
             tb.clearStatus({useDefaults: true});
-        }).defer(1);
+        }.defer(1));
     },
 
     getCurrentLayout: function() {
         var layout = [];
-        for(var groupName in this.groups)
+        var groupName;
+        for(groupName in this.groups)
         {
             var group = this.groups[groupName];
             layout.push({
@@ -615,8 +629,10 @@ Zutubi.ProjectsTable.prototype = {
     update: function(groupsData) {
         var el = this.containerEl;
         var previousGroups = this.groups;
+        var key;
+        var i;
 
-        for (var key in previousGroups)
+        for (key in previousGroups)
         {
             previousGroups[key].destroy();
         }
@@ -641,7 +657,7 @@ Zutubi.ProjectsTable.prototype = {
                 this.renderToolbar();
             }
 
-            for (var i = 0; i < groupsData.length; i++)
+            for (i = 0; i < groupsData.length; i++)
             {
                 var groupData = groupsData[i];
                 var groupName = this.getGroupName(groupData);
@@ -671,9 +687,10 @@ Zutubi.ProjectsTable.prototype = {
 
     forEachChildTemplate: function(templateData, f) {
         var children = templateData.children;
+        var i;
         if (children)
         {
-            for (var i = 0; i < children.length; i++)
+            for (i = 0; i < children.length; i++)
             {
                 var childData = children[i];
                 if (!childData.concrete)
@@ -832,8 +849,9 @@ Zutubi.ChangesTable.prototype = {
         {
             var tableEl = this.tableTemplate.append(this.containerEl, this, true);
             var tbodyEl = tableEl.first();
-
-            for (var i = 0; i < changes.length; i++)
+            var i;
+            
+            for (i = 0; i < changes.length; i++)
             {
                 var change = changes[i];
                 change.base = window.baseUrl;
@@ -892,10 +910,11 @@ Zutubi.ChangesTable.prototype = {
     },
 
     destroy: function() {
+        var key;
+
         this.containerEl.select('a').removeAllListeners();
         this.containerEl.select('span').removeAllListeners();
 
-        var key;
         for (key in this.renderedBuilds)
         {
             this.renderedBuilds[key].remove();

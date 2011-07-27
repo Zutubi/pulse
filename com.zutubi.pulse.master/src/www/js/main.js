@@ -2,7 +2,8 @@
 
 function each(a, f)
 {
-    for(var i = 0; i < a.length; i++)
+    var i;
+    for(i = 0; i < a.length; i++)
     {
         f(a[i]);
     }
@@ -27,7 +28,9 @@ function encodeURIPath(path)
 {
     var pieces = path.split('/');
     var encodedPath = '';
-    for (var i = 0; i < pieces.length; i++)
+    var i;
+
+    for (i = 0; i < pieces.length; i++)
     {
         if (encodedPath.length > 0)
         {
@@ -75,11 +78,12 @@ function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
 
     var form = Ext.getDom(formId);
     var fields = form.elements;
-
-    for(var i = 0; i < fields.length; i++)
+    var i;
+    
+    for(i = 0; i < fields.length; i++)
     {
         var field = fields[i];
-        if(field.id != checkboxId && (includeSubmit || field.type && field.type != "submit"))
+        if(field.id != checkboxId && (includeSubmit || (field.type && field.type != "submit")))
         {
             fields[i].disabled = disabled;
         }
@@ -131,8 +135,9 @@ function toggleSuccessfulTestRows(tableId, successfulShowing)
     if (table)
     {
         var rows = table.getElementsByTagName('tr');
-
-        for(var i = 0; i < rows.length; i++)
+        var i;
+        
+        for(i = 0; i < rows.length; i++)
         {
             var successfulRow = rows[i].className.indexOf('successful') == 0;
             if(successfulRow)
@@ -204,7 +209,7 @@ function getParentPath(path)
     }
 
     return null;
-};
+}
 
 function onSelectFailure(element, response)
 {
@@ -214,7 +219,7 @@ function onSelectFailure(element, response)
     }
     else
     {
-        var message = 'Pulse server returned status ' + response.status;
+        var message = 'Pulse server returned status ' + String(response.status);
         if(response.statusText)
         {
             message = message + ' (' + response.statusText + ')';
@@ -387,6 +392,8 @@ function navigateToDefinition(fieldId)
 
 function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, overriddenOwner, overriddenValue)
 {
+    var menuId;
+    
     if (required)
     {
         form.markRequired(field.getId(), 'field is required');
@@ -400,7 +407,7 @@ function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, o
     if (inheritedFrom)
     {
         field.inheritedFrom = inheritedFrom;
-        var menuId = form.annotateFieldWithMenu(field.getId(), 'inherited', 'value inherited from ' + inheritedFrom);
+        menuId = form.annotateFieldWithMenu(field.getId(), 'inherited', 'value inherited from ' + inheritedFrom);
         Zutubi.MenuManager.registerMenu(menuId, function() {
             return [{
                 image: 'arrow_45.gif',
@@ -413,7 +420,7 @@ function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, o
     if (overriddenOwner)
     {
         field.overriddenValue = overriddenValue;
-        var menuId = form.annotateFieldWithMenu(field.getId(), 'overridden', 'overrides value defined by ' + overriddenOwner + ' (click for actions)');
+        menuId = form.annotateFieldWithMenu(field.getId(), 'overridden', 'overrides value defined by ' + overriddenOwner + ' (click for actions)');
         Zutubi.MenuManager.registerMenu(menuId, function() {
             return [{
                 image: 'arrow_undo.gif',
@@ -535,7 +542,7 @@ function indentImage(size)
     }
     else
     {
-        return '<img src="' + Ext.BLANK_IMAGE_URL + '" width="' + (size * 10) +  '"/>';
+        return '<img src="' + Ext.BLANK_IMAGE_URL + '" width="' + String(size * 10) +  '"/>';
     }
 }
 

@@ -12,7 +12,7 @@
  *
  * This allows the menu manager to find/render the corresponding menu and place it on the page.
  */
-Zutubi.MenuManager = function() {
+Zutubi.MenuManager = (function() {
     var menusById = {};
     
     var renderMenu = function(id)
@@ -26,7 +26,8 @@ Zutubi.MenuManager = function() {
                 menuEl = Ext.getBody().createChild({tag: 'div',  id: id, style: 'display: none'});
                 var listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
                 var items = menu.itemCallback();
-                for (var i = 0; i < items.length; i++)
+                var i;
+                for (i = 0; i < items.length; i++)
                 {
                     appendMenuItem(listEl, id, items[i]);
                 }
@@ -101,5 +102,5 @@ Zutubi.MenuManager = function() {
                 Zutubi.FloatManager.showHideFloat('menus', id, 'tl-bl?', menu.imageClass);
             }
         }
-    }
-}();
+    };
+}());

@@ -123,7 +123,8 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
             var firstPageInWindow = this.getFirstPageInWindow(data.currentPage, pageCount);
             var lastPageInWindow = this.getLastPageInWindow(data.currentPage, pageCount);
-            for (var i = firstPageInWindow; i <= lastPageInWindow; i++)
+            var i;
+            for (i = firstPageInWindow; i <= lastPageInWindow; i++)
             {
                 args.pages.push({index: i});
             }

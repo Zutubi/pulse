@@ -107,11 +107,12 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
 
     dataExists: function()
     {
+        var i, l;
         if (this.data && this.data.length)
         {
             if (this.categorised)
             {
-                for (var i = 0, l = this.data.length; i < l; i++)
+                for (i = 0, l = this.data.length; i < l; i++)
                 {
                     var categoryLinks = this.data[i][this.linksProperty];
                     if (categoryLinks && categoryLinks.length > 0)
@@ -131,9 +132,10 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderData: function()
     {
+        var i, l;
         if (this.categorised)
         {
-            for (var i = 0, l = this.data.length; i < l; i++)
+            for (i = 0, l = this.data.length; i < l; i++)
             {
                 var category = this.data[i];
                 var links = category[this.linksProperty];
@@ -156,7 +158,8 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     
     renderLinks: function(links, categoryName)
     {
-        for (var i = 0, l = links.length; i < l; i++)
+        var i, l;
+        for (i = 0, l = links.length; i < l; i++)
         {
             var args = Ext.apply({}, links[i]);
             var idPrefix = this.id + '-';
@@ -197,7 +200,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             }
             
             this.rowTemplate.append(this.tbodyEl, args);
-        };
+        }
     },
     
     doAction: function(action, arg)

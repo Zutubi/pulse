@@ -172,7 +172,8 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
         }
 
         var skippedLast = false;
-        for(var i = 1; current && i < keys.length; i++)
+        var i;
+        for(i = 1; current && i < keys.length; i++)
         {
             if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
             {

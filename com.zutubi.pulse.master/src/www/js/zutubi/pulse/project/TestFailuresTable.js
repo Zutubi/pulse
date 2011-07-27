@@ -106,7 +106,8 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderData: function()
     {
-        for (var i = 0, l = this.data.length; i < l; i++)
+        var i, l;
+        for (i = 0, l = this.data.length; i < l; i++)
         {
             var stage = this.data[i];
             this.stageRowTemplate.append(this.tbodyEl, stage);
@@ -147,9 +148,10 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderSuiteContents: function(suite, url, indent)
     {
+        var i, l;
         if (suite.suites)
         {
-            for (var i = 0, l = suite.suites.length; i < l; i++)
+            for (i = 0, l = suite.suites.length; i < l; i++)
             {
                 var child = suite.suites[i];
                 this.renderSuite(child, url + encodeURIComponent(child.name) + '/', indent);
