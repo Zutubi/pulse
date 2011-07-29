@@ -58,7 +58,6 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.*;
-import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.ByteArrayOutputStream;
@@ -74,7 +73,6 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 public class RemoteApi
 {
     private static final Messages I18N = Messages.getInstance(RemoteApi.class);
-    private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
     private TransactionContext transactionContext;
     private TokenManager tokenManager;
