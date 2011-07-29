@@ -3021,6 +3021,8 @@ public class RemoteApi
         result.put("name", artifact.getName());
         result.put("permalink", Urls.getBaselessInstance().commandDownload(build, command, artifact.getName()) + "/");
         result.put("dataPath", artifactDir.getPath());
+        result.put("explicit", artifact.isExplicit());
+        result.put("featured", artifact.isFeatured());
         return result;
     }
 
