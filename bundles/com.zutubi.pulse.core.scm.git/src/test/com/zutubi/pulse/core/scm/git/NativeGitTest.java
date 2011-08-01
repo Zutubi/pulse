@@ -99,7 +99,10 @@ public class NativeGitTest extends PulseTestCase
         git.clone(handler,  repository, "base", false);
 
         assertThat(handler.getStatusMessages().size(), greaterThan(1));
-        assertThat(handler.getStatusMessages(), hasItem(startsWith("Initialized empty Git repository")));
+        assertThat(handler.getStatusMessages(),
+                   hasItem(anyOf(
+                           startsWith("Cloning into base..."),
+                           startsWith("Initialized empty Git repository"))));
     }
 
     public void testLog() throws ScmException
