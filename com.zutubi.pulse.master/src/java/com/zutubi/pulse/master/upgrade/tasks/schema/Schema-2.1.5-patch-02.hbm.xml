@@ -8,6 +8,8 @@
 
         <discriminator column="TRIGGER_TYPE" type="string" length="255"/>
 
+        <property name="dataMap" column="DATA" type="serializable" length="16383"/>
+
         <subclass name="com.zutubi.pulse.master.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
             <property name="startTime" column="START_TIME" type="date"/>
             <property name="interval" column="TRIGGER_INTERVAL" type="long"/>
