@@ -82,11 +82,11 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
     {
         var items, i, l;
 
-        if (!this.data.group || !this.data.groupNames || this.data.groupNames.length == 0)
+        if (!this.data.group || !this.data.groupNames || this.data.groupNames.length === 0)
         {
             this.showMessage('No report groups defined.');
         }
-        else if (this.data.buildCount == 0)
+        else if (this.data.buildCount === 0)
         {
             this.showMessage('No builds found in time frame.');
         }

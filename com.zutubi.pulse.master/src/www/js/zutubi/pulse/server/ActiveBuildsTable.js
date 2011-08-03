@@ -78,7 +78,7 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
         for (i = 0, len = this.builds.length; i < len; i++)
         {
             build = this.builds[i];
-            if (build.data.id == id)
+            if (build.data.id === id)
             {
                 return build;
             }

@@ -11,7 +11,7 @@ function each(a, f)
 
 function stopEventPropagation(e)
 {
-    if (typeof e.stopPropagation == 'function')
+    if (typeof e.stopPropagation === 'function')
     {
         e.stopPropagation();
     }
@@ -87,7 +87,7 @@ function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
     for(i = 0; i < fields.length; i++)
     {
         field = fields[i];
-        if(field.id != checkboxId && (includeSubmit || (field.type && field.type != "submit")))
+        if(field.id !== checkboxId && (includeSubmit || (field.type && field.type !== "submit")))
         {
             fields[i].disabled = disabled;
         }
@@ -113,10 +113,12 @@ function openResourceBrowser(contextPath, resourceId, versionId, defaultVersionI
     browseWindow.focus();
 }
 
-// @deprecated. Use the Prototype function Element.toggle instead.
-function toggleElementDisplay(element)
+function toggleDisplay(id)
 {
-    if(element.style.display == 'none')
+    var element;
+
+    element = Ext.getDom(id);
+    if (element.style.display === 'none')
     {
         element.style.display = '';
     }
@@ -124,11 +126,6 @@ function toggleElementDisplay(element)
     {
         element.style.display = 'none';
     }
-}
-
-function toggleDisplay(id)
-{
-    toggleElementDisplay(Ext.getDom(id));
 }
 
 // Toggle display for all success rows under the given table, identified by
@@ -144,7 +141,7 @@ function toggleSuccessfulTestRows(tableId, successfulShowing)
 
         for(i = 0; i < rows.length; i++)
         {
-            successfulRow = rows[i].className.indexOf('successful') == 0;
+            successfulRow = rows[i].className.indexOf('successful') === 0;
             if(successfulRow)
             {
                 rows[i].style.display = successfulShowing ? '' : 'none';
@@ -173,7 +170,7 @@ function handleConfigurationResponse(result)
             detailPanel.update(result.newPanel);
         }
 
-        if (typeof handleSuccessfulConfigurationResponse == 'function')
+        if (typeof handleSuccessfulConfigurationResponse === 'function')
         {
             handleSuccessfulConfigurationResponse(result);
         }
@@ -209,7 +206,7 @@ function onSelectFailure(element, response)
 {
     var message;
 
-    if(response.status == 0)
+    if(response.status === 0)
     {
         showStatus(response.statusText, 'failure');
     }
@@ -488,7 +485,7 @@ function showPromptDialog(title, message, prompt, multiline, statusMesage, url, 
         msg: message,
         fn: function(btn, text) {
                 window.dialogBox = null;
-                if (btn == 'ok')
+                if (btn === 'ok')
                 {
                     if (prompt)
                     {
@@ -552,7 +549,7 @@ function toggleStateList(e)
 
 function indentImage(size)
 {
-    if (size == 0)
+    if (size === 0)
     {
         return '';
     }

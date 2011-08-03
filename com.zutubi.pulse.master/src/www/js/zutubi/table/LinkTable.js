@@ -185,7 +185,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
                 handler = action;
             }
             
-            if (typeof handler == 'string')
+            if (typeof handler === 'string')
             {
                 args.url = handler;
                 args.client = false;

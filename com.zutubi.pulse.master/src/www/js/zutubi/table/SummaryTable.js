@@ -91,7 +91,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         for (i = 0; i < this.keyValues.length; i++)
         {
             kv = this.keyValues[i];
-            if (kv.name == name)
+            if (kv.name === name)
             {
                 return kv;
             }
@@ -146,7 +146,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
             {
                 newColumns[i] = this.activeColumns[i];
             }
-            else if (i == fromIndex)
+            else if (i === fromIndex)
             {
                 newColumns[toIndex] = this.activeColumns[i];
             }
@@ -215,8 +215,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
             column = this.activeColumns[i];
             html += this.headerTemplate.apply({
                 cls: column.cls || '',
-                first: i == 0,
-                last: i == columnCount - 1,
+                first: i === 0,
+                last: i === columnCount - 1,
                 index: i,
                 value: column.key
             });
@@ -237,8 +237,8 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
             column = this.activeColumns[i];
             html += this.cellTemplate.apply({
                 cls: column.cls || '',
-                first: i == 0,
-                last: i == columnCount - 1,
+                first: i === 0,
+                last: i === columnCount - 1,
                 index: i,
                 value: column.getRenderedValue(data)
             });
@@ -379,7 +379,7 @@ Zutubi.table.SummaryTableToolbar = Ext.extend(Zutubi.toolbar.Toolbar, {
                 enableKeyEvents: true,
                 listeners: {
                     keypress: function(c, e) {
-                        if (e.getKey() == e.RETURN)
+                        if (e.getKey() === e.RETURN)
                         {
                             var name;
                             if (c.getStore().findExact('field2', c.getRawValue()) < 0)
@@ -567,7 +567,7 @@ Zutubi.table.SummaryTableDropZone = Ext.extend(Ext.dd.DropZone, {
                 newIndex--;
             }
             
-            if (initialIndex == newIndex)
+            if (initialIndex === newIndex)
             {
                 return false;
             }

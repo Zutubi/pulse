@@ -39,7 +39,7 @@ Ext.extend(Zutubi.tree.ConfigTreeLoader, Ext.tree.TreeLoader, {
         {
             // if the load is cancelled, make sure we notify
             // the node that we are done
-            if(typeof callback == "function")
+            if(typeof callback === "function")
             {
                 callback();
             }

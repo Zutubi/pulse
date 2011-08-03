@@ -154,7 +154,7 @@ Zutubi.ConcreteProject.prototype = {
     getMenuItems: function(menuType, menuArg, id) {
         var items, encodedName, item;
 
-        if (menuType == 'actions')
+        if (menuType === 'actions')
         {
             encodedName = encodeURIComponent(this.data.name);
             items = [{
@@ -663,7 +663,7 @@ Zutubi.ProjectsTable.prototype = {
         tableEl = el.first().first();
 
         this.groups = {};
-        if (groupsData.length == 0)
+        if (groupsData.length === 0)
         {
             if (this.toolbarRendered)
             {
@@ -685,7 +685,7 @@ Zutubi.ProjectsTable.prototype = {
                 groupName = this.getGroupName(groupData);
                 this.applyPreviousState(groupData, previousGroups[groupName]);
 
-                group = new Zutubi.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
+                group = new Zutubi.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i === groupsData.length - 1);
                 group.render(tableEl);
                 this.groups[groupName] = group;
             }
@@ -736,7 +736,7 @@ Zutubi.ProjectsTable.prototype = {
             groupLayout = this.getGroupLayout(previousGroup.data);
             this.forEachTemplate(groupData, function(templateData) {
                 previous = groupLayout[templateData.name];
-                if (previous != null)
+                if (previous !== null)
                 {
                     templateData.collapsed = previous;
                 }

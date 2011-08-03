@@ -86,7 +86,7 @@ Zutubi.pulse.project.ChangelistPanel = Ext.extend(Zutubi.ActivePanel, {
                                     }
                                 }
                                 
-                                if (result.length == 0)
+                                if (result.length === 0)
                                 {
                                     result = '&nbsp;';
                                 }

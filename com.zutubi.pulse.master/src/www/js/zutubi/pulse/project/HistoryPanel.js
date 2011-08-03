@@ -83,7 +83,7 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                         value: this.buildsPerPage,
                         listeners: {
                             specialkey: function(c, e) {
-                                if (e.getKey() == e.RETURN)
+                                if (e.getKey() === e.RETURN)
                                 {
                                     panel.updateBuildsPerPage();
                                 }
@@ -101,8 +101,8 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                     }, '->', {
                         xtype: 'xztblink',
                         icon: window.baseUrl + '/images/feed-icon-16x16.gif',
-                        url: window.baseUrl + '/rss.action' + (this.projectId == '0' ? '' : '?projectId=' + this.projectId),
-                        hidden: this.agentId != '0'
+                        url: window.baseUrl + '/rss.action' + (this.projectId === '0' ? '' : '?projectId=' + this.projectId),
+                        hidden: this.agentId !== '0'
                     }]
                 },
                 items: [{
@@ -117,7 +117,7 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                     xtype: 'xzpager',
                     itemLabel: 'build',
                     url: this.pagerUrl, 
-                    extraParams: this.stateFilter == '' ? '' : 'stateFilter/' + this.stateFilter + '/',
+                    extraParams: this.stateFilter === '' ? '' : 'stateFilter/' + this.stateFilter + '/',
                     labels: {
                         first: 'latest',
                         previous: 'newer',

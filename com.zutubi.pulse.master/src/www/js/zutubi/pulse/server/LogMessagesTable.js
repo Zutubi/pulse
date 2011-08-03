@@ -127,12 +127,12 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
         for (i = 0, len = this.data.length; i < len; i++)
         {
             entry = this.data[i];
-            if (entry.level == 'severe')
+            if (entry.level === 'severe')
             {
                 messageCls = 'error';
                 image = 'exclamation';
             }
-            else if(entry.level == 'warning')
+            else if(entry.level === 'warning')
             {
                 messageCls = 'warning';
                 image = 'error';

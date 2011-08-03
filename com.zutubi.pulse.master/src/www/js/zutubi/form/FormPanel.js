@@ -206,7 +206,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
         f = this.getForm();
         Ext.get(this.formName + '.submitField').dom.value = value;
-        if(value == 'cancel')
+        if(value === 'cancel')
         {
             Ext.DomHelper.append(f.el.parent(), {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
         }
@@ -222,7 +222,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
         }
         else
         {
-            if(value == 'cancel' || f.isValid())
+            if(value === 'cancel' || f.isValid())
             {
                 f.el.dom.submit();
             }
@@ -239,7 +239,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     handleFieldKeypress: function (evt)
     {
-        if (evt.getKey() != evt.RETURN || this.readOnly)
+        if (evt.getKey() !== evt.RETURN || this.readOnly)
         {
             return true;
         }

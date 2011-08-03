@@ -110,13 +110,13 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         for (i = 0, l = this.fields.length; i < l; i++)
         {
             field = this.fields[i];
-            if (this.data.hasOwnProperty(field.name) && this.data[field.name] != null)
+            if (this.data.hasOwnProperty(field.name) && this.data[field.name] !== null)
             {
                 args = {
                     id: this.id + '-' + field.name,
                     key: field.key,
                     value: field.getRenderedValue(this.data),
-                    extraCls: i == l - 1 ? 'status-last' : ''
+                    extraCls: i === l - 1 ? 'status-last' : ''
                 };
                 
                 this.rowTemplate.append(this.tbodyEl, args);
@@ -133,7 +133,7 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
         if (this.rendered)
         {
             newHealth = this.getHealth();
-            if (newHealth != originalHealth)
+            if (newHealth !== originalHealth)
             {
                 this.el.replaceClass(originalHealth + '-box', newHealth + '-box');
             }

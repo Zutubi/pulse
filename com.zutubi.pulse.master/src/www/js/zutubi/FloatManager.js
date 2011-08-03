@@ -115,13 +115,13 @@ Zutubi.FloatManager = (function() {
             windowEl = Ext.get(windowId);
             displayedId = idByCategory[category];
             displayedCls = clsByCategory[category];
-            if(windowEl && displayedId == id)
+            if(windowEl && displayedId === id)
             {
                 unpress(id, displayedCls);
                 windowEl.setDisplayed(false);
                 delete idByCategory[category];
                 delete clsByCategory[category];
-                if (--displayedCategories == 0)
+                if (--displayedCategories === 0)
                 {
                     Ext.getDoc().un('mousedown', onMouseDown);
                 }
@@ -140,7 +140,7 @@ Zutubi.FloatManager = (function() {
 
                 idByCategory[category] = id;
                 clsByCategory[category] = cls;
-                if (++displayedCategories == 1)
+                if (++displayedCategories === 1)
                 {
                     Ext.getDoc().on('mousedown', onMouseDown);
                 }

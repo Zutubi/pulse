@@ -12,7 +12,7 @@
  *                        to a simple HTML encode)
  */
 Zutubi.KeyValue = function(config) {
-    if (typeof config == 'string')
+    if (typeof config === 'string')
     {
         config = {name: config};
     }
@@ -38,8 +38,8 @@ Zutubi.KeyValue.prototype = {
         {
             c = name.charAt(i);
             lower = c.toLowerCase();
-            isUpper = c != lower;
-            if (i != 0 && isUpper && previousLower)
+            isUpper = c !== lower;
+            if (i !== 0 && isUpper && previousLower)
             {
                 result += ' ';
             }

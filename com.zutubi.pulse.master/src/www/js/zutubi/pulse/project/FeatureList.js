@@ -190,14 +190,14 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
                 for (lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
                 {
                     line = lines[lineIndex];
-                    if (lineIndex == feature.lineOffset - 1)
+                    if (lineIndex === feature.lineOffset - 1)
                     {
                         html += '</span><span class="feature">';
                     }
                     
                     html += Ext.util.Format.plainToHtml(line) + '<br/>';
                     
-                    if (lineIndex == feature.lineOffset - 1)
+                    if (lineIndex === feature.lineOffset - 1)
                     {
                         html += '</span><span class="context">';
                     }

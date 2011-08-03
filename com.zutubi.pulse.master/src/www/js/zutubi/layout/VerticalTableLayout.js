@@ -68,7 +68,7 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
         for (i = 0, l = children.length; i < l; i++)
         {
             d = children[i].style.display;
-            if (d != 'none')
+            if (d !== 'none')
             {
                 return true;
             }

@@ -150,7 +150,7 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
             p = p.substring(this.tree.root.attributes.baseName.length + 1);
         }
 
-        if(p.length > 0 && p.substring(0, 1) == '/')
+        if(p.length > 0 && p.substring(0, 1) === '/')
         {
             p = p.substring(1);
         }
@@ -333,7 +333,7 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
         that = this;
         Ext.MessageBox.confirm('confirm', 'Are you sure you want to delete the folder?', function(btn)
         {
-            if (btn == 'yes')
+            if (btn === 'yes')
             {
                 that.onDelete();
             }
@@ -437,7 +437,7 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
         that = this;
         Ext.MessageBox.prompt('create folder', 'folder name:', function(btn, txt)
         {
-            if (btn == 'ok')
+            if (btn === 'ok')
             {
                 that.onOk(txt);
             }

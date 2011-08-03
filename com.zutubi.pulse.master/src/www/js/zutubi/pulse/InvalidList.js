@@ -12,7 +12,7 @@
 Zutubi.pulse.InvalidList = Ext.extend(Ext.BoxComponent, {
     initComponent: function()
     {
-        if (this.scopeUrl[this.scopeUrl.length - 1] != '/')
+        if (this.scopeUrl[this.scopeUrl.length - 1] !== '/')
         {
             this.scopeUrl += '/';
         }

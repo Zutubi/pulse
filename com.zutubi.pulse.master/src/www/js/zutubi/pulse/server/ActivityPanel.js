@@ -117,12 +117,12 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
         else
         {
             stateItem.setIcon(window.baseUrl + '/images/stop.gif');
-            stateItem.setText(queuePrefix == 'build' ? 'ignoring all triggers' : 'paused');
+            stateItem.setText(queuePrefix === 'build' ? 'ignoring all triggers' : 'paused');
             toggleItem.setIcon(window.baseUrl + '/images/config/actions/resume.gif');
             toggleItem.setText('resume');
         }
         
-        if (togglePermitted != toggleItem.enabled)
+        if (togglePermitted !== toggleItem.enabled)
         {
             if (togglePermitted)
             {

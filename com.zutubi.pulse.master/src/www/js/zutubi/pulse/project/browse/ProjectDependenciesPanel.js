@@ -35,7 +35,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActiveP
 
         if (data.name)
         {
-            args = Ext.apply({}, data, {cellId: cellId, building: data.state && data.state == 'building'});
+            args = Ext.apply({}, data, {cellId: cellId, building: data.state && data.state === 'building'});
             return Zutubi.pulse.project.browse.ProjectDependenciesPanel.prototype.contentTemplate.apply(args);
         }
         else

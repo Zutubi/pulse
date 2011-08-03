@@ -147,7 +147,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
         if(this.store.getCount() > 0)
         {
             this.store.each(function(r) {
-                if(r.data[prop] == value)
+                if(r.data[prop] === value)
                 {
                     record = r;
                     return false;

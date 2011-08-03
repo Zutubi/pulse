@@ -25,7 +25,7 @@ Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
             fieldError = errors[i];
             id = fieldError.id;
 
-            if(id.lastIndexOf('_check') == id.length - 6)
+            if(id.lastIndexOf('_check') === id.length - 6)
             {
                 field = this.mainForm.findField(id.substr(0, id.length - 6));
             }

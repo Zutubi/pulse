@@ -19,7 +19,7 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
         if (response.addedFiles)
         {
             each(response.addedFiles, function(addition) {
-                if (addition.parentTemplatePath && addition.parentPath == tree.scope)
+                if (addition.parentTemplatePath && addition.parentPath === tree.scope)
                 {
                     tree.addNode(addition.parentTemplatePath, { baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.templateLeaf});
                 }
@@ -50,7 +50,7 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
         var cs, i, len, found;
 
         node = node || this.root;
-        if (node.attributes[attribute] == value)
+        if (node.attributes[attribute] === value)
         {
             return node;
         }
@@ -73,7 +73,7 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
         var pieces, baseName, node;
 
         pieces = path.split(this.pathSeparator);
-        if (pieces.length == 2 && pieces[0] == this.scope)
+        if (pieces.length === 2 && pieces[0] === this.scope)
         {
             baseName = pieces[1];
             node = this.findNodeByAttribute('baseName', baseName);

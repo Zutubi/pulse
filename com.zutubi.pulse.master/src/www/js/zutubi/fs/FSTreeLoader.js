@@ -24,13 +24,13 @@ Ext.extend(Zutubi.fs.FSTreeLoader, Ext.tree.TreeLoader, {
 
         for (key in bp)
         {
-            if (typeof bp[key] != "function")
+            if (typeof bp[key] !== "function")
             {
                 buf.push(encodeURIComponent(key), "=", encodeURIComponent(bp[key]), "&");
             }
         }
         buf.push("path=", encodeURIComponent(node.getPath("baseName")));
-        if (this.preloadDepth && node.getDepth() == 0)
+        if (this.preloadDepth && node.getDepth() === 0)
         {
             buf.push("&depth=", this.preloadDepth);
         }

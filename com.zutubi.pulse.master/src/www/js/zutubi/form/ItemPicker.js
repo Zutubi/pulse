@@ -226,7 +226,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     {
         var recordCache;
         
-        if (this.optionStore != null)
+        if (this.optionStore !== null)
         {
             recordCache = {};
             this.optionStore.each(function(record)
@@ -385,7 +385,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
             for(i = 0; i < this.hiddenFields.length; i++)
             {
                 hiddenField = this.hiddenFields[i];
-                if (hiddenField.dom.value == Ext.util.Format.htmlEncode(value))
+                if (hiddenField.dom.value === Ext.util.Format.htmlEncode(value))
                 {
                     // this is the one to remove.
                     this.hiddenFields[i].remove();

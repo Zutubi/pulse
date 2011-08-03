@@ -166,7 +166,7 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
             type = '';
         }
 
-        if(path != this.shownPath || type != this.shownType || type == 'wizard')
+        if(path !== this.shownPath || type !== this.shownType || type === 'wizard')
         {
             if(path)
             {
@@ -647,7 +647,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
             for (i = 0; i < count; i++)
             {
                 child = children[i];
-                if (this.selectedId != 0 && this.selectedId == child.attributes.baseName)
+                if (this.selectedId !== 0 && this.selectedId === child.attributes.baseName)
                 {
                     child.select();
                 }
@@ -658,7 +658,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 }
             }
 
-            if (depth == 0)
+            if (depth === 0)
             {
                 this.loading = false;
                 this.loadingEl.remove();
@@ -879,7 +879,7 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
             this.builds.each(function(build) {
                 var selected, url, tooltip;
 
-                selected = build.id == this.buildId;
+                selected = build.id === this.buildId;
                 if (selected)
                 {
                     url = null;
@@ -1105,11 +1105,11 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
     getImage: function(build)
     {
-        if (build.status == 'success')
+        if (build.status === 'success')
         {
             return 'health/ok.gif';    
         }
-        else if (build.status == 'failure')
+        else if (build.status === 'failure')
         {
             return 'health/broken.gif';
         }

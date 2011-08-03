@@ -165,11 +165,11 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             // e.g. { pretty: 'idle', keyTransition: 'pause' }
             result = state.pretty;
             label = state.keyTransition;
-            if (result == 'paused')
+            if (result === 'paused')
             {
                 result = '<span class="obvious">' + result + '</span>';
             }
-            else if (result == 'initialisation failed')
+            else if (result === 'initialisation failed')
             {
                 label = 'reinitialise';
                 result = '<span class="error">' + result + '</span>';
@@ -202,7 +202,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             var error;
 
             // e.g. { total: 9, ok: 6, failed: 1 }
-            if (statistics.total == 0)
+            if (statistics.total === 0)
             {
                 return '<span class="understated">no builds</span>';
             }
@@ -225,16 +225,16 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
 
         resultStatus: function(status, result) {
-            if (status == 'in progress' && result.elapsed && result.elapsed.prettyEstimatedTimeRemaining)
+            if (status === 'in progress' && result.elapsed && result.elapsed.prettyEstimatedTimeRemaining)
             {
                 return Zutubi.pulse.project.image('status', status) + ' ' +
                        Zutubi.pulse.project.renderers.resultElapsed(result.elapsed, result);
             }
-            else if (status == 'success' && result.warnings && result.warnings > 0)
+            else if (status === 'success' && result.warnings && result.warnings > 0)
             {
                 return Zutubi.pulse.project.image('status', 'warnings') + ' success';
             }
-            else if (status == 'queued' && result.prettyQueueTime)
+            else if (status === 'queued' && result.prettyQueueTime)
             {
                 return Zutubi.pulse.project.image('status', status) + ' ' +
                        'queued (' + result.prettyQueueTime + ')';
@@ -333,7 +333,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             {
                 return 'personal';
             }
-            else if (!revision && build.status == 'pending')
+            else if (!revision && build.status === 'pending')
             {
                 return '[floating]';
             }

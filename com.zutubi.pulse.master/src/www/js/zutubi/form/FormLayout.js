@@ -23,7 +23,7 @@ Zutubi.form.FormLayout = function(config)
 Ext.extend(Zutubi.form.FormLayout, Ext.layout.FormLayout, {
     renderItem: function(c, position, target)
     {
-        if(c && !c.rendered && c.isFormField && c.inputType == 'hidden')
+        if(c && !c.rendered && c.isFormField && c.inputType === 'hidden')
         {
             target = target.up('form');
         }

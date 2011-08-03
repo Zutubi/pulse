@@ -14,7 +14,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
         var treePath;
 
         treePath = this.getSelectedTreePath();
-        return treePath == null ? null : this.toConfigPathPrefix(treePath);
+        return treePath === null ? null : this.toConfigPathPrefix(treePath);
     },
 
     getSelectedTreePath: function()
@@ -35,12 +35,12 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
         treePath = configPath;
 
-        if (this.pathPrefix && treePath.indexOf(this.pathPrefix) == 0)
+        if (this.pathPrefix && treePath.indexOf(this.pathPrefix) === 0)
         {
             treePath = treePath.substring(this.pathPrefix.length);
         }
 
-        if(treePath.length > 0 && treePath.substring(0, 1) != '/')
+        if(treePath.length > 0 && treePath.substring(0, 1) !== '/')
         {
             treePath = '/' + treePath;
         }
@@ -50,7 +50,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
             treePath = this.pathSeparator + this.root.attributes.baseName + treePath;
         }
 
-        if (treePath.substring(0, 1) == '/')
+        if (treePath.substring(0, 1) === '/')
         {
             treePath = treePath.substring(1);
         }
@@ -69,7 +69,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
             configPath = configPath.substring(this.root.attributes.baseName.length + 1);
         }
 
-        if(configPath.length > 0 && configPath.substring(0, 1) == '/')
+        if(configPath.length > 0 && configPath.substring(0, 1) === '/')
         {
             configPath = configPath.substring(1);
         }
@@ -105,7 +105,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
         path = this.toTreePathPrefix(path);
         keys = path.split(this.pathSeparator);
         current = this.root;
-        if (current.attributes.baseName != keys[0])
+        if (current.attributes.baseName !== keys[0])
         {
             if(callback)
             {
@@ -119,7 +119,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
         f = function() {
             var c;
 
-            if (++index == keys.length)
+            if (++index === keys.length)
             {
                 if (callback)
                 {
@@ -182,7 +182,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
         path = this.toTreePathPrefix(configPath);
         keys = path.split(this.pathSeparator);
         current = this.root;
-        if (current.attributes.baseName != keys[0])
+        if (current.attributes.baseName !== keys[0])
         {
             return null;
         }

@@ -63,7 +63,7 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
             for (i = 0, l = this.dataKeys.length; i < l; i++)
             {
                 key = this.dataKeys[i];
-                Ext.getCmp(this.id + '-' + key).update(l == 1 ? data : data[key]);    
+                Ext.getCmp(this.id + '-' + key).update(l === 1 ? data : data[key]);
             }
         }
         else

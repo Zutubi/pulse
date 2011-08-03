@@ -74,7 +74,7 @@
     </target>
 
     <target name="check.js" depends="init">
-      <jsl:jslint options="browser,confusion,eqeq,evil,forin,plusplus,regexp,sloppy,white">
+      <jsl:jslint options="browser,confusion,evil,forin,plusplus,regexp,sloppy,white">
         <predef>Ext,Zutubi,showStatus,hideStatus,confirm,detailPanel,refresh,unescape,handleSuccessfulConfigurationResponse,treesInitialised,each,toHtmlName,getBuildMenuItems,takeResponsibility,clearResponsibility,showPromptDialog,cancelBuild,encodeURIPath,configTree,navigateToOwner,actionPath,confirmUrl,handleDialogResponse</predef>
         <formatter type="plain" />
         <fileset dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js" excludes="ext/**,widget/treegrid/**"/>

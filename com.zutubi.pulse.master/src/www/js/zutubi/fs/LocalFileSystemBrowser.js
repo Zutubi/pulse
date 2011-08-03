@@ -91,7 +91,7 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
 
         if (this.isWindows)
         {
-            if(p.length > 0 && p.substring(0, 1) == '/')
+            if(p.length > 0 && p.substring(0, 1) === '/')
             {
                 p = p.substring(1);
             }

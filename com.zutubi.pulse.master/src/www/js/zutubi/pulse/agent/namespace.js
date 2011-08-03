@@ -68,24 +68,24 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
         agentStatus: function(status, agent) {
             var statusType;
 
-            if (status == 'synchronising' ||
-                status == 'synchronised' || 
+            if (status === 'synchronising' ||
+                status === 'synchronised' ||
                 status.indexOf('host upgrading') >= 0)
             {
                 statusType = 'upgrading';
             }
-            else if (status == 'offline' ||
+            else if (status === 'offline' ||
                      status.indexOf('upgrade failed') >= 0 ||
                      status.indexOf('mismatch') >= 0 ||
                      status.indexOf('invalid') >= 0)
             {
                 statusType = 'offline';
             }
-            else if (status == 'disabled')
+            else if (status === 'disabled')
             {
                 statusType = 'disabled';
             }
-            else if (status == 'idle')
+            else if (status === 'idle')
             {
                 statusType = 'idle';
             }
