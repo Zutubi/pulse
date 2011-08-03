@@ -140,7 +140,7 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     generateHandler: function(action, projectId, projectName, domId) {
-        var funtionName;
+        var functionName;
 
         functionName = 'gen_' + action + projectId;
         window[functionName] = function() {

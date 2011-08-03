@@ -110,7 +110,6 @@ function openResourceBrowser(contextPath, resourceId, versionId, defaultVersionI
 {
     var browseWindow;
     browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId + "&defaultVersionId=" + defaultVersionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
-    browseWindow.opener = self;
     browseWindow.focus();
 }
 
@@ -159,22 +158,6 @@ function setClass(id, className)
     var element;
     element = Ext.getDom(id);
     element.className = className;
-}
-
-// Used in left/right pane navigation to handle selection of a new node in
-// the left pane.
-function selectNode(id)
-{
-    var rightPane;
-
-    setClass("nav_" + selectedNode, "");
-    setClass("nav_" + id, "active");
-
-    rightPane = Ext.getDom("node_" + selectedNode);
-    rightPane.style.display = "none";
-    rightPane = Ext.getDom("node_" + id);
-    rightPane.style.display = "block";
-    selectedNode = id;
 }
 
 /*===========================================================================

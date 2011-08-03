@@ -15,6 +15,38 @@
 Zutubi.MenuManager = (function() {
     var menusById = {};
     
+    function appendMenuItem(el, menuId, item)
+    {
+        var child;
+
+        if (!item.title)
+        {
+            item.title = item.id;
+        }
+
+        child = {
+            tag: 'a',
+            id: item.id + '-' + menuId,
+            cls: 'unadorned',
+            href: '#',
+            title: item.title,
+            children: [{
+                tag: 'img',
+                src: window.baseUrl + '/images/' + item.image
+            }, ' ' + item.title]
+        };
+
+        if (item.url !== undefined)
+        {
+            child.href = window.baseUrl + '/' + item.url;
+        }
+        if (item.onclick !== undefined)
+        {
+            child.onclick = item.onclick;
+        }
+        el.createChild({tag: 'li', children: [child]});
+    }
+
     function renderMenu(id)
     {
         var menu, menuEl, listEl, items, i;
@@ -38,38 +70,6 @@ Zutubi.MenuManager = (function() {
         }
     
         return menu;
-    }
-    
-    function appendMenuItem(el, menuId, item)
-    {
-        var child;
-
-        if (!item.title)
-        {
-            item.title = item.id;
-        }
-    
-        child = {
-            tag: 'a',
-            id: item.id + '-' + menuId,
-            cls: 'unadorned',
-            href: '#',
-            title: item.title,
-            children: [{
-                tag: 'img',
-                src: window.baseUrl + '/images/' + item.image
-            }, ' ' + item.title]
-        };
-    
-        if (item.url !== undefined)
-        {
-            child.href = window.baseUrl + '/' + item.url;
-        }
-        if (item.onclick !== undefined)
-        {
-            child.onclick = item.onclick;
-        }
-        el.createChild({tag: 'li', children: [child]});
     }
 
     return {

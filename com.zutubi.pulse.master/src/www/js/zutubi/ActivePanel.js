@@ -129,7 +129,6 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
                 // If we never initialised the view, show an error message.
                 if (!panel.initialised)
                 {
-                    console.dir(transport);
                     message = panel.failureMessage;
                     if (transport.statusText)
                     {

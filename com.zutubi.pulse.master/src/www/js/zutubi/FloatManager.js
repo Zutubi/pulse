@@ -13,16 +13,12 @@ Zutubi.FloatManager = (function() {
         clsByCategory = {},
         displayedCategories = 0,
         showTime = new Date(),
-        initialised = false;
+        initialised = false,
+        onMouseDown;
 
-    function initialise()
+    function getWindowId(category)
     {
-        Ext.getDoc().addKeyListener(27, function() {
-            if(displayedCategories > 0)
-            {
-                hideAll();
-            }
-        });
+        return category + ID_SUFFIX_WINDOW;
     }
 
     function unpress(id, cls)
@@ -33,25 +29,6 @@ Zutubi.FloatManager = (function() {
         if(buttonEl)
         {
             buttonEl.removeClass(cls + CLASS_SUFFIX_PRESSED);
-        }
-    }
-
-    function press(id, cls)
-    {
-        var buttonEl;
-
-        buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
-        if(buttonEl)
-        {
-            buttonEl.addClass(cls + CLASS_SUFFIX_PRESSED);
-        }
-    }
-
-    function onMouseDown(e)
-    {
-        if(showTime.getElapsed() > 50 && displayedCategories > 0 && !e.getTarget(".floating-widget"))
-        {
-            hideAll();
         }
     }
 
@@ -73,10 +50,34 @@ Zutubi.FloatManager = (function() {
         Ext.getDoc().un('mousedown', onMouseDown);
     }
 
-    function getWindowId(category)
+    function initialise()
     {
-        return category + ID_SUFFIX_WINDOW;
+        Ext.getDoc().addKeyListener(27, function() {
+            if(displayedCategories > 0)
+            {
+                hideAll();
+            }
+        });
     }
+
+    function press(id, cls)
+    {
+        var buttonEl;
+
+        buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
+        if(buttonEl)
+        {
+            buttonEl.addClass(cls + CLASS_SUFFIX_PRESSED);
+        }
+    }
+
+    onMouseDown = function(e)
+    {
+        if(showTime.getElapsed() > 50 && displayedCategories > 0 && !e.getTarget(".floating-widget"))
+        {
+            hideAll();
+        }
+    };
 
     return {
         /**

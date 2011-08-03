@@ -183,7 +183,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
     
     renderData: function()
     {
-        var data, i, column, th;
+        var data, i, l, column, th;
 
         data = {};
         for (i = 0; i < this.activeColumns.length; i++)
