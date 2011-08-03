@@ -492,7 +492,7 @@ function showPromptDialog(title, message, prompt, multiline, statusMesage, url, 
                 {
                     if (prompt)
                     {
-                        params['message'] = text;
+                        params.message = text;
                     }
 
                     showStatus(statusMesage , 'working');

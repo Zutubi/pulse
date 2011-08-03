@@ -78,4 +78,4 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     }
 });
 
-Ext.Container.LAYOUTS['vtable'] = Zutubi.layout.VerticalTableLayout;
+Ext.Container.LAYOUTS.vtable = Zutubi.layout.VerticalTableLayout;

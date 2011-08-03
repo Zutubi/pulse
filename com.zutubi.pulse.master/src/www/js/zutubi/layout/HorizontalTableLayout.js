@@ -29,4 +29,4 @@ Zutubi.layout.HorizontalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     }
 });
 
-Ext.Container.LAYOUTS['htable'] = Zutubi.layout.HorizontalTableLayout;
+Ext.Container.LAYOUTS.htable = Zutubi.layout.HorizontalTableLayout;

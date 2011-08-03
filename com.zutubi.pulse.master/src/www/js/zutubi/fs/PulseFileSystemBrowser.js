@@ -510,7 +510,7 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
         {
             this.tree.addNode(this.tree.getSelectedConfigPath(), { baseName: name, text: name, leaf: false });
             newFolder = selected.findChild('baseName', name);
-            newFolder.attributes['baseName'] = name; // since everything else uses baseName, lets add it here.
+            newFolder.attributes.baseName = name; // since everything else uses baseName, lets add it here.
             newFolder.select();
         }
     },
