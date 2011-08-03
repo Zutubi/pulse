@@ -23,7 +23,9 @@ Zutubi.pulse.agent.AgentStatisticsPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 id: this.id + '-inner',

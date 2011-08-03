@@ -63,7 +63,9 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
      */
     renderers: {
         link: function(value, data) {
-            var result = '';
+            var result;
+
+            result = '';
             if (data.link)
             {
                 result += '<a href="' + window.baseUrl + '/' + data.link + '">'; 
@@ -114,10 +116,12 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         },
 
         revision: function(revision) {
+            var result, abbreviate;
+
             if (revision)
             {
-                var result = '';
-                var abbreviate = revision.revisionString.length > 10;
+                result = '';
+                abbreviate = revision.revisionString.length > 10;
                 if (abbreviate)
                 {
                     result += '<span title="' + Ext.util.Format.htmlEncode(revision.revisionString) + '">';
@@ -156,9 +160,11 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         ),
 
         projectState: function(state, project) {
+            var result, label;
+
             // e.g. { pretty: 'idle', keyTransition: 'pause' }
-            var result = state.pretty;
-            var label = state.keyTransition;
+            result = state.pretty;
+            label = state.keyTransition;
             if (result == 'paused')
             {
                 result = '<span class="obvious">' + result + '</span>';
@@ -193,17 +199,19 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         ),
         
         projectStatistics: function(statistics) {
+            var error;
+
             // e.g. { total: 9, ok: 6, failed: 1 }
             if (statistics.total == 0)
             {
                 return '<span class="understated">no builds</span>';
             }
 
-            var getPercent = function(n) {
+            function getPercent(n) {
                 return (n * 100 / statistics.total).toFixed(0);
-            };
+            }
             
-            var error = statistics.total - statistics.ok - statistics.failed;
+            error = statistics.total - statistics.ok - statistics.failed;
             return Zutubi.pulse.project.renderers.STATISTICS_TEMPLATE.apply({
                 baseUrl: window.baseUrl,
                 ok: statistics.ok,
@@ -349,13 +357,14 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         buildStages: function(stages, build)
         {
+            var result, i, l, stage;
+
             if (stages && stages.length > 0)
             {
-                var result = '<ul class="actions">';
-                var i, l;
+                result = '<ul class="actions">';
                 for (i = 0, l = stages.length; i < l; i++)
                 {
-                    var stage = stages[i];
+                    stage = stages[i];
                     result += Zutubi.pulse.project.renderers.STAGE_TEMPLATE.apply({
                         name: stage.name,
                         detailsLink: window.baseUrl + '/' + stage.link + 'details/' + encodeURIComponent(stage.name) + '/',
@@ -409,9 +418,11 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         stageLogs: function(dummy, stage)
         {
+            var url;
+
             if (stage.link)
             {
-                var url = window.baseUrl + '/' + stage.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
+                url = window.baseUrl + '/' + stage.link + 'logs/stage/' + encodeURIComponent(stage.name) + '/';
                 return '<a title="view log" class="unadorned" href="' + url + '"><img src="' + window.baseUrl + '/images/script.gif" alt="view log"> log</a>';
             }
             else

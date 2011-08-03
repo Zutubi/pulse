@@ -12,7 +12,9 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             defaults: {
                 layout: 'fit',
@@ -78,6 +80,8 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
 
     renderReports: function()
     {
+        var items, i, l;
+
         if (!this.data.group || !this.data.groupNames || this.data.groupNames.length == 0)
         {
             this.showMessage('No report groups defined.');
@@ -88,8 +92,7 @@ Zutubi.pulse.project.browse.ProjectReportsPanel = Ext.extend(Ext.Panel, {
         }
         else
         {
-            var items = [];
-            var i, l;
+            items = [];
             for (i = 0, l = this.data.reports.length; i < l; i++)
             {
                 items.push({

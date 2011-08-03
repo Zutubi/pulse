@@ -10,20 +10,20 @@ Zutubi.form.CheckForm = function(mainForm, options)
 Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
     isValid: function()
     {
+        var mainValid, valid;
         // Call both, they have side-effects.
-        var mainValid = this.mainForm.isValid();
-        var valid = Zutubi.form.CheckForm.superclass.isValid.call(this);
+        mainValid = this.mainForm.isValid();
+        valid = Zutubi.form.CheckForm.superclass.isValid.call(this);
         return mainValid && valid;
     },
 
     markInvalid: function(errors)
     {
-        var i;
+        var i, fieldError, id, field;
         for(i = 0; i < errors.length; i++)
         {
-            var fieldError = errors[i];
-            var id = fieldError.id;
-            var field;
+            fieldError = errors[i];
+            id = fieldError.id;
 
             if(id.lastIndexOf('_check') == id.length - 6)
             {
@@ -43,9 +43,10 @@ Ext.extend(Zutubi.form.CheckForm, Zutubi.form.Form, {
 
     submit: function(options)
     {
-        var params = options.params || {};
-        var mainParams = this.mainForm.getValues(false);
-        var param;
+        var params, mainParams, param;
+
+        params = options.params || {};
+        mainParams = this.mainForm.getValues(false);
         for(param in mainParams)
         {
            params[param + '_check'] = mainParams[param];

@@ -64,12 +64,12 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
     
     renderComments: function()
     {
-        var i, l;
+        var i, l, comment;
         if (this.data && this.data.length > 0)
         {
             for (i = 0, l = this.data.length; i < l; i++)
             {
-                var comment = this.data[i];
+                comment = this.data[i];
                 this.commentTemplate.append(this.el, {
                     id: comment.id,
                     buildId: this.buildId,

@@ -26,7 +26,9 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 xtype: 'panel',
@@ -131,7 +133,9 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     setFilter: function(filter)
     {
-        var location = this.pagerUrl + this.data.pager.currentPage + '/';
+        var location;
+
+        location = this.pagerUrl + this.data.pager.currentPage + '/';
         if (filter)
         {
             location += 'stateFilter/' + filter + '/';
@@ -142,8 +146,10 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     updateBuildsPerPage: function()
     {
-        var panel = this;
-        var toolbar = Ext.get('build-toolbar');
+        var panel, toolbar;
+
+        panel = this;
+        toolbar = Ext.get('build-toolbar');
         toolbar.mask();
         Ext.Ajax.request({
             url: window.baseUrl + '/ajax/customiseHistoryBuilds.action',

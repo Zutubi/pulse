@@ -122,12 +122,11 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
 
     renderData: function()
     {
-        var i, len;
+        var i, len, entry, messageCls, image, previewRow, traceRow;
+
         for (i = 0, len = this.data.length; i < len; i++)
         {
-            var entry = this.data[i];
-            var messageCls;
-            var image;
+            entry = this.data[i];
             if (entry.level == 'severe')
             {
                 messageCls = 'error';
@@ -164,8 +163,8 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
 
             if (entry.stackTrace)
             {
-                var previewRow = Ext.get(this.id + '-preview-' + i);
-                var traceRow = Ext.get(this.id + '-trace-' + i);
+                previewRow = Ext.get(this.id + '-preview-' + i);
+                traceRow = Ext.get(this.id + '-trace-' + i);
                 previewRow.on('click', this.toggleTrace.createDelegate(this, [true, previewRow, traceRow]));
                 previewRow.addClassOnOver('project-highlighted');
                 traceRow.on('click', this.toggleTrace.createDelegate(this, [false, previewRow, traceRow]));
@@ -187,7 +186,9 @@ Zutubi.pulse.server.LogMessagesTable = Ext.extend(Ext.BoxComponent, {
 
     clearRows: function()
     {
-        var els = this.tbodyEl.select('tr');
+        var els;
+
+        els = this.tbodyEl.select('tr');
         els.remove();
     }
 });

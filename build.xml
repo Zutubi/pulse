@@ -74,9 +74,9 @@
     </target>
 
     <target name="check.js" depends="init">
-      <jsl:jslint options="confusion,eqeq,evil,forin,plusplus,regexp,sub,sloppy,undef,vars,white">
+      <jsl:jslint options="confusion,eqeq,evil,forin,plusplus,regexp,sub,sloppy,undef,white">
         <formatter type="plain" />
-        <fileset dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js" excludes="ext/**"/>
+        <fileset dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js" excludes="ext/**,widget/treegrid/**"/>
       </jsl:jslint>
     </target>
 

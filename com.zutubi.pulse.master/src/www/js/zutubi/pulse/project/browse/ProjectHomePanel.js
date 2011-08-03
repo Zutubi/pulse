@@ -30,7 +30,9 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             defaults: {
                 layout: 'fit',
@@ -163,6 +165,8 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         
     update: function(data)
     {
+        var latest, title;
+
         Zutubi.pulse.project.browse.ProjectHomePanel.superclass.update.apply(this, arguments);
 
         this.checkPanelForContent('right', function(table) {
@@ -171,8 +175,8 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
 
         if (data.recent && data.recent.length > 0)
         {
-            var latest = data.recent[0];
-            var title = 'latest featured artifacts :: <a href="' + window.baseUrl + '/' + latest.link + '">build ' + latest.number + '</a>';
+            latest = data.recent[0];
+            title = 'latest featured artifacts :: <a href="' + window.baseUrl + '/' + latest.link + '">build ' + latest.number + '</a>';
             Ext.getCmp(this.id + '-artifacts').setTitle(title);
         }
         
@@ -190,9 +194,11 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     
     handleMarkForCleanResponse: function(options, success, response)
     {
+        var result;
+
         if (success)
         {
-            var result = Ext.util.JSON.decode(response.responseText);
+             result = Ext.util.JSON.decode(response.responseText);
             if (result.success)
             {
                 if (result.status)

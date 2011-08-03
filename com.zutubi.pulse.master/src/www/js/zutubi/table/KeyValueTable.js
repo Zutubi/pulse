@@ -44,8 +44,9 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
 
     getKeys: function()
     {
-        var keys = [];
-        var key;
+        var keys, key;
+
+        keys = [];
         if (this.data)
         {
             for (key in this.data)
@@ -64,18 +65,17 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
     
     renderData: function()
     {
-        var keys = this.getKeys();
-        
+        var keys, previousRow, i, key, value, renderedValue, args, moreRow, table;
+
+        keys = this.getKeys();
         keys.sort();
 
-        var previousRow = this.el.child('tr');
-        var i;
+        previousRow = this.el.child('tr');
         for (i = 0; i < keys.length; i++)
         {
-            var key = keys[i];
-            var value = this.data[key];
-            var renderedValue;
-            
+            key = keys[i];
+            value = this.data[key];
+
             if (value.length > this.lengthLimit)
             {
                 renderedValue = this.clippedTemplate.apply({
@@ -89,7 +89,7 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
             }
             
             
-            var args = {
+            args = {
                 key: Ext.util.Format.htmlEncode(key),
                 value: renderedValue,
                 cls: i >= this.rowLimit ? 'xz-keyvalue-over' : ''
@@ -99,8 +99,8 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
         
         if (i > this.rowLimit && !this.expanded)
         {
-            var moreRow = this.moreTemplate.insertAfter(previousRow, {count: i - this.rowLimit}, true);
-            var table = this;
+            moreRow = this.moreTemplate.insertAfter(previousRow, {count: i - this.rowLimit}, true);
+            table = this;
             moreRow.addClassOnOver('project-highlighted');
             moreRow.on('click', function() {
                 table.el.addClass('xz-keyvalue-expanded');

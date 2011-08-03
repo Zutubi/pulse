@@ -15,7 +15,9 @@ Ext.extend(Zutubi.form.CheckFormPanel, Zutubi.form.FormPanel, {
 
     defaultSubmit: function()
     {
-        var f = this.getForm();
+        var f;
+
+        f = this.getForm();
         if (f.isValid())
         {
             f.clearInvalid();

@@ -9,8 +9,10 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
 
     isWindows: false,
 
-    initComponent: function() {
-
+    initComponent: function()
+    {
+        var toolbar, statusBar, userHomeButton, reloadButton, createFolderButton, deleteFolderButton;
+        
         this.fs = 'local';
 
         this.defaultTreeConfig = {
@@ -19,20 +21,20 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
 
         Zutubi.fs.LocalFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
-        var toolbar = this.tree.getTopToolbar();
-        var statusBar = this.tree.getBottomToolbar();
+        toolbar = this.tree.getTopToolbar();
+        statusBar = this.tree.getBottomToolbar();
 
-        var userHomeButton = new Zutubi.fs.SelectNodeButton({
+        userHomeButton = new Zutubi.fs.SelectNodeButton({
             icon: this.baseUrl + '/images/house.gif',
             tooltip: 'go to user home',
             tree: this.tree
         });
-        var reloadButton = new Zutubi.fs.ReloadSelectedNodeButton({
+        reloadButton = new Zutubi.fs.ReloadSelectedNodeButton({
             icon: this.baseUrl + '/images/arrow_refresh.gif',
             tooltip: 'refresh folder',
             tree: this.tree
         });
-        var createFolderButton = new Zutubi.fs.CreateFolderButton({
+        createFolderButton = new Zutubi.fs.CreateFolderButton({
             icon: this.baseUrl + '/images/folder_add.gif',
             tooltip: 'create new folder',
             baseUrl:this.baseUrl,
@@ -40,7 +42,7 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
             tree: this.tree,
             sbar: statusBar
         });
-        var deleteFolderButton = new Zutubi.fs.DeleteFolderButton({
+        deleteFolderButton = new Zutubi.fs.DeleteFolderButton({
             icon: this.baseUrl + '/images/folder_delete.gif',
             cls: 'x-btn-icon',
             tooltip: 'delete folder',
@@ -60,7 +62,9 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
             url: this.baseUrl + '/ajax/getHome.action',
             success: function(rspObj)
             {
-                var data = Ext.util.JSON.decode(rspObj.responseText);
+                var data;
+
+                data = Ext.util.JSON.decode(rspObj.responseText);
                 userHomeButton.setPath(data.userHome);
             },
             failure: function(rspObj)
@@ -76,8 +80,10 @@ Zutubi.fs.LocalFileSystemBrowser = Ext.extend(Zutubi.fs.PulseFileSystemBrowser, 
 
     onSubmit: function()
     {
-        var node = this.tree.getSelectionModel().getSelectedNode();
-        var p = node.getPath('baseName');
+        var node, p;
+
+        node = this.tree.getSelectionModel().getSelectedNode();
+        p = node.getPath('baseName');
         if (!this.tree.rootVisible)
         {
             p = p.substring(this.tree.root.attributes.baseName.length + 1);

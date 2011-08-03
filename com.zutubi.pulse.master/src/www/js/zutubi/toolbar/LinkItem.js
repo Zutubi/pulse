@@ -107,8 +107,10 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 
     setIcon: function(icon)
     {
+        var iconEl;
+
         this.icon = icon;
-        var iconEl = Ext.get(this.id + '-icon');
+        iconEl = Ext.get(this.id + '-icon');
         if (iconEl)
         {
             iconEl.set({src: icon});
@@ -117,8 +119,10 @@ Zutubi.toolbar.LinkItem = Ext.extend(Ext.Toolbar.Item, {
 
     setText: function(text)
     {
+        var textEl;
+
         this.text = text;
-        var textEl = Ext.get(this.id + '-text');
+        textEl = Ext.get(this.id + '-text');
         if (textEl)
         {
             textEl.update(text);

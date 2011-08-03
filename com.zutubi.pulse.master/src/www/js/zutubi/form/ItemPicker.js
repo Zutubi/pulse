@@ -37,6 +37,8 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onRender: function(ct, position)
     {
+        var cls, icons, internalPanel;
+        
         Zutubi.form.ItemPicker.superclass.onRender.call(this, ct, position);
         this.el.on('click', this.onClick, this);
 
@@ -66,7 +68,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
             this.choice = this.input;
         }
 
-        var cls = 'x-item-picker';
+        cls = 'x-item-picker';
         if(!this.tpl)
         {
             if(Ext.isIE || Ext.isIE7)
@@ -98,7 +100,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         // 3) place them such that the right edge of the button lines up with the desired width.
         // note: align right in the icon panel would be nice but does not work.
 
-        var icons = new Ext.Panel({
+        icons = new Ext.Panel({
             border:false,
             header:false,
             width:26,
@@ -143,7 +145,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         icons.add(this.addButton);
 
         this.view.flex = 1;
-        var internalPanel = new Ext.Container({
+        internalPanel = new Ext.Container({
             width:this.width - 24,
             layout:"vbox",
             layoutConfig:{align:"stretch"},
@@ -192,6 +194,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     refreshOptions: function()
     {
         var value;
+
         if (!this.allowDuplicates)
         {
             for (value in this.optionRecordCache)
@@ -221,9 +224,11 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
      */
     initOptionRecordCache: function()
     {
+        var recordCache;
+        
         if (this.optionStore != null)
         {
-            var recordCache = {};
+            recordCache = {};
             this.optionStore.each(function(record)
             {
                 recordCache[record.data.value] = record;
@@ -260,13 +265,15 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     navUp: function(ctrl)
     {
+        var selected;
+        
         if(this.allowReordering && ctrl)
         {
             this.onUp();
         }
         else
         {
-            var selected = this.getSelection();
+            selected = this.getSelection();
             if(selected > 0)
             {
                 this.view.select(selected - 1);
@@ -278,13 +285,14 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     navDown: function(ctrl)
     {
+        var selected;
         if(this.allowReordering && ctrl)
         {
             this.onDown();
         }
         else
         {
-            var selected = this.getSelection();
+            selected = this.getSelection();
             if(selected >= 0 && selected < this.store.getCount() - 1)
             {
                 this.view.select(selected + 1);
@@ -296,9 +304,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onAdd: function(evt)
     {
-        var text = '';
-        var value;
+        var text, value, selectedIndexes, record, index;
 
+        text = '';
         if(this.input)
         {
             text = this.input.getValue();
@@ -307,10 +315,10 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         }
         else
         {
-            var selectedIndexes = this.combo.view.getSelectedIndexes();
+            selectedIndexes = this.combo.view.getSelectedIndexes();
             if(selectedIndexes.length > 0)
             {
-                var record = this.combo.store.getAt(selectedIndexes[0]);
+                record = this.combo.store.getAt(selectedIndexes[0]);
                 if(record)
                 {
                     text = record.get(this.displayField);
@@ -329,7 +337,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
         if(text.length > 0)
         {
-            var index = this.appendItem(text, value);
+            index = this.appendItem(text, value);
             this.view.select(index);
             this.ensureSelectionVisible();
             this.fireEvent('change', this, evt);
@@ -338,7 +346,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     appendItem: function(text, value)
     {
-        var r = new this.ValueRecord({text: text, value: value});
+        var r;
+        
+        r = new this.ValueRecord({text: text, value: value});
         if (this.allowReordering)
         {
             this.store.add(r);
@@ -354,12 +364,14 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onRemove: function(evt)
     {
-        var selected = this.getSelection();
+        var selected, selectedRecord, value, i, hiddenField;
+
+        selected = this.getSelection();
         if(selected >= 0)
         {
-            var selectedRecord = this.store.getAt(selected);
+            selectedRecord = this.store.getAt(selected);
             this.store.remove(selectedRecord);
-            var value = selectedRecord.get('value');
+            value = selectedRecord.get('value');
 
             if (this.optionStore && !this.allowDuplicates)
             {
@@ -370,10 +382,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
             }
 
             // find the matching hidden input field and remove it.
-            var i;
             for(i = 0; i < this.hiddenFields.length; i++)
             {
-                var hiddenField = this.hiddenFields[i];
+                hiddenField = this.hiddenFields[i];
                 if (hiddenField.dom.value == Ext.util.Format.htmlEncode(value))
                 {
                     // this is the one to remove.
@@ -389,15 +400,17 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onUp: function(evt)
     {
-        var selected = this.getSelection();
+        var selected, record, hidden;
+
+        selected = this.getSelection();
         if(selected > 0)
         {
-            var record = this.store.getAt(selected);
+            record = this.store.getAt(selected);
             this.store.remove(record);
             this.store.insert(selected - 1, record);
             this.view.select(selected - 1);
 
-            var hidden = this.hiddenFields.splice(selected, 1)[0];
+            hidden = this.hiddenFields.splice(selected, 1)[0];
             this.hiddenFields.splice(selected - 1, 0, hidden);
             hidden.insertBefore(this.hiddenFields[selected]);
 
@@ -408,15 +421,17 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onDown: function(evt)
     {
-        var selected = this.getSelection();
+        var selected, record, hidden;
+
+        selected = this.getSelection();
         if(selected >= 0 && selected < this.store.getCount() - 1)
         {
-            var record = this.store.getAt(selected);
+            record = this.store.getAt(selected);
             this.store.remove(record);
             this.store.insert(selected + 1, record);
             this.view.select(selected + 1);
 
-            var hidden = this.hiddenFields.splice(selected, 1)[0];
+            hidden = this.hiddenFields.splice(selected, 1)[0];
             this.hiddenFields.splice(selected + 1, 0, hidden);
             hidden.insertAfter(this.hiddenFields[selected]);
 
@@ -427,23 +442,29 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     ensureSelectionVisible: function()
     {
-        var nodes = this.view.getSelectedNodes();
+        var nodes, selectedEl;
+
+        nodes = this.view.getSelectedNodes();
         if(nodes.length > 0)
         {
-            var selectedEl = Ext.get(nodes[0]);
+            selectedEl = Ext.get(nodes[0]);
             selectedEl.scrollIntoView(this.el);
         }
     },
 
     getValue: function()
     {
-        var value = [];
+        var value;
+
+        value = [];
         this.store.each(function(r) { value.push(r.get('value')); });
         return value;
     },
 
     setValue: function(value)
     {
+        var i, text;
+
         if(!this.ValueRecord)
         {
             // Superclass onRender calls before we are ready.
@@ -451,7 +472,6 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         }
 
         this.store.removeAll();
-        var i;
         for(i = 0; i < this.hiddenFields.length; i++)
         {
             this.hiddenFields[i].remove();
@@ -460,7 +480,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
         for(i = 0; i < value.length; i++)
         {
-            var text = this.getTextForValue(value[i]);
+            text = this.getTextForValue(value[i]);
             if(text)
             {
                 this.appendItem(text, value[i]);
@@ -475,6 +495,8 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
      */
     clear: function()
     {
+        var i;
+
         if(!this.ValueRecord)
         {
             // Superclass onRender calls before we are ready.
@@ -510,7 +532,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
      */
     getOptionValues: function()
     {
-        var optionValues = [];
+        var optionValues;
+
+        optionValues = [];
         this.optionStore.each(function(record)
         {
             optionValues.push(record.data.value);
@@ -520,13 +544,15 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     getTextForValue: function(value)
     {
+        var record;
+
         if(this.input)
         {
             return value;
         }
         else
         {
-            var record = this.optionRecordCache[value];
+            record = this.optionRecordCache[value];
             if(record)
             {
                 return record.get(this.displayField);
@@ -540,7 +566,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     getSelection: function()
     {
-        var selections = this.view.getSelectedIndexes();
+        var selections;
+
+        selections = this.view.getSelectedIndexes();
         if(selections.length > 0)
         {
             return selections[0];

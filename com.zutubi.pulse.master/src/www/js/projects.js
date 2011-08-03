@@ -60,7 +60,9 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     render: function(previousRowEl) {
-        var templateData = {
+        var templateData, builds, i, build;
+
+        templateData = {
             id: this.data.id,
             health: this.data.health,
             monitoring: this.data.monitoring.toLowerCase(),
@@ -79,8 +81,7 @@ Zutubi.ConcreteProject.prototype = {
         // a build available - but adding cells fails in IE7.
         if (this.data.built)
         {
-            var builds = this.data.buildRows;
-            var i;
+            builds = this.data.buildRows;
 
             this.addBuildData(templateData, builds[0], 0);
             this.el = this.buildTemplate.insertAfter(previousRowEl, templateData, true);
@@ -88,7 +89,7 @@ Zutubi.ConcreteProject.prototype = {
 
             for (i = 0; i < builds.length; i++)
             {
-                var build = builds[i];
+                build = builds[i];
                 this.addBuildData(templateData, build, i);
 
                 // First build is already rendered in the project row above.
@@ -139,7 +140,9 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     generateHandler: function(action, projectId, projectName, domId) {
-        var functionName = 'gen_' + action + projectId;
+        var funtionName;
+
+        functionName = 'gen_' + action + projectId;
         window[functionName] = function() {
             actionPath('projects/' + projectName, action, false, false);
             Zutubi.FloatManager.showHideFloat('menus', domId);
@@ -149,11 +152,11 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     getMenuItems: function(menuType, menuArg, id) {
-        var items;
+        var items, encodedName, item;
 
         if (menuType == 'actions')
         {
-            var encodedName = encodeURIComponent(this.data.name);
+            encodedName = encodeURIComponent(this.data.name);
             items = [{
                 id: 'home',
                 url: this.getProjectTabLink('home'),
@@ -182,7 +185,7 @@ Zutubi.ConcreteProject.prototype = {
 
             if (this.data.canTrigger)
             {
-                var item = {
+                item = {
                     id: 'trigger',
                     image: 'lightning.gif'
                 };
@@ -226,8 +229,7 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     destroy: function() {
-        var i;
-        var key;
+        var i, key;
 
         for (i = 0; i < this.rows.length; i++)
         {
@@ -253,17 +255,17 @@ Zutubi.ProjectContainer = function(model, columnCount, showHideLinks) {
 
 Zutubi.ProjectContainer.prototype = {
     renderChildren: function() {
+        var children, previousRowEl, i, childData, child;
+
         this.childrenRendered = true;
 
-        var children = this.model.children;
+        children = this.model.children;
         if (children)
         {
-            var previousRowEl = this.el;
-            var i;
+            previousRowEl = this.el;
             for (i = 0; i < children.length; i++)
             {
-                var childData = children[i];
-                var child;
+                childData = children[i];
                 if (childData.concrete)
                 {
                     child = new Zutubi.ConcreteProject(childData, this.columnCount, this.showHideLinks);
@@ -306,11 +308,12 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     collapseAll: function() {
-        var i;
+        var i, child;
+
         this.collapse();
         for (i = 0; i < this.children.length; i++)
         {
-            var child = this.children[i];
+            child = this.children[i];
             if (!child.data.concrete)
             {
                 child.collapseAll();
@@ -332,10 +335,11 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     hideDescendants: function() {
-        var i;
+        var i, child;
+        
         for (i = 0; i < this.children.length; i++)
         {
-            var child = this.children[i];
+            child = this.children[i];
             child.hide();
         }
     },
@@ -355,11 +359,12 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     expandAll: function() {
-        var i;
+        var i, child;
+
         this.expand();
         for (i = 0; i < this.children.length; i++)
         {
-            var child = this.children[i];
+            child = this.children[i];
             if (!child.data.concrete)
             {
                 child.expand();
@@ -381,20 +386,22 @@ Zutubi.ProjectContainer.prototype = {
     },
 
     showDescendants: function() {
-        var i;
+        var i, child;
+        
         for(i = 0; i < this.children.length; i++)
         {
-            var child = this.children[i];
+            child = this.children[i];
             child.show();
         }
     },
 
     destroy: function() {
-        var i;
+        var i, child;
+
         this.el.removeAllListeners();
         for (i = 0; i < this.children.length; i++)
         {
-            var child = this.children[i];
+            child = this.children[i];
             child.destroy();
         }
     }
@@ -424,9 +431,11 @@ Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
         '</tr>').compile(),
 
     render: function(previousRowEl) {
-        var children = this.data.children;
-        var canExpand = children && children.length > 0;
-        var expandable = canExpand ? 'project-expandable' : '';
+        var children, canExpand, expandable;
+
+        children = this.data.children;
+        canExpand = children && children.length > 0;
+        expandable = canExpand ? 'project-expandable' : '';
         if (canExpand && this.data.collapsed)
         {
             expandable += ' project-collapsed';
@@ -483,6 +492,8 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
             '</td>').compile(),
 
     render: function(parentEl) {
+        var spacerClass;
+
         this.el = this.template.append(parentEl, {
             id: this.data.id,
             health: this.data.root.health,
@@ -506,7 +517,7 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
             this.renderChildren();
         }
 
-        var spacerClass = 'project-group-spacer';
+        spacerClass = 'project-group-spacer';
         if (this.last)
         {
             spacerClass += ' project-group-last';
@@ -516,7 +527,9 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
 
     cleanupHandler: function(prefix)
     {
-        var el = Ext.get(prefix + this.data.id);
+        var el;
+
+        el = Ext.get(prefix + this.data.id);
         if (el)
         {
             el.dom.onclick = null;
@@ -574,11 +587,14 @@ Zutubi.ProjectsTable.prototype = {
     },
     
     expandAll: function() {
-        var tb = this.toolbar;
+        var tb, groups;
+
+        tb = this.toolbar;
         tb.showBusy('Expanding...');
-        var groups = this.groups;
+        groups = this.groups;
         (function() {
             var group;
+
             for(group in groups)
             {
                 groups[group].expandAll();
@@ -588,11 +604,14 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     collapseAll: function() {
-        var tb = this.toolbar;
+        var tb, groups;
+
+        tb = this.toolbar;
         tb.showBusy('Collapsing...');
-        var groups = this.groups;
+        groups = this.groups;
         (function() {
             var group;
+
             for(group in groups)
             {
                 groups[group].collapseAll();
@@ -602,11 +621,12 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     getCurrentLayout: function() {
-        var layout = [];
-        var groupName;
+        var layout, groupName, group;
+
+        layout = [];
         for(groupName in this.groups)
         {
-            var group = this.groups[groupName];
+            group = this.groups[groupName];
             layout.push({
                 group: this.getGroupName(group.data),
                 collapsed: group.model.collapsed,
@@ -617,7 +637,9 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     saveLayout: function() {
-        var tb = this.toolbar;
+        var tb;
+
+        tb = this.toolbar;
         tb.showBusy('Saving...');
         Ext.Ajax.request({
             url: window.baseUrl + '/ajax/saveProjectsLayout.action',
@@ -627,10 +649,10 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     update: function(groupsData) {
-        var el = this.containerEl;
-        var previousGroups = this.groups;
-        var key;
-        var i;
+        var el, previousGroups, key, i, tableEl, groupData, groupName, group;
+
+        el = this.containerEl;
+        previousGroups = this.groups;
 
         for (key in previousGroups)
         {
@@ -638,7 +660,7 @@ Zutubi.ProjectsTable.prototype = {
         }
 
         el.update('<table class="project-group"><tbody></tbody></table>');
-        var tableEl = el.first().first();
+        tableEl = el.first().first();
 
         this.groups = {};
         if (groupsData.length == 0)
@@ -659,11 +681,11 @@ Zutubi.ProjectsTable.prototype = {
 
             for (i = 0; i < groupsData.length; i++)
             {
-                var groupData = groupsData[i];
-                var groupName = this.getGroupName(groupData);
+                groupData = groupsData[i];
+                groupName = this.getGroupName(groupData);
                 this.applyPreviousState(groupData, previousGroups[groupName]);
 
-                var group = new Zutubi.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
+                group = new Zutubi.ProjectGroup(groupData, this.columnCount, this.rssEnabled, this.isDashboard, i == groupsData.length - 1);
                 group.render(tableEl);
                 this.groups[groupName] = group;
             }
@@ -686,13 +708,14 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     forEachChildTemplate: function(templateData, f) {
-        var children = templateData.children;
-        var i;
+        var children, i, childData;
+
+        children = templateData.children;
         if (children)
         {
             for (i = 0; i < children.length; i++)
             {
-                var childData = children[i];
+                childData = children[i];
                 if (!childData.concrete)
                 {
                     f.call(this, childData);
@@ -704,13 +727,15 @@ Zutubi.ProjectsTable.prototype = {
 
     applyPreviousState: function(groupData, previousGroup)
     {
+        var groupLayout, previous;
+
         if (previousGroup)
         {
             groupData.root.collapsed = previousGroup.model.collapsed;
 
-            var groupLayout = this.getGroupLayout(previousGroup.data);
+            groupLayout = this.getGroupLayout(previousGroup.data);
             this.forEachTemplate(groupData, function(templateData) {
-                var previous = groupLayout[templateData.name];
+                previous = groupLayout[templateData.name];
                 if (previous != null)
                 {
                     templateData.collapsed = previous;
@@ -721,7 +746,9 @@ Zutubi.ProjectsTable.prototype = {
 
     getGroupLayout: function(groupData)
     {
-        var groupLayout = {};
+        var groupLayout;
+
+        groupLayout = {};
         this.forEachTemplate(groupData, function(templateData) {
             groupLayout[templateData.name] = templateData.collapsed;
         });
@@ -842,18 +869,19 @@ Zutubi.ChangesTable.prototype = {
                                       '</div>').compile(),
 
     update: function(changes) {
+        var tableEl, tbodyEl, i, change, commentButton, buildsButton;
+
         this.destroy();
         this.containerEl.update('');
 
         if (changes && changes.length > 0)
         {
-            var tableEl = this.tableTemplate.append(this.containerEl, this, true);
-            var tbodyEl = tableEl.first();
-            var i;
-            
+            tableEl = this.tableTemplate.append(this.containerEl, this, true);
+            tbodyEl = tableEl.first();
+
             for (i = 0; i < changes.length; i++)
             {
-                var change = changes[i];
+                change = changes[i];
                 change.base = window.baseUrl;
                 change.idSuffix = this.idSuffix;
                 change.showWho = this.showWho;
@@ -865,11 +893,11 @@ Zutubi.ChangesTable.prototype = {
                 this.changeTemplate.append(tbodyEl, change);
                 if (change.shortComment)
                 {
-                    var commentButton = Ext.get(change.id + '-' + this.idSuffix + '-comment-link');
+                    commentButton = Ext.get(change.id + '-' + this.idSuffix + '-comment-link');
                     commentButton.on('click', this.toggleComment.createDelegate(this, [change]));
                 }
 
-                var buildsButton = Ext.get(change.id + '-' + this.idSuffix + '-builds-link');
+                buildsButton = Ext.get(change.id + '-' + this.idSuffix + '-builds-link');
                 if (buildsButton)
                 {
                     buildsButton.on('click', this.toggleBuilds.createDelegate(this, [change]));
@@ -902,7 +930,8 @@ Zutubi.ChangesTable.prototype = {
     },
 
     renderBuilds: function(change) {
-        if (this.renderedBuilds[change.id]) {
+        if (this.renderedBuilds[change.id])
+        {
             return;
         }
 
@@ -957,7 +986,9 @@ Zutubi.ActiveView.prototype = {
     },
 
     load: function(callback) {
-        var view = this;
+        var view;
+
+        view = this;
         Ext.Ajax.request({
             url: view.url,
             timeout: 120000,

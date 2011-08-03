@@ -2,18 +2,18 @@
 //dependency: ./namespace.js
 
 Zutubi.FloatManager = (function() {
-    var ID_SUFFIX_BUTTON = '-button';
-    var ID_SUFFIX_LINK = '-link';
-    var ID_SUFFIX_WINDOW = '-window';
-    var ID_SUFFIX_WINDOW_CONTENT = '-window-content';
+    var ID_SUFFIX_BUTTON = '-button',
+        ID_SUFFIX_LINK = '-link',
+        ID_SUFFIX_WINDOW = '-window',
+        ID_SUFFIX_WINDOW_CONTENT = '-window-content',
     
-    var CLASS_SUFFIX_PRESSED = '-pressed';
+        CLASS_SUFFIX_PRESSED = '-pressed',
     
-    var idByCategory = {};
-    var clsByCategory = {};
-    var displayedCategories = 0;
-    var showTime = new Date();
-    var initialised = false;
+        idByCategory = {},
+        clsByCategory = {},
+        displayedCategories = 0,
+        showTime = new Date(),
+        initialised = false;
 
     function initialise()
     {
@@ -27,7 +27,9 @@ Zutubi.FloatManager = (function() {
 
     function unpress(id, cls)
     {
-        var buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
+        var buttonEl;
+
+        buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
         if(buttonEl)
         {
             buttonEl.removeClass(cls + CLASS_SUFFIX_PRESSED);
@@ -36,7 +38,9 @@ Zutubi.FloatManager = (function() {
 
     function press(id, cls)
     {
-        var buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
+        var buttonEl;
+
+        buttonEl = Ext.get(id + ID_SUFFIX_BUTTON);
         if(buttonEl)
         {
             buttonEl.addClass(cls + CLASS_SUFFIX_PRESSED);
@@ -53,11 +57,12 @@ Zutubi.FloatManager = (function() {
 
     function hideAll()
     {
-        var category;
+        var category, id, cls;
+
         for (category in idByCategory)
         {
-            var id = idByCategory[category];
-            var cls = clsByCategory[category];
+            id = idByCategory[category];
+            cls = clsByCategory[category];
             unpress(id, cls);
             Ext.get(getWindowId(category)).setDisplayed(false);
         }
@@ -86,6 +91,8 @@ Zutubi.FloatManager = (function() {
          */
         showHideFloat: function(category, id, align, cls)
         {
+            var windowId, windowEl, displayedId, displayedCls, contentId, linkEl;
+
             if (!align)
             {
                 align = 'tr-br?';
@@ -103,10 +110,10 @@ Zutubi.FloatManager = (function() {
 
             showTime = new Date();
 
-            var windowId = getWindowId(category);
-            var windowEl = Ext.get(windowId);
-            var displayedId = idByCategory[category];
-            var displayedCls = clsByCategory[category];
+            windowId = getWindowId(category);
+            windowEl = Ext.get(windowId);
+            displayedId = idByCategory[category];
+            displayedCls = clsByCategory[category];
             if(windowEl && displayedId == id)
             {
                 unpress(id, displayedCls);
@@ -120,7 +127,7 @@ Zutubi.FloatManager = (function() {
             }
             else
             {
-                var contentId = category + ID_SUFFIX_WINDOW_CONTENT;
+                contentId = category + ID_SUFFIX_WINDOW_CONTENT;
                 if(!windowEl)
                 {
                     windowEl = Ext.DomHelper.append(document.body, '<div id="' + windowId + '" class="floating floating-widget" style="display: none;"><div id="' + contentId + '"></div></div>', true);
@@ -145,7 +152,7 @@ Zutubi.FloatManager = (function() {
                     windowEl.setDisplayed(true);
                 }
 
-                var linkEl = Ext.get(id + ID_SUFFIX_LINK);
+                linkEl = Ext.get(id + ID_SUFFIX_LINK);
                 windowEl.anchorTo(linkEl, align);
             }
         },

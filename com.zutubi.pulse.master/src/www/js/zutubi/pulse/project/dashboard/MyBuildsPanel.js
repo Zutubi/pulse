@@ -18,7 +18,9 @@ Zutubi.pulse.project.dashboard.MyBuildsPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             defaults: {
                 layout: 'fit',

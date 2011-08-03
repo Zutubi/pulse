@@ -27,12 +27,13 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
 
     initComponent: function()
     {
-        var i;
-        var rowConfigs = this.rows;
+        var i, rowConfigs, keyValue;
+
+        rowConfigs = this.rows;
         this.rows = [];
         for (i = 0; i < rowConfigs.length; i++)
         {
-            var keyValue = new Zutubi.KeyValue(rowConfigs[i]);
+            keyValue = new Zutubi.KeyValue(rowConfigs[i]);
             keyValue.component = this;
             this.rows.push(keyValue);
         }
@@ -42,13 +43,14 @@ Zutubi.table.PropertyTable = Ext.extend(Zutubi.table.ContentTable, {
      
     renderData: function()
     {
-        var rows = this.rows;
-        var previousRow = this.el.child('tr');
-        var i, l;
+        var rows, previousRow, i, l, row, args;
+
+        rows = this.rows;
+        previousRow = this.el.child('tr');
         for (i = 0, l = rows.length; i < l; i++)
         {
-            var row = rows[i];
-            var args = {
+            row = rows[i];
+            args = {
                 id: this.id + '-' + row.name,
                 cls: row.cls || '',
                 key: row.key,

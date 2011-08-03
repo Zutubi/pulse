@@ -49,22 +49,23 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderData: function()
     {
-       var builds = [];
-       var i, len;
-       for (i = 0, len = this.data.length; i < len; i++)
-       {
-           var item = this.data[i];
-           if (item.hidden)
-           {
-               this.tbodyEl.createChild('<td class="leftmost rightmost understated" colspan="4">you do not have permission to view this build</td>');
-           }
-           else
-           {
-               var previousBuild = this.findBuild(item.id); 
-               var build = new Zutubi.pulse.server.ActiveBuild(item);
-               build.appendRows(this.tbodyEl, previousBuild ? previousBuild.collapsed : true);
-               builds.push(build);
-           }
+        var builds, i, len, item, previousBuild, build;
+
+        builds = [];
+        for (i = 0, len = this.data.length; i < len; i++)
+        {
+            item = this.data[i];
+            if (item.hidden)
+            {
+                this.tbodyEl.createChild('<td class="leftmost rightmost understated" colspan="4">you do not have permission to view this build</td>');
+            }
+            else
+            {
+                previousBuild = this.findBuild(item.id);
+                build = new Zutubi.pulse.server.ActiveBuild(item);
+                build.appendRows(this.tbodyEl, previousBuild ? previousBuild.collapsed : true);
+                builds.push(build);
+            }
        }
        
        this.builds = builds;
@@ -72,10 +73,11 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     
     findBuild: function(id)
     {
-        var i, len;
+        var i, len, build;
+
         for (i = 0, len = this.builds.length; i < len; i++)
         {
-            var build = this.builds[i];
+            build = this.builds[i];
             if (build.data.id == id)
             {
                 return build;
@@ -88,6 +90,7 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     expandAll: function()
     {
         var i, len;
+
         for (i = 0, len = this.builds.length; i < len; i++)
         {
             this.builds[i].expand();
@@ -97,6 +100,7 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     collapseAll: function()
     {
         var i, len;
+
         for (i = 0, len = this.builds.length; i < len; i++)
         {
             this.builds[i].collapse();
@@ -133,15 +137,15 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
     
     appendRows: function(tbodyEl, collapsed)
     {
+        var renderers, data, actions, i, link, args, stage;
+
         this.collapsed = collapsed;
         
-        var renderers = Zutubi.pulse.project.renderers;
-        var data = this.data;
-        var actions;
-        var i;
+        renderers = Zutubi.pulse.project.renderers;
+        data = this.data;
         if (data.cancelPermitted)
         {
-            var link = ' href="#" onclick="cancelBuild(' + data.id + ', false); return false"';
+            link = ' href="#" onclick="cancelBuild(' + data.id + ', false); return false"';
             actions = '<a class="unadorned" id="cancel-' + data.id + '-image-button"' + link + '><img alt="cancel" src="' + window.baseUrl + '/images/cancel.gif"/></a> ' +
                       '<a id="cancel-' + data.id + '-button"' + link + '>cancel</a>';
         }
@@ -150,7 +154,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
             actions = '&nbsp;';
         }
             
-        var args = {
+        args = {
             base: window.baseUrl,
             cls: collapsed ? 'project-collapsed' : '',
             name: renderers.buildOwner(data.owner, data) + ' :: ' +  renderers.buildId(data.number, data),
@@ -167,7 +171,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
         // stages form the queue, with the head at the bottom of the page).
         for (i = data.stages.length - 1; i >= 0; i--)
         {
-            var stage = data.stages[i];
+            stage = data.stages[i];
             args = {
                 base: window.baseUrl,
                 display: collapsed ? 'none' : '',
@@ -223,6 +227,7 @@ Ext.apply(Zutubi.pulse.server.ActiveBuild.prototype, {
     setChildDisplays: function(value)
     {
         var i, len;
+        
         for (i = 0, len = this.childRows.length; i < len; i++)
         {
             this.childRows[i].setStyle('display', value);

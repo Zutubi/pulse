@@ -15,18 +15,19 @@
 Zutubi.MenuManager = (function() {
     var menusById = {};
     
-    var renderMenu = function(id)
+    function renderMenu(id)
     {
-        var menu = menusById[id];
+        var menu, menuEl, listEl, items, i;
+
+        menu = menusById[id];
         if (menu)
         {
-            var menuEl = menu.el;
+            menuEl = menu.el;
             if (!menuEl)
             {
                 menuEl = Ext.getBody().createChild({tag: 'div',  id: id, style: 'display: none'});
-                var listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
-                var items = menu.itemCallback();
-                var i;
+                listEl = menuEl.createChild({tag: 'ul', cls: 'actions'});
+                items = menu.itemCallback();
                 for (i = 0; i < items.length; i++)
                 {
                     appendMenuItem(listEl, id, items[i]);
@@ -37,15 +38,18 @@ Zutubi.MenuManager = (function() {
         }
     
         return menu;
-    };
+    }
     
-    var appendMenuItem = function(el, menuId, item) {
+    function appendMenuItem(el, menuId, item)
+    {
+        var child;
+
         if (!item.title)
         {
             item.title = item.id;
         }
     
-        var child = {
+        child = {
             tag: 'a',
             id: item.id + '-' + menuId,
             cls: 'unadorned',
@@ -66,7 +70,7 @@ Zutubi.MenuManager = (function() {
             child.onclick = item.onclick;
         }
         el.createChild({tag: 'li', children: [child]});
-    };
+    }
 
     return {
         /**
@@ -93,12 +97,14 @@ Zutubi.MenuManager = (function() {
          */
         toggleMenu: function(link)
         {
-            var id = link.id.replace(/-link$/, '');
-            var buttonId = id + '-button';
-            var button = Ext.get(buttonId);
+            var id, buttonId, button, menu;
+
+            id = link.id.replace(/-link$/, '');
+            buttonId = id + '-button';
+            button = Ext.get(buttonId);
             if (button && !button.hasClass('x-item-disabled'))
             {
-                var menu = renderMenu(id);
+                menu = renderMenu(id);
                 Zutubi.FloatManager.showHideFloat('menus', id, 'tl-bl?', menu.imageClass);
             }
         }

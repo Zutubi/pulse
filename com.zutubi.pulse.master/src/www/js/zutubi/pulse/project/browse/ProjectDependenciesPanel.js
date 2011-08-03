@@ -31,9 +31,11 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActiveP
                 
     cellRenderer: function(cellId, data)
     {
+        var args;
+
         if (data.name)
         {
-            var args = Ext.apply({}, data, {cellId: cellId, building: data.state && data.state == 'building'});
+            args = Ext.apply({}, data, {cellId: cellId, building: data.state && data.state == 'building'});
             return Zutubi.pulse.project.browse.ProjectDependenciesPanel.prototype.contentTemplate.apply(args);
         }
         else
@@ -44,7 +46,9 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActiveP
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 xtype: 'panel',

@@ -33,8 +33,9 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     add: function()
     {
-        var a = arguments;
-        var i, len;
+        var a, i, len;
+
+        a = arguments;
         for(i = 0, len = a.length; i < len; i++)
         {
             a[i].form = this;
@@ -46,8 +47,10 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     markRequired: function(id, tooltip)
     {
-        var cellEl = Ext.get('x-form-label-annotation-' + id);
-        var spanEl = cellEl.createChild({tag: 'span', cls: 'required', id: id + '.required', html: '*'});
+        var cellEl, spanEl;
+
+        cellEl = Ext.get('x-form-label-annotation-' + id);
+        spanEl = cellEl.createChild({tag: 'span', cls: 'required', id: id + '.required', html: '*'});
         if(tooltip)
         {
             spanEl.dom.qtip = tooltip;
@@ -56,18 +59,19 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     enableField: function(id)
     {
-        var field = this.findById(id);
+        var field, rowEl, actionDomEls, i;
+
+        field = this.findById(id);
         if(field)
         {
             field.enable();
 
-            var rowEl = this.getFieldRowEl(id);
+            rowEl = this.getFieldRowEl(id);
             if (rowEl)
             {
                 Ext.get(rowEl).removeClass('x-item-disabled');
 
-                var actionDomEls = this.getFieldActionDomEls(id);
-                var i;
+                actionDomEls = this.getFieldActionDomEls(id);
                 if (actionDomEls)
                 {
                     for(i = 0; i < actionDomEls.length; i++)
@@ -81,19 +85,20 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     disableField: function(id)
     {
-        var field = this.findById(id);
+        var field, rowEl, actionDomEls, i;
+
+        field = this.findById(id);
         if(field)
         {
             field.clearInvalid();
             field.disable();
 
-            var rowEl = this.getFieldRowEl(id);
+            rowEl = this.getFieldRowEl(id);
             if (rowEl)
             {
                 Ext.get(rowEl).addClass('x-item-disabled');
 
-                var actionDomEls = this.getFieldActionDomEls(id);
-                var i;
+                actionDomEls = this.getFieldActionDomEls(id);
                 if (actionDomEls)
                 {
                     for(i = 0; i < actionDomEls.length; i++)
@@ -107,7 +112,9 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     getFieldActionDomEls: function(id)
     {
-        var rowEl = this.getFieldRowEl(id);
+        var rowEl;
+
+        rowEl = this.getFieldRowEl(id);
         return Ext.query("*[class*='field-action']", rowEl.dom);
     },
 
@@ -118,14 +125,18 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     createAnnotationCell: function(id, annotationName)
     {
-        var rowEl = this.getFieldRowEl(id);
+        var rowEl;
+
+        rowEl = this.getFieldRowEl(id);
         return rowEl.createChild({tag: 'td', cls: 'x-form-annotation', id: id + '.' + annotationName});
     },
     
     annotateField: function(id, annotationName, imageName, tooltip)
     {
-        var cellEl = this.createAnnotationCell(id, annotationName);
-        var imageEl = cellEl.createChild({tag: 'img', src: imageName});
+        var cellEl, imageEl;
+
+        cellEl = this.createAnnotationCell(id, annotationName);
+        imageEl = cellEl.createChild({tag: 'img', src: imageName});
         if(tooltip)
         {
             imageEl.dom.qtip = tooltip;
@@ -136,9 +147,11 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
     
     annotateFieldWithMenu: function(id, annotationName, tooltip)
     {
-        var cellEl = this.createAnnotationCell(id, annotationName);
-        var menuId = id + '-' + annotationName + '-menu';
-        var linkEl = cellEl.createChild({
+        var cellEl, menuId, linkEl, buttonEl;
+
+        cellEl = this.createAnnotationCell(id, annotationName);
+        menuId = id + '-' + annotationName + '-menu';
+        linkEl = cellEl.createChild({
             tag: 'a',
             id: menuId + '-link',
             cls: 'unadorned',
@@ -146,7 +159,7 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
             onclick: 'Zutubi.MenuManager.toggleMenu(this); return false'
         });
         
-        var buttonEl = linkEl.createChild({
+        buttonEl = linkEl.createChild({
             tag: 'img',
             id: menuId + '-button',
             src: window.baseUrl + Ext.BLANK_IMAGE_URL,
@@ -163,10 +176,11 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     updateButtons: function()
     {
+        var dirty, i;
+
         if(this.displayMode)
         {
-            var dirty = this.form.isDirty();
-            var i;
+            dirty = this.form.isDirty();
             if(!dirty)
             {
                 this.form.clearInvalid();
@@ -188,7 +202,9 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     submitForm: function (value)
     {
-        var f = this.getForm();
+        var f;
+
+        f = this.getForm();
         Ext.get(this.formName + '.submitField').dom.value = value;
         if(value == 'cancel')
         {
@@ -237,10 +253,14 @@ Ext.extend(Zutubi.form.FormPanel, Ext.form.FormPanel, {
 
     attachFieldKeyHandlers: function()
     {
-        var panel = this;
-        var form = this.getForm();
+        var panel, form;
+
+        panel = this;
+        form = this.getForm();
         form.items.each(function(field) {
-            var el = field.getEl();
+            var el;
+
+            el = field.getEl();
             if(el)
             {
                 el.set({tabindex: window.nextTabindex++ });

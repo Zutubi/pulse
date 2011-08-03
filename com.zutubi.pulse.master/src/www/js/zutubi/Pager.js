@@ -95,9 +95,11 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
     renderRows: function()
     {
+        var data, pageCount, args, firstPageInWindow, lastPageInWindow, i;
+
         this.tbodyEl.select('tr').remove();
 
-        var data = this.data || {totalItems: 0};
+        data = this.data || {totalItems: 0};
         
         this.countTemplate.append(this.tbodyEl, {
             id: this.id,
@@ -105,10 +107,10 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
             itemLabel: this.itemLabel
         });
 
-        var pageCount = Math.floor((data.totalItems + data.itemsPerPage - 1) / data.itemsPerPage);
+        pageCount = Math.floor((data.totalItems + data.itemsPerPage - 1) / data.itemsPerPage);
         if (pageCount > 1)
         {
-            var args = Ext.apply({
+            args = Ext.apply({
                 id: this.id,
                 url: this.url,
                 extraParams: this.extraParams,
@@ -121,9 +123,8 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
                 pages: []
             }, data);
 
-            var firstPageInWindow = this.getFirstPageInWindow(data.currentPage, pageCount);
-            var lastPageInWindow = this.getLastPageInWindow(data.currentPage, pageCount);
-            var i;
+            firstPageInWindow = this.getFirstPageInWindow(data.currentPage, pageCount);
+            lastPageInWindow = this.getLastPageInWindow(data.currentPage, pageCount);
             for (i = firstPageInWindow; i <= lastPageInWindow; i++)
             {
                 args.pages.push({index: i});
@@ -135,7 +136,9 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
     getFirstPageInWindow: function(currentPage, pageCount)
     {
-        var offset = Math.floor(this.surroundingPages / 2);
+        var offset;
+
+        offset = Math.floor(this.surroundingPages / 2);
         if (currentPage + offset + 1 > pageCount)
         {
             offset += currentPage + offset + 1 - pageCount;
@@ -146,7 +149,9 @@ Zutubi.Pager = Ext.extend(Ext.BoxComponent, {
 
     getLastPageInWindow: function(currentPage, pageCount)
     {
-        var offset = Math.floor(this.surroundingPages / 2);
+        var offset;
+        
+        offset = Math.floor(this.surroundingPages / 2);
         if (currentPage - offset < 0)
         {
             offset += offset - currentPage;

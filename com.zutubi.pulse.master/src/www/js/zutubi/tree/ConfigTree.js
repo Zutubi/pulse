@@ -11,13 +11,17 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     getSelectedConfigPath: function()
     {
-        var treePath = this.getSelectedTreePath();
+        var treePath;
+
+        treePath = this.getSelectedTreePath();
         return treePath == null ? null : this.toConfigPathPrefix(treePath);
     },
 
     getSelectedTreePath: function()
     {
-        var node = this.getSelectionModel().getSelectedNode();
+        var node;
+
+        node = this.getSelectionModel().getSelectedNode();
         if (node)
         {
             return node.getPath('baseName');
@@ -27,7 +31,9 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     toTreePathPrefix: function(configPath)
     {
-        var treePath = configPath;
+        var treePath;
+
+        treePath = configPath;
 
         if (this.pathPrefix && treePath.indexOf(this.pathPrefix) == 0)
         {
@@ -54,7 +60,9 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     toConfigPathPrefix: function(treePath)
     {
-        var configPath = treePath;
+        var configPath;
+
+        configPath = treePath;
 
         if (!this.rootVisible)
         {
@@ -92,9 +100,11 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     expandToPath: function(path, callback)
     {
+        var keys, current, index, skippedLast, f;
+
         path = this.toTreePathPrefix(path);
-        var keys = path.split(this.pathSeparator);
-        var current = this.root;
+        keys = path.split(this.pathSeparator);
+        current = this.root;
         if (current.attributes['baseName'] != keys[0])
         {
             if(callback)
@@ -104,9 +114,11 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
             return;
         }
 
-        var index = 0;
-        var skippedLast = false;
-        var f = function() {
+        index = 0;
+        skippedLast = false;
+        f = function() {
+            var c;
+
             if (++index == keys.length)
             {
                 if (callback)
@@ -125,7 +137,7 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
             {
                 skippedLast = false;
                 current.expand(false, false, function() {
-                    var c = current.findChild('baseName', keys[index]);
+                    c = current.findChild('baseName', keys[index]);
                     if (!c)
                     {
                         if(callback)
@@ -146,8 +158,10 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     getNodeConfigPath: function(node)
     {
-        var p = node.parentNode;
-        var b = [node.attributes['baseName']];
+        var p, b;
+
+        p = node.parentNode;
+        b = [node.attributes['baseName']];
         while (p)
         {
             if (p.attributes.extraAttributes && p.attributes.extraAttributes.collapsedCollection)
@@ -163,16 +177,17 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     getNodeByConfigPath: function(configPath)
     {
-        var path = this.toTreePathPrefix(configPath);
-        var keys = path.split(this.pathSeparator);
-        var current = this.root;
+        var path, keys, current, skippedLast, i;
+
+        path = this.toTreePathPrefix(configPath);
+        keys = path.split(this.pathSeparator);
+        current = this.root;
         if (current.attributes['baseName'] != keys[0])
         {
             return null;
         }
 
-        var skippedLast = false;
-        var i;
+        skippedLast = false;
         for(i = 1; current && i < keys.length; i++)
         {
             if (!skippedLast && current.attributes.extraAttributes && current.attributes.extraAttributes.collapsedCollection)
@@ -190,7 +205,9 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     handleResponse: function(response)
     {
-        var tree = this;
+        var tree;
+
+        tree = this;
 
         if(response.addedFiles)
         {
@@ -218,12 +235,14 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     addNode: function(parentPath, config)
     {
+        var parentNode, newNode;
+
         if (parentPath)
         {
-            var parentNode = this.getNodeByConfigPath(parentPath);
+            parentNode = this.getNodeByConfigPath(parentPath);
             if (parentNode)
             {
-                var newNode = this.getLoader().createNode(config);
+                newNode = this.getLoader().createNode(config);
                 parentNode.leaf = false;
                 parentNode.appendChild(newNode);
             }
@@ -232,9 +251,11 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     renameNode: function(oldPath, newName, newDisplayName, collapsedCollection)
     {
+        var node;
+
         if(oldPath)
         {
-            var node = this.getNodeByConfigPath(oldPath);
+            node = this.getNodeByConfigPath(oldPath);
             if(node)
             {
                 node.attributes.baseName = newName;
@@ -251,9 +272,11 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
 
     removeNode: function(path)
     {
+        var node;
+
         if (path)
         {
-            var node = this.getNodeByConfigPath(path);
+            node = this.getNodeByConfigPath(path);
             if (node)
             {
                 if(node.isRoot)

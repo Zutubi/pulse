@@ -26,9 +26,10 @@ function stopEventPropagation(e)
 // encoding the slashes.
 function encodeURIPath(path)
 {
-    var pieces = path.split('/');
-    var encodedPath = '';
-    var i;
+    var pieces, encodedPath, i;
+
+    pieces = path.split('/');
+    encodedPath = '';
 
     for (i = 0; i < pieces.length; i++)
     {
@@ -54,10 +55,12 @@ function toHtmlName(s)
 // checkbox.
 function setEnableState(id, checkboxId, inverse)
 {
-    var element = Ext.getDom(id);
-    var disabled = !Ext.getDom(checkboxId).checked;
+    var element, disabled;
 
-    if(inverse)
+    element = Ext.getDom(id);
+    disabled = !Ext.getDom(checkboxId).checked;
+
+    if (inverse)
     {
         disabled = !disabled;
     }
@@ -69,20 +72,21 @@ function setEnableState(id, checkboxId, inverse)
 // itself and submits (buttons)) based on the state of a checkbox.
 function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
 {
-    var disabled = !Ext.getDom(checkboxId).checked;
+    var disabled, form, fields, i, field;
+
+    disabled = !Ext.getDom(checkboxId).checked;
 
     if(inverse)
     {
         disabled = !disabled;
     }
 
-    var form = Ext.getDom(formId);
-    var fields = form.elements;
-    var i;
-    
+    form = Ext.getDom(formId);
+    fields = form.elements;
+
     for(i = 0; i < fields.length; i++)
     {
-        var field = fields[i];
+        field = fields[i];
         if(field.id != checkboxId && (includeSubmit || (field.type && field.type != "submit")))
         {
             fields[i].disabled = disabled;
@@ -104,7 +108,8 @@ function confirmUrl(message, url)
 //   - defaultVersionId: ID of textbox to receive the resource default version flag.
 function openResourceBrowser(contextPath, resourceId, versionId, defaultVersionId)
 {
-    var browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId + "&defaultVersionId=" + defaultVersionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    var browseWindow;
+    browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId + "&defaultVersionId=" + defaultVersionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
     browseWindow.opener = self;
     browseWindow.focus();
 }
@@ -131,15 +136,16 @@ function toggleDisplay(id)
 // CSS class "successful".
 function toggleSuccessfulTestRows(tableId, successfulShowing)
 {
-    var table = Ext.getDom(tableId);
+    var table, rows, i, successfulRow;
+
+    table = Ext.getDom(tableId);
     if (table)
     {
-        var rows = table.getElementsByTagName('tr');
-        var i;
-        
+        rows = table.getElementsByTagName('tr');
+
         for(i = 0; i < rows.length; i++)
         {
-            var successfulRow = rows[i].className.indexOf('successful') == 0;
+            successfulRow = rows[i].className.indexOf('successful') == 0;
             if(successfulRow)
             {
                 rows[i].style.display = successfulShowing ? '' : 'none';
@@ -150,7 +156,8 @@ function toggleSuccessfulTestRows(tableId, successfulShowing)
 
 function setClass(id, className)
 {
-    var element = Ext.getDom(id);
+    var element;
+    element = Ext.getDom(id);
     element.className = className;
 }
 
@@ -158,10 +165,12 @@ function setClass(id, className)
 // the left pane.
 function selectNode(id)
 {
+    var rightPane;
+
     setClass("nav_" + selectedNode, "");
     setClass("nav_" + id, "active");
 
-    var rightPane = Ext.getDom("node_" + selectedNode);
+    rightPane = Ext.getDom("node_" + selectedNode);
     rightPane.style.display = "none";
     rightPane = Ext.getDom("node_" + id);
     rightPane.style.display = "block";
@@ -193,7 +202,7 @@ function handleConfigurationResponse(result)
     }
     else
     {
-        if(result.actionErrors && result.actionErrors.length > 0)
+        if (result.actionErrors && result.actionErrors.length > 0)
         {
             showStatus(result.actionErrors[0], 'failure');
         }
@@ -202,7 +211,9 @@ function handleConfigurationResponse(result)
 
 function getParentPath(path)
 {
-    var index = path.lastIndexOf('/');
+    var index;
+
+    index = path.lastIndexOf('/');
     if(index >= 0)
     {
         return path.slice(0, index);
@@ -213,13 +224,15 @@ function getParentPath(path)
 
 function onSelectFailure(element, response)
 {
+    var message;
+
     if(response.status == 0)
     {
         showStatus(response.statusText, 'failure');
     }
     else
     {
-        var message = 'Pulse server returned status ' + String(response.status);
+        message = 'Pulse server returned status ' + String(response.status);
         if(response.statusText)
         {
             message = message + ' (' + response.statusText + ')';
@@ -295,7 +308,9 @@ function getAjaxCallback(maskedElement)
 
 function runAjaxRequest(url)
 {
-    var pane = Ext.get('nested-layout');
+    var pane;
+
+    pane = Ext.get('nested-layout');
     pane.mask('Please wait...');
     window.actionInProgress = true;
     Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
@@ -319,7 +334,9 @@ function addToPath(path, template)
 
 function actionPath(path, action, fromParent, onDescendants)
 {
-    var url = window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?' + action + '=input';
+    var url;
+
+    url = window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?' + action + '=input';
     if (fromParent)
     {
         url += '&newPath=' + getParentPath(path);
@@ -338,7 +355,9 @@ function deletePath(path, direct)
 
 function showHelp(path, type)
 {
-    var helpPanel = Ext.getCmp('nested-east');
+    var helpPanel;
+
+    helpPanel = Ext.getCmp('nested-east');
     // Only show help when there is a panel for it (there is none during
     // setup, for example).
     if(helpPanel)
@@ -349,7 +368,9 @@ function showHelp(path, type)
 
 function showFieldHelp(field)
 {
-    var helpPanel = Ext.getCmp('nested-east');
+    var helpPanel;
+
+    helpPanel = Ext.getCmp('nested-east');
     // Only show help when there is a panel for it (there is none during
     // setup, for example).
     if(helpPanel)
@@ -360,7 +381,9 @@ function showFieldHelp(field)
 
 function revertField(fieldId)
 {
-    var field = Ext.getCmp(fieldId);
+    var field;
+
+    field = Ext.getCmp(fieldId);
     if (field)
     {
         field.setValue(field.overriddenValue);
@@ -371,7 +394,9 @@ function revertField(fieldId)
 
 function navigateToDefinition(fieldId)
 {
-    var field = Ext.getCmp(fieldId);
+    var field;
+
+    field = Ext.getCmp(fieldId);
     if (field)
     {
         // This callback-after-delay is hackish, but the chain of things that
@@ -380,7 +405,9 @@ function navigateToDefinition(fieldId)
         // of highlighting the field.
         navigateToOwner(field.inheritedFrom, field.form.path, function() {
             window.setTimeout(function() {
-                var field = Ext.getCmp(fieldId);
+                var field;
+
+                field = Ext.getCmp(fieldId);
                 if (field)
                 {
                     field.focus(true);
@@ -433,15 +460,19 @@ function addFieldAnnotations(form, field, required, noOverride, inheritedFrom, o
 
 function addFieldHelp(form, field, message)
 {
-    var helpEl = form.annotateField(field.getId(), 'help', window.baseUrl + '/images/help.gif', message);
+    var helpEl;
+
+    helpEl = form.annotateField(field.getId(), 'help', window.baseUrl + '/images/help.gif', message);
     helpEl.on('click', function() { showFieldHelp(field.getName()); });
 }
 
 function handleDialogResponse(options, success, response)
 {
+    var result;
+
     if (success)
     {
-        var result = Ext.util.JSON.decode(response.responseText);
+        result = Ext.util.JSON.decode(response.responseText);
         if (result.success)
         {
             if (window.refresh)
@@ -530,7 +561,9 @@ function deleteComment(buildId, commentId)
 
 function toggleStateList(e)
 {
-    var target = e.target || e.srcElement;
+    var target;
+
+    target = e.target || e.srcElement;
     Ext.get(target).findParent('ul.top-level', document.body, true).toggleClass('expanded');
 }
 
@@ -548,9 +581,11 @@ function indentImage(size)
 
 function refreshPanel(id, url, callback)
 {
-    var panel = Ext.get(id);
+    var panel, updater;
+
+    panel = Ext.get(id);
     panel.mask('Refreshing...');
-    var updater = new Ext.Updater(id);
+    updater = new Ext.Updater(id);
     updater.showLoadIndicator = false;
     updater.update({
         url: url,
@@ -567,9 +602,11 @@ function refreshPanel(id, url, callback)
 
 function handleCancelResponse(options, success, response)
 {
+    var result;
+
     if (success)
     {
-        var result = Ext.util.JSON.decode(response.responseText);
+        result = Ext.util.JSON.decode(response.responseText);
         refresh(function() {
             if (result.success)
             {

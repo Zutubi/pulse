@@ -80,12 +80,13 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     renderFeatures: function()
     {
+        var html, stages, i, l;
+
         if (this.data)
         {
-            var html = '';
+            html = '';
             html += this.simpleFeatures(this.data.features);
-            var stages = this.data.stages;
-            var i, l;
+            stages = this.data.stages;
             if (stages)
             {
                 for (i = 0, l = stages.length; i < l; i++)
@@ -105,8 +106,9 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     simpleFeatures: function(features)
     {
-        var html = '';
-        var i, l;
+        var html, i, l;
+
+        html = '';
         if (features)
         {
             for (i = 0, l = features.length; i < l; i++)
@@ -120,11 +122,12 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     stageFeatures: function(stage)
     {
-        var recipe = stage.recipeName ? Ext.util.Format.htmlEncode(stage.recipeName) : '[default]';
-        var agent = stage.agentName ? Ext.util.Format.htmlEncode(stage.agentName) : '[pending]';
-        var html = '<li class="header">build stage :: ' + Ext.util.Format.htmlEncode(stage.name) + ' :: ' + recipe + '@' + agent + '<ul>';
+        var recipe, agent, html, i, l;
+
+        recipe = stage.recipeName ? Ext.util.Format.htmlEncode(stage.recipeName) : '[default]';
+        agent = stage.agentName ? Ext.util.Format.htmlEncode(stage.agentName) : '[pending]';
+        html = '<li class="header">build stage :: ' + Ext.util.Format.htmlEncode(stage.name) + ' :: ' + recipe + '@' + agent + '<ul>';
         html += this.simpleFeatures(stage.features);
-        var i, l;
 
         if (stage.commands)
         {
@@ -140,9 +143,10 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     commandFeatures: function(command, stageComplete)
     {
-        var html = '<li class="header">command :: ' + Ext.util.Format.htmlEncode(command.name) + '<ul>';
+        var html, i, l;
+
+        html = '<li class="header">command :: ' + Ext.util.Format.htmlEncode(command.name) + '<ul>';
         html += this.simpleFeatures(command.features);
-        var i, l;
 
         if (command.artifacts)
         {
@@ -158,8 +162,9 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     artifactFeatures: function(artifact, artifactsUrl, stageComplete)
     {
-        var html = '';
-        var i, l;
+        var html, i, l;
+
+        html = '';
         for (i = 0, l = artifact.files.length; i < l; i++)
         {
             html += this.fileFeatures(artifact.files[i], artifactsUrl, stageComplete);
@@ -170,21 +175,21 @@ Zutubi.pulse.project.FeatureList = Ext.extend(Ext.BoxComponent, {
     
     fileFeatures: function(file, artifactsUrl, stageComplete)
     {
-        var fileUrl = artifactsUrl + encodeURIPath(file.path);
-        var html = '<li class="header">artifact :: ' + Ext.util.Format.htmlEncode(file.path) + '<ul>';
-        var i, l;
+        var fileUrl, html, i, l, feature, lines, lineIndex, lineCount, line;
+
+        fileUrl = artifactsUrl + encodeURIPath(file.path);
+        html = '<li class="header">artifact :: ' + Ext.util.Format.htmlEncode(file.path) + '<ul>';
         for (i = 0, l = file.features.length; i < l; i++)
         {
             html += '<li class="' + this.level + '">';
-            var feature = file.features[i];
+            feature = file.features[i];
             if (feature.summaryLines)
             {
                 html += '<span class="context">';
-                var lines = feature.summaryLines;
-                var lineIndex, lineCount;
+                lines = feature.summaryLines;
                 for (lineIndex = 0, lineCount = lines.length; lineIndex < lineCount; lineIndex++)
                 {
-                    var line = lines[lineIndex];
+                    line = lines[lineIndex];
                     if (lineIndex == feature.lineOffset - 1)
                     {
                         html += '</span><span class="feature">';

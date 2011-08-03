@@ -30,14 +30,15 @@ Zutubi.KeyValue = function(config) {
 Zutubi.KeyValue.prototype = {
     autoKey: function(name)
     {
-        var result = '';
-        var previousLower = false;
-        var i;
+        var result, previousLower, i, c, lower, isUpper;
+
+        result = '';
+        previousLower = false;
         for (i = 0; i < name.length; i++)
         {
-            var c = name.charAt(i);
-            var lower = c.toLowerCase();
-            var isUpper = c != lower;
+            c = name.charAt(i);
+            lower = c.toLowerCase();
+            isUpper = c != lower;
             if (i != 0 && isUpper && previousLower)
             {
                 result += ' ';

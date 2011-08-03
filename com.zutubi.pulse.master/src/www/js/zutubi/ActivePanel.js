@@ -54,8 +54,8 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
     
     update: function(data)
     {
-        var i, l;
-        var key;
+        var i, l, key, path, properties, componentData;
+
         this.data = data;
         
         if (this.dataKeys)
@@ -70,9 +70,9 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
         {
             for (key in this.dataMapping)
             {
-                var path = this.dataMapping[key];
-                var properties = path.split('.');
-                var componentData = data;
+                path = this.dataMapping[key];
+                properties = path.split('.');
+                componentData = data;
                 for (i = 0, l = properties.length; componentData && i < l; i++)
                 {
                     componentData = componentData[properties[i]];
@@ -85,18 +85,22 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
 
     load: function(callback)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.Ajax.request({
             url: panel.url,
             timeout: 120000,
             
             success: function(transport/*, options*/)
             {
+                var container;
+                
                 Ext.fly(panel.loadingId).update('');
                 panel.update(eval('(' + transport.responseText + ')'));
                 if (!panel.initialised)
                 {
-                    var container = Ext.getCmp(panel.containerId);
+                    container = Ext.getCmp(panel.containerId);
                     if (container.contentEl)
                     {
                         Ext.fly(container.contentEl).setStyle({margin: 0, padding: 0});
@@ -114,6 +118,8 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
 
             failure: function(transport /*, options*/)
             {
+                var message;
+                
                 // Stop trying to refresh.
                 if (panel.runner)
                 {
@@ -124,7 +130,7 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
                 if (!panel.initialised)
                 {
                     console.dir(transport);
-                    var message = panel.failureMessage;
+                    message = panel.failureMessage;
                     if (transport.statusText)
                     {
                         message += ' (' + unescape(transport.statusText.replace(/\+/g, ' ')) + ')';
@@ -152,8 +158,10 @@ Zutubi.ActivePanel = Ext.extend(Ext.Panel, {
      */
     checkPanelForContent: function(idSuffix, fn)
     {
-        var panel = Ext.getCmp(this.id + '-' + idSuffix);
-        var childWithContent = panel.items.find(fn);
+        var panel, childWithContent;
+        
+        panel = Ext.getCmp(this.id + '-' + idSuffix);
+        childWithContent = panel.items.find(fn);
         
         if (childWithContent)
         {

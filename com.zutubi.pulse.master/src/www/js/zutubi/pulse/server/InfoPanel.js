@@ -24,7 +24,9 @@ Zutubi.pulse.server.InfoPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             layout: 'vtable',
             contentEl: 'center',

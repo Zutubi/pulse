@@ -135,7 +135,9 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
 
     synchronise: function(field)
     {
-        var location = detailPanel.getHelp();
+        var location;
+
+        location = detailPanel.getHelp();
         this.showHelp(location.path, location.type, field);
     },
 
@@ -152,6 +154,8 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
 
     loadPath: function(path, type, cb)
     {
+        var panel;
+
         if(!path)
         {
             path = '';
@@ -166,17 +170,21 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
         {
             if(path)
             {
-                var panel = this;
+                panel = this;
                 this.body.load({
                     url: window.baseUrl + '/ajax/help/' + encodeURIPath(path) + '?' + type + '=',
                     scripts: true,
                     callback: function() {
+                        var helpEl, fieldHeaders;
+
                         panel.shownPath = path;
                         panel.shownType = type;
-                        var helpEl = Ext.get('config-help');
-                        var fieldHeaders = helpEl.select('.field-expandable .field-header', true);
+                        helpEl = Ext.get('config-help');
+                        fieldHeaders = helpEl.select('.field-expandable .field-header', true);
                         fieldHeaders.on('click', function(e, el) {
-                            var expandableEl = Ext.fly(el).parent('.field-expandable');
+                            var expandableEl;
+                            
+                            expandableEl = Ext.fly(el).parent('.field-expandable');
                             if(expandableEl)
                             {
                                 expandableEl.toggleClass('field-expanded');
@@ -208,9 +216,11 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
 
     gotoField: function(field)
     {
+        var rowEl, top;
+        
         if(field)
         {
-            var rowEl = Ext.get('field-row-' + field);
+            rowEl = Ext.get('field-row-' + field);
             if(rowEl)
             {
                 if(rowEl.hasClass('field-expandable'))
@@ -218,7 +228,7 @@ Ext.extend(Zutubi.HelpPanel, Ext.Panel, {
                     this.expandField(rowEl);
                 }
 
-                var top = (rowEl.getOffsetsTo(this.body)[1]) + this.body.dom.scrollTop;
+                top = (rowEl.getOffsetsTo(this.body)[1]) + this.body.dom.scrollTop;
                 this.body.scrollTo('top', top - 10);
                 rowEl.highlight();
             }
@@ -270,7 +280,9 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
 
     initComponent: function()
     {
-        var tailWindow = this;
+        var tailWindow;
+
+        tailWindow = this;
         this.form = new Ext.FormPanel({
             method: 'POST',
             labelWidth: 180,
@@ -307,7 +319,9 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
             listeners: {
                 afterLayout: {
                     fn: function() {
-                        var nav = new Ext.KeyNav(this.getForm().getEl(), {
+                        var nav;
+
+                        nav = new Ext.KeyNav(this.getForm().getEl(), {
                             'enter': function() {
                                 tailWindow.apply();
                             },
@@ -333,14 +347,18 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
 
     apply: function()
     {
-        var tailWindow = this;
+        var tailWindow;
+
+        tailWindow = this;
         this.form.getForm().submit({
             clientValidation: true,
             url: window.baseUrl + '/ajax/saveTailSettings.action',
             success: function()
             {
+                var mask;
+
                 tailWindow.close();
-                var mask = new Ext.LoadMask(Ext.getBody(), {msg:"Applying..."});
+                mask = new Ext.LoadMask(Ext.getBody(), {msg:"Applying..."});
                 mask.show();
                 window.location.reload(true);
             },
@@ -403,8 +421,10 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 
     initComponent: function()
     {
-        var tree = this;
-        var config = {
+        var tree, config;
+
+        tree = this;
+        config = {
             loader: new Zutubi.fs.FSTreeLoader({
                 baseUrl: window.baseUrl,
                 fs: 'pulse',
@@ -507,7 +527,9 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 tpl: '<tpl if="extraAttributes.size">{[Ext.util.Format.fileSize(values.extraAttributes.size)]}</tpl>',
                 align: 'right',
                 sortType: function(node) {
-                    var extraAttributes = node.attributes.extraAttributes;
+                    var extraAttributes;
+
+                    extraAttributes = node.attributes.extraAttributes;
                     if (extraAttributes && extraAttributes.size)
                     {
                         return parseInt(extraAttributes.size, 10);
@@ -524,7 +546,9 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
                 tpl: '<tpl if="extraAttributes.hash">{values.extraAttributes.hash}</tpl>',
                 align: 'right',
                 sortType: function(node) {
-                    var extraAttributes = node.attributes.extraAttributes;
+                    var extraAttributes;
+
+                    extraAttributes = node.attributes.extraAttributes;
                     if (extraAttributes && extraAttributes.hash)
                     {
                         return extraAttributes.hash;
@@ -577,23 +601,24 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
     
     setInitialColumnWidths: function()
     {
+        var availableWidth, columns, firstWidth, remainingWidth, count, i, buffer, newWidth;
+
         // If there is more than enough width for our columns,
         // stretch the first one to fill.
-        var availableWidth = this.ownerCt.getSize().width;
-        var columns = this.columns;
-        var firstWidth = columns[0].width;
-        var remainingWidth = 0;
-        var count = columns.length;
-        var i;
+        availableWidth = this.ownerCt.getSize().width;
+        columns = this.columns;
+        firstWidth = columns[0].width;
+        remainingWidth = 0;
+        count = columns.length;
         for (i = 1; i < count; i++)
         {
             remainingWidth += columns[i].width;
         }
 
-        var buffer = Ext.getScrollBarWidth() + 20;
+        buffer = Ext.getScrollBarWidth() + 20;
         if (availableWidth > firstWidth + remainingWidth + buffer)
         {
-            var newWidth = availableWidth - remainingWidth - buffer;
+            newWidth = availableWidth - remainingWidth - buffer;
             if (newWidth > this.MAX_COLUMN_WIDTH)
             {
                 newWidth = this.MAX_COLUMN_WIDTH;
@@ -604,21 +629,24 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 
     smallEnough: function(node)
     {
-        var children = node.attributes.children;
+        var children;
+
+        children = node.attributes.children;
         return children && children.length < 9;
     },
 
     initialExpand: function(node)
     {
-        var depth = node.getDepth();
+        var depth, children, count, i, child;
+
+        depth = node.getDepth();
         if (depth < 3)
         {
-            var children = node.childNodes;
-            var count = children.length;
-            var i;
+            children = node.childNodes;
+            count = children.length;
             for (i = 0; i < count; i++)
             {
-                var child = children[i];
+                child = children[i];
                 if (this.selectedId != 0 && this.selectedId == child.attributes.baseName)
                 {
                     child.select();
@@ -681,7 +709,9 @@ Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
 
     initComponent: function()
     {
-        var config = {
+        var config;
+        
+        config = {
             loader: new Zutubi.fs.FSTreeLoader({
                 baseUrl: window.baseUrl
             }),
@@ -709,15 +739,17 @@ Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
 
     pluginAction: function(id, action)
     {
-        var model = this.getSelectionModel();
-        var selectedNode = model.getSelectedNode();
-        var selectedId = '';
+        var model, selectedNode, selectedId, pluginsTree;
+
+        model = this.getSelectionModel();
+        selectedNode = model.getSelectedNode();
+        selectedId = '';
         if (selectedNode && selectedNode.parentNode)
         {
             selectedId = selectedNode.attributes.baseName;
         }
 
-        var pluginsTree = this;
+        pluginsTree = this;
         Ext.Ajax.request({
             url: window.baseUrl + '/ajax/admin/' + action + 'Plugin.action?id=' + id,
 
@@ -745,9 +777,10 @@ Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
 
     onPluginSelect: function(model, node)
     {
+        var url;
+        
         if (model.tree.detailPanel && node)
         {
-            var url;
             if(node.parentNode)
             {
                 url = window.baseUrl + '/ajax/admin/viewPlugin.action?id=' + node.attributes.baseName;
@@ -815,10 +848,12 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
 
     onRender: function()
     {
+        var currentItems, menuConfig;
+
         Zutubi.PulseHeader.superclass.onRender.apply(this, arguments);
 
         // clear the existing items.
-        var currentItems = (this.items) ? this.items.clone() : new Ext.util.MixedCollection();
+        currentItems = (this.items) ? this.items.clone() : new Ext.util.MixedCollection();
         currentItems.each(function(item) {
             this.items.remove(item);
             item.destroy();
@@ -842,10 +877,12 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
         if (this.buildId)
         {
             this.builds.each(function(build) {
-                var selected = build.id == this.buildId;
+                var selected, url, tooltip;
+
+                selected = build.id == this.buildId;
                 if (selected)
                 {
-                    var url = null;
+                    url = null;
                     if (this.personalBuild)
                     {
                         url = window.baseUrl + '/dashboard/my/' + build.number;
@@ -863,7 +900,6 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
                 }
                 else
                 {
-                    var tooltip;
                     if (build.id < this.buildId)
                     {
                         tooltip = 'step back to build ' + build.number;
@@ -884,7 +920,7 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
 
             if (this.hasMenuItems())
             {
-                var menuConfig = {};
+                menuConfig = {};
                 Ext.apply(menuConfig, this.data);
                 Ext.apply(menuConfig, {
                     id: this.id,

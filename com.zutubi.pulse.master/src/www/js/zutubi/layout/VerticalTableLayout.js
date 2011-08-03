@@ -37,16 +37,17 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     {
         if (this.table)
         {
-            var rows = this.table.tBodies[0].childNodes;
-            var i, j, l, m;
+            var rows, i, j, l, m, display, row, cells, cell;
+
+            rows = this.table.tBodies[0].childNodes;
             for (i = 0, l = rows.length; i < l; i++)
             {
-                var display = false;
-                var row = rows[i];
-                var cells = row.childNodes;
+                display = false;
+                row = rows[i];
+                cells = row.childNodes;
                 for (j = 0, m = cells.length; j < m; j++)
                 {
-                    var cell = cells[j];
+                    cell = cells[j];
                     if (this.hasDisplayedChild(cell))
                     {
                         display = true;
@@ -61,11 +62,12 @@ Zutubi.layout.VerticalTableLayout = Ext.extend(Ext.layout.TableLayout, {
     
     hasDisplayedChild: function(node)
     {
-        var children = node.childNodes;
-        var i, l;
+        var children, i, l, d;
+
+        children = node.childNodes;
         for (i = 0, l = children.length; i < l; i++)
         {
-            var d = children[i].style.display;
+            d = children[i].style.display;
             if (d != 'none')
             {
                 return true;

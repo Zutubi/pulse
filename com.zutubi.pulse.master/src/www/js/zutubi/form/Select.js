@@ -47,6 +47,8 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
     onRender: function(ct, position)
     {
+        var count;
+
         this.el = ct.createChild({tag: 'div', cls: 'x-select', id: this.id});
         if(!this.tpl){
             if(Ext.isIE || Ext.isIE7)
@@ -68,7 +70,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
             selectedClass: 'x-select-selected'
         });
 
-        var count = this.store.getCount();
+        count = this.store.getCount();
         if(!this.size)
         {
             if(count < 3)
@@ -108,14 +110,14 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
     updateHiddenFields: function()
     {
-        var value = this.getValue();
-        var valueMap = {};
-        var i;
-        var key;
+        var value, valueMap, i, key, iv;
+
+        value = this.getValue();
+        valueMap = {};
 
         for(i = 0; i < value.length; i++)
         {
-            var iv = value[i];
+            iv = value[i];
             valueMap[iv] = true;
             if(!this.hiddenFields[iv])
             {
@@ -141,6 +143,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
     findRecord: function(prop, value)
     {
         var record;
+
         if(this.store.getCount() > 0)
         {
             this.store.each(function(r) {
@@ -156,9 +159,10 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
     getValue: function()
     {
-        var value = [];
-        var selections = this.view.getSelectedIndexes();
-        var i;
+        var value, selections, i;
+
+        value = [];
+        selections = this.view.getSelectedIndexes();
         for(i = 0; i < selections.length; i++)
         {
             value.push(this.store.getAt(selections[i]).get(this.valueField));
@@ -172,8 +176,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
     setValue: function(value)
     {
-        var key;
-        var i;
+        var key, i, record;
         
         this.view.clearSelections();
         for(key in this.hiddenFields)
@@ -184,7 +187,7 @@ Ext.extend(Zutubi.form.Select, Ext.form.Field, {
 
         for(i = 0; i < value.length; i++)
         {
-            var record = this.findRecord(this.valueField, value[i]);
+            record = this.findRecord(this.valueField, value[i]);
             if (record)
             {
                 this.view.select(this.store.indexOf(record), true, true);

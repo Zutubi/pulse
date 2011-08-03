@@ -42,9 +42,11 @@ Zutubi.pulse.server.QueuedBuildsTable = Ext.extend(Zutubi.table.SummaryTable, {
             key: 'actions',
             renderer: function(cancelPermitted, request)
             {
+                var link;
+                
                 if (cancelPermitted)
                 {
-                    var link = ' href="#" onclick="cancelQueuedBuild(' + request.id + '); return false"';
+                    link = ' href="#" onclick="cancelQueuedBuild(' + request.id + '); return false"';
                     return '<a class="unadorned"' + link + '><img alt="cancel" src="' + window.baseUrl + '/images/cancel.gif"/></a> ' +
                            '<a id="cancel-' + request.id + '-button" ' + link + '>cancel</a>';
                 }

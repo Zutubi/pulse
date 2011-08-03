@@ -87,23 +87,23 @@ Zutubi.table.GridDiagram = Ext.extend(Ext.BoxComponent, {
      */
     renderData: function()
     {
-        var rowIndex, rowCount, colIndex, colCount;
+        var rowIndex, rowCount, colIndex, colCount, rowSource, row, cell, cellId, cellContent, rowspan, cls, data;
         if (this.data)
         {
             for (rowIndex = 0, rowCount = this.data.length; rowIndex < rowCount; rowIndex++)
             {
                 // The dummy cell at the start of each row is used to workaround a table border bug
                 // in FireFox.
-                var rowSource = '<tr><td>&nbsp;</td>';
-                var row = this.data[rowIndex];
+                rowSource = '<tr><td>&nbsp;</td>';
+                row = this.data[rowIndex];
                 for (colIndex = 0, colCount = row.length; colIndex < colCount; colIndex++)
                 {
-                    var cell = row[colIndex];
-                    var cellId = this.id + '-' + colIndex + '-' + rowIndex;
-                    var cellContent = null;
-                    var rowspan = 1;
-                    var cls = '';
-                    var data = cell.data;
+                    cell = row[colIndex];
+                    cellId = this.id + '-' + colIndex + '-' + rowIndex;
+                    cellContent = null;
+                    rowspan = 1;
+                    cls = '';
+                    data = cell.data;
                     if (data)
                     {
                         if (!data.dead)

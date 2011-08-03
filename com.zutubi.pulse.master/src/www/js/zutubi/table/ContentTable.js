@@ -185,7 +185,9 @@ Zutubi.table.ContentTable = Ext.extend(Ext.BoxComponent, {
      */
      clearDynamic: function()
      {
-         var els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
+         var els;
+
+         els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
          els.remove();
      },
      

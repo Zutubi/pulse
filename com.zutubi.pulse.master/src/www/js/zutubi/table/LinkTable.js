@@ -107,14 +107,15 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
 
     dataExists: function()
     {
-        var i, l;
+        var i, l, categoryLinks;
+
         if (this.data && this.data.length)
         {
             if (this.categorised)
             {
                 for (i = 0, l = this.data.length; i < l; i++)
                 {
-                    var categoryLinks = this.data[i][this.linksProperty];
+                    categoryLinks = this.data[i][this.linksProperty];
                     if (categoryLinks && categoryLinks.length > 0)
                     {
                         return true;
@@ -132,13 +133,14 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderData: function()
     {
-        var i, l;
+        var i, l, category, links;
+
         if (this.categorised)
         {
             for (i = 0, l = this.data.length; i < l; i++)
             {
-                var category = this.data[i];
-                var links = category[this.linksProperty];
+                category = this.data[i];
+                links = category[this.linksProperty];
                 if (links && links.length > 0)
                 {
                     this.categoryRowTemplate.append(this.tbodyEl, {
@@ -158,11 +160,12 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
     
     renderLinks: function(links, categoryName)
     {
-        var i, l;
+        var i, l, args, idPrefix, action, handler;
+
         for (i = 0, l = links.length; i < l; i++)
         {
-            var args = Ext.apply({}, links[i]);
-            var idPrefix = this.id + '-';
+            args = Ext.apply({}, links[i]);
+            idPrefix = this.id + '-';
             if (categoryName)
             {
                 idPrefix += toHtmlName(categoryName) + '-';
@@ -172,8 +175,7 @@ Zutubi.table.LinkTable = Ext.extend(Zutubi.table.ContentTable, {
             args.iconSrc = window.baseUrl + '/' + this.iconTemplate.apply(args);
             args.indent = this.categorised ? '&nbsp;&nbsp;' : '';
             
-            var action = args.action;
-            var handler;
+            action = args.action;
             if (this.handlers)
             {
                 handler = this.handlers[action];

@@ -20,7 +20,9 @@ Zutubi.pulse.server.MessagesPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 layout: 'vtable',

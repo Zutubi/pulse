@@ -3,7 +3,9 @@
 
 Zutubi.fs.FSTreeLoader = function(config)
 {
-    var baseUrl = config.baseUrl;
+    var baseUrl;
+
+    baseUrl = config.baseUrl;
     this.preloadDepth = config.preloadDepth || 0;
 
     Zutubi.fs.FSTreeLoader.superclass.constructor.call(this, {
@@ -15,9 +17,10 @@ Zutubi.fs.FSTreeLoader = function(config)
 Ext.extend(Zutubi.fs.FSTreeLoader, Ext.tree.TreeLoader, {
     getParams: function(node)
     {
-        var buf = [];
-        var bp = this.baseParams;
-        var key;
+        var buf, bp, key;
+
+        buf = [];
+        bp = this.baseParams;
 
         for (key in bp)
         {

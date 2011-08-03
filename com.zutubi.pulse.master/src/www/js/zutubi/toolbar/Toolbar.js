@@ -4,7 +4,9 @@
 Zutubi.toolbar.Toolbar = Ext.extend(Ext.Toolbar, {
     initComponent: function()
     {
-        var config = {
+        var config;
+
+        config = {
             layout: 'xztoolbar'
         };
         Ext.apply(this, config);

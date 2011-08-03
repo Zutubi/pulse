@@ -12,7 +12,9 @@ Zutubi.tree.TemplateTree = function(scope, config)
 Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
     handleResponse: function(response)
     {
-        var tree = this;
+        var tree;
+
+        tree = this;
 
         if (response.addedFiles)
         {
@@ -45,17 +47,18 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
 
     findNodeByAttribute: function(attribute, value, node)
     {
+        var cs, i, len, found;
+
         node = node || this.root;
         if (node.attributes[attribute] == value)
         {
             return node;
         }
 
-        var cs = node.childNodes;
-        var i, len;
+        cs = node.childNodes;
         for(i = 0, len = cs.length; i < len; i++)
         {
-            var found = this.findNodeByAttribute(attribute, value, cs[i]);
+            found = this.findNodeByAttribute(attribute, value, cs[i]);
             if (found)
             {
                 return found;
@@ -67,11 +70,13 @@ Ext.extend(Zutubi.tree.TemplateTree, Zutubi.tree.ConfigTree, {
 
     translatePath: function(path)
     {
-        var pieces = path.split(this.pathSeparator);
+        var pieces, baseName, node;
+
+        pieces = path.split(this.pathSeparator);
         if (pieces.length == 2 && pieces[0] == this.scope)
         {
-            var baseName = pieces[1];
-            var node = this.findNodeByAttribute('baseName', baseName);
+            baseName = pieces[1];
+            node = this.findNodeByAttribute('baseName', baseName);
             if (node)
             {
                 return this.getNodeConfigPath(node);

@@ -27,7 +27,9 @@ Zutubi.pulse.project.ChangelistPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 xtype: 'panel',
@@ -65,7 +67,9 @@ Zutubi.pulse.project.ChangelistPanel = Ext.extend(Zutubi.ActivePanel, {
                             name: 'links',
                             renderer: function(links)
                             {
-                                var result = '';
+                                var result;
+
+                                result = '';
                                 if (links)
                                 {
                                     if (links.viewUrl)

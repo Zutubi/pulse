@@ -106,10 +106,11 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderData: function()
     {
-        var i, l;
+        var i, l, stage;
+        
         for (i = 0, l = this.data.length; i < l; i++)
         {
-            var stage = this.data[i];
+            stage = this.data[i];
             this.stageRowTemplate.append(this.tbodyEl, stage);
 
             if (stage.tests)
@@ -148,12 +149,13 @@ Zutubi.pulse.project.TestFailuresTable = Ext.extend(Zutubi.table.ContentTable, {
 
     renderSuiteContents: function(suite, url, indent)
     {
-        var i, l;
+        var i, l, child;
+
         if (suite.suites)
         {
             for (i = 0, l = suite.suites.length; i < l; i++)
             {
-                var child = suite.suites[i];
+                child = suite.suites[i];
                 this.renderSuite(child, url + encodeURIComponent(child.name) + '/', indent);
             }
         }

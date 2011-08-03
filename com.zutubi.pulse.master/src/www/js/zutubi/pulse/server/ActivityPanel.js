@@ -21,7 +21,9 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             items: [{
                 xtype: 'panel',
@@ -101,8 +103,10 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
     
     updateQueue: function(queuePrefix, queueRunning, togglePermitted)
     {
-        var stateItem = Ext.getCmp(queuePrefix + '-queue-state');
-        var toggleItem = Ext.getCmp(queuePrefix + '-queue-toggle');
+        var stateItem, toggleItem;
+
+        stateItem = Ext.getCmp(queuePrefix + '-queue-state');
+        toggleItem = Ext.getCmp(queuePrefix + '-queue-toggle');
         if (queueRunning)
         {
             stateItem.setIcon(window.baseUrl + '/images/cog.gif');
@@ -150,10 +154,12 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
     
     handleToggleResponse: function(options, success, response)
     {
+        var result;
+
         this.getToolbarEl().unmask();
         if (success)
         {
-            var result = Ext.util.JSON.decode(response.responseText);
+            result = Ext.util.JSON.decode(response.responseText);
             if (result.success)
             {
                 this.load();

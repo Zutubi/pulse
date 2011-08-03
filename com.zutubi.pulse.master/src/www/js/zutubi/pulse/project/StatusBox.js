@@ -30,10 +30,11 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     
     initComponent: function()
     {
+        var fieldConfigs, i;
+
         this.titleTemplate = new Ext.XTemplate(this.titleTemplate);
 
-        var fieldConfigs = this.fields;
-        var i;
+        fieldConfigs = this.fields;
         this.fields = [];
         for (i = 0; i < fieldConfigs.length; i++)
         {
@@ -43,7 +44,9 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     
     onRender: function(container, position)
     {
-        var args = {
+        var args;
+
+        args = {
             id: this.id,
             health: this.getHealth()
         };
@@ -101,14 +104,15 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     
     renderData: function(/*data*/)
     {
-        var i, l;
+        var i, l, field, args;
+
         this.titleTemplate.overwrite(this.titleEl, this.data);
         for (i = 0, l = this.fields.length; i < l; i++)
         {
-            var field = this.fields[i];
+            field = this.fields[i];
             if (this.data.hasOwnProperty(field.name) && this.data[field.name] != null)
             {
-                var args = {
+                args = {
                     id: this.id + '-' + field.name,
                     key: field.key,
                     value: field.getRenderedValue(this.data),
@@ -122,11 +126,13 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     
     update: function(data)
     {
-        var originalHealth = this.data ? this.getHealth() : '';
+        var originalHealth, newHealth;
+
+        originalHealth = this.data ? this.getHealth() : '';
         this.data = data;
         if (this.rendered)
         {
-            var newHealth = this.getHealth();
+            newHealth = this.getHealth();
             if (newHealth != originalHealth)
             {
                 this.el.replaceClass(originalHealth + '-box', newHealth + '-box');
@@ -141,7 +147,9 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
     },
     
     clearDataRows: function(/*data*/) {
-         var els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
+         var els;
+
+         els = this.tbodyEl.select('.' + Zutubi.table.CLASS_DYNAMIC);
          els.remove();
     }
 });

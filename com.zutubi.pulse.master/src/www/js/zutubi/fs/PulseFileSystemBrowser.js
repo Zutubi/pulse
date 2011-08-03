@@ -38,13 +38,15 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     defaultTreeConfig: {},
 
-    initComponent: function() {
+    initComponent: function()
+    {
+        var statusBar;
 
         Zutubi.fs.PulseFileSystemBrowser.superclass.initComponent.apply(this, arguments);
 
         this.target = Ext.getCmp(this.target);
 
-        var statusBar = new Ext.ux.StatusBar({
+        statusBar = new Ext.ux.StatusBar({
             defaultText: '',
             useDefaults: true
         });
@@ -64,7 +66,9 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         }, this);
         this.loader.on('load', function(self, node, response)
         {
-            var data = Ext.util.JSON.decode(response.responseText);
+            var data;
+
+            data = Ext.util.JSON.decode(response.responseText);
             if (data.actionErrors && data.actionErrors.length > 0)
             {
                 statusBar.setStatus({
@@ -137,8 +141,10 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
 
     onSubmit: function()
     {
-        var node = this.tree.getSelectionModel().getSelectedNode();
-        var p = node.getPath('baseName');
+        var node, p;
+
+        node = this.tree.getSelectionModel().getSelectedNode();
+        p = node.getPath('baseName');
         if (!this.tree.rootVisible)
         {
             p = p.substring(this.tree.root.attributes.baseName.length + 1);
@@ -159,11 +165,13 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         this.initialLoadingMask.show();
     },
 
-    hideMask: function() {
+    hideMask: function()
+    {
         this.initialLoadingMask.hide();
     },
 
-    onSelectionChange: function(selectionModel, node) {
+    onSelectionChange: function(selectionModel, node)
+    {
         if (node)
         {
             if (this.submitButton.disabled)
@@ -181,7 +189,8 @@ Zutubi.fs.PulseFileSystemBrowser = Ext.extend(Ext.Window, {
         }
     },
 
-    show: function() {
+    show: function()
+    {
         Zutubi.fs.PulseFileSystemBrowser.superclass.show.apply(this, arguments);
 
         if (this.target)
@@ -271,9 +280,11 @@ Zutubi.fs.ReloadSelectedNodeButton = Ext.extend(Ext.Button, {
 
     onClick: function()
     {
+        var node;
+
         if (!this.disabled)
         {
-            var node = this.tree.getSelectionModel().getSelectedNode();
+            node = this.tree.getSelectionModel().getSelectedNode();
             if (node === null)
             {
                 node = this.tree.getRootNode();
@@ -317,7 +328,9 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
 
     onClick: function()
     {
-        var that = this;
+        var that;
+
+        that = this;
         Ext.MessageBox.confirm('confirm', 'Are you sure you want to delete the folder?', function(btn)
         {
             if (btn == 'yes')
@@ -329,12 +342,13 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
 
     onDelete: function()
     {
+        var path;
+
         this.sbar.setStatus({
             text: 'Deleting folder...'
         });
 
-        var path = this.tree.getSelectedConfigPath();
-
+        path = this.tree.getSelectedConfigPath();
         Ext.Ajax.request({
             url: this.baseUrl + '/ajax/rmdir.action',
             params: {
@@ -359,7 +373,9 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
     onSuccess: function(response, options)
     {
         // check for errors.
-        var decodedResponse = Ext.util.JSON.decode(response.responseText);
+        var decodedResponse, deletedNode, deletedPath;
+
+        decodedResponse = Ext.util.JSON.decode(response.responseText);
         if (decodedResponse.actionErrors[0])
         {
             this.sbar.setStatus({
@@ -375,7 +391,7 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
             clear: true // auto-clear after a set interval
         });
 
-        var deletedNode = this.tree.getSelectionModel().getSelectedNode();
+        deletedNode = this.tree.getSelectionModel().getSelectedNode();
         if (deletedNode.previousSibling)
         {
             deletedNode.previousSibling.select();
@@ -389,7 +405,7 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
             deletedNode.parentNode.select();
         }
 
-        var deletedPath = this.tree.toConfigPathPrefix(deletedNode.getPath('baseName'));
+        deletedPath = this.tree.toConfigPathPrefix(deletedNode.getPath('baseName'));
         this.tree.removeNode(deletedPath);
     }
 });
@@ -416,7 +432,9 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
 
     onClick: function()
     {
-        var that = this;
+        var that;
+
+        that = this;
         Ext.MessageBox.prompt('create folder', 'folder name:', function(btn, txt)
         {
             if (btn == 'ok')
@@ -428,12 +446,13 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
 
     onOk: function(name)
     {
+        var path;
 
         this.sbar.setStatus({
             text: 'Creating folder...'
         });
         this.newFolderName = name;
-        var path = this.tree.getSelectedConfigPath();
+        path = this.tree.getSelectedConfigPath();
 
         Ext.Ajax.request({
             url: this.baseUrl + '/ajax/mkdir.action',
@@ -459,7 +478,9 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
     onSuccess: function(response, options)
     {
         // check for errors.
-        var decodedResponse = Ext.util.JSON.decode(response.responseText);
+        var decodedResponse, name, selected, newFolder;
+
+        decodedResponse = Ext.util.JSON.decode(response.responseText);
         if (decodedResponse.actionErrors[0])
         {
             this.sbar.setStatus({
@@ -475,20 +496,20 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
             clear: true // auto-clear after a set interval
         });
 
-        var name = this.newFolderName;
+        name = this.newFolderName;
 
-        var selected = this.tree.getSelectionModel().getSelectedNode();
+        selected = this.tree.getSelectionModel().getSelectedNode();
         if (!selected.expanded)
         {
             selected.expand(false, true, function(node){
-                var newFolder = node.findChild('baseName', name);
+                newFolder = node.findChild('baseName', name);
                 newFolder.select();
             });
         }
         else
         {
             this.tree.addNode(this.tree.getSelectedConfigPath(), { baseName: name, text: name, leaf: false });
-            var newFolder = selected.findChild('baseName', name);
+            newFolder = selected.findChild('baseName', name);
             newFolder.attributes['baseName'] = name; // since everything else uses baseName, lets add it here.
             newFolder.select();
         }

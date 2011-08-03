@@ -21,21 +21,22 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
         },
         
         getAgentMenuItems: function(agent) {
-            var encodedName = encodeURIComponent(agent.name);
-            var agentUrl = 'agents/' + encodedName + '/';
-            var actionsUrl = agentUrl + 'actions/';
-            var result = [
+            var encodedName, agentUrl, actionsUrl, result, i, len, action;
+
+            encodedName = encodeURIComponent(agent.name);
+            agentUrl = 'agents/' + encodedName + '/';
+            actionsUrl = agentUrl + 'actions/';
+            result = [
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'status', 'magnifier.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'statistics', 'chart_bar.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'history', 'time.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'info', 'information.gif'),
                 Zutubi.pulse.agent.renderers.getAgentTabMenuItem(agentUrl, 'messages', 'script.gif')
             ];
-            var i, len;
-            
+
             for (i = 0, len = agent.actions.length; i < len; i++)
             {
-                var action = agent.actions[i];
+                action = agent.actions[i];
                 result.push({
                     id: action.action,
                     title: action.label,
@@ -66,6 +67,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
 
         agentStatus: function(status, agent) {
             var statusType;
+
             if (status == 'synchronising' ||
                 status == 'synchronised' || 
                 status.indexOf('host upgrading') >= 0)

@@ -12,17 +12,21 @@ Zutubi.tree.ConfigTreeLoader = function(base)
 Ext.extend(Zutubi.tree.ConfigTreeLoader, Ext.tree.TreeLoader, {
     getNodeURL: function(node)
     {
-        var tree = node.getOwnerTree();
-        var path = tree.toConfigPathPrefix(node.getPath('baseName'));
+        var tree, path;
+
+        tree = node.getOwnerTree();
+        path = tree.toConfigPathPrefix(node.getPath('baseName'));
         return this.dataUrl + '/' + encodeURIPath(path);
     },
 
     requestData: function(node, callback)
     {
+        var params, cb;
+
         if(this.fireEvent("beforeload", this, node, callback))
         {
-            var params = this.getParams(node);
-            var cb = {
+            params = this.getParams(node);
+            cb = {
                 success: this.handleResponse,
                 failure: this.handleFailure,
                 scope: this,

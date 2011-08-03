@@ -43,7 +43,9 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     initComponent: function(container, position)
     {
-        var panel = this;
+        var panel;
+
+        panel = this;
         Ext.apply(this, {
             defaults: {
                 layout: 'fit',
@@ -217,7 +219,9 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     deleteBuild: function()
     {
-        var ownerArg = this.personal ? 'personal=true' : 'projectName=' + encodeURIComponent(this.projectName);
+        var ownerArg;
+
+        ownerArg = this.personal ? 'personal=true' : 'projectName=' + encodeURIComponent(this.projectName);
         confirmUrl('Are you sure you wish to delete this build?', window.baseUrl + '/deleteBuild.action?' + ownerArg + '&buildVID=' + this.buildNumber);
     },
 
@@ -248,9 +252,11 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     triggerHook: function(hookHandle)
     {
+        var params;
+
         hideStatus(false);
         
-        var params = {
+        params = {
             buildVID: this.buildNumber,
             hook: hookHandle
         };
@@ -269,7 +275,9 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
             params: params,
             success: function(transport, options)
             {
-                var response = eval("(" + transport.responseText + ")");
+                var response;
+
+                response = eval("(" + transport.responseText + ")");
                 if(response.success)
                 {
                     showStatus(response.detail, 'success');
