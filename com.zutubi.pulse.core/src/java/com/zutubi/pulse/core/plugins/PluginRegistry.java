@@ -49,6 +49,7 @@ public class PluginRegistry
      * Register a new plugin
      *
      * @param id uniquely identifying the plugin
+     * @return an entry for the new plugin
      */
     public PluginRegistryEntry register(String id)
     {
@@ -88,11 +89,6 @@ public class PluginRegistry
     public List<String> getRegistrations()
     {
         return new LinkedList<String>(entries.keySet());
-    }
-
-    public boolean hasEntry(String id)
-    {
-        return entries.containsKey(id);
     }
 
     public PluginRegistryEntry getEntry(String id)

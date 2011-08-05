@@ -137,6 +137,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                         try
                         {
                             // instantiate the tasks.
+                            @SuppressWarnings("unchecked")
                             Class<UpgradeTask> upgradeClazz = (Class<UpgradeTask>) plugin.loadClass(holder.getClazz());
                             
                             // create the upgradeableComponent.
@@ -164,13 +165,14 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                PluginVersion registryVersion = new PluginVersion(entry.get(PLUGIN_VERSION_KEY));
-                if (registryVersion == null)
+                String version = entry.get(PLUGIN_VERSION_KEY);
+                if (version == null)
                 {
                     LOG.warning("Unexpected null version string in plugin registry for " + plugin.getId() + ".");
                     continue;
                 }
-                
+
+                PluginVersion registryVersion = new PluginVersion(version);
                 // we should check for older versions here... can we go back?, and if we do, what happens to the
                 // registry version.
                 if (registryVersion.compareTo(plugin.getVersion()) != 0)

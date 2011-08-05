@@ -4,3 +4,4 @@ Bundle-Description: Fundamental pulse commands and post-processors, upon which s
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.4.0
 Export-Package: com.zutubi.pulse.core.commands.core
+Require-Bundle: com.zutubi.pulse.core; bundle-version="[2.4.0,2.5.0)"
