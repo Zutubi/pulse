@@ -1004,7 +1004,15 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void addCommonScmProperties()
     {
-        Iterator<RecipeController> recipeIt = controllers.iterator();
+        Collection<RecipeController> filteredControllers = CollectionUtils.filter(controllers, new Predicate<RecipeController>()
+        {
+            public boolean satisfied(RecipeController recipeController)
+            {
+                return recipeController.getScmProperties() != null;
+            }
+        });
+
+        Iterator<RecipeController> recipeIt = filteredControllers.iterator();
         if (!recipeIt.hasNext())
         {
             return;
@@ -1014,10 +1022,7 @@ public class DefaultBuildController implements EventListener, BuildController
         while (recipeIt.hasNext())
         {
             final List<ResourceProperty> properties = recipeIt.next().getScmProperties();
-            if (properties != null)
-            {
-                CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
-            }
+            CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
         }
 
         for (ResourceProperty property: commonProperties)
