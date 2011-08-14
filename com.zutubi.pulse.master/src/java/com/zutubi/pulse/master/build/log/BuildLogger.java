@@ -18,7 +18,7 @@ public interface BuildLogger extends HookLogger
     void postBuildCompleted();
 
     void preIvyPublish();
-    void postIvyPublish();
+    void postIvyPublish(String... errors);
 
     MessageLogger getMessageLogger();
 }

@@ -84,9 +84,16 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
         logMarker("Publishing to internal repository...");
     }
 
-    public void postIvyPublish()
+    public void postIvyPublish(String... errors)
     {
-        logMarker("Publish to internal repository complete.");
+        if (errors.length == 0) {
+            logMarker("Publish to internal repository complete.");
+        } else {
+            logMarker("Publish to internal repository completed with errors:");
+            for (String error : errors) {
+                logMarker("    - " + error);
+            }
+        }
     }
 
     /**

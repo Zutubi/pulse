@@ -57,6 +57,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
@@ -949,6 +950,10 @@ public class DefaultBuildController implements EventListener, BuildController
                     // to subsequent builds.
                     publishIvyToRepository();
                 }
+                catch (BuildException e)
+                {
+                    buildResult.error(e);
+                }
                 catch (Exception e)
                 {
                     buildResult.error(new BuildException(e));
@@ -1069,14 +1074,20 @@ public class DefaultBuildController implements EventListener, BuildController
                     return null;
                 }
             });
+            buildLogger.postIvyPublish();
+        }
+        catch (UnknownHostException e)
+        {
+            buildLogger.postIvyPublish("Unknown host: " + e.getMessage());
+            throw new BuildException("Failed to publish the build artifacts to the repository because Pulse could not " +
+                    "contact host \""+e.getMessage()+"\". Please check the Administration | settings | master host " +
+                    "configuration is correct and the host accessible.", e);
         }
         catch (Exception e)
         {
-            throw new BuildException("Failed to publish the build's ivy file to the repository. Cause: " + e.getMessage(), e);
-        }
-        finally
-        {
-            buildLogger.postIvyPublish();
+            buildLogger.postIvyPublish(e.getClass().getName() + ": " + e.getMessage());
+            throw new BuildException("Failed to publish the build artifacts to the repository. " +
+                    e.getClass().getName() + ": " + e.getMessage(), e);
         }
     }
 
