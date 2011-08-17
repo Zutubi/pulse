@@ -226,7 +226,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     {
         var recordCache;
         
-        if (this.optionStore !== null)
+        if (this.optionStore)
         {
             recordCache = {};
             this.optionStore.each(function(record)
