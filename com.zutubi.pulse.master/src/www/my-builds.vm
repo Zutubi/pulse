@@ -18,7 +18,7 @@
                 containerId: 'nested-center',
                 refreshInterval: $refreshInterval,
                 columns: '#jss($columns)'.split(','),
-                version: '${version_number}',
+                version: '${version_number}'
             });
         });
     </script>
