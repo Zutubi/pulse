@@ -42,7 +42,7 @@ public class BuildStageModel extends ResultModel
         recipe = recipeResult.getRecipeName();
         agent = stageResult.getAgentName();
         tests = recipeResult.getTestSummary().toString();
-        if (!buildResult.isPersonal() || buildResult.getOwner().getName().equals(SecurityUtils.getLoggedInUsername()))
+        if (!buildResult.isPersonal() || buildResult.getUser().getLogin().equals(SecurityUtils.getLoggedInUsername()))
         {
             buildLink = Urls.getRelativeInstance().build(buildResult);
         }
