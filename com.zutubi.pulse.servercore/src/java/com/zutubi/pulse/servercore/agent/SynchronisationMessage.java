@@ -123,43 +123,4 @@ public class SynchronisationMessage
         result = 31 * result + arguments.hashCode();
         return result;
     }
-
-    //    @Override
-//    public boolean equals(Object o)
-//    {
-//        if (this == o)
-//        {
-//            return true;
-//        }
-//        if (o == null || getClass() != o.getClass())
-//        {
-//            return false;
-//        }
-//
-//        SynchronisationMessage that = (SynchronisationMessage) o;
-//
-//        if (id != that.id)
-//        {
-//            return false;
-//        }
-//        if (arguments != null ? !arguments.equals(that.arguments) : that.arguments != null)
-//        {
-//            return false;
-//        }
-//        if (typeName != null ? !typeName.equals(that.typeName) : that.typeName != null)
-//        {
-//            return false;
-//        }
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public int hashCode()
-//    {
-//        int result = (int) (id ^ (id >>> 32));
-//        result = 31 * result + (typeName != null ? typeName.hashCode() : 0);
-//        result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
-//        return result;
-//    }
 }

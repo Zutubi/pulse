@@ -45,6 +45,11 @@ public class MapSqueezerTest extends ZutubiTestCase
         roundTrip(asMap(asPair("k:1", "v,1"), asPair("k,2", "v:2")));
     }
 
+    public void testPercentCharacters() throws SqueezeException
+    {
+        roundTrip(asMap(asPair("k%1", "v%1")));
+    }
+
     public void testSomeNullKeys() throws SqueezeException
     {
         roundTrip(asMap(asPair(null, "v1"), asPair(1, "v2")));
