@@ -236,11 +236,6 @@ Zutubi.ConcreteProject.prototype = {
             this.rows[i].select('a').removeAllListeners();
             this.rows[i].select('span').removeAllListeners();
         }
-
-        for (key in this.renderedMenus)
-        {
-            this.renderedMenus[key].remove();
-        }
     }
 };
 
