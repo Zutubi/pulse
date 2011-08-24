@@ -172,7 +172,7 @@ public class MapSqueezer implements TypeSqueezer
     {
         public boolean satisfied(Character character)
         {
-            return character != KEY_VALUE_SEPARATOR && character != ENTRY_SEPARATOR;
+            return character != KEY_VALUE_SEPARATOR && character != ENTRY_SEPARATOR && character != '%';
         }
     }
 

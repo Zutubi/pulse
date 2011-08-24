@@ -3,10 +3,15 @@ package com.zutubi.pulse.servercore.agent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+
+import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
 
 public class SynchronisationTaskFactoryTest extends PulseTestCase
 {
+    private static final String TYPE_MAP = "MAP";
     private static final String TYPE_PROPERTY_TYPES = "PROPERTY_TYPES";
     private static final String TYPE_SIMPLE = "SIMPLE";
     private static final String TYPE_TRANSIENT = "TRANSIENT";
@@ -19,6 +24,7 @@ public class SynchronisationTaskFactoryTest extends PulseTestCase
     {
         synchronisationTaskFactory = new SynchronisationTaskFactory();
         synchronisationTaskFactory.setObjectFactory(new DefaultObjectFactory());
+        SynchronisationTaskFactory.registerType(TYPE_MAP, MapTask.class);
         SynchronisationTaskFactory.registerType(TYPE_PROPERTY_TYPES, PropertyTypesTask.class);
         SynchronisationTaskFactory.registerType(TYPE_SIMPLE, SimpleTask.class);
         SynchronisationTaskFactory.registerType(TYPE_TRANSIENT, TransientFieldTask.class);
@@ -27,18 +33,26 @@ public class SynchronisationTaskFactoryTest extends PulseTestCase
 
     public void testSimpleTask()
     {
-        final String TEST_VALUE = "param-value";
+        simpleValueHelper("param-value");
+    }
 
-        SimpleTask task = new SimpleTask(TEST_VALUE);
+    public void testEncodedString()
+    {
+        simpleValueHelper(encodeFilenameComponent("path value!"));
+    }
+
+    private void simpleValueHelper(String testValue)
+    {
+        SimpleTask task = new SimpleTask(testValue);
 
         SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
         assertEquals(TYPE_SIMPLE, message.getTypeName());
         Properties arguments = message.getArguments();
         assertEquals(1, arguments.size());
-        assertEquals(TEST_VALUE, arguments.get("param"));
-        
+        assertEquals(testValue, arguments.get("param"));
+
         SimpleTask fromProperties = (SimpleTask) synchronisationTaskFactory.fromMessage(message);
-        assertEquals(TEST_VALUE, fromProperties.param);
+        assertEquals(testValue, fromProperties.param);
     }
 
     public void testNullValue()
@@ -74,6 +88,22 @@ public class SynchronisationTaskFactoryTest extends PulseTestCase
         assertEquals(BOOLEAN_VALUE, fromProperties.booleanField);
     }
     
+    public void testMapTask()
+    {
+        final Map<String, String> TEST_MAP = new HashMap<String, String>();
+        TEST_MAP.put("key", "value");
+        TEST_MAP.put("encoded", encodeFilenameComponent("path value!"));
+        TEST_MAP.put(encodeFilenameComponent("encoded key!"), "non-encoded value");
+
+        MapTask task = new MapTask(TEST_MAP);
+        SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
+        Properties arguments = message.getArguments();
+        assertEquals(1, arguments.size());
+
+        MapTask fromProperties = (MapTask) synchronisationTaskFactory.fromMessage(message);
+        assertEquals(TEST_MAP, fromProperties.map);
+    }
+
     public void testMissingPrimitives()
     {
         SynchronisationMessage message = new SynchronisationMessage(SynchronisationTask.Type.TEST.name(), new Properties());
@@ -169,6 +199,24 @@ public class SynchronisationTaskFactoryTest extends PulseTestCase
             this.floatField = floatField;
             this.doubleField = doubleField;
             this.booleanField = booleanField;
+        }
+
+        public void execute()
+        {
+        }
+    }
+
+    public static class MapTask implements SynchronisationTask
+    {
+        private Map<String, String> map;
+
+        public MapTask()
+        {
+        }
+
+        public MapTask(Map<String, String> map)
+        {
+            this.map = map;
         }
 
         public void execute()

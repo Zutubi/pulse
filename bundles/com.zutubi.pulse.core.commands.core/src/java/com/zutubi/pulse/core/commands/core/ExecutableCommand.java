@@ -509,7 +509,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     private String extractCommandLine(ProcessBuilder builder)
     {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         boolean first = true;
 
         for (String part : builder.command())
