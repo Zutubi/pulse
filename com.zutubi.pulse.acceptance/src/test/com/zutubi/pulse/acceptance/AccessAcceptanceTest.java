@@ -3,12 +3,12 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.security.api.ApiPreAuthenticatedProcessingFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import static org.mortbay.http.HttpResponse.__200_OK;
-import static org.mortbay.http.HttpResponse.__401_Unauthorized;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static org.mortbay.http.HttpResponse.*;
 
 /**
  * A general bucket for user access and authentication related acceptance
@@ -44,18 +44,13 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
     public void testApiTokenForNonAdminUser() throws Exception
     {
         rpcClient.loginAsAdmin();
-
         rpcClient.RemoteApi.insertSimpleProject(random);
         rpcClient.RemoteApi.triggerBuild(random);
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
         String path = getBuildArtifactUrl(random);
-
-        String user = randomName();
-        rpcClient.RemoteApi.insertTrivialUser(user);
         rpcClient.logout();
 
-        String token = rpcClient.login(user, "");
-
+        String token = loginRegularUser();
         assertEquals(__200_OK, httpGet(path, token));
     }
 
@@ -72,7 +67,25 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
         assertEquals(__401_Unauthorized, httpGet(getBuildArtifactUrl(random), null));
     }
 
-    // get the url for the builds env.txt 
+    public void testAdminAjaxAccess() throws Exception
+    {
+        String adminAjaxUrl = baseUrl + "/ajax/admin/allPlugins.action";
+        assertEquals(__403_Forbidden, httpGet(adminAjaxUrl, null));
+        assertEquals(__403_Forbidden, httpGet(adminAjaxUrl, loginRegularUser()));
+        assertEquals(__200_OK, httpGet(adminAjaxUrl, rpcClient.loginAsAdmin()));
+    }
+
+    private String loginRegularUser() throws Exception
+    {
+        rpcClient.loginAsAdmin();
+        String user = randomName();
+        rpcClient.RemoteApi.insertTrivialUser(user);
+        rpcClient.logout();
+
+        return rpcClient.login(user, "");
+    }
+
+    // get the url for the builds env.txt
     private String getBuildArtifactUrl(String projectName) throws Exception
     {
         Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(projectName, 1);

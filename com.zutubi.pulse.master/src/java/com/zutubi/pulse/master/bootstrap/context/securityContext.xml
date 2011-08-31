@@ -55,7 +55,7 @@ based upon the Spring Security system.
             <security:filter-chain pattern="/css/**"        filters="none" />
             <security:filter-chain pattern="/images/**"     filters="none" />
             <security:filter-chain pattern="/favicon.*"     filters="none" />
-            <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
+            <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, apiPreAuthenticatedProcessingFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
             <security:filter-chain pattern="/**"            filters="securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, apiPreAuthenticatedProcessingFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
         </security:filter-chain-map>
         <property name="firewall"><bean class="com.zutubi.pulse.master.spring.web.context.OpenFirewall"/></property>
@@ -228,6 +228,7 @@ based upon the Spring Security system.
                 <security:intercept-url pattern="/admin/users/**" access="ADMINISTER" />
                 <security:intercept-url pattern="/admin/groups/**" access="ADMINISTER" />
                 <security:intercept-url pattern="/admin/plugins/**" access="ADMINISTER" />
+                <security:intercept-url pattern="/ajax/admin/**" access="ADMINISTER" />
                 <security:intercept-url pattern="/**" access="ROLE_GUEST,ROLE_USER" />
             </security:filter-security-metadata-source>
         </property>
