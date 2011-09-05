@@ -206,14 +206,6 @@
             <result name="success" type="redirect">${url}</result>
         </action>
 
-        <action name="cat" class="com.zutubi.pulse.master.xwork.actions.vfs.CatAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="stream">
-                <param name="contentType">${contentType}</param>
-                <param name="contentDisposition">filename="${filename}"</param>
-            </result>
-        </action>
-
         <action name="zip" class="com.zutubi.pulse.master.xwork.actions.vfs.ZipAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
