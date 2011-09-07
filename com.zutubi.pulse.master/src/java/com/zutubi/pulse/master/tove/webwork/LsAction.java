@@ -1,13 +1,16 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
+import com.zutubi.pulse.master.vfs.VfsManagerFactoryBean;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
 import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.apache.commons.vfs.*;
@@ -69,6 +72,8 @@ public class LsAction extends VFSActionSupport
      */
     private String filterFlag = null;
 
+    private StartupManager startupManager;
+
     public String getBasePath()
     {
         return basePath;
@@ -124,10 +129,19 @@ public class LsAction extends VFSActionSupport
         return listing;
     }
 
+    private void checkAccess()
+    {
+        if (VfsManagerFactoryBean.FS_LOCAL.equals(fs) && startupManager.isSystemStarted())
+        {
+            accessManager.ensurePermission(ServerPermission.ADMINISTER.name(), null);
+        }
+    }
+
     public String execute() throws Exception
     {
         try
         {
+            checkAccess();
             return doListing();
         }
         catch (FileSystemException e)
@@ -250,6 +264,11 @@ public class LsAction extends VFSActionSupport
         }
 
         return new DirectoryComparator();
+    }
+
+    public void setStartupManager(StartupManager startupManager)
+    {
+        this.startupManager = startupManager;
     }
 
     /**
