@@ -72,14 +72,15 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
+        String sessionToken = SessionTokenManager.getToken();
+        if (sessionToken != null)
+        {
+            context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
+            context.put("sessionToken", sessionToken);
+        }
+
         if (systemStarted)
         {
-            String sessionToken = SessionTokenManager.getToken();
-            if (sessionToken != null)
-            {
-                context.put("sessionToken", sessionToken);
-            }
-            
             GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.class);
             if (config != null)
             {

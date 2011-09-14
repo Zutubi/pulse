@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.util.RandomUtils;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.security.GeneralSecurityException;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Map;
  * The {@link com.zutubi.pulse.master.webwork.interceptor.SessionTokenInterceptor}
  * can be used to validate the token is submitted as required.
  */
+@SuppressWarnings({"unchecked"})
 public class SessionTokenManager
 {
     public static final String TOKEN_NAME = "pulse-session-token";
@@ -50,5 +52,21 @@ public class SessionTokenManager
         }
 
         return token;
+    }
+
+    public static void validateSessionToken()
+    {
+        Map<String, String[]> parameters = ActionContext.getContext().getParameters();
+        String[] tokens = parameters.get(TOKEN_NAME);
+        if (tokens == null || tokens.length == 0)
+        {
+            throw new AccessDeniedException("Missing session token");
+        }
+
+        String token = tokens[0];
+        if (!token.equals(getToken()))
+        {
+            throw new AccessDeniedException("Invalid session token");
+        }
     }
 }

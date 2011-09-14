@@ -1,14 +1,10 @@
 package com.zutubi.pulse.master.webwork.interceptor;
 
-import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionProxy;
 import com.opensymphony.xwork.interceptor.AroundInterceptor;
 import com.zutubi.pulse.master.tove.webwork.ToveActionSupport;
 import com.zutubi.pulse.master.webwork.SessionTokenManager;
-import org.springframework.security.access.AccessDeniedException;
-
-import java.util.Map;
 
 /**
  * An interceptor that requires a valid session token to be in the post parameters of the incoming
@@ -39,19 +35,7 @@ public class SessionTokenInterceptor extends AroundInterceptor
                 return;
             }
         }
-        
-        @SuppressWarnings({"unchecked"})
-        Map<String, String[]> parameters = ActionContext.getContext().getParameters();
-        String[] tokens = parameters.get(SessionTokenManager.TOKEN_NAME);
-        if (tokens == null || tokens.length == 0)
-        {
-            throw new AccessDeniedException("Missing session token");
-        }
 
-        String token = tokens[0];
-        if (!token.equals(SessionTokenManager.getToken()))
-        {
-            throw new AccessDeniedException("Invalid session token");
-        }
+        SessionTokenManager.validateSessionToken();
     }
 }

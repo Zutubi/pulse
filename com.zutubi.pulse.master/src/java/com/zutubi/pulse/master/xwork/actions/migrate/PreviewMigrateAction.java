@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
 import com.zutubi.pulse.master.tove.webwork.TransientAction;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 
 import java.io.File;
 import java.util.Properties;
@@ -18,7 +19,7 @@ import java.util.Properties;
  */
 
 //TODO: We should be able to simply render a form given a class name, then create / validate that class
-//TODO: again given that classname only.  That layer should be independant of the persistence mechanism,
+//TODO: again given that classname only.  That layer should be independent of the persistence mechanism,
 //TODO: and will make these random pages much easier to understand and add.
 
 public class PreviewMigrateAction extends TransientAction<MigrateDatabaseTypeConfiguration>
@@ -69,7 +70,8 @@ public class PreviewMigrateAction extends TransientAction<MigrateDatabaseTypeCon
 
     protected String complete(MigrateDatabaseTypeConfiguration instance) throws Exception
     {
-
+        SessionTokenManager.validateSessionToken();
+        
         if (!instance.getType().isEmbedded())
         {
             if (TextUtils.stringSet(instance.getDriverFile()))

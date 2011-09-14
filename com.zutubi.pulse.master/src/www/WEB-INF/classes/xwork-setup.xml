@@ -81,7 +81,7 @@
         </action>
 
         <action name="execute" class="com.zutubi.pulse.master.xwork.actions.upgrade.ExecuteUpgradeAction">
-            <interceptor-ref name="executeAndWaitStack"/>
+            <interceptor-ref name="executeAndWaitSideEffectStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="cancel" type="redirect">/setup/setup!input.action</result>
             <result name="success" type="velocity">complete.vm</result>
@@ -128,7 +128,7 @@
         </action>
 
         <action name="execute" class="com.zutubi.pulse.master.xwork.actions.restore.ExecuteRestoreAction">
-            <interceptor-ref name="executeAndWaitStack"/>
+            <interceptor-ref name="executeAndWaitSideEffectStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="success" type="velocity">complete.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

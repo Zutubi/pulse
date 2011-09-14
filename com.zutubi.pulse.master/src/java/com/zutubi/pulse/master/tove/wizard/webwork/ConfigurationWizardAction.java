@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.SingleTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.Wizard;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
@@ -181,6 +182,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
 
     private String doFinish()
     {
+        SessionTokenManager.validateSessionToken();
         getWizardInstance().doFinish();
         String newPath = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
         removeWizard();

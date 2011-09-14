@@ -244,15 +244,22 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
 
     triggerBuild: function(rebuild)
     {
-        showStatus('Triggering build...', 'working');
-        runAjaxRequest({
-            url: window.baseUrl + '/ajax/triggerBuild.action',
-            params: {
-                projectId: this.projectId,
-                rebuild: rebuild
-            },
-            callback: this.handleAjaxResponse,
-            scope: this
-        });
+        if (this.data.prompt)
+        {
+            window.location = window.baseUrl + '/editBuildProperties!input.action?projectId=' + this.projectId + '&rebuild=' + rebuild;
+        }
+        else
+        {
+            showStatus('Triggering build...', 'working');
+            runAjaxRequest({
+                url: window.baseUrl + '/ajax/triggerBuild.action',
+                params: {
+                    projectId: this.projectId,
+                    rebuild: rebuild
+                },
+                callback: this.handleAjaxResponse,
+                scope: this
+            });
+        }
     }
 });

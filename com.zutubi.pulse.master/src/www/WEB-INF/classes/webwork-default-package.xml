@@ -87,6 +87,12 @@
                 <interceptor-ref name="execAndWait"/>
             </interceptor-stack>
 
+            <interceptor-stack name="executeAndWaitSideEffectStack">
+                <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="sessionToken"/>
+                <interceptor-ref name="execAndWait"/>
+            </interceptor-stack>
+
             <!-- Everything minus the hibernate session.  Not typically used for actions -->
             <interceptor-stack name="completeNoSession">
                 <interceptor-ref name="prepare"/>
@@ -203,7 +209,6 @@
                     <param name="excludeMethods">input,back,cancel</param>
                 </interceptor-ref>
                 <interceptor-ref name="errorHanding"/>
-                <interceptor-ref name="sessionToken"/>
             </interceptor-stack>
 
             <interceptor-stack name="ajaxConfigWizardStack">

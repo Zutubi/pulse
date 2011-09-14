@@ -42,7 +42,8 @@
     </p>
     <table class="form">
         <tr width="2">
-            <form id="execute" name="execute" action="$base/restore/execute.action" method="post">
+            <form id="execute" name="execute" method="post" action="$base/restore/execute.action" method="post">
+                <input type="hidden" name="$sessionTokenName" value="$sessionToken"/>
                 <td class="submit" colspan="1"><input type="submit" name="continue" value="continue" class="submit"tabindex="1"/></td>
             </form>
 
