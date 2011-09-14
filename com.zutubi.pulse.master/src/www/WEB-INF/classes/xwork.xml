@@ -624,6 +624,11 @@
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">status</result>
         </action>
+
+        <action name="agentAction" class="com.zutubi.pulse.master.xwork.actions.ajax.AgentActionAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
     </package>
 
     <package name="configAjax" namespace="/ajax/config" extends="default">

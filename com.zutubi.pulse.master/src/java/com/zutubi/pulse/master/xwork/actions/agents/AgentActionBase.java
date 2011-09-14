@@ -12,6 +12,7 @@ import com.zutubi.util.StringUtils;
 public class AgentActionBase extends ActionSupport
 {
     private String agentName;
+    private long agentId;
     private Agent agent;
     protected AgentManager agentManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -24,6 +25,16 @@ public class AgentActionBase extends ActionSupport
     public void setAgentName(String agentName)
     {
         this.agentName = agentName;
+    }
+
+    public long getAgentId()
+    {
+        return agentId;
+    }
+
+    public void setAgentId(long agentId)
+    {
+        this.agentId = agentId;
     }
 
     public String getu_agentName()
@@ -50,6 +61,15 @@ public class AgentActionBase extends ActionSupport
                 if(!configurationTemplateManager.isDeeplyValid(agent.getConfig().getConfigurationPath()))
                 {
                     throw new LookupErrorException("Agent configuration is invalid.");
+                }
+            }
+
+            if (agentId != 0)
+            {
+                agent = agentManager.getAgentById(agentId);
+                if (agent == null)
+                {
+                    throw new LookupErrorException("Unknown agent id '" + agentId + "'");
                 }
             }
         }

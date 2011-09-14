@@ -223,7 +223,7 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
             }
             else
             {
-                showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+                showStatus(Ext.util.Format.htmlEncode(result.status.message || result.detail), 'failure');
             }
         }
         else
