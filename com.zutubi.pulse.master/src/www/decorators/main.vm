@@ -76,7 +76,8 @@
             Ext.MessageBox.buttonText.no = 'no';
             Ext.MessageBox.buttonText.ok = 'ok';
             Ext.MessageBox.buttonText.cancel = 'cancel';
-
+            Ext.Ajax.timeout = $ajaxTimeout;
+            
             window.formSubmitting = false;
             window.baseUrl = '$base';
             window.sessionToken = '$sessionToken';

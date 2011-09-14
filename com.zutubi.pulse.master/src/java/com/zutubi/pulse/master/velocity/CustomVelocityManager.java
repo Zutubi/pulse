@@ -31,7 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 public class CustomVelocityManager extends VelocityManager
 {
     private static final int DEFAULT_REFRESH_INTERVAL = 60;
-
+    private static final String PROPERTY_AJAX_TIMEOUT = "pulse.ajax.timeout";
+    private static final int DEFAULT_AJAX_TIMEOUT = Integer.getInteger(PROPERTY_AJAX_TIMEOUT, 120000);
+    
     private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
@@ -78,6 +80,8 @@ public class CustomVelocityManager extends VelocityManager
             context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
             context.put("sessionToken", sessionToken);
         }
+
+        context.put("ajaxTimeout", DEFAULT_AJAX_TIMEOUT);
 
         if (systemStarted)
         {

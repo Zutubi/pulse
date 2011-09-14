@@ -62,7 +62,7 @@ public class TriggerBuildAction extends ProjectActionBase
 
         pauseForDramaticEffect();
 
-        result = new SimpleResult(true, "Build triggered");
+        result = new SimpleResult(true, "project build requested");
         return SUCCESS;
     }
 
