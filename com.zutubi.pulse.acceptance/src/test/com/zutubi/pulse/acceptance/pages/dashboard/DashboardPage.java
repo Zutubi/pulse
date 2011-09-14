@@ -43,7 +43,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // continue to test the link itself on non-Windows systems.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.evalExpression("hideDashboardGroup('" + WebUtils.formUrlEncode(group) + "')");
+            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardGroup('" + WebUtils.formUrlEncode(group) + "')");
         }
         else
         {
@@ -64,7 +64,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // As above, a workaround for Selenium/IE issues.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.evalExpression("hideDashboardProject('" + WebUtils.formUrlEncode(project) + "')");
+            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardProject('" + WebUtils.formUrlEncode(project) + "')");
         }
         else
         {

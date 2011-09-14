@@ -444,7 +444,6 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
-        getBrowser().waitForPageToLoad();
         home.waitFor();
         if (ignored)
         {
