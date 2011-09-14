@@ -20,10 +20,12 @@ public class ProjectHomeModel
     private List<ActionLink> actions = new LinkedList<ActionLink>();
     private List<ActionLink> links = new LinkedList<ActionLink>();
     private String url;
+    private boolean prompt;
 
-    public ProjectHomeModel(StatusModel status)
+    public ProjectHomeModel(StatusModel status, boolean prompt)
     {
         this.status = status;
+        this.prompt = prompt;
     }
 
     public ProjectResponsibilityModel getResponsibility()
@@ -99,6 +101,11 @@ public class ProjectHomeModel
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    public boolean isPrompt()
+    {
+        return prompt;
     }
 
     public static class StatusModel

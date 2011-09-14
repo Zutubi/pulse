@@ -14,7 +14,7 @@
             toggleSuccessfulTestRows('child-suites', filter == '');
             toggleSuccessfulTestRows('child-cases', filter == '');
 
-            Ext.Ajax.request({
+            runAjaxRequest({
                 url: '$base/ajax/setTestFilter.action',
                 params: {
                     buildId: '$buildResult.id',

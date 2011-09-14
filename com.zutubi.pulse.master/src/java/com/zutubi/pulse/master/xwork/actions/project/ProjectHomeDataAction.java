@@ -90,7 +90,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
             buildMapping.collectArtifactsForBuildId(latestCompletedResult.getId());
         }
 
-        model = new ProjectHomeModel(createStatusModel(latestCompletedResult, urls));
+        model = new ProjectHomeModel(createStatusModel(latestCompletedResult, urls), projectConfig.getOptions().getPrompt());
         addActivity(queued, inProgress, buildMapping);
         addRecent(latestCompleted, buildMapping);
         addChanges();

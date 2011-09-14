@@ -90,14 +90,6 @@ function setFormEnableState(formId, checkboxId, includeSubmit, inverse)
     }
 }
 
-function confirmUrl(message, url)
-{
-    if (confirm(message))
-    {
-        location.href = url;
-    }
-}
-
 // Function for opening a resource browse window used on several forms.
 //   - resourceId: ID of textbox to receive the resource name
 //   - versionId: ID of textbox to receive the resource version
@@ -255,7 +247,7 @@ function onConfigSelect(sm, node)
     }
 }
 
-function getAjaxCallback(maskedElement)
+function getAjaxCallbacks(maskedElement)
 {
     return {
         success: function(response)
@@ -293,12 +285,34 @@ function getAjaxCallback(maskedElement)
     };
 }
 
-function runAjaxRequest(url)
+function runAjaxRequest(urlOrConfig)
 {
-    var pane = Ext.get('nested-layout');
-    pane.mask('Please wait...');
+    var config,
+        pane,
+        callbacks;
+
+    if (typeof urlOrConfig === typeof '')
+    {
+        config = {url: urlOrConfig};
+    }
+    else
+    {
+        config = urlOrConfig;
+    }
+
+    config.method = 'POST';
+    config.params = config.params || {};
+    config.params['pulse-session-token'] = window.sessionToken;
+
+    if (!config.callback && !config.success)
+    {
+        pane = Ext.get('nested-layout');
+        Ext.apply(config, getAjaxCallbacks(pane));
+        pane.mask('Please wait...');
+    }
+
     window.actionInProgress = true;
-    Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
+    Ext.Ajax.request(config);
 }
 
 function selectPath(path)
@@ -482,7 +496,7 @@ function showPromptDialog(title, message, prompt, multiline, statusMesage, url, 
                     }
 
                     showStatus(statusMesage , 'working');
-                    Ext.Ajax.request({
+                    runAjaxRequest({
                         url: window.baseUrl + url,
                         params: params,
                         callback: handleDialogResponse
@@ -510,7 +524,7 @@ function takeResponsibility(projectId)
 function clearResponsibility(projectId)
 {
     showStatus('Clearing responsibility...', 'working');
-    Ext.Ajax.request({
+    runAjaxRequest({
         url: window.baseUrl + '/ajax/clearResponsibility.action',
         params: { projectId: projectId },
         callback: handleDialogResponse
@@ -590,7 +604,7 @@ function handleCancelResponse(options, success, response)
 function cancelQueuedBuild(id)
 {
     showStatus('Cancelling queued build...', 'working');
-    Ext.Ajax.request({
+    runAjaxRequest({
         url: window.baseUrl + '/ajax/cancelQueuedBuild.action',
         params: { id: id },
         callback: handleCancelResponse
@@ -600,7 +614,7 @@ function cancelQueuedBuild(id)
 function cancelBuild(id, kill)
 {
     showStatus('Requesting build termination...', 'working');
-    Ext.Ajax.request({
+    runAjaxRequest({
         url: window.baseUrl + '/ajax/cancelBuild.action',
         params: { buildId: id, kill: kill },
         callback: handleCancelResponse

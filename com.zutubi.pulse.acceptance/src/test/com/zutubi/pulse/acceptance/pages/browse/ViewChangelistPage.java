@@ -52,6 +52,7 @@ public class ViewChangelistPage extends SeleniumPage
     public void waitFor()
     {
         super.waitFor();
+        browser.waitForVariable("panel");
         browser.waitForVariable("panel.initialised");
     }
 

@@ -3,10 +3,14 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import com.zutubi.pulse.master.agent.*;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentSorter;
+import com.zutubi.pulse.master.agent.DefaultAgentSorter;
 import com.zutubi.pulse.master.events.AgentAvailableEvent;
 import com.zutubi.pulse.master.events.AgentConnectivityEvent;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
@@ -21,9 +25,11 @@ import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.i18n.Messages;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -129,6 +135,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     public void enqueue(RecipeAssignmentRequest assignmentRequest)
     {
+        LOG.debug("enqueue(" + assignmentRequest.getRequest().getId() + "): started");
         RecipeErrorEvent error = null;
 
         try
@@ -173,10 +180,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             // Publish outside the lock.
             eventManager.publish(error);
         }
+
+        LOG.debug("enqueue(" + assignmentRequest.getRequest().getId() + "): done");
     }
 
     private void addToQueue(RecipeAssignmentRequest assignmentRequest)
     {
+        LOG.debug("Adding request " + assignmentRequest.getRequest().getId() + " to the queue");
         requestQueue.add(assignmentRequest);
         assignmentRequest.queued(clock.getCurrentTimeMillis());
         lockCondition.signal();
@@ -196,6 +206,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     public boolean cancelRequest(final long recipeId)
     {
+        LOG.debug("cancelRequest(" + recipeId + "): started");
         boolean removed = false;
 
         try
@@ -211,6 +222,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             if (removeRequest != null)
             {
+                LOG.debug("Removing request " + removeRequest.getRequest().getId() + " from the queue");
                 requestQueue.remove(removeRequest);
                 removed = true;
             }
@@ -220,6 +232,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             lock.unlock();
         }
 
+        LOG.debug("cancelRequest(" + recipeId + "): done");
         return removed;
     }
 
@@ -232,6 +245,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private void resetTimeoutsForAgent(Agent agent)
     {
+        LOG.debug("resetTimeoutsForAgent(" + agent.getName() + "): started");
         lock.lock();
         try
         {
@@ -248,6 +262,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             lock.unlock();
         }
+        LOG.debug("resetTimeoutsForAgent(" + agent.getName() + "): done");
     }
 
     /**
@@ -256,6 +271,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     void offline()
     {
+        LOG.debug("offline(): started");
         List<RecipeAssignmentRequest> removedRequests = null;
 
         lock.lock();
@@ -283,6 +299,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             publishUnfulfillable(removedRequests);
         }
+        LOG.debug("offline(): done");
     }
 
     private void checkQueuedTimeouts(long timeout)
@@ -343,6 +360,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             while (!stopRequested)
             {
+                LOG.finer("Begin assignment loop");
                 final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
                 long currentTime = clock.getCurrentTimeMillis();
 
@@ -362,15 +380,19 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                 });
                 
+                LOG.finest("  agent pool acquired");
                 for (final RecipeAssignmentRequest request : requestQueue)
                 {
+                    final long recipeId = request.getRequest().getId();
                     if (request.hasTimedOut(currentTime))
                     {
+                        LOG.finest("  request " + recipeId + " timed out");
                         doneRequests.add(request);
-                        eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("recipe.assignment.timeout")));
+                        eventManager.publish(new RecipeErrorEvent(this, recipeId, I18N.format("recipe.assignment.timeout")));
                     }
                     else
                     {
+                        LOG.finest("  trying to dispatch request " + recipeId);
                         agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
                         {
                             // Note that this method must be fast - we are locking agents.
@@ -393,6 +415,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                                     // can the request be sent to this service?
                                     if (request.isFulfilledBy(agent))
                                     {
+                                        LOG.finest("  dispatching request " + recipeId + " to agent '" + agent.getName() + "'");
                                         eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
                                         doneRequests.add(request);
                                         break;
@@ -403,6 +426,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                 }
 
+                LOG.finer("End assignment loop (dispatched " + doneRequests.size() + " requests)");
                 requestQueue.removeAll(doneRequests);
 
                 try

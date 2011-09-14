@@ -3,8 +3,10 @@ package com.zutubi.pulse.acceptance.pages.dashboard;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.user.UserResponsibilityModel;
+import com.zutubi.util.Condition;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.WebUtils;
 
@@ -33,7 +35,7 @@ public class DashboardPage extends ProjectsSummaryPage
         browser.waitForVariable("view.initialised");
     }
 
-    public void hideGroupAndWait(String group)
+    public void hideGroupAndWait(final String group)
     {
         // Under IE for some unknown reason selenium cannot find the group
         // hide element.  I have verified it exists with the expected id, and
@@ -41,29 +43,41 @@ public class DashboardPage extends ProjectsSummaryPage
         // continue to test the link itself on non-Windows systems.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.open(urls.base() + "user/hideDashboardGroup.action?groupName=" + WebUtils.formUrlEncode(group));
+            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardGroup('" + WebUtils.formUrlEncode(group) + "')");
         }
         else
         {
             clickGroupAction(group, ACTION_HIDE);
         }
-        browser.waitForPageToLoad();
-        waitFor();
+
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !isGroupPresent(group);
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "group to be hidden");
     }
 
-    public void hideProjectAndWait(String group, String project)
+    public void hideProjectAndWait(final String group, final String project)
     {
         // As above, a workaround for Selenium/IE issues.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.open(urls.base() + "user/hideDashboardProject.action?projectName=" + WebUtils.formUrlEncode(project));
+            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardProject('" + WebUtils.formUrlEncode(project) + "')");
         }
         else
         {
             clickProjectAction(group, project, ACTION_HIDE);
         }
-        browser.waitForPageToLoad();
-        waitFor();
+
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !isUngroupedProjectPresent(project);
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "project to be hidden");
     }
 
     public boolean hasResponsibilities()

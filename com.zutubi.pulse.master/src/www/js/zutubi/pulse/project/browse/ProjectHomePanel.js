@@ -131,8 +131,8 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                         clean: this.markForClean.createDelegate(this),
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
-                        trigger: window.baseUrl + '/triggerBuild.action?projectId=' + this.projectId,
-                        rebuild: window.baseUrl + '/triggerBuild.action?rebuild=true&projectId=' + this.projectId,
+                        trigger: this.triggerBuild.createDelegate(this, [false]),
+                        rebuild: this.triggerBuild.createDelegate(this, [true]),
                         viewSource: Zutubi.fs.viewWorkingCopy.createDelegate(window, [this.projectId])
                     }
                 }, {
@@ -188,21 +188,38 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         Ext.getCmp(this.id + '-right').getLayout().checkRows();
     },
     
-    handleMarkForCleanResponse: function(options, success, response)
+    handleAjaxResponse: function(options, success, response)
     {
+        var result,
+            message,
+            messageType;
+
         if (success)
         {
-            var result = Ext.util.JSON.decode(response.responseText);
+            result = Ext.util.JSON.decode(response.responseText);
             if (result.success)
             {
                 if (result.status)
                 {
-                    showStatus(result.status.message, result.status.type);
+                    message = result.status.message;
+                    messageType = result.status.type;
                 }
+                else if (result.detail)
+                {
+                    message = result.detail;
+                    messageType = 'success';
+                }
+
+                if (message)
+                {
+                    showStatus(message, messageType);
+                }
+
+                this.load();
             }
             else
             {
-                showStatus(Ext.util.Format.htmlEncode(result.detail), 'failure');
+                showStatus(Ext.util.Format.htmlEncode(result.status.message || result.detail), 'failure');
             }
         }
         else
@@ -214,10 +231,31 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     markForClean: function()
     {
         showStatus('Cleaning up build directories...', 'working');
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/config/projects/' + encodeURIComponent(this.data.status.name) + '?clean=clean',
-            callback: this.handleMarkForCleanResponse,
+            callback: this.handleAjaxResponse,
             scope: this
         });
+    },
+
+    triggerBuild: function(rebuild)
+    {
+        if (this.data.prompt)
+        {
+            window.location = window.baseUrl + '/editBuildProperties!input.action?projectId=' + this.projectId + '&rebuild=' + rebuild;
+        }
+        else
+        {
+            showStatus('Triggering build...', 'working');
+            runAjaxRequest({
+                url: window.baseUrl + '/ajax/triggerBuild.action',
+                params: {
+                    projectId: this.projectId,
+                    rebuild: rebuild
+                },
+                callback: this.handleAjaxResponse,
+                scope: this
+            });
+        }
     }
 });

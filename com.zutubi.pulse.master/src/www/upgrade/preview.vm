@@ -1,21 +1,4 @@
 <html>
-<head>
-    <script type="text/javascript">
-        Ext.onReady(function() {
-            var button = new Ext.Button({
-                id: 'continue',
-                text: 'continue',
-                renderTo: 'continue-anchor',
-                listeners: {
-                    click: function() {
-                        document.location = 'execute.action';
-                    }
-                }
-            });
-            button.render();
-        });
-    </script>
-</head>
 <body>
 <h1 id="upgrade.preview">Upgrade Preview</h1>
 <p>
@@ -69,6 +52,10 @@
 
     <div style="text-align: center; margin-top: 20px">
         <div id="continue-anchor" style="margin: 0 auto; width: 100px">
+            <form id="execute" name="execute" method="post" action="$base/upgrade/execute.action" method="post">
+                <input type="hidden" name="$sessionTokenName" value="$sessionToken"/>
+                <input type="submit" name="continue" value="continue" class="submit" tabindex="1"/>
+            </form>
         </div>
     </div>
 </div>

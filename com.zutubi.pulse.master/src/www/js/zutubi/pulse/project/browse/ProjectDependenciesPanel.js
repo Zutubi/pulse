@@ -76,7 +76,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActiveP
                             select: function(combo) {
                                 panel.loading = true;
                                 panel.el.mask('Updating...');
-                                Ext.Ajax.request({
+                                runAjaxRequest({
                                     url: window.baseUrl + '/ajax/setDependenciesTransitiveMode.action',
                                     params: {
                                         mode: combo.getValue()

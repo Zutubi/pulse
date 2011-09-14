@@ -279,6 +279,10 @@ Ext.extend(Zutubi.TailSettingsWindow, Ext.Window, {
             bodyStyle: 'padding: 10px; background: transparent;',
             border: false,
             items: [{
+                xtype: 'hidden',
+                name: 'pulse-session-token',
+                value: window.sessionToken
+            }, {
                 xtype: 'textfield',
                 name: 'maxLines',
                 id: 'settings-max-lines',
@@ -651,7 +655,7 @@ if(Ext.ux.tree) { Zutubi.ArtifactsTree = Ext.extend(Ext.ux.tree.TreeGrid,
 
     saveFilterFlag: function(flag)
     {
-        Ext.Ajax.request({
+        runAjaxRequest({
            url: window.baseUrl + '/ajax/saveArtifactsFilter.action',
            success: function() { showStatus('Filter saved.','success'); },
            failure: function() { showStatus('Unable to save filter.','failure'); },
@@ -718,7 +722,7 @@ Ext.extend(Zutubi.PluginsTree, Zutubi.tree.ConfigTree,
         }
 
         var pluginsTree = this;
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/admin/' + action + 'Plugin.action?id=' + id,
 
             success: function()

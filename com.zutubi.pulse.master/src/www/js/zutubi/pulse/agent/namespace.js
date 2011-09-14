@@ -40,7 +40,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
                     id: action.action,
                     title: action.label,
                     image: 'config/actions/' + action.icon + '.gif',
-                    url: actionsUrl + action.action + '/'
+                    onclick: 'agentAction(\'' + agent.id + '\', \'' + action.action + '\'); return false'
                 });
             }
             

@@ -141,7 +141,7 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
     toggleQueue: function(queueName)
     {
         this.getToolbarEl().mask();
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/toggleQueue.action',
             params: { queueName: queueName },
             callback: this.handleToggleResponse.createDelegate(this)

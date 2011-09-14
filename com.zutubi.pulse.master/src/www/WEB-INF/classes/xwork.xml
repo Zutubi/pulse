@@ -33,10 +33,6 @@
             <result name="success" type="velocity">/agents.vm</result>
         </action>
 
-        <action name="agentAction" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionAction">
-            <result name="success" type="redirect">${redirect}</result>
-        </action>
-
         <action name="serverActivity" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/server-activity.vm</result>
@@ -181,16 +177,12 @@
             <result name="success" type="velocity">/view-changelist.vm</result>
         </action>
 
-        <action name="triggerBuild" class="com.zutubi.pulse.master.xwork.actions.project.TriggerBuildAction">
-            <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
-            <result name="prompt" type="chain">editBuildProperties!input</result>
-        </action>
-
         <action name="editBuildProperties!input" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction" method="doInput">
             <result name="input" type="velocity">/edit-build-properties.vm</result>
         </action>
 
         <action name="editBuildProperties" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction">
+            <interceptor-ref name="completeSideEffectStack"/>
             <result name="input" type="velocity">/edit-build-properties.vm</result>
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
             <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
@@ -265,11 +257,6 @@
             <result name="success" type="redirect">/viewSystemInfo.action</result>
         </action>
 
-        <action name="deleteBuild" class="com.zutubi.pulse.master.xwork.actions.project.DeleteBuildAction">
-            <result name="personal" type="redirect">/dashboard/my/</result>
-            <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
-        </action>
-
         <action name="rss" class="com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction">
             <interceptor-ref name="completeReadOnlyStack"/>
         </action>
@@ -280,7 +267,7 @@
 
         <action name="home" class="com.zutubi.pulse.master.xwork.actions.user.DashboardAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">/dashboard.vm</result>
+              <result name="success" type="velocity">/dashboard.vm</result>
             <result name="guest" type="redirect">/browse.action</result>
         </action>
 
@@ -301,7 +288,7 @@
     </package>
 
     <package name="user" namespace="/user" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
+        <default-interceptor-ref name="completeSideEffectStack"/>
 
         <action name="hideDashboardProject" class="com.zutubi.pulse.master.xwork.actions.user.HideDashboardProjectAction">
             <result name="success" type="redirect">/dashboard/home/</result>
@@ -337,7 +324,7 @@
         </action>
 
         <action name="triggerBackup" class="com.zutubi.pulse.master.xwork.actions.admin.debug.TriggerBackupAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
+            <interceptor-ref name="defaultReadOnlySideEffectStack"/>
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
@@ -347,14 +334,17 @@
         </action>
 
         <action name="addSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doAdd">
+            <interceptor-ref name="completeSideEffectStack"/>
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
         
         <action name="removeSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doRemove">
+            <interceptor-ref name="completeSideEffectStack"/>
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
         <action name="installPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.InstallPluginAction">
+            <interceptor-ref name="completeSideEffectStack"/>
             <result name="input" type="velocity">addplugin.vm</result>
             <result name="error" type="velocity">addplugin.vm</result>
             <result name="success" type="redirect">/admin/plugins/</result>
@@ -398,7 +388,7 @@
         </action>
 
         <action name="saveProjectsLayout" class="com.zutubi.pulse.master.xwork.actions.project.SaveProjectsLayoutAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
 
@@ -500,17 +490,25 @@
             <result name="error" type="httpheader">500</result>
         </action>
 
+        <action name="deleteBuild" class="com.zutubi.pulse.master.xwork.actions.project.DeleteBuildAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
+            <result name="success" type="httpheader">200</result>
+        </action>
+
         <action name="toggleQueue" class="com.zutubi.pulse.master.xwork.actions.server.ToggleQueueAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
             <result name="error" type="httpheader">500</result>
         </action>
 
         <action name="cancelQueuedBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelQueuedBuildAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
             <result name="error" type="httpheader">500</result>
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelBuildAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
             <result name="error" type="httpheader">500</result>
         </action>
@@ -524,6 +522,7 @@
         </action>
 
         <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MakeDirectoryAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">
                 <param name="deep">true</param>
                 <param name="location">result</param>
@@ -535,6 +534,7 @@
         </action>
 
         <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RemoveDirectoryAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">
                 <param name="deep">true</param>
                 <param name="location">result</param>
@@ -546,22 +546,22 @@
         </action>
 
         <action name="customiseBuildColumns" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseBuildColumnsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
 
         <action name="customiseHistoryBuilds" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseHistoryBuildsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
 
         <action name="setDependenciesTransitiveMode" class="com.zutubi.pulse.master.xwork.actions.user.SetDependenciesTransitiveModeAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="setTestFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SetTestFilterAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
 
@@ -569,11 +569,18 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
+        <action name="triggerBuild" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
+
         <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="togglePin" class="com.zutubi.pulse.master.xwork.actions.ajax.TogglePinAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
@@ -587,32 +594,32 @@
         </action>
 
         <action name="takeResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.TakeResponsibilityAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="clearResponsibility" class="com.zutubi.pulse.master.xwork.actions.ajax.ClearResponsibilityAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="addComment" class="com.zutubi.pulse.master.xwork.actions.ajax.AddCommentAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="deleteComment" class="com.zutubi.pulse.master.xwork.actions.ajax.DeleteCommentAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="saveTailSettings" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveTailSettingsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
         <action name="saveArtifactsFilter" class="com.zutubi.pulse.master.xwork.actions.ajax.SaveArtifactsFilterAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="flexjson">result</result>
         </action>
 
@@ -625,16 +632,22 @@
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="flexjson">status</result>
         </action>
+
+        <action name="agentAction" class="com.zutubi.pulse.master.xwork.actions.ajax.AgentActionAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
+            <result name="success" type="flexjson">result</result>
+        </action>
     </package>
 
     <package name="configAjax" namespace="/ajax/config" extends="default">
-        <default-interceptor-ref name="ajaxConfigStack"/>
+        <default-interceptor-ref name="ajaxConfigSideEffectStack"/>
 
         <global-results>
             <result name="error" type="flexjson">configurationErrors</result>
         </global-results>
 
         <action name="display" class="com.zutubi.pulse.master.tove.webwork.DisplayAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <result name="custom" type="customVelocity"/>
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
@@ -642,10 +655,12 @@
         </action>
 
         <action name="dependentOptions" class="com.zutubi.pulse.master.tove.webwork.DependentOptionsAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <result name="success" type="flexjson">options</result>
         </action>
 
         <action name="help" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <result name="success" type="velocity">help.vm</result>
         </action>
 
@@ -686,6 +701,7 @@
         </action>
 
         <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="flexjson">
@@ -695,6 +711,7 @@
         </action>
 
         <action name="check" class="com.zutubi.pulse.master.tove.webwork.CheckAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">checkResponse</result>
         </action>
@@ -748,12 +765,15 @@
         </action>
 
         <action name="options" class="com.zutubi.pulse.master.tove.webwork.OptionsAction">
+            <interceptor-ref name="ajaxConfigStack"/>
             <result name="success" type="flexjson">options</result>
             <result name="error" type="velocity">error.vm</result>
         </action>
     </package>
 
     <package name="helpAjax" namespace="/ajax/help" extends="configAjax">
+        <default-interceptor-ref name="ajaxConfigStack"/>
+        
         <action name="type" class="com.zutubi.pulse.master.tove.webwork.help.TypeHelpAction">
             <result name="success" type="velocity">type.vm</result>
         </action>
@@ -773,7 +793,7 @@
         </action>
 
         <action name="wizardSelect" class="com.zutubi.pulse.master.tove.webwork.help.WizardSelectHelpAction">
-            <result name="success" type="velocity">select.vm</result>            
+            <result name="success" type="velocity">select.vm</result>
         </action>
 
         <action name="manualTrigger" class="com.zutubi.pulse.master.tove.webwork.help.ManualTriggerHelpAction">
@@ -808,7 +828,7 @@
     </package>
 
     <package name="adminAjax" namespace="/ajax/admin" extends="admin">
-        <default-interceptor-ref name="ajaxStack"/>
+        <default-interceptor-ref name="ajaxSideEffectStack"/>
 
         <action name="allPlugins" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>

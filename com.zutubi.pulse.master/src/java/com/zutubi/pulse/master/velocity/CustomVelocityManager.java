@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -30,7 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 public class CustomVelocityManager extends VelocityManager
 {
     private static final int DEFAULT_REFRESH_INTERVAL = 60;
-
+    private static final String PROPERTY_AJAX_TIMEOUT = "pulse.ajax.timeout";
+    private static final int DEFAULT_AJAX_TIMEOUT = Integer.getInteger(PROPERTY_AJAX_TIMEOUT, 120000);
+    
     private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
@@ -70,6 +73,15 @@ public class CustomVelocityManager extends VelocityManager
         context.put("version_number", v.getVersionNumber());
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
+
+        String sessionToken = SessionTokenManager.getToken();
+        if (sessionToken != null)
+        {
+            context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
+            context.put("sessionToken", sessionToken);
+        }
+
+        context.put("ajaxTimeout", DEFAULT_AJAX_TIMEOUT);
 
         if (systemStarted)
         {

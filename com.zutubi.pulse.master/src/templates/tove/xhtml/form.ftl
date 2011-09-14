@@ -43,7 +43,12 @@ width of its contents.  Floating it works, but hurts other things.
             id: '${form.name?js_string}.submitField',
             name: 'submitField',
             value: 'h'
-        }]
+        } <#if sessionToken?exists> , {
+            xtype: 'hidden',
+            id: '${form.name?js_string}.sessionToken',
+            name: '${sessionTokenName}',
+            value: '${sessionToken}'
+        } </#if> ]
     });
 
     var bc;

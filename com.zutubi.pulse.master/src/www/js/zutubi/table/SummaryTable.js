@@ -333,7 +333,7 @@ Zutubi.table.SummaryTable = Ext.extend(Zutubi.table.ContentTable, {
         var params = this.saveParams || {};
         params.columns = columnsString;
         
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: this.saveUrl,
             params: params
         });

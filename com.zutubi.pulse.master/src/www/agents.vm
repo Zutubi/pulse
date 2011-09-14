@@ -9,6 +9,41 @@
     <title>#wwtext("name=agents")</title>
     <script type="text/javascript">
         var panel = null;
+
+        function handleActionResponse(options, success, response)
+        {
+            var result;
+            if (success)
+            {
+                result = Ext.util.JSON.decode(response.responseText);
+                if (result.success)
+                {
+                    window.location.reload(true);
+                }
+                else
+                {
+                    showStatus(Ext.util.Format.htmlEncode(result.message), 'failure');
+                }
+            }
+            else
+            {
+                showStatus('Cannot contact server', 'failure');
+            }
+        }
+
+        function agentAction(id, action)
+        {
+            Zutubi.FloatManager.hideAll();
+
+            runAjaxRequest({
+                url: window.baseUrl + '/ajax/agentAction.action',
+                params: {
+                    agentId: id,
+                    actionName: action
+                },
+                callback: handleActionResponse
+            });
+        }
         
         Ext.onReady(function() {
             panel = new Zutubi.pulse.agent.AgentsPanel({
