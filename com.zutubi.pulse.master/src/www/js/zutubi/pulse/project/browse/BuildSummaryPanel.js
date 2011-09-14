@@ -219,17 +219,41 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
     
     deleteBuild: function()
     {
-        var ownerArg;
+        var newLocation,
+            params;
 
-        ownerArg = this.personal ? 'personal=true' : 'projectName=' + encodeURIComponent(this.projectName);
-        confirmUrl('Are you sure you wish to delete this build?', window.baseUrl + '/deleteBuild.action?' + ownerArg + '&buildVID=' + this.buildNumber);
+        params = {
+            buildVID: this.buildNumber
+        };
+
+        if (this.personal)
+        {
+            newLocation = '/dashboard/my/';
+            params.personal = true;
+        }
+        else
+        {
+            newLocation = '/browse/projects/' + encodeURIComponent(this.projectName) + '/';
+            params.projectName = this.projectName;
+        }
+
+        if (confirm('Are you sure you wish to delete this build?'))
+        {
+            runAjaxRequest({
+               url: window.baseUrl + '/ajax/deleteBuild.action',
+               params: params,
+               callback: function() {
+                   window.location = window.baseUrl + newLocation;
+               }
+            });
+        }
     },
 
     togglePin: function(pin)
     {
         this.getEl().mask((pin ? 'Pinning' : 'Unpinning') + ' build...', 'working');
 
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/togglePin.action',
             params: {
                 buildId: this.buildId,
@@ -270,7 +294,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
              params.projectName = this.projectName;
         }
 
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/triggerBuildHook.action',
             params: params,
             success: function(transport, options)

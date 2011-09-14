@@ -14,7 +14,30 @@
         var myChangesTable;
         var myProjectsChangesTable;
 
-        function update(data) {
+        function hideDashboardProject(encodedName)
+        {
+            Zutubi.FloatManager.hideAll();
+            runAjaxRequest({
+                url: window.baseUrl + '/user/hideDashboardProject.action?projectName=' + encodedName,
+                callback: function() {
+                    view.load();
+                }
+            })
+        }
+
+        function hideDashboardGroup(encodedName)
+        {
+            Zutubi.FloatManager.hideAll();
+            runAjaxRequest({
+                url: window.baseUrl + '/user/hideDashboardGroup.action?groupName=' + encodedName,
+                callback: function() {
+                    view.load();
+                }
+            })
+        }
+
+        function update(data)
+        {
             var center = Ext.get('center');
             center.select('.note').remove();
 

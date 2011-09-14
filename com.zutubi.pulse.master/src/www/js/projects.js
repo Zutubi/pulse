@@ -157,6 +157,8 @@ Zutubi.ConcreteProject.prototype = {
         if (menuType === 'actions')
         {
             encodedName = encodeURIComponent(this.data.name);
+            encodedName = encodedName.replace(/'/g, "%27");
+            
             items = [{
                 id: 'home',
                 url: this.getProjectTabLink('home'),
@@ -192,7 +194,7 @@ Zutubi.ConcreteProject.prototype = {
 
                 if (this.data.prompt)
                 {
-                    item.url = 'triggerBuild.action?projectName=' + encodedName;
+                    item.url = 'editBuildProperties!input.action?projectName=' + encodedName;
                 }
                 else
                 {
@@ -215,7 +217,7 @@ Zutubi.ConcreteProject.prototype = {
             {
                 items.push({
                     id: 'hide',
-                    url: 'user/hideDashboardProject.action?projectName=' + encodedName,
+                    onclick: 'hideDashboardProject(\'' + encodedName + '\'); return false;',
                     image: 'close.gif'
                 });
             }
@@ -483,11 +485,14 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
                 '<img alt="health: warnings" src="{base}/images/health/warnings.gif"> warnings: {warningCount} ' +
                 '<img alt="health: broken" src="{base}/images/health/broken.gif"> broken: {brokenCount}&nbsp;' +
                 '<tpl if="rssEnabled"><a class="unadorned" id="rss.builds.{id}" href="{base}/rss.action?groupName={encodedName}" onclick="stopEventPropagation(event);"><img alt="rss" src="{base}/images/feed-icon-16x16.gif"></a>&nbsp;</tpl>' +
-                '<tpl if="showHideLinks &amp;&amp; labelled"><a class="unadorned" id="hide.{id}" href="{base}/user/hideDashboardGroup.action?groupName={encodedName}" onclick="stopEventPropagation(event);"><img alt="hide group" src="{base}/images/close.gif"></a></tpl>' +
+                '<tpl if="showHideLinks &amp;&amp; labelled"><a class="unadorned" id="hide.{id}" href="#" onclick="hideDashboardGroup(\'{encodedName}\'); stopEventPropagation(event); return false;"><img alt="hide group" src="{base}/images/close.gif"></a></tpl>' +
             '</td>').compile(),
 
     render: function(parentEl) {
-        var spacerClass;
+        var spacerClass,
+            encodedName;
+
+        encodedName = encodeURIComponent(this.data.groupName).replace(/'/g, "%27");
 
         this.el = this.template.append(parentEl, {
             id: this.data.id,
@@ -497,7 +502,7 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
             okCount: this.data.root.okCount,
             warningCount: this.data.root.warningCount,
             brokenCount: this.data.root.brokenCount,
-            encodedName: encodeURIComponent(this.data.groupName),
+            encodedName: encodedName,
             collapsed: this.model.collapsed ? 'project-collapsed' : '',
             columnCount: this.columnCount,
             rssEnabled: this.rssEnabled,
@@ -636,7 +641,7 @@ Zutubi.ProjectsTable.prototype = {
 
         tb = this.toolbar;
         tb.showBusy('Saving...');
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/saveProjectsLayout.action',
             params: { layout: Ext.util.JSON.encode(this.getCurrentLayout()), dashboard: this.isDashboard },
             callback: function() { tb.clearStatus({useDefaults: true}); }

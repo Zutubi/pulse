@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
@@ -73,6 +74,12 @@ public class CustomVelocityManager extends VelocityManager
 
         if (systemStarted)
         {
+            String sessionToken = SessionTokenManager.getToken();
+            if (sessionToken != null)
+            {
+                context.put("sessionToken", sessionToken);
+            }
+            
             GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.class);
             if (config != null)
             {

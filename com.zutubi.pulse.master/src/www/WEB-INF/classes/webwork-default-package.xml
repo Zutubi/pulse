@@ -48,6 +48,7 @@
             <interceptor name="configErrorHandling" class="com.zutubi.pulse.master.xwork.interceptor.ConfigErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.master.xwork.interceptor.HibernateSessionInterceptor"/>
             <interceptor name="readOnly" class="com.zutubi.pulse.master.xwork.interceptor.ReadOnlyInterceptor"/>
+            <interceptor name="sessionToken" class="com.zutubi.pulse.master.webwork.interceptor.SessionTokenInterceptor"/>
 
             <!-- Primitive stack with no hibernate session -->
             <interceptor-stack name="noSessionStack">
@@ -71,6 +72,12 @@
                 <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="readOnly"/>
                 <interceptor-ref name="noSessionStack"/>
+            </interceptor-stack>
+
+            <!-- Basic read only (DB-wise) actions with some side effects -->
+            <interceptor-stack name="defaultReadOnlySideEffectStack">
+                <interceptor-ref name="defaultReadOnlyStack"/>
+                <interceptor-ref name="sessionToken"/>
             </interceptor-stack>
 
             <!-- Execute and wait stack.
@@ -120,6 +127,11 @@
                 <interceptor-ref name="completeNoSession"/>
             </interceptor-stack>
 
+            <interceptor-stack name="completeSideEffectStack">
+                <interceptor-ref name="completeStack"/>
+                <interceptor-ref name="sessionToken"/>
+            </interceptor-stack>
+
             <interceptor-stack name="crudStack">
                 <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="prepare"/>
@@ -150,9 +162,19 @@
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
+            <interceptor-stack name="ajaxSideEffectStack">
+                <interceptor-ref name="ajaxStack"/>
+                <interceptor-ref name="sessionToken"/>
+            </interceptor-stack>
+
             <interceptor-stack name="ajaxConfigStack">
                 <interceptor-ref name="ajaxStack"/>
                 <interceptor-ref name="configErrorHandling"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="ajaxConfigSideEffectStack">
+                <interceptor-ref name="ajaxConfigStack"/>
+                <interceptor-ref name="sessionToken"/>
             </interceptor-stack>
 
             <interceptor-stack name="ajaxReadOnlyStack">
@@ -181,6 +203,7 @@
                     <param name="excludeMethods">input,back,cancel</param>
                 </interceptor-ref>
                 <interceptor-ref name="errorHanding"/>
+                <interceptor-ref name="sessionToken"/>
             </interceptor-stack>
 
             <interceptor-stack name="ajaxConfigWizardStack">

@@ -79,6 +79,7 @@
 
             window.formSubmitting = false;
             window.baseUrl = '$base';
+            window.sessionToken = '$sessionToken';
 
             var viewport;
             var statusAreaEl;

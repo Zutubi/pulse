@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.pulse.master.velocity.AbstractDirective;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -111,6 +112,8 @@ public class WizardDirective extends AbstractDirective
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
             context.put("wizard", wizardDescriptor.instantiate(path, state.getRenderRecord()));
+            context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
+            context.put("sessionToken", SessionTokenManager.getToken());
 
             // validation support:
             OgnlValueStack stack = ActionContext.getContext().getValueStack();

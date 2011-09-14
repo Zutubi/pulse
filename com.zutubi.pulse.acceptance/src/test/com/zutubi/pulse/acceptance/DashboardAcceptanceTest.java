@@ -1,13 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
@@ -16,6 +12,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -99,7 +99,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertFalse(dashboard.isProjectPresent(group2, project));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
-
+/*
     public void testHideGroup() throws Exception
     {
         String group1 = random + "-group1";
@@ -125,7 +125,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertTrue(dashboard.isGroupPresent(group2));
         assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
-
+*/
     public void testShowSpecificProjects() throws Exception
     {
         String project1 = random + "-project1";
@@ -140,7 +140,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertTrue(dashboard.isUngroupedProjectPresent(project1));
         assertFalse(dashboard.isUngroupedProjectPresent(project2));
     }
-
+/*
     public void testHideProject() throws Exception
     {
         String project1 = random + "-project1";
@@ -160,7 +160,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         assertFalse(dashboard.isUngroupedProjectPresent(project1));
         assertTrue(dashboard.isUngroupedProjectPresent(project2));
     }
-
+*/
     
     public void testMultipleBuildsPerProject() throws Exception
     {

@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.freemarker.GetTextMethod;
 import com.zutubi.pulse.master.tove.freemarker.ValidIdMethod;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.model.Form;
+import com.zutubi.pulse.master.webwork.SessionTokenManager;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
@@ -587,6 +588,9 @@ public class ToveUtils
         context.put("actionErrors", stack.findValue("actionErrors"));
         context.put("fieldErrors", stack.findValue("fieldErrors"));
         context.put("isWindows", ""+SystemUtils.IS_WINDOWS);
+
+        context.put("sessionTokenName", SessionTokenManager.TOKEN_NAME);
+        context.put("sessionToken", SessionTokenManager.getToken());
 
         // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
         DelegateBuiltin.conditionalRegistration("i18n", "i18nText");

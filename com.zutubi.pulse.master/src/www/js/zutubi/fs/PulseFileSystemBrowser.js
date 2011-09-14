@@ -349,7 +349,7 @@ Zutubi.fs.DeleteFolderButton = Ext.extend(Ext.Button, {
         });
 
         path = this.tree.getSelectedConfigPath();
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: this.baseUrl + '/ajax/rmdir.action',
             params: {
                 path: path,
@@ -454,7 +454,7 @@ Zutubi.fs.CreateFolderButton = Ext.extend(Ext.Button, {
         this.newFolderName = name;
         path = this.tree.getSelectedConfigPath();
 
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: this.baseUrl + '/ajax/mkdir.action',
             params: {
                 path:path,

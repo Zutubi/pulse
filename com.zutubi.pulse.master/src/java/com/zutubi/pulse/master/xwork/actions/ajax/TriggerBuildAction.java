@@ -1,9 +1,11 @@
-package com.zutubi.pulse.master.xwork.actions.project;
+package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.xwork.actions.project.ProjectActionBase;
 import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.util.logging.Logger;
 
 /**
  * Manually trigger a project build.
@@ -13,9 +15,13 @@ import com.zutubi.tove.actions.ActionManager;
  */
 public class TriggerBuildAction extends ProjectActionBase
 {
+    private static final Logger LOG = Logger.getLogger(TriggerBuildAction.class);
+
     private ActionManager actionManager;
 
     private boolean rebuild = false;
+
+    private SimpleResult result;
 
     public boolean isRebuild()
     {
@@ -27,6 +33,11 @@ public class TriggerBuildAction extends ProjectActionBase
         this.rebuild = rebuild;
     }
 
+    public SimpleResult getResult()
+    {
+        return result;
+    }
+
     public String execute()
     {
         Project project = getRequiredProject();
@@ -34,9 +45,10 @@ public class TriggerBuildAction extends ProjectActionBase
 
         actionManager.ensurePermission(projectConfig.getConfigurationPath(), ProjectConfigurationActions.ACTION_TRIGGER);
 
-        if(projectConfig.getOptions().getPrompt())
+        if (projectConfig.getOptions().getPrompt())
         {
-            return "prompt";
+            /** The front end should use the {@link com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction} for such projects. */
+            LOG.warning("Bare trigger action used for project with prompting enabled.");
         }
 
         if (rebuild)
@@ -50,6 +62,7 @@ public class TriggerBuildAction extends ProjectActionBase
 
         pauseForDramaticEffect();
 
+        result = new SimpleResult(true, "Build triggered");
         return SUCCESS;
     }
 

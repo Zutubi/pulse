@@ -151,7 +151,7 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
         panel = this;
         toolbar = Ext.get('build-toolbar');
         toolbar.mask();
-        Ext.Ajax.request({
+        runAjaxRequest({
             url: window.baseUrl + '/ajax/customiseHistoryBuilds.action',
             params: {'buildsPerPage': Ext.get('builds-per-page').getValue() },
             success: function() {
