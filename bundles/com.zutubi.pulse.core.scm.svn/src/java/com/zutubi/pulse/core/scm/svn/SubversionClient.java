@@ -79,7 +79,14 @@ public class SubversionClient implements ScmClient
     private ScmException convertException(SVNException e)
     {
         LOG.error(e);
-        return new ScmException(e.getMessage(), e);
+        if (e instanceof SVNCancelException)
+        {
+            return new ScmCancelledException(e.getMessage(), e);
+        }
+        else
+        {
+            return new ScmException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -755,6 +762,10 @@ public class SubversionClient implements ScmClient
 
             update(context.getWorkingDir(), convertRevision(rev), client);
             updateExternals(context.getWorkingDir(), rev, client, handler);
+        }
+        catch (ScmCancelledException e)
+        {
+            throw new ScmCancelledException(e);
         }
         catch (ScmException e)
         {
