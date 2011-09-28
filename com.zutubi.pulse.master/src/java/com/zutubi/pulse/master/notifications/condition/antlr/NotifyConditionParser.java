@@ -139,6 +139,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		case 23:
 		case 24:
 		case 25:
+		case 26:
 		case LEFT_PAREN:
 		{
 			break;
@@ -171,6 +172,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		case 21:
 		case 22:
 		case 23:
+		case 24:
 		{
 			boolsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -212,8 +214,8 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			break;
 		}
 		case INTEGER:
-		case 24:
 		case 25:
+		case 26:
 		{
 			compareexpression();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -316,6 +318,15 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
+		case 24:
+		{
+			AST tmp19_AST = null;
+			tmp19_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp19_AST);
+			match(24);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
 		default:
 		{
 			throw new NoViableAltException(LT(1), getFilename());
@@ -336,49 +347,49 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case EQUAL:
 		{
-			AST tmp19_AST = null;
-			tmp19_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp19_AST);
+			AST tmp20_AST = null;
+			tmp20_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp20_AST);
 			match(EQUAL);
 			break;
 		}
 		case NOT_EQUAL:
 		{
-			AST tmp20_AST = null;
-			tmp20_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp20_AST);
+			AST tmp21_AST = null;
+			tmp21_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp21_AST);
 			match(NOT_EQUAL);
 			break;
 		}
 		case LESS_THAN:
 		{
-			AST tmp21_AST = null;
-			tmp21_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp21_AST);
+			AST tmp22_AST = null;
+			tmp22_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp22_AST);
 			match(LESS_THAN);
 			break;
 		}
 		case LESS_THAN_OR_EQUAL:
 		{
-			AST tmp22_AST = null;
-			tmp22_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp22_AST);
+			AST tmp23_AST = null;
+			tmp23_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp23_AST);
 			match(LESS_THAN_OR_EQUAL);
 			break;
 		}
 		case GREATER_THAN:
 		{
-			AST tmp23_AST = null;
-			tmp23_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp23_AST);
+			AST tmp24_AST = null;
+			tmp24_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp24_AST);
 			match(GREATER_THAN);
 			break;
 		}
 		case GREATER_THAN_OR_EQUAL:
 		{
-			AST tmp24_AST = null;
-			tmp24_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp24_AST);
+			AST tmp25_AST = null;
+			tmp25_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp25_AST);
 			match(GREATER_THAN_OR_EQUAL);
 			break;
 		}
@@ -403,15 +414,15 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case INTEGER:
 		{
-			AST tmp25_AST = null;
-			tmp25_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp25_AST);
+			AST tmp26_AST = null;
+			tmp26_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp26_AST);
 			match(INTEGER);
 			integer_AST = (AST)currentAST.root;
 			break;
 		}
-		case 24:
 		case 25:
+		case 26:
 		{
 			intsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -420,9 +431,9 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			case LEFT_PAREN:
 			{
 				match(LEFT_PAREN);
-				AST tmp27_AST = null;
-				tmp27_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp27_AST);
+				AST tmp28_AST = null;
+				tmp28_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp28_AST);
 				match(LITERAL_previous);
 				match(RIGHT_PAREN);
 				break;
@@ -464,21 +475,21 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		AST intsymbol_AST = null;
 		
 		switch ( LA(1)) {
-		case 24:
-		{
-			AST tmp29_AST = null;
-			tmp29_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp29_AST);
-			match(24);
-			intsymbol_AST = (AST)currentAST.root;
-			break;
-		}
 		case 25:
 		{
 			AST tmp30_AST = null;
 			tmp30_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp30_AST);
 			match(25);
+			intsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case 26:
+		{
+			AST tmp31_AST = null;
+			tmp31_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp31_AST);
+			match(26);
 			intsymbol_AST = (AST)currentAST.root;
 			break;
 		}
@@ -515,6 +526,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		"\"changed\"",
 		"\"changed.by.me\"",
 		"\"changed.by.me.since.success\"",
+		"\"responsibility.taken\"",
 		"\"state.change\"",
 		"\"unsuccessful.count.builds\"",
 		"\"unsuccessful.count.days\"",

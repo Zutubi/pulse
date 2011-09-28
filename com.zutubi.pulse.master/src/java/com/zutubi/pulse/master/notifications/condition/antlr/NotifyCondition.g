@@ -76,6 +76,7 @@ boolsymbol
     | "changed"
     | "changed.by.me"
     | "changed.by.me.since.success"
+    | "responsibility.taken"
     | "state.change"
     ;
 
@@ -131,6 +132,7 @@ boolsymbol
     | "changed"
     | "changed.by.me"
     | "changed.by.me.since.success"
+    | "responsibility.taken"
     | "state.change"
     ;
 
