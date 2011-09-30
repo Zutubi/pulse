@@ -830,7 +830,7 @@ public class RemoteApiClient extends ApiClient
 
     public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId) throws Exception
     {
-        return waitForBuildRequestToBeHandled(requestId, (int)BUILD_TIMEOUT);
+        return waitForBuildRequestToBeHandled(requestId, (int) BUILD_TIMEOUT);
     }
 
     public Hashtable<String, Object> waitForBuildRequestToBeHandled(String requestId, int timeoutMillis) throws Exception
@@ -840,7 +840,7 @@ public class RemoteApiClient extends ApiClient
 
     public Hashtable<String, Object> waitForBuildRequestToBeActivated(String requestId) throws Exception
     {
-        return waitForBuildRequestToBeActivated(requestId, (int)BUILD_TIMEOUT);
+        return waitForBuildRequestToBeActivated(requestId, (int) BUILD_TIMEOUT);
     }
 
     public Hashtable<String, Object> waitForBuildRequestToBeActivated(String requestId, int timeoutMillis) throws Exception
@@ -1189,7 +1189,7 @@ public class RemoteApiClient extends ApiClient
                     throw new RuntimeException(e);
                 }
             }
-        }, timeout, "build " + number + " of project " + projectName + " to become '"+state+"'");
+        }, timeout, "build " + number + " of project " + projectName + " to become '" + state + "'");
     }
 
     public void waitForBuildStageInProgress(final String projectName, final String stageName, final int number, long timeout) throws Exception
@@ -1422,6 +1422,21 @@ public class RemoteApiClient extends ApiClient
     public boolean deleteBuildComment(String projectName, int buildId, String commentId) throws Exception
     {
         return (Boolean) call("deleteBuildComment", projectName, buildId, commentId);
+    }
+
+    public Hashtable<String,Boolean> getQueueStates() throws Exception
+    {
+        return call("getQueueStates");
+    }
+
+    public boolean setBuildQueueState(boolean running) throws Exception
+    {
+        return (Boolean) call("setBuildQueueState", running);
+    }
+
+    public boolean setStageQueueState(boolean running) throws Exception
+    {
+        return (Boolean) call("setStageQueueState", running);
     }
 
     public String threadDump() throws Exception
