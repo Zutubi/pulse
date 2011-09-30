@@ -21,9 +21,7 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.build.queue.BuildQueueSnapshot;
-import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
-import com.zutubi.pulse.master.build.queue.FatController;
+import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.DataPoint;
@@ -98,6 +96,8 @@ public class RemoteApi
     private BuildRequestRegistry buildRequestRegistry;
     private PluginManager pluginManager;
     private StateDisplayManager stateDisplayManager;
+    private RecipeQueue recipeQueue;
+    private SchedulingController schedulingController;
 
     public RemoteApi()
     {
@@ -3476,7 +3476,108 @@ public class RemoteApi
             tokenManager.logoutUser();
         }        
     }
-    
+
+    /**
+     * Returns the current state of the build and stage queues, indicating if
+     * they are running or paused.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @return {@xtype [RemoteApi.QueueStates]} the states of the queues
+     * @access available to all users
+     */
+    public Hashtable<String, Boolean> getQueueStates(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Hashtable<String, Boolean> result = new Hashtable<String, Boolean>();
+            result.put("buildQueue", schedulingController.isRunning());
+            result.put("stageQueue", recipeQueue.isRunning());
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Sets the state of the build queue.  May be used to pause or resume build
+     * scheduling.  When the build queue is paused, all triggers are ignored.
+     *
+     * @param token   authentication token, see {@link #login(String, String)}
+     * @param running use true to resume the queue, or false to pause it
+     * @return true if the queue state was changed, false if it was already in
+     *         the requested state
+     * @access only available to administrators
+     */
+    public boolean setBuildQueueState(String token, boolean running)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+            if (schedulingController.isRunning() != running)
+            {
+                if (running)
+                {
+                    schedulingController.resume();
+                }
+                else
+                {
+                    schedulingController.pause();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Sets the state of the stage queue.  May be used to pause or resume
+     * dispatching of stages to agents.  When the stage queue is paused, stage
+     * requests may continue to build up but none will be dispatched to agents.
+     *
+     * @param token   authentication token, see {@link #login(String, String)}
+     * @param running use true to resume the queue, or false to pause it
+     * @return true if the queue state was changed, false if it was already in
+     *         the requested state
+     * @access only available to administrators
+     */
+    public boolean setStageQueueState(String token, boolean running)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+            if (recipeQueue.isRunning() != running)
+            {
+                if (running)
+                {
+                    recipeQueue.start();
+                }
+                else
+                {
+                    recipeQueue.stop();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     /**
      * Returns an array of all queued build requests.  These build requests
      * may be cancelled without affecting the build history for the project.
@@ -4672,5 +4773,15 @@ public class RemoteApi
     public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
     {
         this.stateDisplayManager = stateDisplayManager;
+    }
+
+    public void setRecipeQueue(RecipeQueue recipeQueue)
+    {
+        this.recipeQueue = recipeQueue;
+    }
+
+    public void setSchedulingController(SchedulingController schedulingController)
+    {
+        this.schedulingController = schedulingController;
     }
 }

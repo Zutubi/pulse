@@ -633,6 +633,30 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(statistics.containsKey("totalSynchronisingTime"));
     }
 
+    public void testGetAndSetQueueStates() throws Exception
+    {
+        rpcClient.TestApi.ensureQueuesRunning();
+        Hashtable<String, Boolean> states = rpcClient.RemoteApi.getQueueStates();
+        assertEquals(Boolean.TRUE, states.get("buildQueue"));
+        assertEquals(Boolean.TRUE, states.get("stageQueue"));
+
+        rpcClient.RemoteApi.setBuildQueueState(false);
+        states = rpcClient.RemoteApi.getQueueStates();
+        assertEquals(Boolean.FALSE, states.get("buildQueue"));
+        assertEquals(Boolean.TRUE, states.get("stageQueue"));
+
+        rpcClient.RemoteApi.setStageQueueState(false);
+        states = rpcClient.RemoteApi.getQueueStates();
+        assertEquals(Boolean.FALSE, states.get("buildQueue"));
+        assertEquals(Boolean.FALSE, states.get("stageQueue"));
+
+        rpcClient.RemoteApi.setBuildQueueState(true);
+        rpcClient.RemoteApi.setStageQueueState(true);
+        states = rpcClient.RemoteApi.getQueueStates();
+        assertEquals(Boolean.TRUE, states.get("buildQueue"));
+        assertEquals(Boolean.TRUE, states.get("stageQueue"));
+    }
+
     private Vector<String> insertAndTriggerProject(String projectName) throws Exception
     {
         rpcClient.RemoteApi.insertSimpleProject(projectName);
