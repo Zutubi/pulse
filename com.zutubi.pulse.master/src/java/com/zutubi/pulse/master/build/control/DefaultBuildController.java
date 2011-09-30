@@ -10,7 +10,10 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import com.zutubi.pulse.core.dependency.ivy.*;
+import com.zutubi.pulse.core.dependency.ivy.IvyClient;
+import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
+import com.zutubi.pulse.core.dependency.ivy.IvyManager;
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -30,7 +33,6 @@ import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
 import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
@@ -56,7 +58,6 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
@@ -1051,24 +1052,11 @@ public class DefaultBuildController implements EventListener, BuildController
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            String masterUrl = buildContext.getString(PROPERTY_MASTER_URL);
-            String repositoryUrl = masterUrl + WebManager.REPOSITORY_PATH;
-
+            String repositoryUrl = configurationManager.getUserPaths().getRepositoryRoot().toURI().toString();
             final IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
             ivy.pushMessageLogger(buildLogger.getMessageLogger());
-
-            String host = new URL(masterUrl).getHost();
-            String password = buildContext.getSecurityHash();
-
-            AuthenticatedAction.execute(host, password, new NullaryFunctionE<Object, Exception>()
-            {
-                public Object process() throws Exception
-                {
-                    ivy.publishArtifacts(descriptor);
-                    ivy.publishDescriptor(descriptor);
-                    return null;
-                }
-            });
+            ivy.publishArtifacts(descriptor);
+            ivy.publishDescriptor(descriptor);
         }
         catch (Exception e)
         {
