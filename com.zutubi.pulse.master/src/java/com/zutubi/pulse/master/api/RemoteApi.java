@@ -3482,7 +3482,7 @@ public class RemoteApi
      * they are running or paused.
      *
      * @param token authentication token, see {@link #login(String, String)}
-     * @return {@xtype array<[RemoteApi.QueueStates]>} the states of the queues
+     * @return {@xtype [RemoteApi.QueueStates]} the states of the queues
      * @access available to all users
      */
     public Hashtable<String, Boolean> getQueueStates(String token)
