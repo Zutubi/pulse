@@ -19,6 +19,7 @@ public class NotifyConditionFactory
     public static final String ERROR = "error";
     public static final String FAILURE = "failure";
     public static final String FALSE = "false";
+    public static final String RESPONSIBILITY_TAKEN = "responsibility.taken";
     public static final String SUCCESS = "success";
     public static final String STATE_CHANGE = "state.change";
     public static final String TRUE = "true";
@@ -43,6 +44,7 @@ public class NotifyConditionFactory
         typeMap.put(ERROR, ErrorNotifyCondition.class);
         typeMap.put(FAILURE, FailureNotifyCondition.class);
         typeMap.put(FALSE, FalseNotifyCondition.class);
+        typeMap.put(RESPONSIBILITY_TAKEN, ResponsibilityTakenNotifyCondition.class);
         typeMap.put(SUCCESS, SuccessNotifyCondition.class);
         typeMap.put(STATE_CHANGE, StateChangeNotifyCondition.class);
         typeMap.put(TRUE, TrueNotifyCondition.class);

@@ -19,10 +19,11 @@ LITERAL_error="error"=19
 LITERAL_changed="changed"=20
 "changed.by.me"=21
 "changed.by.me.since.success"=22
-"state.change"=23
-"unsuccessful.count.builds"=24
-"unsuccessful.count.days"=25
-LEFT_PAREN("an opening parenthesis '('")=26
-RIGHT_PAREN("a closing parenthesis ')'")=27
-WORD("a word")=28
-WHITESPACE=29
+"responsibility.taken"=23
+"state.change"=24
+"unsuccessful.count.builds"=25
+"unsuccessful.count.days"=26
+LEFT_PAREN("an opening parenthesis '('")=27
+RIGHT_PAREN("a closing parenthesis ')'")=28
+WORD("a word")=29
+WHITESPACE=30
