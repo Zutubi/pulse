@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.SequenceManager;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
@@ -69,6 +70,7 @@ public class SchedulingController implements EventListener
         lock.lock();
         try
         {
+            LOG.info("Build queue paused by '" + SecurityUtils.getLoggedInUsername() + "'");
             running = false;
         }
         finally
@@ -82,6 +84,7 @@ public class SchedulingController implements EventListener
         lock.lock();
         try
         {
+            LOG.info("Build queue resumed by '" + SecurityUtils.getLoggedInUsername() + "'");
             running = true;
         }
         finally

@@ -16,6 +16,7 @@ import com.zutubi.pulse.master.events.AgentConnectivityEvent;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationEventListener;
@@ -112,6 +113,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 throw new IllegalStateException(I18N.format("illegal.state.running"));
             }
 
+            LOG.info("Stage queue resumed by '" + SecurityUtils.getLoggedInUsername() + "'");
             isRunning = true;
             executor = Executors.newSingleThreadExecutor(threadFactory);
             executor.execute(this);
@@ -125,6 +127,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void stop()
     {
+        LOG.info("Stage queue paused by '" + SecurityUtils.getLoggedInUsername() + "'");
         stop(true);
     }
 
