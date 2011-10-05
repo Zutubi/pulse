@@ -298,7 +298,7 @@ public class SubversionClient implements ScmClient
         // noop
     }
 
-    public void close()
+    private void close(SVNRepository repository)
     {
         if (repository != null)
         {
@@ -310,9 +310,13 @@ public class SubversionClient implements ScmClient
             {
                 LOG.warning(e);
             }
-
-            repository = null;
         }
+    }
+
+    public void close()
+    {
+        close(repository);
+        repository = null;
     }
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
@@ -609,19 +613,27 @@ public class SubversionClient implements ScmClient
 
     private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final SVNDepth depth, final List<ExternalDefinition> result) throws SVNException
     {
-        SVNRepository repository = SVNRepositoryFactory.create(ownerURL);
-        repository.setAuthenticationManager(authenticationManager);
-
-        ISVNReporterBaton reporter = new ISVNReporterBaton()
+        SVNRepository repository = null;
+        try
         {
-            public void report(ISVNReporter reporter) throws SVNException
-            {
-                reporter.setPath("", null, revision, depth, true);
-                reporter.finishReport();
-            }
-        };
+            repository = SVNRepositoryFactory.create(ownerURL);
+            repository.setAuthenticationManager(authenticationManager);
 
-        repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+            ISVNReporterBaton reporter = new ISVNReporterBaton()
+            {
+                public void report(ISVNReporter reporter) throws SVNException
+                {
+                    reporter.setPath("", null, revision, depth, true);
+                    reporter.finishReport();
+                }
+            };
+
+            repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+        }
+        finally
+        {
+            close(repository);
+        }
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
