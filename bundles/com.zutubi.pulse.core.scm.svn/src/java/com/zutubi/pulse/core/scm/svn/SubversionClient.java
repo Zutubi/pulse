@@ -298,7 +298,7 @@ public class SubversionClient implements ScmClient
         // noop
     }
 
-    public void close()
+    private void close(SVNRepository repository)
     {
         if (repository != null)
         {
@@ -310,9 +310,13 @@ public class SubversionClient implements ScmClient
             {
                 LOG.warning(e);
             }
-
-            repository = null;
         }
+    }
+
+    public void close()
+    {
+        close(repository);
+        repository = null;
     }
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
@@ -486,11 +490,19 @@ public class SubversionClient implements ScmClient
                 List<ExternalDefinition> externals = getExternals(to);
                 for (ExternalDefinition external : externals)
                 {
-                    SVNRepository repo = SVNRepositoryFactory.create(external.url);
-                    repo.setAuthenticationManager(authenticationManager);
-                    if (log(repo, fromNumber, toNumber, handler))
+                    SVNRepository repo = null;
+                    try
                     {
-                        return true;
+                        repo = SVNRepositoryFactory.create(external.url);
+                        repo.setAuthenticationManager(authenticationManager);
+                        if (log(repo, fromNumber, toNumber, handler))
+                        {
+                            return true;
+                        }
+                    }
+                    finally
+                    {
+                        close(repo);
                     }
                 }
             }
@@ -609,19 +621,27 @@ public class SubversionClient implements ScmClient
 
     private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final SVNDepth depth, final List<ExternalDefinition> result) throws SVNException
     {
-        SVNRepository repository = SVNRepositoryFactory.create(ownerURL);
-        repository.setAuthenticationManager(authenticationManager);
-
-        ISVNReporterBaton reporter = new ISVNReporterBaton()
+        SVNRepository repository = null;
+        try
         {
-            public void report(ISVNReporter reporter) throws SVNException
-            {
-                reporter.setPath("", null, revision, depth, true);
-                reporter.finishReport();
-            }
-        };
+            repository = SVNRepositoryFactory.create(ownerURL);
+            repository.setAuthenticationManager(authenticationManager);
 
-        repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+            ISVNReporterBaton reporter = new ISVNReporterBaton()
+            {
+                public void report(ISVNReporter reporter) throws SVNException
+                {
+                    reporter.setPath("", null, revision, depth, true);
+                    reporter.finishReport();
+                }
+            };
+
+            repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+        }
+        finally
+        {
+            close(repository);
+        }
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
@@ -667,12 +687,20 @@ public class SubversionClient implements ScmClient
             
             for (ExternalDefinition external: getExternals(null))
             {
-                SVNRepository repo = SVNRepositoryFactory.create(external.url);
-                repo.setAuthenticationManager(authenticationManager);
-                long externalRevision = getLatestRepositoryRevision(repo);
-                if (externalRevision > revision)
+                SVNRepository repo = null;
+                try
                 {
-                    revision = externalRevision;
+                    repo = SVNRepositoryFactory.create(external.url);
+                    repo.setAuthenticationManager(authenticationManager);
+                    long externalRevision = getLatestRepositoryRevision(repo);
+                    if (externalRevision > revision)
+                    {
+                        revision = externalRevision;
+                    }
+                }
+                finally
+                {
+                    close(repo);
                 }
             }
 
@@ -854,18 +882,26 @@ public class SubversionClient implements ScmClient
 
     boolean pathExists(SVNURL path) throws SVNException
     {
-        SVNRepository repo = SVNRepositoryFactory.create(path);
-        repo.setAuthenticationManager(authenticationManager);
-        repo.testConnection();
-        SVNDirEntry dir;
+        SVNRepository repo = null;
         try
         {
-            dir = repo.info("", SVNRevision.HEAD.getNumber());
-            return dir != null;
+            repo = SVNRepositoryFactory.create(path);
+            repo.setAuthenticationManager(authenticationManager);
+            repo.testConnection();
+            SVNDirEntry dir;
+            try
+            {
+                dir = repo.info("", SVNRevision.HEAD.getNumber());
+                return dir != null;
+            }
+            catch (SVNException e)
+            {
+                return false;
+            }
         }
-        catch (SVNException e)
+        finally
         {
-            return false;
+            close(repo);
         }
     }
 

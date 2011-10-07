@@ -309,7 +309,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
             if (force)
             {
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_FLUSH), FLAG_CLIENT, workspace.getName(), COMMAND_FLUSH, "#" + REVISION_NONE);
+                if (!SKIP_FLUSH)
+                {
+                    core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_FLUSH), FLAG_CLIENT, workspace.getName(), COMMAND_FLUSH, "#" + REVISION_NONE);
+                }
                 core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + revision.getRevisionString());
             }
             else
