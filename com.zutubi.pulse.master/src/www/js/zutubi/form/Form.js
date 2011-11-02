@@ -3,6 +3,7 @@
 
 Zutubi.form.Form = function(config)
 {
+    config.timeout = config.timeout || 120000;
     Zutubi.form.Form.superclass.constructor.call(this, null, config);
 };
 
