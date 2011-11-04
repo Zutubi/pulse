@@ -6,9 +6,12 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 
 /**
@@ -183,13 +186,39 @@ public class ProcessControl
 
     private static void killWithTaskkill(int pid)
     {
+        Process process = null;
         try
         {
-            SystemUtils.runCommand(0, COMMAND_TASKKILL, FLAG_PID, Integer.toString(pid), FLAG_FORCE, FLAG_TREE);
+            ProcessBuilder builder = new ProcessBuilder(COMMAND_TASKKILL, FLAG_PID, Integer.toString(pid), FLAG_FORCE, FLAG_TREE);
+            builder.redirectErrorStream(true);
+            process = builder.start();
+            process.getOutputStream().close();
+            InputStreamReader outputReader = new InputStreamReader(process.getInputStream());
+            StringWriter outputWriter = new StringWriter();
+            IOUtils.joinReaderToWriter(outputReader, outputWriter);
+            int exitCode = process.waitFor();
+            outputReader.close();
+            if (exitCode != 0)
+            {
+                LOG.warning("Unable to kill process " + pid + " with taskkill: taskkill returned exit code " + exitCode + ", output:\n" + outputWriter.toString());
+            }
         }
         catch (IOException e)
         {
             LOG.warning("Unable to kill process " + pid + " with taskkill: " + e.getMessage(), e);
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning("Interrupted while trying to kill process " + pid + " with taskkill: " + e.getMessage(), e);
+        }
+        finally
+        {
+            if (process != null)
+            {
+                IOUtils.close(process.getErrorStream());
+                IOUtils.close(process.getInputStream());
+                process.destroy();
+            }
         }
     }
 }
