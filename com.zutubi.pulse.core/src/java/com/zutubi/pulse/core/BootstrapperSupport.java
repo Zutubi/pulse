@@ -34,6 +34,7 @@ public abstract class BootstrapperSupport implements Bootstrapper
 
         // we don't close the feedback writer because the underlying output stream
         // is not controlled by us.
+        feedbackWriter.flush();
     }
 
     protected abstract void doBootstrap(CommandContext commandContext);
