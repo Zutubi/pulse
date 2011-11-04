@@ -72,7 +72,7 @@ public class EmailContactConfiguration extends ContactConfiguration
 
         try
         {
-            emailService.sendMail(Arrays.asList(getAddress()), subject, mimeType, rendered, config);
+            emailService.sendMail(Arrays.asList(getAddress()), subject, mimeType, rendered, config, true);
         }
         catch (Exception e)
         {

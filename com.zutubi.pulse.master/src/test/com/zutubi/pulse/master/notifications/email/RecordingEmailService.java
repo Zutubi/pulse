@@ -14,7 +14,7 @@ public class RecordingEmailService implements EmailService
 {
     private List<Collection<String>> recipientsByEmail = new LinkedList<Collection<String>>();
 
-    public void sendMail(Collection<String> recipients, String subject, String mimeType, String message, EmailConfiguration config) throws MessagingException
+    public void sendMail(Collection<String> recipients, String subject, String mimeType, String message, EmailConfiguration config, boolean reuseSession) throws MessagingException
     {
         recipientsByEmail.add(recipients);
     }

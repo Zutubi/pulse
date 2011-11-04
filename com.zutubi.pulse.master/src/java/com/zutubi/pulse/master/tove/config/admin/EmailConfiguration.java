@@ -138,6 +138,20 @@ public class EmailConfiguration extends AbstractConfiguration implements Validat
         this.localhost = localhost;
     }
 
+    public boolean isEquivalentTo(EmailConfiguration other)
+    {
+        return other != null &&
+                StringUtils.equals(host, other.host) &&
+                ssl == other.ssl &&
+                StringUtils.equals(from, other.from) &&
+                StringUtils.equals(username, other.username) &&
+                StringUtils.equals(password, other.password) &&
+                StringUtils.equals(subjectPrefix, other.subjectPrefix) &&
+                StringUtils.equals(localhost, other.localhost) &&
+                customPort == other.customPort &&
+                (!customPort || port == other.port);
+    }
+
     public void validate(ValidationContext context)
     {
         if (StringUtils.stringSet(host))

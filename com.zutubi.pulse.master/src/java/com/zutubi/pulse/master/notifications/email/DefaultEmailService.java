@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.notifications.email;
 
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -16,69 +17,111 @@ import java.util.Properties;
  */
 public class DefaultEmailService implements EmailService
 {
-    private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
-    private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
-    private static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
-    private static final String SMTP_LOCALHOST_PROPERTY = "mail.smtp.localhost";
-    private static final String SMTPS_HOST_PROPERTY = "mail.smtps.host";
-    private static final String SMTPS_AUTH_PROPERTY = "mail.smtps.auth";
-    private static final String SMTPS_PORT_PROPERTY = "mail.smtps.port";
-    private static final String SMTPS_LOCALHOST_PROPERTY = "mail.smtps.localhost";
+    private static final Logger LOG = Logger.getLogger(DefaultEmailService.class);
 
-    public void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config) throws MessagingException
+    private static final String PROPERTY_TRANSPORT_PROTOCOL = "mail.transport.protocol";
+    private static final String PROTOCOL_SMTP = "smtp";
+    private static final String PROTOCOL_SMTPS = "smtps";
+
+    private static final String PROPERTY_HOST = "host";
+    private static final String PROPERTY_AUTH = "auth";
+    private static final String PROPERTY_PORT = "port";
+    private static final String PROPERTY_LOCALHOST = "localhost";
+
+    private EmailConfiguration sharedConfig;
+    private Session sharedSession;
+    private Transport sharedTransport;
+
+    public synchronized void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
+    {
+        Session session;
+        Transport transport;
+        if (reuseSession)
+        {
+            ensureSharedSession(config);
+            session = sharedSession;
+            transport = sharedTransport;
+        }
+        else
+        {
+            session = getSession(config);
+            transport = session.getTransport();
+        }
+
+        subject = addSubjectPrefix(config, subject);
+        Message msg = createMessage(recipients, subject, mimeType, message, config, session);
+
+        try
+        {
+            if (!transport.isConnected())
+            {
+                transport.connect();
+            }
+            msg.saveChanges();
+            transport.sendMessage(msg, msg.getAllRecipients());
+        }
+        finally
+        {
+            if (!reuseSession && transport != null)
+            {
+                transport.close();
+            }
+        }
+    }
+
+    private void ensureSharedSession(EmailConfiguration config) throws NoSuchProviderException
+    {
+        if (!config.isEquivalentTo(sharedConfig))
+        {
+            if (sharedTransport != null)
+            {
+                try
+                {
+                    sharedTransport.close();
+                }
+                catch (MessagingException e)
+                {
+                    LOG.warning(e);
+                }
+            }
+
+            sharedConfig = config;
+            sharedSession = getSession(config);
+            sharedTransport = sharedSession.getTransport();
+        }
+    }
+
+    private String addSubjectPrefix(EmailConfiguration config, String subject)
     {
         String prefix = config.getSubjectPrefix();
         if (StringUtils.stringSet(prefix))
         {
             subject = prefix + " " + subject;
         }
+        return subject;
+    }
 
+    private Session getSession(final EmailConfiguration config)
+    {
         Properties properties = (Properties) System.getProperties().clone();
-        if (config.getSsl())
-        {
-            properties.put(SMTPS_HOST_PROPERTY, config.getHost());
-        }
-        else
-        {
-            properties.put(SMTP_HOST_PROPERTY, config.getHost());
-        }
+        properties.put(PROPERTY_TRANSPORT_PROTOCOL, getProtocol(config));
+        properties.put(getProperty(config, PROPERTY_HOST), config.getHost());
 
         if (config.isCustomPort())
         {
-            if(config.getSsl())
-            {
-                properties.put(SMTPS_PORT_PROPERTY, Integer.toString(config.getPort()));
-            }
-            else
-            {
-                properties.put(SMTP_PORT_PROPERTY, Integer.toString(config.getPort()));
-            }
+            properties.put(getProperty(config, PROPERTY_PORT), Integer.toString(config.getPort()));
         }
 
         String localhost = config.getLocalhost();
         if (StringUtils.stringSet(localhost))
         {
-            if(config.getSsl())
-            {
-                properties.put(SMTPS_LOCALHOST_PROPERTY, localhost);
-            }
-            else
-            {
-                properties.put(SMTP_LOCALHOST_PROPERTY, localhost);
-            }
+            properties.put(getProperty(config, PROPERTY_LOCALHOST), localhost);
         }
 
         Authenticator authenticator = null;
         if (StringUtils.stringSet(config.getUsername()))
         {
-            if(config.getSsl())
-            {
-                properties.put(SMTPS_AUTH_PROPERTY, "true");
-            }
-            else
-            {
-                properties.put(SMTP_AUTH_PROPERTY, "true");
-            }
+            properties.put(getProperty(config, PROPERTY_AUTH), "true");
 
             authenticator = new Authenticator()
             {
@@ -89,10 +132,22 @@ public class DefaultEmailService implements EmailService
             };
         }
 
-        Session session = Session.getInstance(properties, authenticator);
+        return Session.getInstance(properties, authenticator);
+    }
 
+    private String getProtocol(EmailConfiguration config)
+    {
+        return config.getSsl() ? PROTOCOL_SMTPS : PROTOCOL_SMTP;
+    }
+
+    private String getProperty(EmailConfiguration config, String name)
+    {
+        return "mail." + getProtocol(config) + "." + name;
+    }
+
+    private Message createMessage(Collection<String> recipients, String subject, String mimeType, String message, EmailConfiguration config, Session session) throws MessagingException
+    {
         Message msg = new MimeMessage(session);
-
         if (StringUtils.stringSet(config.getFrom()))
         {
             msg.setFrom(new InternetAddress(config.getFrom()));
@@ -108,17 +163,6 @@ public class DefaultEmailService implements EmailService
         msg.setContent(message, mimeType);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");
         msg.setSentDate(new Date());
-
-        Transport transport = session.getTransport(config.getSsl() ? "smtps" : "smtp");
-        try
-        {
-            transport.connect();
-            msg.saveChanges();
-            transport.sendMessage(msg, msg.getAllRecipients());
-        }
-        finally
-        {
-            transport.close();
-        }
+        return msg;
     }
 }

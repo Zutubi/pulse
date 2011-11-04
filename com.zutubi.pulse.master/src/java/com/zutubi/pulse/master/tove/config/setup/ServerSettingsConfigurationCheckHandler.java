@@ -33,7 +33,7 @@ public class ServerSettingsConfigurationCheckHandler extends AbstractConfigurati
 
     public void test(ServerSettingsConfiguration configuration) throws MessagingException
     {
-        emailService.sendMail(Arrays.asList(testAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration);
+        emailService.sendMail(Arrays.asList(testAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration, false);
     }
 
     public void setEmailService(EmailService emailService)

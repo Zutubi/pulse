@@ -22,6 +22,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,7 +54,7 @@ public class ResultNotifier implements EventListener
 
     public void init()
     {
-        AsynchronousDelegatingListener listener = new AsynchronousDelegatingListener(this, threadFactory);
+        AsynchronousDelegatingListener listener = new AsynchronousDelegatingListener(this, Executors.newCachedThreadPool(threadFactory));
         eventManager.register(listener);
     }
 
