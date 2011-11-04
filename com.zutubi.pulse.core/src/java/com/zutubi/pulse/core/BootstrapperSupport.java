@@ -14,15 +14,20 @@ import java.io.PrintWriter;
  */
 public abstract class BootstrapperSupport implements Bootstrapper
 {
+    private static final String PROPERTY_SUPPRESS_OUTPUT = "pulse.suppress.bootstrap.output";
+
     private volatile boolean terminated = false;
     private transient PrintWriter feedbackWriter;
 
     public void bootstrap(CommandContext commandContext) throws BuildException
     {
-        OutputStream output = commandContext.getExecutionContext().getOutputStream();
-        if (output != null)
+        if (!Boolean.getBoolean(PROPERTY_SUPPRESS_OUTPUT))
         {
-            feedbackWriter = new PrintWriter(output);
+            OutputStream output = commandContext.getExecutionContext().getOutputStream();
+            if (output != null)
+            {
+                feedbackWriter = new PrintWriter(output);
+            }
         }
 
         doBootstrap(commandContext);
@@ -45,7 +50,6 @@ public abstract class BootstrapperSupport implements Bootstrapper
         if (feedbackWriter != null)
         {
             feedbackWriter.println(msg);
-            feedbackWriter.flush();
         }
     }
 
