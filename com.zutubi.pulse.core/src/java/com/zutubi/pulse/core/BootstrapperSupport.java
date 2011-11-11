@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.util.io.IgnoreFlushOutputStream;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -26,7 +27,12 @@ public abstract class BootstrapperSupport implements Bootstrapper
             OutputStream output = commandContext.getExecutionContext().getOutputStream();
             if (output != null)
             {
-                feedbackWriter = new PrintWriter(output);
+                // Wrap the underlying stream to stop flushing of our writer
+                // from being passed all the way through the chain.  The more
+                // normal way to handle this is using a buffered writer, but we
+                // don't want to buffer at this level because that is handled
+                // below.
+                feedbackWriter = new PrintWriter(new IgnoreFlushOutputStream(output));
             }
         }
 
@@ -54,6 +60,7 @@ public abstract class BootstrapperSupport implements Bootstrapper
         if (feedbackWriter != null)
         {
             feedbackWriter.println(msg);
+            feedbackWriter.flush();
         }
     }
 
