@@ -365,7 +365,7 @@ public class SubversionClient implements ScmClient
         try
         {
             repository.testConnection();
-            SVNNodeKind kind = repository.checkPath(".", SVNRevision.HEAD.getNumber());
+            SVNNodeKind kind = repository.checkPath("", SVNRevision.HEAD.getNumber());
             if(kind == SVNNodeKind.NONE)
             {
                 throw new ScmException("Path '" + repository.getLocation().getPath() + "' does not exist in the repository");
@@ -714,7 +714,7 @@ public class SubversionClient implements ScmClient
 
     private long getLatestRepositoryRevision(SVNRepository repository) throws SVNException, ScmException
     {
-        SVNDirEntry entry = repository.info(".", SVNRevision.HEAD.getNumber());
+        SVNDirEntry entry = repository.info("", SVNRevision.HEAD.getNumber());
         if (entry == null)
         {
             throw new ScmException("Unable to retrieve latest revision: no repository found at '" + repository.getLocation() + "'");

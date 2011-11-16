@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.util.io.IgnoreFlushOutputStream;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -14,21 +15,35 @@ import java.io.PrintWriter;
  */
 public abstract class BootstrapperSupport implements Bootstrapper
 {
+    private static final String PROPERTY_SUPPRESS_OUTPUT = "pulse.suppress.bootstrap.output";
+
     private volatile boolean terminated = false;
     private transient PrintWriter feedbackWriter;
 
     public void bootstrap(CommandContext commandContext) throws BuildException
     {
-        OutputStream output = commandContext.getExecutionContext().getOutputStream();
-        if (output != null)
+        if (!Boolean.getBoolean(PROPERTY_SUPPRESS_OUTPUT))
         {
-            feedbackWriter = new PrintWriter(output);
+            OutputStream output = commandContext.getExecutionContext().getOutputStream();
+            if (output != null)
+            {
+                // Wrap the underlying stream to stop flushing of our writer
+                // from being passed all the way through the chain.  The more
+                // normal way to handle this is using a buffered writer, but we
+                // don't want to buffer at this level because that is handled
+                // below.
+                feedbackWriter = new PrintWriter(new IgnoreFlushOutputStream(output));
+            }
         }
 
         doBootstrap(commandContext);
 
         // we don't close the feedback writer because the underlying output stream
         // is not controlled by us.
+        if (feedbackWriter != null)
+        {
+            feedbackWriter.flush();
+        }
     }
 
     protected abstract void doBootstrap(CommandContext commandContext);

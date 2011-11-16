@@ -176,7 +176,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
 
-            emailService.sendMail(emails, subject, mimeType, rendered.getContent(), emailConfiguration);
+            emailService.sendMail(emails, subject, mimeType, rendered.getContent(), emailConfiguration, true);
         }
     }
 

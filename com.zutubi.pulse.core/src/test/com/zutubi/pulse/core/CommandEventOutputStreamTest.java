@@ -4,14 +4,15 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.CommandEventOutputStream.DISABLE_AUTO_FLUSH;
-import static com.zutubi.pulse.core.CommandEventOutputStream.MINIMUM_SIZE;
 import com.zutubi.pulse.core.events.OutputEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.CommandEventOutputStream.DISABLE_AUTO_FLUSH;
+import static com.zutubi.pulse.core.CommandEventOutputStream.MINIMUM_SIZE;
 
 /**
  */
@@ -117,6 +118,7 @@ public class CommandEventOutputStreamTest extends PulseTestCase implements Event
             totalWritten += 600;
         }
 
+        stream.flush();
         assertReceived(totalWritten);
     }
 

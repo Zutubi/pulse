@@ -21,7 +21,7 @@ public class EmailConfigurationCheckHandler extends AbstractConfigurationCheckHa
 
     public void test(EmailConfiguration configuration) throws Exception
     {
-        emailService.sendMail(Arrays.asList(emailAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration);
+        emailService.sendMail(Arrays.asList(emailAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration, false);
     }
 
     public String getEmailAddress()

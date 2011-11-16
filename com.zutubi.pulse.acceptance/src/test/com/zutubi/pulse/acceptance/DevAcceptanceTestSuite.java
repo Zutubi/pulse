@@ -20,7 +20,7 @@ public class DevAcceptanceTestSuite
         suite.addTestSuite(ResourceXmlRpcAcceptanceTest.class);
         // these tests use the remote api exclusively, but does not test the xmlrpc interface.
         suite.addTestSuite(LoggingAcceptanceTest.class);
-        suite.addTestSuite(NotificationAcceptanceTest.class);
+//        suite.addTestSuite(NotificationAcceptanceTest.class);
         suite.addTestSuite(CustomProjectAcceptanceTest.class);
         suite.addTestSuite(PluginRepositoryAcceptanceTest.class);
 

@@ -13,7 +13,8 @@ import java.util.concurrent.TimeUnit;
  * executed on a separate thread.
  * <p/>
  * The use of this delegating listener ensures that events do not block the event dispatch
- * thread and are delegated in the same order as they are received.
+ * thread.  If this listener is single threaded, events are also guaranteed to be handled
+ * in the order they were sent.
  */
 public class AsynchronousDelegatingListener implements EventListener
 {
@@ -22,10 +23,15 @@ public class AsynchronousDelegatingListener implements EventListener
     private final ExecutorService executor;
     private final EventListener delegate;
 
-    public AsynchronousDelegatingListener(EventListener delegate, ThreadFactory threadFactory)
+    public AsynchronousDelegatingListener(EventListener delegate, ExecutorService executor)
     {
         this.delegate = delegate;
-        executor = Executors.newSingleThreadExecutor(threadFactory);
+        this.executor = executor;
+    }
+
+    public AsynchronousDelegatingListener(EventListener delegate, ThreadFactory threadFactory)
+    {
+        this(delegate, Executors.newSingleThreadExecutor(threadFactory));
     }
 
     public void handleEvent(final Event event)

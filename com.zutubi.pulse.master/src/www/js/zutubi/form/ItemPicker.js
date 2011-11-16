@@ -199,9 +199,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         {
             for (value in this.optionRecordCache)
             {
-                if (this.store.find('value', value) < 0)
+                if (this.store.findExact('value', value) < 0)
                 {
-                    if (this.combo.store.find(this.valueField, value) < 0)
+                    if (this.combo.store.findExact(this.valueField, value) < 0)
                     {
                         // if the option has not been selected and is not in the options, add it.
                         this.combo.store.addSorted(this.optionRecordCache[value]);
@@ -209,7 +209,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                 }
                 else
                 {
-                    if (this.combo.store.find(this.valueField, value) >= 0)
+                    if (this.combo.store.findExact(this.valueField, value) >= 0)
                     {
                         // if the option has been selected and is in the options, remove it.
                         this.combo.store.remove(this.optionRecordCache[value]);

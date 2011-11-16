@@ -4215,6 +4215,77 @@ public class RemoteApi
     }
 
     /**
+     * Request that the given active personal build for the logged in user is
+     * killed as quickly as possible.  Killing does not allow for any graceful
+     * cleanup.  This function returns when the request is made, which is
+     * likely to be before the build is killed.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @param id    the ID of the personal build to kill
+     * @return true if kill was requested, false if the build was not found or
+     *         was not in progress
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires administration permission for the server
+     */
+    public boolean killPersonalBuild(String token, int id)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            BuildResult build = buildManager.getByUserAndNumber(user, id);
+            if (build == null || !build.inProgress())
+            {
+                return false;
+            }
+            else
+            {
+                buildManager.terminateBuild(build, "requested by '" + user.getLogin() + "' via remote API", true);
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Request that the given active personal build for the given user is
+     * killed as quickly as possible.  Killing does not allow for any graceful
+     * cleanup.  This function returns when the request is made, which is
+     * likely to be before the build is killed.
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @param user  login of the user that owns the personal build to kill
+     * @param id    the ID of the personal build to kill
+     * @return true if kill was requested, false if the build was not found or
+     *         was not in progress
+     * @throws IllegalArgumentException if the given project name is invalid
+     * @access requires administration permission for the server
+     */
+    public boolean killPersonalBuildForUser(String token, String user, int id)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildResult build = buildManager.getByUserAndNumber(internalGetUser(user), id);
+            if (build == null || !build.inProgress())
+            {
+                return false;
+            }
+            else
+            {
+                buildManager.terminateBuild(build, "requested by '" + user + "' via remote API", true);
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Retrieves the state of the given project.  Possible states include:
      * <ul>
      * <li>initialising</li>

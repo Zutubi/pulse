@@ -222,13 +222,14 @@ public class ProjectBuildModel
             }
             else
             {
+                int run = summary.getTotal() - summary.getSkipped();
                 if (summary.hasBroken())
                 {
-                    content = Integer.toString(summary.getBroken()) + " of " + summary.getTotal() + " broken";
+                    content = Integer.toString(summary.getBroken()) + " of " + run + " broken";
                 }
                 else
                 {
-                    content = Integer.toString(summary.getTotal()) + " passed";
+                    content = Integer.toString(run) + " passed";
                 }
 
                 if (summary.hasSkipped())

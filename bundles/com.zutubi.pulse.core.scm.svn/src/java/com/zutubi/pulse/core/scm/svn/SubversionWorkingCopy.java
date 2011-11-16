@@ -663,8 +663,7 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
 
     /**
      * An info handler that extracts the highest revision from all entries it
-     * sees.  A warning is issued if different revisions are seen (i.e. a
-     * mixed revision working copy).
+     * sees.
      */
     private static class GuessRevisionInfoHandler implements ISVNInfoHandler
     {
