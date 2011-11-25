@@ -180,7 +180,8 @@ public class ConfigurationUIModel
             if (instance != null && targetType instanceof CompositeType)
             {
                 CompositeType itemType = (CompositeType) targetType;
-                Collection<? extends Configuration> items = instanceToItems();
+                @SuppressWarnings("unchecked")
+                Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
                 displayFields = stateDisplayManager.getCollectionDisplayFields(itemType, items, instance);
             }
         }
@@ -229,21 +230,6 @@ public class ConfigurationUIModel
         }
 
         displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    private Collection<? extends Configuration> instanceToItems()
-    {
-        Collection<? extends Configuration> items;
-        if (instance instanceof ConfigurationList)
-        {
-            items = ((ConfigurationList) instance);
-        }
-        else
-        {
-            items = ((ConfigurationMap) instance).values();
-        }
-        return items;
     }
 
     private void resolveNested()
@@ -339,7 +325,9 @@ public class ConfigurationUIModel
     {
         if (type instanceof CollectionType)
         {
-            return stateDisplayRenderer.renderCollection(fieldName, (CompositeType) targetType, instanceToItems(), configurationProvider.get(parentPath, Configuration.class));
+            @SuppressWarnings("unchecked")
+            Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
+            return stateDisplayRenderer.renderCollection(fieldName, (CompositeType) targetType, items, configurationProvider.get(parentPath, Configuration.class));
         }
         else
         {
