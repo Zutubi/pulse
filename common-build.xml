@@ -51,7 +51,7 @@
 
         <property name="build.tmp.dir" value="${build.dir}/tmp"/>
 
-        <property name="distconf" value="build"/>
+        <property name="distconf" value="build,test"/>
 
         <!-- resources / properties definition-->
         <patternset id="resources">
