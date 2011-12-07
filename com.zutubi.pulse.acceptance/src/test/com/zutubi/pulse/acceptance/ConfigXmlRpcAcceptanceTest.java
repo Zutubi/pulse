@@ -1,13 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
@@ -16,15 +14,18 @@ import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Sort;
+
+import java.util.*;
+
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import java.util.*;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -1157,6 +1158,13 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String triggerPath = rpcClient.RemoteApi.insertConfig(getPath(projectPath, "triggers"), trigger);
         Hashtable<String, String> state = rpcClient.RemoteApi.getConfigState(triggerPath);
         assertEquals("scheduled", state.get("state"));
+    }
+
+    public void testGetConfigStateForCollection() throws Exception
+    {
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
+        Hashtable<String, String> state = rpcClient.RemoteApi.getConfigState(getPath(projectPath, Constants.Project.REQUIREMENTS));
+        assertEquals("all agents", state.get("compatibleAgents"));
     }
 
     private String renameRecipe(String projectPath, String originalName, String newName) throws Exception

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
@@ -8,6 +7,8 @@ import junit.framework.AssertionFailedError;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 /**
  * Support base class for test report post-processor test cases.  This case
@@ -189,7 +190,7 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
 
         TestResultToName<TestCaseResult> caseMapFn = new TestResultToName<TestCaseResult>();
         List<String> expectedCases = CollectionUtils.map(expected.getCases(), caseMapFn);
-        List<String> actualCases = CollectionUtils.map(expected.getCases(), caseMapFn);
+        List<String> actualCases = CollectionUtils.map(actual.getCases(), caseMapFn);
         if (!expectedCases.equals(actualCases))
         {
             return "Nested case names differ: " + expectedCases + " != " + actualCases;

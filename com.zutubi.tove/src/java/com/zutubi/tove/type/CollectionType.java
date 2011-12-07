@@ -1,5 +1,6 @@
 package com.zutubi.tove.type;
 
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
@@ -93,6 +94,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     public abstract String getItemKey(String path, Record record);
     public abstract Comparator<String> getKeyComparator(Record record);
+    public abstract Collection<?> getItems(Configuration instance);
 
     public MutableRecord createNewRecord(boolean applyDefaults)
     {

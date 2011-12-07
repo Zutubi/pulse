@@ -362,6 +362,12 @@ public class ListType extends CollectionType
         };
     }
 
+    @Override
+    public Collection<?> getItems(Configuration instance)
+    {
+        return (ConfigurationList) instance;
+    }
+
     public String toString()
     {
         return "list[" + getCollectionType().toString() + "]";

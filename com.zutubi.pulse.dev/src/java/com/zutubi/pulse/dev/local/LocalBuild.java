@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ExternalPulseFileProvider;
 import com.zutubi.pulse.core.engine.ResourcesConfiguration;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
 import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
@@ -23,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Entry point for executing local builds within a development tree.
@@ -117,7 +118,7 @@ public class LocalBuild
         }
         catch (IOException e)
         {
-            throw new PulseException("Unable to clean output diretory '" + paths.getOutputDir().getAbsolutePath() + "': " + e.getMessage(), e);
+            throw new PulseException("Unable to clean output directory '" + paths.getOutputDir().getAbsolutePath() + "': " + e.getMessage(), e);
         }
 
         File logFile = new File(baseDir, "build.log");

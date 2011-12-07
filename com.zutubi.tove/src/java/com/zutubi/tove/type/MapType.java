@@ -257,6 +257,12 @@ public class MapType extends CollectionType
         }
     }
 
+    @Override
+    public Collection<?> getItems(Configuration instance)
+    {
+        return ((ConfigurationMap) instance).values();
+    }
+
     public String getKeyProperty()
     {
         return keyProperty;
