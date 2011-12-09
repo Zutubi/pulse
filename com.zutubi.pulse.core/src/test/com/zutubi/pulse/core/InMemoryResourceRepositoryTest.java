@@ -4,9 +4,10 @@ import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static java.util.Arrays.asList;
 
 import java.util.Collections;
+
+import static java.util.Arrays.asList;
 
 public class InMemoryResourceRepositoryTest extends PulseTestCase
 {
@@ -32,31 +33,61 @@ public class InMemoryResourceRepositoryTest extends PulseTestCase
 
     public void testSatisfiesNonExistantResource()
     {
-        assertFalse(repository.satisfies(asList(new ResourceRequirement("doesnt exist", false))));
+        assertFalse(repository.satisfies(asList(new ResourceRequirement("doesnt exist", false, false))));
     }
 
     public void testSatisfiesNonExistantResourceOptional()
     {
-        assertTrue(repository.satisfies(asList(new ResourceRequirement("doesnt exist", true))));
+        assertTrue(repository.satisfies(asList(new ResourceRequirement("doesnt exist", false, true))));
     }
 
     public void testSatisfiesExistingResourceDefaultVersion()
     {
-        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, false))));
+        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, false, false))));
     }
 
     public void testSatisfiesExistingResourceExistingVersion()
     {
-        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, EXISTING_VERSION, false))));
+        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, EXISTING_VERSION, false, false))));
     }
 
     public void testSatisfiesExistingResourceNonExistantVersion()
     {
-        assertFalse(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, "nope", false))));
+        assertFalse(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, "nope", false, false))));
+    }
+
+    public void testSatisfiesNonExistantResourceInverse()
+    {
+        assertTrue(repository.satisfies(asList(new ResourceRequirement("doesnt exist", "nope", true, false))));
+    }
+
+    public void testSatisfiesNonExistantResourceInverseOptional()
+    {
+        assertTrue(repository.satisfies(asList(new ResourceRequirement("doesnt exist", "nope", true, true))));
+    }
+
+    public void testSatisfiesExistingResourceInverse()
+    {
+        assertFalse(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, null, true, false))));
+    }
+
+    public void testSatisfiesExistingResourceExistingVersionInverse()
+    {
+        assertFalse(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, EXISTING_VERSION, true, false))));
+    }
+
+    public void testSatisfiesExistingResourceNonExistantVersionInverse()
+    {
+        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, "nope", true, false))));
+    }
+
+    public void testSatisfiesExistingResourceInverseOptional()
+    {
+        assertFalse(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, null, true, true))));
     }
 
     public void testSatisfiesExistingResourceNonExistantVersionOptional()
     {
-        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, "nope", true))));
+        assertTrue(repository.satisfies(asList(new ResourceRequirement(EXISTING_RESOURCE, "nope", false, true))));
     }
 }

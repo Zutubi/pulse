@@ -136,7 +136,7 @@ public class PulseFileExpanderTest extends PulseTestCase
         File resourcesFile = copyInputToDirectory("resources.xml", tempDir);
         PulseFileExpanderOptions options = new PulseFileExpanderOptions();
         options.setResourcesFile(resourcesFile.getAbsolutePath());
-        options.getResourceRequirements().add(new ResourceRequirement("my-resource", false));
+        options.getResourceRequirements().add(new ResourceRequirement("my-resource", false, false));
         expandAndCompare(options);
     }
 

@@ -10,13 +10,14 @@ import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class ResourceFileLoaderTest extends PulseTestCase
 {
@@ -97,9 +98,10 @@ public class ResourceFileLoaderTest extends PulseTestCase
     public void testResourceRequirements() throws Exception
     {
         List<ResourceRequirement> requirements = loadRequirements();
-        assertEquals(asList(new ResourceRequirement("basic", false),
-                            new ResourceRequirement("versioned", "aver", false),
-                            new ResourceRequirement("optional-versioned", "aver", true)),
+        assertEquals(asList(new ResourceRequirement("basic", false, false),
+                            new ResourceRequirement("versioned", "aver", false, false),
+                            new ResourceRequirement("inverted", true, false),
+                            new ResourceRequirement("optional-versioned", "aver", false, true)),
                      requirements);
     }
 

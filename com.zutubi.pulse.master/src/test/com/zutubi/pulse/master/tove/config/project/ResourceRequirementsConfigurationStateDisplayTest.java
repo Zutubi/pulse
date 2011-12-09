@@ -8,16 +8,17 @@ import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
-import static java.util.Arrays.asList;
 import org.mockito.Matchers;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class ResourceRequirementsConfigurationStateDisplayTest extends PulseTestCase
 {
@@ -27,9 +28,9 @@ public class ResourceRequirementsConfigurationStateDisplayTest extends PulseTest
     private static final AgentConfiguration AGENT_2 = new AgentConfiguration("two");
     private static final AgentConfiguration AGENT_3 = new AgentConfiguration("three");
 
-    private static final ResourceRequirement REQUIREMENT_1 = new ResourceRequirement("r1", false);
-    private static final ResourceRequirement REQUIREMENT_1_AND_2 = new ResourceRequirement("rboth", false);
-    private static final ResourceRequirement REQUIREMENT_NONE = new ResourceRequirement("rnone", false);
+    private static final ResourceRequirement REQUIREMENT_1 = new ResourceRequirement("r1", false, false);
+    private static final ResourceRequirement REQUIREMENT_1_AND_2 = new ResourceRequirement("rboth", false, false);
+    private static final ResourceRequirement REQUIREMENT_NONE = new ResourceRequirement("rnone", false, false);
 
     private static final ResourceRequirementConfiguration REQUIREMENT_CONFIG_1 = new ResourceRequirementConfiguration(REQUIREMENT_1);
     private static final ResourceRequirementConfiguration REQUIREMENT_CONFIG_1_AND_2 = new ResourceRequirementConfiguration(REQUIREMENT_1_AND_2);

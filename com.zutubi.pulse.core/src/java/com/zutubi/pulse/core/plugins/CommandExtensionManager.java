@@ -84,7 +84,7 @@ public class CommandExtensionManager extends AbstractExtensionManager
         CommandInfo info = new CommandInfo(commandClass);
         for (IConfigurationElement resourceElement: config.getChildren(ELEMENT_RESOURCE))
         {
-            info.addDefaultResourceRequirement(new ResourceRequirement(resourceElement.getAttribute(ATTRIBUTE_NAME), null, Boolean.valueOf(resourceElement.getAttribute(ATTRIBUTE_OPTIONAL))));
+            info.addDefaultResourceRequirement(new ResourceRequirement(resourceElement.getAttribute(ATTRIBUTE_NAME), null, false, Boolean.valueOf(resourceElement.getAttribute(ATTRIBUTE_OPTIONAL))));
         }
 
         return info;

@@ -16,6 +16,7 @@ public class SimpleResourceRequirementConfiguration extends AbstractConfiguratio
     @Required
     private String name;
     private String version;
+    private boolean inverse = false;
     private boolean optional = false;
 
     public String getName()
@@ -38,6 +39,16 @@ public class SimpleResourceRequirementConfiguration extends AbstractConfiguratio
         this.version = version;
     }
 
+    public boolean isInverse()
+    {
+        return inverse;
+    }
+
+    public void setInverse(boolean inverse)
+    {
+        this.inverse = inverse;
+    }
+
     public boolean isOptional()
     {
         return optional;
@@ -52,11 +63,11 @@ public class SimpleResourceRequirementConfiguration extends AbstractConfiguratio
     {
         if (StringUtils.stringSet(version))
         {
-            return new ResourceRequirement(name, version, optional);
+            return new ResourceRequirement(name, version, inverse, optional);
         }
         else
         {
-            return new ResourceRequirement(name, optional);
+            return new ResourceRequirement(name, inverse, optional);
         }
     }
 }

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+
 import static java.util.Arrays.asList;
 
 public class RecipeUtilsTest extends PulseTestCase
@@ -68,7 +69,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportDefaultVersion()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyAdded(context, VERSION_DEFAULT);
         assertPropertyNotAdded(context, VERSION_NON_DEFAULT);
@@ -76,7 +77,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportSpecificVersion()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, VERSION_NON_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, VERSION_NON_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyNotAdded(context, VERSION_DEFAULT);
         assertPropertyAdded(context, VERSION_NON_DEFAULT);
@@ -84,21 +85,21 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportDefaultVersionNoDefault()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_NO_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_NO_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_NO_DEFAULT);
         assertPropertyNotAdded(context, VERSION_ONLY);
     }
 
     public void testImportUnknownResource()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement("unknown", false));
+        ExecutionContext context = populateContext(new ResourceRequirement("unknown", false, false));
         assertPropertyNotAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyNotAdded(context, RESOURCE_NO_DEFAULT);
     }
 
     public void testImportUnknownVersion()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, "unknown", false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, "unknown", false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyNotAdded(context, VERSION_DEFAULT);
         assertPropertyNotAdded(context, VERSION_NON_DEFAULT);
@@ -106,7 +107,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportMultipleResources()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, false), new ResourceRequirement(RESOURCE_NO_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, false, false), new ResourceRequirement(RESOURCE_NO_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyAdded(context, VERSION_DEFAULT);
         assertPropertyNotAdded(context, VERSION_NON_DEFAULT);
@@ -116,7 +117,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportResourceExistingAfterUnknown()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement("unknown", false), new ResourceRequirement(RESOURCE_WITH_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement("unknown", false, false), new ResourceRequirement(RESOURCE_WITH_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyAdded(context, VERSION_DEFAULT);
         assertPropertyNotAdded(context, RESOURCE_NO_DEFAULT);
@@ -124,7 +125,7 @@ public class RecipeUtilsTest extends PulseTestCase
 
     public void testImportResourceExistingAfterUnknownVerison()
     {
-        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, "unknown", false), new ResourceRequirement(RESOURCE_NO_DEFAULT, false));
+        ExecutionContext context = populateContext(new ResourceRequirement(RESOURCE_WITH_DEFAULT, "unknown", false, false), new ResourceRequirement(RESOURCE_NO_DEFAULT, false, false));
         assertPropertyAdded(context, RESOURCE_WITH_DEFAULT);
         assertPropertyAdded(context, RESOURCE_NO_DEFAULT);
     }

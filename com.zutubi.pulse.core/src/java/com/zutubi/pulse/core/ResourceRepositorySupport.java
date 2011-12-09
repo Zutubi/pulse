@@ -21,7 +21,15 @@ public abstract class ResourceRepositorySupport implements ResourceRepository
     {
         for (ResourceRequirement resourceRequirement: requirements)
         {
-            if (!resourceRequirement.isOptional() && !hasResource(resourceRequirement))
+            boolean haveResource = hasResource(resourceRequirement);
+            if (resourceRequirement.isInverse())
+            {
+                if (haveResource)
+                {
+                    return false;
+                }
+            }
+            else if (!haveResource && !resourceRequirement.isOptional())
             {
                 return false;
             }

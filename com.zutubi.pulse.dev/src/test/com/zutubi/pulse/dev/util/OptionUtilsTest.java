@@ -4,26 +4,32 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import org.apache.commons.cli.ParseException;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.Properties;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class OptionUtilsTest extends PulseTestCase
 {
     public void testRequirement() throws PulseException
     {
-        assertEquals(new ResourceRequirement("myresource", false), OptionUtils.parseResourceRequirement("myresource"));
+        assertEquals(new ResourceRequirement("myresource", false, false), OptionUtils.parseResourceRequirement("myresource"));
+    }
+
+    public void testRequirementInverted() throws PulseException
+    {
+        assertEquals(new ResourceRequirement("myresource", true, false), OptionUtils.parseResourceRequirement("!myresource"));
     }
 
     public void testRequirementWithVersion() throws PulseException
     {
-        assertEquals(new ResourceRequirement("myresource", "myversion", false), OptionUtils.parseResourceRequirement("myresource/myversion"));
+        assertEquals(new ResourceRequirement("myresource", "myversion", false, false), OptionUtils.parseResourceRequirement("myresource/myversion"));
     }
 
     public void testRequirementWithEmptyVersion() throws PulseException
     {
-        assertEquals(new ResourceRequirement("myresource", false), OptionUtils.parseResourceRequirement("myresource/"));
+        assertEquals(new ResourceRequirement("myresource", false, false), OptionUtils.parseResourceRequirement("myresource/"));
     }
 
     public void testRequirementEmpty() throws PulseException

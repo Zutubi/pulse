@@ -8,12 +8,13 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.IOAssertions;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.*;
 import java.net.URISyntaxException;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class LocalBuildTest extends PulseTestCase
 {
@@ -93,7 +94,7 @@ public class LocalBuildTest extends PulseTestCase
         String resourceFile = copyInputToDirectory("resources", "xml", tmpDir).getAbsolutePath();
 
         LocalBuildOptions options = getOptions(pulseFile, null);
-        options.setResourceRequirements(asList(new ResourceRequirement("my-resource", false)));
+        options.setResourceRequirements(asList(new ResourceRequirement("my-resource", false, false)));
         options.setResourcesFile(resourceFile);
         builder.runBuild(baseDir, options);
         compareOutput("resourceload");
@@ -105,7 +106,7 @@ public class LocalBuildTest extends PulseTestCase
         String resourceFile = new File(getInputURL("resources", "xml").toURI()).getAbsolutePath();
 
         LocalBuildOptions options = getOptions(pulseFile, null);
-        options.setResourceRequirements(asList(new ResourceRequirement("with-default", false)));
+        options.setResourceRequirements(asList(new ResourceRequirement("with-default", false, false)));
         options.setResourcesFile(resourceFile);
         builder.runBuild(baseDir, options);
         compareOutput("defaultresource");

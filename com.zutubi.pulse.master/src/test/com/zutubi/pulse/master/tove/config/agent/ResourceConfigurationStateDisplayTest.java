@@ -9,13 +9,14 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.util.TreeNode;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class ResourceConfigurationStateDisplayTest extends PulseTestCase
 {
@@ -152,6 +153,6 @@ public class ResourceConfigurationStateDisplayTest extends PulseTestCase
 
     private ResourceRequirementConfiguration createRequirement(String resource)
     {
-        return new ResourceRequirementConfiguration(new ResourceRequirement(resource, false));
+        return new ResourceRequirementConfiguration(new ResourceRequirement(resource, false, false));
     }
 }

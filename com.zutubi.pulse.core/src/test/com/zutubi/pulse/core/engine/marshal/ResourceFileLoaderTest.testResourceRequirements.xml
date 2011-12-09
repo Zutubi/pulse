@@ -2,6 +2,7 @@
 <resources>
     <require name="basic"/>
     <require name="versioned" version="aver"/>
+    <require name="inverted" inverse="true"/>
     <require name="optional-versioned" version="aver" optional="true"/>
 </resources>
         

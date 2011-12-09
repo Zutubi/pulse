@@ -4,13 +4,14 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 public class PulseFileExpanderOptionsTest extends PulseTestCase
 {
@@ -54,8 +55,8 @@ public class PulseFileExpanderOptionsTest extends PulseTestCase
         
         List<ResourceRequirement> requirements = options.getResourceRequirements();
         assertEquals(2, requirements.size());
-        assertThat(requirements, hasItem(new ResourceRequirement("r1", false)));
-        assertThat(requirements, hasItem(new ResourceRequirement("r2", "ver", false)));
+        assertThat(requirements, hasItem(new ResourceRequirement("r1", false, false)));
+        assertThat(requirements, hasItem(new ResourceRequirement("r2", "ver", false, false)));
     }
     
     public void testDefines() throws PulseException

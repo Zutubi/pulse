@@ -26,15 +26,22 @@ public class OptionUtils
         {
             throw new PulseException("Resource requirement is empty");
         }
-        
+
+        boolean inverse = false;
+        if (arg.startsWith("!"))
+        {
+            arg = arg.substring(1);
+            inverse = true;
+        }
+
         int slashOffset = arg.indexOf('/');
         if (slashOffset < 0)
         {
-            return new ResourceRequirement(arg, false);
+            return new ResourceRequirement(arg, inverse, false);
         }
         else if (slashOffset == arg.length() - 1)
         {
-            return new ResourceRequirement(arg.substring(0, slashOffset), false);
+            return new ResourceRequirement(arg.substring(0, slashOffset), inverse, false);
         }
         else
         {
@@ -44,7 +51,7 @@ public class OptionUtils
                 throw new PulseException("Resource requirement '" + arg + "' has empty resource name");
             }
 
-            return new ResourceRequirement(name, arg.substring(slashOffset + 1), false);
+            return new ResourceRequirement(name, arg.substring(slashOffset + 1), inverse, false);
         }
     }
 

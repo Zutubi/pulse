@@ -9,23 +9,30 @@ public class ResourceRequirement
 {
     private String resource;
     private String version;
+    private boolean inverse;
     private boolean optional;
 
-    public ResourceRequirement(String resource, boolean optional)
+    public ResourceRequirement(String resource, boolean inverse, boolean optional)
     {
-        this(resource, null, optional);
+        this(resource, null, inverse, optional);
     }
 
-    public ResourceRequirement(String resource, String version, boolean optional)
+    public ResourceRequirement(String resource, String version, boolean inverse, boolean optional)
     {
         this.resource = resource;
         this.version = version;
+        this.inverse = inverse;
         this.optional = optional;
     }
 
     public String getResource()
     {
         return resource;
+    }
+
+    public boolean isInverse()
+    {
+        return inverse;
     }
 
     public boolean isOptional()
@@ -45,12 +52,12 @@ public class ResourceRequirement
 
     public ResourceRequirement copy()
     {
-        return new ResourceRequirement(resource, version, optional);
+        return new ResourceRequirement(resource, version, inverse, optional);
     }
 
     public String toString()
     {
-        return (resource == null ? "?" : resource) + ":" + (!isDefaultVersion() ? version : "[default]");
+        return (inverse ? "!" : "") + (resource == null ? "?" : resource) + ":" + (!isDefaultVersion() ? version : "[default]");
     }
 
     @Override
@@ -67,6 +74,10 @@ public class ResourceRequirement
 
         ResourceRequirement that = (ResourceRequirement) o;
 
+        if (inverse != that.inverse)
+        {
+            return false;
+        }
         if (optional != that.optional)
         {
             return false;
@@ -88,6 +99,7 @@ public class ResourceRequirement
     {
         int result = resource != null ? resource.hashCode() : 0;
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (inverse ? 1 : 0);
         result = 31 * result + (optional ? 1 : 0);
         return result;
     }

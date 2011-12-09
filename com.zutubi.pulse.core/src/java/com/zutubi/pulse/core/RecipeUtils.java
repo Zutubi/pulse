@@ -27,28 +27,31 @@ public class RecipeUtils
         {
             for (ResourceRequirement requirement : resourceRequirements)
             {
-                ResourceConfiguration resource = resourceRepository.getResource(requirement.getResource());
-                if (resource != null)
+                if (!requirement.isInverse())
                 {
-                    for (ResourcePropertyConfiguration property : resource.getProperties().values())
+                    ResourceConfiguration resource = resourceRepository.getResource(requirement.getResource());
+                    if (resource != null)
                     {
-                        context.add(property.asResourceProperty());
-                    }
-
-                    String importVersion = requirement.getVersion();
-                    if (requirement.isDefaultVersion())
-                    {
-                        importVersion = resource.getDefaultVersion();
-                    }
-
-                    if (StringUtils.stringSet(importVersion))
-                    {
-                        ResourceVersionConfiguration version = resource.getVersion(importVersion);
-                        if (version != null)
+                        for (ResourcePropertyConfiguration property : resource.getProperties().values())
                         {
-                            for (ResourcePropertyConfiguration property : version.getProperties().values())
+                            context.add(property.asResourceProperty());
+                        }
+
+                        String importVersion = requirement.getVersion();
+                        if (requirement.isDefaultVersion())
+                        {
+                            importVersion = resource.getDefaultVersion();
+                        }
+
+                        if (StringUtils.stringSet(importVersion))
+                        {
+                            ResourceVersionConfiguration version = resource.getVersion(importVersion);
+                            if (version != null)
                             {
-                                context.add(property.asResourceProperty());
+                                for (ResourcePropertyConfiguration property : version.getProperties().values())
+                                {
+                                    context.add(property.asResourceProperty());
+                                }
                             }
                         }
                     }

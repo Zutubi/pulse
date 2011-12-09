@@ -5,8 +5,8 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
-@Table(columns = {"resource", "displayVersion", "optional"})
-@Form(fieldOrder = {"resource", "defaultVersion", "version"})
+@Table(columns = {"resource", "displayVersion", "inverse", "optional"})
+@Form(fieldOrder = {"resource", "defaultVersion", "version", "inverse", "optional"})
 @SymbolicName("zutubi.resourceRequirementConfig")
 public class ResourceRequirementConfiguration extends AbstractConfiguration
 {
@@ -17,6 +17,8 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
     private boolean defaultVersion = true;
     @Required // if version is enabled, it is also required.
     private String version;
+    @ControllingCheckbox(uncheckedFields = {"optional"})
+    private boolean inverse;
     private boolean optional;
 
     public ResourceRequirementConfiguration()
@@ -76,6 +78,16 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
         this.version = version;
     }
 
+    public boolean isInverse()
+    {
+        return inverse;
+    }
+
+    public void setInverse(boolean inverse)
+    {
+        this.inverse = inverse;
+    }
+
     public boolean isOptional()
     {
         return optional;
@@ -100,11 +112,11 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
     {
         if (isDefaultVersion())
         {
-            return new ResourceRequirement(resource, optional);
+            return new ResourceRequirement(resource, inverse, optional);
         }
         else
         {
-            return new ResourceRequirement(resource, version, optional);
+            return new ResourceRequirement(resource, version, inverse, optional);
         }
     }
 }

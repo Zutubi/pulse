@@ -8,9 +8,10 @@ import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
+
+import static org.mockito.Mockito.*;
 
 public class AnyCapableAgentRequirementsTest extends PulseTestCase
 {
@@ -41,27 +42,27 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
 
     public void testNonExistantResource()
     {
-        assertFalse(requirements.isFulfilledBy(createRequest(new ResourceRequirement("doesnt exist", false)), mockAgentService));
+        assertFalse(requirements.isFulfilledBy(createRequest(new ResourceRequirement("doesnt exist", false, false)), mockAgentService));
     }
 
     public void testExistingResource()
     {
-        assertTrue(requirements.isFulfilledBy(createRequest(new ResourceRequirement(RESOURCE_NAME, false)), mockAgentService));
+        assertTrue(requirements.isFulfilledBy(createRequest(new ResourceRequirement(RESOURCE_NAME, false, false)), mockAgentService));
     }
 
     public void testUnfulfillableReason()
     {
         assertEquals(
                 "Missing one or more of the following resources. ant:[default].",
-                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", false)))
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", false, false)))
         );
         assertEquals(
                 "Missing one or more of the following resources. ant:1.0.",
-                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false)))
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false, false)))
         );
         assertEquals(
                 "Missing one or more of the following resources. ant:1.0, make:2.0.",
-                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false), new ResourceRequirement("make", "2.0", false)))
+                requirements.getUnfulfilledReason(createRequest(new ResourceRequirement("ant", "1.0", false, false), new ResourceRequirement("make", "2.0", false, false)))
         );
     }
 

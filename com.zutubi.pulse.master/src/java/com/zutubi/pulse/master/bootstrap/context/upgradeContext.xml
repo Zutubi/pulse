@@ -168,6 +168,7 @@
                 <ref local="stageResults"/>
                 <ref local="removeBuildNodeHierarchy"/>
                 <ref local="dropBuildNodeTable"/>
+                <ref local="addResourceRequirementInverse"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -875,5 +876,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.4.1-patch-03.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="addResourceRequirementInverse" class="com.zutubi.pulse.master.upgrade.tasks.AddResourceRequirementInverseUpgradeTask">
+        <property name="buildNumber" value="204999001"/>
     </bean>
 </beans>
