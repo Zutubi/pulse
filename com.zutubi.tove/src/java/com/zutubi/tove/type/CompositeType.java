@@ -626,7 +626,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private boolean recognisedProperty(String property)
     {
-        return property.equals(XML_RPC_SYMBOLIC_NAME) || properties.containsKey(property);
+        return property.startsWith("meta.") || properties.containsKey(property);
     }
 
     private void propertyFromXmlRpc(String tempalteOwnerPath, TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException

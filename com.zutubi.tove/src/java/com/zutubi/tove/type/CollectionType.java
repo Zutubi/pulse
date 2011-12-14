@@ -56,14 +56,14 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             return new LinkedList<String>();
         }
 
-        return new LinkedList(WebUtils.splitAndDecode(SEPARATOR, order));
+        return new LinkedList<String>(WebUtils.splitAndDecode(SEPARATOR, order));
     }
 
     public List<String> getOrder(Record record)
     {
         List<String> order = getDeclaredOrder(record);
 
-        // Remove non-existant keys
+        // Remove non-existent keys
         Set<String> keySet = record.keySet();
         Iterator<String> it = order.iterator();
         while (it.hasNext())

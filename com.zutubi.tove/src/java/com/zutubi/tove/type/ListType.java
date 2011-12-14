@@ -11,11 +11,12 @@ import com.zutubi.util.GraphFunction;
 import java.util.*;
 
 /**
- *
- *
+ * Instances of this type are lists of either simple items or composites.
  */
 public class ListType extends CollectionType
 {
+    private static final String META_LIST_KEY = "meta.listKey";
+
     private HandleAllocator handleAllocator;
 
     public ListType(HandleAllocator handleAllocator, Type collectionType, TypeRegistry typeRegistry) throws TypeException
@@ -179,12 +180,8 @@ public class ListType extends CollectionType
         List<String> order = new ArrayList<String>(collection.size());
         for(Object o: collection)
         {
-            String key;
-            if(o instanceof Configuration && ((Configuration)o).getConfigurationPath() != null)
-            {
-                key = PathUtils.getBaseName(((Configuration)o).getConfigurationPath());
-            }
-            else
+            String key = toRecord.getKey(o);
+            if (key == null)
             {
                 key = Long.toString(handleAllocator.allocateHandle());
             }
@@ -417,13 +414,17 @@ public class ListType extends CollectionType
 
         public Object convert(String key, Type type, Object child) throws TypeException
         {
-            return type.toXmlRpc(templateOwnerPath, child);
+            @SuppressWarnings({"unchecked"})
+            Hashtable<String, Object> struct = (Hashtable<String, Object>) type.toXmlRpc(templateOwnerPath, child);
+            struct.put(META_LIST_KEY, key);
+            return struct;
         }
     }
 
     private static interface ToRecord
     {
         Object convert(Type type, Object data) throws TypeException;
+        String getKey(Object data);
     }
 
     private static class UnstantiateToRecord implements ToRecord
@@ -439,6 +440,18 @@ public class ListType extends CollectionType
         {
             return type.unstantiate(data, templateOwnerPath);
         }
+
+        public String getKey(Object data)
+        {
+            if (data != null && ((Configuration)data).getConfigurationPath() != null)
+            {
+                return PathUtils.getBaseName(((Configuration)data).getConfigurationPath());
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
     private static class XmlRpcToRecord implements ToRecord
@@ -453,6 +466,20 @@ public class ListType extends CollectionType
         public Object convert(Type type, Object data) throws TypeException
         {
             return type.fromXmlRpc(templateOwnerPath, data);
+        }
+
+        public String getKey(Object data)
+        {
+            if (data != null && data instanceof Hashtable)
+            {
+                @SuppressWarnings({"unchecked"})
+                Hashtable<String, Object> struct = (Hashtable<String, Object>) data;
+                return (String) struct.get(META_LIST_KEY);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
