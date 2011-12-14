@@ -589,7 +589,12 @@ Ext.apply(Zutubi.pulse.project, {
                 name: 'stages',
                 cls: 'nowrap',
                 renderer: Zutubi.pulse.project.renderers.buildStages
-            }
+            },
+
+            version: {
+                name: 'version',
+                renderer: Ext.util.Format.htmlEncode
+            },
         },
         
         /**
