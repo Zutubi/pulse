@@ -1519,7 +1519,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                         {
                             // References to the key in the parent record
                             // (e.g. in a declared order) need to be updated.
-                            // Same goes for template descedents of the
+                            // Same goes for template descendants of the
                             // parent.
                             updateCollectionReferences(collectionType, parentPath, oldKey, newKey);
                         }

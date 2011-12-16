@@ -192,7 +192,7 @@ public class ServerActivityModel
 
         public ActiveBuildModel(boolean personal)
         {
-            super(0, 0, personal, null, null, null, null, null, null, null);
+            super(0, 0, personal, null, null, null, null, null, null, null, null);
             hidden = true;
         }
 

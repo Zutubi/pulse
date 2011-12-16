@@ -739,6 +739,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         Property property = child.getPropertiesList().get(0);
         assertNotNull(property);
         assertEquals("gp1", property.getName());
+        long expectedHandle = property.getHandle();
 
         clone = configurationTemplateManager.deepClone(child);
         clone.getPropertiesList().add(new Property("newer", "value"));
@@ -748,6 +749,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         property = child.getPropertiesList().get(0);
         assertNotNull(property);
         assertEquals("gp1", property.getName());
+        // Verify the handle to make sure this is not a new property that looks the same.
+        assertEquals(expectedHandle, property.getHandle());
     }
 
     public void testHideInherited()

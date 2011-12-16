@@ -29,10 +29,11 @@ public class BuildModel extends ResultModel
     private String link;
     private String tests;
     private String maturity;
+    private String version;
     private boolean pinned;
     private List<BuildStageModel> stages = new LinkedList<BuildStageModel>();
 
-    public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision, String maturity)
+    public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision, String maturity, String version)
     {
         super(id, status);
         this.number = number;
@@ -41,7 +42,9 @@ public class BuildModel extends ResultModel
         this.owner = owner;
         this.prettyQueueTime = prettyQueueTime;
         this.reason = reason;
+        this.revision = revision;
         this.maturity = maturity;
+        this.version = version;
     }
 
     public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts)
@@ -75,6 +78,7 @@ public class BuildModel extends ResultModel
         }
 
         maturity = buildResult.getStatus();
+        version = buildResult.getVersion();
         pinned = buildResult.isPinned();
     }
 
@@ -131,6 +135,11 @@ public class BuildModel extends ResultModel
     public String getMaturity()
     {
         return maturity;
+    }
+
+    public String getVersion()
+    {
+        return version;
     }
 
     public boolean isPinned()

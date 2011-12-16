@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -14,7 +15,9 @@ import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
 import java.util.*;
@@ -26,6 +29,7 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -458,6 +462,85 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(projectPath + "/options");
         assertEquals(true, loadedOptions.get("prompt"));
+    }
+
+    public void testSaveConfigDeepListItems() throws Exception
+    {
+        // New project, no requirements.
+        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, true);
+        Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
+        Vector<Hashtable<String, Object>> requirements = (Vector<Hashtable<String, Object>>) project.get("requirements");
+        verifyRequirements(requirements);
+
+        // Add requirement, save project deeply and verify requirement
+        requirements.add(createRequirement("r1"));
+        rpcClient.RemoteApi.saveConfig(projectPath, project, true);
+
+        project = rpcClient.RemoteApi.getConfig(projectPath);
+        requirements = (Vector<Hashtable<String, Object>>) project.get("requirements");
+        verifyRequirements(requirements, "r1");
+
+        // Add another requirement, save project deeply and verify both requirements
+        requirements.add(createRequirement("r2"));
+        rpcClient.RemoteApi.saveConfig(projectPath, project, true);
+
+        project = rpcClient.RemoteApi.getConfig(projectPath);
+        requirements = (Vector<Hashtable<String, Object>>) project.get("requirements");
+        verifyRequirements(requirements, "r1", "r2");
+    }
+
+    public void testSaveConfigDeepInheritedListItems() throws Exception
+    {
+        String random = randomName();
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+
+        // Template project with one requirement
+        String parentPath = rpcClient.RemoteApi.insertSimpleProject(parentName, true);
+        rpcClient.RemoteApi.insertConfig(getPath(parentPath, "requirements"), createRequirement("p1"));
+
+        // Child project, add requirement and deeply save, then verify requirements
+        String childPath = rpcClient.RemoteApi.insertSimpleProject(childName, parentName, false);
+        Hashtable<String, Object> child = rpcClient.RemoteApi.getConfig(childPath);
+        Vector<Hashtable<String, Object>> requirements = (Vector<Hashtable<String, Object>>) child.get("requirements");
+        verifyRequirements(requirements, "p1");
+        requirements.add(createRequirement("c1"));
+        rpcClient.RemoteApi.saveConfig(childPath, child, true);
+
+        child = rpcClient.RemoteApi.getConfig(childPath);
+        requirements = (Vector<Hashtable<String, Object>>) child.get("requirements");
+        verifyRequirements(requirements, "p1", "c1");
+
+        // Now verify that we are actually seeing the parent's requirement in
+        // the child, not just a local requirement with the same name.
+        List<String> parentHandles = rpcClient.RemoteApi.getConfigListing(getPath(parentPath, "requirements"));
+        List<String> childHandles = rpcClient.RemoteApi.getConfigListing(getPath(childPath, "requirements"));
+        assertThat(childHandles, hasItem(parentHandles.get(0)));
+    }
+
+    private Hashtable<String, Object> createRequirement(String resource)
+    {
+        Hashtable<String, Object> requirement = rpcClient.RemoteApi.createEmptyConfig(ResourceRequirementConfiguration.class);
+        requirement.put("resource", resource);
+        return requirement;
+    }
+
+    private void verifyRequirements(Vector<Hashtable<String, Object>> requirements, String... expectedNames)
+    {
+        assertEquals(sorted(asList(expectedNames)), sorted(CollectionUtils.map(requirements, new Mapping<Hashtable<String, Object>, String>()
+        {
+            public String map(Hashtable<String, Object> requirement)
+            {
+                return (String) requirement.get("resource");
+            }
+        })));
+    }
+
+    private List<String> sorted(List<String> l)
+    {
+        List<String> copy = new LinkedList<String>(l);
+        Collections.sort(copy);
+        return copy;
     }
 
     public void testDeleteConfigEmptyPath() throws Exception
