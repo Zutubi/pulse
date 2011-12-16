@@ -10,36 +10,57 @@ import java.io.File;
 import java.util.List;
 
 /**
- * A predicate that is satisfied if and only if the tested string
- * is not matched by one of the excluded paths.
+ * A predicate that is satisfied if and only if the tested string passes
+ * specified inclusion and exclusion filters.  To pass the predicate, a path
+ * must match at least one inclusion and no exclusions.  As a special case, if
+ * there are no inclusions only exclusions are applied (i.e. specifying no
+ * inclusions is equivalent to having inclusions that match all paths).
  *
- * The excluded path format uses ant selector formatting.
+ * The filter path format uses ant selector formatting.
  * <ul>
  * <li>** - matches multiple path components, ie: this/path/is/matched.</li>
  * <li>*  - matches a single path component.</li>
  * <li>the rest is matched literally.</li>
  * </ul>
  */
-public class ExcludePathPredicate implements Predicate<String>
+public class FilterPathsPredicate implements Predicate<String>
 {
+    private List<String> includedPaths = null;
     private List<String> excludedPaths = null;
 
-    public ExcludePathPredicate(List<String> excludedPaths)
+    public FilterPathsPredicate(List<String> includedPaths, List<String> excludedPaths)
     {
-        this.excludedPaths = CollectionUtils.map(excludedPaths, new Mapping<String, String>()
+        Mapping<String, String> normaliseMapping = new Mapping<String, String>()
         {
             public String map(String s)
             {
                 return normalisePath(s);
             }
-        });
+        };
+
+        this.includedPaths = CollectionUtils.map(includedPaths, normaliseMapping);
+        this.excludedPaths = CollectionUtils.map(excludedPaths, normaliseMapping);
     }
 
     public boolean satisfied(String path)
     {
         path = normalisePath(path);
+        return isIncluded(path) && !isExcluded(path);
+    }
 
-        for (String pattern : excludedPaths)
+    private boolean isIncluded(String path)
+    {
+        return includedPaths.isEmpty() || pathMatchesPatterns(path, includedPaths);
+    }
+
+    private boolean isExcluded(String path)
+    {
+       return pathMatchesPatterns(path, excludedPaths);
+    }
+
+    private boolean pathMatchesPatterns(String path, List<String> patterns)
+    {
+        for (String pattern: patterns)
         {
             // The Ant selector will only match a path starting with the
             // file separator if the pattern also starts with the file
@@ -58,10 +79,11 @@ public class ExcludePathPredicate implements Predicate<String>
 
             if (SelectorUtils.matchPath(pattern, matchPath))
             {
-                return false;
+                return true;
             }
         }
-        return true;
+
+        return false;
     }
 
     private String normalisePath(String path)

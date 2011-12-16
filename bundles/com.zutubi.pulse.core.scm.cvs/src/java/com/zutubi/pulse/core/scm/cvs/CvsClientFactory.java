@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
@@ -26,7 +26,7 @@ public class CvsClientFactory implements ScmClientFactory<CvsConfiguration>
                             config.getBranch()
                     }
             );
-            client.setExcludedPaths(config.getFilterPaths());
+            client.setFilterPaths(config.getIncludedPaths(), config.getExcludedPaths());
             return client;
         }
         catch (Exception e)

@@ -664,7 +664,7 @@ public class PerforceClientTest extends PerforceTestBase
             configuration = new PerforceConfiguration(getP4Port(), "test-user", "", workspaceOrView);
         }
         
-        configuration.setFilterPaths(Arrays.asList(excludedPaths));
+        configuration.setExcludedPaths(Arrays.asList(excludedPaths));
         this.client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         this.core.setEnv(PerforceConstants.ENV_PORT, getP4Port());
         this.core.setEnv(PerforceConstants.ENV_USER, "test-user");

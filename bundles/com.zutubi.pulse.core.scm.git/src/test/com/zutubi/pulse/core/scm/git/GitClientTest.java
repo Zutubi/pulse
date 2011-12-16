@@ -458,7 +458,7 @@ public class GitClientTest extends GitClientTestBase
     public void testLatestChangesWithExcludes() throws ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.setExcludedPaths(Arrays.asList("**/*"));
+        client.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/*"));
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~1"), new Revision(REVISION_MASTER_LATEST));
         assertEquals(0, changes.size());
@@ -467,7 +467,7 @@ public class GitClientTest extends GitClientTestBase
     public void testLatestChangesWithSpecificExcludes() throws ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.setExcludedPaths(Arrays.asList("**/c.txt"));
+        client.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/c.txt"));
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision(REVISION_MASTER_LATEST + "~1"), new Revision(REVISION_MASTER_LATEST));
         assertEquals(1, changes.size());

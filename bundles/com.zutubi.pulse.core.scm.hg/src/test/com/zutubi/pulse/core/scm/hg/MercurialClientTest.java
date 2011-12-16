@@ -7,10 +7,6 @@ import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +15,11 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class MercurialClientTest extends MercurialTestBase
 {
@@ -298,7 +299,7 @@ public class MercurialClientTest extends MercurialTestBase
 
     public void testLatestChangesWithExcludes() throws ScmException
     {
-        config.setFilterPaths(asList("**/*"));
+        config.setExcludedPaths(asList("**/*"));
         client.init(scmContext, new ScmFeedbackAdapter());
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision(MercurialConstants.REVISION_ZERO), null);
@@ -307,7 +308,7 @@ public class MercurialClientTest extends MercurialTestBase
 
     public void testLatestChangesWithSpecificExcludes() throws ScmException
     {
-        config.setFilterPaths(asList(CONTENT_FILE_PATH));
+        config.setExcludedPaths(asList(CONTENT_FILE_PATH));
         client.init(scmContext, new ScmFeedbackAdapter());
 
         List<Changelist> changes = client.getChanges(scmContext, new Revision(MercurialConstants.REVISION_ZERO), null);

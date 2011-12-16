@@ -42,6 +42,10 @@ public class NativeGit
     private ScmProcessRunner runner;
     private DateFormat timeFormat = SimpleDateFormat.getDateTimeInstance();
     /**
+     * The paths to be included in log requests.
+     */
+    private List<String> includedPaths = new LinkedList<String>();
+    /**
      * The paths to be excluded from log requests.
      */
     private List<String> excludedPaths = new LinkedList<String>();
@@ -191,7 +195,7 @@ public class NativeGit
             }
         }
 
-        LogOutputHandler handler = new LogOutputHandler(this.excludedPaths);
+        LogOutputHandler handler = new LogOutputHandler(includedPaths, excludedPaths);
 
         runWithHandler(handler, null, true, command.toArray(new String[command.size()]));
 
@@ -344,8 +348,9 @@ public class NativeGit
         return System.getProperty(PROPERTY_GIT_COMMAND, DEFAULT_GIT);
     }
 
-    public void setExcludedPaths(List<String> excludedPaths)
+    public void setFilterPaths(List<String> includedPaths, List<String> excludedPaths)
     {
+        this.includedPaths = includedPaths;
         this.excludedPaths = excludedPaths;
     }
 
@@ -424,16 +429,18 @@ public class NativeGit
         private List<GitLogEntry> entries;
 
         private List<String> lines;
+        private List<String> includedPaths;
         private List<String> excludedPaths;
 
         public LogOutputHandler()
         {
-            this(new LinkedList<String>());
+            this(Collections.<String>emptyList(), Collections.<String>emptyList());
         }
 
-        public LogOutputHandler(List<String> excludedPaths)
+        public LogOutputHandler(List<String> includedPaths, List<String> excludedPaths)
         {
             this.lines = new LinkedList<String>();
+            this.includedPaths = includedPaths;
             this.excludedPaths = excludedPaths;
         }
 
@@ -453,7 +460,7 @@ public class NativeGit
          */
         public List<GitLogEntry> getEntries() throws GitException
         {
-            final Predicate<String> changesFilter = new ExcludePathPredicate(this.excludedPaths);
+            final Predicate<String> changesFilter = new FilterPathsPredicate(this.includedPaths, this.excludedPaths);
 
             try
             {

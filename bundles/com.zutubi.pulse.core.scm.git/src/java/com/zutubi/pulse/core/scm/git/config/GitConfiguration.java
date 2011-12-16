@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.gitConfig")
 @ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     public enum CloneType

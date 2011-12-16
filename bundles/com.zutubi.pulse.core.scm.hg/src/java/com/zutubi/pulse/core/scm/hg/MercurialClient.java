@@ -20,7 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
- * Mercurial source control system (http://git.or.cz/).
+ * Mercurial source control system (http://mercurial.selenic.com/).
  */
 public class MercurialClient implements ScmClient
 {
@@ -285,7 +285,7 @@ public class MercurialClient implements ScmClient
                 changelists = changelists.subList(1, changelists.size());
             }
 
-            return CollectionUtils.filter(changelists, new ChangelistPathsPredicate(config.getFilterPaths()));
+            return CollectionUtils.filter(changelists, new ChangelistPathsPredicate(config.getIncludedPaths(), config.getExcludedPaths()));
         }
         finally
         {

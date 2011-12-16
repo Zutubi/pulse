@@ -470,7 +470,7 @@ public class SubversionClientTest extends PulseTestCase
         assertEquals(8, changelist.getChanges().size());
 
         // exclude the new changes
-        client.setExcludedPaths(Arrays.asList("**/afolder/**"));
+        client.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/afolder/**"));
         changelists = client.getChanges(null, createRevision(0), createRevision(1));
 
         assertEquals(0, changelists.size());

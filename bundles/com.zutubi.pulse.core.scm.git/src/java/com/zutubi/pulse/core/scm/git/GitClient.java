@@ -87,9 +87,7 @@ public class GitClient implements ScmClient
      */
     private int inactivityTimeout;
     private GitConfiguration.CloneType cloneType;
-    /**
-     * The list of scm paths to be excluded from log requests.
-     */
+    private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
 
     public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType)
@@ -399,7 +397,7 @@ public class GitClient implements ScmClient
     private NativeGit preparePersistentDirectory(File workingDir) throws ScmException
     {
         NativeGit git = new NativeGit(inactivityTimeout);
-        git.setExcludedPaths(excludedPaths);
+        git.setFilterPaths(includedPaths, excludedPaths);
         if (!isGitRepository(workingDir))
         {
             String path;
@@ -640,8 +638,9 @@ public class GitClient implements ScmClient
         this.branch = branch;
     }
 
-    public void setExcludedPaths(List<String> excludedPaths)
+    public void setFilterPaths(List<String> includedPaths, List<String> excludedPaths)
     {
+        this.includedPaths = includedPaths;
         this.excludedPaths = excludedPaths;
     }
 

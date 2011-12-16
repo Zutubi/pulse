@@ -1,12 +1,13 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.engine.api.ResourceProperty;
 
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CvsClientTest extends AbstractCvsClientTestCase
@@ -72,25 +73,25 @@ public class CvsClientTest extends AbstractCvsClientTestCase
         assertEquals(6, changes.get(0).getChanges().size());
 
         // filter all .txt files
-        cvsClient.setExcludedPaths(Arrays.asList("**/*.txt"));
+        cvsClient.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/*.txt"));
         changes = cvsClient.getChanges(scmContext, from, to);
         assertEquals(1, changes.size());
         assertEquals(4, changes.get(0).getChanges().size());
 
         // filter the file.txt files in the subdirectory.
-        cvsClient.setExcludedPaths(Arrays.asList("**/directory/file.txt"));
+        cvsClient.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/directory/file.txt"));
         changes = cvsClient.getChanges(scmContext, from, to);
         assertEquals(1, changes.size());
         assertEquals(5, changes.get(0).getChanges().size());
 
         // filter .txt and everything from the directory subdirectory.
-        cvsClient.setExcludedPaths(Arrays.asList("**/*.txt", "**/directory/*"));
+        cvsClient.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/*.txt", "**/directory/*"));
         changes = cvsClient.getChanges(null, from, to);
         assertEquals(1, changes.size());
         assertEquals(2, changes.get(0).getChanges().size());
 
         // filter everything.
-        cvsClient.setExcludedPaths(Arrays.asList("**/*"));
+        cvsClient.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/*"));
         changes = cvsClient.getChanges(null, from, to);
         assertEquals(0, changes.size());
     }

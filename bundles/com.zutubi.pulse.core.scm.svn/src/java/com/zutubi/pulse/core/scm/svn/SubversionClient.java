@@ -59,6 +59,7 @@ public class SubversionClient implements ScmClient
      */
     private List<String> externalsPaths = new LinkedList<String>();
     private boolean verifyExternals = true;
+    private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
     private SVNRepository repository;
     private ISVNAuthenticationManager authenticationManager;
@@ -248,8 +249,9 @@ public class SubversionClient implements ScmClient
         return options.isAuthStorageEnabled();
     }
 
-    public void setExcludedPaths(List<String> excludedPaths)
+    public void setFilterPaths(List<String> includedPaths, List<String> excludedPaths)
     {
+        this.includedPaths = includedPaths;
         this.excludedPaths = excludedPaths;
     }
 
@@ -519,7 +521,7 @@ public class SubversionClient implements ScmClient
     private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, ScmException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-        Predicate<String> changelistFilter = new ExcludePathPredicate(excludedPaths);
+        Predicate<String> changelistFilter = new FilterPathsPredicate(includedPaths, excludedPaths);
 
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
 

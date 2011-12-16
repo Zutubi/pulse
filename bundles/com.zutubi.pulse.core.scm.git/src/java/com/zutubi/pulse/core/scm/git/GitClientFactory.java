@@ -17,7 +17,7 @@ public class GitClientFactory implements ScmClientFactory<GitConfiguration>
     {
         int inactivityTimeout = config.isInactivityTimeoutEnabled() ? config.getInactivityTimeoutSeconds() : 0;
         GitClient client = new GitClient(config.getRepository(), config.getBranch(), inactivityTimeout, config.getCloneType());
-        client.setExcludedPaths(config.getFilterPaths());
+        client.setFilterPaths(config.getIncludedPaths(), config.getExcludedPaths());
         return client;
     }
 }

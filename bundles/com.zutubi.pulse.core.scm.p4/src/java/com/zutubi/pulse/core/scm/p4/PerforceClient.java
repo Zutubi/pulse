@@ -170,7 +170,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
         Revision revision = new Revision(Long.toString(number));
-        ExcludePathPredicate predicate = new ExcludePathPredicate(configuration.getFilterPaths());
+        FilterPathsPredicate predicate = new FilterPathsPredicate(configuration.getIncludedPaths(), configuration.getExcludedPaths());
         List<FileChange> changes = new LinkedList<FileChange>();
         boolean fileExcluded = false;
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)

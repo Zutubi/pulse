@@ -52,9 +52,7 @@ public class CvsClient implements ScmClient
     private String root;
     private String password;
 
-    /**
-     * A list of ant style path expressions that define what should be excluded from being considered as a change.
-     */
+    private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
 
     public CvsClient(String root, String module, String password, String branch)
@@ -82,15 +80,16 @@ public class CvsClient implements ScmClient
         return modules;
     }
 
-    public CvsClient(String root, String module, String password, String branch, List<String> filteredPaths, File tempDir)
+    public CvsClient(String root, String module, String password, String branch, List<String> includedPaths, List<String> excludedPaths, File tempDir)
     {
         this(root, module, password, branch);
-        setExcludedPaths(filteredPaths);
+        setFilterPaths(includedPaths, excludedPaths);
         setTemporarySpace(tempDir);
     }
 
-    public void setExcludedPaths(List<String> excluded)
+    public void setFilterPaths(List<String> included, List<String> excluded)
     {
+        this.includedPaths = included;
         this.excludedPaths = excluded;
     }
 
@@ -492,7 +491,7 @@ public class CvsClient implements ScmClient
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
-        changes = ScmUtils.filter(changes, new ExcludePathPredicate(excludedPaths));
+        changes = ScmUtils.filter(changes, new FilterPathsPredicate(includedPaths, excludedPaths));
         if (changes.size() == 0)
         {
             return changes;

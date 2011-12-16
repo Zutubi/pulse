@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.validation.annotation.CvsRoot;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.validation.annotations.Required;
@@ -10,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-@Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths"})
 @ConfigurationCheck("CvsConfigurationCheckHandler")
 @SymbolicName("zutubi.cvsConfig")
 public class CvsConfiguration extends PollableScmConfiguration

@@ -169,6 +169,7 @@
                 <ref local="removeBuildNodeHierarchy"/>
                 <ref local="dropBuildNodeTable"/>
                 <ref local="addResourceRequirementInverse"/>
+                <ref local="scmInclusionPaths"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -880,5 +881,9 @@
 
     <bean id="addResourceRequirementInverse" class="com.zutubi.pulse.master.upgrade.tasks.AddResourceRequirementInverseUpgradeTask">
         <property name="buildNumber" value="204999001"/>
+    </bean>
+
+    <bean id="scmInclusionPaths" class="com.zutubi.pulse.master.upgrade.tasks.ScmInclusionPathsUpgradeTask">
+        <property name="buildNumber" value="204999002"/>
     </bean>
 </beans>

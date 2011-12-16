@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * A supporting base class for configuration of SCMs that support polling.
  */
 @SymbolicName("zutubi.pollableScmConfig")
 public abstract class PollableScmConfiguration extends ScmConfiguration implements Pollable
@@ -40,7 +41,11 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
 
     @StringList
     @Wizard.Ignore
-    private List<String> filterPaths = new LinkedList<String>();
+    private List<String> includedPaths = new LinkedList<String>();
+
+    @StringList
+    @Wizard.Ignore
+    private List<String> excludedPaths = new LinkedList<String>();
 
     public boolean isMonitor()
     {
@@ -92,13 +97,23 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
         this.quietPeriod = quietPeriod;
     }
 
-    public List<String> getFilterPaths()
+    public List<String> getIncludedPaths()
     {
-        return filterPaths;
+        return includedPaths;
     }
 
-    public void setFilterPaths(List<String> filterPaths)
+    public void setIncludedPaths(List<String> includedPaths)
     {
-        this.filterPaths = filterPaths;
+        this.includedPaths = includedPaths;
+    }
+
+    public List<String> getExcludedPaths()
+    {
+        return excludedPaths;
+    }
+
+    public void setExcludedPaths(List<String> excludedPaths)
+    {
+        this.excludedPaths = excludedPaths;
     }
 }
