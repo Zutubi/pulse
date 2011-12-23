@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -28,12 +27,21 @@ public class SaveAction extends ToveActionSupport
         this.symbolicName = symbolicName;
     }
 
+    public CompositeType getType()
+    {
+        if (type == null && StringUtils.stringSet(symbolicName))
+        {
+            type = typeRegistry.getType(symbolicName);
+        }
+
+        return (CompositeType) type;
+    }
+
     public void doCancel()
     {
-        String parentPath = PathUtils.getParentPath(path);
-        if(isParentEmbeddedCollection(parentPath))
+        if(isParentEmbeddedCollection())
         {
-            path = parentPath;
+            path = PathUtils.getParentPath(path);
         }
 
         response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
@@ -50,32 +58,46 @@ public class SaveAction extends ToveActionSupport
             return doRender();
         }
     }
-
-    @SuppressWarnings({"unchecked"})
-    private String doSave() throws Exception
+    
+    protected String doSave() throws Exception
     {
-        if (!StringUtils.stringSet(symbolicName))
-        {
-            return doRender();
-        }
-
-        CompositeType type = typeRegistry.getType(symbolicName);
+        CompositeType type = getType();
         if (type == null)
         {
             return doRender();
         }
+        
+        bindRecord();
+        
+        if (validateRecord())
+        {
+            setupResponse(configurationTemplateManager.saveRecord(path, (MutableRecord) record));
+            return doRender();            
+        }
+        else
+        {
+            return INPUT;
+        }
+    }
 
+    @SuppressWarnings({"unchecked"})
+    protected void bindRecord()
+    {
+        CompositeType type = getType();
         record = ToveUtils.toRecord(type, ActionContext.getContext().getParameters());
         Record existingRecord = configurationTemplateManager.getRecord(path);
         if (existingRecord != null)
         {
             ToveUtils.unsuppressPasswords(existingRecord, (MutableRecord) record, type, false);
         }
-        
-        String parentPath = PathUtils.getParentPath(path);
-        String baseName = PathUtils.getBaseName(path);
+    }
+
+    protected boolean validateRecord()
+    {
         try
         {
+            String parentPath = PathUtils.getParentPath(path);
+            String baseName = PathUtils.getBaseName(path);
             Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, configurationTemplateManager.isConcrete(path), false);
             if (!instance.isValid())
             {
@@ -86,15 +108,13 @@ public class SaveAction extends ToveActionSupport
         {
             addActionError(e.getMessage());
         }
+        
+        return !hasErrors();
+    }
 
-        if(hasErrors())
-        {
-            return INPUT;
-        }
-
-        String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
-
-        if(isParentEmbeddedCollection(parentPath))
+    protected void setupResponse(String newPath)
+    {
+        if (isParentEmbeddedCollection())
         {
             path = PathUtils.getParentPath(newPath);
             response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
@@ -111,18 +131,5 @@ public class SaveAction extends ToveActionSupport
 
             path = newPath;
         }
-
-        return doRender();
-    }
-
-    private boolean isParentEmbeddedCollection(String parentPath)
-    {
-        if(parentPath == null)
-        {
-            return false;
-        }
-
-        ComplexType parentType = configurationTemplateManager.getType(parentPath);
-        return ToveUtils.isEmbeddedCollection(parentType);
     }
 }

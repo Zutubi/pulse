@@ -1,23 +1,21 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
 /**
- * Labels are used for freeform categorisation.
+ * Transient configuration used as an argument when renaming labels.
  */
-@SymbolicName("zutubi.labelConfig")
-@Form(fieldOrder = "label", actionName = "saveLabel")
-public class LabelConfiguration extends AbstractConfiguration
+@SymbolicName("zutubi.newLabelConfig")
+public class NewLabelConfiguration extends AbstractConfiguration
 {
     private String label;
 
-    public LabelConfiguration()
+    public NewLabelConfiguration()
     {
     }
 
-    public LabelConfiguration(String label)
+    public NewLabelConfiguration(String label)
     {
         this.label = label;
     }

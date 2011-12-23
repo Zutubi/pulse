@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.tove.model.FieldDescriptor;
 import com.zutubi.tove.type.record.Record;
 
 /**

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.velocity;
 
+import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.model.*;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -102,7 +103,10 @@ public class FormDirective extends ToveDirective
             formDescriptor.setReadOnly(!configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE));
             formDescriptor.setAjax(ajax);
             formDescriptor.setNamespace(namespace);
-
+            if (ctype.getClazz().equals(LabelConfiguration.class))
+            {
+                formDescriptor.setAction("saveLabel");
+            }
             // These decorations should be genericised
             if (displayMode)
             {

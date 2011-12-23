@@ -1,6 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.admin.LabelForm;
+import com.zutubi.pulse.acceptance.forms.admin.NewLabelForm;
+import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
+import com.zutubi.pulse.master.tove.config.NewLabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
@@ -142,6 +146,114 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         assertFalse(browsePage.isGroupPresent(group));
     }
 
+    public void testRenameLabelAction() throws Exception
+    {
+        String p1 = random + "-p1";
+        String p2 = random + "-p2";
+        String originalLabel = random + "-label";
+        String editedLabel = originalLabel + "-edited";
+        
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p2,  false);
+
+        String l1Path = rpcClient.RemoteApi.addLabel(p1, originalLabel);
+        String l2Path = rpcClient.RemoteApi.addLabel(p2, originalLabel);
+
+        Hashtable<String, Object> newLabel = rpcClient.RemoteApi.createEmptyConfig(NewLabelConfiguration.class);
+        newLabel.put("label", editedLabel);
+        
+        rpcClient.RemoteApi.doConfigActionWithArgument(l1Path, "rename", newLabel);
+
+        assertLabelName(editedLabel, l1Path);
+        assertLabelName(editedLabel, l2Path);
+    }
+
+    public void testRenameLabelCustomWorkflow() throws Exception
+    {
+        String p1 = random + "-p1";
+        String p2 = random + "-p2";
+        String originalName = random + "-label";
+        String secondName = originalName + "-edited";
+        String thirdName = secondName + "-edited";
+        String finalName = thirdName + "-edited";
+
+        rpcClient.RemoteApi.insertSimpleProject(p1,  false);
+        rpcClient.RemoteApi.insertSimpleProject(p2,  false);
+
+        // Begin with two differently named labels, rename one so it matches the other, then rename
+        // again to test custom workflow will prompt to change both.
+        
+        String l1Path = rpcClient.RemoteApi.addLabel(p1, originalName);
+        String l2Path = rpcClient.RemoteApi.addLabel(p2, secondName);
+
+        getBrowser().loginAsAdmin();
+        // View then cancel, nothing changes.
+        ListPage labelsPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(l1Path));
+        labelsPage.clickView(PathUtils.getBaseName(l1Path));        
+        LabelForm labelForm = getBrowser().createForm(LabelForm.class);
+        labelForm.waitFor();
+        labelForm.cancelFormElements("");
+        
+        labelsPage.waitFor();
+        assertLabelName(originalName, l1Path);
+        assertLabelName(secondName, l2Path);
+
+        // View and edit, only first label changes.
+        labelsPage.clickView(PathUtils.getBaseName(l1Path));
+        labelForm.waitFor();
+        labelForm.saveFormElements(secondName);
+        
+        labelsPage.waitFor();
+        assertLabelName(secondName, l1Path);
+        assertLabelName(secondName, l2Path);
+
+        // View then edit, prompted for both labels, cancel and nothing changes.
+        labelsPage.clickView(PathUtils.getBaseName(l1Path));
+        labelForm.waitFor();
+        labelForm.saveFormElements(thirdName);
+
+        NewLabelForm renameForm = getBrowser().createForm(NewLabelForm.class);
+        renameForm.waitFor();
+        assertTrue(getBrowser().isTextPresent("rename all labels?"));        
+        renameForm.cancelFormElements("");
+        
+        labelsPage.waitFor();
+        assertLabelName(secondName, l1Path);
+        assertLabelName(secondName, l2Path);
+
+        // View then edit, prompted for both labels, edit and change both.
+        labelsPage.clickView(PathUtils.getBaseName(l1Path));
+        labelForm.waitFor();
+        labelForm.saveFormElements(thirdName);
+
+        renameForm.waitFor();
+        assertTrue(getBrowser().isTextPresent("rename all labels?"));
+        renameForm.submitFormElements("all", thirdName);
+
+        labelsPage.waitFor();
+        assertLabelName(thirdName, l1Path);
+        assertLabelName(thirdName, l2Path);
+        
+        // View then edit, prompted for both labels, edit one and only that one changes.
+        labelsPage.clickView(PathUtils.getBaseName(l1Path));
+        labelForm.waitFor();
+        labelForm.saveFormElements(finalName);
+
+        renameForm.waitFor();
+        assertTrue(getBrowser().isTextPresent("rename all labels?"));
+        renameForm.submitFormElements("one", finalName);
+
+        labelsPage.waitFor();
+        assertLabelName(finalName, l1Path);
+        assertLabelName(thirdName, l2Path);
+    }
+
+    private void assertLabelName(String expectedName, String path) throws Exception
+    {
+        Hashtable<String, Object> label = rpcClient.RemoteApi.getConfig(path);
+        assertEquals(expectedName, label.get("label"));        
+    }
+    
     private void assertGroupPresent(BrowsePage browsePage, String group, String... projects)
     {
         assertTrue("Group '" + group + "' not found", browsePage.isGroupPresent(group));

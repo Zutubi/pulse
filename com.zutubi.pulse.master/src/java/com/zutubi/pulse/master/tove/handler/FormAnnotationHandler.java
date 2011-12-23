@@ -18,6 +18,7 @@ public class FormAnnotationHandler implements AnnotationHandler
     {
         Form form = (Form) annotation;
         FormDescriptor formDescriptor = (FormDescriptor) descriptor;
+        formDescriptor.setAction(form.actionName());
         formDescriptor.setActions(form.actions());
         
         // Collect all of the annotations fields in a map and add them to the descriptor.

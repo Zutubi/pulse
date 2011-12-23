@@ -12,10 +12,8 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.CollectionType;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.Type;
-import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
@@ -205,6 +203,18 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         return ERROR;
     }
 
+    protected boolean isParentEmbeddedCollection()
+    {
+        String parentPath = PathUtils.getParentPath(path);
+        if (parentPath == null)
+        {
+            return false;
+        }
+
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        return ToveUtils.isEmbeddedCollection(parentType);
+    }
+
     /**
      * Find and return (if available) a custom velocity template to use when rendering
      * the specified configuration type.
@@ -276,8 +286,6 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
             VelocityClasspathResourceLoader.CONTEXT.set(null);
         }
     }
-
-
 
     public Template getTemplate()
     {

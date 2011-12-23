@@ -88,6 +88,11 @@ public class GenericAction extends ToveActionSupport
 
     public void doCancel()
     {
+        if(isParentEmbeddedCollection())
+        {
+            path = PathUtils.getParentPath(path);
+        }
+
         response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
     }
 

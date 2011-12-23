@@ -26,6 +26,13 @@ public @interface Form
     String[] fieldOrder();
 
     /**
+     * Specify a custom webwork action to invoke when this form is submitted.
+     * 
+     * @return name of the webwork the action to invoke when this form is submitted
+     */
+    String actionName() default "save";
+    
+    /**
      * Specify the submit actions available for this form.
      * 
      * @return an array of strings representing the actions available for this form.
