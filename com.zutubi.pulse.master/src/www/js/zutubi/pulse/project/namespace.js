@@ -594,7 +594,7 @@ Ext.apply(Zutubi.pulse.project, {
             version: {
                 name: 'version',
                 renderer: Ext.util.Format.htmlEncode
-            },
+            }
         },
         
         /**
