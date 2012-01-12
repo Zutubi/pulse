@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.agent.HostLocation;
 import com.zutubi.pulse.master.agent.SlaveProxyFactory;
 import com.zutubi.tove.annotations.*;
@@ -12,6 +13,7 @@ import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
 import java.net.MalformedURLException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,8 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Wizard.Ignore
     private String dataDirectory = "$(data.dir)/agents/$(agent.handle)";
     private Map<String, ResourceConfiguration> resources;
+    @Ordered
+    private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
     @Transient
@@ -147,6 +151,16 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setAgentStateId(long agentStateId)
     {
         this.agentStateId = agentStateId;
+    }
+
+    public Map<String, ResourcePropertyConfiguration> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, ResourcePropertyConfiguration> properties)
+    {
+        this.properties = properties;
     }
 
     public Map<String, ResourceConfiguration> getResources()

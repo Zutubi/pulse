@@ -11,6 +11,8 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultCustomFields;
+import com.zutubi.pulse.core.resources.api.AsResourcePropertyMapping;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
@@ -30,11 +32,13 @@ import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -208,12 +212,6 @@ public class RecipeController
         recipeResultNode.setAgentName(agent.getName());
         buildManager.save(recipeResultNode);
 
-        ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
-        if (resourceRepository != null)
-        {
-            addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
-        }
-
         // Update the request and its context before it is sent to the agent.
         RecipeRequest recipeRequest = assignmentRequest.getRequest();
 
@@ -235,6 +233,20 @@ public class RecipeController
         // update the context to be used for the post build actions with version details.
         addRevisionProperties(recipeContext, buildResult);
         recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
+
+        Collection<ResourcePropertyConfiguration> agentProperties = agent.getConfig().getProperties().values();
+        recipeRequest.addAllProperties(CollectionUtils.map(agentProperties, new AsResourcePropertyMapping()));
+        for (ResourcePropertyConfiguration propertyConfig: agentProperties)
+        {
+            ResourceProperty property = propertyConfig.asResourceProperty();
+            recipeContext.add(property);
+        }
+
+        ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
+        if (resourceRepository != null)
+        {
+            addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
+        }
 
         // Now it may be dispatched.
         recipeDispatchService.dispatch(event);

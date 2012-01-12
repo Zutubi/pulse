@@ -1105,6 +1105,25 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertEnvironment(buildCompletedProject, 1, "PULSE_TP=tpv");
     }
 
+    public void testAgentProperties() throws Exception
+    {
+        String projectName = random + "-project";
+        String propertyName = random + "-prop";
+        final String projectValue = random + "-projectval";
+        final String agentValue = random + "-agentval";
+
+        rpcClient.RemoteApi.ensureProject(projectName);
+        assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, propertyName, projectValue, false, true, false);
+        rpcClient.RemoteApi.insertAgentProperty(MASTER_AGENT_NAME, propertyName, agentValue, false, true, false);
+
+        getBrowser().loginAsAdmin();
+        triggerSuccessfulBuild(projectName);
+        goToEnv(projectName, 1);
+        assertTrue(getBrowser().isTextPresent(agentValue));
+        assertFalse(getBrowser().isTextPresent(projectValue));
+    }
+
     public void testVersionedBuildWithImports() throws Exception
     {
         getBrowser().loginAsAdmin();

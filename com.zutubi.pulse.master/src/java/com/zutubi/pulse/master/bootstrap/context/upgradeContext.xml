@@ -170,6 +170,7 @@
                 <ref local="dropBuildNodeTable"/>
                 <ref local="addResourceRequirementInverse"/>
                 <ref local="scmInclusionPaths"/>
+                <ref local="addAgentProperties"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -885,5 +886,9 @@
 
     <bean id="scmInclusionPaths" class="com.zutubi.pulse.master.upgrade.tasks.ScmInclusionPathsUpgradeTask">
         <property name="buildNumber" value="204999002"/>
+    </bean>
+
+    <bean id="addAgentProperties" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPropertiesUpgradeTask">
+        <property name="buildNumber" value="204999003"/>
     </bean>
 </beans>

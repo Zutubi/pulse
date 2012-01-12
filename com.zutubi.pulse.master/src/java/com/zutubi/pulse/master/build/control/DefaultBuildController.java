@@ -26,6 +26,7 @@ import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.AsResourcePropertyMapping;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -304,13 +305,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
     {
-        return CollectionUtils.map(resourcePropertyConfigurations, new Mapping<ResourcePropertyConfiguration, ResourceProperty>()
-        {
-            public ResourceProperty map(ResourcePropertyConfiguration config)
-            {
-                return config.asResourceProperty();
-            }
-        });
+        return CollectionUtils.map(resourcePropertyConfigurations, new AsResourcePropertyMapping());
     }
 
     private AgentRequirements getAgentRequirements(BuildStageConfiguration stage)

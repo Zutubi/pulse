@@ -665,6 +665,13 @@ public class RemoteApiClient extends ApiClient
         }
     }
 
+    public String insertAgentProperty(String agent, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
+    {
+        String propertiesPath = getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent, "properties");
+        Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
+        return insertConfig(propertiesPath, property);
+    }
+
     public Hashtable<String, Object> createProperty(String name, String value)
     {
         return createProperty(name, value, false, false, false);
