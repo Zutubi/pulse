@@ -12,7 +12,9 @@ import java.util.*;
 
 /**
  * Converts maps to and from strings.  All keys must be of the same, squeezable
- * class (likewise for values).
+ * class (likewise for values).  Maps are encode in the string as sequences of
+ * entries separated by commas, where each entry is a key and value separated
+ * by a colon.
  */
 public class MapSqueezer implements TypeSqueezer
 {
@@ -87,9 +89,8 @@ public class MapSqueezer implements TypeSqueezer
         return s == null ? null : WebUtils.percentEncode(s, ALLOWED_CHARACTERS_PREDICATE);
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        String s = str[0];
         if (!StringUtils.stringSet(s))
         {
             return null;
@@ -183,7 +184,7 @@ public class MapSqueezer implements TypeSqueezer
             return null;
         }
 
-        public Object unsqueeze(String... str) throws SqueezeException
+        public Object unsqueeze(String s) throws SqueezeException
         {
             return null;
         }

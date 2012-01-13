@@ -5,7 +5,9 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.StringUtils;
 
 /**
- * <class-comment/>
+ * Converts between strings and longs, using Java's default long parsing.
+ *
+ * @see Long#parseLong(String)
  */
 public class LongSqueezer implements TypeSqueezer
 {
@@ -18,9 +20,8 @@ public class LongSqueezer implements TypeSqueezer
         return obj.toString();
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        String s = str[0];
         if (!StringUtils.stringSet(s))
         {
             return null;

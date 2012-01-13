@@ -5,7 +5,7 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.StringUtils;
 
 /**
- * <class-comment/>
+ * Converts between bytes and strings.  Bytes are formatted as signed decimal strings.
  */
 public class ByteSqueezer implements TypeSqueezer
 {
@@ -18,9 +18,8 @@ public class ByteSqueezer implements TypeSqueezer
         return obj.toString();
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        String s = str[0];
         if (StringUtils.stringSet(s))
         {
             try

@@ -20,8 +20,8 @@ public class FileSqueezer implements TypeSqueezer
         return ((File) obj).getPath();
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        return new File(str[0]);
+        return new File(s);
     }
 }

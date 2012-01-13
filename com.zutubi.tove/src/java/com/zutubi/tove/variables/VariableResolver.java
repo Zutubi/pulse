@@ -134,6 +134,21 @@ public class VariableResolver
         }
     }
 
+    private static boolean escapable(char c, boolean split)
+    {
+        switch (c)
+        {
+            case '$':
+            case '\\':
+                return true;
+            case '"':
+            case ' ':
+                return split;
+            default:
+                return false;
+        }
+    }
+
     private static List<Token> tokenise(String input, boolean split) throws ResolutionException
     {
         List<Token> result = new LinkedList<Token>();
@@ -220,6 +235,11 @@ public class VariableResolver
                 }
                 case ESCAPED:
                 {
+                    if (!escapable(inputChar, split))
+                    {
+                        current.append('\\');
+                    }
+
                     current.append(inputChar);
                     haveData = true;
                     state = LexerState.INITIAL;
@@ -363,7 +383,10 @@ public class VariableResolver
             }
             case ESCAPED:
             {
-                throw new ResolutionException("Syntax error: unexpected end of input in escape sequence (\\)");
+                current.append('\\');
+                haveData = true;
+                addCurrent(current, haveData, result);
+                break;
             }
             case DOLLAR:
             {

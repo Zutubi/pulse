@@ -4,7 +4,10 @@ import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 
 /**
- * <class-comment/>
+ * Converts between strings and booleans.  In addition to the standard Java
+ * behaviour (a string set to "true", case ignored, is true) this converter
+ * also recognises "on" and "yes" (again, case ignored) as true.  Everythig
+ * else is false.
  */
 public class BooleanSqueezer implements TypeSqueezer
 {
@@ -17,9 +20,8 @@ public class BooleanSqueezer implements TypeSqueezer
         return obj.toString();
     }
 
-    public Boolean unsqueeze(String... str) throws SqueezeException
+    public Boolean unsqueeze(String value) throws SqueezeException
     {
-        String value = str[0];
         if (value != null)
         {
             if ("on".equalsIgnoreCase(value))

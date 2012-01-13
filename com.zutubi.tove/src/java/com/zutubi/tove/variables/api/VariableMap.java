@@ -42,7 +42,7 @@ public interface VariableMap
     void add(Variable variable);
 
     /**
-     * Add all of the variables contained by the given ollection to this map.
+     * Add all of the variables contained by the given collection to this map.
      *
      * @param variables the collection of variables to be added.
      */

@@ -3,7 +3,8 @@ package com.zutubi.tove.squeezer.squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 
 /**
- * <class-comment/>
+ * An identity conversion for strings (almost: null converts to the empty
+ * string).
  */
 public class StringSqueezer implements TypeSqueezer
 {
@@ -16,8 +17,8 @@ public class StringSqueezer implements TypeSqueezer
         return (String)obj;
     }
 
-    public Object unsqueeze(String... str)
+    public Object unsqueeze(String s)
     {
-        return str[0];
+        return s;
     }
 }

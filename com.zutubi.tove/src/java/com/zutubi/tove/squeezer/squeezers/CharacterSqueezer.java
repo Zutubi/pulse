@@ -5,7 +5,8 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.StringUtils;
 
 /**
- * <class-comment/>
+ * Coverts between strings and characters.  Characters are encoded as strings
+ * of length 1.
  */
 public class CharacterSqueezer implements TypeSqueezer
 {
@@ -18,10 +19,9 @@ public class CharacterSqueezer implements TypeSqueezer
         return obj.toString();
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        String s = str[0];
-        if(StringUtils.stringSet(s))
+        if (StringUtils.stringSet(s))
         {
             return s.charAt(0);
         }

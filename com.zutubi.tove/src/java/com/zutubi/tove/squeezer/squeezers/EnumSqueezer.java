@@ -2,8 +2,8 @@ package com.zutubi.tove.squeezer.squeezers;
 
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.TypeSqueezer;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.EnumUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * A type squeezer that converts to and from enums.  Assumes a naming
@@ -28,9 +28,8 @@ public class EnumSqueezer implements TypeSqueezer
         return EnumUtils.toPrettyString(((Enum)obj));
     }
 
-    public Object unsqueeze(String... str) throws SqueezeException
+    public Object unsqueeze(String s) throws SqueezeException
     {
-        String s = str[0];
         if (!StringUtils.stringSet(s))
         {
             return null;

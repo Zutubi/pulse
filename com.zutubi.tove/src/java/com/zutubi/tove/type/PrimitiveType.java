@@ -61,7 +61,7 @@ public class PrimitiveType extends SimpleType implements Type
         {
             if (data instanceof String[])
             {
-                return squeezer.unsqueeze((String[]) data);
+                return squeezer.unsqueeze(((String[]) data)[0]);
             }
             else if (data instanceof String)
             {

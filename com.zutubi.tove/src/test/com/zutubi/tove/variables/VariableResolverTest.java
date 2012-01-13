@@ -89,9 +89,9 @@ public class VariableResolverTest extends ZutubiTestCase
         errorTest("$e", "Syntax error: expecting '{' or '(', got 'e'");
     }
 
-    public void testHalfEscape()
+    public void testHalfEscape() throws Exception
     {
-        errorTest("hoorah \\", "Syntax error: unexpected end of input in escape sequence (\\)");
+        successTest("hoorah \\", "hoorah \\");
     }
 
     public void testEmptyVariable()
@@ -161,7 +161,7 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testSimpleEscape() throws Exception
     {
-        successTest("esc\\ape", "escape");
+        successTest("esc\\ape", "esc\\ape");
     }
 
     public void testEscapeDollar() throws Exception
@@ -181,7 +181,7 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testEscapeSlashOther() throws Exception
     {
-        successTest("\\\\\\x", "\\x");
+        successTest("\\\\\\x", "\\\\x");
     }
 
     public void testSlashInVariable() throws Exception
