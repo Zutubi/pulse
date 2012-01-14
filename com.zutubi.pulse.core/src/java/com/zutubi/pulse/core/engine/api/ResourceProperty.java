@@ -6,7 +6,6 @@ public class ResourceProperty
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
-    private boolean resolveVariables = false;
 
     public ResourceProperty()
     {
@@ -14,21 +13,20 @@ public class ResourceProperty
 
     public ResourceProperty(String name, String value)
     {
-        this(name, value, false, false, false);
+        this(name, value, false, false);
     }
 
-    public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
+    public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath)
     {
         this.name = name;
         this.value = value;
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
-        this.resolveVariables = resolveVariables;
     }
 
     public ResourceProperty copy()
     {
-        return new ResourceProperty(getName(), value, addToEnvironment, addToPath, resolveVariables);
+        return new ResourceProperty(getName(), value, addToEnvironment, addToPath);
     }
 
     public String getName()
@@ -51,11 +49,6 @@ public class ResourceProperty
         return addToPath;
     }
 
-    public boolean getResolveVariables()
-    {
-        return resolveVariables;
-    }
-
     public void setName(String name)
     {
         this.name = name;
@@ -74,11 +67,6 @@ public class ResourceProperty
     public void setAddToPath(boolean addToPath)
     {
         this.addToPath = addToPath;
-    }
-
-    public void setResolveVariables(boolean resolveVariables)
-    {
-        this.resolveVariables = resolveVariables;
     }
 
     @Override
@@ -103,10 +91,6 @@ public class ResourceProperty
         {
             return false;
         }
-        if (resolveVariables != that.resolveVariables)
-        {
-            return false;
-        }
         if (!name.equals(that.name))
         {
             return false;
@@ -126,7 +110,6 @@ public class ResourceProperty
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (addToEnvironment ? 1 : 0);
         result = 31 * result + (addToPath ? 1 : 0);
-        result = 31 * result + (resolveVariables ? 1 : 0);
         return result;
     }
 }

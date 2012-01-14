@@ -171,6 +171,7 @@
                 <ref local="addResourceRequirementInverse"/>
                 <ref local="scmInclusionPaths"/>
                 <ref local="addAgentProperties"/>
+                <ref local="removeResolveVariables"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -890,5 +891,9 @@
 
     <bean id="addAgentProperties" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentPropertiesUpgradeTask">
         <property name="buildNumber" value="204999003"/>
+    </bean>
+
+    <bean id="removeResolveVariables" class="com.zutubi.pulse.master.upgrade.tasks.RemoveResolveVariablesUpgradeTask">
+        <property name="buildNumber" value="204999004"/>
     </bean>
 </beans>

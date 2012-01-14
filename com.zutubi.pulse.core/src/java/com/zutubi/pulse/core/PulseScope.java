@@ -384,17 +384,13 @@ public class PulseScope implements Scope
     public void add(ResourceProperty resourceProperty)
     {
         String value = resourceProperty.getValue();
-
-        if(resourceProperty.getResolveVariables())
+        try
         {
-            try
-            {
-                value = VariableResolver.resolveVariables(value, this, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
-            }
-            catch (ResolutionException e)
-            {
-                // Just use unresolved value.
-            }
+            value = VariableResolver.resolveVariables(value, this, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
+        }
+        catch (ResolutionException e)
+        {
+            // Just use unresolved value.
         }
 
         String name = resourceProperty.getName();

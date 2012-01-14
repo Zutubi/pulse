@@ -33,6 +33,8 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
     private static final String PROPERTY_URL  = "url";
 
     private RecordManager recordManager;
+    private TemplatedScopeDetails emptyDetails;
+    private TemplatedScopeDetails projectsDetails;
 
     protected void setUp() throws Exception
     {
@@ -63,14 +65,16 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
         addProject(PROJECT_ROOT, PROJECT_TEMPLATE);
         addProject(PROJECT_TEMPLATE, PROJECT_TEMPLATE_CHILD1);
         addProject(PROJECT_TEMPLATE, PROJECT_TEMPLATE_CHILD2);
+
+        emptyDetails = new TemplatedScopeDetails(SCOPE_EMPTY, recordManager);
+        projectsDetails = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
     }
 
     public void testEmptyScope()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_EMPTY, recordManager);
         try
         {
-            details.getHierarchy();
+            emptyDetails.getHierarchy();
             fail("Should not be able to get hierarchy for empty scope: all scopes need a root");
         }
         catch(PulseRuntimeException e)
@@ -82,10 +86,9 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
     public void testMultipleRootsScope()
     {
         addProject(null, "uh-oh, a second root");
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
         try
         {
-            details.getHierarchy();
+            projectsDetails.getHierarchy();
             fail("Should not be able to get hierarchy for a scope with multiple roots");
         }
         catch(PulseRuntimeException e)
@@ -96,8 +99,7 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
 
     public void testProjectsHierarchy()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        ScopeHierarchy hierarchy = details.getHierarchy();
+        ScopeHierarchy hierarchy = projectsDetails.getHierarchy();
         assertNode(hierarchy.getRoot(), PROJECT_ROOT, null, PROJECT_SIMPLE_CHILD, PROJECT_TEMPLATE);
         assertNode(hierarchy.findNodeById(PROJECT_SIMPLE_CHILD), PROJECT_SIMPLE_CHILD, PROJECT_ROOT);
         assertNode(hierarchy.findNodeById(PROJECT_TEMPLATE), PROJECT_TEMPLATE, PROJECT_ROOT, PROJECT_TEMPLATE_CHILD1, PROJECT_TEMPLATE_CHILD2);
@@ -105,76 +107,122 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
         assertNode(hierarchy.findNodeById(PROJECT_TEMPLATE_CHILD2), PROJECT_TEMPLATE_CHILD2, PROJECT_TEMPLATE);
     }
 
+    public void testGetAncestorPathInvalidPath()
+    {
+        assertNull(projectsDetails.getAncestorPath("garbage"));
+    }
+
+    public void testGetAncestorPathRootProject()
+    {
+        assertNull(projectsDetails.getAncestorPath(getProjectPath(PROJECT_ROOT)));
+    }
+
+    public void testGetAncestorPathSimpleChildProject()
+    {
+        assertEquals(getProjectPath(PROJECT_ROOT), projectsDetails.getAncestorPath(getProjectPath(PROJECT_SIMPLE_CHILD)));
+    }
+
+    public void testGetAncestorPathTemplateProject()
+    {
+        assertEquals(getProjectPath(PROJECT_ROOT), projectsDetails.getAncestorPath(getProjectPath(PROJECT_TEMPLATE)));
+    }
+
+    public void testGetAncestorPathTemplateChildProject()
+    {
+        assertEquals(getProjectPath(PROJECT_TEMPLATE), projectsDetails.getAncestorPath(getProjectPath(PROJECT_TEMPLATE_CHILD1)));
+    }
+
+    public void testGetAncestorPathRootScm()
+    {
+        String rootScmPath = addScm(PROJECT_ROOT);
+        assertNull(projectsDetails.getAncestorPath(rootScmPath));
+    }
+
+    public void testGetAncestorPathSimpleChildScm()
+    {
+        String childScmPath = addScm(PROJECT_SIMPLE_CHILD);
+        assertNull(projectsDetails.getAncestorPath(childScmPath));
+
+        // Now add a parent, and make sure the result changes.
+        String rootScmPath = addScm(PROJECT_ROOT);
+        assertEquals(rootScmPath, projectsDetails.getAncestorPath(childScmPath));
+    }
+
+    public void testGetAncestorPathTemplateChildScm()
+    {
+        String childScmPath = addScm(PROJECT_TEMPLATE_CHILD1);
+        assertNull(projectsDetails.getAncestorPath(childScmPath));
+
+        String templateScmPath = addScm(PROJECT_TEMPLATE);
+        assertEquals(templateScmPath, projectsDetails.getAncestorPath(childScmPath));
+    }
+
+    public void testGetAncestorPathIndirectTemplateChildScm()
+    {
+        String childScmPath = addScm(PROJECT_TEMPLATE_CHILD1);
+        assertNull(projectsDetails.getAncestorPath(childScmPath));
+
+        String rootScmPath = addScm(PROJECT_ROOT);
+        assertEquals(rootScmPath, projectsDetails.getAncestorPath(childScmPath));
+    }
+
     public void testHasAncestorInvalidPath()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        assertFalse(details.hasAncestor("garbage"));
+        assertFalse(projectsDetails.hasAncestor("garbage"));
     }
 
     public void testHasAncestorRootProject()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        assertFalse(details.hasAncestor(getProjectPath(PROJECT_ROOT)));
+        assertFalse(projectsDetails.hasAncestor(getProjectPath(PROJECT_ROOT)));
     }
 
     public void testHasAncestorSimpleChildProject()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        assertTrue(details.hasAncestor(getProjectPath(PROJECT_SIMPLE_CHILD)));
+        assertTrue(projectsDetails.hasAncestor(getProjectPath(PROJECT_SIMPLE_CHILD)));
     }
 
     public void testHasAncestorTemplateProject()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        assertTrue(details.hasAncestor(getProjectPath(PROJECT_TEMPLATE)));
+        assertTrue(projectsDetails.hasAncestor(getProjectPath(PROJECT_TEMPLATE)));
     }
 
     public void testHasAncestorTemplateChildProject()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        assertTrue(details.hasAncestor(getProjectPath(PROJECT_TEMPLATE_CHILD1)));
+        assertTrue(projectsDetails.hasAncestor(getProjectPath(PROJECT_TEMPLATE_CHILD1)));
     }
 
     public void testHasAncestorRootScm()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-
         String rootScmPath = addScm(PROJECT_ROOT);
-        assertFalse(details.hasAncestor(rootScmPath));
+        assertFalse(projectsDetails.hasAncestor(rootScmPath));
     }
 
     public void testHasAncestorSimpleChildScm()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-
         String childScmPath = addScm(PROJECT_SIMPLE_CHILD);
-        assertFalse(details.hasAncestor(childScmPath));
+        assertFalse(projectsDetails.hasAncestor(childScmPath));
 
         // Now add a parent, and make sure the result changes.
         addScm(PROJECT_ROOT);
-        assertTrue(details.hasAncestor(childScmPath));
+        assertTrue(projectsDetails.hasAncestor(childScmPath));
     }
 
     public void testHasAncestorTemplateChildScm()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-
         String childScmPath = addScm(PROJECT_TEMPLATE_CHILD1);
-        assertFalse(details.hasAncestor(childScmPath));
+        assertFalse(projectsDetails.hasAncestor(childScmPath));
 
         addScm(PROJECT_TEMPLATE);
-        assertTrue(details.hasAncestor(childScmPath));
+        assertTrue(projectsDetails.hasAncestor(childScmPath));
     }
 
     public void testHasAncestorIndirectTemplateChildScm()
     {
-        TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-
         String childScmPath = addScm(PROJECT_TEMPLATE_CHILD1);
-        assertFalse(details.hasAncestor(childScmPath));
+        assertFalse(projectsDetails.hasAncestor(childScmPath));
 
         addScm(PROJECT_ROOT);
-        assertTrue(details.hasAncestor(childScmPath));
+        assertTrue(projectsDetails.hasAncestor(childScmPath));
     }
 
     private String getProjectPath(String... elements)

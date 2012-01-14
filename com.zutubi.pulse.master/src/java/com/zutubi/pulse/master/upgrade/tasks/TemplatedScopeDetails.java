@@ -27,7 +27,32 @@ public class TemplatedScopeDetails extends ScopeDetails
         this.recordManager = recordManager;
     }
 
+    /**
+     * Indicates if the given path has a template ancestor record.  Note that
+     * even if the owning instance is not the root of the hierarchy, this method
+     * may still return false if the remainder path has not been defined in any
+     * ancestor.  Always returns false if the path is not in this scope.
+     *
+     * @param path the path to test for a template ancestor
+     * @return true if the given path has a template ancestor record, false if
+     *         it does not or the path is not in this scope
+     */
     public boolean hasAncestor(String path)
+    {
+        return getAncestorPath(path) != null;
+    }
+
+    /**
+     * Gets that path of the next ancestor record for the record at the given
+     * path.  This method walks up template parents looking for a record at the
+     * same remainder path, and returns the path of the first such record
+     * found.
+     *
+     * @param path the path to get the template ancestor path for
+     * @return the first template ancestor path, or null if there is no
+     *         template ancestor record (or the path is not in this scope)
+     */
+    public String getAncestorPath(String path)
     {
         PathInfo pathInfo = new PathInfo(path);
         ScopeHierarchy.Node node = getHierarchy().findNodeById(pathInfo.getOwner());
@@ -35,19 +60,21 @@ public class TemplatedScopeDetails extends ScopeDetails
         {
             if (node.getParent() == null)
             {
-                return false;
-            }
-
-            if (pathInfo.getRemainder() == null)
-            {
-                return true;
+                return null;
             }
 
             String parentPath = PathUtils.getPath(pathInfo.getScope(), node.getParent().getId(), pathInfo.getRemainder());
-            return recordManager.containsRecord(parentPath) || hasAncestor(parentPath);
+            if (recordManager.containsRecord(parentPath))
+            {
+                return parentPath;
+            }
+            else
+            {
+                return getAncestorPath(parentPath);
+            }
         }
 
-        return false;
+        return null;
     }
 
     ScopeHierarchy getHierarchy()

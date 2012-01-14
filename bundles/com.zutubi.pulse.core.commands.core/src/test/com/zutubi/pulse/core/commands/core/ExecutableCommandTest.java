@@ -1,27 +1,28 @@
 package com.zutubi.pulse.core.commands.core;
 
-import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
-import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
-import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_ARTIFACT_NAME;
-import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_FILENAME;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.hamcrest.Matchers;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
+import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
+import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_ARTIFACT_NAME;
+import static com.zutubi.pulse.core.commands.core.ExecutableCommand.ENV_FILENAME;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_BUILD_NUMBER;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class ExecutableCommandTest extends ExecutableCommandTestCase
 {
@@ -202,7 +203,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
         ExecutionContext context = createExecutionContext();
-        context.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
+        context.add(new ResourceProperty("java.bin.dir", "somedir", false, true));
         ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
         config.setExe("echo");
 
@@ -332,7 +333,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         if (SystemUtils.IS_WINDOWS)
         {
             ExecutionContext context = createExecutionContext();
-            context.add(new ResourceProperty("a<>", "b", true, false, false));
+            context.add(new ResourceProperty("a<>", "b", true, false));
             ExecutableCommandConfiguration config = new ExecutableCommandConfiguration();
             config.setExe("dir");
 

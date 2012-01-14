@@ -70,7 +70,7 @@ public class MsBuildResourceLocator implements ResourceLocator
                     ResourceVersionConfiguration version = new ResourceVersionConfiguration(versionName);
                     resource.addVersion(version);
                     resource.setDefaultVersion(version.getValue());
-                    version.addProperty(new ResourcePropertyConfiguration("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false, false));
+                    version.addProperty(new ResourcePropertyConfiguration("msbuild.bin", FileSystemUtils.normaliseSeparators(getMsBuildBinary(home).getCanonicalPath()), false, false));
                     return resource;
                 }
                 catch (Exception e)

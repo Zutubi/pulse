@@ -432,10 +432,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         List<ResourceProperty> result = new LinkedList<ResourceProperty>();
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {
-            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false));
         }
 
-        result.add(new ResourceProperty("P4CLIENT", PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context), true, false, false));
+        result.add(new ResourceProperty("P4CLIENT", PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context), true, false));
         return result;
     }
 

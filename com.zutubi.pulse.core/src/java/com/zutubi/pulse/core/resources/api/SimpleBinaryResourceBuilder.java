@@ -31,12 +31,12 @@ public class SimpleBinaryResourceBuilder implements FileSystemResourceBuilder
     public ResourceConfiguration buildResource(File path)
     {
         ResourceConfiguration resource = new ResourceConfiguration(resourceName);
-        resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY, FileSystemUtils.normaliseSeparators(path.getAbsolutePath()), false, false, false));
+        resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY, FileSystemUtils.normaliseSeparators(path.getAbsolutePath()), false, false));
 
         File binaryDir = path.getParentFile();
         if (binaryDir != null)
         {
-            resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY_DIRECTORY, FileSystemUtils.normaliseSeparators(binaryDir.getAbsolutePath()), false, false, false));
+            resource.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY_DIRECTORY, FileSystemUtils.normaliseSeparators(binaryDir.getAbsolutePath()), false, false));
         }
         return resource;
     }

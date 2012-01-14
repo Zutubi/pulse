@@ -14,7 +14,6 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
-    private boolean resolveVariables = false;
     private String description;
 
     public ResourcePropertyConfiguration()
@@ -23,26 +22,25 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
 
     public ResourcePropertyConfiguration(String name, String value)
     {
-        this(name, value, false, false, false);
+        this(name, value, false, false);
     }
 
-    public ResourcePropertyConfiguration(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
+    public ResourcePropertyConfiguration(String name, String value, boolean addToEnvironment, boolean addToPath)
     {
         super(name);
         this.value = value;
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
-        this.resolveVariables = resolveVariables;
     }
 
     public ResourcePropertyConfiguration(ResourceProperty p)
     {
-        this(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath(), p.getResolveVariables());
+        this(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath());
     }
 
     public ResourcePropertyConfiguration copy()
     {
-        return new ResourcePropertyConfiguration(getName(), value, addToEnvironment, addToPath, resolveVariables);
+        return new ResourcePropertyConfiguration(getName(), value, addToEnvironment, addToPath);
     }
 
     public String getValue()
@@ -75,16 +73,6 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
         this.addToPath = addToPath;
     }
 
-    public boolean getResolveVariables()
-    {
-        return resolveVariables;
-    }
-
-    public void setResolveVariables(boolean resolveVariables)
-    {
-        this.resolveVariables = resolveVariables;
-    }
-
     public String getDescription()
     {
         return description;
@@ -97,6 +85,6 @@ public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
 
     public ResourceProperty asResourceProperty()
     {
-        return new ResourceProperty(getName(), getValue(), getAddToEnvironment(), getAddToPath(), getResolveVariables());
+        return new ResourceProperty(getName(), getValue(), getAddToEnvironment(), getAddToPath());
     }
 }

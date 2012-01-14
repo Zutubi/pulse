@@ -69,15 +69,15 @@ public class StandardHomeDirectoryResourceBuilder implements FileSystemResourceB
             resource.addVersion(version);
             resource.setDefaultVersion(versionName);
 
-            version.addProperty(new ResourcePropertyConfiguration(convertResourceNameToEnvironmentVariable(resourceName), getNormalisedPath(home), true, false, false));
-            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY_DIRECTORY, binDirPath, false, true, false));
-            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY, binaryPath, false, false, false));
+            version.addProperty(new ResourcePropertyConfiguration(convertResourceNameToEnvironmentVariable(resourceName), getNormalisedPath(home), true, false));
+            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY_DIRECTORY, binDirPath, false, true));
+            version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_BINARY, binaryPath, false, false));
 
             File lib = getLibraryDirectory(home);
             if (lib.isDirectory())
             {
                 String libDirPath = FileSystemUtils.normaliseSeparators(lib.getAbsolutePath());
-                version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_LIBRARY_DIRECTORY, libDirPath, false, false, false));
+                version.addProperty(new ResourcePropertyConfiguration(resourceName + PROPERTY_SUFFIX_LIBRARY_DIRECTORY, libDirPath, false, false));
             }
 
             return resource;

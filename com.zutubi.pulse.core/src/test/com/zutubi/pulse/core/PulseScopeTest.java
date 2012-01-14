@@ -39,8 +39,8 @@ public class PulseScopeTest extends PulseTestCase
         scope.setLabel(LABEL_CHILD);
         parent.add(new GenericVariable<String>(KEY_PARENT_ONLY, VALUE_PARENT));
         parent.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_PARENT));
-        parent.add(new ResourceProperty(KEY_PARENT_ONLY_RESOURCE, VALUE_PARENT_RESOURCE, true, true, false));
-        parent.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_PARENT_RESOURCE, true, true, false));
+        parent.add(new ResourceProperty(KEY_PARENT_ONLY_RESOURCE, VALUE_PARENT_RESOURCE, true, true));
+        parent.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_PARENT_RESOURCE, true, true));
 
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
@@ -50,10 +50,10 @@ public class PulseScopeTest extends PulseTestCase
 
         scope.add(new GenericVariable<String>(KEY_CHILD_ONLY, VALUE_CHILD));
         scope.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_CHILD));
-        scope.add(new ResourceProperty(KEY_CHILD_ONLY_RESOURCE, VALUE_CHILD_RESOURCE, true, true, false));
-        scope.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_CHILD_RESOURCE, true, true, false));
+        scope.add(new ResourceProperty(KEY_CHILD_ONLY_RESOURCE, VALUE_CHILD_RESOURCE, true, true));
+        scope.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_CHILD_RESOURCE, true, true));
 
-        scope.add(new ResourceProperty("not added", "not added", false, false, false));
+        scope.add(new ResourceProperty("not added", "not added", false, false));
     }
 
     public void testCreateChild()
@@ -253,8 +253,8 @@ public class PulseScopeTest extends PulseTestCase
     public void testPathOrdering()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("first", "first", false, true, false));
-        s.add(new ResourceProperty("second", "second", false, true, false));
+        s.add(new ResourceProperty("first", "first", false, true));
+        s.add(new ResourceProperty("second", "second", false, true));
         
         List<String> paths = s.getPathDirectories();
         assertEquals(2, paths.size());
@@ -265,10 +265,10 @@ public class PulseScopeTest extends PulseTestCase
     public void testPathOrderingWhenOverriding()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new ResourceProperty("first", "first", false, true, false));
-        parent.add(new ResourceProperty("second", "second", false, true, false));
+        parent.add(new ResourceProperty("first", "first", false, true));
+        parent.add(new ResourceProperty("second", "second", false, true));
         PulseScope child = new PulseScope(parent);
-        child.add(new ResourceProperty("first", "override", false, true, false));
+        child.add(new ResourceProperty("first", "override", false, true));
 
         List<String> paths = child.getPathDirectories();
         assertEquals(2, paths.size());
@@ -297,7 +297,7 @@ public class PulseScopeTest extends PulseTestCase
     public void testEnvPathPrefixButNoPath()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("foo", "foo", false, true, false));
+        s.add(new ResourceProperty("foo", "foo", false, true));
         assertEquals("foo", s.getVariableValue("env.PATH", String.class));
     }
 
@@ -312,30 +312,22 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PatH", "base");
-        s.add(new ResourceProperty("foo", "prefix", false, true, false));
+        s.add(new ResourceProperty("foo", "prefix", false, true));
         assertEquals("prefix" + File.pathSeparator + "base", s.getVariableValue("env.PATH", String.class));
     }
 
     public void testReferToEarlierProperty()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("test", "value", false, false, false));
-        s.add(new ResourceProperty("test2", "${test}2", false, false, true));
+        s.add(new ResourceProperty("test", "value", false, false));
+        s.add(new ResourceProperty("test2", "${test}2", false, false));
         assertEquals("value2", s.getVariable("test2").getValue());
-    }
-
-    public void testDontResolve()
-    {
-        PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("test", "value", false, false, false));
-        s.add(new ResourceProperty("test2", "${test}2", false, false, false));
-        assertEquals("${test}2", s.getVariable("test2").getValue());
     }
 
     public void testSelfVariable()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("testvar", "${testvar}", false, false, true));
+        s.add(new ResourceProperty("testvar", "${testvar}", false, false));
         assertEquals("${testvar}", s.getVariable("testvar").getValue());
     }
 
@@ -343,17 +335,17 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("test", "value", false, false, false));
-        c.add(new ResourceProperty("test2", "${test}2", false, false, true));
+        p.add(new ResourceProperty("test", "value", false, false));
+        c.add(new ResourceProperty("test2", "${test}2", false, false));
         assertEquals("value2", c.getVariable("test2").getValue());
     }
 
     public void testAddToPathPreservesOrder()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("j", "jv", false, true, false));
-        s.add(new ResourceProperty("z", "zv", false, true, false));
-        s.add(new ResourceProperty("a", "av", false, true, false));
+        s.add(new ResourceProperty("j", "jv", false, true));
+        s.add(new ResourceProperty("z", "zv", false, true));
+        s.add(new ResourceProperty("a", "av", false, true));
         assertEquals(FileSystemUtils.composeSearchPath("av", "zv", "jv") + File.pathSeparatorChar, s.getPathPrefix());
     }
 
@@ -361,8 +353,8 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("testvar", VALUE_PARENT, false, true, false));
-        c.add(new ResourceProperty("testvar", VALUE_CHILD, false, false, false));
+        p.add(new ResourceProperty("testvar", VALUE_PARENT, false, true));
+        c.add(new ResourceProperty("testvar", VALUE_CHILD, false, false));
         assertEquals(VALUE_PARENT + File.pathSeparator, p.getPathPrefix());
         assertEquals("", c.getPathPrefix());
     }
@@ -371,15 +363,15 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("priceless", VALUE_PARENT, true, false, false));
-        c.add(new ResourceProperty("priceless", VALUE_CHILD, false, false, false));
+        p.add(new ResourceProperty("priceless", VALUE_PARENT, true, false));
+        c.add(new ResourceProperty("priceless", VALUE_CHILD, false, false));
         assertFalse(c.containsVariable("env.PRICELESS"));
     }
 
     public void testAddToEnvironmentAddsEnvVar()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("testvar", "value", true, false, false));
+        s.add(new ResourceProperty("testvar", "value", true, false));
         assertEquals("value", s.getVariable("env.testvar").getValue());
     }
 
@@ -387,15 +379,15 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("testvar", "value", true, false, false));
+        p.add(new ResourceProperty("testvar", "value", true, false));
         assertEquals("value", c.getVariable("env.testvar").getValue());
     }
 
     public void testAddToEnvVariableEnvVar()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("testvar", "value", true, false, false));
-        s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
+        s.add(new ResourceProperty("testvar", "value", true, false));
+        s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false));
         assertEquals("value2", s.getVariable("testvar2").getValue());
     }
 
@@ -403,8 +395,8 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope p = new PulseScope();
         PulseScope c = new PulseScope(p);
-        p.add(new ResourceProperty("testvar", "value", true, false, false));
-        c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
+        p.add(new ResourceProperty("testvar", "value", true, false));
+        c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false));
         assertEquals("value2", c.getVariable("testvar2").getValue());
     }
 
@@ -412,15 +404,15 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
-        s.add(new ResourceProperty("somevar", "someval", false, true, false));
-        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false, true));
+        s.add(new ResourceProperty("somevar", "someval", false, true));
+        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false));
         assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getVariable("refvar").getValue());
     }
 
     public void testSelfVariableEnvVar()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false, true));
+        s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false));
         assertEquals("${env.refvar}?", s.getVariable("refvar").getValue());
     }
 
@@ -428,21 +420,21 @@ public class PulseScopeTest extends PulseTestCase
     {
         PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
-        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true, true));
+        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true));
         assertEquals("dummypath?", s.getVariable("refvar").getValue());
     }
 
     public void testBackslash()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("myvar", "\\", false, true, true));
+        s.add(new ResourceProperty("myvar", "\\", false, true));
         assertEquals("\\", s.getVariable("myvar").getValue());
     }
 
     public void testBadSyntax()
     {
         PulseScope s = new PulseScope();
-        s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
+        s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true));
         assertEquals("this ${ is invalid", s.getVariable("myvar").getValue());
     }
 
@@ -595,7 +587,7 @@ public class PulseScopeTest extends PulseTestCase
 
         assertEquals("1", scope.getVariableValue("env." + name, String.class));
 
-        ResourceProperty prop = new ResourceProperty(name, "3", true, false, false);
+        ResourceProperty prop = new ResourceProperty(name, "3", true, false);
         scope.add(prop);
 
         assertEquals("3", scope.getVariableValue("env." + name, String.class));
