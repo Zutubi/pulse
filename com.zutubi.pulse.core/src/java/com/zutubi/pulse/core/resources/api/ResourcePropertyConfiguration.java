@@ -6,7 +6,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
-@Form(fieldOrder = { "name", "value", "description", "addToEnvironment", "addToPath", "resolveVariables" })
+@Form(fieldOrder = { "name", "value", "description", "addToEnvironment", "addToPath" })
 @Table(columns = {"name", "value"})
 @SymbolicName("zutubi.resourceProperty")
 public class ResourcePropertyConfiguration extends AbstractNamedConfiguration

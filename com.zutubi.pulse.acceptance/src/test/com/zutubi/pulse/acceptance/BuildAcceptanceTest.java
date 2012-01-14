@@ -698,7 +698,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         rpcClient.RemoteApi.ensureProject(random);
 
-        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", true, false);
 
         triggerSuccessfulBuild(random);
         assertEnvironment(random, 1, "pname=pvalue", "PULSE_PNAME=pvalue", "PULSE_BUILD_NUMBER=1");
@@ -708,7 +708,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("test-property", "test-value", false, false, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("test-property", "test-value", false, false));
 
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
@@ -723,13 +723,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "rv", false, false, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "rv", false, false));
 
         String projectName = random + "-project";
         String projectPath = getPath(PROJECTS_SCOPE, projectName);
         rpcClient.RemoteApi.ensureProject(projectName);
         rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
-        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "properties"), rpcClient.RemoteApi.createProperty("pp", "ref ${rp}", true, true, false));
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "properties"), rpcClient.RemoteApi.createProperty("pp", "ref ${rp}", true, false));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -741,8 +741,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         String propertiesPath = getPath(resourcePath, "properties");
-        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referee", "ee", false, false, false));
-        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referer", "ref ${referee}", true, true, false));
+        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referee", "ee", false, false));
+        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referer", "ref ${referee}", true, false));
 
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
@@ -758,7 +758,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
-        rpcClient.RemoteApi.insertProjectProperty(projectName, "pp", "ref ${agent}", true, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "pp", "ref ${agent}", true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -769,7 +769,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "ref ${agent}", true, true, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "ref ${agent}", true, false));
 
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
@@ -787,7 +787,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
         String suppressedName = "PULSE_TEST_SUPPRESSED";
         String suppressedValue = random + "-suppress";
-        rpcClient.RemoteApi.insertProjectProperty(projectName, suppressedName, suppressedValue, false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, suppressedName, suppressedValue, true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -998,7 +998,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.ensureProject(random);
 
         // add the pname=pvalue property to the build.
-        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", true, false);
 
         // edit the build options, setting prompt to true.
         rpcClient.RemoteApi.enableBuildPrompting(random);
@@ -1031,7 +1031,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.ensureProject(random);
 
         // add the pname=pvalue property to the build.
-        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", true, false);
 
         // edit the build options, setting prompt to true.
         rpcClient.RemoteApi.enableBuildPrompting(random);
@@ -1114,8 +1114,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.RemoteApi.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
-        rpcClient.RemoteApi.insertProjectProperty(projectName, propertyName, projectValue, false, true, false);
-        rpcClient.RemoteApi.insertAgentProperty(MASTER_AGENT_NAME, propertyName, agentValue, false, true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, propertyName, projectValue, true, false);
+        rpcClient.RemoteApi.insertAgentProperty(MASTER_AGENT_NAME, propertyName, agentValue, true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -1533,7 +1533,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testDeadlockUpdatingConfigAfterTrigger() throws Exception
     {
         rpcClient.RemoteApi.insertSimpleProject(random);
-        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(random, "prop", "val", false, true, false);
+        String propertyPath = rpcClient.RemoteApi.insertProjectProperty(random, "prop", "val", true, false);
         Hashtable<String, Object> property = rpcClient.RemoteApi.getConfig(propertyPath);
         
         // Run through a few times to make the deadlock more likely to happen.

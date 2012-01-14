@@ -637,13 +637,13 @@ public class RemoteApiClient extends ApiClient
 
     public String insertProjectProperty(String project, String name, String value) throws Exception
     {
-        return insertProjectProperty(project, name, value, false, false, false);
+        return insertProjectProperty(project, name, value, false, false);
     }
 
-    public String insertProjectProperty(String project, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
+    public String insertProjectProperty(String project, String name, String value, boolean addToEnvironment, boolean addToPath) throws Exception
     {
         String propertiesPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
-        Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
+        Hashtable<String, Object> property = createProperty(name, value, addToEnvironment, addToPath);
         return insertConfig(propertiesPath, property);
     }
 
@@ -660,29 +660,28 @@ public class RemoteApiClient extends ApiClient
         }
         else
         {
-            Hashtable<String, Object> property = createProperty(name, value, false, false, false);
+            Hashtable<String, Object> property = createProperty(name, value, false, false);
             return insertConfig(propertiesPath, property);
         }
     }
 
-    public String insertAgentProperty(String agent, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
+    public String insertAgentProperty(String agent, String name, String value, boolean addToEnvironment, boolean addToPath) throws Exception
     {
         String propertiesPath = getPath(MasterConfigurationRegistry.AGENTS_SCOPE, agent, "properties");
-        Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
+        Hashtable<String, Object> property = createProperty(name, value, addToEnvironment, addToPath);
         return insertConfig(propertiesPath, property);
     }
 
     public Hashtable<String, Object> createProperty(String name, String value)
     {
-        return createProperty(name, value, false, false, false);
+        return createProperty(name, value, false, false);
     }
 
-    public Hashtable<String, Object> createProperty(String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath)
+    public Hashtable<String, Object> createProperty(String name, String value, boolean addToEnvironment, boolean addToPath)
     {
         Hashtable<String, Object> property = createEmptyConfig(ResourcePropertyConfiguration.class);
         property.put("name", name);
         property.put("value", value);
-        property.put("resolveVariables", resolveVariables);
         property.put("addToEnvironment", addToEnvironment);
         property.put("addToPath", addToPath);
         return property;
