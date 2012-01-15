@@ -16,6 +16,6 @@ public class ResourcePropertyForm extends ConfigurationForm
 
     public int[] getFieldTypes()
     {
-        return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX, CHECKBOX};
+        return new int[]{TEXTFIELD, TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX};
     }
 }
