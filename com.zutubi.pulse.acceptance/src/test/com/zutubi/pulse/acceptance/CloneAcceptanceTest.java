@@ -14,13 +14,14 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfi
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.WebUtils;
-import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for cloning both of top-level template collection items and of
@@ -120,7 +121,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         ResourcePropertyForm propertyForm = getBrowser().createForm(ResourcePropertyForm.class);
         propertyForm.waitFor();
-        assertTrue(propertyForm.checkFormValues(CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false", "false"));
+        assertTrue(propertyForm.checkFormValues(CLONE_PROPERTY_NAME, TEST_PROPERTY_VALUE, "", "false", "false"));
 
         labelList.openAndWaitFor();
         assertTrue(labelList.isItemPresent(CLONE_PROPERTY_NAME));
