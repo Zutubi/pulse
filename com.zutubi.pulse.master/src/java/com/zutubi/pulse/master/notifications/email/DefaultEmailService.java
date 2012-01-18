@@ -34,37 +34,58 @@ public class DefaultEmailService implements EmailService
 
     public synchronized void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
     {
-        Session session;
-        Transport transport;
-        if (reuseSession)
+        int attempts = 0;
+        int retryLimit = reuseSession ? 3 : 1;
+        boolean sent = false;
+        while (!sent)
         {
-            ensureSharedSession(config);
-            session = sharedSession;
-            transport = sharedTransport;
-        }
-        else
-        {
-            session = getSession(config);
-            transport = session.getTransport();
-        }
+            attempts++;
 
-        subject = addSubjectPrefix(config, subject);
-        Message msg = createMessage(recipients, subject, mimeType, message, config, session);
-
-        try
-        {
-            if (!transport.isConnected())
+            Session session;
+            Transport transport;
+            if (reuseSession)
             {
-                transport.connect();
+                ensureSharedSession(config);
+                session = sharedSession;
+                transport = sharedTransport;
             }
-            msg.saveChanges();
-            transport.sendMessage(msg, msg.getAllRecipients());
-        }
-        finally
-        {
-            if (!reuseSession && transport != null)
+            else
             {
-                transport.close();
+                session = getSession(config);
+                transport = session.getTransport();
+            }
+
+            subject = addSubjectPrefix(config, subject);
+            Message msg = createMessage(recipients, subject, mimeType, message, config, session);
+
+            try
+            {
+                if (!transport.isConnected())
+                {
+                    transport.connect();
+                }
+                msg.saveChanges();
+                transport.sendMessage(msg, msg.getAllRecipients());
+                sent = true;
+            }
+            catch (MessagingException e)
+            {
+                if (reuseSession)
+                {
+                    cleanupSession();
+                }
+
+                if (attempts == retryLimit)
+                {
+                    throw new MessagingException(e.getMessage(), e);
+                }
+            }
+            finally
+            {
+                if (!reuseSession && transport != null)
+                {
+                    transport.close();
+                }
             }
         }
     }
@@ -73,21 +94,30 @@ public class DefaultEmailService implements EmailService
     {
         if (!config.isEquivalentTo(sharedConfig))
         {
-            if (sharedTransport != null)
-            {
-                try
-                {
-                    sharedTransport.close();
-                }
-                catch (MessagingException e)
-                {
-                    LOG.warning(e);
-                }
-            }
+            cleanupSession();
 
             sharedConfig = config;
             sharedSession = getSession(config);
             sharedTransport = sharedSession.getTransport();
+        }
+    }
+
+    private void cleanupSession()
+    {
+        if (sharedTransport != null)
+        {
+            try
+            {
+                sharedTransport.close();
+            }
+            catch (MessagingException e)
+            {
+                LOG.warning(e);
+            }
+
+            sharedConfig = null;
+            sharedSession = null;
+            sharedTransport = null;
         }
     }
 
