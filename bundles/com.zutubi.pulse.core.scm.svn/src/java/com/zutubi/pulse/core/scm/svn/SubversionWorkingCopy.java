@@ -173,11 +173,15 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
         // to a single revision.  In this guess we assume the "normal" case,
         // that the user has updated everything from the base of the working
         // copy.
-        SVNWCClient wcClient = getClientManager(context, true).getWCClient();
-        GuessRevisionInfoHandler handler = new GuessRevisionInfoHandler();
+        SVNClientManager clientManager = getClientManager(context, true);
+        GuessRevisionInfoHandler handler;
         try
         {
-            wcClient.doInfo(context.getBase(), SVNRevision.UNDEFINED, SVNRevision.WORKING, SVNDepth.INFINITY, null, handler);
+            SVNWCClient wcClient = clientManager.getWCClient();
+            SVNInfo info = wcClient.doInfo(context.getBase(), SVNRevision.WORKING);
+            handler = new GuessRevisionInfoHandler(info.getRepositoryRootURL());
+            SVNStatusClient statusClient = clientManager.getStatusClient();
+            statusClient.doStatus(context.getBase(), SVNRevision.WORKING, SVNDepth.INFINITY, false, true, false, false, handler, null);
         }
         catch (SVNException e)
         {
@@ -662,24 +666,34 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
     }
 
     /**
-     * An info handler that extracts the highest revision from all entries it
+     * A status handler that extracts the highest revision from all entries it
      * sees.
      */
-    private static class GuessRevisionInfoHandler implements ISVNInfoHandler
+    private static class GuessRevisionInfoHandler implements ISVNStatusHandler
     {
         private long highestCommittedRevision = 0;
+        private String rootURL;
+
+        public GuessRevisionInfoHandler(SVNURL rootURL)
+        {
+            this.rootURL = rootURL.toDecodedString();
+        }
 
         public long getRevision()
         {
             return highestCommittedRevision;
         }
 
-        public void handleInfo(SVNInfo svnInfo) throws SVNException
+        public void handleStatus(SVNStatus svnStatus) throws SVNException
         {
-            long committed = svnInfo.getCommittedRevision().getNumber();
-            if (committed > highestCommittedRevision)
+            SVNURL url = svnStatus.getURL();
+            if (url != null && url.toDecodedString().startsWith(rootURL))
             {
-                highestCommittedRevision = committed;
+                long committed = svnStatus.getCommittedRevision().getNumber();
+                if (committed > highestCommittedRevision)
+                {
+                    highestCommittedRevision = committed;
+                }
             }
         }
     }

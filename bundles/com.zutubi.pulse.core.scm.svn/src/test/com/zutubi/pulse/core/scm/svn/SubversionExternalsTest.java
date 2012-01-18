@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.process.ProcessControl;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -14,11 +16,12 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class SubversionExternalsTest extends PulseTestCase
 {
@@ -246,13 +249,27 @@ public class SubversionExternalsTest extends PulseTestCase
 
     public void testGetLatestRevisionLatestInExternal() throws ScmException, IOException, SVNException
     {
+        checkoutAndEditExternal();
+        
+        assertEquals("9", client.getLatestRevision(null).getRevisionString());
+    }
+
+    public void testGuessLocalRevisionLatestInExternal() throws ScmException, IOException, SVNException
+    {
+        checkoutAndEditExternal();
+
+        SubversionWorkingCopy wc = new SubversionWorkingCopy();
+        WorkingCopyContext context = new WorkingCopyContextImpl(checkoutDir, new PropertiesConfig(), null);
+        assertEquals("9", wc.guessLocalRevision(context).getRevisionString());
+    }
+
+    private void checkoutAndEditExternal() throws ScmException, IOException, SVNException
+    {
         doCheckout(8);
 
         File f1 = new File(checkoutDir, "pull1/file1");
         FileSystemUtils.createFile(f1, "edit in external");
-        clientManager.getCommitClient().doCommit(new File[] { f1 }, true, "edit ext", null, null, false, false, SVNDepth.EMPTY);
-        
-        assertEquals("9", client.getLatestRevision(null).getRevisionString());
+        clientManager.getCommitClient().doCommit(new File[]{f1}, true, "edit ext", null, null, false, false, SVNDepth.EMPTY);
     }
 
     // ========================================================================
