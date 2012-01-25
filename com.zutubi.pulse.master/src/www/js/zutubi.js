@@ -30,6 +30,33 @@ function getBuildMenuItems(buildLink)
     ];
 }
 
+function getBuildCommentsTooltip(buildModel)
+{
+    var commentsTip, i, recentComments, comment;
+    commentsTip = '';
+    if (buildModel.comments && buildModel.comments.commentCount > 0)
+    {
+        recentComments = buildModel.comments.recentComments;
+        for (i = 0; i < recentComments.length; i++)
+        {
+            comment = recentComments[i];
+            if (commentsTip)
+            {
+                commentsTip += '<br/>';
+            }
+
+            commentsTip += '<b>' + Ext.util.Format.htmlEncode(comment.author) + '</b>: ' + Ext.util.Format.htmlEncode(comment.snippet);
+        }
+
+        if (recentComments.length < buildModel.comments.commentCount)
+        {
+            commentsTip += '<br/><br/><em>' + recentComments.length + ' of ' + buildModel.comments.commentCount + ' comments shown</em>';
+        }
+    }
+
+    return commentsTip;
+}
+
 Zutubi.DetailPanel = function(config)
 {
     Zutubi.DetailPanel.superclass.constructor.call(this, config);

@@ -22,6 +22,7 @@ Zutubi.PROJECT_CELLS = '<td class="monitoring-{monitoring}" rowspan="{rowspan}">
 
 Zutubi.BUILD_CELLS = '<td class="build-id fit-width">' +
                          '<a id="{buildId}-link" href="{buildLink}">build {buildNumber}</a>' +
+                         '<tpl if="commentsTip">&nbsp;<img ext:qtip="{commentsTip}" src="{[window.baseUrl]}/images/comment.gif"/></tpl>' +
                      '</td>' +
                      '<td class="actions-menu">' +
                          '<a class="unadorned" id="{buildId}-bactions-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
@@ -56,6 +57,7 @@ Zutubi.ConcreteProject.prototype = {
         templateData.buildLink = window.baseUrl + '/browse/projects/' + encodeURIComponent(templateData.name) + '/builds/' + build.number + '/';
         templateData.status = build.status;
         templateData.statusIcon = build.statusIcon;
+        templateData.commentsTip = getBuildCommentsTooltip(build);
         templateData.columns = build.columns;
     },
 
@@ -440,17 +442,17 @@ Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
         children = this.data.children;
         healthStyles = '';
 
-        if ((this.data.okCount + this.data.unknownCount) == 0)
+        if ((this.data.okCount + this.data.unknownCount) === 0)
         {
             healthStyles += ' project-health-no-ok';
         }
 
-        if (this.data.warningCount == 0)
+        if (this.data.warningCount === 0)
         {
             healthStyles += ' project-health-no-warnings';
         }
 
-        if (this.data.brokenCount == 0)
+        if (this.data.brokenCount === 0)
         {
             healthStyles += ' project-health-no-broken';
         }

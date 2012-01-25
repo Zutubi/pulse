@@ -50,6 +50,7 @@ public class ProjectBuildModel
     private ResultState state;
     private String status;
     private String statusIcon;
+    private CommentSummaryModel comments;
     private List<String> columns = new LinkedList<String>();
 
     public ProjectBuildModel(final BuildResult buildResult, ProjectsSummaryConfiguration configuration, final Urls urls)
@@ -58,7 +59,7 @@ public class ProjectBuildModel
         state = buildResult.getState();
         status = formatStatus(buildResult, urls);
         statusIcon = ToveUtils.getStatusIcon(buildResult);
-
+        comments = new CommentSummaryModel(buildResult);
         columns = CollectionUtils.map(configuration.getColumns(), new Mapping<String, String>()
         {
             public String map(String column)
@@ -126,6 +127,11 @@ public class ProjectBuildModel
     public String getStatusIcon()
     {
         return statusIcon;
+    }
+
+    public CommentSummaryModel getComments()
+    {
+        return comments;
     }
 
     @JSON

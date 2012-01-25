@@ -32,6 +32,7 @@ public class BuildModel extends ResultModel
     private String version;
     private boolean pinned;
     private List<BuildStageModel> stages = new LinkedList<BuildStageModel>();
+    private CommentSummaryModel comments;
 
     public BuildModel(long id, long number, boolean personal, String project, String owner, String status, String prettyQueueTime, String reason, RevisionModel revision, String maturity, String version)
     {
@@ -80,6 +81,7 @@ public class BuildModel extends ResultModel
         maturity = buildResult.getStatus();
         version = buildResult.getVersion();
         pinned = buildResult.isPinned();
+        comments = new CommentSummaryModel(buildResult);
     }
 
     public long getNumber()
@@ -152,6 +154,11 @@ public class BuildModel extends ResultModel
         this.pinned = pinned;
     }
 
+    public CommentSummaryModel getComments()
+    {
+        return comments;
+    }
+
     @JSON
     public List<BuildStageModel> getStages()
     {
@@ -168,4 +175,5 @@ public class BuildModel extends ResultModel
             }
         });
     }
+
 }

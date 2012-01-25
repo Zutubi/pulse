@@ -287,21 +287,25 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         
         ID_TEMPLATE: new Ext.XTemplate(
             '<a href="{link}">build {number}</a>&nbsp;' +
+            '<tpl if="commentsTip"><img ext:qtip="{commentsTip}" src="{[window.baseUrl]}/images/comment.gif"/>&nbsp;</tpl>' +
             '<a class="unadorned" id="bactions-{id}-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
                 '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="bactions-{id}-button" alt="build menu"/>' +
             '</a>'
         ),
         
         buildId: function(number, build) {
+            var commentsTip;
             if (number > 0)
             {
                 if (build.link)
                 {
                     Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
+                    commentsTip = getBuildCommentsTooltip(build);
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
                         id: build.id,
-                        link: window.baseUrl + '/' + build.link
+                        link: window.baseUrl + '/' + build.link,
+                        commentsTip: commentsTip
                     });
                 }
                 else
