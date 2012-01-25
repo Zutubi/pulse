@@ -9,8 +9,19 @@ import java.util.List;
  */
 public class BrowseModel
 {
+    private String projectsFilter;
     private List<ProjectsModel> projectGroups;
     private List<String> invalidProjects;
+
+    public String getProjectsFilter()
+    {
+        return projectsFilter;
+    }
+
+    public void setProjectsFilter(String projectsFilter)
+    {
+        this.projectsFilter = projectsFilter;
+    }
 
     @JSON
     public List<ProjectsModel> getProjectGroups()

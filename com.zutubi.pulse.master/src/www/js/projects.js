@@ -44,11 +44,11 @@ Zutubi.ConcreteProject = function(data, columnCount, showHideLinks) {
 };
 
 Zutubi.ConcreteProject.prototype = {
-    buildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.BUILD_CELLS + '</tr>').compile(),
+    buildTemplate: new Ext.XTemplate('<tr class="project-row project-health-{health}" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.BUILD_CELLS + '</tr>').compile(),
 
-    noBuildTemplate: new Ext.XTemplate('<tr class="project-row" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.NO_BUILD_CELLS + '</tr>').compile(),
+    noBuildTemplate: new Ext.XTemplate('<tr class="project-row project-health-{health}" id="{id}">' + Zutubi.PROJECT_CELLS + Zutubi.NO_BUILD_CELLS + '</tr>').compile(),
 
-    noProjectTemplate: new Ext.XTemplate('<tr class="project-row" id="{buildId}">' + Zutubi.BUILD_CELLS + '</tr>').compile(),
+    noProjectTemplate: new Ext.XTemplate('<tr class="project-row project-health-{health}" id="{buildId}">' + Zutubi.BUILD_CELLS + '</tr>').compile(),
 
     addBuildData: function(templateData, build, index) {
         templateData.buildId = 'b' + String(index + 1) + '.' + templateData.id;
@@ -111,11 +111,18 @@ Zutubi.ConcreteProject.prototype = {
         return this.rows[this.rows.length - 1];
     },
 
-    setRowDisplay: function(display) {
+    setRowsHidden: function(hide) {
         var i;
         for (i = 0; i < this.rows.length; i++)
         {
-            this.rows[i].setStyle('display', display);
+            if (hide)
+            {
+                this.rows[i].addClass('project-hidden');
+            }
+            else
+            {
+                this.rows[i].removeClass('project-hidden');
+            }
         }
     },
 
@@ -123,7 +130,7 @@ Zutubi.ConcreteProject.prototype = {
         if (!this.hidden)
         {
             this.hidden = true;
-            this.setRowDisplay('none');
+            this.setRowsHidden(true);
         }
     },
 
@@ -131,7 +138,7 @@ Zutubi.ConcreteProject.prototype = {
         if (this.hidden)
         {
             this.hidden = false;
-            this.setRowDisplay('');
+            this.setRowsHidden(false);
         }
     },
 
@@ -321,7 +328,7 @@ Zutubi.ProjectContainer.prototype = {
     hide: function() {
         if (!this.hidden)
         {
-            this.el.setStyle('display', 'none');
+            this.el.addClass('project-hidden');
             this.hidden = true;
         }
 
@@ -364,7 +371,7 @@ Zutubi.ProjectContainer.prototype = {
             child = this.children[i];
             if (!child.data.concrete)
             {
-                child.expand();
+                child.expandAll();
             }
         }
     },
@@ -372,7 +379,7 @@ Zutubi.ProjectContainer.prototype = {
     show: function() {
         if (this.hidden)
         {
-            this.el.setStyle('display', '');
+            this.el.removeClass('project-hidden');
             this.hidden = false;
         }
 
@@ -411,7 +418,7 @@ Zutubi.TemplateProject = function(data, columnCount, showHideLinks) {
 
 Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
     template: new Ext.Template(
-        '<tr class="project-row {expandable}" id="{id}">' +
+        '<tr class="project-row {healthStyles} {expandable}" id="{id}">' +
             '<td class="health-{health}">&nbsp;</td>' +
             '<td class="fit-width">' +
                 '<img alt="-" src="{base}/images/default/s.gif" class="project-name" style="width: {indent}px; height: 16px;"/> ' +
@@ -428,9 +435,26 @@ Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
         '</tr>').compile(),
 
     render: function(previousRowEl) {
-        var children, canExpand, expandable;
+        var children, healthStyles, canExpand, expandable;
 
         children = this.data.children;
+        healthStyles = '';
+
+        if ((this.data.okCount + this.data.unknownCount) == 0)
+        {
+            healthStyles += ' project-health-no-ok';
+        }
+
+        if (this.data.warningCount == 0)
+        {
+            healthStyles += ' project-health-no-warnings';
+        }
+
+        if (this.data.brokenCount == 0)
+        {
+            healthStyles += ' project-health-no-broken';
+        }
+
         canExpand = children && children.length > 0;
         expandable = canExpand ? 'project-expandable' : '';
         if (canExpand && this.data.collapsed)
@@ -441,6 +465,7 @@ Ext.extend(Zutubi.TemplateProject, Zutubi.ProjectContainer, {
         this.el = this.template.insertAfter(previousRowEl, {
             expandable: expandable,
             id: this.data.id,
+            healthStyles: healthStyles,
             health: this.data.health,
             base: window.baseUrl,
             indent: this.data.depth * 12,
@@ -544,8 +569,7 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
     }
 });
 
-Zutubi.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled, isDashboard) {
-    this.toolbarEl = toolbarEl;
+Zutubi.ProjectsTable = function(containerEl, columnCount, rssEnabled, isDashboard) {
     this.containerEl = containerEl;
     this.columnCount = columnCount;
     this.rssEnabled = rssEnabled;
@@ -555,29 +579,84 @@ Zutubi.ProjectsTable = function(containerEl, toolbarEl, columnCount, rssEnabled,
 };
 
 Zutubi.ProjectsTable.prototype = {
-    renderToolbar: function() {
-        this.toolbar = new Ext.ux.StatusBar({
-            defaultText: 'Layout Controls:',
-            renderTo: this.toolbarEl,
-            style: { 'background': '#F2F2FF', 'border-width': '1px' },
-            width: 176,
-            items:  [ {
-                         icon: window.baseUrl + '/images/expand.gif',
-                         cls: 'x-btn-icon',
-                         tooltip: 'expand all',
-                         onClick: this.expandAll.createDelegate(this)
-                     }, {
-                         icon: window.baseUrl + '/images/collapse.gif',
-                         cls: 'x-btn-icon',
-                         tooltip: 'collapse all',
-                         onClick: this.collapseAll.createDelegate(this)
-                     }, {
-                         icon: window.baseUrl + '/images/save.gif',
-                         cls: 'x-btn-icon',
-                         tooltip: 'save current layout',
-                         onClick: this.saveLayout.createDelegate(this)
-                     }]
+    renderToolbar: function(projectsFilter) {
+        var table = this;
+        this.toolbar = new Ext.Toolbar({
+            el: 'build-toolbar',
+            items: [{
+                xtype: 'label',
+                text: 'filter:'
+            }, ' ', ' ', {
+                xtype: 'combo',
+                id: 'projects-filter',
+                width: 230,
+                editable: false,
+                mode: 'local',
+                triggerAction: 'all',
+                store: new Ext.data.ArrayStore({
+                    idIndex: 0,
+                    fields: [
+                        'filter',
+                        'text'
+                    ],
+                    data: [
+                        ['', 'show all projects'],
+                        ['ok', 'only show healthy projects'],
+                        ['warnings', 'only show projects with warnings'],
+                        ['broken', 'only show broken projects']
+                    ]
+                }),
+                valueField: 'filter',
+                displayField: 'text',
+                value: projectsFilter,
+                listeners: {
+                    select: function(combo, record) {
+                        table.applyFilter(record.get('filter'));
+                    }
+                }
+            }, {
+                xtype: 'xztblink',
+                id: 'save-filter-link',
+                text: 'save filter',
+                icon: window.baseUrl + '/images/save.gif',
+                listeners: {
+                    click: function() {
+                        table.saveFilter();
+                    }
+                }
+            }, '->', {
+                xtype: 'xztblink',
+                id: 'expand-all-link',
+                text: 'expand all',
+                icon: window.baseUrl + '/images/expand.gif',
+                listeners: {
+                    click: function() {
+                        table.expandAll();
+                    }
+                }
+            }, {
+                xtype: 'xztblink',
+                id: 'collapse-all-link',
+                text: 'collapse all',
+                icon: window.baseUrl + '/images/collapse.gif',
+                listeners: {
+                    click: function() {
+                        table.collapseAll();
+                    }
+                }
+            }, {
+                xtype: 'xztblink',
+                id: 'save-layout-link',
+                text: 'save layout',
+                icon: window.baseUrl + '/images/save.gif',
+                listeners: {
+                    click: function() {
+                        table.saveLayout();
+                    }
+                }
+            }]
         });
+        this.toolbar.render();
         this.toolbarRendered = true;
     },
 
@@ -585,12 +664,34 @@ Zutubi.ProjectsTable.prototype = {
         this.toolbar.destroy();
         this.toolbarRendered = false;
     },
-    
-    expandAll: function() {
-        var tb, groups;
 
-        tb = this.toolbar;
-        tb.showBusy('Expanding...');
+    applyFilter: function(filter) {
+        this.containerEl.removeClass('project-filter-broken');
+        this.containerEl.removeClass('project-filter-ok');
+        this.containerEl.removeClass('project-filter-warnings');
+        if (filter)
+        {
+            this.containerEl.addClass('project-filter-' + filter);
+        }
+    },
+
+    saveFilter: function() {
+        var toolbarEl;
+
+        toolbarEl = this.toolbar.el;
+        toolbarEl.mask('Saving...');
+        runAjaxRequest({
+            url: window.baseUrl + '/ajax/saveProjectsFilter.action',
+            params: { filter: Ext.getCmp('projects-filter').getValue(), dashboard: this.isDashboard },
+            callback: function() { toolbarEl.unmask(); }
+        });
+    },
+
+    expandAll: function() {
+        var toolbarEl, groups;
+
+        toolbarEl = this.toolbar.el;
+        toolbarEl.mask('Expanding...');
         groups = this.groups;
         (function() {
             var group;
@@ -599,15 +700,15 @@ Zutubi.ProjectsTable.prototype = {
             {
                 groups[group].expandAll();
             }
-            tb.clearStatus({useDefaults: true});
+            toolbarEl.unmask();
         }.defer(1));
     },
 
     collapseAll: function() {
-        var tb, groups;
+        var toolbarEl, groups;
 
-        tb = this.toolbar;
-        tb.showBusy('Collapsing...');
+        toolbarEl = this.toolbar.el;
+        toolbarEl.mask('Collapsing...');
         groups = this.groups;
         (function() {
             var group;
@@ -616,7 +717,7 @@ Zutubi.ProjectsTable.prototype = {
             {
                 groups[group].collapseAll();
             }
-            tb.clearStatus({useDefaults: true});
+            toolbarEl.unmask();
         }.defer(1));
     },
 
@@ -637,18 +738,18 @@ Zutubi.ProjectsTable.prototype = {
     },
 
     saveLayout: function() {
-        var tb;
+        var toolbarEl;
 
-        tb = this.toolbar;
-        tb.showBusy('Saving...');
+        toolbarEl = this.toolbar.el;
+        toolbarEl.mask('Saving...');
         runAjaxRequest({
             url: window.baseUrl + '/ajax/saveProjectsLayout.action',
             params: { layout: Ext.util.JSON.encode(this.getCurrentLayout()), dashboard: this.isDashboard },
-            callback: function() { tb.clearStatus({useDefaults: true}); }
+            callback: function() { toolbarEl.unmask(); }
         });
     },
 
-    update: function(groupsData) {
+    update: function(projectsFilter, groupsData) {
         var el, previousGroups, key, i, tableEl, groupData, groupName, group;
 
         el = this.containerEl;
@@ -676,7 +777,7 @@ Zutubi.ProjectsTable.prototype = {
         {
             if (!this.toolbarRendered)
             {
-                this.renderToolbar();
+                this.renderToolbar(projectsFilter);
             }
 
             for (i = 0; i < groupsData.length; i++)
@@ -689,6 +790,8 @@ Zutubi.ProjectsTable.prototype = {
                 group.render(tableEl);
                 this.groups[groupName] = group;
             }
+
+            this.applyFilter(projectsFilter);
         }
     },
 

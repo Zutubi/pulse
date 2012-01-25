@@ -31,5 +31,9 @@
         </set>
 
         <property name="artifactsFilter" type="string" column="ARTIFACTS_FILTER" length="63"/>
+
+        <property name="browseViewFilter" type="string" column="BROWSE_VIEW_FILTER" length="63"/>
+
+        <property name="dashboardFilter" type="string" column="DASHBOARD_FILTER" length="63"/>
     </class>
 </hibernate-mapping>

@@ -379,6 +379,11 @@
             <result name="success" type="flexjson">model</result>
         </action>
 
+        <action name="saveProjectsFilter" class="com.zutubi.pulse.master.xwork.actions.project.SaveProjectsFilterAction">
+            <interceptor-ref name="ajaxSideEffectStack"/>
+            <result name="success" type="httpheader">200</result>
+        </action>
+
         <action name="saveProjectsLayout" class="com.zutubi.pulse.master.xwork.actions.project.SaveProjectsLayoutAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
             <result name="success" type="httpheader">200</result>

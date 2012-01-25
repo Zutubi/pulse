@@ -155,7 +155,7 @@ public class DashboardDataAction extends ActionSupport
                     projectChangelists.addAll(buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
                 }
     
-                model = new DashboardModel(contactPointsWithErrors, responsibilities, projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
+                model = new DashboardModel(contactPointsWithErrors, responsibilities, user.getDashboardFilter(), projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
     
                 return SUCCESS;
             }

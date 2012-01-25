@@ -827,6 +827,18 @@ th.fit-width, td.fit-width
     background-image: url(../images/default/tree/elbow-plus-nl.gif);
 }
 
+.project-hidden
+{
+    display: none;
+}
+
+.project-filter-broken .project-health-no-broken, .project-filter-broken .project-health-ok, .project-filter-broken .project-health-unknown, .project-filter-broken .project-health-warnings,
+.project-filter-ok .project-health-no-ok, .project-filter-ok .project-health-broken, .project-filter-ok .project-health-warnings,
+.project-filter-warnings .project-health-no-warnings, .project-filter-warnings .project-health-broken, .project-filter-warnings .project-health-ok, .project-filter-warnings .project-health-unknown
+{
+    display: none;
+}
+
 .actions-menu
 {
     width: 16px;
@@ -1138,6 +1150,7 @@ td.status-last
 .xz-tblink, .xz-tbicontext
 {
     margin: 7px;
+    white-space: nowrap;
 }
 
 .xz-tblink img, .xz-tbicontext img

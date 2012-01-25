@@ -13,7 +13,6 @@ import java.util.Set;
  */
 public class User extends Entity implements NamedEntity
 {
-    public static final int REFRESH_DISABLED = 0;
     public static final String DEFAULT_ARTIFACTS_FILTER = "explicit";
 
     /**
@@ -31,9 +30,17 @@ public class User extends Entity implements NamedEntity
      */
     private long lastAccessTime = 0;
     /**
+     * Project state filter for the browse view.
+     */
+    private String browseViewFilter = "";
+    /**
      * Collapsed groups/projects on the browse view.
      */
     private Set<LabelProjectTuple> browseViewCollapsed = new HashSet<LabelProjectTuple>();
+    /**
+     * Project state filter for the dashboard view.
+     */
+    private String dashboardFilter = "";
     /**
      * Collapsed groups/projects on the dashboard.
      */
@@ -116,6 +123,16 @@ public class User extends Entity implements NamedEntity
         }
     }
 
+    public String getBrowseViewFilter()
+    {
+        return browseViewFilter;
+    }
+
+    public void setBrowseViewFilter(String browseViewFilter)
+    {
+        this.browseViewFilter = browseViewFilter;
+    }
+
     public Set<LabelProjectTuple> getBrowseViewCollapsed()
     {
         return browseViewCollapsed;
@@ -124,6 +141,16 @@ public class User extends Entity implements NamedEntity
     public void setBrowseViewCollapsed(Set<LabelProjectTuple> browseViewCollapsed)
     {
         this.browseViewCollapsed = browseViewCollapsed;
+    }
+
+    public String getDashboardFilter()
+    {
+        return dashboardFilter;
+    }
+
+    public void setDashboardFilter(String dashboardFilter)
+    {
+        this.dashboardFilter = dashboardFilter;
     }
 
     public Set<LabelProjectTuple> getDashboardCollapsed()

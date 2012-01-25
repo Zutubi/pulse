@@ -172,6 +172,7 @@
                 <ref local="scmInclusionPaths"/>
                 <ref local="addAgentProperties"/>
                 <ref local="removeResolveVariables"/>
+                <ref local="addProjectFilters"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -895,5 +896,14 @@
 
     <bean id="removeResolveVariables" class="com.zutubi.pulse.master.upgrade.tasks.RemoveResolveVariablesUpgradeTask">
         <property name="buildNumber" value="204999004"/>
+    </bean>
+
+    <bean id="addProjectFilters" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="204999005"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.5.0-patch-01.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

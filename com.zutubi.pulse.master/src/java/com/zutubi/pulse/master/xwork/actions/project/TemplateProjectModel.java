@@ -62,6 +62,11 @@ public class TemplateProjectModel extends ProjectModel
         return health;
     }
 
+    public int getUnknownCount()
+    {
+        return getCount(ProjectHealth.UNKNOWN);
+    }
+
     public int getOkCount()
     {
         return getCount(ProjectHealth.OK);

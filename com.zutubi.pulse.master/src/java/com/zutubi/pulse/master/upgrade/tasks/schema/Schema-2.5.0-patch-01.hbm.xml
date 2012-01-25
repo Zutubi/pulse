@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.master.model.User" table="LOCAL_USER" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="browseViewFilter" type="string" length="63">
+            <column name="BROWSE_VIEW_FILTER" default="''"/>
+        </property>
+
+        <property name="dashboardFilter" type="string" length="63">
+            <column name="DASHBOARD_FILTER" default="''"/>
+        </property>
+    </class>
+</hibernate-mapping>

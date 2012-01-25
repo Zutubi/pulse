@@ -42,13 +42,13 @@
                 invalidEl.show();
             }
 
-            projectsTable.update(data.projectGroups);
+            projectsTable.update(data.projectsFilter, data.projectGroups);
         }
 
         Ext.onReady(function() {
             invalidEl = Ext.get('invalid-projects');
             invalidEl.setVisibilityMode(Ext.Element.DISPLAY);
-            projectsTable = new Zutubi.ProjectsTable(Ext.get('projects'), Ext.get('projects.toolbar'), $columnCount, $rssEnabled, false);
+            projectsTable = new Zutubi.ProjectsTable(Ext.get('projects'), $columnCount, $rssEnabled, false);
             view = new Zutubi.ActiveView(window.baseUrl + '/ajax/browseData.action', $refreshInterval, update, window, Ext.get('projects'), 'Unable to load projects.');
             view.init();
         });
@@ -58,11 +58,21 @@
     #end
 </head>
 <body>
-    <div style="margin-bottom: 16px">
-        <span id="projects.toolbar" style="float: right">
-        </span>
-        <h2>:: all projects ::</h2>
-    </div>
+        <table class="columns" width="98%">
+            <tr>
+                <td>
+                    <h2 style="margin-top: 0; margin-bottom: 1em;">
+                        :: all projects ::
+#if($rssEnabled)
+                        <a style="border-bottom: none" href="$base/rss.action"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+                    </h2>
+                </td>
+                <td>
+                    <div id="build-toolbar" style="margin-top: 0;"></div>
+                </td>
+            </tr>
+        </table>
 
     <div id="invalid-projects" style="display: none;" class="invalid-configs">
         #wwtext("name=invalid.projects")

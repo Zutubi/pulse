@@ -12,14 +12,16 @@ public class DashboardModel
 {
     private List<String> contactPointsWithErrors;
     private List<UserResponsibilityModel> responsibilities;
+    private String projectsFilter;
     private List<ProjectsModel> projects;
     private List<ChangelistModel> myChanges;
     private List<ChangelistModel> myProjectChanges;
 
-    public DashboardModel(List<String> contactPointsWithErrors, List<UserResponsibilityModel> responsibilities, List<ProjectsModel> projects, List<ChangelistModel> myChanges, List<ChangelistModel> myProjectChanges)
+    public DashboardModel(List<String> contactPointsWithErrors, List<UserResponsibilityModel> responsibilities, String projectsFilter, List<ProjectsModel> projects, List<ChangelistModel> myChanges, List<ChangelistModel> myProjectChanges)
     {
         this.contactPointsWithErrors = contactPointsWithErrors;
         this.responsibilities = responsibilities;
+        this.projectsFilter = projectsFilter;
         this.projects = projects;
         this.myChanges = myChanges;
         this.myProjectChanges = myProjectChanges;
@@ -35,6 +37,11 @@ public class DashboardModel
     public List<UserResponsibilityModel> getResponsibilities()
     {
         return responsibilities;
+    }
+
+    public String getProjectsFilter()
+    {
+        return projectsFilter;
     }
 
     @JSON
