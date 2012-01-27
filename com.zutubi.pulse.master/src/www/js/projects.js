@@ -571,11 +571,12 @@ Ext.extend(Zutubi.ProjectGroup, Zutubi.ProjectContainer, {
     }
 });
 
-Zutubi.ProjectsTable = function(containerEl, columnCount, rssEnabled, isDashboard) {
+Zutubi.ProjectsTable = function(containerEl, columnCount, rssEnabled, isDashboard, isAnonymous) {
     this.containerEl = containerEl;
     this.columnCount = columnCount;
     this.rssEnabled = rssEnabled;
     this.isDashboard = isDashboard;
+    this.isAnonymous = isAnonymous;
     this.groups = {};
     this.toolbarRendered = false;
 };
@@ -619,6 +620,7 @@ Zutubi.ProjectsTable.prototype = {
             }, {
                 xtype: 'xztblink',
                 id: 'save-filter-link',
+                hidden: table.isAnonymous,
                 text: 'save filter',
                 icon: window.baseUrl + '/images/save.gif',
                 listeners: {
@@ -649,6 +651,7 @@ Zutubi.ProjectsTable.prototype = {
             }, {
                 xtype: 'xztblink',
                 id: 'save-layout-link',
+                hidden: table.isAnonymous,
                 text: 'save layout',
                 icon: window.baseUrl + '/images/save.gif',
                 listeners: {

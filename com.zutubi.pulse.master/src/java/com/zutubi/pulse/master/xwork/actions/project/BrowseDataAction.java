@@ -32,7 +32,7 @@ public class BrowseDataAction extends ProjectActionSupport
             public String process()
             {
                 User user = getLoggedInUser();
-                model.setProjectsFilter(user.getBrowseViewFilter());
+                model.setProjectsFilter(user == null ? "" : user.getBrowseViewFilter());
                 
                 final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
                 Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
