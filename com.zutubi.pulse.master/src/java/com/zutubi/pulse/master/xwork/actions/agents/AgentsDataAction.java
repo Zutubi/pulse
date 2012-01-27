@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationFormatter;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.project.CommentSummaryModel;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.actions.ActionManager;
@@ -77,7 +78,7 @@ public class AgentsDataAction extends ActionSupport
         List<AgentRowModel> rows = new LinkedList<AgentRowModel>();
         for (Agent agent: agents)
         {
-            AgentRowModel rowModel = new AgentRowModel(agent.getId(), agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent));
+            AgentRowModel rowModel = new AgentRowModel(agent.getId(), agent.getConfig().getName(), agent.getHost().getLocation(), formatter.getStatus(agent), new CommentSummaryModel(agent.getComments()));
             addExecutingBuild(agent, rowModel, urls);
             addActions(agent, rowModel, messages);
             rows.add(rowModel);

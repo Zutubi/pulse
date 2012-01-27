@@ -5,6 +5,7 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
     renderers: {
         AGENT_TEMPLATE: new Ext.XTemplate(
             '<a href="{link}">{name:htmlEncode}</a>&nbsp;' +
+            '<tpl if="commentsTip"><img ext:qtip="{commentsTip}" src="{[window.baseUrl]}/images/comment.gif"/>&nbsp;</tpl>' +
             '<a class="unadorned" id="aactions-{id}-link" onclick="Zutubi.MenuManager.toggleMenu(this); return false">' +
                 '<img src="{[window.baseUrl]}/images/default/s.gif" class="popdown floating-widget" id="aactions-{id}-button" alt="agent menu"/>' +
             '</a>'
@@ -59,7 +60,8 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
             return Zutubi.pulse.agent.renderers.AGENT_TEMPLATE.apply({
                 name: name,
                 id: agent.id,
-                link: window.baseUrl + '/agents/' + encodeURIComponent(name)
+                link: window.baseUrl + '/agents/' + encodeURIComponent(name),
+                commentsTip: getCommentsTooltip(agent)
             });
         },
 

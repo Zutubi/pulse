@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
+    <class name="com.zutubi.pulse.master.model.Comment" table="BUILD_COMMENT" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+    </class>
+
     <class name="com.zutubi.pulse.master.model.AgentState" table="AGENT_STATE" lazy="false">
-        <cache usage="read-write"/>
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <property name="enableStateName" column="ENABLE_STATE" type="string" length="255"/>
-
-        <list name="comments" cascade="all,delete-orphan" lazy="false">
+        <list name="comments" table="AGENT_STATE_COMMENTS" cascade="all,delete-orphan" lazy="false">
             <key column="AGENT_STATE_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.master.model.Comment"/>

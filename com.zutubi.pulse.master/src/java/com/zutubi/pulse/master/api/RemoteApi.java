@@ -3386,29 +3386,12 @@ public class RemoteApi
         try
         {
             BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
-            List<Comment> comments = buildResult.getComments();
-            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(comments.size());
-            for (Comment comment: comments)
-            {
-                result.add(convertComment(comment));
-            }
-
-            return result;
+            return convertComments(buildResult.getComments());
         }
         finally
         {
             tokenManager.logoutUser();
         }
-    }
-
-    private Hashtable<String, Object> convertComment(Comment comment)
-    {
-        Hashtable<String, Object> result = new Hashtable<String, Object>();
-        result.put("id", Long.toString(comment.getId()));
-        result.put("author", comment.getAuthor());
-        result.put("message", comment.getMessage());
-        result.put("time", Long.toString(comment.getTime()));
-        return result;
     }
 
     /**
@@ -3422,7 +3405,7 @@ public class RemoteApi
      * @return the id of the created comment
      * @throws IllegalArgumentException if the given project or build does not exist
      * @access requires view permission for the given project
-     * @see #getBuildComments(String, String, int) 
+     * @see #getBuildComments(String, String, int)
      * @see #deleteBuildComment(String, String, int, String)
      */
     public String addBuildComment(String token, String projectName, int buildId, String message)
@@ -3441,7 +3424,7 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-    
+
     /**
      * Deletes a comment from a build result.  Comments are generally only deleted by
      * the user that left them, although admins may also delete comments.
@@ -3454,8 +3437,8 @@ public class RemoteApi
      *         comment of the given ID exists on the build
      * @throws IllegalArgumentException if the given project or build does not exist
      * @access requires ownership of the given comment or server admin permission
-     * @see #getBuildComments(String, String, int) 
-     * @see #addBuildComment(String, String, int, String) 
+     * @see #getBuildComments(String, String, int)
+     * @see #addBuildComment(String, String, int, String)
      */
     public boolean deleteBuildComment(String token, String projectName, int buildId, String commentId)
     {
@@ -3471,7 +3454,7 @@ public class RemoteApi
             {
                 throw new IllegalArgumentException("Invalid comment id '" + commentId + "'");
             }
-            
+
             BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
             Comment comment = CollectionUtils.find(buildResult.getComments(), new EntityWithIdPredicate<Comment>(id));
             if (comment == null)
@@ -3489,7 +3472,146 @@ public class RemoteApi
         finally
         {
             tokenManager.logoutUser();
-        }        
+        }
+    }
+
+    /**
+     * Returns an array of all comments on an agent.  Comments are sorted from oldest
+     * to newest.
+     *
+     * @param token     authentication token, see {@link #login(String, String)}
+     * @param agentName the name of the agent to get the comments for
+     * @return {@xtype array<[RemoteApi.Comment]>} all comments on the given
+     *         agent
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access requires view permission for the given agent
+     * @see #addAgentComment(String, String, String)
+     * @see #deleteAgentComment(String, String, String)
+     */
+    public Vector<Hashtable<String, Object>> getAgentComments(String token, String agentName)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Agent agent = internalGetAgent(agentName);
+            return convertComments(agent.getComments());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Adds a comment to an agent result.  Comments are used to communicate with
+     * other users viewing the agent.
+     *
+     * @param token     authentication token, see {@link #login(String, String)}
+     * @param agentName the name of the agent to comment on
+     * @param message   the comment message to add
+     * @return the id of the created comment
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access requires view permission for the given agent
+     * @see #getAgentComments(String, String)
+     * @see #deleteAgentComment(String, String, String)
+     */
+    public String addAgentComment(String token, String agentName, String message)
+    {
+        User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            Agent agent = internalGetAgent(agentName);
+            final Comment comment = new Comment(user.getLogin(), System.currentTimeMillis(), message);
+            agentManager.updateAgentState(agent, new UnaryProcedure<AgentState>()
+            {
+                public void run(AgentState agentState)
+                {
+                    agentState.addComment(comment);
+                }
+            });
+            
+            return Long.toString(comment.getId());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Deletes a comment from an agent.  Comments are generally only deleted by
+     * the user that left them, although admins may also delete comments.
+     *
+     * @param token     authentication token, see {@link #login(String, String)}
+     * @param agentName the name of the agent to delete the comment from
+     * @param commentId ID of the comment to delete
+     * @return true if the comment existed on the build and was deleted, false if no
+     *         comment of the given ID exists on the build
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access requires ownership of the given comment or server admin permission
+     * @see #getAgentComments(String, String)
+     * @see #addAgentComment(String, String, String)
+     */
+    public boolean deleteAgentComment(String token, String agentName, String commentId)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            long id;
+            try
+            {
+                id = Long.parseLong(commentId);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new IllegalArgumentException("Invalid comment id '" + commentId + "'");
+            }
+
+            Agent agent = internalGetAgent(agentName);
+            final Comment comment = CollectionUtils.find(agent.getComments(), new EntityWithIdPredicate<Comment>(id));
+            if (comment == null)
+            {
+                return false;
+            }
+            else
+            {
+                accessManager.ensurePermission(AccessManager.ACTION_DELETE, comment);
+                agentManager.updateAgentState(agent, new UnaryProcedure<AgentState>()
+                {
+                    public void run(AgentState agentState)
+                    {
+                        agentState.removeComment(comment);
+                    }
+                });
+                return true;
+            }
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+
+    private Vector<Hashtable<String, Object>> convertComments(List<Comment> comments)
+    {
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(comments.size());
+        for (Comment comment: comments)
+        {
+            result.add(convertComment(comment));
+        }
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertComment(Comment comment)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(comment.getId()));
+        result.put("author", comment.getAuthor());
+        result.put("message", comment.getMessage());
+        result.put("time", Long.toString(comment.getTime()));
+        return result;
     }
 
     /**

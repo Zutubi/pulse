@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.util.StringUtils;
 import flexjson.JSON;
@@ -19,9 +18,8 @@ public class CommentSummaryModel
     private int commentCount;
     private List<CommentSnippetModel> recentComments = new LinkedList<CommentSnippetModel>();
 
-    public CommentSummaryModel(BuildResult build)
+    public CommentSummaryModel(List<Comment> comments)
     {
-        List<Comment> comments = build.getComments();
         commentCount = comments.size();
         for(Comment recent: comments.subList(Math.max(0, commentCount - MAX_COMMENTS), commentCount))
         {

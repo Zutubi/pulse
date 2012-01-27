@@ -4,10 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Comment;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.ProjectResponsibility;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
@@ -119,7 +116,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
 
         if (getLoggedInUser() != null)
         {
-            model.addAction(ToveUtils.getActionLink(BuildResult.ACTION_ADD_COMMENT, messages, contentRoot));
+            model.addAction(ToveUtils.getActionLink(CommentContainer.ACTION_ADD_COMMENT, messages, contentRoot));
         }
     }
 

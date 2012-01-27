@@ -6,11 +6,19 @@ import com.zutubi.pulse.master.agent.DefaultAgent;
 import com.zutubi.pulse.master.agent.Host;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.pulse.master.xwork.actions.CommentModel;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.HostStatus;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.security.Actor;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.TimeStamps;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +33,9 @@ public class AgentStatusDataAction extends AgentActionBase
     private AgentStatusModel model;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
-    
+    private SystemPaths systemPaths;
+    private ActionManager actionManager;
+
     public AgentStatusModel getModel()
     {
         return model;
@@ -103,6 +113,24 @@ public class AgentStatusDataAction extends AgentActionBase
             addAgentStatus(agent.getStatus(), agent.getStatus().getPrettyString());
         }
 
+        final Messages messages = Messages.getInstance(AgentConfiguration.class);
+        File contentRoot = systemPaths.getContentRoot();
+        for (String actionName: actionManager.getActions(agent.getConfig(), false, true))
+        {
+            model.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
+        }
+
+        if (getLoggedInUser() != null)
+        {
+            model.addAction(ToveUtils.getActionLink(CommentContainer.ACTION_ADD_COMMENT, messages, contentRoot));
+        }
+
+        Actor actor = accessManager.getActor();
+        for (Comment comment: agent.getComments())
+        {
+            model.addComment(new CommentModel(comment, accessManager.hasPermission(actor, AccessManager.ACTION_DELETE, comment)));
+        }
+
         List<AgentSynchronisationMessage> synchronisationMessages = new LinkedList<AgentSynchronisationMessage>(agentManager.getSynchronisationMessages(agent.getId()));
         Collections.reverse(synchronisationMessages);
         model.addSynchronisationMessages(synchronisationMessages);
@@ -128,5 +156,15 @@ public class AgentStatusDataAction extends AgentActionBase
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

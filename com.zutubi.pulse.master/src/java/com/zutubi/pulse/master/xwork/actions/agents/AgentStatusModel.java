@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
+import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.master.xwork.actions.CommentModel;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -14,7 +16,9 @@ public class AgentStatusModel
 {
     private AgentModel info;
     private Map<String, String> status = new LinkedHashMap<String, String>();
+    private List<ActionLink> actions = new LinkedList<ActionLink>();
     private ExecutingStageModel executingStage;
+    private List<CommentModel> comments = new LinkedList<CommentModel>();
     private List<SynchronisationMessageModel> synchronisationMessages = new LinkedList<SynchronisationMessageModel>();
 
     public AgentStatusModel(String name, String location)
@@ -37,6 +41,16 @@ public class AgentStatusModel
         status.put(name, value);
     }
 
+    public List<ActionLink> getActions()
+    {
+        return actions;
+    }
+
+    public void addAction(ActionLink action)
+    {
+        actions.add(action);
+    }
+    
     public ExecutingStageModel getExecutingStage()
     {
         return executingStage;
@@ -45,6 +59,16 @@ public class AgentStatusModel
     public void setExecutingStage(ExecutingStageModel executingStage)
     {
         this.executingStage = executingStage;
+    }
+
+    public List<CommentModel> getComments()
+    {
+        return comments;
+    }
+
+    public void addComment(CommentModel comment)
+    {
+        comments.add(comment);
     }
 
     public List<SynchronisationMessageModel> getSynchronisationMessages()

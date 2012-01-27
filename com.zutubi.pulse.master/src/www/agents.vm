@@ -31,20 +31,6 @@
             }
         }
 
-        function agentAction(id, action)
-        {
-            Zutubi.FloatManager.hideAll();
-
-            runAjaxRequest({
-                url: window.baseUrl + '/ajax/agentAction.action',
-                params: {
-                    agentId: id,
-                    actionName: action
-                },
-                callback: handleActionResponse
-            });
-        }
-        
         Ext.onReady(function() {
             panel = new Zutubi.pulse.agent.AgentsPanel({
                 id: 'agents',

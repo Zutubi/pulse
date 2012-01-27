@@ -133,4 +133,14 @@ public interface AgentManager extends AgentPersistentStatusManager
      *         new messages are available
      */
     boolean completeSynchronisation(long agentId, boolean successful);
+
+    /**
+     * Updates the agent state, ensuring that it persists and that the agent
+     * itself is also updated.  Agent state should always be updated using this
+     * manager, so cached agents reflect any changes made.
+     *
+     * @param agent    the agent to update the state of
+     * @param updateFn a callback that can make desired changes to the state
+     */
+    public void updateAgentState(Agent agent, UnaryProcedure<AgentState> updateFn);
 }

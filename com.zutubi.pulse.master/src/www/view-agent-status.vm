@@ -10,10 +10,50 @@
 #if(!$action.hasErrors())
     <script type="text/javascript">
         var panel = null;
-        
+
+        function refresh(cb)
+        {
+            panel.load(function()
+            {
+                if (cb)
+                {
+                    cb();
+                }
+
+                panel.updateRows();
+            });
+        }
+
+        function handleActionResponse(options, success, response)
+        {
+            var result;
+            if (success)
+            {
+                result = Ext.util.JSON.decode(response.responseText);
+                if (result.success)
+                {
+                    if (result.detail)
+                    {
+                        showStatus(result.detail, 'success');
+                    }
+                    
+                    refresh();
+                }
+                else
+                {
+                    showStatus(Ext.util.Format.htmlEncode(result.message), 'failure');
+                }
+            }
+            else
+            {
+                showStatus('Cannot contact server', 'failure');
+            }
+        }
+
         Ext.onReady(function() {
             panel = new Zutubi.pulse.agent.AgentStatusPanel({
                 id: 'agent-status',
+                agentId: $agent.id,
                 url: window.baseUrl + '/ajax/agentStatusData.action?agentName=' + encodeURIComponent('$agentName'),
                 loadingId: 'agent-status-loading',
                 containerId: 'nested-center',

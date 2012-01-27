@@ -5,7 +5,6 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.*;
@@ -42,6 +41,8 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutubi.events.EventListener
 {
@@ -805,6 +806,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public boolean completeSynchronisation(long agentId, boolean successful)
         {
             throw new RuntimeException("Method not implemented.");
+        }
+
+        public void updateAgentState(Agent agent, UnaryProcedure<AgentState> updateFn)
+        {
+            throw new RuntimeException("Not yet implemented");
         }
 
         public Agent getAgent(String name)

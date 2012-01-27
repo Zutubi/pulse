@@ -216,7 +216,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
         Ext.getCmp(this.id + '-main').getLayout().checkRows();
         Ext.getCmp(this.id + '-right').getLayout().checkRows();
     },
-    
+
     deleteBuild: function()
     {
         var newLocation,

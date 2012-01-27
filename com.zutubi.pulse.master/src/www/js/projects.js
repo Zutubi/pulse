@@ -57,7 +57,7 @@ Zutubi.ConcreteProject.prototype = {
         templateData.buildLink = window.baseUrl + '/browse/projects/' + encodeURIComponent(templateData.name) + '/builds/' + build.number + '/';
         templateData.status = build.status;
         templateData.statusIcon = build.statusIcon;
-        templateData.commentsTip = getBuildCommentsTooltip(build);
+        templateData.commentsTip = getCommentsTooltip(build);
         templateData.columns = build.columns;
     },
 

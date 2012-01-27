@@ -13,9 +13,13 @@
  * }, ... ]
  *
  * @cfg {String} id      Id to use for this component.
- * @cfg {String} buildId Id of the build these comments are on.
+ * @cfg {String} agentId Id of the agent these comments are on, if any.
+ * @cfg {String} buildId Id of the build these comments are on, if any.
  */
 Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
+    agentId: 0,
+    buildId: 0,
+    
     template: new Ext.XTemplate(
         '<ul id="{id}" class="comments">' +
         '</ul>'
@@ -29,7 +33,7 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
             '<div class="comment-author">' +
                 'by {author:htmlEncode}, {relativeDate} ({absoluteDate})' +
                 '<tpl if="canDelete">' +
-                    ' [<a id="delete-comment-{id}" href="#" onclick="deleteComment({buildId}, {id}); return false;">delete</a>]' +
+                    ' [<a id="delete-comment-{id}" href="#" onclick="deleteComment({agentId}, {buildId}, {id}); return false;">delete</a>]' +
                 '</tpl>' +
             '</div>' +
         '</li>'
@@ -72,6 +76,7 @@ Zutubi.pulse.project.CommentList = Ext.extend(Ext.BoxComponent, {
                 comment = this.data[i];
                 this.commentTemplate.append(this.el, {
                     id: comment.id,
+                    agentId: this.agentId,
                     buildId: this.buildId,
                     message: comment.message,
                     author: comment.author,

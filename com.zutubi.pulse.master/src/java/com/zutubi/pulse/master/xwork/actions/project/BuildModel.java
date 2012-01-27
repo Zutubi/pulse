@@ -81,7 +81,7 @@ public class BuildModel extends ResultModel
         maturity = buildResult.getStatus();
         version = buildResult.getVersion();
         pinned = buildResult.isPinned();
-        comments = new CommentSummaryModel(buildResult);
+        comments = new CommentSummaryModel(buildResult.getComments());
     }
 
     public long getNumber()

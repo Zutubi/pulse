@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Comment;
+import com.zutubi.pulse.master.model.CommentContainer;
 import com.zutubi.pulse.master.model.User;
 
 /**
@@ -17,10 +17,10 @@ public class AddCommentAction extends CommentActionBase
     }
 
     @Override
-    protected void updateBuild(BuildResult build, User user)
+    protected void updateContainer(CommentContainer container, User user)
     {
         Comment comment = new Comment(user.getLogin(), System.currentTimeMillis(), message);
-        build.addComment(comment);
+        container.addComment(comment);
     }
 
 }

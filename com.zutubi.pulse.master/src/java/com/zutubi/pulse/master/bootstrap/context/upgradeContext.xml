@@ -173,6 +173,7 @@
                 <ref local="addAgentProperties"/>
                 <ref local="removeResolveVariables"/>
                 <ref local="addProjectFilters"/>
+                <ref local="addAgentComments"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -903,6 +904,15 @@
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.5.0-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="addAgentComments" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="204999006"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.5.0-patch-02.hbm.xml</value>
             </list>
         </property>
     </bean>

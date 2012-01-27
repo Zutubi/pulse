@@ -424,6 +424,14 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         });
     }
 
+    public void updateAgentState(Agent agent, UnaryProcedure<AgentState> updateFn)
+    {
+        AgentState agentState = agentStateDao.findById(agent.getId());
+        updateFn.run(agentState);
+        agentStateDao.save(agentState);
+        agent.setAgentState(agentState);
+    }
+
     public void setEnableState(Agent agent, AgentState.EnableState state)
     {
         AgentState agentState = agentStateDao.findById(agent.getId());

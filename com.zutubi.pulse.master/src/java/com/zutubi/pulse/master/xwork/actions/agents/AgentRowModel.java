@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
 import com.zutubi.pulse.master.tove.model.ActionLink;
+import com.zutubi.pulse.master.xwork.actions.project.CommentSummaryModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,14 +16,16 @@ public class AgentRowModel
     private String location;
     private String status;
     private ExecutingStageModel executingStage;
+    private CommentSummaryModel comments;
     private List<ActionLink> actions = new LinkedList<ActionLink>();
 
-    public AgentRowModel(long id, String name, String location, String status)
+    public AgentRowModel(long id, String name, String location, String status, CommentSummaryModel comments)
     {
         this.id = id;
         this.name = name;
         this.location = location;
         this.status = status;
+        this.comments = comments;
     }
 
     public long getId()
@@ -53,6 +56,11 @@ public class AgentRowModel
     public void setExecutingStage(ExecutingStageModel executingStage)
     {
         this.executingStage = executingStage;
+    }
+
+    public CommentSummaryModel getComments()
+    {
+        return comments;
     }
 
     public List<ActionLink> getActions()

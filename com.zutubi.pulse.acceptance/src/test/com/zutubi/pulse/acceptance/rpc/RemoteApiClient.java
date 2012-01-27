@@ -1430,6 +1430,21 @@ public class RemoteApiClient extends ApiClient
         return (Boolean) call("deleteBuildComment", projectName, buildId, commentId);
     }
 
+    public Vector<Hashtable<String, Object>> getAgentComments(String agentName) throws Exception
+    {
+        return call("getAgentComments", agentName);
+    }
+
+    public String addAgentComment(String agentName, String message) throws Exception
+    {
+        return call("addAgentComment", agentName, message);
+    }
+
+    public boolean deleteAgentComment(String agentName, String commentId) throws Exception
+    {
+        return (Boolean) call("deleteAgentComment", agentName, commentId);
+    }
+
     public Hashtable<String,Boolean> getQueueStates() throws Exception
     {
         return call("getQueueStates");

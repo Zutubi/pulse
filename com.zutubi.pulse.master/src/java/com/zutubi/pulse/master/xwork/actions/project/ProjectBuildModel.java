@@ -59,7 +59,7 @@ public class ProjectBuildModel
         state = buildResult.getState();
         status = formatStatus(buildResult, urls);
         statusIcon = ToveUtils.getStatusIcon(buildResult);
-        comments = new CommentSummaryModel(buildResult);
+        comments = new CommentSummaryModel(buildResult.getComments());
         columns = CollectionUtils.map(configuration.getColumns(), new Mapping<String, String>()
         {
             public String map(String column)

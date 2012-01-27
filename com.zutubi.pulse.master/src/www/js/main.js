@@ -540,7 +540,7 @@ function clearResponsibility(projectId)
     });
 }
 
-function deleteComment(buildId, commentId)
+function deleteComment(agentId, buildId, commentId)
 {
     showPromptDialog('Delete Comment',
                      'Are you sure you want to delete this comment?',
@@ -548,7 +548,7 @@ function deleteComment(buildId, commentId)
                      false,
                      'Deleting comment...',
                      '/ajax/deleteComment.action',
-                     { buildId: buildId, commentId: commentId });
+                     { agentId: agentId, buildId: buildId, commentId: commentId });
 }
 
 function toggleStateList(e)

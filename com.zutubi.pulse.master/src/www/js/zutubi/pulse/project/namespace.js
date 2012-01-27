@@ -300,7 +300,7 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                 if (build.link)
                 {
                     Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
-                    commentsTip = getBuildCommentsTooltip(build);
+                    commentsTip = getCommentsTooltip(build);
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
                         id: build.id,

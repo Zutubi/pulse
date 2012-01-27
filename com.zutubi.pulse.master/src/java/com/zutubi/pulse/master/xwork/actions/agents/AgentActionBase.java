@@ -88,6 +88,13 @@ public class AgentActionBase extends ActionSupport
         return agent;
     }
 
+    @Override
+    public String execute() throws Exception
+    {
+        getRequiredAgent();
+        return SUCCESS;
+    }
+
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;

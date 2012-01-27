@@ -6,16 +6,19 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.ExecutingStageTable;
 import com.zutubi.pulse.acceptance.pages.agents.SynchronisationMessageTable;
 import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
+
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the agent status tab.
@@ -107,7 +110,33 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
         project.releaseBuild();
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
     }
-    
+
+    public void testActions() throws Exception
+    {
+        rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");
+        getBrowser().loginAsAdmin();
+        final AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, random);
+        assertTrue(statusPage.isActionPresent(AgentConfigurationActions.ACTION_DISABLE));
+        statusPage.clickAction(AgentConfigurationActions.ACTION_DISABLE);
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return statusPage.isActionPresent(AgentConfigurationActions.ACTION_ENABLE);
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "agent to disable");
+        
+        statusPage.clickAction(AgentConfigurationActions.ACTION_ENABLE);
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return statusPage.isActionPresent(AgentConfigurationActions.ACTION_DISABLE);
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "agent to enable");
+
+    }
+
     public void testNoSynchronisationMessages() throws Exception
     {
         rpcClient.RemoteApi.insertSimpleAgent(random, "localhost");

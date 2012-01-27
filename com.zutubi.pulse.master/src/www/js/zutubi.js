@@ -30,13 +30,13 @@ function getBuildMenuItems(buildLink)
     ];
 }
 
-function getBuildCommentsTooltip(buildModel)
+function getCommentsTooltip(model)
 {
     var commentsTip, i, recentComments, comment;
     commentsTip = '';
-    if (buildModel.comments && buildModel.comments.commentCount > 0)
+    if (model.comments && model.comments.commentCount > 0)
     {
-        recentComments = buildModel.comments.recentComments;
+        recentComments = model.comments.recentComments;
         for (i = 0; i < recentComments.length; i++)
         {
             comment = recentComments[i];
@@ -48,13 +48,27 @@ function getBuildCommentsTooltip(buildModel)
             commentsTip += '<b>' + Ext.util.Format.htmlEncode(comment.author) + '</b>: ' + Ext.util.Format.htmlEncode(comment.snippet);
         }
 
-        if (recentComments.length < buildModel.comments.commentCount)
+        if (recentComments.length < model.comments.commentCount)
         {
-            commentsTip += '<br/><br/><em>' + recentComments.length + ' of ' + buildModel.comments.commentCount + ' comments shown</em>';
+            commentsTip += '<br/><br/><em>' + recentComments.length + ' of ' + model.comments.commentCount + ' comments shown</em>';
         }
     }
 
     return commentsTip;
+}
+
+function agentAction(id, action)
+{
+    Zutubi.FloatManager.hideAll();
+
+    runAjaxRequest({
+        url: window.baseUrl + '/ajax/agentAction.action',
+        params: {
+            agentId: id,
+            actionName: action
+        },
+        callback: handleActionResponse
+    });
 }
 
 Zutubi.DetailPanel = function(config)

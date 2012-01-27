@@ -4,6 +4,7 @@
 // dependency: zutubi/ActivePanel.js
 // dependency: zutubi/table/package.js
 // dependency: zutubi/pulse/project/namespace.js
+// dependency: zutubi/pulse/project/CommentList.js
 
 /**
  * The content of the agent status tab.  Expects data of the form:
@@ -16,7 +17,7 @@
  */
 Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
     border: false,
-    autoScroll: true,
+    layout: 'border',
     messageIndex: 0,
     
     STATUS_TEMPLATE: new Ext.XTemplate(
@@ -43,7 +44,7 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
         '</tpl>'
     ),
     
-    dataKeys: ['info', 'status', 'executingStage', 'synchronisationMessages'],
+    dataKeys: ['info', 'status', 'actions', 'executingStage', 'comments', 'synchronisationMessages'],
     
     initComponent: function(container, position)
     {
@@ -51,13 +52,18 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
 
         panel = this;
         Ext.apply(this, {
+            defaults: {
+                layout: 'fit',
+                border: false,
+                autoScroll: true
+            },
+            contentEl: 'center',
             items: [{
+                region: 'center',
                 id: this.id + '-inner',
-                xtype: 'container',
                 layout: 'htable',
-                contentEl: 'center',
                 items: [{
-                    id: this.id + '-left',
+                    id: this.id + '-inner-left',
                     xtype: 'container',
                     layout: 'vtable',
                     items: [{
@@ -69,7 +75,7 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
                             formatter: Ext.util.Format.htmlEncode
                         }, {
                             name: 'location',
-                            formatter: Ext.util.Format.htmlEncode                        
+                            formatter: Ext.util.Format.htmlEncode
                         }]
                     }, {
                         id: this.id + '-status',
@@ -82,31 +88,74 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
                         title: 'executing build stage'
                     }]
                 }, {
-                    id: this.id + '-synchronisationMessages',
-                    title: 'recent synchronisation messages',
-                    emptyMessage: 'no synchronisation messages found',
-                    xtype: 'xzsummarytable',
-                    style: 'margin-top: 17px',
-                    columns: [{
-                        name: 'type',
-                        cls: 'fit-width',
-                        renderer: Ext.util.Format.htmlEncode
+                    id: this.id + '-inner-right',
+                    xtype: 'container',
+                    layout: 'vtable',
+                    items: [{
+                        xtype: 'xzcommentlist',
+                        id: this.id + '-comments',
+                        title: 'comments',
+                        agentId: this.agentId
                     }, {
-                        name: 'description',
-                        renderer: Ext.util.Format.htmlEncode
-                    }, {
-                        name: 'status',
-                        cls: 'fit-width',
-                        renderer: function(status, message) {
-                            return panel.STATUS_TEMPLATE.apply({
-                                baseUrl: window.baseUrl,
-                                id: panel.messageIndex++,
-                                status: status,
-                                squashedStatus: status.replace(/\s+/, ''),
-                                statusMessage: message.statusMessage
-                            });
+                        id: this.id + '-synchronisationMessages',
+                        title: 'recent synchronisation messages',
+                        emptyMessage: 'no synchronisation messages found',
+                        xtype: 'xzsummarytable',
+                        columns: [{
+                            name: 'type',
+                            cls: 'fit-width',
+                            renderer: Ext.util.Format.htmlEncode
+                        }, {
+                            name: 'description',
+                            renderer: Ext.util.Format.htmlEncode
+                        }, {
+                            name: 'status',
+                            cls: 'fit-width',
+                            renderer: function(status, message) {
+                                return panel.STATUS_TEMPLATE.apply({
+                                    baseUrl: window.baseUrl,
+                                    id: panel.messageIndex++,
+                                    status: status,
+                                    squashedStatus: status.replace(/\s+/, ''),
+                                    statusMessage: message.statusMessage
+                                });
+                            }
+                        }],
+                        listeners: {
+                            afterrender: function() {
+                                panel.updateRows();
+                            }
                         }
                     }]
+                }]
+            }, {
+                region: 'east',
+                id: this.id + '-right',
+                bodyStyle: 'padding: 0 17px',
+                split: true,
+                collapsible: true,
+                collapseMode: 'mini',
+                hideCollapseTool: true,
+                width: 200,
+                layout: 'vtable',
+                items: [{
+                    xtype: 'xzlinktable',
+                    id: this.id + '-actions',
+                    title: 'actions',
+                    handlers: {
+                        addComment: this.addComment.createDelegate(this),
+                        disable: agentAction.createDelegate(window, [this.agentId, 'disable']),
+                        disableNow: agentAction.createDelegate(window, [this.agentId, 'disableNow']),
+                        enable: agentAction.createDelegate(window, [this.agentId, 'enable']),
+                        gc: agentAction.createDelegate(window, [this.agentId, 'gc']),
+                        ping: agentAction.createDelegate(window, [this.agentId, 'ping']),
+                        retryUpgrade: agentAction.createDelegate(window, [this.agentId, 'retryUpgrade'])
+                    },
+                    listeners: {
+                        afterrender: function() {
+                            panel.updateRows();
+                        }
+                    }
                 }]
             }]
         });
@@ -118,5 +167,22 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
     {
         this.messageIndex = 0;
         Zutubi.pulse.agent.AgentStatusPanel.superclass.update.apply(this, arguments);
+    },
+
+    updateRows: function()
+    {
+        Ext.getCmp(this.id + '-inner-left').getLayout().checkRows();
+        Ext.getCmp(this.id + '-inner-right').getLayout().checkRows();
+    },
+
+    addComment: function()
+    {
+        showPromptDialog('Add Comment',
+                         'Comment:',
+                         true,
+                         true,
+                         'Adding comment...',
+                         '/ajax/addComment.action',
+                         { agentId: this.agentId });
     }
 });

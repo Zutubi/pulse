@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.components.pulse.project.TestFailuresTable;
 import com.zutubi.pulse.acceptance.components.table.LinkTable;
 import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
+import com.zutubi.pulse.acceptance.pages.agents.CommentPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -16,7 +17,7 @@ import static com.zutubi.util.WebUtils.uriComponentEncode;
 /**
  * The summary tab for a build result.
  */
-public class BuildSummaryPage extends ResponsibilityPage
+public class BuildSummaryPage extends ResponsibilityPage implements CommentPage
 {
     private static final String PROPERTY_STATUS = "status";
     private static final String PROPERTY_TESTS = "tests";
@@ -105,7 +106,7 @@ public class BuildSummaryPage extends ResponsibilityPage
     {
         commentList.waitFor(timeout);
     }
-    
+
     public boolean isCommentsPresent()
     {
         return commentList.isPresent();

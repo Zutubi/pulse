@@ -2,10 +2,13 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 
 import java.text.DateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  */
@@ -180,6 +183,11 @@ public class DefaultAgent implements Agent
     public AgentState.EnableState getEnableState()
     {
         return agentState.getEnableState();
+    }
+
+    public List<Comment> getComments()
+    {
+        return Collections.unmodifiableList(agentState.getComments());
     }
 
     public synchronized void setAgentState(AgentState agentState)

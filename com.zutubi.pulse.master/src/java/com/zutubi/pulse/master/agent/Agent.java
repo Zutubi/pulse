@@ -2,7 +2,10 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+
+import java.util.List;
 
 /**
  * An abstraction over an agent, be it the local (master) agent or a slave.
@@ -35,6 +38,7 @@ public interface Agent
     boolean isAvailable();
 
     AgentState.EnableState getEnableState();
-
+    List<Comment> getComments();
+    
     void setAgentState(AgentState agentState);
 }

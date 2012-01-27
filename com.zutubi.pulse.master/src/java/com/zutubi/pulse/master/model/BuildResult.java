@@ -16,9 +16,8 @@ import java.util.List;
 
 /**
  */
-public class BuildResult extends Result implements Iterable<RecipeResultNode>
+public class BuildResult extends Result implements Iterable<RecipeResultNode>, CommentContainer
 {
-    public static final String ACTION_ADD_COMMENT = "addComment";
     public static final String ACTION_CANCEL = "cancel";
     public static final String ACTION_KILL = "kill";
     public static final String ACTION_PIN = "pin";
