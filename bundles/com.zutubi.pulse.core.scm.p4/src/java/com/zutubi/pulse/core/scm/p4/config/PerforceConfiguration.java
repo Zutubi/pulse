@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "view", "options", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
+@Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "stream", "view", "options", "useTicketAuth", "unicodeServer", "charset", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
@@ -22,12 +22,13 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String user;
     @Password
     private String password;
-    @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"view", "options"})
+    @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"options", "stream", "view"})
     private boolean useTemplateClient = true;
     @Required
     private String spec;
     private String options;
-    @TextArea(rows = 10, cols = 80) @Required
+    private String stream;
+    @TextArea(rows = 10, cols = 80)
     private String view = "//depot/... //pulse/...";
     private boolean useTicketAuth = false;
     @Wizard.Ignore @Min(0)
@@ -102,6 +103,16 @@ public class PerforceConfiguration extends PollableScmConfiguration
     public void setSpec(String spec)
     {
         this.spec = spec;
+    }
+
+    public String getStream()
+    {
+        return stream;
+    }
+
+    public void setStream(String stream)
+    {
+        this.stream = stream;
     }
 
     public String getView()

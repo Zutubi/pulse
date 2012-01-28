@@ -61,11 +61,11 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         PerforceWorkspace workspace;
         if (configuration.getUseTemplateClient())
         {
-            workspace = core.createOrUpdateWorkspace(configuration.getSpec(), workspaceName, description, rootPath, null, null);
+            workspace = core.createOrUpdateWorkspace(configuration.getSpec(), workspaceName, description, rootPath, null, null, null);
         }
         else
         {
-            workspace = core.createOrUpdateWorkspace(null, workspaceName, description, rootPath, configuration.getView(), configuration.getOptions());
+            workspace = core.createOrUpdateWorkspace(null, workspaceName, description, rootPath, configuration.getStream(), configuration.getView(), configuration.getOptions());
         }
 
         workspace.setTemporary(temporary);

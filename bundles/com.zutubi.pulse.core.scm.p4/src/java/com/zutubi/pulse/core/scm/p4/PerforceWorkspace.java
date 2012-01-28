@@ -24,6 +24,7 @@ public class PerforceWorkspace
     private static final String TAG_DESCRIPTION = "Description";
     private static final String TAG_ROOT = "Root";
     private static final String TAG_OPTIONS = "Options";
+    private static final String TAG_STREAM = "Stream";
     private static final String TAG_VIEW = "View";
 
     private static final String COMMENT_MARKER = "#";
@@ -36,6 +37,7 @@ public class PerforceWorkspace
     private String root;
     private Set<String> options = new HashSet<String>();
     private List<String> view;
+    private String stream;
     private Map<String, List<String>> unrecognised = new HashMap<String, List<String>>();
 
     private boolean temporary;
@@ -84,6 +86,12 @@ public class PerforceWorkspace
         if (value != null)
         {
             options = new HashSet<String>(Arrays.asList(StringUtils.join(" ", value).split("\\s+")));
+        }
+
+        value = taggedValues.remove(TAG_STREAM);
+        if (value != null)
+        {
+            stream = StringUtils.join("", value);
         }
 
         unrecognised = new HashMap<String, List<String>>(taggedValues);
@@ -226,6 +234,7 @@ public class PerforceWorkspace
         writeMultiValue(writer, TAG_DESCRIPTION, description);
         writeSingleValue(writer, TAG_ROOT, root);
         writeSingleValue(writer, TAG_OPTIONS, StringUtils.join(" ", options));
+        writeSingleValue(writer, TAG_STREAM, stream);
         writeMultiValue(writer, TAG_VIEW, view);
 
         for (Map.Entry<String, List<String>> entry: unrecognised.entrySet())
@@ -394,6 +403,19 @@ public class PerforceWorkspace
     }
 
     /**
+     * @return the stream to associate with the workspace (Perforce 2011.1 and later)
+     */
+    public String getStream()
+    {
+        return stream;
+    }
+
+    public void setStream(String stream)
+    {
+        this.stream = stream;
+    }
+
+    /**
      * @return true if this workspace should be deleted when the operation is
      *         completed, false if it should persist (used by the
      *         {@link PerforceWorkspaceManager}.
@@ -443,6 +465,14 @@ public class PerforceWorkspace
         {
             return false;
         }
+        if (view != null ? !view.equals(workspace.view) : workspace.view != null)
+        {
+            return false;
+        }
+        if (stream != null ? !stream.equals(workspace.stream) : workspace.stream != null)
+        {
+            return false;
+        }
         if (!name.equals(workspace.name))
         {
             return false;
@@ -455,12 +485,8 @@ public class PerforceWorkspace
         {
             return false;
         }
-        if (!unrecognised.equals(workspace.unrecognised))
-        {
-            return false;
-        }
 
-        return view.equals(workspace.view);
+        return unrecognised.equals(workspace.unrecognised);
     }
 
     @Override
@@ -469,9 +495,10 @@ public class PerforceWorkspace
         int result = name.hashCode();
         result = 31 * result + (host != null ? host.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (view != null ? view.hashCode() : 0);
+        result = 31 * result + (stream != null ? stream.hashCode() : 0);
         result = 31 * result + root.hashCode();
         result = 31 * result + options.hashCode();
-        result = 31 * result + view.hashCode();
         result = 31 * result + unrecognised.hashCode();
         result = 31 * result + (temporary ? 1 : 0);
         return result;

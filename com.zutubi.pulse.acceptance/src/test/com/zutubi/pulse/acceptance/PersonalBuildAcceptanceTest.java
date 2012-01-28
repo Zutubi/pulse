@@ -397,7 +397,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         PerforceCore core = PerforceUtils.createCore();
-        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, PerforceUtils.WORKSPACE_PREFIX + random, "Test workspace", workingCopyDir.getAbsolutePath(), null, null);
+        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, PerforceUtils.WORKSPACE_PREFIX + random, "Test workspace", workingCopyDir.getAbsolutePath(), null, null, null);
         try
         {
             core.setEnv(ENV_CLIENT, PerforceUtils.WORKSPACE_PREFIX + random);
@@ -428,7 +428,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         PerforceCore core = PerforceUtils.createCore();
-        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, clientName, "Test workspace", workingCopyDir.getAbsolutePath(), developerClientMapping, null);
+        core.createOrUpdateWorkspace(PerforceUtils.P4CLIENT, clientName, "Test workspace", workingCopyDir.getAbsolutePath(), null, developerClientMapping, null);
         try
         {
             core.setEnv(ENV_CLIENT, clientName);

@@ -13,6 +13,7 @@ import com.zutubi.util.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.FLAG_CLIENT;
@@ -113,24 +114,24 @@ public class PerforceClientTest extends PerforceTestBase
         setupClient(DEPOT_WORKSPACE);
         List<String> statuses = checkoutChanges(workDir, null, 4);
 
-        assertEquals(11, statuses.size());
-        for (int i = 1; i < 11; i++)
+        assertEquals(12, statuses.size());
+        for (int i = 2; i < 12; i++)
         {
             String status = statuses.get(i);
 
             // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
-            if (i == 1)
+            if (i == 2)
             {
                 number = 1;
             }
-            else if (i == 2)
+            else if (i == 3)
             {
                 number = 10;
             }
             else
             {
-                number = i - 1;
+                number = i - 2;
             }
 
             String re = String.format("//depot/file%d#[1-9][0-9]* - added as.*", number);
@@ -318,6 +319,7 @@ public class PerforceClientTest extends PerforceTestBase
     {
         setupClient(TEST_WORKSPACE);
         List<ScmFile> files = client.browse(null, "", null);
+        Collections.sort(files);
         assertEquals(2, files.size());
         ScmFile f = files.get(0);
         assertEquals("depot", f.getName());
@@ -333,18 +335,29 @@ public class PerforceClientTest extends PerforceTestBase
     {
         setupClient(TEST_WORKSPACE);
         List<ScmFile> files = client.browse(null, "depot2", null);
-        assertEquals(10, files.size());
+        Collections.sort(files);
+        assertEquals(11, files.size());
 
         ScmFile f;
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 10; i++)
         {
             f = files.get(i);
             assertTrue(f.isFile());
-            assertEquals("file" + (i + 1), f.getName());
-            assertEquals("depot2/file" + (i + 1), f.getPath());
+            // Foolish of me to create file10 which ruins lexical ordering :|
+            int number = i;
+            if (i == 0)
+            {
+                number = 1;
+            }
+            else if (i == 1)
+            {
+                number = 10;
+            }
+            assertEquals("file" + number, f.getName());
+            assertEquals("depot2/file" + number, f.getPath());
         }
 
-        f = files.get(9);
+        f = files.get(10);
         assertEquals("test-branch", f.getName());
         assertEquals("depot2/test-branch", f.getPath());
         assertTrue(f.isDirectory());
@@ -577,7 +590,7 @@ public class PerforceClientTest extends PerforceTestBase
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         PerforceCore core = getCore();
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath(), null, null);
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "unlocked-client", "description", tmpDir.getAbsolutePath(), null, null, null);
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_WORKSPACE);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
@@ -599,7 +612,7 @@ public class PerforceClientTest extends PerforceTestBase
                      "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-i");
         core.runP4(null, "p4", FLAG_CLIENT, TEST_WORKSPACE, "change", "-d", "9");
 
-        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath(), null, null);
+        core.createOrUpdateWorkspace(TEST_WORKSPACE, "edit-client", "description", workDir.getAbsolutePath(), null, null, null);
         core.setEnv(PerforceConstants.ENV_CLIENT, "edit-client");
         core.runP4(null, "p4", "sync");
         core.runP4(null, "p4", "edit", "//depot/file1");
@@ -624,7 +637,9 @@ public class PerforceClientTest extends PerforceTestBase
         client.checkout(context, new Revision("1"), handler);
         
         String expectedWorkspace = PerforceWorkspaceManager.getSyncWorkspaceName(client.getConfiguration(), context);
-        assertEquals(">> p4 -c " + expectedWorkspace + " sync -f @1", handler.getStatusMessages().get(0));
+        assertEquals(12, handler.getStatusMessages().size());
+        assertEquals(">> p4 -c " + expectedWorkspace + " flush #none", handler.getStatusMessages().get(0));
+        assertEquals(">> p4 -c " + expectedWorkspace + " sync -f @1", handler.getStatusMessages().get(1));
     }
 
     public void testErrorIncludesCommandLine() throws ScmException, IOException

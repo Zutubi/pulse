@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmProcessRunner;
 import com.zutubi.util.StringUtils;
@@ -13,6 +12,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 /**
  * Core methods used for interaction with the p4 command.
@@ -152,7 +153,7 @@ public class PerforceCore
         return getWorkspace(workspaceName, false) != null;
     }
 
-    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root, String view, String options) throws ScmException
+    public PerforceWorkspace createOrUpdateWorkspace(String templateWorkspace, String workspaceName, String description, String root, String stream, String view, String options) throws ScmException
     {
         PerforceWorkspace workspace;
         if (templateWorkspace == null)
@@ -173,7 +174,12 @@ public class PerforceCore
         workspace.setHost(null);
         workspace.setDescription(Arrays.asList(description));
         workspace.setRoot(root);
-        if (view != null)
+        if (StringUtils.stringSet(stream))
+        {
+            workspace.setStream(stream);
+        }
+
+        if (StringUtils.stringSet(view))
         {
             view = view.replaceAll("//" + Pattern.quote(DUMMY_CLIENT) + "/", Matcher.quoteReplacement("//" + workspaceName + "/"));
             workspace.setView(Arrays.asList(view.split("\\n")));

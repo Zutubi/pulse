@@ -38,6 +38,14 @@ public class PerforceWorkspaceTest extends PulseTestCase
         EqualityAssertions.assertEquals(Arrays.asList("local"), workspace.getUnrecognised().get("LineEnd"));
     }
 
+    public void testParseStream() throws ScmException, IOException
+    {
+        PerforceWorkspace workspace = parseHelper();
+        assertEquals("px", workspace.getName());
+        assertEquals("aurelius.local", workspace.getHost());
+        assertEquals("//projectx/main", workspace.getStream());
+    }
+
     public void testRename()
     {
         final String NEW_NAME = "newname";
