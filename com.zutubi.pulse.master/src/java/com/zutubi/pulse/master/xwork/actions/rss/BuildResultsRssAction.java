@@ -10,12 +10,13 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.master.notifications.ResultNotifier;
-import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
-import com.zutubi.pulse.master.notifications.renderer.RenderService;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultExpressions;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQuery;
+import com.zutubi.pulse.master.notifications.ResultNotifier;
+import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.notifications.renderer.RenderService;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.util.cache.Cache;
 import com.zutubi.pulse.master.util.cache.CacheManager;
@@ -70,85 +71,91 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     public String execute()
     {
-        RssFeedTemplate feedTemplate;
-
         urls = new Urls(getBaseUrl());
 
-        // check that rss is enabled.
-        if (!configurationProvider.get(GlobalConfiguration.class).isRssEnabled())
+        SecurityUtils.runAsSystem(new Runnable()
         {
-            addActionError("rss feed is disabled");
-            feedTemplate = new ErrorResultTemplate(
-                    I18N.format("disabled.title"),
-                    I18N.format("disabled.description")
-            );
-        }
-        else if (projectId != NONE_SPECIFIED)
-        {
-            Project project = projectManager.getProject(projectId, false);
-            if (project != null)
+            public void run()
             {
-                feedTemplate = new ProjectResultTemplate(project);
-            }
-            else
-            {
-                feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.project.title", projectId),
-                        I18N.format("unknown.project.description", projectId)
-                );
-            }
-        }
-        else if (stringSet(projectName))
-        {
-            Project project = projectManager.getProject(projectName, false);
-            if (project != null)
-            {
-                feedTemplate = new ProjectResultTemplate(project);
-            }
-            else
-            {
-                feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.project.title", projectName),
-                        I18N.format("unknown.project.description", projectName)
-                );
-            }
-        }
-        else if (stringSet(groupName))
-        {
-            ProjectGroup group = projectManager.getProjectGroup(groupName);
-            if (group.getProjects().size() != 0)
-            {
-                feedTemplate = new ProjectGroupTemplate(group);
-            }
-            else
-            {
-                feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.group.title", groupName),
-                        I18N.format("unknown.group.description", groupName)
-                );
-            }
-        }
-        else if (userId != NONE_SPECIFIED)
-        {
-            User user = userManager.getUser(userId);
-            if (user != null)
-            {
-                feedTemplate = new UserDashboardTemplate(user);
-            }
-            else
-            {
-                feedTemplate = new ErrorResultTemplate(
-                        I18N.format("unknown.user.title", userId),
-                        I18N.format("unknown.user.description", userId)
-                );
-            }
-        }
-        else
-        {
-            feedTemplate = new AllProjectsResultTemplate();
-        }
+                RssFeedTemplate feedTemplate;
 
-        feed = new BuildJITFeed(feedTemplate);
+                // check that rss is enabled.
+                if (!configurationProvider.get(GlobalConfiguration.class).isRssEnabled())
+                {
+                    addActionError("rss feed is disabled");
+                    feedTemplate = new ErrorResultTemplate(
+                            I18N.format("disabled.title"),
+                            I18N.format("disabled.description")
+                    );
+                }
+                else if (projectId != NONE_SPECIFIED)
+                {
+                    Project project = projectManager.getProject(projectId, false);
+                    if (project != null)
+                    {
+                        feedTemplate = new ProjectResultTemplate(project);
+                    }
+                    else
+                    {
+                        feedTemplate = new ErrorResultTemplate(
+                                I18N.format("unknown.project.title", projectId),
+                                I18N.format("unknown.project.description", projectId)
+                        );
+                    }
+                }
+                else if (stringSet(projectName))
+                {
+                    Project project = projectManager.getProject(projectName, false);
+                    if (project != null)
+                    {
+                        feedTemplate = new ProjectResultTemplate(project);
+                    }
+                    else
+                    {
+                        feedTemplate = new ErrorResultTemplate(
+                                I18N.format("unknown.project.title", projectName),
+                                I18N.format("unknown.project.description", projectName)
+                        );
+                    }
+                }
+                else if (stringSet(groupName))
+                {
+                    ProjectGroup group = projectManager.getProjectGroup(groupName);
+                    if (group.getProjects().size() != 0)
+                    {
+                        feedTemplate = new ProjectGroupTemplate(group);
+                    }
+                    else
+                    {
+                        feedTemplate = new ErrorResultTemplate(
+                                I18N.format("unknown.group.title", groupName),
+                                I18N.format("unknown.group.description", groupName)
+                        );
+                    }
+                }
+                else if (userId != NONE_SPECIFIED)
+                {
+                    User user = userManager.getUser(userId);
+                    if (user != null)
+                    {
+                        feedTemplate = new UserDashboardTemplate(user);
+                    }
+                    else
+                    {
+                        feedTemplate = new ErrorResultTemplate(
+                                I18N.format("unknown.user.title", userId),
+                                I18N.format("unknown.user.description", userId)
+                        );
+                    }
+                }
+                else
+                {
+                    feedTemplate = new AllProjectsResultTemplate();
+                }
+
+                feed = new BuildJITFeed(feedTemplate);
+            }
+        });
 
         return "rss";
     }
@@ -526,17 +533,24 @@ public class BuildResultsRssAction extends ProjectActionSupport
         protected List<Long> results = null;
         protected RssFeedTemplate template;
 
-        public BuildJITFeed(RssFeedTemplate template)
+        public BuildJITFeed(final RssFeedTemplate template)
         {
-            HibernateSearchQuery<Long> query = template.getQuery();
-            if (query != null)
+            SecurityUtils.runAsSystem(new Runnable()
             {
-                this.results = query.list();
-            }
-            else
-            {
-                this.results = new LinkedList<Long>();
-            }
+                public void run()
+                {
+                    final HibernateSearchQuery<Long> query = template.getQuery();
+                    if (query != null)
+                    {
+                        results = query.list();
+                    }
+                    else
+                    {
+                        results = new LinkedList<Long>();
+                    }
+                }
+            });
+            
             this.template = template;
         }
 
@@ -547,8 +561,16 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public Date getPublishedDate()
         {
-            BuildResult result = buildManager.getBuildResult(results.get(0));
-            return new Date(result.getStamps().getEndTime());
+            final BuildResult result[] = new BuildResult[1];
+            SecurityUtils.runAsSystem(new Runnable()
+            {
+                public void run()
+                {
+                    result[0] = buildManager.getBuildResult(results.get(0));
+                }
+            });
+            
+            return new Date(result[0].getStamps().getEndTime());
         }
 
         public Date getUpdatedDate()
@@ -558,49 +580,55 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public WireFeed createWireFeed(String format)
         {
-            SyndFeedImpl feed = new SyndFeedImpl();
-
-            // set Title, Description and Link
-            feed.setTitle(template.getTitle());
-            feed.setDescription(template.getDescription());
-            feed.setLink(template.getLink());
-
-            List<SyndEntry> entries = fetch(template.getUID(), results, new SyndFeedEntryFactory()
+            final SyndFeedImpl feed = new SyndFeedImpl();
+            SecurityUtils.runAsSystem(new Runnable()
             {
-                public SyndEntry createEntry(BuildResult result)
+                public void run()
                 {
-                    SyndEntry entry = new SyndEntryImpl();
+                    // set Title, Description and Link
+                    feed.setTitle(template.getTitle());
+                    feed.setDescription(template.getDescription());
+                    feed.setLink(template.getLink());
 
-                    // with rss 2.0, the content is added in the description field.
-                    SyndContent description = new SyndContentImpl();
+                    List<SyndEntry> entries = fetch(template.getUID(), results, new SyndFeedEntryFactory()
+                    {
+                        public SyndEntry createEntry(BuildResult result)
+                        {
+                            SyndEntry entry = new SyndEntryImpl();
 
-                    // type should be based on user selected type.
-                    description.setType("text/plain");
-                    description.setValue(template.getEntryTitle(result));
-                    entry.setDescription(description);
-                    entry.setTitle(template.getEntryTitle(result));
+                            // with rss 2.0, the content is added in the description field.
+                            SyndContent description = new SyndContentImpl();
 
-                    ContentModule content = new ContentModuleImpl();
+                            // type should be based on user selected type.
+                            description.setType("text/plain");
+                            description.setValue(template.getEntryTitle(result));
+                            entry.setDescription(description);
+                            entry.setTitle(template.getEntryTitle(result));
 
-                    // NOTE: We wrap in mutable lists else entry.setPublishedDate will fail.
-                    content.setEncodeds(new LinkedList<String>(Arrays.asList(renderResult(result))));
-                    entry.setModules(new LinkedList<ContentModule>(Arrays.asList(content)));
+                            ContentModule content = new ContentModuleImpl();
 
-                    // NOTES:
-                    // calling setLink is effectively setting guid without a isPermaLink reference.
-                    // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
-                    entry.setLink(template.getEntryLink(result));
-                    entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
-                    return entry;
+                            // NOTE: We wrap in mutable lists else entry.setPublishedDate will fail.
+                            content.setEncodeds(new LinkedList<String>(Arrays.asList(renderResult(result))));
+                            entry.setModules(new LinkedList<ContentModule>(Arrays.asList(content)));
+
+                            // NOTES:
+                            // calling setLink is effectively setting guid without a isPermaLink reference.
+                            // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
+                            entry.setLink(template.getEntryLink(result));
+                            entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
+                            return entry;
+                        }
+                    });
+
+                    feed.setEntries(entries);
                 }
             });
-
-            feed.setEntries(entries);
+            
             return feed.createWireFeed(format);
         }
     }
 
-    private List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
+    private List<SyndEntry> fetch(String key, List<Long> ids, final SyndFeedEntryFactory factory)
     {
         Cache cache = cacheManager.getCache("BuildResultsRss");
         @SuppressWarnings({"unchecked"})
