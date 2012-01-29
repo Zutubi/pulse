@@ -234,7 +234,10 @@ public class PerforceWorkspace
         writeMultiValue(writer, TAG_DESCRIPTION, description);
         writeSingleValue(writer, TAG_ROOT, root);
         writeSingleValue(writer, TAG_OPTIONS, StringUtils.join(" ", options));
-        writeSingleValue(writer, TAG_STREAM, stream);
+        if (StringUtils.stringSet(stream))
+        {
+            writeSingleValue(writer, TAG_STREAM, stream);
+        }
         writeMultiValue(writer, TAG_VIEW, view);
 
         for (Map.Entry<String, List<String>> entry: unrecognised.entrySet())
