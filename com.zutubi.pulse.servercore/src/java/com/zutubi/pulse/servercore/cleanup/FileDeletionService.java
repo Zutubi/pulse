@@ -35,6 +35,9 @@ public class FileDeletionService extends BackgroundServiceSupport
     private static final Messages I18N = Messages.getInstance(FileDeletionService.class);
     private static final Logger LOG = Logger.getLogger(FileDeletionService.class);
 
+    private static final String PROPERTY_DELETE_OUTSIDE_DATA = "pulse.delete.outside.data";
+    private static final boolean DELETE_OUTSIDE_DATA = Boolean.getBoolean(PROPERTY_DELETE_OUTSIDE_DATA);
+
     public static final String INDEX_FILE_NAME = "dead-index.txt";
     public static final String SUFFIX = ".dead";
 
@@ -81,7 +84,7 @@ public class FileDeletionService extends BackgroundServiceSupport
             throw new IllegalArgumentException(I18N.format("delete.null.exception"));
         }
 
-        if (!file.exists() || !withinDataDir(file))
+        if (!file.exists() || !allowedToDelete(file))
         {
             return new FixedFuture<Boolean>(true);
         }
@@ -107,11 +110,11 @@ public class FileDeletionService extends BackgroundServiceSupport
         return indexAndScheduleDeletion(file);
     }
 
-    private boolean withinDataDir(File file)
+    private boolean allowedToDelete(File file)
     {
         try
         {
-            return FileSystemUtils.isParentOf(dataDir, file);
+            return DELETE_OUTSIDE_DATA || FileSystemUtils.isParentOf(dataDir, file);
         }
         catch (IOException e)
         {
