@@ -69,7 +69,7 @@
                 </h2>
             </td>
             <td>
-                <div id="build-toolbar" style="margin-top: 0;"></div>
+                <div id="build-toolbar" style="display: none; margin-top: 0;"></div>
             </td>
         </tr>
     </table>

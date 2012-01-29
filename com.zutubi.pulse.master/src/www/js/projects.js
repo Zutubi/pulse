@@ -584,6 +584,7 @@ Zutubi.ProjectsTable = function(containerEl, columnCount, rssEnabled, isDashboar
 Zutubi.ProjectsTable.prototype = {
     renderToolbar: function(projectsFilter) {
         var table = this;
+        Ext.fly('build-toolbar').setStyle('display', '');
         this.toolbar = new Ext.Toolbar({
             el: 'build-toolbar',
             items: [{
