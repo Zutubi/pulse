@@ -207,9 +207,10 @@ public class PerforceCore
         }
         catch (ScmException e1)
         {
-            // Try to force the delete - CIB-2571
+            // Try to revert open files (CIB-2820) then force the delete (CIB-2571)
             try
             {
+                runP4(false, null, getP4Command(COMMAND_REVERT), FLAG_CLIENT, workspaceName, COMMAND_REVERT, "//...");
                 runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, FLAG_FORCE, workspaceName);
             }
             catch (ScmException e2)

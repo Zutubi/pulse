@@ -39,6 +39,7 @@ public class PerforceConstants
     public static final String COMMAND_LABELSYNC = "labelsync";
     public static final String COMMAND_LOGIN = "login";
     public static final String COMMAND_RESOLVE = "resolve";
+    public static final String COMMAND_REVERT = "revert";
     public static final String COMMAND_SET = "set";
     public static final String COMMAND_SUBMIT = "submit";
     public static final String COMMAND_SYNC = "sync";

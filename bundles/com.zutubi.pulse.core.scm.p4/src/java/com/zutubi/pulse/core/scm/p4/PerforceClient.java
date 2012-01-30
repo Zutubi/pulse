@@ -295,7 +295,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         }
     }
 
-    private Revision sync(ExecutionContext context, Revision revision, ScmFeedbackHandler handler, boolean force) throws ScmException
+    private Revision sync(ExecutionContext context, Revision revision, ScmFeedbackHandler handler, boolean cleanCheckout) throws ScmException
     {
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
@@ -307,16 +307,20 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
             PerforceCheckoutFeedbackHandler perforceHandler = new PerforceCheckoutFeedbackHandler(false, handler);
 
-            if (force)
+            if (cleanCheckout)
             {
                 if (!SKIP_FLUSH)
                 {
+                    // p4 -c $(workspace.name) flush #none
                     core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_FLUSH), FLAG_CLIENT, workspace.getName(), COMMAND_FLUSH, "#" + REVISION_NONE);
                 }
+
+                // p4 -c $(workspace.name) sync -f @$(revision)
                 core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + revision.getRevisionString());
             }
             else
             {
+                // p4 -c $(workspace.name) sync @$(revision)
                 core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, "@" + revision.getRevisionString());
             }
         }

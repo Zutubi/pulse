@@ -644,12 +644,13 @@ public class PerforceClientTest extends PerforceTestBase
 
     public void testErrorIncludesCommandLine() throws ScmException, IOException
     {
-        PerforceConfiguration configuration = new PerforceConfiguration(getP4Port(), "invalid", "", DEPOT_WORKSPACE);
+        PerforceConfiguration configuration = new PerforceConfiguration(getP4Port(), "invalid", "invalid", DEPOT_WORKSPACE);
+        configuration.setPort(":1");
         client = new PerforceClient(configuration, new PerforceWorkspaceManager());
         try
         {
             client.testConnection();
-            fail("Connection test should fail with bad user");
+            fail("Connection test should fail with bad user/password/port");
         }
         catch (ScmException e)
         {
