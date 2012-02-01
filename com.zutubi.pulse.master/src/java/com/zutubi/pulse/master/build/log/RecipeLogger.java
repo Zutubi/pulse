@@ -30,6 +30,8 @@ public interface RecipeLogger extends HookLogger
     void cleaning();
     void cleaningComplete();
 
+    void preStage();
+    void preStageComplete();
     void postStage();
     void postStageComplete();
 

@@ -17,8 +17,6 @@ import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -28,6 +26,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -145,6 +146,15 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.triggerBuild(random, "", properties);
         rpcClient.RemoteApi.waitForBuildToComplete(random, number);
         assertArgs("trigger.value");
+    }
+
+    public void testPreStageHook() throws Exception
+    {
+        preStageHelper();
+        addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
+
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        assertArgs(PROJECT_NAME, "default", "[default]", "${status}");
     }
 
     public void testPostStageHook() throws Exception
@@ -328,6 +338,17 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         selectFromAllTasks();
     }
 
+    private void preStageHelper()
+    {
+        chooseHookType("zutubi.preStageHookConfig");
+
+        ConfigurationForm hookForm = getBrowser().createForm(ConfigurationForm.class, PreStageHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextNamedFormElements(asPair("name", random));
+
+        selectFromStageTasks();
+    }
+
     private void postStageHelper()
     {
         chooseHookType("zutubi.postStageHookConfig");
@@ -392,7 +413,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         SelectTypeState hookType = new SelectTypeState(getBrowser());
         hookType.waitFor();
-        assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig"), hookType.getSortedOptionList());
+        assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig", "zutubi.preStageHookConfig"), hookType.getSortedOptionList());
         hookType.nextFormElements(symbolicName);
         return hookType;
     }

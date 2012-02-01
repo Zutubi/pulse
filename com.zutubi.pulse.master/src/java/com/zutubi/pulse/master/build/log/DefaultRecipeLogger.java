@@ -125,6 +125,17 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
         logMarker("Clean up complete.");
     }
 
+    public void preStage()
+    {
+        hookCount = 0;
+        logMarker("Running pre stage hooks...");
+    }
+
+    public void preStageComplete()
+    {
+        logMarker(String.format("Pre stage hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
+    }
+
     public void postStage()
     {
         hookCount = 0;

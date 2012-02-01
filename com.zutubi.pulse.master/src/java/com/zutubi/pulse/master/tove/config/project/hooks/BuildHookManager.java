@@ -91,6 +91,7 @@ public class BuildHookManager
                                 try
                                 {
                                     MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
+                                    MasterBuildProperties.addCompletedStageProperties(context, result, recipeResultNode, configurationManager, false);
                                     logAndExecuteTask(hook, context, recipeLogger, result, recipeResultNode, true);
                                 }
                                 finally

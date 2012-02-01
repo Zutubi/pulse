@@ -25,7 +25,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.tagTaskConfig")
 @Form(fieldOrder = {"tag", "moveExisting"})
-@CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class, PostStageHookConfiguration.class})
+@CompatibleHooks({ManualBuildHookConfiguration.class, PreStageHookConfiguration.class, PostBuildHookConfiguration.class, PostStageHookConfiguration.class})
 @Wire
 public class TagTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {

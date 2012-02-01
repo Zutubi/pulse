@@ -5,11 +5,12 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 
 /**
- * An event raised just after a build stage completes.
+ * An event raised just after a build stage is assigned to an agent, before it
+ * is dispatched.
  */
-public class PostStageEvent extends StageEvent
+public class PreStageEvent extends StageEvent
 {
-    public PostStageEvent(Object source, BuildResult result, RecipeResultNode stageNode, PulseExecutionContext context)
+    public PreStageEvent(Object source, BuildResult result, RecipeResultNode stageNode, PulseExecutionContext context)
     {
         super(source, result, stageNode, context);
     }
@@ -17,7 +18,7 @@ public class PostStageEvent extends StageEvent
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder("Post Stage Event");
+        StringBuilder builder = new StringBuilder("Pre Stage Event");
         if (getBuildResult() != null)
         {
             builder.append(": ").append(getBuildResult().getId());

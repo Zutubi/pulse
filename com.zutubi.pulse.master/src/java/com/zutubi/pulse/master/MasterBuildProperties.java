@@ -113,25 +113,21 @@ public class MasterBuildProperties extends BuildProperties
         for (RecipeResultNode node: result.getStages())
         {
             addStageProperties(context, result, node, configurationManager, true);
+            addCompletedStageProperties(context, result, node, configurationManager, true);
         }
     }
 
     public static void addStageProperties(ExecutionContext context, BuildResult result, RecipeResultNode node, MasterConfigurationManager configurationManager, boolean includeName)
     {
-        String name = node.getStageName();
-        String prefix = "stage.";
+        String prefix = getStagePropertyPrefix(node, includeName);
 
         RecipeResult recipeResult = node.getResult();
-        if (includeName)
+        if (!includeName)
         {
-            prefix += name + ".";
-        }
-        else
-        {
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, node.getAgentNameSafe());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, node.getStageName());
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, node.getStageHandle());
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
         
         context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getAgentNameSafe());
@@ -154,7 +150,6 @@ public class MasterBuildProperties extends BuildProperties
             }
 
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
-            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
             File recipeDir = recipeResult.getRecipeDir(configurationManager.getDataDirectory());
             if (recipeDir != null)
             {
@@ -168,24 +163,67 @@ public class MasterBuildProperties extends BuildProperties
         }
     }
 
-    private static void addCommandProperties(ExecutionContext context, RecipeResultNode node, CommandResult commandResult, MasterConfigurationManager configurationManager, boolean includeName)
+    public static void addCompletedStageProperties(ExecutionContext context, BuildResult result, RecipeResultNode node, MasterConfigurationManager configurationManager, boolean includeName)
     {
-        String stageName = node.getStageName();
-        String commandName = commandResult.getCommandName();
-        String prefix = "";
+        String prefix = getStagePropertyPrefix(node, includeName);
 
-        if(includeName)
+        RecipeResult recipeResult = node.getResult();
+        if (!includeName)
         {
-            prefix = "stage." + stageName + ".";
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
 
-        prefix += "command." + commandName + ".";
+        if (result != null)
+        {
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
+            for (CommandResult command: recipeResult.getCommandResults())
+            {
+                addCompletedCommandProperties(context, node, command, configurationManager, includeName);
+            }
+        }
+    }
 
-        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, commandResult.getState().getString());
+    private static String getStagePropertyPrefix(RecipeResultNode node, boolean includeName)
+    {
+        String name = node.getStageName();
+        String prefix = "stage.";
+
+        if (includeName)
+        {
+            prefix += name + ".";
+        }
+        return prefix;
+    }
+
+    private static void addCommandProperties(ExecutionContext context, RecipeResultNode node, CommandResult commandResult, MasterConfigurationManager configurationManager, boolean includeName)
+    {
+        String prefix = getCommentPropertyPrefix(node, commandResult, includeName);
+
         File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
         if (outputDir != null)
         {
             context.addString(NAMESPACE_INTERNAL, prefix + SUFFIX_DIRECTORY, outputDir.getAbsolutePath());
         }
+    }
+
+    private static void addCompletedCommandProperties(ExecutionContext context, RecipeResultNode node, CommandResult commandResult, MasterConfigurationManager configurationManager, boolean includeName)
+    {
+        String prefix = getCommentPropertyPrefix(node, commandResult, includeName);
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, commandResult.getState().getString());
+    }
+
+    private static String getCommentPropertyPrefix(RecipeResultNode node, CommandResult commandResult, boolean includeName)
+    {
+        String stageName = node.getStageName();
+        String commandName = commandResult.getCommandName();
+        String prefix = "";
+
+        if (includeName)
+        {
+            prefix = "stage." + stageName + ".";
+        }
+
+        prefix += "command." + commandName + ".";
+        return prefix;
     }
 }

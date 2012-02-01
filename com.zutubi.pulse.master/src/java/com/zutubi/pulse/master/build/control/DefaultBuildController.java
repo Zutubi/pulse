@@ -608,7 +608,7 @@ public class DefaultBuildController implements EventListener, BuildController
         for (RecipeController controller : sortedControllers)
         {
             controller.initialise(bootstrapperCreator.create());
-            checkContollerStatus(controller);
+            checkControllerStatus(controller);
         }
     }
 
@@ -672,7 +672,7 @@ public class DefaultBuildController implements EventListener, BuildController
             }
 
             controller.handleRecipeEvent(e);
-            checkContollerStatus(controller);
+            checkControllerStatus(controller);
         }
     }
 
@@ -832,8 +832,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 controller.collect(buildResult);
             }
 
-            controller.cleanup(buildResult);
-            controller.sendPostStageEvent();
+            controller.postStage(buildResult);
 
             // the end of the post recipe execution handling.
             publishEvent(new RecipeCollectedEvent(this, controller.getResult().getId()));
@@ -843,7 +842,7 @@ public class DefaultBuildController implements EventListener, BuildController
         return false;
     }
 
-    private void checkContollerStatus(RecipeController controller)
+    private void checkControllerStatus(RecipeController controller)
     {
         if (handleIfFinished(controller, true))
         {

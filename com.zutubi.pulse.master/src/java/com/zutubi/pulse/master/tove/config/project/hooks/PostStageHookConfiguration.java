@@ -4,10 +4,10 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.events.build.PostStageEvent;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.SymbolicName;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,36 +18,12 @@ import java.util.List;
  */
 @SymbolicName("zutubi.postStageHookConfig")
 @Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
-public class PostStageHookConfiguration extends AutoBuildHookConfiguration
+public class PostStageHookConfiguration extends AbstractStageHookConfiguration
 {
-    @ControllingCheckbox(uncheckedFields = "stages")
-    private boolean applyToAllStages = true;
-    @Reference
-    private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
     @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();
-
-    public boolean isApplyToAllStages()
-    {
-        return applyToAllStages;
-    }
-
-    public void setApplyToAllStages(boolean applyToAllStages)
-    {
-        this.applyToAllStages = applyToAllStages;
-    }
-
-    public List<BuildStageConfiguration> getStages()
-    {
-        return stages;
-    }
-
-    public void setStages(List<BuildStageConfiguration> stages)
-    {
-        this.stages = stages;
-    }
 
     public boolean isRunForAll()
     {
@@ -78,38 +54,6 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
             return triggeredByBuildType(pse.getBuildResult()) && stageMatches(stage) && stateMatches(pse);
         }
 
-        return false;
-    }
-
-    public boolean appliesTo(BuildResult result)
-    {
-        return false;
-    }
-
-    public boolean appliesTo(RecipeResultNode result)
-    {
-        return stageMatches(result.getStageHandle());
-    }
-
-    private boolean stageMatches(long stage)
-    {
-        if(stage == 0)
-        {
-            return false;
-        }
-        
-        if(applyToAllStages)
-        {
-            return true;
-        }
-        
-        for(BuildStageConfiguration stageConfig: stages)
-        {
-            if(stageConfig.getHandle() == stage)
-            {
-                return true;
-            }
-        }
         return false;
     }
 

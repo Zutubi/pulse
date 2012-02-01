@@ -17,11 +17,11 @@ public class PreBuildEvent extends BuildEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Pre Build Event");
+        StringBuilder builder = new StringBuilder("Pre Build Event");
         if (getBuildResult() != null)
         {
-            buff.append(": ").append(getBuildResult().getId());
+            builder.append(": ").append(getBuildResult().getId());
         }
-        return buff.toString();
+        return builder.toString();
     }
 }

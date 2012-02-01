@@ -23,6 +23,7 @@ import com.zutubi.pulse.master.build.log.RecipeLogger;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.events.build.PostStageEvent;
+import com.zutubi.pulse.master.events.build.PreStageEvent;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.master.model.BuildManager;
@@ -248,6 +249,9 @@ public class RecipeController
             addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
         }
 
+        MasterBuildProperties.addStageProperties(recipeContext, buildResult, recipeResultNode, configurationManager, false);
+        sendPreStageEvent();
+
         // Now it may be dispatched.
         recipeDispatchService.dispatch(event);
     }
@@ -367,7 +371,7 @@ public class RecipeController
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
 
-        MasterBuildProperties.addStageProperties(recipeContext, buildResult, recipeResultNode, configurationManager, false);
+        MasterBuildProperties.addCompletedStageProperties(recipeContext, buildResult, recipeResultNode, configurationManager, false);
 
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
@@ -458,7 +462,7 @@ public class RecipeController
         }
     }
 
-    public void cleanup(BuildResult buildResult)
+    public void postStage(BuildResult buildResult)
     {
         try
         {
@@ -472,6 +476,21 @@ public class RecipeController
         finally
         {
             logger.cleaningComplete();
+        }
+
+        sendPostStageEvent();
+    }
+
+    public void sendPreStageEvent()
+    {
+        logger.preStage();
+        try
+        {
+            publishEvent(new PreStageEvent(this, buildResult, recipeResultNode, recipeContext));
+        }
+        finally
+        {
+            logger.preStageComplete();
         }
     }
 

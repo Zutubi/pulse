@@ -157,6 +157,8 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(AutoBuildHookConfiguration.class);
             registerConfigurationType(PreBuildHookConfiguration.class);
             registerConfigurationType(PostBuildHookConfiguration.class);
+            registerConfigurationType(AbstractStageHookConfiguration.class);
+            registerConfigurationType(PreStageHookConfiguration.class);
             registerConfigurationType(PostStageHookConfiguration.class);
             registerConfigurationType(RunExecutableTaskConfiguration.class);
 
