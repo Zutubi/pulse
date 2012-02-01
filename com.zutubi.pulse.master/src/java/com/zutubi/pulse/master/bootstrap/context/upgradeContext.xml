@@ -175,6 +175,7 @@
                 <ref local="addProjectFilters"/>
                 <ref local="addAgentComments"/>
                 <ref local="addPerforceStream"/>
+                <ref local="addProjectCleanPermission"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -920,5 +921,9 @@
 
     <bean id="addPerforceStream" class="com.zutubi.pulse.master.upgrade.tasks.AddPerforceStreamUpgradeTask">
         <property name="buildNumber" value="204999007"/>
+    </bean>
+
+    <bean id="addProjectCleanPermission" class="com.zutubi.pulse.master.upgrade.tasks.AddProjectCleanPermissionUpgradeTask">
+        <property name="buildNumber" value="204999008"/>
     </bean>
 </beans>

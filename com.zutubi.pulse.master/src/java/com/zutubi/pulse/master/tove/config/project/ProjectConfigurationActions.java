@@ -194,7 +194,7 @@ public class ProjectConfigurationActions
         projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.RESUME);
     }
 
-    @Permission(ACTION_TRIGGER)
+    @Permission(ACTION_MARK_CLEAN)
     public void doClean(ProjectConfiguration projectConfig)
     {
         projectManager.cleanupWorkDirs(projectConfig);

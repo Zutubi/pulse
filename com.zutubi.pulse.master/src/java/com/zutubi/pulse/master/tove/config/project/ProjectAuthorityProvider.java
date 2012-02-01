@@ -29,6 +29,7 @@ public class ProjectAuthorityProvider extends MapOptionProvider
         addFormattedOptions(options, AccessManager.ACTION_ADMINISTER,
                                      AccessManager.ACTION_VIEW,
                                      AccessManager.ACTION_WRITE,
+                                     ProjectConfigurationActions.ACTION_MARK_CLEAN,
                                      ProjectConfigurationActions.ACTION_PAUSE,
                                      ProjectConfigurationActions.ACTION_TRIGGER,
                                      ProjectConfigurationActions.ACTION_CANCEL_BUILD,
