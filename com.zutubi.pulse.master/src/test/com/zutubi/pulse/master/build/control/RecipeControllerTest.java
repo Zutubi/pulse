@@ -30,6 +30,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -104,6 +105,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeController.setResourceManager(new DefaultResourceManager());
         recipeController.setRecipeDispatchService(recipeDispatchService);
         recipeController.setScmManager(scmManager);
+        recipeController.setBuildHookManager(mock(BuildHookManager.class));
     }
 
     protected void tearDown() throws Exception
