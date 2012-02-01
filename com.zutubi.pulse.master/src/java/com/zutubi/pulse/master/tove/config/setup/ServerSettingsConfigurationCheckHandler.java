@@ -7,6 +7,8 @@ import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.validation.annotations.Required;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
 
 /**
@@ -33,7 +35,11 @@ public class ServerSettingsConfigurationCheckHandler extends AbstractConfigurati
 
     public void test(ServerSettingsConfiguration configuration) throws MessagingException
     {
-        emailService.sendMail(Arrays.asList(testAddress), "Test Email", "text/plain", "Welcome to Zutubi Pulse!", configuration, false);
+        MimeMultipart message = new MimeMultipart();
+        MimeBodyPart bodyPart = new MimeBodyPart();
+        bodyPart.setContent("Welcome to Zutubi Pulse!", "text/plain");
+        message.addBodyPart(bodyPart);
+        emailService.sendMail(Arrays.asList(testAddress), "Test Email", message, configuration, false);
     }
 
     public void setEmailService(EmailService emailService)

@@ -32,7 +32,7 @@ public class DefaultEmailService implements EmailService
     private Session sharedSession;
     private Transport sharedTransport;
 
-    public synchronized void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
+    public synchronized void sendMail(Collection<String> recipients, String subject, Multipart message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
     {
         int attempts = 0;
         int retryLimit = reuseSession ? 3 : 1;
@@ -56,7 +56,7 @@ public class DefaultEmailService implements EmailService
             }
 
             subject = addSubjectPrefix(config, subject);
-            Message msg = createMessage(recipients, subject, mimeType, message, config, session);
+            Message msg = createMessage(recipients, subject, message, config, session);
 
             try
             {
@@ -175,7 +175,7 @@ public class DefaultEmailService implements EmailService
         return "mail." + getProtocol(config) + "." + name;
     }
 
-    private Message createMessage(Collection<String> recipients, String subject, String mimeType, String message, EmailConfiguration config, Session session) throws MessagingException
+    private Message createMessage(Collection<String> recipients, String subject, Multipart message, EmailConfiguration config, Session session) throws MessagingException
     {
         Message msg = new MimeMessage(session);
         if (StringUtils.stringSet(config.getFrom()))
@@ -190,7 +190,7 @@ public class DefaultEmailService implements EmailService
         }
 
         msg.setSubject(subject);
-        msg.setContent(message, mimeType);
+        msg.setContent(message);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");
         msg.setSentDate(new Date());
         return msg;

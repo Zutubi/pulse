@@ -26,7 +26,7 @@ import java.util.List;
  * A subscription to results for project builds.
  */
 @SymbolicName("zutubi.projectSubscriptionConfig")
-@Form(fieldOrder = {"name", "allProjects", "projects", "labels", "contact", "template"})
+@Form(fieldOrder = {"name", "allProjects", "projects", "labels", "contact", "template", "attachLogs", "logLineLimit"})
 @Classification(single = "favourite")
 @Wire
 public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
@@ -47,8 +47,6 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
      * Condition to be satisfied before notifying.
      */
     private SubscriptionConditionConfiguration condition;
-    @Select(optionProvider = "SubscriptionTemplateOptionProvider")
-    private String template;
 
     /**
      * Cache of the parsed and modelled condition.
@@ -178,16 +176,6 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
         }
 
         return notifyCondition;
-    }
-
-    public String getTemplate()
-    {
-        return template;
-    }
-
-    public void setTemplate(String template)
-    {
-        this.template = template;
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

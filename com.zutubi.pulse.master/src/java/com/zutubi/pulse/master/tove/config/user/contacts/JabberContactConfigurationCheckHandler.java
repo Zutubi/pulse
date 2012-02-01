@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
+import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.master.notifications.jabber.JabberManager;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
-import com.zutubi.pulse.core.api.PulseException;
-import com.zutubi.pulse.master.notifications.jabber.JabberManager;
 
 @Wire
 @SymbolicName("zutubi.jabberContactConfigurationCheckHandler")
@@ -18,7 +19,7 @@ public class JabberContactConfigurationCheckHandler extends AbstractConfiguratio
         {
             throw new PulseException("Jabber is disabled.");
         }
-        configuration.notify(null, null, "Test message from Pulse", null);
+        configuration.notify(new RenderedResult(null, "Test message from Pulse", null), null);
     }
 
     public void setJabberManager(JabberManager jabberManager)

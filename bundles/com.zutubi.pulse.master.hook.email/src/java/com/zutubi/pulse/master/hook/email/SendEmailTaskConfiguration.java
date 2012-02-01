@@ -9,10 +9,12 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.CommitterMappingConfiguration;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.notifications.NotificationAttachment;
 import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.RenderService;
@@ -37,8 +39,11 @@ import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,13 +55,17 @@ import static java.util.Arrays.asList;
  * users that committed changes that affected the build.
  */
 @SymbolicName("zutubi.sendEmailTaskConfig")
-@Form(fieldOrder = {"template", "emailContacts", "emailCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+@Form(fieldOrder = {"template", "attachLogs", "logLineLimit", "emailContacts", "emailCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
 @CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
 @Wire
 public class SendEmailTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
     @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
+    @ControllingCheckbox(checkedFields = "logLineLimit")
+    private boolean attachLogs;
+    @Numeric(min = 0, max = 250)
+    private int logLineLimit = 50;
     private boolean emailContacts;
     @ControllingCheckbox(checkedFields = {"emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
     private boolean emailCommitters;
@@ -73,6 +82,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     private ScmManager scmManager;
     private EmailService emailService;
     private RenderService renderService;
+    private MasterConfigurationManager configurationManager;
 
     public String getTemplate()
     {
@@ -82,6 +92,26 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     public void setTemplate(String template)
     {
         this.template = template;
+    }
+
+    public boolean isAttachLogs()
+    {
+        return attachLogs;
+    }
+
+    public void setAttachLogs(boolean attachLogs)
+    {
+        this.attachLogs = attachLogs;
+    }
+
+    public int getLogLineLimit()
+    {
+        return logLineLimit;
+    }
+
+    public void setLogLineLimit(int logLineLimit)
+    {
+        this.logLineLimit = logLineLimit;
     }
 
     public boolean isEmailContacts()
@@ -176,7 +206,17 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
 
-            emailService.sendMail(emails, subject, mimeType, rendered.getContent(), emailConfiguration, true);
+            MimeMultipart message = new MimeMultipart();
+            MimeBodyPart bodyPart = new MimeBodyPart();
+            bodyPart.setContent(rendered.getContent(), mimeType);
+            message.addBodyPart(bodyPart);
+
+            for (NotificationAttachment attachment: renderService.getAttachments(buildResult, attachLogs, logLineLimit, false, configurationManager))
+            {
+                message.addBodyPart(attachment.asBodyPart());
+            }
+
+            emailService.sendMail(emails, subject, message, emailConfiguration, true);
         }
     }
 
@@ -340,6 +380,11 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     public void setRenderService(RenderService renderService)
     {
         this.renderService = renderService;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }
 

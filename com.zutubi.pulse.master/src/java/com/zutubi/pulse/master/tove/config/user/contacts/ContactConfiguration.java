@@ -1,9 +1,12 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotificationAttachment;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.validation.annotations.Constraint;
+
+import java.util.List;
 
 /**
  * Base for all contact points, establishes the minimal contract they must
@@ -20,6 +23,9 @@ public abstract class ContactConfiguration extends AbstractNamedConfiguration
     @Transient
     public abstract String getUid();
 
+    @Transient
+    public abstract boolean supportsAttachments();
+
     public boolean isPrimary()
     {
         return primary;
@@ -35,5 +41,5 @@ public abstract class ContactConfiguration extends AbstractNamedConfiguration
         setPermanent(primary);
     }
 
-    public abstract void notify(BuildResult buildResult, String subject, String content, String mimeType) throws Exception;
+    public abstract void notify(RenderedResult rendered, List<NotificationAttachment> attachments) throws Exception;
 }

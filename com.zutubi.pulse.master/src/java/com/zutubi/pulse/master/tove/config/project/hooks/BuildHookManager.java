@@ -18,6 +18,7 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +30,8 @@ import java.util.concurrent.Executors;
  */
 public class BuildHookManager
 {
+    private static final Logger LOG = Logger.getLogger(BuildHookManager.class);
+
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MasterConfigurationManager configurationManager;
@@ -161,6 +164,8 @@ public class BuildHookManager
                         result.error();
                     }
                 }
+
+                LOG.severe("Error executing task for hook '" + hook.getName() + "': " + e.getMessage(), e);
             }
         }
     }

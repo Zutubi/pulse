@@ -1,13 +1,16 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.NotificationException;
+import com.zutubi.pulse.master.notifications.NotificationAttachment;
 import com.zutubi.pulse.master.notifications.jabber.JabberManager;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPConnection;
+
+import java.util.List;
 
 /**
  *
@@ -43,7 +46,13 @@ public class JabberContactConfiguration extends ContactConfiguration
         return getUsername();
     }
 
-    public void notify(BuildResult buildResult, String subject, String content, String mimeType) throws Exception
+    @Override
+    public boolean supportsAttachments()
+    {
+        return false;
+    }
+
+    public void notify(RenderedResult rendered, List<NotificationAttachment> attachments) throws Exception
     {
         if (!jabberManager.isConfigured())
         {
@@ -57,7 +66,7 @@ public class JabberContactConfiguration extends ContactConfiguration
             try
             {
                 Chat chat = connection.createChat(getUsername());
-                chat.sendMessage(content);
+                chat.sendMessage(rendered.getContent());
             }
             catch (Exception e)
             {

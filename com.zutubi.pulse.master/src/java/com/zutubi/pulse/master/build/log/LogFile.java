@@ -45,7 +45,7 @@ public class LogFile
     public static final String EXTENSION_NON_EXISTENT = ".non";
 
     private static final int DEFAULT_COMPRESS_THRESHOLD = 100 * 1024;
-    private static final int DEFAULT_TAIL_LIMIT = 100;
+    private static final int DEFAULT_TAIL_LIMIT = 250;
 
     private static final Map<String, SharedData> canonicalPathToData = new HashMap<String, SharedData>();
 

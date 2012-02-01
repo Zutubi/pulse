@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.notifications.email;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import java.util.Collection;
 
 /**
@@ -17,7 +18,6 @@ public interface EmailService
      * @param recipients   email addresses to send the email to (using the To:
      *                     header)
      * @param subject      subject line of the email
-     * @param mimeType     mime-type of the email, e.g. text/plain
      * @param message      the email contents
      * @param config       configuration specifying how to send email
      * @param reuseSession if true, reuse an existing session with equivalent
@@ -25,5 +25,5 @@ public interface EmailService
      *                     connected for future reuse
      * @throws MessagingException if the message cannot be sent
      */
-    void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config, boolean reuseSession) throws MessagingException;
+    void sendMail(Collection<String> recipients, String subject, Multipart message, final EmailConfiguration config, boolean reuseSession) throws MessagingException;
 }

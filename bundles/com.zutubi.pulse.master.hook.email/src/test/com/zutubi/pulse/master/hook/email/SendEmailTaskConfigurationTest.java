@@ -67,7 +67,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         emailService = new RecordingEmailService();
 
         RenderService renderService = mock(RenderService.class);
-        doReturn(new RenderedResult("subject", "content")).when(renderService).renderResult(Matchers.<BuildResult>anyObject(), anyString(), Matchers.<BuildManager>anyObject(), Matchers.<BuildResultRenderer>anyObject(), anyString());
+        doReturn(new RenderedResult("subject", "content", "mimeType")).when(renderService).renderResult(Matchers.<BuildResult>anyObject(), anyString(), Matchers.<BuildManager>anyObject(), Matchers.<BuildResultRenderer>anyObject(), anyString());
         
         taskConfig.setConfigurationProvider(configurationProvider);
         taskConfig.setBuildResultRenderer(resultRenderer);

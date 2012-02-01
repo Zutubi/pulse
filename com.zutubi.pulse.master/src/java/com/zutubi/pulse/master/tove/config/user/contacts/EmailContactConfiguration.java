@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.tove.config.user.contacts;
 
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.NotificationException;
+import com.zutubi.pulse.master.notifications.NotificationAttachment;
 import com.zutubi.pulse.master.notifications.email.EmailService;
+import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Form;
@@ -14,7 +15,10 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
 
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  */
@@ -60,7 +64,13 @@ public class EmailContactConfiguration extends ContactConfiguration
         return getAddress();
     }
 
-    public void notify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
+    @Override
+    public boolean supportsAttachments()
+    {
+        return true;
+    }
+
+    public void notify(RenderedResult rendered, List<NotificationAttachment> attachments) throws Exception
     {
         EmailConfiguration config = configurationProvider.get(EmailConfiguration.class);
 
@@ -72,7 +82,16 @@ public class EmailContactConfiguration extends ContactConfiguration
 
         try
         {
-            emailService.sendMail(Arrays.asList(getAddress()), subject, mimeType, rendered, config, true);
+            MimeMultipart message = new MimeMultipart();
+            MimeBodyPart bodyPart = new MimeBodyPart();
+            bodyPart.setContent(rendered.getContent(), rendered.getMimeType());
+            message.addBodyPart(bodyPart);
+            for (NotificationAttachment attachment: attachments)
+            {
+                message.addBodyPart(attachment.asBodyPart());
+            }
+            
+            emailService.sendMail(Arrays.asList(getAddress()), rendered.getSubject(), message, config, true);
         }
         catch (Exception e)
         {

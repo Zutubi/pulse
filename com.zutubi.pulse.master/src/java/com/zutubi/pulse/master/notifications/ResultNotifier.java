@@ -84,6 +84,7 @@ public class ResultNotifier implements EventListener
 
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
+        // We use a render cach
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
         Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
@@ -108,7 +109,7 @@ public class ResultNotifier implements EventListener
                     RenderedResult rendered = renderService.renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
                     notifiedContactPoints.add(contactPoint.getHandle());
 
-                    notifyContactPoint(contactPoint, buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
+                    notifyContactPoint(contactPoint, buildResult, rendered, subscription);
                 }
             }
         }
@@ -120,12 +121,17 @@ public class ResultNotifier implements EventListener
         return accessManager.hasPermission(user, AccessManager.ACTION_VIEW, buildResult);
     }
 
-    private void notifyContactPoint(ContactConfiguration contactPoint, BuildResult buildResult, RenderedResult rendered, String mimeType)
+    private void notifyContactPoint(ContactConfiguration contactPoint, BuildResult buildResult, RenderedResult rendered, SubscriptionConfiguration subscription)
     {
         clearError(contactPoint);
         try
         {
-            contactPoint.notify(buildResult, rendered.getSubject(), rendered.getContent(), mimeType);
+            List<NotificationAttachment> attachments = null;
+            if (contactPoint.supportsAttachments())
+            {
+                attachments = renderService.getAttachments(buildResult, subscription.isAttachLogs(), subscription.getLogLineLimit(), true, configurationManager);
+            }
+            contactPoint.notify(rendered, attachments);
         }
         catch (Exception e)
         {

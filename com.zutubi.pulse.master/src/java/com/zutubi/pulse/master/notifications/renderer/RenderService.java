@@ -1,8 +1,11 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotificationAttachment;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,4 +37,17 @@ public interface RenderService
      * @return a rendered result
      */
     RenderedResult renderResult(BuildResult buildResult, String baseUrl, BuildManager buildManager, BuildResultRenderer buildResultRenderer, String template);
+
+    /**
+     * Returns a set of build stage log file attachments based on the given configuration.
+     *
+     *
+     * @param buildResult          the build to get the logs from
+     * @param attachLogs           a flag to indicate if logs should be attached (if false the empty list is returned)
+     * @param logLineLimit         a limit on the lines per log, if the log is larger only the tail is attached
+     * @param includeBuildLog      if true, include the build's own log along with the stage logs
+     * @param configurationManager the master's configuration
+     * @return a list of log file attachments for the build
+     */
+    List<NotificationAttachment> getAttachments(BuildResult buildResult, boolean attachLogs, int logLineLimit, boolean includeBuildLog, MasterConfigurationManager configurationManager);
 }
