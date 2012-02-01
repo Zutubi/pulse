@@ -86,6 +86,7 @@ Zutubi.pulse.project.browse.BuildSummaryPanel = Ext.extend(Zutubi.ActivePanel, {
                             Zutubi.pulse.project.configs.build.reason,
                             Zutubi.pulse.project.configs.build.revision,
                             Zutubi.pulse.project.configs.build.maturity,
+                            Zutubi.pulse.project.configs.build.version,
                             Zutubi.pulse.project.configs.result.when,
                             Zutubi.pulse.project.configs.result.completed,
                             Zutubi.pulse.project.configs.result.elapsedStatic
