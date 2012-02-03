@@ -23,9 +23,9 @@ import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -247,19 +247,22 @@ public class PersonalBuildAction extends ActionSupport
     private List<ResourcePropertyConfiguration> convertOverrides()
     {
         List<ResourcePropertyConfiguration> result = new LinkedList<ResourcePropertyConfiguration>();
-        Properties properties = new Properties();
-        try
+        if (StringUtils.stringSet(overrides))
         {
-            properties.load(new StringReader(overrides));
-            for (Map.Entry<Object, Object> entry: properties.entrySet())
+            Properties properties = new Properties();
+            try
             {
-                result.add(new ResourcePropertyConfiguration(entry.getKey().toString(), entry.getValue().toString()));
+                properties.load(new ByteArrayInputStream(overrides.getBytes(Constants.UTF8)));
+                for (Map.Entry<Object, Object> entry: properties.entrySet())
+                {
+                    result.add(new ResourcePropertyConfiguration(entry.getKey().toString(), entry.getValue().toString()));
+                }
             }
-        }
-        catch (IOException e)
-        {
-            // Not expected with a string as input.
-            LOG.warning(e);
+            catch (IOException e)
+            {
+                // Not expected with a string as input.
+                LOG.warning(e);
+            }
         }
 
         return result;

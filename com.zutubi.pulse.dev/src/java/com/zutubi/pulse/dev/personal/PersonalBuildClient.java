@@ -20,6 +20,7 @@ import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.client.UserAbortException;
 import com.zutubi.pulse.dev.sync.SynchronisePluginsClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
+import com.zutubi.util.Constants;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
@@ -35,9 +36,9 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -537,16 +538,18 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
 
     private String convertOverrides(Properties overrides)
     {
-        StringWriter writer = new StringWriter();
         try
         {
-            overrides.store(writer, "");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            overrides.store(outputStream, "");
+            return outputStream.toString(Constants.UTF8);
         }
         catch (IOException e)
         {
-            // Not expected with a string output.
+            // Not expected with an array output.
         }
-        return writer.toString();
+
+        return "";
     }
 
     public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)
