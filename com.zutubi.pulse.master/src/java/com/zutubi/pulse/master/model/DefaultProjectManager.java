@@ -6,6 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.api.PulseException;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -51,8 +52,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -63,6 +62,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -1140,7 +1142,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return requestIds;
     }
 
-    public long triggerBuild(long number, Project project, User user, Revision revision, File patchFile, String patchFormat) throws PulseException
+    public long triggerBuild(long number, Project project, User user, Revision revision, List<ResourcePropertyConfiguration> overrides, File patchFile, String patchFormat) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
@@ -1151,7 +1153,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
-            return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig));
+            return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig, overrides));
         }
         catch (Exception e)
         {

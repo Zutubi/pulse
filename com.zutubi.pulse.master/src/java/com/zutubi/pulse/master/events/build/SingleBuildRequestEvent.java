@@ -57,24 +57,24 @@ public class SingleBuildRequestEvent extends BuildRequestEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Build Request Event");
+        StringBuilder builder = new StringBuilder("Build Request Event");
         // should never be null, but then again, toString must never fail either.
         if (getProjectConfig() != null)
         {
-            buff.append(": name: ").append(getProjectConfig().getName());
+            builder.append(": name: ").append(getProjectConfig().getName());
         }
         if (options.getReason() != null)
         {
-            buff.append(": summary: ").append(options.getReason().getSummary());
+            builder.append(": summary: ").append(options.getReason().getSummary());
         }
         if (options.getSource() != null)
         {
-            buff.append(": source: ").append(options.getSource());
+            builder.append(": source: ").append(options.getSource());
         }
         if(options.isReplaceable())
         {
-            buff.append(" (replaceable)");
+            builder.append(" (replaceable)");
         }
-        return buff.toString();
+        return builder.toString();
     }
 }

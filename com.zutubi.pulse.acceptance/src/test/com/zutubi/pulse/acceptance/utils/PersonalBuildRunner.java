@@ -23,15 +23,17 @@ import com.zutubi.pulse.dev.personal.PersonalBuildConfig;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.io.IOUtils;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * The personal build runner is an acceptance test support class that
@@ -44,6 +46,7 @@ public class PersonalBuildRunner
     private DefaultPatchFormatFactory patchFormatFactory;
 
     private File base;
+    private Properties overrides = new Properties();
 
     static
     {
@@ -90,6 +93,17 @@ public class PersonalBuildRunner
     public void setBase(File base)
     {
         this.base = base;
+    }
+
+    /**
+     * Adds a property override.
+     *
+     * @param name  the property name
+     * @param value the property value
+     */
+    public void addOverride(String name, String value)
+    {
+        overrides.put(name, value);
     }
 
     /**
@@ -176,7 +190,8 @@ public class PersonalBuildRunner
     private AcceptancePersonalBuildUI requestPersonalBuild() throws IOException
     {
         AcceptancePersonalBuildUI ui = new AcceptancePersonalBuildUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(base, ui);
+        PersonalBuildConfig config = new PersonalBuildConfig(base, new PropertiesConfig(), overrides, ui);
+
         PersonalBuildClient client = new PersonalBuildClient(config, ui);
         client.setPatchFormatFactory(patchFormatFactory);
         

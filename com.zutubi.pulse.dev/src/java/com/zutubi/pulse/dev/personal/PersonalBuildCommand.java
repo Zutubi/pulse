@@ -134,6 +134,7 @@ public class PersonalBuildCommand implements Command
         options.put("-f [--file] filename", I18N.format("flag.file"));
         options.put("-t [--patch-type] type", I18N.format("flag.patch.type"));
         options.put("-e [--revision] rev", I18N.format("flag.revision"));
+        options.put("-o [--override] name=value", I18N.format("flag.override"));
         options.put("--no-send-request", I18N.format("flag.no.request"));
         options.put("--send-request", I18N.format("flag.request"));
         options.put("--no-update", I18N.format("flag.no.update"));

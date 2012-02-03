@@ -6,6 +6,7 @@ import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.build.control.BuildController;
@@ -270,7 +271,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         user.setId(nextId.getAndIncrement());
         BuildRevision revision = new BuildRevision(new Revision(1234), true);
 
-        BuildRequestEvent request = new PersonalBuildRequestEvent(this, nextId.getAndIncrement(), revision, user, null, null, project.getConfig());
+        BuildRequestEvent request = new PersonalBuildRequestEvent(this, nextId.getAndIncrement(), revision, user, null, null, project.getConfig(), Collections.<ResourcePropertyConfiguration>emptyList());
 
         BuildController controller = mock(BuildController.class);
         doReturn(request.getId()).when(controller).start();

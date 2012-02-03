@@ -1,12 +1,15 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 import com.zutubi.pulse.core.model.NamedEntity;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
+import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 
 /**
  * A request for a personal build.
@@ -18,9 +21,9 @@ public class PersonalBuildRequestEvent extends BuildRequestEvent
     private File patch;
     private String patchFormat;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, String patchFormat, ProjectConfiguration projectConfig)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, String patchFormat, ProjectConfiguration projectConfig, List<ResourcePropertyConfiguration> properties)
     {
-        super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), null));
+        super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), properties));
         this.number = number;
         this.user = user;
         this.patch = patch;

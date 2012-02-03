@@ -6,6 +6,7 @@ import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A value object for carrying the options for triggering a build.
@@ -27,7 +28,7 @@ public class TriggerOptions
      * A freeform source for the trigger, used to identify related
      * triggers for replacing.
      */
-    private final String source;
+    private String source;
 
     /**
      * If true, while queue this build request may be replaced by
@@ -92,6 +93,12 @@ public class TriggerOptions
     {
         this.reason = reason;
         this.source = source;
+    }
+
+    public TriggerOptions(BuildReason reason, List<ResourcePropertyConfiguration> properties)
+    {
+        this.reason = reason;
+        this.properties = properties;
     }
 
     public void setProperties(Collection<ResourcePropertyConfiguration> properties)

@@ -17,15 +17,16 @@ import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.OutstandingChangesTriggerConditionConfiguration;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class OutstandingChangesTriggerConditionTest extends PulseTestCase
 {
@@ -121,6 +122,6 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
         {
             buildRevision = new BuildRevision();
         }
-        return new SingleBuildRequestEvent(this, project, buildRevision, new TriggerOptions(null, null));
+        return new SingleBuildRequestEvent(this, project, buildRevision, new TriggerOptions(null, (String) null));
     }
 }

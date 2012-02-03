@@ -173,4 +173,16 @@ public class PersonalBuildClientFactoryTest extends AbstractDevTestCase
         assertEquals(asList("file1"), asList(config.getFiles()));
         assertEquals("test.project", config.getProject());
     }
+
+    public void testOverride() throws ParseException
+    {
+        PersonalBuildClient client = factory.newInstance("-o", "foo=bar");
+        assertProperties(client.getConfig().getOverrides(), asPair("foo", "bar"));
+    }
+
+    public void testMultipleOverrides() throws ParseException
+    {
+        PersonalBuildClient client = factory.newInstance("-o", "foo=bar", "--override", "baz=quux");
+        assertProperties(client.getConfig().getOverrides(), asPair("foo", "bar"), asPair("baz", "quux"));
+    }
 }

@@ -299,6 +299,32 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent("Patch does not apply cleanly"));
     }
 
+    public void testPersonalBuildWithOverrides() throws Exception
+    {
+        final String P1_NAME = "property1";
+        final String P1_ORIGINAL_VALUE = "original1";
+        final String P1_OVERRIDE_VALUE = "ride1";
+        final String P2_NAME = "property2";
+        final String P2_OVERRIDE_VALUE = "val2";
+
+        checkout(Constants.TRIVIAL_ANT_REPOSITORY);
+        makeChangeToBuildFile();
+        createConfigFile(random);
+        buildRunner.addOverride(P1_NAME, P1_OVERRIDE_VALUE);
+        buildRunner.addOverride(P2_NAME, P2_OVERRIDE_VALUE);
+
+        getBrowser().loginAsAdmin();
+        rpcClient.RemoteApi.insertSimpleProject(random);
+        rpcClient.RemoteApi.insertProjectProperty(random, P1_NAME, P1_ORIGINAL_VALUE);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
+
+        long buildNumber = runPersonalBuild(ResultState.FAILURE);
+
+        PersonalEnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(PersonalEnvironmentArtifactPage.class, random, buildNumber, "default", "build");
+        assertTrue(envPage.isPulsePropertyPresentWithValue(P1_NAME, P1_OVERRIDE_VALUE));
+        assertTrue(envPage.isPulsePropertyPresentWithValue(P2_NAME, P2_OVERRIDE_VALUE));
+    }
+
     public void testGitPersonalBuild() throws Exception
     {
         String gitUrl = Constants.getGitUrl();

@@ -11,10 +11,7 @@ import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
 import org.apache.commons.cli.*;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A command which allows interactive setup of required configuration for the
@@ -42,7 +39,7 @@ public class ConfigCommand implements Command
         }
 
         ConsoleUI ui = new ConsoleUI();
-        PersonalBuildConfig config = new PersonalBuildConfig(FileSystemUtils.getWorkingDirectory(), new PropertiesConfig(), ui);
+        PersonalBuildConfig config = new PersonalBuildConfig(FileSystemUtils.getWorkingDirectory(), new PropertiesConfig(), new Properties(), ui);
         if(!projectOnly)
         {
             DevConfigSetup.setupPulseConfig(ui, config);

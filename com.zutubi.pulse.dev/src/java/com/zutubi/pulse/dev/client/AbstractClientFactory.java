@@ -65,7 +65,7 @@ public abstract class AbstractClientFactory<T>
         PropertiesConfig defineConfig = processDefines(commandLine);
         CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
 
-        return newInstance(base, uiConfig, configureConsole(commandLine), commandLine.getArgs());
+        return newInstance(base, uiConfig, configureConsole(commandLine), commandLine);
     }
 
     @SuppressWarnings({"AccessStaticViaInstance"})
@@ -156,6 +156,6 @@ public abstract class AbstractClientFactory<T>
         return new PropertiesConfig(defines);
     }
 
-    protected abstract T newInstance(File base, CompositeConfig uiConfig, ConsoleUI ui, String[] args);
+    protected abstract T newInstance(File base, CompositeConfig uiConfig, ConsoleUI ui, CommandLine commandLine) throws ParseException;
     protected abstract void addExtraOptions(CommandLineConfig switchConfig, Options options);
 }

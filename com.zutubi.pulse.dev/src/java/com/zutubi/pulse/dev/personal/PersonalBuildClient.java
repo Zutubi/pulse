@@ -37,10 +37,8 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * The client does the work of actually talking to the Pulse server, sending
@@ -478,6 +476,7 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
             Part[] parts = {
                     new StringPart("project", config.getProject()),
                     new StringPart("revision", revision.getRevisionString()),
+                    new StringPart("overrides", convertOverrides(config.getOverrides())),
                     new StringPart("patchFormat", context.getPatchFormatType()),
                     new FilePart("patch.zip", patchFile),
             };
@@ -534,6 +533,20 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
         {
             post.releaseConnection();
         }
+    }
+
+    private String convertOverrides(Properties overrides)
+    {
+        StringWriter writer = new StringWriter();
+        try
+        {
+            overrides.store(writer, "");
+        }
+        catch (IOException e)
+        {
+            // Not expected with a string output.
+        }
+        return writer.toString();
     }
 
     public void setPatchFormatFactory(PatchFormatFactory patchFormatFactory)

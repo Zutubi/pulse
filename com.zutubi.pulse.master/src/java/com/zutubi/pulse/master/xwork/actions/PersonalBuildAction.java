@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -23,8 +24,12 @@ import org.springframework.security.access.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Action for requesting a personal build.  The personal build client posts to
@@ -39,6 +44,7 @@ public class PersonalBuildAction extends ActionSupport
     private String project;
     private String patchFormat;
     private String revision;
+    private String overrides;
     private long number = 0;
     private List<String> responseErrors = new LinkedList<String>();
     private List<String> responseWarnings = new LinkedList<String>();
@@ -56,6 +62,11 @@ public class PersonalBuildAction extends ActionSupport
     public void setRevision(String revision)
     {
         this.revision = revision;
+    }
+
+    public void setOverrides(String overrides)
+    {
+        this.overrides = overrides;
     }
 
     public void setPatchFormat(String patchFormat)
@@ -176,8 +187,8 @@ public class PersonalBuildAction extends ActionSupport
 
             PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), number));
             properties.setPatchFormat(patchFormat);
-            
-            long requestId = projectManager.triggerBuild(number, p, user, convertRevision(p), patchFile, patchFormat);
+
+            long requestId = projectManager.triggerBuild(number, p, user, convertRevision(p), convertOverrides(), patchFile, patchFormat);
             BuildRequestRegistry.RequestStatus requestStatus = buildRequestRegistry.waitForRequestToBeHandled(requestId, TIMEOUT);
             switch (requestStatus)
             {
@@ -231,6 +242,27 @@ public class PersonalBuildAction extends ActionSupport
         {
             return new Revision(revision);
         }
+    }
+
+    private List<ResourcePropertyConfiguration> convertOverrides()
+    {
+        List<ResourcePropertyConfiguration> result = new LinkedList<ResourcePropertyConfiguration>();
+        Properties properties = new Properties();
+        try
+        {
+            properties.load(new StringReader(overrides));
+            for (Map.Entry<Object, Object> entry: properties.entrySet())
+            {
+                result.add(new ResourcePropertyConfiguration(entry.getKey().toString(), entry.getValue().toString()));
+            }
+        }
+        catch (IOException e)
+        {
+            // Not expected with a string as input.
+            LOG.warning(e);
+        }
+
+        return result;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

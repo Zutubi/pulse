@@ -5,6 +5,7 @@ import com.zutubi.pulse.dev.config.DevConfig;
 import com.zutubi.util.config.Config;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * Extends {@link com.zutubi.pulse.dev.config.DevConfig} with personal build
@@ -24,15 +25,24 @@ public class PersonalBuildConfig extends DevConfig
     public static final String PROPERTY_PATCH_TYPE = "patch.format";
     public static final String PROPERTY_SEND_REQUEST = "send.request";
 
+    private Properties overrides;
+
     public PersonalBuildConfig(File base, UserInterface ui, String... files)
     {
-        this(base, null, ui, files);
+        this(base, null, new Properties(), ui, files);
     }
 
-    public PersonalBuildConfig(File base, Config uiConfig, UserInterface ui, String... files)
+    public PersonalBuildConfig(File base, Config uiConfig, Properties overrides, UserInterface ui, String... files)
     {
         super(base, uiConfig, ui, files);
+        this.overrides = overrides;
     }
+
+    public Properties getOverrides()
+    {
+        return overrides;
+    }
+
     public String getProject()
     {
         return getProperty(PROPERTY_PROJECT);
