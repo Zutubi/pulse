@@ -185,7 +185,7 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
                     
                     String dependencyProjectName = mrid.getName();
                     stageDependency.setProjectName(dependencyProjectName);
-                    boolean isDependencyAvailable = projectManager.getProjectConfig(mrid.getName(), false) != null;
+                    boolean isDependencyAvailable = projectManager.getProjectConfig(dependencyProjectName, false) != null;
                     if (isDependencyAvailable)
                     {
                         stageDependency.setProjectUrl(urls.project(uriComponentEncode(dependencyProjectName)));

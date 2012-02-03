@@ -297,6 +297,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     private Revision sync(ExecutionContext context, Revision revision, ScmFeedbackHandler handler, boolean cleanCheckout) throws ScmException
     {
+        core.setContext(context);
+
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
@@ -394,6 +396,11 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         {
             return configuration.getPassword();
         }
+    }
+
+    public String getImplicitResource()
+    {
+        return "perforce";
     }
 
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
@@ -629,6 +636,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
+        core.setContext(context);
+
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContent);
         try
         {
@@ -651,6 +660,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
+        core.setContext(context);
+
         String clientName = PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context);
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, clientName, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
@@ -661,6 +672,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException
     {
+        core.setContext(context);
+
         final EOLStyle[] eol = new EOLStyle[]{EOLStyle.NATIVE};
 
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
@@ -830,6 +843,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public void beforePatch(ExecutionContext context, List<FileStatus> statuses) throws ScmException
     {
+        core.setContext(context);
+
         Predicate<FileStatus> addedPredicate = new Predicate<FileStatus>()
         {
             public boolean satisfied(FileStatus fileStatus)

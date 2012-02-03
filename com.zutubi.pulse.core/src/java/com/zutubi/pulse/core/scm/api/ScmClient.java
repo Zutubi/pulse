@@ -16,6 +16,20 @@ import java.util.Set;
 public interface ScmClient extends Closeable
 {
     /**
+     * Indicates the name of a resource that should be optionally imported for any builds
+     * that use this SCM client.  This resource may be used to, e.g. define where the
+     * command-line binary can be found for the SCM.  The default version of the resource
+     * is imported.
+     * <p/>
+     * Note that if the build already has a requirement upon a resource of the same name,
+     * the implicit import will not take effect.
+     * 
+     * @return the name of a resource to optionally import, or null if no such resource
+     *         is needed/supported
+     */
+    String getImplicitResource();
+
+    /**
      * The init method is a callback that is called before any of the methods that receive
      * an SCM context.  It is called once when a project is initialised.  It may be called
      * again for the same project if the user chooses to manually reinitialise, in which

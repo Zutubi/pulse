@@ -26,6 +26,11 @@ public class TestScmClient implements ScmClient, DataCacheAware
         this.throwError = throwError;
     }
 
+    public String getImplicitResource()
+    {
+        return null;
+    }
+
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         // noop

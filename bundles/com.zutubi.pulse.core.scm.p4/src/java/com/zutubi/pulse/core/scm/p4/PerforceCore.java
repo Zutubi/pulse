@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
@@ -55,7 +56,7 @@ public class PerforceCore
 
     public PerforceCore(int inactivityTimeout)
     {
-        runner = new ScmProcessRunner("p4");
+        runner = new ScmProcessRunner("p4", null);
         runner.setInactivityTimeout(inactivityTimeout == USE_SYSTEM_INACTIVITY_TIMEOUT ? SYSTEM_INACTIVITY_TIMEOUT : inactivityTimeout);
     }
 
@@ -78,6 +79,11 @@ public class PerforceCore
         runner.setDirectory(dir);
     }
 
+    public void setContext(ExecutionContext context)
+    {
+        runner.setContext(context);
+    }
+    
     public P4Result runP4(String input, String... commands) throws ScmException
     {
         return runP4(true, input, commands);

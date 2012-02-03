@@ -244,7 +244,7 @@ public class GitClientTest extends GitClientTestBase
     private NativeGit getNativeGitOnMaster() throws ScmException
     {
         // Add a new commit which requires merging
-        NativeGit git = new NativeGit(0);
+        NativeGit git = new NativeGit(0, null);
         git.setWorkingDirectory(repositoryBase);
         git.checkout(null, "master");
         return git;

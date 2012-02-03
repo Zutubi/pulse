@@ -98,6 +98,11 @@ public class GitClient implements ScmClient
         this.cloneType = cloneType;
     }
 
+    public String getImplicitResource()
+    {
+        return "git";
+    }
+
     /**
      * Prepare the local clone of the remote git repository.  This local clone will subsequently
      * be used for browsing, checking for changes, determining changelists etc etc.
@@ -122,7 +127,7 @@ public class GitClient implements ScmClient
             }
         }
 
-        NativeGit git = new NativeGit(inactivityTimeout);
+        NativeGit git = new NativeGit(inactivityTimeout, null);
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
@@ -197,7 +202,7 @@ public class GitClient implements ScmClient
             }
         }
 
-        NativeGit git = new NativeGit(inactivityTimeout);
+        NativeGit git = new NativeGit(inactivityTimeout, context);
 
         switch (cloneType)
         {
@@ -304,7 +309,7 @@ public class GitClient implements ScmClient
             return checkout(context, revision, handler);
         }
 
-        NativeGit git = new NativeGit(inactivityTimeout);
+        NativeGit git = new NativeGit(inactivityTimeout, context);
         git.setWorkingDirectory(workingDir);
 
         // switch to the primary local checkout and update.
@@ -396,7 +401,7 @@ public class GitClient implements ScmClient
 
     private NativeGit preparePersistentDirectory(File workingDir) throws ScmException
     {
-        NativeGit git = new NativeGit(inactivityTimeout);
+        NativeGit git = new NativeGit(inactivityTimeout, null);
         git.setFilterPaths(includedPaths, excludedPaths);
         if (!isGitRepository(workingDir))
         {
@@ -571,7 +576,7 @@ public class GitClient implements ScmClient
         scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit nativeGit = new NativeGit(inactivityTimeout);
+            NativeGit nativeGit = new NativeGit(inactivityTimeout, null);
             nativeGit.setWorkingDirectory(scmContext.getPersistentWorkingDir());
             nativeGit.tag(revision, name, "[pulse] applying tag", moveExisting);
             nativeGit.push("origin", name);
@@ -651,7 +656,7 @@ public class GitClient implements ScmClient
 
     public void testConnection() throws ScmException
     {
-        NativeGit git = new NativeGit(inactivityTimeout);
+        NativeGit git = new NativeGit(inactivityTimeout, null);
         LsRemoteOutputHandler handler = new LsRemoteOutputHandler();
         git.lsRemote(handler, repository, branch);
 

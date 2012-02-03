@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.process.api;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ByteHandler;
@@ -20,10 +21,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * to the process and sending output to an {@link ScmLineHandler}.  Includes
  * optional support for checking exit codes and timing out on process
  * inactivity.
+ * <p/>
+ * This runner includes support for finding binary locations in the build
+ * context (e.g. those imported from resources).  Any command run with an
+ * available execution context will be resolved from that context if possible.
+ * For example, when the command "foo checkout" is run, the runner looks for a
+ * property named "foo.bin" in the context.  If found, the value of this
+ * property is substituted in place of "foo".
  */
 public class ScmProcessRunner
 {
     private String name;
+    private ExecutionContext context;
     private ProcessBuilder processBuilder = new ProcessBuilder();
     private int inactivityTimeout = 0;
     private Charset charset = Charset.defaultCharset();
@@ -32,11 +41,14 @@ public class ScmProcessRunner
      * Creates a new runner which will run a command of the given name (e.g.
      * svn, p4, git).
      * 
-     * @param name name of the process to run, returned in feedback messages
+     * @param name    name of the process to run, returned in feedback messages
+     * @param context the context in which to run commands, may be null if there
+     *                is no extra context
      */
-    public ScmProcessRunner(String name)
+    public ScmProcessRunner(String name, ExecutionContext context)
     {
         this.name = name;
+        this.context = context;
     }
 
     /**
@@ -75,6 +87,26 @@ public class ScmProcessRunner
     public void setDirectory(File directory)
     {
         processBuilder.directory(directory);
+    }
+
+    /**
+     * The context in which the process will run, if any.
+     *
+     * @return the context in which to run, may be null
+     */
+    public ExecutionContext getContext()
+    {
+        return context;
+    }
+
+    /**
+     * Sets the context in which to run the SCM process, if any.
+     *
+     * @param context the context to run under, may be null
+     */
+    public void setContext(ExecutionContext context)
+    {
+        this.context = context;
     }
 
     /**
@@ -179,7 +211,13 @@ public class ScmProcessRunner
      * Received output is converted to strings using the current character set
      * before being passed to the output handler.  If the current inactivity
      * timeout is non-zero, it will be applied to detect process hangs.
-     * 
+     * <p/>
+     * Note that if a context was provided when creating this runner, the
+     * binary to run will be resolved from that context if possible.  This is
+     * done by appending ".bin" to the command name and looking in the context
+     * for a property with that name.  If such a property is found, its value
+     * is substituted into the command.
+     *
      * @param handler       handler that will be notified of process output,
      *                      may be null in which case output is discarded
      * @param input         input bytes to feed to the process, may be null if
@@ -195,6 +233,7 @@ public class ScmProcessRunner
     {
         final ScmOutputHandler safeHandler = handler == null ?  new ScmOutputHandlerSupport() : handler;
 
+        commands[0] = resolveCommand(commands[0]);
         processBuilder.command(commands);
         String commandLine = getLastCommandLine();
         safeHandler.handleCommandLine(commandLine);
@@ -220,6 +259,20 @@ public class ScmProcessRunner
         }
      
         return exitCode;
+    }
+
+    private String resolveCommand(String command)
+    {
+        if (context != null)
+        {
+            String binary = context.getString(command + ".bin");
+            if (StringUtils.stringSet(binary))
+            {
+                command = binary;
+            }
+        }
+
+        return command;
     }
 
     private Process startProcess() throws ScmException

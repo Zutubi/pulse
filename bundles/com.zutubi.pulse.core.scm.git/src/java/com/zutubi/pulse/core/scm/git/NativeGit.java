@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.process.api.*;
 import com.zutubi.util.Constants;
@@ -55,18 +56,20 @@ public class NativeGit
      */
     public NativeGit()
     {
-        this(0);
+        this(0, null);
     }
 
     /**
      * Creates a git command line wrapper with the given inactivity timeout.
      *
      * @param inactivityTimeout number of seconds of inactivity (no output)
-     *                          after which to timeout a git subprocess 
+     *                          after which to timeout a git subprocess
+     * @param context           the context in which to execute git - may be
+     *                          null
      */
-    public NativeGit(int inactivityTimeout)
+    public NativeGit(int inactivityTimeout, ExecutionContext context)
     {
-        runner = new ScmProcessRunner("git");
+        runner = new ScmProcessRunner("git", context);
         runner.setCharset(CHARSET_UTF8);
         runner.setInactivityTimeout(inactivityTimeout);
     }

@@ -103,6 +103,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
 
     private ScmManager scmManager;
+    private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private ThreadFactory threadFactory;
     private ResourceManager resourceManager;
 
@@ -324,6 +325,37 @@ public class DefaultBuildController implements EventListener, BuildController
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
         requirements.addAll(asResourceRequirements(projectConfig.getRequirements()));
         requirements.addAll(asResourceRequirements(node.getRequirements()));
+
+        // If the SCM has an implicit resource not conflicting with those configured, add it too.
+        try
+        {
+            final String implicitResource = withScmClient(projectConfig.getScm(), scmClientFactory, new ScmAction<String>()
+            {
+                public String process(ScmClient scmClient) throws ScmException
+                {
+                    return scmClient.getImplicitResource();
+                }
+            });
+
+            if (StringUtils.stringSet(implicitResource))
+            {
+                if (!CollectionUtils.contains(requirements, new Predicate<ResourceRequirement>()
+                {
+                    public boolean satisfied(ResourceRequirement resourceRequirement)
+                    {
+                        return resourceRequirement.getResource().equals(implicitResource);
+                    }
+                }))
+                {
+                    requirements.add(new ResourceRequirement(implicitResource, false, true));
+                }
+            }
+        }
+        catch (ScmException e)
+        {
+            LOG.warning("Unable to get implicit SCM resource: " + e.getMessage(), e);
+        }
+
         return requirements;
     }
 
@@ -1194,6 +1226,11 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
     {
         this.repositoryAttributes = repositoryAttributes;
+    }
+
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 
     private static interface BootstrapperCreator

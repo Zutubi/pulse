@@ -41,6 +41,11 @@ public class MercurialClient implements ScmClient
         hg = new MercurialCore(config.isInactivityTimeoutEnabled() ? config.getInactivityTimeoutSeconds() : 0);
     }
 
+    public String getImplicitResource()
+    {
+        return "mercurial";
+    }
+
     /**
      * Prepare the local clone of the remote repository.  This local clone will subsequently
      * be used for browsing, checking for changes, determining changelists etc etc.
@@ -132,6 +137,7 @@ public class MercurialClient implements ScmClient
         // hg update --rev <revision>
         ScmLineHandler outputHandler = new ScmLineHandlerSupport(handler);
         hg.setWorkingDirectory(workingDir.getParentFile());
+        hg.setContext(context);
         hg.clone(outputHandler, config.getRepository(), config.getBranch(), null, workingDir.getName());
 
         hg.setWorkingDirectory(workingDir);
@@ -150,6 +156,7 @@ public class MercurialClient implements ScmClient
 
         ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport(handler);
         hg.setWorkingDirectory(workingDir);
+        hg.setContext(context);
         hg.pull(outputHandler, config.getBranch());
         hg.update(outputHandler, safeRevisionString(revision));
         return new Revision(hg.parents());
@@ -338,6 +345,7 @@ public class MercurialClient implements ScmClient
         try
         {
             preparePersistentDirectory(null, scmContext.getPersistentWorkingDir(), null);
+            hg.setContext(context);
             hg.tag(null, revision, name, "[pulse] applying tag", moveExisting);
             hg.push(null, config.getBranch());
         }

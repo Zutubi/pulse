@@ -648,7 +648,7 @@ public class DefaultBuildManager implements BuildManager
         {
             List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
-            // file the ivy file.
+            // find the ivy file.
             candidateIvyPath = CollectionUtils.find(paths, new Predicate<String>()
             {
                 public boolean satisfied(String path)

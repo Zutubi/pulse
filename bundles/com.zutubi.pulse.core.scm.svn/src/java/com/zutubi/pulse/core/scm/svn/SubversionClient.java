@@ -290,6 +290,11 @@ public class SubversionClient implements ScmClient
     // ScmClient interface
     //=======================================================================
 
+    public String getImplicitResource()
+    {
+        return "subversion";
+    }
+
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         // noop

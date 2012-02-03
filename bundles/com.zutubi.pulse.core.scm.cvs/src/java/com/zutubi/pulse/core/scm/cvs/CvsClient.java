@@ -93,6 +93,11 @@ public class CvsClient implements ScmClient
         this.excludedPaths = excluded;
     }
 
+    public String getImplicitResource()
+    {
+        return "cvs";
+    }
+
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
     }

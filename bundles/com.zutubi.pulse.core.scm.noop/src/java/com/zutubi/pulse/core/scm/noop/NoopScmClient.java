@@ -16,6 +16,11 @@ import java.util.Set;
  */
 public class NoopScmClient implements ScmClient
 {
+    public String getImplicitResource()
+    {
+        return null;
+    }
+
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
     }

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.hg;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputHandler;
@@ -13,6 +13,8 @@ import com.zutubi.util.StringUtils;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
+
+import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
 
 /**
  * A wrapper around the hg command line.
@@ -37,7 +39,7 @@ public class MercurialCore
      */
     public MercurialCore(int inactivityTimeout)
     {
-        runner = new ScmProcessRunner("hg");
+        runner = new ScmProcessRunner("hg", null);
         runner.setInactivityTimeout(inactivityTimeout);
     }
 
@@ -59,6 +61,16 @@ public class MercurialCore
         }
 
         runner.setDirectory(dir);
+    }
+
+    /**
+     * Set the context in which hg commands will be run.
+     *
+     * @param context the context in which to run commands
+     */
+    public void setContext(ExecutionContext context)
+    {
+        runner.setContext(context);
     }
 
     public void add(ScmOutputHandler handler, String filename) throws ScmException
