@@ -13,4 +13,7 @@
              working-copy-class="com.zutubi.pulse.core.scm.git.GitWorkingCopy"
              patch-format="git"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="git" class="com.zutubi.pulse.core.scm.git.GitResourceLocator"/>
+    </extension>
 </plugin>

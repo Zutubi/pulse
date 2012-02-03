@@ -18,6 +18,8 @@ public class MercurialConstants
      */
     public static final String DEFAULT_HG = SystemUtils.IS_WINDOWS ? "hg.exe" : "hg";
 
+    public static final String RESOURCE_NAME = "mercurial";
+    
     public static final String COMMAND_ADD = "add";
     public static final String COMMAND_BRANCH = "branch";
     public static final String COMMAND_CAT = "cat";

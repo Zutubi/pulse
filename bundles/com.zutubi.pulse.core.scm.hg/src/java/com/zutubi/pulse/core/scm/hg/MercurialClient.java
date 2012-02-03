@@ -43,7 +43,7 @@ public class MercurialClient implements ScmClient
 
     public String getImplicitResource()
     {
-        return "mercurial";
+        return RESOURCE_NAME;
     }
 
     /**

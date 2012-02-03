@@ -400,7 +400,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public String getImplicitResource()
     {
-        return "perforce";
+        return RESOURCE_NAME;
     }
 
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException

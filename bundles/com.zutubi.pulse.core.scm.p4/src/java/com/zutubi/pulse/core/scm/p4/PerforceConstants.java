@@ -124,7 +124,10 @@ public class PerforceConstants
             "xunicode"
     };
 
-    public static final String P4_COMMAND = System.getProperty("pulse.p4.command", "p4");
+    public static final String RESOURCE_NAME = "p4";
+
+    public static final String DEFAULT_P4 = "p4";
+    public static final String P4_COMMAND = System.getProperty("pulse.p4.command", DEFAULT_P4);
     public static final boolean SKIP_FLUSH = Boolean.getBoolean("pulse.p4.skip.flush");
     private static final String P4_COMMAND_PREFIX = "pulse.p4.command.";
 

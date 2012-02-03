@@ -13,4 +13,7 @@
              working-copy-class="com.zutubi.pulse.core.scm.hg.MercurialWorkingCopy"
              patch-format="hg"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="hg" class="com.zutubi.pulse.core.scm.hg.MercurialResourceLocator"/>
+    </extension>
 </plugin>

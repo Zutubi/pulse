@@ -18,6 +18,8 @@ public class GitConstants
      */
     public static final String DEFAULT_GIT = SystemUtils.IS_WINDOWS ? "git.exe" : "git";
 
+    public static final String RESOURCE_NAME = "git";
+
     public static final String COMMAND_PULL = "pull";
     public static final String COMMAND_LOG = "log";
     public static final String COMMAND_CLONE = "clone";

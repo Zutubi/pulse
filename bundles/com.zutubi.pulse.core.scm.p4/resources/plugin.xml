@@ -10,4 +10,7 @@
              working-copy-class="com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy"
              patch-format="standard"/>
     </extension>
+    <extension point="com.zutubi.pulse.core.resourcelocators">
+        <resource-locator name="p4" class="com.zutubi.pulse.core.scm.p4.PerforceResourceLocator"/>
+    </extension>
 </plugin>

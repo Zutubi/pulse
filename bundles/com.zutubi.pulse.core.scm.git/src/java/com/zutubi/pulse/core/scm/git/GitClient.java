@@ -100,7 +100,7 @@ public class GitClient implements ScmClient
 
     public String getImplicitResource()
     {
-        return "git";
+        return RESOURCE_NAME;
     }
 
     /**

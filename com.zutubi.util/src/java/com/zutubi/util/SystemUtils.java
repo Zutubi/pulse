@@ -4,12 +4,12 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 
 /**
  */
@@ -209,8 +209,9 @@ public class SystemUtils
      * Attempts to find an executable with the given name in the given
      * extra paths or directories in the system PATH.  For most systems,
      * this equates to finding a file of the given name in one of the
-     * extra paths or a directory in the PATH.  On windows, files are
-     * expected to have one of the extensions in PATHEXT.
+     * extra paths or a directory in the PATH.  On windows, both the given
+     * name and all variants of it by adding the extensions in PATHEXT are
+     * tried.
      *
      * @param name       the name of the executable to look for
      * @param extraPaths a set of extra paths to check, in order, BEFORE
@@ -300,6 +301,11 @@ public class SystemUtils
 
     private static boolean filenameMatches(String name, String filename, String[] extensions)
     {
+        if (filename.equals(name))
+        {
+            return true;
+        }
+
         filename = filename.toUpperCase();
 
         for (String extension : extensions)
