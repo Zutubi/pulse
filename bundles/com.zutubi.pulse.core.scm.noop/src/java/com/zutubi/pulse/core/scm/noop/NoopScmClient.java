@@ -38,12 +38,12 @@ public class NoopScmClient implements ScmClient
         return Collections.emptySet();
     }
 
-    public String getUid() throws ScmException
+    public String getUid(ScmContext context) throws ScmException
     {
         return "no-op.scm";
     }
 
-    public String getLocation()
+    public String getLocation(ScmContext context)
     {
         return "[none]";
     }
@@ -99,7 +99,7 @@ public class NoopScmClient implements ScmClient
         return checkout(context, rev, handler);
     }
 
-    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         throw new ScmException("Operation not supported");
     }

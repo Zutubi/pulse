@@ -4,24 +4,26 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
+import com.zutubi.pulse.master.vfs.provider.pulse.ProjectProvider;
 import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileName;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * The base ScmFileObject class that contains the common functionality between
@@ -98,15 +100,30 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
             {
                 try
                 {
-                    ProjectConfiguration projectConfig = getAncestor(ProjectConfigProvider.class).getProjectConfig();
+                    Project project = null;
+                    ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
+                    if (projectProvider != null)
+                    {
+                        project = projectProvider.getProject();
+                    }
 
-                    loadedChildren = withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<List<ScmFile>>()
+                    ScmClientUtils.ScmContextualAction<List<ScmFile>> action = new ScmClientUtils.ScmContextualAction<List<ScmFile>>()
                     {
                         public List<ScmFile> process(ScmClient client, ScmContext context) throws ScmException
                         {
                             return client.browse(context, getScmPath(), null);
                         }
-                    });
+                    };
+
+                    if (project == null)
+                    {
+                        ProjectConfigProvider configProvider = getAncestor(ProjectConfigProvider.class);
+                        loadedChildren = withScmClient(configProvider.getProjectConfig().getScm(), scmManager, action);
+                    }
+                    else
+                    {
+                        loadedChildren = withScmClient(project.getConfig(), project.getState(), scmManager, action);
+                    }
                 }
                 catch (ScmException e)
                 {

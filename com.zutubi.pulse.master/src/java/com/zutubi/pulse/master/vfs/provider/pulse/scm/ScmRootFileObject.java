@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.scm;
 
 import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
@@ -36,11 +37,11 @@ public class ScmRootFileObject extends AbstractScmFileObject
         try
         {
             ScmConfiguration scm = getAncestor(ProjectConfigProvider.class).getProjectConfig().getScm();
-            displayName = ScmClientUtils.withScmClient(scm, scmManager, new ScmClientUtils.ScmAction<String>()
+            displayName = ScmClientUtils.withScmClient(scm, scmManager, new ScmClientUtils.ScmContextualAction<String>()
             {
-                public String process(ScmClient scmClient) throws ScmException
+                public String process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    return scmClient.getLocation();
+                    return client.getLocation(context);
                 }
             });
         }

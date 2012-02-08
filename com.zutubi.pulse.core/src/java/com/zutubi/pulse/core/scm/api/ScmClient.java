@@ -11,7 +11,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An interface for interaction with SCM servers.
+ * An interface for interaction with SCM servers.  The methods on this
+ * interface, with a couple of exceptions, are provided with a context in which
+ * the method should operate.  This will be an {@link ScmContext} when the
+ * method is run on the master, and an {@link ExecutionContext} when the method
+ * is run on an agent (during a build).
+ * <p/>
+ * Take note that the contents of the context may occasionally vary, as noted
+ * in documentation for specific methods.
  */
 public interface ScmClient extends Closeable
 {
@@ -79,7 +86,7 @@ public interface ScmClient extends Closeable
     void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException;
 
     /**
-     * Must be called to release resources when this client is not longer
+     * Must be called to release resources when this client is no longer
      * required.  No other methods may be called after closing.
      */
     void close();
@@ -92,9 +99,9 @@ public interface ScmClient extends Closeable
      *
      * @param context  the scm context that will be available for a
      * subsequent call to the scm client based on the returned capabilities.
-     * Note that in some situatations, the context is not available.  In particular,
-     * when the scm is still being configured or initialised.  In that case, the
-     * context will be null.
+     * Note that in some situations, no persistent context is not available.
+     * In particular, when the scm is still being configured or initialised.
+     * In that case, the persistent context will be null.
      *
      * @return a set of operations this implementation is capable of
      */
@@ -107,10 +114,11 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for all implementations.
      *
+     * @param context defines the scm context in which the operation is being run
      * @return a unique id for the SCM server
      * @throws ScmException on error
      */
-    String getUid() throws ScmException;
+    String getUid(ScmContext context) throws ScmException;
 
     /**
      * Returns a summarised form of the location of the source this SCM has
@@ -118,11 +126,12 @@ public interface ScmClient extends Closeable
      * <p/>
      * Required for all implementations.
      *
+     * @param context defines the scm context in which the operation is being run
      * @return a summarised form of the source location, fit for human
      *         consumption
      * @throws ScmException on error
      */
-    String getLocation() throws ScmException;
+    String getLocation(ScmContext context) throws ScmException;
 
     /**
      * Returns a list of properties that should be added to the context of a
@@ -178,7 +187,7 @@ public interface ScmClient extends Closeable
      *
      * @param context  defines the scm context in which the operation is being run
      * @param path     path defining the content to be retrieved.
-     * @param revision the revision be checked out or null for the latest
+     * @param revision the revision to be checked out or null for the latest
      *                 revision (may be ignored by implementations that do
      *                 not support {@link ScmCapability#REVISIONS}).
      * @return input stream providing access to the requested content.
@@ -269,7 +278,7 @@ public interface ScmClient extends Closeable
      * Required for {@link ScmCapability#BROWSE}.
      *
      * @param context  defines the scm context in which the operation is being run.
-     *                  This context may be null.
+     *                 Note that the persistent context within may be null.
      * @param path     the path to list (relative to the root of the connection,
      *                 i.e. an empty string is valid and means "list the root").
      * @param revision revision at which to browse, or null for the latest
@@ -287,7 +296,6 @@ public interface ScmClient extends Closeable
      * Required for {@link ScmCapability#TAG}.
      *
      * @param scmContext   defines the scm context in which the operation is being run
-     * @param context      defines the execution context in which the operation is being run
      * @param revision     the revision to be tagged
      * @param name         the name of the tag, which has an SCM-specific format
      * @param moveExisting if true and a tag of the same name already exists,
@@ -295,7 +303,7 @@ public interface ScmClient extends Closeable
      *
      * @throws ScmException on error
      */
-    void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException;
+    void tag(ScmContext scmContext, Revision revision, String name, boolean moveExisting) throws ScmException;
 
     /**
      * Converts a string into a revision.  The string is input from the user,

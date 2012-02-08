@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.tove.type.record.PathUtils;
 
 import java.io.InputStream;
@@ -15,20 +15,20 @@ import java.io.InputStream;
  */
 public class ScmFileResolver implements FileResolver
 {
-    private ProjectConfiguration projectConfiguration;
+    private Project project;
     private Revision revision;
     private ScmManager scmManager;
 
-    public ScmFileResolver(ProjectConfiguration projectConfiguration, Revision revision, ScmManager scmManager)
+    public ScmFileResolver(Project project, Revision revision, ScmManager scmManager)
     {
-        this.projectConfiguration = projectConfiguration;
+        this.project = project;
         this.revision = revision;
         this.scmManager = scmManager;
     }
 
     public InputStream resolve(final String path) throws Exception
     {
-        return ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<InputStream>()
+        return ScmClientUtils.withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<InputStream>()
         {
             public InputStream process(ScmClient client, ScmContext context) throws ScmException
             {

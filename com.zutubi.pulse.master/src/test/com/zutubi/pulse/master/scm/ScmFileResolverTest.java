@@ -1,18 +1,22 @@
 package com.zutubi.pulse.master.scm;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import org.mockito.Matchers;
 
 import java.io.InputStream;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ScmFileResolverTest extends PulseTestCase
 {
@@ -40,12 +44,16 @@ public class ScmFileResolverTest extends PulseTestCase
         stub(mockScmClient.retrieve((ScmContext) anyObject(), eq(PATH_NESTED), eq(REVISION_1))).toReturn(INPUT_NESTED_1);
 
         ScmManager mockScmManager = mock(ScmManager.class);
-        stub(mockScmManager.createContext((ProjectConfiguration) anyObject())).toReturn(new ScmContextImpl());
+        stub(mockScmManager.createContext((ProjectConfiguration) anyObject(), Matchers.<Project.State>anyObject(), anyString())).toReturn(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
         stub(mockScmManager.createClient((ScmConfiguration) anyObject())).toReturn(mockScmClient);
 
         ProjectConfiguration projectConfiguration = new ProjectConfiguration();
-        resolver1 = new ScmFileResolver(projectConfiguration, REVISION_1, mockScmManager);
-        resolver2 = new ScmFileResolver(projectConfiguration, REVISION_2, mockScmManager);
+        Project project = new Project();
+        project.stateTransition(Project.Transition.INITIALISE);
+        project.stateTransition(Project.Transition.INITIALISE_SUCCESS);
+        project.setConfig(projectConfiguration);
+        resolver1 = new ScmFileResolver(project, REVISION_1, mockScmManager);
+        resolver2 = new ScmFileResolver(project, REVISION_2, mockScmManager);
     }
 
     public void testSimpleResolve() throws Exception

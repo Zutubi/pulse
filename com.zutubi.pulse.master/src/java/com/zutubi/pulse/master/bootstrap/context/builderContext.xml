@@ -157,6 +157,8 @@
 
     <bean id="resultNotifier" class="com.zutubi.pulse.master.notifications.ResultNotifier" init-method="init"/>
 
+    <bean id="resourceRepository" class="com.zutubi.pulse.master.MasterResourceRepository"/>
+    
     <!-- todo: beans should really be registering themselves with the shutdown manager on startup. -->
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">

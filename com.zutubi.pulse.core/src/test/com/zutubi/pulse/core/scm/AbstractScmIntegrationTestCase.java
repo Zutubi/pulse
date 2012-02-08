@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -33,10 +34,10 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
         workingDir = new File(tmp, "wd");
         persistentWorkingDir = new File(tmp, "pwd");
 
-        context = new ScmContextImpl();
-        context.setProjectName("test project");
-        context.setProjectHandle(101);
-        context.setPersistentWorkingDir(persistentWorkingDir);
+        PulseExecutionContext environmentContext = new PulseExecutionContext();
+        environmentContext.addString(BuildProperties.PROPERTY_PROJECT, "test project");
+        environmentContext.addValue(BuildProperties.PROPERTY_PROJECT_HANDLE, 101);
+        context = new ScmContextImpl(new PersistentContextImpl(persistentWorkingDir), environmentContext);
     }
 
     protected void tearDown() throws Exception

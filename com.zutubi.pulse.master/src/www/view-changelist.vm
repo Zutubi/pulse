@@ -9,6 +9,9 @@
 #else
     #set($thisUrl = $urls.dashboardChangelist($changelist.id))
 #end
+<content tag="header.javascript">
+    zutubi/pulse/project/ChangelistPanel.js
+</content>
 <html>
     <head>
         <title>#wwtext("name=changelist") $changelist.revision</title>

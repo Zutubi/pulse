@@ -340,7 +340,7 @@ public class SubversionClient implements ScmClient
         return info;
     }
 
-    public String getUid() throws ScmException
+    public String getUid(ScmContext context) throws ScmException
     {
         if (uid == null)
         {
@@ -357,7 +357,7 @@ public class SubversionClient implements ScmClient
         return uid;
     }
 
-    public String getLocation()
+    public String getLocation(ScmContext context)
     {
         return repository.getLocation().toString();
     }
@@ -912,7 +912,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         try
         {
@@ -946,7 +946,7 @@ public class SubversionClient implements ScmClient
     public void storeConnectionDetails(ExecutionContext context, File outputDir) throws ScmException, IOException
     {
         Properties props = new Properties();
-        props.put("location", getLocation());
+        props.put("location", getLocation(null));
 
         FileOutputStream os = null;
         try
@@ -1347,7 +1347,7 @@ public class SubversionClient implements ScmClient
                         try
                         {
                             String uid = repo.getRepositoryUUID(true);
-                            if (uid.equals(getUid()))
+                            if (uid.equals(getUid(null)))
                             {
                                 addExternal(revision, definition, externals);
                             }

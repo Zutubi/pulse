@@ -46,7 +46,7 @@ public interface WorkingCopy
      * @param context the context in which the operation is run, in particular
      *                contains the base directory
      * @param location the location string for the SCM configured for the Pulse
-     *                 project - this is the value returned from {@link ScmClient#getLocation()}
+     *                 project - this is the value returned from {@link ScmClient#getLocation(ScmContext)}
      *                 using the ScmClient implementation for that project
      * @return true if the working copy appears to match the SCM project
      *         configuration identified by the location

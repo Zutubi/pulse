@@ -4,6 +4,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.project.events.*;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
@@ -84,8 +85,13 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     checkExistingInitialisation(projectConfiguration);
 
                     ScmConfiguration scmConfiguration = projectConfiguration.getScm();
-                    ScmContext scmContext = scmManager.createContext(projectConfiguration);
-                    scmContext.lock();
+                    scmClient = scmManager.createClient(scmConfiguration);
+
+                    // Pass the idle project state as a special case in initialisation -
+                    // so that we get a new persistent context.
+                    ScmContext scmContext = scmManager.createContext(projectConfiguration, Project.State.IDLE, scmClient.getImplicitResource());
+                    PersistentContext persistentContext = scmContext.getPersistentContext();
+                    persistentContext.lock();
                     try
                     {
                         ScmFeedbackHandler handler = new ScmFeedbackHandler()
@@ -101,13 +107,12 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                             }
                         };
 
-                        scmClient = scmManager.createClient(scmConfiguration);
-                        cleanupScmDirectoryIfRequired(scmContext.getPersistentWorkingDir());
+                        cleanupScmDirectoryIfRequired(persistentContext.getPersistentWorkingDir());
                         scmClient.init(scmContext, handler);
                     }
                     finally
                     {
-                        scmContext.unlock();
+                        persistentContext.unlock();
                     }
 
                     synchronized (initialisedConfigurations)
@@ -197,11 +202,11 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
 
         try
         {
-            ScmClientUtils.withScmClient(projectConfiguration, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
+            ScmClientUtils.withScmClient(projectConfiguration, Project.State.IDLE, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
             {
                 public Object process(ScmClient scmClient, ScmContext scmContext) throws ScmException
                 {
-                    scmContext.lock();
+                    scmContext.getPersistentContext().lock();
                     try
                     {
                         scmManager.clearCache(projectConfiguration.getProjectId());
@@ -209,7 +214,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     }
                     finally
                     {
-                        scmContext.unlock();
+                        scmContext.getPersistentContext().unlock();
                     }
 
                     return null;

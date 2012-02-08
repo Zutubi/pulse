@@ -10,9 +10,9 @@ import java.util.StringTokenizer;
  */
 public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
 {
-    public String getUniqueLocation() throws ScmException
+    public String getUniqueLocation(ScmContext context) throws ScmException
     {
-        return getLocation();
+        return getLocation(context);
     }
 
     public boolean requiresRefresh(ScmContext context, Revision revision) throws ScmException

@@ -1,42 +1,89 @@
 package com.zutubi.pulse.master.scm;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.RecipeUtils;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.MasterBuildProperties;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Default implementation of the scm context factory interface.
  */
-public class DefaultScmContextFactory implements ScmContextFactory
+public class DefaultScmContextFactory implements MasterScmContextFactory
 {
     private File projectsDir;
+    private final Map<Long, PersistentContextImpl> persistentContexts = new HashMap<Long, PersistentContextImpl>();
 
-    private final Map<Long, ScmContextImpl> contexts = new HashMap<Long, ScmContextImpl>();
+    private ConfigurationProvider configurationProvider;
+    private ProjectManager projectManager;
+    private ResourceRepository resourceRepository;
 
-    public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
+    public ScmContext createContext(ScmConfiguration scmConfiguration, String implicitResource)
+    {
+        if (scmConfiguration.getConfigurationPath() != null)
+        {
+            ProjectConfiguration projectConfiguration = configurationProvider.getAncestorOfType(scmConfiguration, ProjectConfiguration.class);
+            if (projectConfiguration != null)
+            {
+                Project project = projectManager.getProject(projectConfiguration.getProjectId(), false);
+                if (project != null)
+                {
+                    try
+                    {
+                        return createContext(projectConfiguration, project.getState(), implicitResource);
+                    }
+                    catch (ScmException e)
+                    {
+                        // Fall through to default.
+                    }
+                }
+            }
+        }
+
+        return createContext(implicitResource);
+    }
+
+    public ScmContext createContext(String implicitResource)
+    {
+        return new ScmContextImpl(null, getEnvironmentContext(null, implicitResource));
+    }
+
+    public ScmContext createContext(ProjectConfiguration projectConfiguration, Project.State projectState, String implicitResource) throws ScmException
     {
         try
         {
             ScmConfiguration config = projectConfiguration.getScm();
-            synchronized(contexts)
+            PersistentContextImpl persistentContext = null;
+            if (projectState.isInitialised())
             {
-                if (!contexts.containsKey(config.getHandle()))
+                synchronized(persistentContexts)
                 {
-                    ScmContextImpl context = new ScmContextImpl();
-                    context.setProjectName(projectConfiguration.getName());
-                    context.setProjectHandle(projectConfiguration.getHandle());
-                    context.setPersistentWorkingDir(getPersistentWorkingDir(projectConfiguration.getProjectId()));
-                    contexts.put(config.getHandle(), context);
+                    persistentContext = persistentContexts.get(config.getHandle());
+                    if (persistentContext == null)
+                    {
+                        persistentContext = new PersistentContextImpl(getPersistentWorkingDir(projectConfiguration.getProjectId()));
+                        persistentContexts.put(config.getHandle(), persistentContext);
+                    }
                 }
             }
-            return contexts.get(config.getHandle());
+
+            return new ScmContextImpl(persistentContext, getEnvironmentContext(projectConfiguration, implicitResource));
         }
         catch (IOException e)
         {
@@ -57,10 +104,37 @@ public class DefaultScmContextFactory implements ScmContextFactory
         return workingDir;
     }
 
+    private PulseExecutionContext getEnvironmentContext(ProjectConfiguration projectConfiguration, String implicitResource)
+    {
+        PulseExecutionContext environmentContext = new PulseExecutionContext();
+        if (projectConfiguration != null)
+        {
+            MasterBuildProperties.addProjectProperties(environmentContext, projectConfiguration);
+        }
+        if (StringUtils.stringSet(implicitResource))
+        {
+            RecipeUtils.addResourceProperties(environmentContext, Arrays.asList(new ResourceRequirement(implicitResource, false, true)), resourceRepository);
+        }
+        return environmentContext;
+    }
+
     public void setProjectsDir(File projectsDir)
     {
         this.projectsDir = projectsDir;
     }
 
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
 
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    public void setResourceRepository(ResourceRepository resourceRepository)
+    {
+        this.resourceRepository = resourceRepository;
+    }
 }

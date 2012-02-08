@@ -132,7 +132,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
 
     static String getPersistentWorkspaceDescription(ScmContext scmContext)
     {
-        return "Persistent master workspace for project '" + scmContext.getProjectName() + "'.";
+        return "Persistent master workspace for project '" + getProjectName(scmContext) + "'.";
     }
 
     /**
@@ -142,7 +142,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
      * when no longer in use.
      * <p/>
      * Workspaces will persist and be reused where possible when they can be
-     * associated to a project (i.e. when the SCM context is not null).
+     * associated to a project (i.e. when the SCM context environment has a project property).
      *
      * @param core          core to use to talk to Perforce
      * @param configuration configuration describing how to contact Perforce
@@ -158,7 +158,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         File root;
         String description;
         boolean temporary;
-        if (scmContext == null)
+        if (getProjectName(scmContext) == null)
         {
             workspaceName = getWorkspacePrefix() + TEMP_WORKSPACE_TAG + RandomUtils.randomString(10);
             root = new File(".");
@@ -167,8 +167,8 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         }
         else
         {
-            workspaceName = allocateWorkspaceName(scmContext.getProjectHandle());
-            root = scmContext.getPersistentWorkingDir();
+            workspaceName = allocateWorkspaceName(getProjectHandle(scmContext));
+            root = scmContext.getPersistentContext().getPersistentWorkingDir();
             description = getPersistentWorkspaceDescription(scmContext);
             temporary = false;
         }
@@ -186,6 +186,16 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
 
             throw new ScmException("Unable to update allocated workspace: " + e.getMessage(), e);
         }
+    }
+
+    private static String getProjectName(ScmContext scmContext)
+    {
+        return scmContext.getEnvironmentContext().getString(BuildProperties.PROPERTY_PROJECT);
+    }
+
+    private static long getProjectHandle(ScmContext scmContext)
+    {
+        return scmContext.getEnvironmentContext().getLong(BuildProperties.PROPERTY_PROJECT_HANDLE, 0L);
     }
 
     /**
@@ -231,7 +241,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
     public void cleanupPersistentWorkspaces(PerforceCore core, ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         handler.status("Cleaning up all persistent workspaces for project...");
-        String prefix = getWorkspacePrefix(context.getProjectHandle());
+        String prefix = getWorkspacePrefix(getProjectHandle(context));
         List<String> allWorkspaces = core.getAllWorkspaceNames();
         for (String workspace: allWorkspaces)
         {

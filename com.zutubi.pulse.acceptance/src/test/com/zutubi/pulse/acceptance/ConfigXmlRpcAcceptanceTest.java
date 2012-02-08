@@ -87,7 +87,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void testGetConfigListingComposite() throws Exception
     {
         Vector<String> listing = rpcClient.RemoteApi.getConfigListing("settings");
-        assertSortedEquals(listing, "agentPing", "backup", "email", "jabber", "ldap", "license", "logging", "repository");
+        assertSortedEquals(listing, "agentPing", "backup", "email", "jabber", "ldap", "license", "logging", "repository", "resources");
     }
 
     public void testGetConfigListingCollection() throws Exception

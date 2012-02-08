@@ -1,74 +1,30 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.api.PersistentContext;
 import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A simple implementation of {@link com.zutubi.pulse.core.scm.api.ScmContext}.
  */
 public class ScmContextImpl implements ScmContext
 {
-    private String projectName;
-    private long projectHandle;
-    private File persistentWorkingDir;
-    private ReentrantLock lock = new ReentrantLock();
+    private PersistentContext persistentContext;
+    private ExecutionContext environmentContext;
 
-    public void lock()
+    public ScmContextImpl(PersistentContext persistentContext, ExecutionContext environmentContext)
     {
-        lock.lock();
+        this.persistentContext = persistentContext;
+        this.environmentContext = environmentContext;
     }
 
-    public void tryLock(long timeout, TimeUnit timeUnit) throws ScmException
+    public PersistentContext getPersistentContext()
     {
-        try
-        {
-            if (!lock.tryLock(timeout, timeUnit))
-            {
-                throw new ScmException("Timed out waiting for exclusive access to ScmContext");
-            }
-        }
-        catch (InterruptedException e)
-        {
-            throw new ScmException("Interrupted waiting for exclusive access to ScmContext");
-        }
+        return persistentContext;
     }
 
-    public void unlock()
+    public ExecutionContext getEnvironmentContext()
     {
-        lock.unlock();
-    }
-
-    public String getProjectName()
-    {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName)
-    {
-        this.projectName = projectName;
-    }
-
-    public long getProjectHandle()
-    {
-        return projectHandle;
-    }
-
-    public void setProjectHandle(long projectHandle)
-    {
-        this.projectHandle = projectHandle;
-    }
-
-    public File getPersistentWorkingDir()
-    {
-        return persistentWorkingDir;
-    }
-
-    public void setPersistentWorkingDir(File dir)
-    {
-        this.persistentWorkingDir = dir;
+        return environmentContext;
     }
 }

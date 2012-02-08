@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
  * The scm manager handles the basic management of the background scm processes
  * and life cycle.
  */
-public interface ScmManager extends ScmContextFactory, ScmClientFactory<ScmConfiguration>
+public interface ScmManager extends MasterScmContextFactory, ScmClientFactory<ScmConfiguration>
 {
     /**
      * Clears any cached information for the project with the given id.  This

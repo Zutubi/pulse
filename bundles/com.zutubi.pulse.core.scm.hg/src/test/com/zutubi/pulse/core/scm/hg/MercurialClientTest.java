@@ -37,12 +37,12 @@ public class MercurialClientTest extends MercurialTestBase
 
     public void testGetUid() throws ScmException
     {
-        assertEquals(repository, client.getUid());
+        assertEquals(repository, client.getUid(scmContext));
     }
 
     public void testGetLocation() throws ScmException
     {
-        assertEquals(repository, client.getLocation());
+        assertEquals(repository, client.getLocation(scmContext));
     }
 
     public void testClose()
@@ -337,7 +337,7 @@ public class MercurialClientTest extends MercurialTestBase
 
     public void testTestConnectionOK() throws ScmException
     {
-        client.testConnection();
+        client.testConnection(scmContext);
     }
 
     public void testTestConnectionBadRepo()
@@ -345,7 +345,7 @@ public class MercurialClientTest extends MercurialTestBase
         config.setRepository("file:///no/such/repo");
         try
         {
-            client.testConnection();
+            client.testConnection(scmContext);
             fail("Test of bad repo should fail");
         }
         catch (ScmException e)
@@ -359,7 +359,7 @@ public class MercurialClientTest extends MercurialTestBase
         config.setBranch("nosuchbranch");
         try
         {
-            client.testConnection();
+            client.testConnection(scmContext);
             fail("Test of bad branch should fail");
         }
         catch (ScmException e)
@@ -435,7 +435,7 @@ public class MercurialClientTest extends MercurialTestBase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
+        client.tag(scmContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
 
         assertTag(TAG_NAME, REVISION_DEFAULT_PREVIOUS);
     }
@@ -445,8 +445,8 @@ public class MercurialClientTest extends MercurialTestBase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
-        client.tag(scmContext, buildContext, new Revision(REVISION_DEFAULT_LATEST), TAG_NAME, true);
+        client.tag(scmContext, new Revision(REVISION_DEFAULT_PREVIOUS), TAG_NAME, false);
+        client.tag(scmContext, new Revision(REVISION_DEFAULT_LATEST), TAG_NAME, true);
 
         assertTag(TAG_NAME, REVISION_DEFAULT_LATEST);
     }

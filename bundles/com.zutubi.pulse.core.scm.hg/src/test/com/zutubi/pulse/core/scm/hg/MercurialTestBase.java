@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.scm.hg;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
+import com.zutubi.pulse.core.scm.api.PersistentContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 
@@ -118,8 +120,8 @@ public abstract class MercurialTestBase extends PulseTestCase
 
         File persistentWorkingDir = new File(tmp, "scm");
         assertTrue(persistentWorkingDir.mkdir());
-        scmContext = new ScmContextImpl();
-        scmContext.setPersistentWorkingDir(persistentWorkingDir);
+        PersistentContext persistentContext = new PersistentContextImpl(persistentWorkingDir);
+        scmContext = new ScmContextImpl(persistentContext, new PulseExecutionContext());
 
         handler = new RecordingScmFeedbackHandler();
     }

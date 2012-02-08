@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackAdapter;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
@@ -29,7 +31,7 @@ public class PerforceTicketsTest extends PerforceTestBase
     public void testSimpleConnectionTest() throws ScmException
     {
         PerforceClient client = new PerforceClient(configuration, new PerforceWorkspaceManager());
-        client.testConnection();
+        client.testConnection(createScmContext());
     }
 
     public void testConnectionTestWithoutTickets() throws ScmException
@@ -49,7 +51,7 @@ public class PerforceTicketsTest extends PerforceTestBase
         try
         {
             PerforceClient client = new PerforceClient(configuration, new PerforceWorkspaceManager());
-            client.testConnection();
+            client.testConnection(createScmContext());
             fail("Expecting authentication to fail");
         }
         catch (ScmException e)
@@ -61,9 +63,10 @@ public class PerforceTicketsTest extends PerforceTestBase
     public void testMultipleInteractions() throws ScmException
     {
         PerforceClient client = new PerforceClient(configuration, new PerforceWorkspaceManager());
-        client.testConnection();
-        assertEquals("1", client.getLatestRevision(null).toString());
-        client.testConnection();
+        ScmContextImpl scmContext = createScmContext();
+        client.testConnection(scmContext);
+        assertEquals("1", client.getLatestRevision(scmContext).toString());
+        client.testConnection(scmContext);
     }
 
     public void testCheckout() throws ScmException
@@ -71,7 +74,12 @@ public class PerforceTicketsTest extends PerforceTestBase
         File workDir = new File(tmpDir, "work");
         assertTrue(workDir.mkdir());
         PerforceClient client = new PerforceClient(configuration, new PerforceWorkspaceManager());
-        client.checkout(createExecutionContext(workDir, false), client.getLatestRevision(null), new ScmFeedbackAdapter());
+        client.checkout(createExecutionContext(workDir, false), client.getLatestRevision(createScmContext()), new ScmFeedbackAdapter());
         assertTrue("Ant build file should be checked out", new File(workDir, FILE_ANT_BUILD).isFile());
+    }
+
+    private ScmContextImpl createScmContext()
+    {
+        return new ScmContextImpl(null, new PulseExecutionContext());
     }
 }

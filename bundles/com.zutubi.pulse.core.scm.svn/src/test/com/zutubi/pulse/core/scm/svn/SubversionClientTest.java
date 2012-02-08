@@ -197,7 +197,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testTag() throws ScmException, IOException
     {
-        client.tag(null, null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(1), TAG_PATH, false);
 
         SubversionClient confirmServer = null;
 
@@ -222,14 +222,14 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testMoveTag() throws ScmException, IOException
     {
-        client.tag(null, null, createRevision(1), TAG_PATH, false);
-        client.tag(null, null, createRevision(8), TAG_PATH, true);
+        client.tag(null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
     public void testMoveTagNonExistant() throws ScmException, IOException
     {
-        client.tag(null, null, createRevision(8), TAG_PATH, true);
+        client.tag(null, createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
@@ -257,10 +257,10 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testUnmovableTag() throws ScmException
     {
-        client.tag(null, null, createRevision(1), TAG_PATH, false);
+        client.tag(null, createRevision(1), TAG_PATH, false);
         try
         {
-            client.tag(null, null, createRevision(8), TAG_PATH, false);
+            client.tag(null, createRevision(8), TAG_PATH, false);
             fail();
         }
         catch (ScmException e)

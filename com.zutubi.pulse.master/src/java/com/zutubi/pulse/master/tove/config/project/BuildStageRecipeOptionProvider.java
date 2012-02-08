@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
@@ -30,6 +32,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
     
     private ConfigurationProvider configurationProvider;
     private PulseFileLoaderFactory fileLoaderFactory;
+    private ProjectManager projectManager;
     private ScmManager scmManager;
 
     public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
@@ -53,10 +56,14 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
                     ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(stages, ProjectConfiguration.class);
                     if (projectConfig != null)
                     {
-                        PulseFileProvider pulseFileProvider = projectConfig.getType().getPulseFile();
-                        PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
-                        ScmFileResolver resolver = new ScmFileResolver(projectConfig, Revision.HEAD, scmManager);
-                        return pulseFileLoader.loadAvailableRecipes(pulseFileProvider.getFileContent(resolver), new RelativeFileResolver(pulseFileProvider.getPath(), resolver));
+                        Project project = projectManager.getProject(projectConfig.getProjectId(), false);
+                        if (project != null)
+                        {
+                            PulseFileProvider pulseFileProvider = projectConfig.getType().getPulseFile();
+                            PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
+                            ScmFileResolver resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
+                            return pulseFileLoader.loadAvailableRecipes(pulseFileProvider.getFileContent(resolver), new RelativeFileResolver(pulseFileProvider.getPath(), resolver));
+                        }
                     }
 
                     return Collections.emptyList();
@@ -94,5 +101,10 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
     public void setScmManager(ScmManager scmManager)
     {
         this.scmManager = scmManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

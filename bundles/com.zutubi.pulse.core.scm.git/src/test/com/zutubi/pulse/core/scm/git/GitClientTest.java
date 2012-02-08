@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.util.CollectionUtils;
@@ -29,12 +30,12 @@ public class GitClientTest extends GitClientTestBase
 {
     public void testGetUid() throws ScmException
     {
-        assertEquals(repository, client.getUid());
+        assertEquals(repository, client.getUid(scmContext));
     }
 
     public void testGetLocation() throws ScmException
     {
-        assertEquals(repository, client.getLocation());
+        assertEquals(repository, client.getLocation(scmContext));
     }
 
     public void testClose()
@@ -575,7 +576,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testBrowseNotAvailableWhenContextNotAvailable()
     {
-        assertFalse(client.getCapabilities(null).contains(ScmCapability.BROWSE));
+        assertFalse(client.getCapabilities(new ScmContextImpl(null, null)).contains(ScmCapability.BROWSE));
     }
 
     public void testBrowseAvailableWhenContextAvailable()
@@ -585,7 +586,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testTestConnectionOK() throws ScmException
     {
-        client.testConnection();
+        client.testConnection(scmContext);
     }
 
     public void testTestConnectionBadRepo()
@@ -593,7 +594,7 @@ public class GitClientTest extends GitClientTestBase
         client = new GitClient("file:///no/such/repo", "master", 0, GitConfiguration.CloneType.NORMAL);
         try
         {
-            client.testConnection();
+            client.testConnection(scmContext);
             fail("Test of bad repo should fail");
         }
         catch (ScmException e)
@@ -607,7 +608,7 @@ public class GitClientTest extends GitClientTestBase
         client = new GitClient(repository, "nosuchbranch", 0, GitConfiguration.CloneType.NORMAL);
         try
         {
-            client.testConnection();
+            client.testConnection(scmContext);
             fail("Test of bad branch should fail");
         }
         catch (ScmException e)
@@ -621,7 +622,7 @@ public class GitClientTest extends GitClientTestBase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
+        client.tag(scmContext, new Revision(REVISION_INITIAL), TAG_NAME, false);
 
         NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);
@@ -635,8 +636,8 @@ public class GitClientTest extends GitClientTestBase
         final String TAG_NAME = "test-tag";
 
         client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, context, new Revision(REVISION_INITIAL), TAG_NAME, false);
-        client.tag(scmContext, context, new Revision(REVISION_MASTER_LATEST), TAG_NAME, true);
+        client.tag(scmContext, new Revision(REVISION_INITIAL), TAG_NAME, false);
+        client.tag(scmContext, new Revision(REVISION_MASTER_LATEST), TAG_NAME, true);
 
         NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);

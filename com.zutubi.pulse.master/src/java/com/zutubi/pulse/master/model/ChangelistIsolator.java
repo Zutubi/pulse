@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
@@ -13,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  */
@@ -47,7 +48,7 @@ public class ChangelistIsolator
             }
         }
 
-        result = withScmClient(projectConfig, scmManager, new ScmContextualAction<List<Revision>>()
+        result = withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<List<Revision>>()
         {
             public List<Revision> process(ScmClient client, ScmContext context) throws ScmException
             {

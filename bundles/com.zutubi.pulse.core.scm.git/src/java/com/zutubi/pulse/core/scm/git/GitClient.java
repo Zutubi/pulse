@@ -112,7 +112,7 @@ public class GitClient implements ScmClient
      */
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
-        File workingDir = context.getPersistentWorkingDir();
+        File workingDir = context.getPersistentContext().getPersistentWorkingDir();
 
         // git does not like to clone 'into' existing directories.
         if (workingDir.exists())
@@ -127,7 +127,7 @@ public class GitClient implements ScmClient
             }
         }
 
-        NativeGit git = new NativeGit(inactivityTimeout, null);
+        NativeGit git = new NativeGit(inactivityTimeout, context.getEnvironmentContext());
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
@@ -148,7 +148,7 @@ public class GitClient implements ScmClient
 
     public Set<ScmCapability> getCapabilities(ScmContext context)
     {
-        if (context != null)
+        if (context.getPersistentContext() != null)
         {
             return CAPABILITIES;
         }
@@ -158,14 +158,14 @@ public class GitClient implements ScmClient
         return capabilities;
     }
 
-    public String getUid() throws ScmException
+    public String getUid(ScmContext context) throws ScmException
     {
         return repository;
     }
 
-    public String getLocation() throws ScmException
+    public String getLocation(ScmContext context) throws ScmException
     {
-        return getUid();
+        return getUid(context);
     }
 
     public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
@@ -362,15 +362,16 @@ public class GitClient implements ScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            NativeGit git = preparePersistentDirectory(context);
             return git.show(getRevisionString(revision), path);
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -386,22 +387,24 @@ public class GitClient implements ScmClient
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+            NativeGit git = preparePersistentDirectory(context);
             GitLogEntry entry = git.log(null, getRemoteBranchRef(), 1).get(0);
             return new Revision(entry.getId());
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
-    private NativeGit preparePersistentDirectory(File workingDir) throws ScmException
+    private NativeGit preparePersistentDirectory(ScmContext context) throws ScmException
     {
-        NativeGit git = new NativeGit(inactivityTimeout, null);
+        File workingDir = context.getPersistentContext().getPersistentWorkingDir();
+        NativeGit git = new NativeGit(inactivityTimeout, context.getEnvironmentContext());
         git.setFilterPaths(includedPaths, excludedPaths);
         if (!isGitRepository(workingDir))
         {
@@ -443,7 +446,8 @@ public class GitClient implements ScmClient
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             List<GitLogEntry> entries = gitlog(context, from, to);
@@ -457,13 +461,14 @@ public class GitClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
             List<GitLogEntry> entries = gitlog(context, from, to);
@@ -512,7 +517,7 @@ public class GitClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -529,7 +534,7 @@ public class GitClient implements ScmClient
      */
     private List<GitLogEntry> gitlog(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        NativeGit git = preparePersistentDirectory(context.getPersistentWorkingDir());
+        NativeGit git = preparePersistentDirectory(context);
         List<GitLogEntry> entries = git.log(getRevisionString(from), getRevisionString(to));
 
         // if revision to < from, then the base log request will return no results.  So
@@ -544,10 +549,11 @@ public class GitClient implements ScmClient
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit nativeGit = preparePersistentDirectory(context.getPersistentWorkingDir());
+            NativeGit nativeGit = preparePersistentDirectory(context);
             String treeish = getRevisionString(revision);
             if (StringUtils.stringSet(path))
             {
@@ -567,23 +573,24 @@ public class GitClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
-    public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContext, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = scmContext.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            NativeGit nativeGit = new NativeGit(inactivityTimeout, null);
-            nativeGit.setWorkingDirectory(scmContext.getPersistentWorkingDir());
+            NativeGit nativeGit = new NativeGit(inactivityTimeout, scmContext.getEnvironmentContext());
+            nativeGit.setWorkingDirectory(persistentContext.getPersistentWorkingDir());
             nativeGit.tag(revision, name, "[pulse] applying tag", moveExisting);
             nativeGit.push("origin", name);
         }
         finally
         {
-            scmContext.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -654,9 +661,9 @@ public class GitClient implements ScmClient
         this.cloneType = cloneType;
     }
 
-    public void testConnection() throws ScmException
+    public void testConnection(ScmContext context) throws ScmException
     {
-        NativeGit git = new NativeGit(inactivityTimeout, null);
+        NativeGit git = new NativeGit(inactivityTimeout, context.getEnvironmentContext());
         LsRemoteOutputHandler handler = new LsRemoteOutputHandler();
         git.lsRemote(handler, repository, branch);
 

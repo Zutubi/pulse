@@ -10,10 +10,7 @@ import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.CommitterMappingConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.pulse.master.model.UserManager;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.notifications.NotificationAttachment;
 import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
@@ -196,7 +193,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
         if (emailCommitters)
         {
-            addCommitterEmails(projectConfig, getBuilds(buildResult), emails);
+            addCommitterEmails(projectConfig, buildResult.getProject().getState(), getBuilds(buildResult), emails);
         }
 
         if (emails.size() > 0)
@@ -269,7 +266,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         }
     }
 
-    private void addCommitterEmails(ProjectConfiguration projectConfig, List<BuildResult> builds, Set<String> emails)
+    private void addCommitterEmails(ProjectConfiguration projectConfig, Project.State projectState, List<BuildResult> builds, Set<String> emails)
     {
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
@@ -282,14 +279,14 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
                 {
                     if (StringUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
                     {
-                        emails.add(getEmail(projectConfig, scmLogin));
+                        emails.add(getEmail(projectConfig, projectState, scmLogin));
                     }
                 }
             }
         }
     }
 
-    private String getEmail(ProjectConfiguration projectConfig, final String scmLogin)
+    private String getEmail(ProjectConfiguration projectConfig, Project.State projectState, final String scmLogin)
     {
         CommitterMappingConfiguration mapping = CollectionUtils.find(projectConfig.getScm().getCommitterMappings(), new Predicate<CommitterMappingConfiguration>()
         {
@@ -306,7 +303,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             {
                 try
                 {
-                    email = ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<String>()
+                    email = ScmClientUtils.withScmClient(projectConfig, projectState, scmManager, new ScmClientUtils.ScmContextualAction<String>()
                     {
                         public String process(ScmClient client, ScmContext context) throws ScmException
                         {

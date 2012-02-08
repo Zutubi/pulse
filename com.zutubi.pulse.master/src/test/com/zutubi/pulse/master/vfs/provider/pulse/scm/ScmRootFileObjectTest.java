@@ -18,11 +18,13 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.cache.NullFilesCache;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.mockito.Matchers;
+
+import java.util.List;
+
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-
-import java.util.List;
 
 /**
  * Tests for the ScmRootFileObject AND the ScmFileObject classes.  It does not make
@@ -64,7 +66,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
     public void testRootDisplayName() throws ScmException, FileSystemException
     {
         String location = RandomUtils.randomString(10);
-        stub(scmClient.getLocation()).toReturn(location);
+        stub(scmClient.getLocation(Matchers.<ScmContext>anyObject())).toReturn(location);
 
         ScmRootFileObject srfo = resolveRoot();
         assertTrue(srfo.exists()); // needed to ensure the srfo is attached..

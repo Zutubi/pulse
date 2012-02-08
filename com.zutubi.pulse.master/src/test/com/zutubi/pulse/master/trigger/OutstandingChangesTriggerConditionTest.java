@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.trigger;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
@@ -17,6 +19,7 @@ import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.OutstandingChangesTriggerConditionConfiguration;
+import org.mockito.Matchers;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -63,7 +66,7 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
         stub(scmClient.getRevisions((ScmContext) anyObject(), eq(notLatestRevision), (Revision) isNull())).toReturn(asList(latestRevision));
 
         scmManager = mock(ScmManager.class);
-        stub(scmManager.createContext((ProjectConfiguration) anyObject())).toReturn(new ScmContextImpl());
+        stub(scmManager.createContext((ProjectConfiguration) anyObject(), Matchers.<Project.State>anyObject(), anyString())).toReturn(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
         stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(scmClient);
 
         config = new OutstandingChangesTriggerConditionConfiguration();

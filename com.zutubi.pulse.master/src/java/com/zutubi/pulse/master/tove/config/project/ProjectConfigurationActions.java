@@ -205,8 +205,12 @@ public class ProjectConfigurationActions
         CustomTypeConfiguration result = new CustomTypeConfiguration();
         try
         {
-            ScmFileResolver resolver = new ScmFileResolver(projectConfiguration, Revision.HEAD, scmManager);
-            result.setPulseFileString(projectConfiguration.getType().getPulseFile().getFileContent(resolver));
+            Project project = projectManager.getProject(projectConfiguration.getProjectId(), false);
+            if (project != null)
+            {
+                ScmFileResolver resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
+                result.setPulseFileString(projectConfiguration.getType().getPulseFile().getFileContent(resolver));
+            }
         }
         catch (Exception e)
         {

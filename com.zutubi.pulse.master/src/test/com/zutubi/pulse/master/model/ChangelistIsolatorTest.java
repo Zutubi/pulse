@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -11,12 +12,13 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.Transient;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ChangelistIsolatorTest extends PulseTestCase
 {
@@ -57,9 +59,19 @@ public class ChangelistIsolatorTest extends PulseTestCase
             {
             }
 
-            public ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
+            public ScmContext createContext(ScmConfiguration scmConfiguration, String implicitResource)
             {
-                return new ScmContextImpl();
+                return new ScmContextImpl(null, new PulseExecutionContext());
+            }
+
+            public ScmContext createContext(String implicitResource)
+            {
+                return new ScmContextImpl(null, new PulseExecutionContext());
+            }
+
+            public ScmContext createContext(ProjectConfiguration projectConfiguration, Project.State projectState, String implicitResource) throws ScmException
+            {
+                return new ScmContextImpl(null, new PulseExecutionContext());
             }
 
             public ScmClient createClient(ScmConfiguration config) throws ScmException

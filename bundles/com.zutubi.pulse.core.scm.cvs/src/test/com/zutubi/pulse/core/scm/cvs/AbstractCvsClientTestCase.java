@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
@@ -28,8 +29,7 @@ public class AbstractCvsClientTestCase extends PulseTestCase
         tmp = createTempDirectory();
 
         scmBaseDir = new File(tmp, "scmContext");
-        scmContext = new ScmContextImpl();
-        scmContext.setPersistentWorkingDir(scmBaseDir);
+        scmContext = new ScmContextImpl(new PersistentContextImpl(scmBaseDir), new PulseExecutionContext());
 
         exeBaseDir = new File(tmp, "work");
         exeContext = new PulseExecutionContext();

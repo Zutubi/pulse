@@ -140,7 +140,7 @@ public class GitPatchFormat implements PatchFormat
 
     public List<Feature> applyPatch(ExecutionContext context, File patchFile, File baseDir, ScmClient scmClient, ScmFeedbackHandler scmFeedbackHandler) throws ScmException
     {
-        NativeGit git = new NativeGit();
+        NativeGit git = new NativeGit(0, context);
         git.setWorkingDirectory(baseDir);
         git.apply(scmFeedbackHandler, patchFile);
         return Collections.emptyList();

@@ -4138,12 +4138,11 @@ public class RemoteApi
     {
         try
         {
-            return withScmClient(project.getConfig(), scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
+            return withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Revision>()
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    ScmContext c = (project.isInitialised()) ? context : null;
-                    if (client.getCapabilities(c).contains(ScmCapability.REVISIONS))
+                    if (client.getCapabilities(context).contains(ScmCapability.REVISIONS))
                     {
                         return client.parseRevision(context, revision);
                     }
@@ -4471,14 +4470,14 @@ public class RemoteApi
         try
         {
             final Hashtable<String, Object> result = new Hashtable<String, Object>();
-            final ProjectConfiguration projectConfig = internalGetProject(projectName, false).getConfig();
-            result.put(PersonalBuildInfo.SCM_TYPE, projectConfig.getScm().getType());
+            final Project project = internalGetProject(projectName, false);
+            result.put(PersonalBuildInfo.SCM_TYPE, project.getConfig().getScm().getType());
 
-            withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Object>()
+            withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Object>()
             {
                 public Object process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    result.put(PersonalBuildInfo.SCM_LOCATION, client.getLocation());
+                    result.put(PersonalBuildInfo.SCM_LOCATION, client.getLocation(context));
                     return null;
                 }
             });

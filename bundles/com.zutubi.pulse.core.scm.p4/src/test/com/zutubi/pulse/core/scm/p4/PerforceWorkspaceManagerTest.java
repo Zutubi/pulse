@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -125,17 +126,19 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     public void testAllocateWorkspaceBasicProperties() throws ScmException
     {
-        ScmContextImpl context = createScmContext(11223344);
+        final long PROJECT_HANDLE = 11223344;
+
+        ScmContextImpl context = createScmContext(PROJECT_HANDLE);
         
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, context);
-        assertTrue(workspace.getName().contains(Long.toString(context.getProjectHandle())));
+        assertTrue(workspace.getName().contains(Long.toString(PROJECT_HANDLE)));
         assertEquals(TEST_ROOT, workspace.getRoot());
         assertFalse(workspace.isTemporary());
     }
 
     public void testAllocateWorkspaceNullContextCreatesTempClient() throws ScmException
     {
-        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, new ScmContextImpl(null, new PulseExecutionContext()));
         assertTrue(workspace.isTemporary());
     }
 
@@ -158,7 +161,7 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
 
     public void testFreeTempWorkspaceDeletesClient() throws ScmException
     {
-        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, null);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, TEST_PERFORCE_CONFIGURATION, new ScmContextImpl(null, new PulseExecutionContext()));
         verify(core).createOrUpdateWorkspace(eq(TEST_TEMPLATE_WORKSPACE), eq(workspace.getName()), anyString(), anyString(), (String) isNull(), (String) isNull(), (String) isNull());
         workspaceManager.freeWorkspace(core, workspace);
         verify(core).deleteWorkspace(workspace.getName());
@@ -261,12 +264,11 @@ public class PerforceWorkspaceManagerTest extends PulseTestCase
         return context;
     }
 
-    private ScmContextImpl createScmContext(int projectHandle)
+    private ScmContextImpl createScmContext(long projectHandle)
     {
-        ScmContextImpl scmContext = new ScmContextImpl();
-        scmContext.setProjectName(TEST_PROJECT);
-        scmContext.setProjectHandle(projectHandle);
-        scmContext.setPersistentWorkingDir(TEST_DIR);
-        return scmContext;
+        PulseExecutionContext environmentContext = new PulseExecutionContext();
+        environmentContext.addString(BuildProperties.PROPERTY_PROJECT, TEST_PROJECT);
+        environmentContext.addValue(BuildProperties.PROPERTY_PROJECT_HANDLE, projectHandle);
+        return new ScmContextImpl(new PersistentContextImpl(TEST_DIR), environmentContext);
     }
 }

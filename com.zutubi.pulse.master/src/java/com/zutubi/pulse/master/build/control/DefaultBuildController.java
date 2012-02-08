@@ -502,12 +502,11 @@ public class DefaultBuildController implements EventListener, BuildController
     {
         try
         {
-            return withScmClient(projectConfig, scmManager, new ScmContextualAction<Revision>()
+            return withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<Revision>()
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
-                    ScmContext c = (project.isInitialised()) ? context : null;
-                    boolean supportsRevisions = client.getCapabilities(c).contains(ScmCapability.REVISIONS);
+                    boolean supportsRevisions = client.getCapabilities(context).contains(ScmCapability.REVISIONS);
                     return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
                 }
             });
@@ -792,11 +791,11 @@ public class DefaultBuildController implements EventListener, BuildController
                 try
                 {
                     buildLogger.status("Retrieving changes in build...");
-                    Set<ScmCapability> capabilities = getCapabilities(project, projectConfig, scmManager);
+                    Set<ScmCapability> capabilities = getCapabilities(project.getConfig(), project.getState(), scmManager);
                     if (capabilities.contains(ScmCapability.CHANGESETS))
                     {
-                        ScmContext context = scmManager.createContext(projectConfig);
                         client = scmManager.createClient(scm);
+                        ScmContext context = scmManager.createContext(projectConfig, project.getState(), client.getImplicitResource());
 
                         List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
 

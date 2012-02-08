@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
+import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -112,13 +113,19 @@ public class PollingService implements Stoppable
         {
             try
             {
-                ProjectConfiguration config = project.getConfig();
-                ScmClient client = scmManager.createClient(config.getScm());
-                String projectUid = client.getUid();
-                if (projectUid != null)
+                ScmClientUtils.withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Object>()
                 {
-                    projectUidCache.put(key, projectUid);
-                }
+                    public Object process(ScmClient client, ScmContext context) throws ScmException
+                    {
+                        String projectUid = client.getUid(context);
+                        if (projectUid != null)
+                        {
+                            projectUidCache.put(key, projectUid);
+                        }
+
+                        return null;
+                    }
+                });
             }
             catch (ScmException e)
             {
@@ -213,13 +220,13 @@ public class PollingService implements Stoppable
             publishStatusMessage(projectConfig, I18N.format("polling.start"));
             projectManager.updateLastPollTime(projectId, now);
 
-            ScmContext context = createContext(projectConfig);
             client = createClient(projectConfig.getScm());
+            ScmContext context = createContext(project, client.getImplicitResource());
 
             // When was the last time that we checked?  If never, get the latest revision.  We do
             // this under the lock to protect from races with project destruction clearing the
             // latestRevisions cache.
-            context.lock();
+            context.getPersistentContext().lock();
             Revision previous;
             try
             {
@@ -239,7 +246,7 @@ public class PollingService implements Stoppable
             }
             finally
             {
-                context.unlock();
+                context.getPersistentContext().unlock();
             }
 
             if (pollable.isQuietPeriodEnabled())
@@ -316,9 +323,9 @@ public class PollingService implements Stoppable
         eventManager.publish(new ProjectStatusEvent(this, project, message));
     }
 
-    private ScmContext createContext(ProjectConfiguration projectConfiguration) throws ScmException
+    private ScmContext createContext(Project project, String implicitResource) throws ScmException
     {
-        return scmManager.createContext(projectConfiguration);
+        return scmManager.createContext(project.getConfig(), project.getState(), implicitResource);
     }
 
     private ScmClient createClient(ScmConfiguration config) throws ScmException

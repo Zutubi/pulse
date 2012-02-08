@@ -42,7 +42,7 @@ public class ScmFileCache
         lock.lock();
         try
         {
-            String uid = populator.getUniqueLocation();
+            String uid = populator.getUniqueLocation(context);
             if (cache.containsKey(uid))
             {
                 item = cache.get(uid);

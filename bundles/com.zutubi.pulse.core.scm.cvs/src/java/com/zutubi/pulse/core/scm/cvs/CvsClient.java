@@ -132,7 +132,7 @@ public class CvsClient implements ScmClient
 
     private String getContextVersion(ScmContext context) throws ScmException
     {
-        File versionFile = new File(context.getPersistentWorkingDir(), ".version");
+        File versionFile = new File(context.getPersistentContext().getPersistentWorkingDir(), ".version");
         if (!versionFile.isFile())
         {
             try
@@ -171,14 +171,15 @@ public class CvsClient implements ScmClient
     /**
      * Returns the unique identifier for this scm server. For CVS servers, this is the cvs root.
      *
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#getUid()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getUid(com.zutubi.pulse.core.scm.api.ScmContext)
+     * @param context
      */
-    public String getUid()
+    public String getUid(ScmContext context)
     {
         return getRoot();
     }
 
-    public String getLocation()
+    public String getLocation(ScmContext context)
     {
         return String.format("%s[%s]", getRoot(), getModule());
     }
@@ -271,7 +272,7 @@ public class CvsClient implements ScmClient
         });
     }
 
-    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
         for (String module : modules)

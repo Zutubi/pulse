@@ -1,6 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -20,6 +23,7 @@ import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.provider.UriParser;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -56,6 +60,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
             projectPath = RootFileObject.PREFIX_CONFIG + PathUtils.getPath(0, 2, PathUtils.getPathElements(path));
         }
 
+        Set<ScmCapability> capabilities = Collections.emptySet();
         try
         {
             AbstractPulseFileObject pfo = (AbstractPulseFileObject) fileSystemManager.resolveFile("pulse:///" + UriParser.encode(projectPath));
@@ -63,13 +68,24 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
             if (projectConfigProvider != null && projectConfigProvider.getProjectConfig() != null)
             {
                 ProjectConfiguration projectConfig = projectConfigProvider.getProjectConfig();
-                Project project = projectManager.getProject(projectConfig.getProjectId(), true);
-
                 ScmConfiguration config = projectConfig.getScm();
                 if (config != null && configurationTemplateManager.isDeeplyCompleteAndValid(config))
                 {
-                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project, projectConfig, scmManager);
-                    return capabilities.contains(ScmCapability.BROWSE);
+                    Project project = projectManager.getProject(projectConfig.getProjectId(), true);
+                    if (project == null)
+                    {
+                        capabilities = ScmClientUtils.withScmClient(config, scmManager, new ScmClientUtils.ScmContextualAction<Set<ScmCapability>>()
+                        {
+                            public Set<ScmCapability> process(ScmClient scmClient, ScmContext context) throws ScmException
+                            {
+                                return scmClient.getCapabilities(context);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        capabilities = ScmClientUtils.getCapabilities(projectConfig, project.getState(), scmManager);
+                    }
                 }
             }
         }
@@ -78,7 +94,7 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
             LOG.warning(e);
         }
 
-        return false;
+        return capabilities.contains(ScmCapability.BROWSE);
     }
 
     public void setFileSystemManager(FileSystemManager fileSystemManager)

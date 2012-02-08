@@ -163,7 +163,7 @@ public class ChangelistDataAction extends ActionSupport
         }
         else
         {
-            addLinkedFileModels(changelist.getRevision(), files, projectWithChangeViewer.getConfig());
+            addLinkedFileModels(changelist.getRevision(), files, projectWithChangeViewer);
         }
 
         return SUCCESS;
@@ -177,15 +177,16 @@ public class ChangelistDataAction extends ActionSupport
         }
     }
 
-    private void addLinkedFileModels(Revision revision, List<PersistentFileChange> files, ProjectConfiguration projectWithViewer)
+    private void addLinkedFileModels(Revision revision, List<PersistentFileChange> files, Project projectWithViewer)
     {
-        ScmConfiguration scmConfiguration = projectWithViewer.getScm();
-        final ChangeViewerConfiguration changeViewer = projectWithViewer.getChangeViewer();
+        ProjectConfiguration projectConfiguration = projectWithViewer.getConfig();
+        ScmConfiguration scmConfiguration = projectConfiguration.getScm();
+        final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
         ScmClient scmClient = null;
         try
         {
-            ScmContext scmContext = scmManager.createContext(projectWithViewer);
             scmClient = scmManager.createClient(scmConfiguration);
+            ScmContext scmContext = scmManager.createContext(projectWithViewer.getConfig(), projectWithViewer.getState(), scmClient.getImplicitResource());
             final ChangeContext context = new ChangeContextImpl(revision, scmConfiguration, scmClient, scmContext);
 
             for (PersistentFileChange file: files)

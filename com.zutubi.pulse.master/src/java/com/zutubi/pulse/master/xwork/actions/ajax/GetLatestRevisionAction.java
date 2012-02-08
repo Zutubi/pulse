@@ -2,11 +2,12 @@ package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
 import com.zutubi.util.TimeStamps;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Simple ajax action to retrieve the latest revision for a project, used on
@@ -36,12 +37,11 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         {
             try
             {
-                result.setLatestRevision(withScmClient(project.getConfig(), scmManager, new ScmContextualAction<String>()
+                result.setLatestRevision(withScmClient(project.getConfig(), project.getState(), scmManager, new ScmContextualAction<String>()
                 {
                     public String process(ScmClient client, ScmContext context) throws ScmException
                     {
-                        ScmContext c = (project.isInitialised()) ? context : null;
-                        if(client.getCapabilities(c).contains(ScmCapability.REVISIONS))
+                        if(client.getCapabilities(context).contains(ScmCapability.REVISIONS))
                         {
                             return client.getLatestRevision(context).getRevisionString();
                         }

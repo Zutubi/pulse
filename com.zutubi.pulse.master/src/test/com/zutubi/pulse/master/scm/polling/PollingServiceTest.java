@@ -4,6 +4,9 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -24,6 +27,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -33,6 +37,7 @@ import java.util.concurrent.*;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import static java.util.Arrays.asList;
+import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
@@ -614,8 +619,8 @@ public class PollingServiceTest extends ZutubiTestCase
         Project projectA = createProject("projectA");
         Project projectB = createProject("projectB");
 
-        stub(scmClientsByProject.get(projectA).getUid()).toReturn(null);
-        stub(scmClientsByProject.get(projectB).getUid()).toReturn(null);
+        stub(scmClientsByProject.get(projectA).getUid(Matchers.<ScmContext>anyObject())).toReturn(null);
+        stub(scmClientsByProject.get(projectB).getUid(Matchers.<ScmContext>anyObject())).toReturn(null);
 
         serviceHandle.init();
         serviceHandle.pollAndWait();
@@ -783,16 +788,17 @@ public class PollingServiceTest extends ZutubiTestCase
         ScmClient scmClient = mock(ScmClient.class);
         stub(scmManager.createClient(scmConfig)).toReturn(scmClient);
 
-        ScmContextImpl context = new ScmContextImpl();
-        context.setProjectHandle(project.getConfig().getHandle());
-        context.setProjectName(project.getName());
-        stub(scmManager.createContext(project.getConfig())).toReturn(context);
+        PulseExecutionContext environmentContext = new PulseExecutionContext();
+        environmentContext.addValue(BuildProperties.PROPERTY_PROJECT_HANDLE, project.getConfig().getHandle());
+        environmentContext.addString(BuildProperties.PROPERTY_PROJECT, project.getName());
+        ScmContextImpl context = new ScmContextImpl(new PersistentContextImpl(null), environmentContext);
+        stub(scmManager.createContext(refEq(project.getConfig()), Matchers.<Project.State>anyObject(), anyString())).toReturn(context);
 
         scmClientsByProject.put(project, scmClient);
 
         project.getConfig().setScm(scmConfig);
 
-        stub(scmClient.getUid()).toAnswer(new Answer<Object>()
+        stub(scmClient.getUid(context)).toAnswer(new Answer<Object>()
         {
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {

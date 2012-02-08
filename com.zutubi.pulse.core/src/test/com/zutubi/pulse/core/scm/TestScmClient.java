@@ -50,12 +50,12 @@ public class TestScmClient implements ScmClient, DataCacheAware
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
     }
 
-    public String getUid() throws ScmException
+    public String getUid(ScmContext context) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public String getLocation()
+    public String getLocation(ScmContext context)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -107,7 +107,7 @@ public class TestScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         throw new RuntimeException("Method not implemented");
     }

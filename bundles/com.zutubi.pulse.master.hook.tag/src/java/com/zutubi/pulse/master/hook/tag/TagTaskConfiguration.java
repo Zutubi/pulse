@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.hook.tag;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -73,12 +74,13 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         try
         {
             String tagName = context.resolveVariables(tag);
-            ScmContext scmContext = scmManager.createContext(project.getConfig());
-            ScmContext c = (project.isInitialised()) ? scmContext : null;
             client = scmManager.createClient(scm);
-            if(client.getCapabilities(c).contains(ScmCapability.TAG))
+            ScmContext scmContext = scmManager.createContext(project.getConfig(), project.getState(), client.getImplicitResource());
+            // Override with our environment
+            scmContext = new ScmContextImpl(scmContext.getPersistentContext(), context);
+            if (client.getCapabilities(scmContext).contains(ScmCapability.TAG))
             {
-                client.tag(scmContext, context, revision, tagName, moveExisting);
+                client.tag(scmContext, revision, tagName, moveExisting);
             }
             else
             {

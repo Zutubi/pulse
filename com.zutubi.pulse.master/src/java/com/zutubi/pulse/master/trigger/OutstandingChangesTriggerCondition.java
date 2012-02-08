@@ -8,7 +8,6 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.OutstandingChangesTriggerConditionConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
@@ -56,7 +55,7 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
             }
         }
 
-        return previousRevision == null || hasChangedSince(project.getConfig(), previousRevision);
+        return previousRevision == null || hasChangedSince(project, previousRevision);
     }
 
     /**
@@ -82,11 +81,11 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
         return event == null ? null : event.getRevision();
     }
 
-    private boolean hasChangedSince(ProjectConfiguration projectConfig, final Revision latestBuiltRevision)
+    private boolean hasChangedSince(Project project, final Revision latestBuiltRevision)
     {
         try
         {
-            return ScmClientUtils.withScmClient(projectConfig, scmManager, new ScmClientUtils.ScmContextualAction<Boolean>()
+            return ScmClientUtils.withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Boolean>()
             {
                 public Boolean process(ScmClient client, ScmContext context) throws ScmException
                 {

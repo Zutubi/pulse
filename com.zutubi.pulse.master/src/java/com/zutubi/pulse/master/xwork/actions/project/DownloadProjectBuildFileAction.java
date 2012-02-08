@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.util.api.XMLUtils;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import org.hsqldb.lib.StringInputStream;
 
 import java.io.InputStream;
@@ -36,11 +36,11 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
 
     public String execute() throws Exception
     {
-        ProjectConfiguration projectConfig = getRequiredProject().getConfig();
+        Project project = getRequiredProject();
         try
         {
-            ScmFileResolver resolver = new ScmFileResolver(projectConfig, Revision.HEAD, scmManager);
-            String pulseFile = XMLUtils.prettyPrint(projectConfig.getType().getPulseFile().getFileContent(resolver));
+            ScmFileResolver resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
+            String pulseFile = XMLUtils.prettyPrint(project.getConfig().getType().getPulseFile().getFileContent(resolver));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }

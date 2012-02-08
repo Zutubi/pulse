@@ -41,6 +41,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
+        core.setContext(context.getEnvironmentContext());
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
@@ -59,7 +60,8 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public void populate(ScmContext context, ScmFileCache.CacheItem item) throws ScmException
     {
-        item.cachedRevision = getLatestRevision((ScmContext)null);
+        core.setContext(context.getEnvironmentContext());
+        item.cachedRevision = getLatestRevision(context);
         item.cachedListing = new TreeMap<String, CachingScmFile>();
 
         CachingScmFile rootFile = new CachingScmFile("", true);
@@ -411,6 +413,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     public void destroy(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
         // Clean up the persistent clients for this project.
+        core.setContext(context.getEnvironmentContext());
         workspaceManager.cleanupPersistentWorkspaces(core, context, handler);
     }
 
@@ -423,12 +426,12 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         return EnumSet.allOf(ScmCapability.class);
     }
 
-    public String getUid()
+    public String getUid(ScmContext context)
     {
         return configuration.getPort();
     }
 
-    public String getLocation()
+    public String getLocation(ScmContext context)
     {
         return getUniqueWorkspaceString() + "@" + configuration.getPort();
     }
@@ -450,9 +453,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         return result;
     }
 
-    public void testConnection() throws ScmException
+    public void testConnection(ScmContext context) throws ScmException
     {
-        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, null);
+        core.setContext(context.getEnvironmentContext());
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
             if (!core.workspaceExists(workspace.getName()))
@@ -473,6 +477,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
+        core.setContext(context.getEnvironmentContext());
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
@@ -526,6 +531,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
     {
         List<Revision> result = new LinkedList<Revision>();
 
+        core.setContext(scmContext.getEnvironmentContext());
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContext);
         try
         {
@@ -634,11 +640,11 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         return rev;
     }
 
-    public void tag(ScmContext scmContent, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContext, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        core.setContext(context);
+        core.setContext(scmContext.getEnvironmentContext());
 
-        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContent);
+        PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, scmContext);
         try
         {
             if (!labelExists(workspace.getName(), name))
@@ -716,6 +722,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public Revision parseRevision(ScmContext context, String revision) throws ScmException
     {
+        core.setContext(context.getEnvironmentContext());
         PerforceWorkspace workspace = workspaceManager.allocateWorkspace(core, configuration, context);
         try
         {
@@ -767,6 +774,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
+        core.setContext(context.getEnvironmentContext());
         try
         {
             PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_USER), COMMAND_USER, FLAG_OUTPUT, user);

@@ -55,7 +55,7 @@ public class MercurialClient implements ScmClient
      */
     public void init(ScmContext context, ScmFeedbackHandler handler) throws ScmException
     {
-        File workingDir = context.getPersistentWorkingDir();
+        File workingDir = context.getPersistentContext().getPersistentWorkingDir();
         if (workingDir.exists())
         {
             try
@@ -68,6 +68,7 @@ public class MercurialClient implements ScmClient
             }
         }
 
+        hg.setContext(context.getEnvironmentContext());
         hg.setWorkingDirectory(workingDir.getParentFile());
         handler.status("Initialising clone of repository '" + config.getRepository() + "'...");
         ScmLineHandlerSupport outputHandler = new ScmLineHandlerSupport(handler);
@@ -100,14 +101,14 @@ public class MercurialClient implements ScmClient
         return capabilities;
     }
 
-    public String getUid() throws ScmException
+    public String getUid(ScmContext context) throws ScmException
     {
         return config.getRepository();
     }
 
-    public String getLocation() throws ScmException
+    public String getLocation(ScmContext context) throws ScmException
     {
-        return getUid();
+        return getUid(context);
     }
 
     public List<ResourceProperty> getProperties(ExecutionContext context) throws ScmException
@@ -164,15 +165,16 @@ public class MercurialClient implements ScmClient
 
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
+            preparePersistentDirectory(null, context, null);
             return hg.cat(path, getRevisionString(revision));
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -188,10 +190,11 @@ public class MercurialClient implements ScmClient
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
+            preparePersistentDirectory(null, context, null);
             String symbolicRevision = config.getBranch();
             if (!StringUtils.stringSet(symbolicRevision))
             {
@@ -203,12 +206,13 @@ public class MercurialClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
-    private void preparePersistentDirectory(ScmLineHandler handler, File workingDir, String revision) throws ScmException
+    private void preparePersistentDirectory(ScmLineHandler handler, ScmContext context, String revision) throws ScmException
     {
+        File workingDir = context.getPersistentContext().getPersistentWorkingDir();
         if (!isMercurialRepository(workingDir))
         {
             String path;
@@ -226,6 +230,7 @@ public class MercurialClient implements ScmClient
         else
         {
             hg.setWorkingDirectory(workingDir);
+            hg.setContext(context.getEnvironmentContext());
             hg.pull(handler, config.getBranch());
             hg.update(handler, revision);
         }
@@ -238,10 +243,11 @@ public class MercurialClient implements ScmClient
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
+            preparePersistentDirectory(null, context, null);
 
             List<Changelist> changelists = hg.log(false, safeBranch(), safeRevisionString(from), safeRevisionString(to), -1);
             if (changelists.size() > 0)
@@ -258,7 +264,7 @@ public class MercurialClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -280,10 +286,11 @@ public class MercurialClient implements ScmClient
 
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir(), null);
+            preparePersistentDirectory(null, context, null);
             String safeFromRevision = safeRevisionString(from);
             List<Changelist> changelists = hg.log(true, safeBranch(), safeFromRevision, safeRevisionString(to), -1);
             if (changelists.size() > 0 && !REVISION_ZERO.equals(safeFromRevision))
@@ -296,24 +303,25 @@ public class MercurialClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
     public List<ScmFile> browse(ScmContext context, final String path, Revision revision) throws ScmException
     {
-        context.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, context.getPersistentWorkingDir(), safeRevisionString(revision));
+            preparePersistentDirectory(null, context, safeRevisionString(revision));
             final File dir;
             if (StringUtils.stringSet(path))
             {
-                dir = new File(context.getPersistentWorkingDir(), path);
+                dir = new File(persistentContext.getPersistentWorkingDir(), path);
             }
             else
             {
-                dir = context.getPersistentWorkingDir();
+                dir = persistentContext.getPersistentWorkingDir();
             }
             
             if (!dir.isDirectory())
@@ -335,23 +343,23 @@ public class MercurialClient implements ScmClient
         }
         finally
         {
-            context.unlock();
+            persistentContext.unlock();
         }
     }
 
-    public void tag(ScmContext scmContext, ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        scmContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
         try
         {
-            preparePersistentDirectory(null, scmContext.getPersistentWorkingDir(), null);
-            hg.setContext(context);
+            preparePersistentDirectory(null, context, null);
             hg.tag(null, revision, name, "[pulse] applying tag", moveExisting);
             hg.push(null, config.getBranch());
         }
         finally
         {
-            scmContext.unlock();
+            persistentContext.unlock();
         }
     }
 
@@ -387,7 +395,7 @@ public class MercurialClient implements ScmClient
         }
     }
     
-    public void testConnection() throws ScmException
+    public void testConnection(ScmContext context) throws ScmException
     {
         File tempDir = null;
         try
@@ -405,7 +413,8 @@ public class MercurialClient implements ScmClient
                     }
                 }
             };
-            
+
+            hg.setContext(context.getEnvironmentContext());
             hg.clone(handler, config.getRepository(), config.getBranch(), REVISION_NULL, tempDir.getAbsolutePath());
 
             String stderr = stderrBuilder.toString().trim();

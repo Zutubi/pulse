@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4.config;
 
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmContextFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -15,6 +16,7 @@ import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 public class PerforceConfigurationCheckHandler extends AbstractConfigurationCheckHandler<PerforceConfiguration>
 {
     private ScmClientFactory<? super PerforceConfiguration> scmClientFactory;
+    private ScmContextFactory scmContextFactory;
 
     public void test(PerforceConfiguration configuration) throws ScmException
     {
@@ -22,7 +24,7 @@ public class PerforceConfigurationCheckHandler extends AbstractConfigurationChec
         try
         {
             client = (PerforceClient) scmClientFactory.createClient(configuration);
-            client.testConnection();
+            client.testConnection(scmContextFactory.createContext(configuration, client.getImplicitResource()));
         }
         finally
         {
@@ -36,5 +38,10 @@ public class PerforceConfigurationCheckHandler extends AbstractConfigurationChec
     public void setScmClientFactory(ScmClientFactory<? super PerforceConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }
