@@ -44,6 +44,14 @@ public interface HostManager
     void agentDeleted(AgentConfiguration agentConfig);
 
     /**
+     * Returns the host for the given location.
+     *
+     * @param location the location to get the host for
+     * @return the host for the location, or null if there is no such host
+     */
+    public Host getHostForLocation(String location);
+
+    /**
      * Returns the host that is to be used for the given agent.  The agent must
      * have been previously registered using {@link #agentAdded(com.zutubi.pulse.master.tove.config.agent.AgentConfiguration)}.
      *

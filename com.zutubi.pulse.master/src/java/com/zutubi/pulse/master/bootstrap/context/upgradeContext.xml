@@ -177,6 +177,7 @@
                 <ref local="addPerforceStream"/>
                 <ref local="addProjectCleanPermission"/>
                 <ref local="addSubscriptionLogOptions"/>
+                <ref local="addMasterResources"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -930,5 +931,9 @@
 
     <bean id="addSubscriptionLogOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddAttachLogOptionsUpgradeTask">
         <property name="buildNumber" value="204999009"/>
+    </bean>
+
+    <bean id="addMasterResources" class="com.zutubi.pulse.master.upgrade.tasks.AddMasterResourcesUpgradeTask">
+        <property name="buildNumber" value="204999010"/>
     </bean>
 </beans>

@@ -147,6 +147,14 @@ public class DefaultHostManager implements HostManager
         return agentIds == null || agentIds.isEmpty();
     }
 
+    public Host getHostForLocation(String location)
+    {
+        synchronized (locationToHostMap)
+        {
+            return locationToHostMap.get(location);
+        }
+    }
+
     public Host getHostForAgent(AgentConfiguration agentConfig)
     {
         return agentHandleToHostMap.get(agentConfig.getHandle());
@@ -212,7 +220,7 @@ public class DefaultHostManager implements HostManager
                     return agent.isEnabled();
                 }
             });
-    
+
             if (hasEnabledAgent)
             {
                 hostPingService.requestPing(host, getServiceForHost(host));
@@ -220,20 +228,6 @@ public class DefaultHostManager implements HostManager
         }
     }
 
-    /**
-     * For testing: returns the host for the given location.
-     *
-     * @param location the location to get the host for
-     * @return the host for the location, or null if there is no such host
-     */
-    Host getHostForLocation(String location)
-    {
-        synchronized (locationToHostMap)
-        {
-            return locationToHostMap.get(location);
-        }
-    }
-    
     private HostService createService(Host host)
     {
         if (host.isRemote())

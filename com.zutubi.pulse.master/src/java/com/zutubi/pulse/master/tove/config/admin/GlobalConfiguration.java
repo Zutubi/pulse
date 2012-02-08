@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
+import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.master.notifications.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.master.restore.BackupConfiguration;
@@ -9,6 +10,9 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The global configuration scope, which holds server-administration configuration.
@@ -40,6 +44,8 @@ public class GlobalConfiguration extends AbstractConfiguration
     private BackupConfiguration backup = new BackupConfiguration();
     private RepositoryConfiguration repository = new RepositoryConfiguration();
     private AgentPingConfiguration agentPing = new AgentPingConfiguration();
+    private Map<String, ResourceConfiguration> resources = new HashMap<String, ResourceConfiguration>();
+
 
     public String getBaseUrl()
     {
@@ -214,5 +220,15 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setAgentPing(AgentPingConfiguration agentPing)
     {
         this.agentPing = agentPing;
+    }
+
+    public Map<String, ResourceConfiguration> getResources()
+    {
+        return resources;
+    }
+
+    public void setResources(Map<String, ResourceConfiguration> resources)
+    {
+        this.resources = resources;
     }
 }

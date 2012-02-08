@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.HostLocationFormatter;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -245,6 +246,18 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         {
             public List<AgentConfiguration> process()
             {
+                if (hostLocation.equals(HostLocationFormatter.LOCATION_MASTER))
+                {
+                    GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
+                    for (ResourceConfiguration discoveredResource : discoveredResources)
+                    {
+                        ResourceConfiguration existingResource = globalConfiguration.getResources().get(discoveredResource.getName());
+                        addResource(globalConfiguration.getConfigurationPath(), discoveredResource, existingResource);
+                        // Lookup again, we just changed this config.
+                        globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
+                    }
+                }
+
                 List<AgentConfiguration> agentConfigs = configurationTemplateManager.getHighestInstancesSatisfying(new DefinesLocation(hostLocation), AgentConfiguration.class);
                 List<AgentConfiguration> affectedAgents = new LinkedList<AgentConfiguration>();
                 for (AgentConfiguration config: agentConfigs)
@@ -286,11 +299,11 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         return true;
     }
 
-    private void addResource(String agentPath, ResourceConfiguration discoveredResource, ResourceConfiguration existingResource)
+    private void addResource(String ownerPath, ResourceConfiguration discoveredResource, ResourceConfiguration existingResource)
     {
         if (existingResource == null)
         {
-            configurationProvider.insert(PathUtils.getPath(agentPath, "resources"), discoveredResource);
+            configurationProvider.insert(PathUtils.getPath(ownerPath, "resources"), discoveredResource);
         }
         else
         {
