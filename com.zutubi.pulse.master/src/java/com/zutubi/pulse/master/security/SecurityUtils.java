@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.concurrent.Callable;
+
 /**
  * Utility functions for the security system.
  */
@@ -100,11 +102,45 @@ public class SecurityUtils
      * user.
      *
      * @param runnable the task to run
-     * @see #runAsUser(Principle ,Runnable)
+     * @see #callAsUser(Principle, java.util.concurrent.Callable)
      */
     public static void runAsSystem(Runnable runnable)
     {
         runAsUser(systemUser, runnable);
+    }
+
+    public static <V> V callAsUser(Principle user, Callable<V> callable) throws Exception
+    {
+        // Note: replacing the authentication itself is unsafe in the presence
+        // of the SecurityContextPersistenceFilter, which shares contexts
+        // among threads from the same session.
+        SecurityContext existingContext = SecurityContextHolder.getContext();
+        try
+        {
+            SecurityContextHolder.setContext(new SecurityContextImpl());
+            loginAs(user);
+            return callable.call();
+        }
+        finally
+        {
+            SecurityContextHolder.setContext(existingContext);
+        }
+    }
+
+    public static <V> V callAsSystem(Callable<V> callable) throws Exception
+    {
+        return callAsUser(systemUser, callable);
+    }
+
+    public static <V> Callable<V> callableAsSystem(final Callable<V> callable)
+    {
+        return new Callable<V>()
+        {
+            public V call() throws Exception
+            {
+                return callAsSystem(callable);
+            }
+        };
     }
 
     public static void logout()

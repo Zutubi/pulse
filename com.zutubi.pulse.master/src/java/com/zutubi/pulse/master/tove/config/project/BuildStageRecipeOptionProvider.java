@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
@@ -48,7 +49,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
         List<String> recipeNames;
         try
         {
-            recipeNames = ConcurrentUtils.runWithTimeout(new Callable<List<String>>()
+            recipeNames = ConcurrentUtils.runWithTimeout(SecurityUtils.callableAsSystem(new Callable<List<String>>()
             {
                 public List<String> call() throws Exception
                 {
@@ -68,7 +69,7 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
 
                     return Collections.emptyList();
                 }
-            }, TIMEOUT_SECONDS, TimeUnit.SECONDS, null);
+            }), TIMEOUT_SECONDS, TimeUnit.SECONDS, null);
         }
         catch (Exception e)
         {
