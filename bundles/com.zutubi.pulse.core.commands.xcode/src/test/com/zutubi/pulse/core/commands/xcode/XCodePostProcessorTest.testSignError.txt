@@ -1,0 +1,12 @@
+=== BUILD NATIVE TARGET interact OF PROJECT interact WITH CONFIGURATION Debug ===
+Check dependencies
+[WARN]iOS deployment target '5.0' for architecture 'armv6' and variant 'normal' is greater than the maximum value '4.3.99' for the iOS 4.3 SDK.
+[WARN]iOS deployment target '5.0' for architecture 'armv7' and variant 'normal' is greater than the maximum value '4.3.99' for the iOS 4.3 SDK.
+[BEROR]Code Sign error: The identity 'iPhone Developer' doesn't match any valid certificate/private key pair in the default keychain
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+Check dependencies
+(1 failure)

@@ -16,12 +16,15 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
             "Assertion failure",
             "No such file or directory",
             "Undefined symbols",
-            "Uncaught exception:"
+            "Uncaught exception:",
+            "\\[BEROR\\]",
+            "BUILD FAILED"
     };
 
     private static final String[] WARNING_REGEXES = new String[]
     {
-            "warning:"
+            "warning:",
+            "\\[WARN\\]"
     };
 
     public XCodePostProcessorConfiguration()
