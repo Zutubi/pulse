@@ -11,6 +11,7 @@ import com.zutubi.pulse.master.build.queue.QueuedRequest;
 import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
@@ -41,6 +42,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private static final Messages PROJECT_I18N = Messages.getInstance(ProjectConfiguration.class);
 
     private static final String LINK_HOMEPAGE = "homepage";
+    private static final String LINK_RSS = "rss";
 
     private ProjectHomeModel model;
     
@@ -202,6 +204,12 @@ public class ProjectHomeDataAction extends ProjectActionBase
         {
             model.setUrl(url);
             model.addLink(new ActionLink(url, PROJECT_I18N.format(LINK_HOMEPAGE + ConfigurationLinks.KEY_SUFFIX_LABEL), LINK_HOMEPAGE));
+        }
+
+        GlobalConfiguration globalConfig = configurationTemplateManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
+        if (globalConfig.isRssEnabled())
+        {
+            model.addLink(new ActionLink(urls.base() + "rss.action?projectId=" + project.getId(), PROJECT_I18N.format(LINK_RSS + ConfigurationLinks.KEY_SUFFIX_LABEL),  LINK_RSS));
         }
     }
 
