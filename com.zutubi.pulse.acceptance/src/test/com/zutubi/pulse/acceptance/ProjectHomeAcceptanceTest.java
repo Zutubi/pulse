@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
@@ -102,7 +103,9 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         assertEquals(0, homePage.getChangesCount());
         assertFalse(homePage.hasDescription());
         assertEquals(asList("clean up build directories", "trigger", "take responsibility"), homePage.getActions());
-        assertEquals(asList("configure"), homePage.getLinks());
+        List<String> links = homePage.getLinks();
+        Collections.sort(links);
+        assertEquals(asList("build result feed", "configure"), links);
         
         Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         project.put("description", TEST_DESCRIPTION);
