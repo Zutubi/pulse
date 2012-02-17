@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.scm.config.api.CommitterMappingConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.notifications.NotificationAttachment;
+import com.zutubi.pulse.master.notifications.ResultNotifier;
 import com.zutubi.pulse.master.notifications.email.EmailService;
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.RenderService;
@@ -198,6 +199,8 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
         if (emails.size() > 0)
         {
+            buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), ResultNotifier.getFailureLimit());
+
             GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
             RenderedResult rendered = renderService.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();

@@ -258,7 +258,7 @@ public class RecipeResult extends Result
 
     public void loadFailedTestResults(File dataRoot, int limit)
     {
-        if (completed())
+        if (completed() && failedTestResults == null)
         {
             File output = getAbsoluteOutputDir(dataRoot);
             File testDir = new File(output, TEST_DIR);

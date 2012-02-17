@@ -84,7 +84,7 @@ public class ResultNotifier implements EventListener
 
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
-        // We use a render cach
+        // We use a render cache
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
         Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
