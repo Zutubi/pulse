@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.hook.email;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
@@ -68,12 +69,16 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
 
         RenderService renderService = mock(RenderService.class);
         doReturn(new RenderedResult("subject", "content", "mimeType")).when(renderService).renderResult(Matchers.<BuildResult>anyObject(), anyString(), Matchers.<BuildManager>anyObject(), Matchers.<BuildResultRenderer>anyObject(), anyString());
+
+        MasterConfigurationManager configurationManager = mock(MasterConfigurationManager.class);
+        doReturn(null).when(configurationManager).getDataDirectory();
         
         taskConfig.setConfigurationProvider(configurationProvider);
         taskConfig.setBuildResultRenderer(resultRenderer);
         taskConfig.setUserManager(userManager);
         taskConfig.setEmailService(emailService);
         taskConfig.setRenderService(renderService);
+        taskConfig.setConfigurationManager(configurationManager);
     }
 
     public void testEmailUserContacts() throws Exception
