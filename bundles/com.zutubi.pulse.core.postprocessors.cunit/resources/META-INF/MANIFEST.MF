@@ -2,5 +2,5 @@ Bundle-Name: CUnit Post-Processor
 Bundle-SymbolicName: com.zutubi.pulse.core.postprocessors.cunit; singleton:=true
 Bundle-Description: A post-processor for integrating test results from CUnit XML reports.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.4.0
-Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.4.0,2.5.0)"
+Bundle-Version: 2.5.0
+Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.5.0,2.6.0)"

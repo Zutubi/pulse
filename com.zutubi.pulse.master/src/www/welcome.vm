@@ -14,11 +14,11 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.4!  This page provides information on common next steps and important
-        new features in the 2.4 release.
+        Welcome to Pulse 2.5 Alpha!  This page provides information on common next steps and important
+        new features in the 2.5 release.
     </p>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2.4" link in the top left
+        You can return to this page at any time by clicking on the "pulse 2.5" link in the top left
         corner.
     </p>
     <h1> :: getting started :: </h1>
@@ -80,133 +80,116 @@
 
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.4 brings further usability improvements throughout both the reporting and
-        administration interfaces, along with built in support for new tools.  Key updates
-        include:
+        Pulse 2.5 is very much a user-focused release.  We've always used feedback to improve
+        Pulse, and this release is almost entirely feedback-driven.  Key updates include:
     </p>
     <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
         <tr>
-            <th class="category" colspan="2">new in 2.4</th>
+            <th class="category" colspan="2">new in 2.5</th>
         </tr>
         <tr>
-            #actionHeader("mercurial" "mercurial support" "accept" false)
+            #actionHeader("filter" "filter main views" "accept" false)
             <td>
-                Pulse now has built-in support for the Mercurial SCM, in the form of a new plugin.
-                All SCM capabilities, including personal builds, are supported.
+                The browse and dashboard pages may now be filtered by build state.  This allows
+                you to easily find projects that are broken and need attention.
             </td>
         </tr>
         <tr>
-            #actionHeader("maven3" "maven 3 support" "accept" false)
+            #actionHeader("mstest" "mstest support" "accept" false)
             <td>
-                Pulse now has built-in support for Maven 3, via a new maven3 command, maven3.pp
-                post-processor and updated maven resource discovery.
+                A new plugin has been added to process TRX reports produced by MSTest, integrating
+                test results into your build.
             </td>
         </tr>
         <tr>
-            #actionHeader("agents" "agents page" "accept" false)
+            #actionHeader("comments" "comment visibility" "accept" false)
             <td>
-                The main page of the agents section has been completely overhauled.  It now shows
-                a graphical indication of the agent status, provides quick access to all agent tabs,
-                and shows more information about builds running on agents.
+                The visibility of builds comments has been raised, making them easier to notice and
+                access.
             </td>
         </tr>
         <tr>
-            #actionHeader("agentstatus" "agent status tab" "accept" false)
+            #actionHeader("agentcomments" "agent comments" "accept" false)
             <td>
-                The agent status tab has been rewritten to show more information about the
-                build stage running on the agent, and to update all status details efficiently.
+                Comments may be left on agents, allowing communication between users.  For example,
+                an admin can make a note of why an agent has been disabled.
             </td>
         </tr>
         <tr>
-            #actionHeader("agenthistory" "agent history tab" "accept" false)
+            #actionHeader("agentproperties" "agent properties" "accept" false)
             <td>
-                A new agent history tab has added showing all builds that have involved the agent.
+                Properties can now be configured directly on agents, giving a simpler way to
+                parameterise your build depending on the machine it runs on.
             </td>
         </tr>
         <tr>
-            #actionHeader("serverhistory" "server history tab" "accept" false)
+            #actionHeader("scmresources" "scm resources" "accept" false)
             <td>
-                A new history tab has been added to the server section of the UI.  This tab
-                shows build history across all projects.
+                SCM support that is built upon command-line clients can now be customised using
+                resources.  This gives you simple control of the commands used for SCM integration.
             </td>
         </tr>
         <tr>
-            #actionHeader("activity" "server activity tab" "accept" false)
+            #actionHeader("masterresources" "master resources" "accept" false)
             <td>
-                The server activity tab has been overhauled to show more information in
-                less vertical space.  Queued and running build stages are now shown nested
-                under the builds they are part of.
+                As with agents, the Pulse master now supports a resource repository.  Resources
+                will allow you to customise tools used by the master outside of builds.
             </td>
         </tr>
         <tr>
-            #actionHeader("pauseserver" "pause server action" "accept" false)
+            #actionHeader("logattachments" "log attachments" "accept" false)
             <td>
-                The server may now be paused, such that all new build triggers are ignored.
-                This is especially useful for maintenance on large installations.
+                Build notification emails may now optionally have logs attached.  This includes both
+                the overall build log and output logs from each stage.
             </td>
         </tr>
         <tr>
-            #actionHeader("info" "server info and messages tabs" "accept" false)
+            #actionHeader("prestagehooks" "pre-stage hooks" "accept" false)
             <td>
-                The server and agent info and messages tabs have also been restyled to
-                match the new look of these sections.
+                A new hook point has been added, allowing you to run a task just before a build
+                stage is dispatched to an agent.
             </td>
         </tr>
         <tr>
-            #actionHeader("changelistpages" "changelist pages" "accept" false)
+            #actionHeader("scminclusions" "scm inclusion filters" "accept" false)
             <td>
-                Personal build changes and changelist pages have been reworked to match the
-                styling in other parts of the UI.
+                SCM monitoring can now be customised with inclusive filters, complimenting the
+                existing exclusion filters.
             </td>
         </tr>
         <tr>
-            #actionHeader("pinnedbuilds" "pinned builds" "accept" false)
+            #actionHeader("inverseresources" "inverse resource requirements" "accept" false)
             <td>
-                Builds may now be pinned: so they may not be deleted and are exempt from
-                cleanup rules. This is useful for ensuring important builds are retained.
+                Builds may now be configured to avoid agents that have a specific resource.  This
+                compliments the existing ability to assign builds by agent capabilities.
             </td>
         </tr>
         <tr>
-            #actionHeader("killbuild" "kill build action" "accept" false)
+            #actionHeader("renamelabels" "rename labels" "accept" false)
             <td>
-                A new kill build action has been added for Pulse administrators, allowing
-                builds to be terminated quickly without full cleanup.
+                When a label is edited you are now prompted to choose whether all such labels
+                should be renamed.  This makes renaming existing labels much simpler.
             </td>
         </tr>
         <tr>
-            #actionHeader("templatedfields" "templated field actions" "accept" false)
+            #actionHeader("cleanuppermission" "cleanup permission" "accept" false)
             <td>
-                Overridden configuration values are now easier to revert, and it is also
-                easier to navigate to where an inherited configuration value is defined.
+                The ability to clean up build directories has been classified as a separate
+                permission, allowing finer control of user access.
             </td>
         </tr>
         <tr>
-            #actionHeader("introduceparent" "introduce parent refactoring" "accept" false)
+            #actionHeader("perforcestreams" "perforce stream support" "accept" false)
             <td>
-                The templated configuration system now supports a new introduce parent
-                refactoring.  This allows you to adjust your hierarchy over time to take
-                full advantage of templates.
+                The Perforce plugin has been enhanced to support streams, a kind of built-in
+                 branching model in newer Perforce releases.
             </td>
         </tr>
-        <tr>
-            #actionHeader("pluggablediscovery" "pluggable resource discovery" "accept" false)
-            <td>
-                Automatic tool discovery and configuration is now pluggable, so if you use a tool
-                not yet supported by Pulse you can choose to add support yourself.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("svnchangelist" "subversion changelist support" "accept" false)
-            <td>
-                When submitting a personal build you can now tell pulse to use the changes in a
-                specific Subversion changelist.
-            </td>
-        </tr>
-        <tr>
+       <tr>
             #actionHeader("more" "and more..." "accept" false)
             <td>
                 This release also includes numerous smaller improvements and fixes. These include
-                extra touches in the UI, new support for common plugin implementations and much more.
+                UI refinements, better Subversion externals support and much more.
             </td>
         </tr>
     </table>
