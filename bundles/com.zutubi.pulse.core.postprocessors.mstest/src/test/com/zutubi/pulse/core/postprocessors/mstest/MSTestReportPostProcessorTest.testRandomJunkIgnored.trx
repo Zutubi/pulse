@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="8f8fd61c-e61d-4ac2-99d2-43512255a485" name="Foo@BAR 2011-05-08 09:35:48" runUser="BAR\Foo" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="becb1b75-ab5b-499e-b6ab-58d674318d57">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="Foo_BAR 2011-05-08 09_35_48" />
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-05-08T09:35:48.8483172+01:00" queuing="2011-05-08T09:35:49.1343335+01:00" start="2011-05-08T09:35:49.4693527+01:00" finish="2011-05-08T09:35:50.4014060+01:00" />
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" error="0" failed="1" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" passed="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+      <Junk>
+          tag not recognised
+      </Junk>
+    <UnitTest name="TestFailure" storage="d:\testproject1\bin\debug\testproject1.dll" id="024180b9-4ed0-384f-03da-78bb09452e2a">
+        <Junk>
+            tag not recognised
+        </Junk>
+      <Execution timeOut="1800000" id="6fdc49a9-8b66-431c-ab3a-e552cc49baae" />
+        <Junk>
+            tag not recognised
+        </Junk>
+      <TestMethod codeBase="D:/TestProject1/bin/Debug/TestProject1.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="TestProject1.UnitTest1, TestProject1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TestFailure" />
+        <Junk>
+            tag not recognised
+        </Junk>
+    </UnitTest>
+      <Junk>
+          tag not recognised
+      </Junk>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="024180b9-4ed0-384f-03da-78bb09452e2a" executionId="6fdc49a9-8b66-431c-ab3a-e552cc49baae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+      <Junk>
+          tag not recognised
+      </Junk>
+    <UnitTestResult executionId="6fdc49a9-8b66-431c-ab3a-e552cc49baae" testId="024180b9-4ed0-384f-03da-78bb09452e2a" testName="TestFailure" computerName="BAR" duration="00:00:00.7190412" startTime="2011-05-08T09:35:49.5143553+01:00" endTime="2011-05-08T09:35:50.3164011+01:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6fdc49a9-8b66-431c-ab3a-e552cc49baae">
+        <Junk>
+            tag not recognised
+        </Junk>
+      <Output>
+          <Junk>
+              tag not recognised
+          </Junk>
+        <ErrorInfo>
+            <Junk>
+                tag not recognised
+            </Junk>
+          <Message>Test method TestProject1.UnitTest1.TestFailure threw exception:
+System.InvalidOperationException: There was an error generating the XML document. ---&gt; System.InvalidOperationException: Unable to generate a temporary class (result=1).
+</Message>
+          <StackTrace>    at System.Xml.Serialization.Compiler.Compile(Assembly parent, String ns, XmlSerializerCompilerParameters xmlParameters, Evidence evidence)
+   at System.Xml.Serialization.TempAssembly.GenerateAssembly(XmlMapping[] xmlMappings, Type[] types, String defaultNamespace, Evidence evidence, XmlSerializerCompilerParameters parameters, Assembly assembly, Hashtable assemblies)
+   at System.Xml.Serialization.XmlSerializer.GenerateTempAssembly(XmlMapping xmlMapping, Type type, String defaultNamespace)
+   at System.Xml.Serialization.XmlSerializer..ctor(Type type, String defaultNamespace)
+   at System.Xml.Serialization.XmlSerializer..ctor(Type type)
+              <Junk>
+                  tag not recognised
+              </Junk>
+</StackTrace>
+            <Junk>
+                tag not recognised
+            </Junk>
+        </ErrorInfo>
+          <Junk>
+              tag not recognised
+          </Junk>
+      </Output>
+        <Junk>
+            tag not recognised
+        </Junk>
+    </UnitTestResult>
+      <Junk>
+          tag not recognised
+      </Junk>
+  </Results>
+    <Junk>
+        tag not recognised
+    </Junk>
+</TestRun>
