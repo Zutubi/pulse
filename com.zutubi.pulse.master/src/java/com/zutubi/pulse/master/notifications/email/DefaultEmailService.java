@@ -34,6 +34,8 @@ public class DefaultEmailService implements EmailService
 
     public synchronized void sendMail(Collection<String> recipients, String subject, String mimeType, String message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
     {
+        subject = addSubjectPrefix(config, subject);
+
         int attempts = 0;
         int retryLimit = reuseSession ? 3 : 1;
         boolean sent = false;
@@ -55,7 +57,6 @@ public class DefaultEmailService implements EmailService
                 transport = session.getTransport();
             }
 
-            subject = addSubjectPrefix(config, subject);
             Message msg = createMessage(recipients, subject, mimeType, message, config, session);
 
             try
