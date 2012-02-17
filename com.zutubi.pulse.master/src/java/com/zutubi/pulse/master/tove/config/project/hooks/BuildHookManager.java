@@ -22,6 +22,7 @@ import com.zutubi.util.io.IOUtils;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Manages the execution of build hooks at various points in the build
@@ -172,5 +173,18 @@ public class BuildHookManager
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setThreadFactory(final ThreadFactory threadFactory)
+    {
+        executor = Executors.newSingleThreadExecutor(new ThreadFactory()
+        {
+            public Thread newThread(Runnable r)
+            {
+                Thread thread = threadFactory.newThread(r);
+                thread.setName("Build Hook Executor");
+                return thread;
+            }
+        });
     }
 }
