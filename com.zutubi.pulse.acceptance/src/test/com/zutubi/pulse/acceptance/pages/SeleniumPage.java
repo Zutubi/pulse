@@ -11,7 +11,7 @@ import static com.zutubi.util.WebUtils.toValidHtmlName;
  */
 public abstract class SeleniumPage
 {
-    public static final String TITLE_PREFIX = ":: pulse :: ";
+    public static final String TITLE_PREFIX = ":: pulse [alpha] :: ";
 
     protected SeleniumBrowser browser;
     /**
