@@ -3,7 +3,9 @@ package com.zutubi.pulse.master.build.control;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
@@ -16,6 +18,7 @@ import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -30,11 +33,14 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -44,13 +50,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  *
@@ -388,7 +387,14 @@ public class RecipeController
         try
         {
             logger.collecting(recipeResult);
-            collector.collect(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.collect(
+                    buildResult,
+                    recipeResultNode.getStageHandle(),
+                    recipeResultNode.getStageName(),
+                    recipeResult.getId(),
+                    recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false),
+                    recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, false),
+                    agentService);
             copyBuildScopedData();
         }
         catch (BuildException e)
@@ -467,7 +473,14 @@ public class RecipeController
         try
         {
             logger.cleaning();
-            collector.cleanup(buildResult, recipeResultNode.getStageHandle(), recipeResultNode.getStageName(), recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.cleanup(
+                    buildResult,
+                    recipeResultNode.getStageHandle(),
+                    recipeResultNode.getStageName(),
+                    recipeResult.getId(),
+                    recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false),
+                    recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, false),
+                    agentService);
         }
         catch (Exception e)
         {
@@ -477,7 +490,7 @@ public class RecipeController
         {
             logger.cleaningComplete();
         }
-
+    
         sendPostStageEvent();
     }
 

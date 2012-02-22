@@ -24,7 +24,7 @@ import java.util.*;
  * Pulse project for a nightly build and another for a continuous build.
  */
 @Form(fieldOrder = {"name", "organisation", "url", "description"})
-@Listing(order = {"type", "requirements", "properties", "stages", "options", "triggers", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "contacts", "permissions", "reportGroups", "cleanupRules"})
+@Listing(order = {"type", "requirements", "properties", "bootstrap", "stages", "options", "triggers", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "contacts", "permissions", "reportGroups", "cleanupRules"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
@@ -42,6 +42,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @NoInherit
     @TextArea(rows = 7, cols = 70)
     private String description;
+    @Essential
+    private BootstrapConfiguration bootstrap = new BootstrapConfiguration();
     @Essential
     private ScmConfiguration scm;
     @Essential
@@ -135,6 +137,16 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public BootstrapConfiguration getBootstrap()
+    {
+        return bootstrap;
+    }
+
+    public void setBootstrap(BootstrapConfiguration bootstrap)
+    {
+        this.bootstrap = bootstrap;
     }
 
     public ScmConfiguration getScm()

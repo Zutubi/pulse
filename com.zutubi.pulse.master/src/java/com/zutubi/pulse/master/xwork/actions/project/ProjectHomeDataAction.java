@@ -12,7 +12,9 @@ import com.zutubi.pulse.master.build.queue.SchedulingController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
@@ -24,15 +26,13 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
-import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -255,8 +255,8 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
     private void addViewWorkingCopyAction(Messages messages, File contentRoot)
     {
-        ProjectConfiguration config = getProject().getConfig();
-        if (config.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
+        BootstrapConfiguration config = getProject().getConfig().getBootstrap();
+        if (config != null && config.getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
         {
             if (accessManager.hasPermission(ACTION_VIEW_SOURCE, getProject()))
             {

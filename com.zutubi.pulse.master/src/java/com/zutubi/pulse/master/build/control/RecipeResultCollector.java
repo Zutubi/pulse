@@ -11,9 +11,9 @@ public interface RecipeResultCollector
 {
     void prepare(BuildResult result, long recipeId);
 
-    void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, AgentService agentService);
+    void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService);
 
-    void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, AgentService agentService);
+    void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService);
 
     File getRecipeDir(BuildResult result, long recipeId);
 }

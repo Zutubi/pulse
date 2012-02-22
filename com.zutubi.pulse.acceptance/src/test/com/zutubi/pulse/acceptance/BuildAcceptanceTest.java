@@ -1,6 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -20,6 +31,8 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -34,12 +47,18 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
@@ -49,9 +68,14 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.Header;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -60,31 +84,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -1434,12 +1433,10 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
 
-        String optionsPath = PathUtils.getPath(projectPath, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
-        options.put(Constants.Project.Options.PERSISTENT_WORK_DIR, "${data.dir}/customwork/${project}");
-        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
-
-        setSchemeToIncrementalUpdate(random);
+        String bootstrapPath = PathUtils.getPath(projectPath, Project.BOOTSTRAP);
+        Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
+        bootstrap.put(Bootstrap.TEMP_DIR_PATTERN, "${data.dir}/customtemp/${project}");
+        rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
         Hashtable<String, Object> stage = rpcClient.RemoteApi.getConfig(stagePath);
@@ -1453,6 +1450,37 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(workDir.isDirectory());
         File buildFile = new File(workDir, "build.xml");
         assertTrue(buildFile.isFile());
+    }
+
+    public void testCustomTempDir() throws Exception
+    {
+        File tempDir = createTempDirectory();
+        try
+        {
+            final WaitProject project = projects.createWaitAntProject(random, tempDir, false);
+            String tempDirPattern = tempDir.getAbsolutePath() + "/base";
+            project.getConfig().getBootstrap().setTempDirPattern(tempDirPattern);
+            project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
+            configurationHelper.insertProject(project.getConfig(), false);
+
+            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
+            rpcClient.RemoteApi.triggerBuild(project.getName());
+            rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
+
+            File baseDir = new File(tempDirPattern);
+            assertTrue(baseDir.isDirectory());
+            File buildFile = new File(baseDir, "build.xml");
+            assertTrue(buildFile.isFile());
+            
+            project.releaseBuild();
+            rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
+            
+            assertFalse(baseDir.exists());
+        }
+        finally
+        {
+            FileSystemUtils.rmdir(tempDir);
+        }
     }
 
     public void testTerminateOnStageFailure() throws Exception
@@ -1644,10 +1672,10 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     
     private void setSchemeToIncrementalUpdate(String projectName) throws Exception
     {
-        String svnPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Project.SCM);
-        Hashtable<String, Object> svn = rpcClient.RemoteApi.getConfig(svnPath);
-        svn.put(Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
-        rpcClient.RemoteApi.saveConfig(svnPath, svn, false);
+        String bootstrapPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Project.BOOTSTRAP);
+        Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
+        bootstrap.put(Bootstrap.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
+        rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
         rpcClient.RemoteApi.waitForProjectToInitialise(projectName);
     }
 

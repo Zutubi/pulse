@@ -20,11 +20,11 @@ public class SubversionForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" };
+        return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, COMBOBOX, ITEM_PICKER, CHECKBOX, CHECKBOX, COMBOBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
+        return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, COMBOBOX, ITEM_PICKER, CHECKBOX, CHECKBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
     }
 }

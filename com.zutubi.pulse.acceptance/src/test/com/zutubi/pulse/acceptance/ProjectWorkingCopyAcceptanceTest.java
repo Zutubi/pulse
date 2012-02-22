@@ -6,12 +6,12 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
+import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
@@ -60,7 +60,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.isViewWorkingCopyPresent());
 
-        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
         homePage.openAndWaitFor();
         assertTrue(homePage.isViewWorkingCopyPresent());
@@ -69,7 +69,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     public void testWorkingCopyLinkControlledByViewSourcePermissions() throws Exception
     {
         ProjectConfiguration project = createProject(random);
-        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
         getBrowser().loginAsAdmin();
 
@@ -100,7 +100,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     private void runTestViewWorkingCopyOnAgent(String agentName) throws Exception
     {
         ProjectConfiguration project = createProject(random, agentName);
-        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
         buildRunner.triggerSuccessfulBuild(project);
 
         getBrowser().loginAsAdmin();
@@ -123,7 +123,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     public void testViewWorkingCopyBeforeFirstBuild() throws Exception
     {
         ProjectConfiguration project = createProject(random);
-        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
 
         getBrowser().loginAsAdmin();
 
@@ -150,7 +150,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         enableAgent(AGENT_NAME);
 
         ProjectConfiguration project = createProject(random, AGENT_NAME);
-        updateScmCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
         buildRunner.triggerSuccessfulBuild(project);
 
         disableAgent(AGENT_NAME);
@@ -220,10 +220,10 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         return user;
     }
 
-    private void updateScmCheckoutScheme(ProjectConfiguration project, CheckoutScheme scheme) throws Exception
+    private void updateCheckoutScheme(ProjectConfiguration project, CheckoutScheme scheme) throws Exception
     {
-        SubversionConfiguration scm = (SubversionConfiguration) project.getScm();
-        scm.setCheckoutScheme(scheme);
-        configurationHelper.update(scm);
+        BootstrapConfiguration bootstrap = project.getBootstrap();
+        bootstrap.setCheckoutScheme(scheme);
+        configurationHelper.update(bootstrap);
     }
 }

@@ -9,10 +9,9 @@ import java.io.File;
 public interface RecipePaths
 {
     /**
-     * @return a working area that persists across builds, or null if no such
-     *         area is available
+     * @return the directory where a boostrap checkout should take place, if any
      */
-    File getPersistentWorkDir();
+    File getCheckoutDir();
 
     /**
      * The base directory is the root directory for execution of a recipe.

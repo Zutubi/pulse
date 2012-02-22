@@ -1,11 +1,10 @@
 package com.zutubi.pulse.servercore;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
 import com.zutubi.tove.variables.api.VariableMap;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
 
 /**
@@ -24,7 +23,9 @@ public class AgentRecipeDetails
     private String stage;
     private long recipeId;
     private boolean incremental;
+    private boolean update;
     private String projectPersistentPattern;
+    private String projectTempPattern;
 
     public AgentRecipeDetails()
     {
@@ -41,7 +42,9 @@ public class AgentRecipeDetails
         setStage(context.getString(NAMESPACE_INTERNAL, PROPERTY_STAGE));
         setRecipeId(context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0));
         setIncremental(context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
+        setUpdate(context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, false));
         setProjectPersistentPattern(context.getString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN));
+        setProjectTempPattern(context.getString(NAMESPACE_INTERNAL, PROPERTY_TEMP_PATTERN));
     }
     
     public VariableMap createPathVariableMap()
@@ -51,6 +54,7 @@ public class AgentRecipeDetails
         map.add(new GenericVariable<String>(PROPERTY_AGENT_HANDLE, Long.toString(agentHandle)));
         map.add(new GenericVariable<String>(PROPERTY_PROJECT, encodeFilenameComponent(project)));
         map.add(new GenericVariable<String>(PROPERTY_PROJECT_HANDLE, Long.toString(projectHandle)));
+        map.add(new GenericVariable<String>(PROPERTY_RECIPE_ID, Long.toString(recipeId)));
         map.add(new GenericVariable<String>(PROPERTY_STAGE, encodeFilenameComponent(stage)));
         map.add(new GenericVariable<String>(PROPERTY_STAGE_HANDLE, Long.toString(stageHandle)));
         return map;
@@ -136,6 +140,16 @@ public class AgentRecipeDetails
         this.recipeId = recipeId;
     }
 
+    public boolean isUpdate()
+    {
+        return update;
+    }
+
+    public void setUpdate(boolean update)
+    {
+        this.update = update;
+    }
+
     public boolean isIncremental()
     {
         return incremental;
@@ -154,5 +168,15 @@ public class AgentRecipeDetails
     public void setProjectPersistentPattern(String projectPersistentPattern)
     {
         this.projectPersistentPattern = projectPersistentPattern;
+    }
+
+    public String getProjectTempPattern()
+    {
+        return projectTempPattern;
+    }
+
+    public void setProjectTempPattern(String projectTempPattern)
+    {
+        this.projectTempPattern = projectTempPattern;
     }
 }

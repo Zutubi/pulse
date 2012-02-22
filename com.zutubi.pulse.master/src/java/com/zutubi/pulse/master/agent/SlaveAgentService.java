@@ -10,6 +10,8 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.IOUtils;
@@ -21,9 +23,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
-import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -84,7 +83,9 @@ public class SlaveAgentService implements AgentService
                                             asPair(PARAM_STAGE, recipeDetails.getStage()),
                                             asPair(PARAM_RECIPE_ID, Long.toString(recipeDetails.getRecipeId())),
                                             asPair(PARAM_INCREMENTAL, Boolean.toString(recipeDetails.isIncremental())),
+                                            asPair(PARAM_UPDATE, Boolean.toString(recipeDetails.isUpdate())),
                                             asPair(PARAM_PERSISTENT_PATTERN, recipeDetails.getProjectPersistentPattern()),
+                                            asPair(PARAM_TEMP_PATTERN, recipeDetails.getProjectTempPattern()),
                                             asPair(PARAM_OUTPUT, Boolean.toString(true)));
 
             URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);

@@ -120,10 +120,12 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         details.setAgentDataPattern(agentConfig.getDataDirectory());
         details.setAgentHandle(agentConfig.getHandle());
 
-        details.setIncremental(!buildResult.isPersonal() && projectConfig.getScm().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE);
+        details.setIncremental(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE);
+        details.setUpdate(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutScheme() != CheckoutScheme.CLEAN_CHECKOUT);
         details.setProject(projectConfig.getName());
         details.setProjectHandle(projectConfig.getHandle());
-        details.setProjectPersistentPattern(projectConfig.getOptions().getPersistentWorkDir());
+        details.setProjectPersistentPattern(projectConfig.getBootstrap().getPersistentDirPattern());
+        details.setProjectTempPattern(projectConfig.getBootstrap().getTempDirPattern());
 
         details.setRecipeId(recipeId);
         details.setStage(node.getStageName());

@@ -264,7 +264,7 @@ public class AddProjectWizard
 
         public void scmState(AddProjectWizard.ScmState form)
         {
-            form.nextFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, "CLEAN_CHECKOUT");
+            form.nextFormElements(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null);
         }
 
         public String selectType()
@@ -332,12 +332,12 @@ public class AddProjectWizard
 
         public String[] getFieldNames()
         {
-            return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme"};
+            return new String[]{ "url", "username", "password", "keyfile", "keyfilePassphrase" };
         }
 
         public int[] getFieldTypes()
         {
-            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, COMBOBOX };
+            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD, TEXTFIELD };
         }
     }
 
@@ -355,12 +355,12 @@ public class AddProjectWizard
 
         public String[] getFieldNames()
         {
-            return new String[]{ "repository", "branch", "checkoutScheme"};
+            return new String[]{ "repository", "branch" };
         }
 
         public int[] getFieldTypes()
         {
-            return new int[]{ TEXTFIELD, TEXTFIELD, TEXTFIELD};
+            return new int[]{ TEXTFIELD, TEXTFIELD };
         }
     }
 

@@ -52,6 +52,8 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -62,9 +64,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -269,7 +268,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void checkForPersistentWorkDirChange(ProjectConfiguration instance, ProjectConfiguration old)
     {
-        if (!StringUtils.equals(instance.getOptions().getPersistentWorkDir(), old.getOptions().getPersistentWorkDir()))
+        BootstrapConfiguration newBootstrap = instance.getBootstrap();
+        BootstrapConfiguration oldBootstrap = old.getBootstrap();
+        if (oldBootstrap == null || newBootstrap == null ||
+            !StringUtils.equals(newBootstrap.getPersistentDirPattern(), oldBootstrap.getPersistentDirPattern()))
         {
             cleanupWorkDirs(old, null);
         }
@@ -1019,42 +1021,46 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void cleanupWorkDirs(ProjectConfiguration projectConfig, BuildStageConfiguration specificStage)
     {
-        String workDirPattern = projectConfig.getOptions().getPersistentWorkDir();
-
-        AgentRecipeDetails details = new AgentRecipeDetails();
-        details.setProject(projectConfig.getName());
-        details.setProjectHandle(projectConfig.getHandle());
-        for (Agent agent: agentManager.getAllAgents())
+        BootstrapConfiguration bootstrap = projectConfig.getBootstrap();
+        if (bootstrap != null)
         {
-            List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
+            String workDirPattern = bootstrap.getPersistentDirPattern();
 
-            AgentConfiguration agentConfig = agent.getConfig();
-            details.setAgent(agent.getName());
-            details.setAgentHandle(agentConfig.getHandle());
-            
-            Collection<BuildStageConfiguration> stageConfigs;
-            if (specificStage == null)
+            AgentRecipeDetails details = new AgentRecipeDetails();
+            details.setProject(projectConfig.getName());
+            details.setProjectHandle(projectConfig.getHandle());
+            for (Agent agent: agentManager.getAllAgents())
             {
-                stageConfigs = projectConfig.getStages().values();
-            }
-            else
-            {
-                stageConfigs = Arrays.asList(specificStage);
-            }
-            
-            for (BuildStageConfiguration stageConfig: stageConfigs)
-            {
-                details.setStage(stageConfig.getName());
-                details.setStageHandle(stageConfig.getHandle());
-
-                DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
-                SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
-                messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
-            }
+                List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
+    
+                AgentConfiguration agentConfig = agent.getConfig();
+                details.setAgent(agent.getName());
+                details.setAgentHandle(agentConfig.getHandle());
                 
-            if (messageDescriptionPairs.size() > 0)
-            {
-                agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
+                Collection<BuildStageConfiguration> stageConfigs;
+                if (specificStage == null)
+                {
+                    stageConfigs = projectConfig.getStages().values();
+                }
+                else
+                {
+                    stageConfigs = Arrays.asList(specificStage);
+                }
+                
+                for (BuildStageConfiguration stageConfig: stageConfigs)
+                {
+                    details.setStage(stageConfig.getName());
+                    details.setStageHandle(stageConfig.getHandle());
+    
+                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
+                    SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
+                    messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
+                }
+                    
+                if (messageDescriptionPairs.size() > 0)
+                {
+                    agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
+                }
             }
         }
     }

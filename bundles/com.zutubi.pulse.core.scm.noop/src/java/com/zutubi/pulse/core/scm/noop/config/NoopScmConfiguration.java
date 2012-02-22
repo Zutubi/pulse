@@ -7,7 +7,7 @@ import com.zutubi.tove.annotations.SymbolicName;
 /**
  * Noop SCM configuration.
  */
-@Form(fieldOrder = { "checkoutScheme" })
+@Form(fieldOrder = {})
 @SymbolicName("zutubi.noopScmConfig")
 public class NoopScmConfiguration extends ScmConfiguration
 {

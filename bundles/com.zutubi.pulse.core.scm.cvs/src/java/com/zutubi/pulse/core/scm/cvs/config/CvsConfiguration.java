@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-@Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths"})
+@Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths"})
 @ConfigurationCheck("CvsConfigurationCheckHandler")
 @SymbolicName("zutubi.cvsConfig")
 public class CvsConfiguration extends PollableScmConfiguration

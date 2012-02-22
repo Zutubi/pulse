@@ -3,14 +3,13 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 
 /**
  * The server recipe paths, which by default live at:
@@ -25,6 +24,7 @@ public class ServerRecipePaths implements RecipePaths
 
     public static final String PROPERTY_DATA_DIR = "data.dir";
     public static final String PROPERTY_AGENT_DATA_DIR = "agent.data.dir";
+    public static final String PROPERTY_RECIPES_DIR = "recipes.dir";
     
     private AgentRecipeDetails recipeDetails;
     private File dataDir;
@@ -62,21 +62,40 @@ public class ServerRecipePaths implements RecipePaths
         return new File(getRecipesRoot(), Long.toString(recipeDetails.getRecipeId()));
     }
 
-    public File getPersistentWorkDir()
+    private File resolveDirPattern(String pattern, File defaultDir)
     {
         VariableMap references = recipeDetails.createPathVariableMap();
         references.add(new GenericVariable<String>(PROPERTY_AGENT_DATA_DIR, getAgentDataDir().getAbsolutePath()));
         references.add(new GenericVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
+        references.add(new GenericVariable<String>(PROPERTY_RECIPES_DIR, getRecipesRoot().getAbsolutePath()));
 
         try
         {
-            String path = VariableResolver.resolveVariables(recipeDetails.getProjectPersistentPattern(), references, RESOLVE_STRICT);
+            String path = VariableResolver.resolveVariables(pattern, references, RESOLVE_STRICT);
             return new File(path);
         }
         catch (ResolutionException e)
         {
-            LOG.warning("Invalid persistent work directory '" + recipeDetails.getProjectPersistentPattern() + "': " + e.getMessage(), e);
-            return new File(getAgentDataDir(), FileSystemUtils.composeFilename("work", Long.toString(recipeDetails.getProjectHandle()), Long.toString(recipeDetails.getStageHandle())));
+            LOG.warning("Invalid directory pattern '" + pattern + "': " + e.getMessage() + "; using default '" + defaultDir.getAbsolutePath() + "'", e);
+            return defaultDir;
+        }
+    }
+
+    public File getPersistentWorkDir()
+    {
+        File defaultDir = new File(getAgentDataDir(), FileSystemUtils.composeFilename("work", Long.toString(recipeDetails.getProjectHandle()), Long.toString(recipeDetails.getStageHandle())));
+        return resolveDirPattern(recipeDetails.getProjectPersistentPattern(), defaultDir);
+    }
+
+    public File getCheckoutDir()
+    {
+        if (recipeDetails.isUpdate())
+        {
+            return getPersistentWorkDir();
+        }
+        else
+        {
+            return getBaseDir();
         }
     }
 
@@ -88,7 +107,7 @@ public class ServerRecipePaths implements RecipePaths
         }
         else
         {
-            return new File(getRecipeRoot(), "base");
+            return resolveDirPattern(recipeDetails.getProjectTempPattern(), new File(getRecipeRoot(), "base"));
         }
     }
 

@@ -91,7 +91,19 @@ public class MasterAgentService implements AgentService
         }
         catch (IOException e)
         {
-            throw new BuildException("Unable to remove recipe directory: " + e.getMessage(), e);
+            throw new BuildException("Unable to remove recipe root directory: " + e.getMessage(), e);
+        }
+
+        if (!recipeDetails.isIncremental())
+        {
+            try
+            {
+                FileSystemUtils.rmdir(recipePaths.getBaseDir());
+            }
+            catch (IOException e)
+            {
+                throw new BuildException("Unable to remove recipe base directory: " + e.getMessage(), e);
+            }
         }
     }
 

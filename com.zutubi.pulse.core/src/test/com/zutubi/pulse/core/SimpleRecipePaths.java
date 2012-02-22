@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import java.io.File;
 
 /**
+ * A simple {@link RecipePaths} implementation for testing.
  */
 public class SimpleRecipePaths implements RecipePaths
 {
@@ -15,9 +16,9 @@ public class SimpleRecipePaths implements RecipePaths
         this.outputDir = outputDir;
     }
 
-    public File getPersistentWorkDir()
+    public File getCheckoutDir()
     {
-        return null;
+        return baseDir;
     }
 
     public File getBaseDir()

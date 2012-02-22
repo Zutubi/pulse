@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.tove.annotations.*;
@@ -16,7 +15,7 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "cleanOnUpdateFailure", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "includedPaths", "excludedPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "cleanOnUpdateFailure", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "includedPaths", "excludedPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration implements Validateable
@@ -201,11 +200,6 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     {
         if (useExport)
         {
-            if (getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE)
-            {
-                context.addFieldError("checkoutScheme", I18N.format("useExport.bad.scheme"));
-            }
-            
             if (externalsMonitoring != ExternalsMonitoring.DO_NOT_MONITOR)
             {
                 context.addFieldError("externalsMonitoring", I18N.format("useExport.externals"));                

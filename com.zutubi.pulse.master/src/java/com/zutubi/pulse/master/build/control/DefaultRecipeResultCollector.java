@@ -33,24 +33,24 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, AgentService agentService)
+    public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
     {
         if (agentService != null)
         {
             File outputDest = paths.getOutputDir(result, recipeId);
-            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental), outputDest);
+            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental, update), outputDest);
         }
     }
 
-    public void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, AgentService agentService)
+    public void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
     {
         if (agentService != null)
         {
-            agentService.cleanup(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental));
+            agentService.cleanup(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental, update));
         }
     }
 
-    private AgentRecipeDetails getRecipeDetails(AgentConfiguration agent, long stageHandle, String stage, long recipeId, boolean incremental)
+    private AgentRecipeDetails getRecipeDetails(AgentConfiguration agent, long stageHandle, String stage, long recipeId, boolean incremental, boolean update)
     {
         AgentRecipeDetails details = new AgentRecipeDetails();
         details.setAgentHandle(agent.getHandle());
@@ -58,11 +58,13 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         details.setAgentDataPattern(agent.getDataDirectory());
         details.setProjectHandle(projectConfig.getHandle());
         details.setProject(projectConfig.getName());
-        details.setProjectPersistentPattern(projectConfig.getOptions().getPersistentWorkDir());
+        details.setProjectPersistentPattern(projectConfig.getBootstrap().getPersistentDirPattern());
+        details.setProjectTempPattern(projectConfig.getBootstrap().getTempDirPattern());
         details.setStageHandle(stageHandle);
         details.setStage(stage);
         details.setRecipeId(recipeId);
         details.setIncremental(incremental);
+        details.setUpdate(update);
         return details;
     }
 

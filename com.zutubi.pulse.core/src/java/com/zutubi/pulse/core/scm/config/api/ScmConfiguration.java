@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.config.api;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,19 +14,7 @@ import java.util.List;
 @SymbolicName("zutubi.scmConfig")
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
-    @Required
-    private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     private List<CommitterMappingConfiguration> committerMappings = new LinkedList<CommitterMappingConfiguration>();
-
-    public CheckoutScheme getCheckoutScheme()
-    {
-        return checkoutScheme;
-    }
-
-    public void setCheckoutScheme(CheckoutScheme checkoutScheme)
-    {
-        this.checkoutScheme = checkoutScheme;
-    }
 
     public List<CommitterMappingConfiguration> getCommitterMappings()
     {

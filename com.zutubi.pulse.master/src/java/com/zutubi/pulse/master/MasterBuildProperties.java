@@ -92,12 +92,13 @@ public class MasterBuildProperties extends BuildProperties
         }
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OWNER, owner);
 
-        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
+        CheckoutScheme checkoutScheme = projectConfig.getBootstrap().getCheckoutScheme();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && checkoutScheme != CheckoutScheme.CLEAN_CHECKOUT));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, Boolean.toString(true));
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getOptions().getPersistentWorkDir());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getBootstrap().getPersistentDirPattern());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_TEMP_PATTERN, projectConfig.getBootstrap().getTempDirPattern());
     }
 
     public static void addRevisionProperties(ExecutionContext context, BuildResult buildResult)

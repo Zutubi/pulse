@@ -43,11 +43,15 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertProject(createdProject, projectName);
         assertDefaultOptions(createdProject);
 
+        Hashtable<String, Object> createdBootstrap = (Hashtable<String, Object>) createdProject.get("bootstrap");
+        assertNotNull(createdBootstrap);
+        assertEquals("zutubi.bootstrapConfig", createdBootstrap.get(SYMBOLIC_NAME_KEY));
+        assertEquals("CLEAN_CHECKOUT", createdBootstrap.get("checkoutScheme"));
+
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);
         assertEquals("zutubi.subversionConfig", createdScm.get(SYMBOLIC_NAME_KEY));
         assertEquals(Constants.TRIVIAL_ANT_REPOSITORY, createdScm.get("url"));
-        assertEquals("CLEAN_CHECKOUT", createdScm.get("checkoutScheme"));
         assertEquals(false, createdScm.get("monitor"));
 
         Hashtable<String, Object> createdType = (Hashtable<String, Object>) createdProject.get("type");

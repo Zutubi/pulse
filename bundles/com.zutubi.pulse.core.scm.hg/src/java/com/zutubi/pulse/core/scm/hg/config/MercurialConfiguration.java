@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.mercurialConfig")
 @ConfigurationCheck("MercurialConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "checkoutScheme", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
 public class MercurialConfiguration extends PollableScmConfiguration
 {
     @Required

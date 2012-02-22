@@ -165,10 +165,10 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private void setIncrementalUpdate() throws Exception
     {
-        String scmPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.SCM);
-        Hashtable<String, Object> scm = rpcClient.RemoteApi.getConfig(scmPath);
-        scm.put(Constants.Project.Scm.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.name());
-        rpcClient.RemoteApi.saveConfig(scmPath, scm, false);
+        String bootstrapPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.BOOTSTRAP);
+        Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
+        bootstrap.put(Constants.Project.Bootstrap.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.name());
+        rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
         rpcClient.RemoteApi.waitForProjectToInitialise(random);
     }
 
@@ -182,10 +182,10 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
     private void setCustomPersistentDir(String pattern) throws Exception
     {
-        String optionsPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
-        options.put("persistentWorkDir", pattern);
-        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
+        String boostrapPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.BOOTSTRAP);
+        Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(boostrapPath);
+        bootstrap.put(Constants.Project.Bootstrap.PERSISTENT_DIR_PATTERN, pattern);
+        rpcClient.RemoteApi.saveConfig(boostrapPath, bootstrap, false);
     }
 
     private String getMasterAgentId(File agentsDir)

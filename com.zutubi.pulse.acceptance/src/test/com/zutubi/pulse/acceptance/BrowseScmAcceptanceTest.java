@@ -76,7 +76,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
             public void scmState(AddProjectWizard.ScmState form)
             {
-                form.nextFormElements("file://doesnt/matter/", "master", "CLEAN_CHECKOUT");
+                form.nextFormElements("file://doesnt/matter/", "master");
             }
 
             public void commandState(AddProjectWizard.CommandState form)

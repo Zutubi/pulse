@@ -122,6 +122,12 @@ public class BuildProperties
      */
     public static final String PROPERTY_PERSISTENT_WORK_PATTERN = "persistent.work.pattern";
     /**
+     * Specifies the location of the temporary working directory for a project
+     * on an agent.  Supports limited properties (as it is resolved when the
+     * full context is not available).
+     */
+    public static final String PROPERTY_TEMP_PATTERN            = "temp.pattern";
+    /**
      * Set to "true" for a personal build, "false" otherwise.
      */
     public static final String PROPERTY_PERSONAL_BUILD          = "personal.build";

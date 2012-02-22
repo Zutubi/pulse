@@ -24,10 +24,9 @@ public class LocalRecipePaths implements RecipePaths
 
     }
 
-    public File getPersistentWorkDir()
+    public File getCheckoutDir()
     {
-        // None available
-        return null;
+        return baseDir;
     }
 
     public File getBaseDir()

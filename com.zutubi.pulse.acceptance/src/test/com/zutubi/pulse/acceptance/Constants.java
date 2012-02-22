@@ -97,6 +97,7 @@ public class Constants
         public static final String HOOKS = "buildHooks";
         public static final String REQUIREMENTS = "requirements";
         public static final String STAGES = "stages";
+        public static final String BOOTSTRAP = "bootstrap";
         public static final String SCM = "scm";
         public static final String TYPE = "type";
         public static final String LABELS = "labels";
@@ -152,7 +153,7 @@ public class Constants
                 public static final String PUBLISH = "publish";
                 public static final String FEATURED = "featured";
             }
-
+            
             /**
              * The constants for the property names in the FileArtifactConfiguration class.
              */
@@ -198,11 +199,20 @@ public class Constants
         }
 
         /**
+         * The constants for the property names in the BootstrapConfiguration class.
+         */
+        public static class Bootstrap
+        {
+            public static final String CHECKOUT_SCHEME = "checkoutScheme";
+            public static final String PERSISTENT_DIR_PATTERN = "persistentDirPattern";
+            public static final String TEMP_DIR_PATTERN = "tempDirPattern";
+        }
+
+        /**
          * Properties shared by all SCMs.
          */
         public static class Scm
         {
-            public static final String CHECKOUT_SCHEME = "checkoutScheme";
             public static final String QUIET_PERIOD_ENABLED = "quietPeriodEnabled";
         }
 
@@ -223,7 +233,6 @@ public class Constants
         {
             public static final String AUTO_CLEAR_RESPONSIBILITY = "autoClearResponsibility";
             public static final String ID_LEADER = "idLeader";
-            public static final String PERSISTENT_WORK_DIR = "persistentWorkDir";
         }
 
         public class Cleanup

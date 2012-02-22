@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.acceptance.Constants;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorConfiguration;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -190,7 +189,6 @@ public class ProjectConfigurations
     private void configureGitScm(ProjectConfigurationHelper helper, String repository)
     {
         GitConfiguration git = new GitConfiguration();
-        git.setCheckoutScheme(CheckoutScheme.CLEAN_CHECKOUT);
         git.setMonitor(false);
         git.setRepository(repository);
 
@@ -200,7 +198,6 @@ public class ProjectConfigurations
     private void configureSvnScm(ProjectConfigurationHelper helper, String url)
     {
         SubversionConfiguration svn = new SubversionConfiguration();
-        svn.setCheckoutScheme(CheckoutScheme.CLEAN_CHECKOUT);
         svn.setMonitor(false);
         svn.setUrl(url);
 

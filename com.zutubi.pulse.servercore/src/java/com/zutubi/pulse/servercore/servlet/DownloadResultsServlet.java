@@ -34,7 +34,9 @@ public class DownloadResultsServlet extends HttpServlet
     public static final String PARAM_STAGE = "stage";
     public static final String PARAM_RECIPE_ID = "recipeId";
     public static final String PARAM_INCREMENTAL = "incremental";
+    public static final String PARAM_UPDATE = "update";
     public static final String PARAM_PERSISTENT_PATTERN = "persistentPattern";
+    public static final String PARAM_TEMP_PATTERN = "tempPattern";
     public static final String PARAM_OUTPUT = "output";
 
     private ConfigurationManager configurationManager;
@@ -47,7 +49,9 @@ public class DownloadResultsServlet extends HttpServlet
         details.setProject(request.getParameter(PARAM_PROJECT));
         details.setStage(request.getParameter(PARAM_STAGE)) ;
         details.setIncremental(Boolean.parseBoolean(request.getParameter(PARAM_INCREMENTAL)));
+        details.setUpdate(Boolean.parseBoolean(request.getParameter(PARAM_UPDATE)));
         details.setProjectPersistentPattern(request.getParameter(PARAM_PERSISTENT_PATTERN));
+        details.setProjectTempPattern(request.getParameter(PARAM_TEMP_PATTERN));
         details.setAgentDataPattern(request.getParameter(PARAM_AGENT_DATA_PATTERN));
 
         String agentHandleString = request.getParameter(PARAM_AGENT_HANDLE);
