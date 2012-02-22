@@ -2,38 +2,39 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 
 import java.util.*;
+
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
+import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -70,8 +71,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(random, true, GLOBAL_PROJECT_NAME);
-        getBrowser().open(urls.adminProject(uriComponentEncode(random)) + "scm/");
-        SubversionForm form = getBrowser().createForm(SubversionForm.class);
+        getBrowser().open(urls.adminProject(uriComponentEncode(random)) + "bootstrap/");
+        BootstrapForm form = getBrowser().createForm(BootstrapForm.class);
         form.waitFor();
         String[] options = form.getComboBoxOptions("checkoutScheme");
         assertEquals("", options[0]);
@@ -221,7 +222,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(checkForm.isResultOk());
         assertEquals("configuration ok", checkForm.getResultMessage());
 
-        subversionState.cancelFormElements(null, null, null, null, null, null);
+        subversionState.cancelNamedFormElements();
     }
 
     public void testClearItemPicker() throws Exception
@@ -537,7 +538,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         scmPage.waitFor();
         SubversionForm subversionForm = getBrowser().createForm(SubversionForm.class);
         subversionForm.waitFor();
-        assertTrue(subversionForm.checkFormValues(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null, null));
+        assertTrue(subversionForm.checkFormValues(Constants.TRIVIAL_ANT_REPOSITORY, null, null, null, null, null, null, null, null, null, null, null, null));
     }
 
     public void testWizardOverridingConfiguredWithNonDefaultName() throws Exception
@@ -712,7 +713,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         projectState.nextFormElements(childName, null, null);
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(getBrowser());
         subversionState.waitFor();
-        subversionState.nextFormElements("", null, null, null, null, null);
+        subversionState.nextNamedFormElements(asPair("url", ""));
         assertTrue(subversionState.isFormPresent());
         assertTrue(getBrowser().isTextPresent("url requires a value"));
     }
