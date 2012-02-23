@@ -71,4 +71,17 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
         assertEquals("[BEROR]Code Sign error: The identity 'iPhone Developer' doesn't match any valid certificate/private key pair in the default keychain", features.get(2).getSummary());
         assertEquals("** BUILD FAILED **", features.get(3).getSummary());
     }
+
+    public void testFatal() throws Exception
+    {
+        pp.getConfig().setLeadingContext(0);
+        pp.getConfig().setTrailingContext(0);
+
+        CommandResult result = createAndProcessArtifact(getName(), pp);
+        assertTrue(result.failed());
+        List<PersistentFeature> features = artifact.getFeatures();
+        assertEquals(2, features.size());
+        assertEquals("/Users/joe/pulse/data/agents/macbuild1/recipes/42598404/base/products/ngs/src/client/ios/interact/../ngslib/ngslib/NGSMenuFieldConfig.h:10:9: fatal error: 'NGSMenuEntry.h' file not found", features.get(0).getSummary());
+        assertEquals("1 error generated.", features.get(1).getSummary());
+    }
 }

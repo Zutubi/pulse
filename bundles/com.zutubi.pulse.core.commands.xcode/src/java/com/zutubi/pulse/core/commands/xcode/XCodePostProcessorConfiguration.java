@@ -13,6 +13,8 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
     private static final String[] ERROR_REGEXES = new String[]
     {
             "[\\d]+: error:",
+            "[\\d]+: fatal error:",
+            "[\\d]+ errors? generated",
             "Assertion failure",
             "No such file or directory",
             "Undefined symbols",
