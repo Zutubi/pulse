@@ -28,13 +28,18 @@ public class AutoBuildHookConfigurationActions extends BuildHookConfigurationAct
 
     public void doEnable(AutoBuildHookConfiguration instance)
     {
-        instance.setEnabled(true);
-        configurationProvider.save(instance);
+        setInstanceEnabled(instance, true);
     }
 
     public void doDisable(AutoBuildHookConfiguration instance)
     {
-        instance.setEnabled(false);
+        setInstanceEnabled(instance, false);
+    }
+
+    private void setInstanceEnabled(AutoBuildHookConfiguration instance, boolean enabled)
+    {
+        instance = configurationProvider.deepClone(instance);
+        instance.setEnabled(enabled);
         configurationProvider.save(instance);
     }
 }

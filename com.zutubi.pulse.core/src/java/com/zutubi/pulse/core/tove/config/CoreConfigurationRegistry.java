@@ -47,6 +47,7 @@ public class CoreConfigurationRegistry implements ConfigurationRegistry
             registerConfigurationType(TestReportPostProcessorConfigurationSupport.class);
             registerConfigurationType(XMLTestReportPostProcessorConfigurationSupport.class);
 
+            registerConfigurationType(CommandConfiguration.class);
             registerConfigurationType(CommandConfigurationSupport.class);
             registerConfigurationType(OutputProducingCommandConfigurationSupport.class);
             registerConfigurationType(CommandGroupConfiguration.class);

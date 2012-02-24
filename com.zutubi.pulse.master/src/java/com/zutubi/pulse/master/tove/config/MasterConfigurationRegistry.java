@@ -285,7 +285,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
                     typeRegistry.register(creatorClass);
                 }
 
-                Class actionsClass = ConventionSupport.getActions(clazz);
+                Class actionsClass = ConventionSupport.getActions(type.getClazz());
                 if(actionsClass != null)
                 {
                     ConfigurationActions configurationActions = actionManager.getConfigurationActions(type);

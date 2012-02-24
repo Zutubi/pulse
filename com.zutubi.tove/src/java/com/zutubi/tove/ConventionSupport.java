@@ -2,6 +2,10 @@ package com.zutubi.tove;
 
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.Type;
+import com.zutubi.util.reflection.ReflectionUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Helper methods for finding classes associated with configuration types,
@@ -65,24 +69,64 @@ public class ConventionSupport
 
     private static Class loadClass(Class clazz, String suffix)
     {
-        if(clazz.isArray() || clazz.isPrimitive())
+        Class searchClass = clazz;
+        if (searchClass.isArray() || searchClass.isPrimitive())
         {
             return null;
         }
         
-        while (clazz != null && clazz != Object.class)
+        while (searchClass != null && searchClass != Object.class)
         {
             try
             {
-                String className = clazz.getName() + suffix;
-                return clazz.getClassLoader().loadClass(className);
+                String className = searchClass.getName() + suffix;
+                return searchClass.getClassLoader().loadClass(className);
             }
             catch (ClassNotFoundException e)
             {
                 // noops.
             }
-            clazz = clazz.getSuperclass();
+            searchClass = searchClass.getSuperclass();
         }
-        return null;
+
+        // Interfaces are done separately, as there is no longer a total
+        // ordering.  Because of this we actually verify that we only find one
+        // matching *Actions interface (we don't want silent non-determinism).
+        Set<Class> implementedInterfaces = ReflectionUtils.getImplementedInterfaces(clazz, Object.class, true);
+        Set<Class> foundInterfaces = new HashSet<Class>();
+        for (Class iface: implementedInterfaces)
+        {
+            if (iface != Configuration.class && Configuration.class.isAssignableFrom(iface))
+            {
+                try
+                {
+                    String interfaceName = iface.getName() + suffix;
+                    foundInterfaces.add(iface.getClassLoader().loadClass(interfaceName));
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // noops.
+                }
+            }
+        }
+
+        if (foundInterfaces.isEmpty())
+        {
+            return null;
+        }
+        else if (foundInterfaces.size() == 1)
+        {
+            return foundInterfaces.iterator().next();
+        }
+        else
+        {
+            String message = "Unable to resolve " + suffix + " type for class '" + clazz.getName() + "': multiple candidate interfaces found:";
+            for (Class iface: foundInterfaces)
+            {
+                message += " '" + iface.getName() + "'";
+            }
+            
+            throw new RuntimeException(message);
+        }
     }
 }

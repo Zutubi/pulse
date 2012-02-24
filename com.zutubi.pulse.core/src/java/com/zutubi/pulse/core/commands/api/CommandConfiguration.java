@@ -15,7 +15,7 @@ import java.util.Map;
  * to build from the configuration.
  */
 @SymbolicName("zutubi.commandConfig")
-@Table(columns = {"name", "force"})
+@Table(columns = {"name", "force", "enabled"})
 public interface CommandConfiguration extends NamedConfiguration
 {
     /**
