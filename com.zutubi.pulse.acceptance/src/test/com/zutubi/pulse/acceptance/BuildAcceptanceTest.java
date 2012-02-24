@@ -51,6 +51,7 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.httpclient.Header;
 import org.tmatesoft.svn.core.SVNException;
 
@@ -92,6 +93,8 @@ import static org.hamcrest.Matchers.hasItem;
  */
 public class BuildAcceptanceTest extends AcceptanceTestBase
 {
+    private static final Logger LOG = Logger.getLogger(BuildAcceptanceTest.class);
+
     private static final int BUILD_TIMEOUT = 120000;
 
     private static final String CHANGE_AUTHOR = "pulse";
@@ -1436,7 +1439,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         String bootstrapPath = PathUtils.getPath(projectPath, Project.BOOTSTRAP);
         Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
-        bootstrap.put(Bootstrap.TEMP_DIR_PATTERN, "${data.dir}/customwork/${project}");
+        bootstrap.put(Bootstrap.PERSISTENT_DIR_PATTERN, "${data.dir}/customwork/${project}");
         rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
@@ -1480,7 +1483,14 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         }
         finally
         {
-            FileSystemUtils.rmdir(tempDir);
+            try
+            {
+                FileSystemUtils.rmdir(tempDir);
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
         }
     }
 
