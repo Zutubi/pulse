@@ -178,6 +178,10 @@
                 <ref local="addProjectCleanPermission"/>
                 <ref local="addSubscriptionLogOptions"/>
                 <ref local="addMasterResources"/>
+                <ref local="addBootstrapOptions"/>
+                <ref local="populateBootstrapOptions"/>
+                <ref local="removePersistentWorkDirOption"/>
+                <ref local="removeCheckoutScheme"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -935,5 +939,21 @@
 
     <bean id="addMasterResources" class="com.zutubi.pulse.master.upgrade.tasks.AddMasterResourcesUpgradeTask">
         <property name="buildNumber" value="204999010"/>
+    </bean>
+
+    <bean id="addBootstrapOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddBootstrapOptionsUpgradeTask">
+        <property name="buildNumber" value="205000001"/>
+    </bean>
+
+    <bean id="populateBootstrapOptions" class="com.zutubi.pulse.master.upgrade.tasks.PopulateBootstrapOptionsUpgradeTask">
+        <property name="buildNumber" value="205000002"/>
+    </bean>
+
+    <bean id="removePersistentWorkDirOption" class="com.zutubi.pulse.master.upgrade.tasks.RemovePersistentWorkDirOptionUpgradeTask">
+        <property name="buildNumber" value="205000003"/>
+    </bean>
+
+    <bean id="removeCheckoutScheme" class="com.zutubi.pulse.master.upgrade.tasks.RemoveCheckoutSchemeUpgradeTask">
+        <property name="buildNumber" value="205000004"/>
     </bean>
 </beans>

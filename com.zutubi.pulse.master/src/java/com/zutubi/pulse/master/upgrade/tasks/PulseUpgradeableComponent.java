@@ -14,8 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Handles upgrades built in to Pulse (not plugged in).
  */
 public class PulseUpgradeableComponent implements UpgradeableComponent, JobListener<PulseUpgradeTask>
 {
@@ -23,11 +22,8 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
      * The registered upgrade tasks.
      */
     private List<PulseUpgradeTask> upgradeTasks = new LinkedList<PulseUpgradeTask>();
-
     private List<PulseUpgradeTask> systemTasks = new LinkedList<PulseUpgradeTask>();
-
     private MasterConfigurationManager configurationManager;
-    
     private Data upgradeTarget;
 
     /**
