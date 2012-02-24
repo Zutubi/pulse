@@ -9,7 +9,8 @@ import java.io.File;
 public interface RecipePaths
 {
     /**
-     * @return the directory where a boostrap checkout should take place, if any
+     * @return the directory where a bootstrap checkout should take place, or
+     * null if no checkout should be performed
      */
     File getCheckoutDir();
 

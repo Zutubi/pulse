@@ -3,7 +3,6 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -15,6 +14,8 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A runnable that wraps execution of a recipe on the master.
@@ -43,7 +44,7 @@ public class MasterRecipeRunner implements RecipeRunner
 
         PulseExecutionContext context = request.getContext();
         File dataDir = configurationManager.getUserPaths().getData();
-        ServerRecipePaths recipePaths = new ServerRecipePaths(new AgentRecipeDetails(context), dataDir);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(context, dataDir);
 
         CommandEventOutputStream outputStream = null;
         context.push();

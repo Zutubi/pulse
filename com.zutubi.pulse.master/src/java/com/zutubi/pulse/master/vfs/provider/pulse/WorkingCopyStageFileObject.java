@@ -2,12 +2,13 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildType;
+import com.zutubi.pulse.master.tove.config.project.CheckoutType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoRootFileObject;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -120,8 +121,8 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         details.setAgentDataPattern(agentConfig.getDataDirectory());
         details.setAgentHandle(agentConfig.getHandle());
 
-        details.setIncremental(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutScheme() == CheckoutScheme.INCREMENTAL_UPDATE);
-        details.setUpdate(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutScheme() != CheckoutScheme.CLEAN_CHECKOUT);
+        details.setIncremental(!buildResult.isPersonal() && projectConfig.getBootstrap().getBuildType() == BuildType.INCREMENTAL_BUILD);
+        details.setUpdate(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutType() == CheckoutType.INCREMENTAL_CHECKOUT);
         details.setProject(projectConfig.getName());
         details.setProjectHandle(projectConfig.getHandle());
         details.setProjectPersistentPattern(projectConfig.getBootstrap().getPersistentDirPattern());

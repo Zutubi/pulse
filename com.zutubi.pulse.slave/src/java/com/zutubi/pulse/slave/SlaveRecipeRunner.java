@@ -68,7 +68,7 @@ public class SlaveRecipeRunner implements RecipeRunner
             PulseExecutionContext context = request.getContext();
             AgentRecipeDetails details = new AgentRecipeDetails(context);
             File dataDir = configurationManager.getUserPaths().getData();
-            ServerRecipePaths processorPaths = new ServerRecipePaths(details, dataDir);
+            ServerRecipePaths processorPaths = new ServerRecipePaths(context, dataDir);
 
             ResourceRepository repo = new RemoteResourceRepository(details.getAgentHandle(), masterProxy, serviceTokenManager);
 

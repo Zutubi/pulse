@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.build.control;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -33,20 +34,20 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
+    public void collect(BuildResult result, long recipeId, ExecutionContext context, AgentService agentService)
     {
         if (agentService != null)
         {
             File outputDest = paths.getOutputDir(result, recipeId);
-            agentService.collectResults(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental, update), outputDest);
+            agentService.collectResults(new AgentRecipeDetails(context), outputDest);
         }
     }
 
-    public void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
+    public void cleanup(long recipeId, ExecutionContext context, AgentService agentService)
     {
         if (agentService != null)
         {
-            agentService.cleanup(getRecipeDetails(agentService.getAgentConfig(), stageHandle, stage, recipeId, incremental, update));
+            agentService.cleanup(new AgentRecipeDetails(context));
         }
     }
 

@@ -26,7 +26,7 @@ public class LocalRecipePaths implements RecipePaths
 
     public File getCheckoutDir()
     {
-        return baseDir;
+        return null;
     }
 
     public File getBaseDir()

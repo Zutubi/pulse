@@ -36,16 +36,13 @@ public class CleanupRecipeCommand implements Runnable
             LOG.warning("Unable to remove recipe root directory: " + e.getMessage(), e);
         }
 
-        if (!recipeDetails.isIncremental())
+        try
         {
-            try
-            {
-                FileSystemUtils.rmdir(recipeProcessorPaths.getBaseDir());
-            }
-            catch (IOException e)
-            {
-                LOG.warning("Unable to remove recipe base directory: " + e.getMessage(), e);
-            }
+            FileSystemUtils.rmdir(recipeProcessorPaths.getTempDir());
+        }
+        catch (IOException e)
+        {
+            LOG.warning("Unable to remove recipe temp directory: " + e.getMessage(), e);
         }
     }
 

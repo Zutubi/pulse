@@ -48,9 +48,8 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
-import com.zutubi.pulse.servercore.ProjectRepositoryBootstrapper;
+import com.zutubi.pulse.servercore.ProjectBootstrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
@@ -467,26 +466,7 @@ public class DefaultBuildController implements EventListener, BuildController
             controller.prepare(buildResult);
         }
 
-        initialiseControllers(new BootstrapperCreator()
-        {
-            public Bootstrapper create()
-            {
-                Bootstrapper initialBootstrapper;
-                if (buildContext.getBoolean(PROPERTY_INCREMENTAL_BOOTSTRAP, false))
-                {
-                    initialBootstrapper = new ProjectRepositoryBootstrapper(projectConfig.getName(), request.getRevision());
-                }
-                else
-                {
-                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), request.getRevision());
-                    if (request.isPersonal())
-                    {
-                        initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
-                    }
-                }
-                return initialBootstrapper;
-            }
-        });
+        initialiseControllers();
 
         // If there are no executing controllers, then there is nothing more to be done.
         // Complete the build now as we will not be receiving event triggered callbacks
@@ -626,8 +606,14 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private void initialiseControllers(BootstrapperCreator bootstrapperCreator)
+    private void initialiseControllers()
     {
+        Bootstrapper bootstrapper = new ProjectBootstrapper(projectConfig.getName(), request.getRevision());
+        if (request.isPersonal())
+        {
+            bootstrapper = createPersonalBuildBootstrapper(bootstrapper);
+        }
+
         // Important to add them all first as a failure during initialisation
         // will test if there are other executing controllers (if not the
         // build is finished).
@@ -638,7 +624,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         for (RecipeController controller : sortedControllers)
         {
-            controller.initialise(bootstrapperCreator.create());
+            controller.initialise(bootstrapper);
             checkControllerStatus(controller);
         }
     }
@@ -863,7 +849,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 controller.collect(buildResult);
             }
 
-            controller.postStage(buildResult);
+            controller.postStage();
 
             // the end of the post recipe execution handling.
             publishEvent(new RecipeCollectedEvent(this, controller.getResult().getId()));
@@ -1230,11 +1216,6 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
-    }
-
-    private static interface BootstrapperCreator
-    {
-        Bootstrapper create();
     }
 
     private static class ContainsMatchingPropertyPredicate implements Predicate<ResourceProperty>

@@ -31,16 +31,12 @@ import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -1439,6 +1435,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         String bootstrapPath = PathUtils.getPath(projectPath, Project.BOOTSTRAP);
         Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
+        bootstrap.put(Bootstrap.CHECKOUT_TYPE, CheckoutType.INCREMENTAL_CHECKOUT.name());
+        bootstrap.put(Bootstrap.BUILD_TYPE, BuildType.INCREMENTAL_BUILD.name());
         bootstrap.put(Bootstrap.PERSISTENT_DIR_PATTERN, "${data.dir}/customwork/${project}");
         rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
 
@@ -1462,7 +1460,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         try
         {
             final WaitProject project = projects.createWaitAntProject(random, tempDir, false);
-            String tempDirPattern = tempDir.getAbsolutePath() + "/base";
+            final String tempDirPattern = tempDir.getAbsolutePath() + "/base";
             project.getConfig().getBootstrap().setTempDirPattern(tempDirPattern);
             project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
             configurationHelper.insertProject(project.getConfig(), false);
@@ -1471,15 +1469,19 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
-            File baseDir = new File(tempDirPattern);
-            assertTrue(baseDir.isDirectory());
-            File buildFile = new File(baseDir, "build.xml");
-            assertTrue(buildFile.isFile());
-            
+            TestUtils.waitForCondition(new Condition()
+            {
+                public boolean satisfied()
+                {
+                    File buildFile = new File(tempDirPattern, "build.xml");
+                    return buildFile.isFile();
+                }
+            }, BUILD_TIMEOUT, "build file to appear in customr temp directory");
+
             project.releaseBuild();
             rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), 1);
             
-            assertFalse(baseDir.exists());
+            assertFalse(new File(tempDirPattern).exists());
         }
         finally
         {
@@ -1615,7 +1617,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         {
             String projectPath = rpcClient.RemoteApi.insertSimpleProject(projectName);
             assignStageToAgent(projectName, DEFAULT_STAGE, agentName);
-            setSchemeToIncrementalUpdate(projectName);
+            setToIncrementalCheckoutAndBuild(projectName);
 
             rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
             rpcClient.RemoteApi.doConfigAction(projectPath, ProjectConfigurationActions.ACTION_MARK_CLEAN);
@@ -1653,7 +1655,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         try
         {
             String projectPath = createProjectWithTwoAntStages(projectName, "build.xml", SECOND_STAGE_NAME);
-            setSchemeToIncrementalUpdate(projectName);
+            setToIncrementalCheckoutAndBuild(projectName);
 
             // First build establishes directories for both stages on master agent.
             rpcClient.RemoteApi.runBuild(projectName, BUILD_TIMEOUT);
@@ -1681,11 +1683,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         }
     }
     
-    private void setSchemeToIncrementalUpdate(String projectName) throws Exception
+    private void setToIncrementalCheckoutAndBuild(String projectName) throws Exception
     {
         String bootstrapPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, projectName, Project.BOOTSTRAP);
         Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
-        bootstrap.put(Bootstrap.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.toString());
+        bootstrap.put(Bootstrap.CHECKOUT_TYPE, CheckoutType.INCREMENTAL_CHECKOUT.toString());
+        bootstrap.put(Bootstrap.BUILD_TYPE, BuildType.INCREMENTAL_BUILD.toString());
         rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
         rpcClient.RemoteApi.waitForProjectToInitialise(projectName);
     }

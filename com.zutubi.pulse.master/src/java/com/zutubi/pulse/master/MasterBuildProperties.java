@@ -7,11 +7,12 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildType;
+import com.zutubi.pulse.master.tove.config.project.CheckoutType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
@@ -92,9 +93,9 @@ public class MasterBuildProperties extends BuildProperties
         }
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OWNER, owner);
 
-        CheckoutScheme checkoutScheme = projectConfig.getBootstrap().getCheckoutScheme();
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && checkoutScheme != CheckoutScheme.CLEAN_CHECKOUT));
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_SKIP_CHECKOUT, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutType() == CheckoutType.NO_CHECKOUT));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutType() == CheckoutType.INCREMENTAL_CHECKOUT));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getBuildType() == BuildType.INCREMENTAL_BUILD));
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, Boolean.toString(true));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getBootstrap().getPersistentDirPattern());

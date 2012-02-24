@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import java.util.Hashtable;
-import java.util.Vector;
 
 /**
  * Tests configuration of projects via the remote API.
@@ -46,7 +46,7 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> createdBootstrap = (Hashtable<String, Object>) createdProject.get("bootstrap");
         assertNotNull(createdBootstrap);
         assertEquals("zutubi.bootstrapConfig", createdBootstrap.get(SYMBOLIC_NAME_KEY));
-        assertEquals("CLEAN_CHECKOUT", createdBootstrap.get("checkoutScheme"));
+        assertEquals("CLEAN_CHECKOUT", createdBootstrap.get(Constants.Project.Bootstrap.CHECKOUT_TYPE));
 
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);

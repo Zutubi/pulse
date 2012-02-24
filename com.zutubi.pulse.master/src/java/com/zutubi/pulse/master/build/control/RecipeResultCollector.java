@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.control;
 
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.model.BuildResult;
 
@@ -11,9 +12,9 @@ public interface RecipeResultCollector
 {
     void prepare(BuildResult result, long recipeId);
 
-    void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService);
+    void collect(BuildResult result, long recipeId, ExecutionContext context, AgentService agentService);
 
-    void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService);
+    void cleanup(long recipeId, ExecutionContext context, AgentService agentService);
 
     File getRecipeDir(BuildResult result, long recipeId);
 }

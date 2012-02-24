@@ -203,7 +203,8 @@ public class Constants
          */
         public static class Bootstrap
         {
-            public static final String CHECKOUT_SCHEME = "checkoutScheme";
+            public static final String CHECKOUT_TYPE = "checkoutType";
+            public static final String BUILD_TYPE = "buildType";
             public static final String PERSISTENT_DIR_PATTERN = "persistentDirPattern";
             public static final String TEMP_DIR_PATTERN = "tempDirPattern";
         }

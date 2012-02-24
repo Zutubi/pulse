@@ -5,17 +5,19 @@ import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildType;
+import com.zutubi.pulse.master.tove.config.project.CheckoutType;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
-import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
  * Tests for the working copy functionality.
@@ -51,7 +53,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         super.tearDown();
     }
 
-    public void testWorkingCopyLinkEnabledByIncrementalCheckoutScheme() throws Exception
+    public void testWorkingCopyLinkEnabledByIncrementalCheckout() throws Exception
     {
         ProjectConfiguration project = createProject(random);
 
@@ -60,7 +62,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         assertFalse(homePage.isViewWorkingCopyPresent());
 
-        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        setIncrementalCheckoutAndBuild(project);
 
         homePage.openAndWaitFor();
         assertTrue(homePage.isViewWorkingCopyPresent());
@@ -69,7 +71,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     public void testWorkingCopyLinkControlledByViewSourcePermissions() throws Exception
     {
         ProjectConfiguration project = createProject(random);
-        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        setIncrementalCheckoutAndBuild(project);
 
         getBrowser().loginAsAdmin();
 
@@ -100,7 +102,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     private void runTestViewWorkingCopyOnAgent(String agentName) throws Exception
     {
         ProjectConfiguration project = createProject(random, agentName);
-        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        setIncrementalCheckoutAndBuild(project);
         buildRunner.triggerSuccessfulBuild(project);
 
         getBrowser().loginAsAdmin();
@@ -123,7 +125,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
     public void testViewWorkingCopyBeforeFirstBuild() throws Exception
     {
         ProjectConfiguration project = createProject(random);
-        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        setIncrementalCheckoutAndBuild(project);
 
         getBrowser().loginAsAdmin();
 
@@ -150,7 +152,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         enableAgent(AGENT_NAME);
 
         ProjectConfiguration project = createProject(random, AGENT_NAME);
-        updateCheckoutScheme(project, CheckoutScheme.INCREMENTAL_UPDATE);
+        setIncrementalCheckoutAndBuild(project);
         buildRunner.triggerSuccessfulBuild(project);
 
         disableAgent(AGENT_NAME);
@@ -220,10 +222,11 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         return user;
     }
 
-    private void updateCheckoutScheme(ProjectConfiguration project, CheckoutScheme scheme) throws Exception
+    private void setIncrementalCheckoutAndBuild(ProjectConfiguration project) throws Exception
     {
         BootstrapConfiguration bootstrap = project.getBootstrap();
-        bootstrap.setCheckoutScheme(scheme);
+        bootstrap.setCheckoutType(CheckoutType.INCREMENTAL_CHECKOUT);
+        bootstrap.setBuildType(BuildType.INCREMENTAL_BUILD);
         configurationHelper.update(bootstrap);
     }
 }

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
@@ -36,10 +36,12 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.*;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static org.mockito.Mockito.*;
 
 public class RecipeControllerTest extends PulseTestCase
 {
@@ -318,12 +320,12 @@ public class RecipeControllerTest extends PulseTestCase
             preparedRecipes.add(recipeId);
         }
 
-        public void collect(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
+        public void collect(BuildResult result, long recipeId, ExecutionContext context, AgentService agentService)
         {
             collectedRecipes.put(recipeId, agentService);
         }
 
-        public void cleanup(BuildResult result, long stageHandle, String stage, long recipeId, boolean incremental, boolean update, AgentService agentService)
+        public void cleanup(long recipeId, ExecutionContext context, AgentService agentService)
         {
             cleanedRecipes.put(recipeId, agentService);
         }

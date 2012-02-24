@@ -1,15 +1,19 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_SKIP_CHECKOUT;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 
 /**
  * The server recipe paths, which by default live at:
@@ -28,11 +32,18 @@ public class ServerRecipePaths implements RecipePaths
     
     private AgentRecipeDetails recipeDetails;
     private File dataDir;
+    private boolean skipCheckout = false;
 
     public ServerRecipePaths(AgentRecipeDetails recipeDetails, File dataDir)
     {
         this.recipeDetails = recipeDetails;
         this.dataDir = dataDir;
+    }
+
+    public ServerRecipePaths(ExecutionContext context, File dataDir)
+    {
+        this(new AgentRecipeDetails(context), dataDir);
+        skipCheckout = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_SKIP_CHECKOUT, false);
     }
 
     private File getAgentDataDir()
@@ -87,15 +98,24 @@ public class ServerRecipePaths implements RecipePaths
         return resolveDirPattern(recipeDetails.getProjectPersistentPattern(), defaultDir);
     }
 
+    public File getTempDir()
+    {
+        return resolveDirPattern(recipeDetails.getProjectTempPattern(), new File(getRecipeRoot(), "base"));
+    }
+
     public File getCheckoutDir()
     {
-        if (recipeDetails.isUpdate())
+        if (skipCheckout)
+        {
+            return null;
+        }
+        else if (recipeDetails.isUpdate())
         {
             return getPersistentWorkDir();
         }
         else
         {
-            return getBaseDir();
+            return getTempDir();
         }
     }
 
@@ -107,7 +127,7 @@ public class ServerRecipePaths implements RecipePaths
         }
         else
         {
-            return resolveDirPattern(recipeDetails.getProjectTempPattern(), new File(getRecipeRoot(), "base"));
+            return getTempDir();
         }
     }
 

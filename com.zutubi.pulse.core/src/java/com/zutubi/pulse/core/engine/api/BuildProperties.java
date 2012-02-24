@@ -257,6 +257,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_SCM_CLIENT_FACTORY      = "scm.client.factory";
     /**
+     * Internal property used to indicate the checkout step should be skipped.
+     */
+    public static final String PROPERTY_SKIP_CHECKOUT           = "skip.checkout";
+    /**
      * The name of the stage being built.
      */
     public static final String PROPERTY_STAGE                   = "stage";

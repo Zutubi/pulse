@@ -71,10 +71,10 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.addProject(random, true, GLOBAL_PROJECT_NAME);
-        getBrowser().open(urls.adminProject(uriComponentEncode(random)) + "bootstrap/");
+        getBrowser().open(urls.adminProject(uriComponentEncode(random)) + Constants.Project.BOOTSTRAP);
         BootstrapForm form = getBrowser().createForm(BootstrapForm.class);
         form.waitFor();
-        String[] options = form.getComboBoxOptions("checkoutScheme");
+        String[] options = form.getComboBoxOptions(Constants.Project.Bootstrap.CHECKOUT_TYPE);
         assertEquals("", options[0]);
     }
 

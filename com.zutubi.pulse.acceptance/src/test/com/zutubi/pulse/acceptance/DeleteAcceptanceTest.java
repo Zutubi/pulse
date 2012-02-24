@@ -1,32 +1,30 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.acceptance.utils.Repository;
-import com.zutubi.pulse.core.scm.config.api.CheckoutScheme;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
-import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
+import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
-import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
-import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
-import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
+
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
+import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
+import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
+import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
@@ -150,7 +148,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
     {
         // Set up the project to build on the master agent, using a custom
         // persistent work directory.
-        setIncrementalUpdate();
+        setIncrementalCheckoutAndBuild();
         setMasterAgent();
         setCustomPersistentDir("$(agent.data.dir)/work/$(project)/$(stage)");
 
@@ -163,11 +161,12 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         return buildDirectory;
     }
 
-    private void setIncrementalUpdate() throws Exception
+    private void setIncrementalCheckoutAndBuild() throws Exception
     {
-        String bootstrapPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.BOOTSTRAP);
+        String bootstrapPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, random, Constants.Project.BOOTSTRAP);
         Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
-        bootstrap.put(Constants.Project.Bootstrap.CHECKOUT_SCHEME, CheckoutScheme.INCREMENTAL_UPDATE.name());
+        bootstrap.put(Constants.Project.Bootstrap.CHECKOUT_TYPE, CheckoutType.INCREMENTAL_CHECKOUT.toString());
+        bootstrap.put(Constants.Project.Bootstrap.BUILD_TYPE, BuildType.INCREMENTAL_BUILD.toString());
         rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
         rpcClient.RemoteApi.waitForProjectToInitialise(random);
     }
