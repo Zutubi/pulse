@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 
 public abstract class GitClientTestBase extends PulseTestCase
 {
@@ -50,7 +51,7 @@ public abstract class GitClientTestBase extends PulseTestCase
         repositoryBase = new File(tmp, "repo");
         repository = "file://" + repositoryBase.getCanonicalPath();
 
-        client = new GitClient(repository, "master", 0, GitConfiguration.CloneType.NORMAL);
+        client = new GitClient(repository, "master", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
 
         workingDir = new File(tmp, "wd");
         context = new PulseExecutionContext();

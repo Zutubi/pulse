@@ -10,14 +10,21 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.gitConfig")
 @ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "submoduleProcessing", "selectedSubmodules", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     public enum CloneType
     {
         SELECTED_BRANCH_ONLY,
         NORMAL,
-        FULL_MIRROR
+        FULL_MIRROR,
+    }
+
+    public enum SubmoduleProcessing
+    {
+        NONE,
+        UPDATE_ALL_RECURSIVELY,
+        UPDATE_SELECTED,
     }
 
     @Required
@@ -25,7 +32,10 @@ public class GitConfiguration extends PollableScmConfiguration
     @Required
     private String branch = "master";
     @Required
-    private CloneType cloneType = GitConfiguration.CloneType.NORMAL;
+    private CloneType cloneType = CloneType.NORMAL;
+    @Required @ControllingSelect(dependentFields = "selectedSubmodules", enableSet = {"UPDATE_SELECTED"})
+    private SubmoduleProcessing submoduleProcessing = SubmoduleProcessing.NONE;
+    private String selectedSubmodules;
     @ControllingCheckbox(checkedFields = "inactivityTimeoutSeconds") @Wizard.Ignore
     private boolean inactivityTimeoutEnabled = false;
     @Wizard.Ignore
@@ -65,6 +75,26 @@ public class GitConfiguration extends PollableScmConfiguration
     public void setCloneType(CloneType cloneType)
     {
         this.cloneType = cloneType;
+    }
+
+    public SubmoduleProcessing getSubmoduleProcessing()
+    {
+        return submoduleProcessing;
+    }
+
+    public void setSubmoduleProcessing(SubmoduleProcessing submoduleProcessing)
+    {
+        this.submoduleProcessing = submoduleProcessing;
+    }
+
+    public String getSelectedSubmodules()
+    {
+        return selectedSubmodules;
+    }
+
+    public void setSelectedSubmodules(String selectedSubmodules)
+    {
+        this.selectedSubmodules = selectedSubmodules;
     }
 
     public boolean isInactivityTimeoutEnabled()

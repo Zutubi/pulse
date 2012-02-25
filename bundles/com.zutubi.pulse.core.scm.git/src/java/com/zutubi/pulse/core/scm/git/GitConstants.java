@@ -20,6 +20,8 @@ public class GitConstants
 
     public static final String RESOURCE_NAME = "git";
 
+    // Top level commands.
+
     public static final String COMMAND_PULL = "pull";
     public static final String COMMAND_LOG = "log";
     public static final String COMMAND_CLONE = "clone";
@@ -43,6 +45,9 @@ public class GitConstants
     public static final String COMMAND_MERGE_BASE = "merge-base";
     public static final String COMMAND_APPLY = "apply";
     public static final String COMMAND_ADD = "add";
+    public static final String COMMAND_SUBMODULE = "submodule";
+
+    // Command flags.
 
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_FORCE = "-f";
@@ -66,11 +71,18 @@ public class GitConstants
     public static final String FLAG_FIND_COPIES = "-C";
     public static final String FLAG_CACHED = "--cached";
     public static final String FLAG_VERBOSE = "--verbose";
+    public static final String FLAG_INIT = "--init";
+    public static final String FLAG_RECURSIVE = "--recursive";
 
     public static final String FLAG_SEPARATOR = "--";
-    
-    public static final String ARG_ADD = "add";
 
+    // Non-flag command arguments (subcommands).
+
+    public static final String ARG_ADD = "add";
+    public static final String ARG_UPDATE = "update";
+
+    // Misc.
+    
     public static final String REMOTE_ORIGIN = "origin";
 
     public static final String REVISION_HEAD = "HEAD";

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         URL url = getClass().getResource("GitClientIntegrationTest.git.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
-        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, GitConfiguration.CloneType.NORMAL);
+        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 

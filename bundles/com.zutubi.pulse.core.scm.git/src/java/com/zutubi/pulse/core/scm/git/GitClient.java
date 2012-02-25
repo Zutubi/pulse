@@ -89,13 +89,17 @@ public class GitClient implements ScmClient
     private GitConfiguration.CloneType cloneType;
     private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
+    private boolean processSubmodules;
+    private List<String> submoduleNames;
 
-    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType)
+    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, boolean processSubmodules, List<String> submoduleNames)
     {
         this.repository = repository;
         this.branch = branch;
         this.inactivityTimeout = inactivityTimeout;
         this.cloneType = cloneType;
+        this.processSubmodules = processSubmodules;
+        this.submoduleNames = submoduleNames;
     }
 
     public String getImplicitResource()
@@ -254,6 +258,11 @@ public class GitClient implements ScmClient
             git.checkout(handler, revision.getRevisionString(), TMP_BRANCH_PREFIX + revision.getRevisionString());
         }
 
+        if (processSubmodules)
+        {
+            git.submoduleUpdate(handler, submoduleNames.isEmpty(), submoduleNames.toArray(new String[submoduleNames.size()]));
+        }
+
         createMarker(workingDir);
 
         // Determine the head revision from this checkout.  This is equivalent to the evaluated version
@@ -354,6 +363,11 @@ public class GitClient implements ScmClient
         {
             String rev = revision.getRevisionString();
             git.checkout(handler, rev, TMP_BRANCH_PREFIX + rev);
+        }
+
+        if (processSubmodules)
+        {
+            git.submoduleUpdate(handler, submoduleNames.isEmpty(), submoduleNames.toArray(new String[submoduleNames.size()]));
         }
 
         GitLogEntry entry = git.log(1).get(0);
@@ -659,6 +673,16 @@ public class GitClient implements ScmClient
     public void setCloneType(GitConfiguration.CloneType cloneType)
     {
         this.cloneType = cloneType;
+    }
+
+    public void setProcessSubmodules(boolean processSubmodules)
+    {
+        this.processSubmodules = processSubmodules;
+    }
+
+    public void setSubmoduleNames(List<String> submoduleNames)
+    {
+        this.submoduleNames = submoduleNames;
     }
 
     public void testConnection(ScmContext context) throws ScmException

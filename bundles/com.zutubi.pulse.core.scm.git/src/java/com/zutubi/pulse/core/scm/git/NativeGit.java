@@ -215,6 +215,18 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_CHECKOUT, FLAG_FORCE, FLAG_BRANCH, localBranch, branch);
     }
 
+    public void submoduleUpdate(ScmFeedbackHandler handler, boolean recursive, String... submodules) throws ScmException
+    {
+        List<String> commands = new LinkedList<String>(Arrays.asList(getGitCommand(), COMMAND_SUBMODULE, ARG_UPDATE, FLAG_INIT));
+        if (recursive)
+        {
+            commands.add(FLAG_RECURSIVE);
+        }
+
+        commands.addAll(Arrays.asList(submodules));
+        run(handler, commands.toArray(new String[commands.size()]));
+    }
+
     public void deleteBranch(String branch) throws ScmException
     {
         run(getGitCommand(), COMMAND_BRANCH, FLAG_DELETE, branch);

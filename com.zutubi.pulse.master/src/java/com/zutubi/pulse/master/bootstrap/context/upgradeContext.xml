@@ -182,6 +182,7 @@
                 <ref local="populateBootstrapOptions"/>
                 <ref local="removePersistentWorkDirOption"/>
                 <ref local="removeCheckoutScheme"/>
+                <ref local="addGitSubmoduleOptions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -955,5 +956,9 @@
 
     <bean id="removeCheckoutScheme" class="com.zutubi.pulse.master.upgrade.tasks.RemoveCheckoutSchemeUpgradeTask">
         <property name="buildNumber" value="205000004"/>
+    </bean>
+
+    <bean id="addGitSubmoduleOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddGitSubmoduleOptionsUpgradeTask">
+        <property name="buildNumber" value="205000005"/>
     </bean>
 </beans>
