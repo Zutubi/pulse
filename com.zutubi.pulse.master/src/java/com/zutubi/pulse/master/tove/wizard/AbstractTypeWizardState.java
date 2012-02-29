@@ -54,7 +54,7 @@ public abstract class AbstractTypeWizardState extends AbstractChainableState
     @SuppressWarnings({"unchecked"})
     public void updateRecord(Map parameters)
     {
-        getDataRecord().update(ToveUtils.toRecord(getType(), parameters));
+        getDataRecord().update(ToveUtils.toRecord(getType(), parameters), false, true);
     }
 
     public Messages getMessages()

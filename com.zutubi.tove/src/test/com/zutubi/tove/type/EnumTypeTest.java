@@ -26,7 +26,7 @@ public class EnumTypeTest extends TypeTestCase
 
     public void testFromXmlRpc() throws TypeException
     {
-        Object o = type.fromXmlRpc(null, "M2");
+        Object o = type.fromXmlRpc(null, "M2", true);
         assertTrue(o instanceof String);
         assertEquals("M2", o);
     }
@@ -35,7 +35,7 @@ public class EnumTypeTest extends TypeTestCase
     {
         try
         {
-            type.fromXmlRpc(null, new Integer(2));
+            type.fromXmlRpc(null, new Integer(2), true);
             fail();
         }
         catch (TypeException e)

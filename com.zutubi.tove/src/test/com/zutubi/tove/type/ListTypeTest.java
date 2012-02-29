@@ -125,7 +125,7 @@ public class ListTypeTest extends TypeTestCase
         Vector<Hashtable<String, Object>> rpcForm = new Vector<Hashtable<String, Object>>();
         rpcForm.add(entry);
 
-        Object o = listType.fromXmlRpc(null, rpcForm);
+        Object o = listType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof Record);
         Record record = (Record) o;
         assertEquals(1, record.size());
@@ -141,7 +141,7 @@ public class ListTypeTest extends TypeTestCase
     {
         Vector<Hashtable<String, Object>> rpcForm = new Vector<Hashtable<String, Object>>();
 
-        Object o = listType.fromXmlRpc(null, rpcForm);
+        Object o = listType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof Record);
         Record record = (Record) o;
         assertEquals(0, record.size());
@@ -151,7 +151,7 @@ public class ListTypeTest extends TypeTestCase
     {
         try
         {
-            listType.fromXmlRpc(null, new Hashtable());
+            listType.fromXmlRpc(null, new Hashtable(), true);
             fail();
         }
         catch (TypeException e)
@@ -166,7 +166,7 @@ public class ListTypeTest extends TypeTestCase
         vector.add("bad news");
         try
         {
-            listType.fromXmlRpc(null, vector);
+            listType.fromXmlRpc(null, vector, true);
             fail();
         }
         catch (TypeException e)
@@ -180,7 +180,7 @@ public class ListTypeTest extends TypeTestCase
         Vector<String> rpcForm = new Vector<String>();
         rpcForm.add("simple");
 
-        Object o = simpleListType.fromXmlRpc(null, rpcForm);
+        Object o = simpleListType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof String[]);
         String[] array = (String[]) o;
         assertEquals(1, array.length);
@@ -191,7 +191,7 @@ public class ListTypeTest extends TypeTestCase
     {
         Vector<String> rpcForm = new Vector<String>();
 
-        Object o = simpleListType.fromXmlRpc(null, rpcForm);
+        Object o = simpleListType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof String[]);
         String[] array = (String[]) o;
         assertEquals(0, array.length);
@@ -201,7 +201,7 @@ public class ListTypeTest extends TypeTestCase
     {
         try
         {
-            simpleListType.fromXmlRpc(null, "string");
+            simpleListType.fromXmlRpc(null, "string", true);
             fail();
         }
         catch (TypeException e)
@@ -216,7 +216,7 @@ public class ListTypeTest extends TypeTestCase
         {
             Vector<Integer> v = new Vector<Integer>();
             v.add(2);
-            simpleListType.fromXmlRpc(null, v);
+            simpleListType.fromXmlRpc(null, v, true);
             fail();
         }
         catch (TypeException e)

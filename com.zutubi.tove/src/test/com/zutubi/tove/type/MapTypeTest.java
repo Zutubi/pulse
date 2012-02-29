@@ -103,7 +103,7 @@ public class MapTypeTest extends TypeTestCase
         Hashtable<String, Object> rpcForm = new Hashtable<String, Object>();
         rpcForm.put("avalue", element);
 
-        Object o = mapType.fromXmlRpc(null, rpcForm);
+        Object o = mapType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof Record);
         Record record = (Record) o;
         assertEquals(1, record.size());
@@ -119,7 +119,7 @@ public class MapTypeTest extends TypeTestCase
     {
         Hashtable rpcForm = new Hashtable();
 
-        Object o = mapType.fromXmlRpc(null, rpcForm);
+        Object o = mapType.fromXmlRpc(null, rpcForm, true);
         assertTrue(o instanceof Record);
         Record record = (Record) o;
         assertEquals(0, record.size());
@@ -129,7 +129,7 @@ public class MapTypeTest extends TypeTestCase
     {
         try
         {
-            mapType.fromXmlRpc(null, "string");
+            mapType.fromXmlRpc(null, "string", true);
             fail();
         }
         catch (TypeException e)
@@ -144,7 +144,7 @@ public class MapTypeTest extends TypeTestCase
         {
             Hashtable<String, Object> rpcForm = new Hashtable<String, Object>();
             rpcForm.put("a", "avalue");
-            mapType.fromXmlRpc(null, rpcForm);
+            mapType.fromXmlRpc(null, rpcForm, true);
             fail();
         }
         catch (TypeException e)
@@ -159,7 +159,7 @@ public class MapTypeTest extends TypeTestCase
         {
             Hashtable<Integer, Object> rpcForm = new Hashtable<Integer, Object>();
             rpcForm.put(1, "avalue");
-            mapType.fromXmlRpc(null, rpcForm);
+            mapType.fromXmlRpc(null, rpcForm, true);
             fail();
         }
         catch (TypeException e)

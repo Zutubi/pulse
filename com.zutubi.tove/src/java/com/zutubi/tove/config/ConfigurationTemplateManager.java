@@ -1691,7 +1691,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             TemplateRecord templateRecord = (TemplateRecord) existingRecord;
             newRecord = templateRecord.getMoi().copy(false, true);
-            newRecord.update(updates);
+            newRecord.update(updates, false, true);
 
             // Scrub values from the incoming record where they are identical
             // to the existing record's parent.
@@ -1700,7 +1700,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         else
         {
             newRecord = existingRecord.copy(false, true);
-            newRecord.update(updates);
+            newRecord.update(updates, false, true);
         }
 
         return newRecord;

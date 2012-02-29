@@ -79,7 +79,10 @@ public interface Type
      *                          the data is or will be contained by, may be
      *                          null if not within a templated scope
      * @param data the data to be converted (XML-RPC form)  @return the record formatted data
+     * @param applyDefaults if true, default values will be added to the
+     *                      returned record where not provided in the XML-RPC
+     *                      data
      * @throws TypeException in the event of an error
      */
-    Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException;
+    Object fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException;
 }

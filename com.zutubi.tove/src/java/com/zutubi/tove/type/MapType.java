@@ -176,7 +176,7 @@ public class MapType extends CollectionType
         }
     }
 
-    public Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
+    public Object fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
         typeCheck(data, Hashtable.class);
         return convertToRecord((Hashtable) data, new XmlRpcToRecord(templateOwnerPath));
@@ -402,7 +402,7 @@ public class MapType extends CollectionType
 
         public Object convert(Type type, Object object) throws TypeException
         {
-            return type.fromXmlRpc(templateOwnerPath, object);
+            return type.fromXmlRpc(templateOwnerPath, object, true);
         }
     }
 }

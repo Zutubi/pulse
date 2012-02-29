@@ -58,7 +58,7 @@ public class EnumType extends SimpleType
         return data;
     }
 
-    public String fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
+    public String fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
         typeCheck(data, String.class);
         return (String) data;

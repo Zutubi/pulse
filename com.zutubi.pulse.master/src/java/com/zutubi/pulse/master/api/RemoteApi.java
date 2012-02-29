@@ -680,7 +680,7 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config);
+            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config, true);
 
             Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true, true);
             if (!type.isValid(instance))
@@ -761,12 +761,17 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-            MutableRecord record = type.fromXmlRpc(null, config);
+            // Start with the template parent, overwrite with provided struct,
+            // then apply defaults where values are not specified.
+            MutableRecord record = templateParent.flatten(false);
+            record.update(type.fromXmlRpc(null, config, false), true, true);
+            record.update(type.createNewRecord(true), true, false);
             configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
-            if (template)
+            if (!template)
             {
-                configurationTemplateManager.markAsTemplate(record);
+                record.removeMeta(TemplateRecord.TEMPLATE_KEY);
             }
+            record.removeMeta(Configuration.PERMANENT_KEY);
 
             Configuration instance = configurationTemplateManager.validate(insertPath, null, record, !template, true);
             if (!type.isValid(instance))
@@ -844,7 +849,7 @@ public class RemoteApi
             }
 
             CompositeType type = typeRegistry.getType(existingSymbolicName);
-            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config);
+            MutableRecord record = type.fromXmlRpc(configurationTemplateManager.getTemplateOwnerPath(path), config, true);
             ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
 
             Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, configurationTemplateManager.isConcrete(path), deep);
@@ -1501,7 +1506,7 @@ public class RemoteApi
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
-            MutableRecord record = type.fromXmlRpc(null, argument);
+            MutableRecord record = type.fromXmlRpc(null, argument, true);
             Configuration arg = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, true);
             if (!type.isValid(arg))
             {

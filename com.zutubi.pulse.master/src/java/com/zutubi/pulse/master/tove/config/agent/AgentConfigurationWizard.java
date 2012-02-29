@@ -7,8 +7,7 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
 
 /**
- *
- *
+ * A wizard tailored to creating agents (or agent templates).
  */
 public class AgentConfigurationWizard extends AbstractTypeWizard
 {
@@ -25,7 +24,7 @@ public class AgentConfigurationWizard extends AbstractTypeWizard
         super.doFinish();
 
         MutableRecord record = agentType.createNewRecord(false);
-        record.update(getCompletedStateForType(agentType).getDataRecord());
+        record.update(getCompletedStateForType(agentType).getDataRecord(), false, true);
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if(template)

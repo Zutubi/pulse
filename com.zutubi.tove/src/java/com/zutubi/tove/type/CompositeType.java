@@ -165,17 +165,6 @@ public class CompositeType extends AbstractType implements ComplexType
         });
     }
 
-    public List<Type> getPropertyTypes(Class<? extends Type> type)
-    {
-        return CollectionUtils.map(getProperties(type), new Mapping<TypeProperty, Type>()
-        {
-            public Type map(TypeProperty property)
-            {
-                return property.getType();
-            }
-        });
-    }
-
     public List<String> getPropertyNames()
     {
         return new LinkedList<String>(properties.keySet());
@@ -225,11 +214,6 @@ public class CompositeType extends AbstractType implements ComplexType
     public boolean hasProperty(String propertyName)
     {
         return properties.containsKey(propertyName);
-    }
-
-    public boolean hasInternalProperties()
-    {
-        return internalProperties.size() > 0;
     }
 
     public boolean hasInternalProperty(String propertyName)
@@ -575,7 +559,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return (String) o;
     }
 
-    public MutableRecord fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
+    public MutableRecord fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
         typeCheck(data, Hashtable.class);
 
@@ -594,8 +578,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 }
             }
 
-            // Values not specified get default values.
-            MutableRecord result = createNewRecord(true);
+            MutableRecord result = createNewRecord(applyDefaults);
 
             // Internal properties may not be set this way, so strip them
             // from the default config.
@@ -620,7 +603,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 throw new TypeException("XML-RPC struct has unrecognised symbolic name '" + symbolicName + "'");
             }
 
-            return actualType.fromXmlRpc(templateOwnerPath, data);
+            return actualType.fromXmlRpc(templateOwnerPath, data, true);
         }
     }
 
@@ -636,7 +619,7 @@ public class CompositeType extends AbstractType implements ComplexType
         {
             try
             {
-                result.put(property.getName(), property.getType().fromXmlRpc(tempalteOwnerPath, value));
+                result.put(property.getName(), property.getType().fromXmlRpc(tempalteOwnerPath, value, true));
             }
             catch (TypeException e)
             {

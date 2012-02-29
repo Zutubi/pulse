@@ -31,7 +31,23 @@ public interface MutableRecord extends Record, Cloneable
 
     void clear();
 
-    void update(Record record);
+    /**
+     * Updates this record by taking values from the given record.  All meta
+     * and simple values from the given record are added to this record, except
+     * where overwriteExisting is false and a corresponding value is already
+     * defined.  If deep is true, all nested record in the given record are
+     * used to recursively update existing counterparts in this record.  If
+     * there is no existing counterpart a copy of the nested record is inserted
+     * into this record.
+     *
+     * @param record the record to take values from to update this record
+     * @param deep if true, the update recursively processes nested records
+     *             where they exist in both this and the given record
+     * @param overwriteExisting if true, values from record are unconditionally
+     *                          set on this; if false they are only set where
+     *                          no corresponding value exists
+     */
+    void update(Record record, boolean deep, boolean overwriteExisting);
 
     void setHandle(long handle);
 

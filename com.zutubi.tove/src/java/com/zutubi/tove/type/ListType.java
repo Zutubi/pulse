@@ -243,7 +243,7 @@ public class ListType extends CollectionType
         }
     }
 
-    public Object fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
+    public Object fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
         typeCheck(data, Vector.class);
         Vector vector = (Vector) data;
@@ -259,7 +259,7 @@ public class ListType extends CollectionType
             {
                 try
                 {
-                    result[i++] = simpleType.fromXmlRpc(templateOwnerPath, item);
+                    result[i++] = simpleType.fromXmlRpc(templateOwnerPath, item, true);
                 }
                 catch (TypeException e)
                 {
@@ -465,7 +465,7 @@ public class ListType extends CollectionType
 
         public Object convert(Type type, Object data) throws TypeException
         {
-            return type.fromXmlRpc(templateOwnerPath, data);
+            return type.fromXmlRpc(templateOwnerPath, data, true);
         }
 
         public String getKey(Object data)

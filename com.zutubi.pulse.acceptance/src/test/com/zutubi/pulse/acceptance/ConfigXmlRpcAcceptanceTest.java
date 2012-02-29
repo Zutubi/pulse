@@ -6,7 +6,9 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
@@ -365,6 +367,33 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertTemplatedConfig("projects/global project template", project, true);
         Hashtable<String, Object> loadedProject = rpcClient.RemoteApi.getConfig(projectPath);
         assertEquals(projectName, loadedProject.get("name"));
+    }
+
+    public void testInsertTemplatedConfigDefaults() throws Exception
+    {
+        final String OVERRIDE = "override pattern";
+
+        String parentProject = random + "-parent";
+        String childProject = random + "-child";
+        String parentPath = rpcClient.RemoteApi.insertProject(parentProject, ProjectManager.GLOBAL_PROJECT_NAME, true, null, null);
+
+        // Defaults should be added to this project.
+        BootstrapConfiguration defaults = new BootstrapConfiguration();
+        String parentBootstrapPath = getPath(parentPath, Constants.Project.BOOTSTRAP);
+        Hashtable<String, Object> parentBootstrap = rpcClient.RemoteApi.getConfig(parentBootstrapPath);
+        assertEquals(defaults.getPersistentDirPattern(), parentBootstrap.get(Constants.Project.Bootstrap.PERSISTENT_DIR_PATTERN));
+        assertEquals(defaults.getTempDirPattern(), parentBootstrap.get(Constants.Project.Bootstrap.TEMP_DIR_PATTERN));
+        parentBootstrap.put(Constants.Project.Bootstrap.TEMP_DIR_PATTERN, OVERRIDE);
+        rpcClient.RemoteApi.saveConfig(parentBootstrapPath, parentBootstrap, false);
+
+        // The child should see the parent's override as-is.
+        Hashtable<String, Object> child = rpcClient.RemoteApi.createEmptyConfig(ProjectConfiguration.class);
+        child.put(Constants.Project.NAME, childProject);
+        String childPath = rpcClient.RemoteApi.insertTemplatedConfig(parentPath, child, true);
+        String childBootstrapPath = getPath(childPath, Constants.Project.BOOTSTRAP);
+        Hashtable<String, Object> childBootstrap = rpcClient.RemoteApi.getConfig(childBootstrapPath);
+        assertEquals(defaults.getPersistentDirPattern(), childBootstrap.get(Constants.Project.Bootstrap.PERSISTENT_DIR_PATTERN));
+        assertEquals(OVERRIDE, childBootstrap.get(Constants.Project.Bootstrap.TEMP_DIR_PATTERN));
     }
 
     public void testSaveConfigEmptyPath() throws Exception

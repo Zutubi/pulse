@@ -130,7 +130,7 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public String fromXmlRpc(String templateOwnerPath, Object data) throws TypeException
+    public String fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
         if(data == null)
         {

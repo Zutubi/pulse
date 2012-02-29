@@ -172,7 +172,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         super.doFinish();
 
         MutableRecord record = projectType.createNewRecord(false);
-        record.update(getCompletedStateForType(projectType).getDataRecord());
+        record.update(getCompletedStateForType(projectType).getDataRecord(), false, true);
         record.put(PROPERTY_SCM, getCompletedStateForType(scmType).getDataRecord());
 
         ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);

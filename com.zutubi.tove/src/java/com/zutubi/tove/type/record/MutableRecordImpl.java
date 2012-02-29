@@ -124,17 +124,41 @@ public class MutableRecordImpl extends AbstractMutableRecord
         return clone;
     }
 
-    public void update(Record record)
+    public void update(Record record, boolean deep, boolean overwriteExisting)
     {
-        // take the new primitive data from the record.
+        Map<String, String> meta = getMeta();
         for (String key : record.metaKeySet())
         {
-            getMeta().put(key, record.getMeta(key));
+            if (overwriteExisting || !meta.containsKey(key))
+            {
+                meta.put(key, record.getMeta(key));
+            }
         }
 
+        Map<String, Object> data = getData();
         for (String key : record.simpleKeySet())
         {
-            getData().put(key, record.get(key));
+            if (overwriteExisting || !data.containsKey(key))
+            {
+                data.put(key, record.get(key));
+            }
+        }
+
+        if (deep)
+        {
+            for (String key : record.nestedKeySet())
+            {
+                Record nested = (Record) record.get(key);
+                Object existing = data.get(key);
+                if (existing == null)
+                {
+                    put(key, nested.copy(true, false));
+                }
+                else if (existing instanceof MutableRecord)
+                {
+                    ((MutableRecord) existing).update(nested, deep, overwriteExisting);
+                }
+            }
         }
     }
 
