@@ -30,7 +30,7 @@ public abstract class GitClientTestBase extends PulseTestCase
     protected static final String CONTENT_A_TXT = "another a edit\n";
     protected static final String EXTENSION_TXT = "txt";
 
-    private File tmp;
+    protected File tmp;
     protected String repository;
     protected GitClient client;
     protected File workingDir;

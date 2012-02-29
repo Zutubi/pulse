@@ -90,7 +90,7 @@ public class GitClient implements ScmClient
     private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
     private boolean processSubmodules;
-    private List<String> submoduleNames;
+    private List<String> submoduleNames = Collections.emptyList();
 
     public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, boolean processSubmodules, List<String> submoduleNames)
     {
