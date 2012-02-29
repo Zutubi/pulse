@@ -65,6 +65,8 @@ public class VariableResolver
                 return s.trim().replaceAll("[\\\\/]", Matcher.quoteReplacement(File.separator));
             }
         });
+
+        FILTER_FUNCTIONS.put("normalize", FILTER_FUNCTIONS.get("normalise"));
     }
 
     public enum ResolutionStrategy
