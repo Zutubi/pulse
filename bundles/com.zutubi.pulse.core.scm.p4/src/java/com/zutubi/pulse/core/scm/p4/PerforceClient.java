@@ -311,21 +311,20 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
             PerforceCheckoutFeedbackHandler perforceHandler = new PerforceCheckoutFeedbackHandler(false, handler);
 
-            if (cleanCheckout)
+            context.push();
+            try
             {
-                if (!SKIP_FLUSH)
+                context.addString(PROPERTY_WORKSPACE, workspace.getName());
+                context.addString(PROPERTY_REVISION, revision.getRevisionString());
+                List<String[]> commands = PerforceConstants.resolveScript(context, cleanCheckout ? SCRIPT_CHECKOUT : SCRIPT_UPDATE);
+                for (String[] command: commands)
                 {
-                    // p4 -c $(workspace.name) flush #none
-                    core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_FLUSH), FLAG_CLIENT, workspace.getName(), COMMAND_FLUSH, "#" + REVISION_NONE);
+                    core.runP4WithHandler(perforceHandler, null, command);
                 }
-
-                // p4 -c $(workspace.name) sync -f @$(revision)
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, FLAG_FORCE, "@" + revision.getRevisionString());
             }
-            else
+            finally
             {
-                // p4 -c $(workspace.name) sync @$(revision)
-                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, workspace.getName(), COMMAND_SYNC, "@" + revision.getRevisionString());
+                context.pop();
             }
         }
         finally

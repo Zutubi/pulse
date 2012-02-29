@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.util.StringUtils;
+
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -128,7 +129,6 @@ public class PerforceConstants
 
     public static final String DEFAULT_P4 = "p4";
     public static final String P4_COMMAND = System.getProperty("pulse.p4.command", DEFAULT_P4);
-    public static final boolean SKIP_FLUSH = Boolean.getBoolean("pulse.p4.skip.flush");
     private static final String P4_COMMAND_PREFIX = "pulse.p4.command.";
 
     /**
@@ -151,6 +151,19 @@ public class PerforceConstants
         }
     }
 
+    public static final String SCRIPT_CHECKOUT = "p4.script.checkout";
+    public static final String SCRIPT_UPDATE = "p4.script.update";
+    
+    public static final String PROPERTY_REVISION = "revision";
+    public static final String PROPERTY_WORKSPACE = "workspace";
+
+    private static Map<String, String> scriptMap = new HashMap<String, String>();
+    static
+    {
+        scriptMap.put(SCRIPT_CHECKOUT, "p4 -c $(workspace) flush #none; p4 -c $(workspace) sync -f @$(revision)");
+        scriptMap.put(SCRIPT_UPDATE, "p4 -c $(workspace) sync @$(revision)");
+    }
+
     public static String getP4Command(String command)
     {
         String result = commandMap.get(command);
@@ -160,5 +173,25 @@ public class PerforceConstants
         }
 
         return result;
+    }
+
+    public static List<String[]> resolveScript(ExecutionContext context, String name)
+    {
+        String script = context.getString(name);
+        if (script == null)
+        {
+            script = scriptMap.get(name);
+        }
+
+        List<String[]> resolved = new LinkedList<String[]>();
+        String[] commands = StringUtils.split(script, ';', true);
+        for (String command: commands)
+        {
+            command = command.trim();
+            List<String> split = context.splitAndResolveVariables(command);
+            resolved.add(split.toArray(new String[split.size()]));
+        }
+
+        return resolved;
     }
 }

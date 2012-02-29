@@ -329,4 +329,22 @@ public interface ExecutionContext
      * @return the pieces of the input after resolution and splitting
      */
     List<String> splitAndResolveVariables(String input);
+
+    /**
+     * Pushes a new scope onto this context.  Variables added subsequently will
+     * be placed in this scope.  The scope may later be popped to return the
+     * context to the state before this push.
+     *
+     * @see #pop()
+     */
+    void push();
+
+    /**
+     * Pops the top scope from this context.  Should only be used to pop scopes
+     * owned by the caller (i.e. the code that calls pop should be pairing up
+     * with an earlier push).
+     *
+     * @see #push() 
+     */
+    void pop();
 }
