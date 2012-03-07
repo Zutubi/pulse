@@ -2,13 +2,15 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
+import com.zutubi.util.StringUtils;
 import flexjson.JSON;
 
-import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * Data structure used to send the details of a single file to the Ext tree
@@ -18,6 +20,7 @@ public class ExtFile
 {
     private String baseName;
     private String text;
+    private String href;
     private boolean leaf;
     private String cls;
     private String iconCls;
@@ -35,12 +38,17 @@ public class ExtFile
         this.leaf = leaf;
     }
 
-    public ExtFile(FileObjectWrapper fo)
+    public ExtFile(FileObjectWrapper fo,  String baseUrl)
     {
         baseName = fo.getBaseName();
         text = fo.getName();
         leaf = !fo.isContainer();
         cls = fo.getCls();
+        href = fo.getUrl();
+        if (StringUtils.stringSet(href))
+        {
+            href = StringUtils.join('/', true, true, baseUrl, href);
+        }
         iconCls = fo.getIconCls();
         extraAttributes = fo.getExtraAttributes();
         if (extraAttributes == null)
@@ -72,6 +80,11 @@ public class ExtFile
     public String getIconCls()
     {
         return iconCls;
+    }
+
+    public String getHref()
+    {
+        return href;
     }
 
     @JSON

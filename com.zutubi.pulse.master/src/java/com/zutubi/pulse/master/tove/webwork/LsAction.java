@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
 import org.apache.commons.vfs.*;
@@ -73,6 +75,7 @@ public class LsAction extends VFSActionSupport
     private String filterFlag = null;
 
     private StartupManager startupManager;
+    private ConfigurationProvider configurationProvider;
 
     public String getBasePath()
     {
@@ -215,7 +218,7 @@ public class LsAction extends VFSActionSupport
             {
                 public ExtFile map(FileObject child)
                 {
-                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject));
+                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
                     if (!extFile.isLeaf() && currentDepth < depth)
                     {
                         try
@@ -269,6 +272,11 @@ public class LsAction extends VFSActionSupport
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     /**

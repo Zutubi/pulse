@@ -162,7 +162,7 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
                 String masterLocation = masterLocationProvider.getMasterUrl();
                 final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
                 IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
-                Urls urls = new Urls( configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
+                Urls urls = new Urls(configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
                 dependencies = new LinkedList<StageDependency>();
                 for (Artifact artifact : report.getRetrievedArtifacts())
