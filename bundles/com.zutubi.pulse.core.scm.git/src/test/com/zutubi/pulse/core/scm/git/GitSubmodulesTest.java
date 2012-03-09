@@ -2,9 +2,6 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.FileSystemUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,37 +46,37 @@ public class GitSubmodulesTest extends GitClientTestBase
         git.run(git.getGitCommand(), "submodule", "add", "../" + name);
     }
 
-    public void testNoSubmoduleProcessing() throws ScmException
-    {
-        client.setProcessSubmodules(false);
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
+//    public void testNoSubmoduleProcessing() throws ScmException
+//    {
+//        client.setProcessSubmodules(false);
+//        client.checkout(context, null, handler);
+//        assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
+//
+//        assertSubmoduleNotUpdated(SUBMODULE1_NAME);
+//        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+//    }
+//
+//    public void testAllSubmoduleProcessing() throws ScmException
+//    {
+//        client.setProcessSubmodules(true);
+//        client.checkout(context, null, handler);
+//        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+//
+//        assertSubmoduleUpdated(SUBMODULE1_NAME);
+//        assertSubmoduleUpdated(SUBMODULE2_NAME);
+//    }
+//
+//    public void testSelectedSubmoduleProcessing() throws ScmException
+//    {
+//        client.setProcessSubmodules(true);
+//        client.setSubmoduleNames(asList(SUBMODULE1_NAME));
+//        client.checkout(context, null, handler);
+//        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+//
+//        assertSubmoduleUpdated(SUBMODULE1_NAME);
+//        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+//    }
 
-        assertSubmoduleNotUpdated(SUBMODULE1_NAME);
-        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
-    }
-
-    public void testAllSubmoduleProcessing() throws ScmException
-    {
-        client.setProcessSubmodules(true);
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
-
-        assertSubmoduleUpdated(SUBMODULE1_NAME);
-        assertSubmoduleUpdated(SUBMODULE2_NAME);
-    }
-
-    public void testSelectedSubmoduleProcessing() throws ScmException
-    {
-        client.setProcessSubmodules(true);
-        client.setSubmoduleNames(asList(SUBMODULE1_NAME));
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
-
-        assertSubmoduleUpdated(SUBMODULE1_NAME);
-        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
-    }
-    
     private void assertSubmoduleNotUpdated(String name)
     {
         // Submodule dir will exist but will be empty.

@@ -102,6 +102,7 @@ public class NativeGitTest extends PulseTestCase
         assertThat(handler.getStatusMessages(),
                    hasItem(anyOf(
                            startsWith("Cloning into base..."),
+                           startsWith("Cloning into 'base'..."),
                            startsWith("Initialized empty Git repository"))));
     }
 

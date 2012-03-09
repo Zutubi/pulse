@@ -48,7 +48,7 @@ public class ShutdownCommand extends AdminCommand
     {
         return "Triggers a shutdown of a local pulse server.  By default, the shutdown is\n" +
                "'clean': i.e. pulse will wait for running builds to complete.  This may be\n" +
-               "overriden with the --force option, which causes builds to be aborted.";
+               "overridden with the --force option, which causes builds to be aborted.";
     }
 
     public List<String> getAliases()
