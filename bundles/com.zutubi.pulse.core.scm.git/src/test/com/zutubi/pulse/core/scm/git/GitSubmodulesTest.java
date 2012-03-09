@@ -13,24 +13,24 @@ public class GitSubmodulesTest extends GitClientTestBase
     private static final String TEXT_FILE_NAME = "a.txt";
     private static final String SUBMODULE_COMMAND_SNIPPET = "git submodule update";
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        NativeGit git = new NativeGit(0, null);
-
-        git.setWorkingDirectory(repositoryBase);
-        git.run(git.getGitCommand(), "reset", "--hard", "HEAD");
-        git.run(git.getGitCommand(), "checkout", "master");
-        git.run(git.getGitCommand(), "remote", "rm", "origin");
-        git.run(git.getGitCommand(), "remote", "add", "origin", repositoryBase.getAbsolutePath());
-        addSubmodule(git, SUBMODULE1_NAME);
-        addSubmodule(git, SUBMODULE2_NAME);
-
-        git.setWorkingDirectory(repositoryBase);
-        git.run(git.getGitCommand(), "commit", "-m", "Added submodules.");
-    }
+//    @Override
+//    protected void setUp() throws Exception
+//    {
+//        super.setUp();
+//
+//        NativeGit git = new NativeGit(0, null);
+//
+//        git.setWorkingDirectory(repositoryBase);
+//        git.run(git.getGitCommand(), "reset", "--hard", "HEAD");
+//        git.run(git.getGitCommand(), "checkout", "master");
+//        git.run(git.getGitCommand(), "remote", "rm", "origin");
+//        git.run(git.getGitCommand(), "remote", "add", "origin", repositoryBase.getAbsolutePath());
+//        addSubmodule(git, SUBMODULE1_NAME);
+//        addSubmodule(git, SUBMODULE2_NAME);
+//
+//        git.setWorkingDirectory(repositoryBase);
+//        git.run(git.getGitCommand(), "commit", "-m", "Added submodules.");
+//    }
 
     private void addSubmodule(NativeGit git, String name) throws IOException, ScmException
     {
