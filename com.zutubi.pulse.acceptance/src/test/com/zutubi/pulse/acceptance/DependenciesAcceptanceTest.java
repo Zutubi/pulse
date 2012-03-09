@@ -175,7 +175,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         assertIvyStatus(STATUS_INTEGRATION, project, buildNumber);
     }
 
-    public void testStatusValidation() throws Exception
+    public void testMaturityValidation() throws Exception
     {
         try
         {
@@ -186,7 +186,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         }
         catch (Exception e)
         {
-            assertThat(e.getMessage(), containsString("status is invalid"));
+            assertThat(e.getMessage(), containsString("maturity is invalid"));
         }
     }
 
