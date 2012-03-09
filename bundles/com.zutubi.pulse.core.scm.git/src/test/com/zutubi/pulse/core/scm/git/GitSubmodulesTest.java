@@ -2,13 +2,12 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.FileSystemUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+
+import java.io.File;
+import java.io.IOException;
 
 public class GitSubmodulesTest extends GitClientTestBase
 {
@@ -25,6 +24,7 @@ public class GitSubmodulesTest extends GitClientTestBase
         NativeGit git = new NativeGit(0, null);
 
         git.setWorkingDirectory(repositoryBase);
+        git.run(git.getGitCommand(), "reset", "--hard", "HEAD");
         git.run(git.getGitCommand(), "checkout", "master");
         git.run(git.getGitCommand(), "remote", "rm", "origin");
         git.run(git.getGitCommand(), "remote", "add", "origin", repositoryBase.getAbsolutePath());
