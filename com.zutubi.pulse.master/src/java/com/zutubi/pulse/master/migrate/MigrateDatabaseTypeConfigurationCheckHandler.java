@@ -4,10 +4,10 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.tove.config.setup.DatabaseType;
-import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.DelegatingInvocationHandler;
 
 import java.io.File;
 import java.net.URL;
@@ -43,7 +43,7 @@ public class MigrateDatabaseTypeConfigurationCheckHandler extends AbstractConfig
                     URLClassLoader loader = new URLClassLoader(new URL[]{driverUrl});
                     Class driverClass = loader.loadClass(type.getJDBCClassName(configuration));
                     Driver driver = (Driver) driverClass.newInstance();
-                    DriverWrapper shim = new DriverWrapper(driver);
+                    Driver shim = DelegatingInvocationHandler.newProxy(Driver.class, driver);
 
                     try
                     {

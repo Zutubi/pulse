@@ -3,18 +3,12 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 
 public class GitSubmodulesTest extends GitClientTestBase
 {

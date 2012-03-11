@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.database;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.DelegatingInvocationHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Driver;
@@ -17,8 +18,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- *
- *
+ * Dynamically loads and registers JDBC drivers from the data directory.  This allows them to
+ * persist across upgrades.
  */
 public class DriverRegistry
 {
@@ -118,27 +119,7 @@ public class DriverRegistry
 
     public boolean isRegistered(String className)
     {
-        // can check the registry file or the DriverManager.
-//        isRegisteredWithRegistryFile(className);
         return isRegisteredWithDriverManager(className);
-    }
-
-    private boolean isRegisteredWithRegistryFile(String className)
-    {
-        File registryFile = getRegistryFile();
-        if (registryFile.isFile())
-        {
-            try
-            {
-                Properties registeredDrivers = IOUtils.read(registryFile);
-                return registeredDrivers.containsKey(className);
-            }
-            catch (IOException e)
-            {
-                return false;
-            }
-        }
-        return false;
     }
 
     private boolean isRegisteredWithDriverManager(String className)
@@ -147,9 +128,11 @@ public class DriverRegistry
         while (drivers.hasMoreElements())
         {
             Driver driver = drivers.nextElement();
-            if (driver instanceof DriverWrapper)
+            if (driver instanceof Proxy)
             {
-                driver = ((DriverWrapper)driver).getDelegate();
+                @SuppressWarnings("unchecked")
+                DelegatingInvocationHandler<Driver> invocationHandler = (DelegatingInvocationHandler<Driver>) Proxy.getInvocationHandler(driver);
+                driver = invocationHandler.getDelegate();
             }
 
             if (driver.getClass().getName().equals(className))
@@ -192,12 +175,10 @@ public class DriverRegistry
 
             // look at the jar file first.
             if (jarFileName != null && jarFileName.length() > 0)
-            {
-                
+            {                
                 //TODO: if we load the classfile from the jar, then a file handle remains open on that jar
                 //TODO: until the jvm shuts down. (or at least this appears to be the case).  Is there anyway
                 //TODO: around this, to cleanup this open file handle?
-
                 File jar = new File(driverDir, jarFileName);
                 URLClassLoader loader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
                 driverClass = loader.loadClass(driverClassName);
@@ -209,8 +190,7 @@ public class DriverRegistry
                 driverClass = Class.forName(driverClassName);
             }
 
-            Driver driver = new DriverWrapper((Driver) driverClass.newInstance());
-            DriverManager.registerDriver(driver);
+            DriverManager.registerDriver(DelegatingInvocationHandler.newProxy(Driver.class, (Driver) driverClass.newInstance()));
         }
         catch (Exception e)
         {
