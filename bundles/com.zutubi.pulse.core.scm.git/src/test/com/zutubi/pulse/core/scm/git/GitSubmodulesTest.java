@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.SystemUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 
@@ -52,7 +53,13 @@ public class GitSubmodulesTest extends GitClientTestBase
         git.run(git.getGitCommand(), "add", textFile.getName());
         git.run(git.getGitCommand(), "commit", "-m", "Added a file");
         git.setWorkingDirectory(repositoryBase);
-        git.run(git.getGitCommand(), "submodule", "add", "file://" + submoduleDir.getAbsolutePath().replace('\\', '/'));
+        String submodulePath = "../" + name;
+        if (SystemUtils.IS_WINDOWS)
+        {
+            // Cygwin-ify.  This means you need to use cygwin git to run this test.
+            submodulePath = SystemUtils.runCommand("cygpath", submoduleDir.getAbsolutePath());
+        }
+        git.run(git.getGitCommand(), "submodule", "add", submodulePath, submoduleDir.getName());
     }
 
     public void testNoSubmoduleProcessing() throws ScmException
