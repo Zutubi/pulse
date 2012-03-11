@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.util.jdbc;
 
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.DriverPropertyInfo;
+import java.sql.*;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Wraps a JDBC driver class.  We do this so that we can load the delegate
@@ -49,6 +47,11 @@ public class DriverWrapper implements Driver
     public boolean jdbcCompliant()
     {
         return this.delegate.jdbcCompliant();
+    }
+
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException
+    {
+        return this.delegate.getParentLogger();
     }
 
     public Driver getDelegate()
