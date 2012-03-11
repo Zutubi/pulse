@@ -51,7 +51,7 @@ public class DriverWrapper implements Driver
 
     public Logger getParentLogger() throws SQLFeatureNotSupportedException
     {
-        return this.delegate.getParentLogger();
+        throw new SQLFeatureNotSupportedException();
     }
 
     public Driver getDelegate()
