@@ -2,35 +2,44 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.FileSystemUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 
 public class GitSubmodulesTest extends GitClientTestBase
 {
     private static final String SUBMODULE1_NAME = "sub1";
     private static final String SUBMODULE2_NAME = "sub2";
     private static final String TEXT_FILE_NAME = "a.txt";
-    private static final String SUBMODULE_COMMAND_SNIPPET = "git submodule update";
+    private static final String SUBMODULE_COMMAND_SNIPPET = "submodule update";
 
-//    @Override
-//    protected void setUp() throws Exception
-//    {
-//        super.setUp();
-//
-//        NativeGit git = new NativeGit(0, null);
-//
-//        git.setWorkingDirectory(repositoryBase);
-//        git.run(git.getGitCommand(), "reset", "--hard", "HEAD");
-//        git.run(git.getGitCommand(), "checkout", "master");
-//        git.run(git.getGitCommand(), "remote", "rm", "origin");
-//        git.run(git.getGitCommand(), "remote", "add", "origin", repositoryBase.getAbsolutePath());
-//        addSubmodule(git, SUBMODULE1_NAME);
-//        addSubmodule(git, SUBMODULE2_NAME);
-//
-//        git.setWorkingDirectory(repositoryBase);
-//        git.run(git.getGitCommand(), "commit", "-m", "Added submodules.");
-//    }
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        NativeGit git = new NativeGit(0, null);
+
+        git.setWorkingDirectory(repositoryBase);
+        git.run(git.getGitCommand(), "reset", "--hard", "HEAD");
+        git.run(git.getGitCommand(), "checkout", "master");
+        git.run(git.getGitCommand(), "remote", "rm", "origin");
+        git.run(git.getGitCommand(), "remote", "add", "origin", repositoryBase.getAbsolutePath());
+        addSubmodule(git, SUBMODULE1_NAME);
+        addSubmodule(git, SUBMODULE2_NAME);
+
+        git.setWorkingDirectory(repositoryBase);
+        git.run(git.getGitCommand(), "commit", "-m", "Added submodules.");
+    }
 
     private void addSubmodule(NativeGit git, String name) throws IOException, ScmException
     {
@@ -43,44 +52,39 @@ public class GitSubmodulesTest extends GitClientTestBase
         git.run(git.getGitCommand(), "add", textFile.getName());
         git.run(git.getGitCommand(), "commit", "-m", "Added a file");
         git.setWorkingDirectory(repositoryBase);
-        git.run(git.getGitCommand(), "submodule", "add", "../" + name);
+        git.run(git.getGitCommand(), "submodule", "add", "file://" + submoduleDir.getAbsolutePath().replace('\\', '/'));
     }
 
-    public void testToMakeBuildHappy()
+    public void testNoSubmoduleProcessing() throws ScmException
     {
-        // I'm sorry.
+        client.setProcessSubmodules(false);
+        client.checkout(context, null, handler);
+        assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
+
+        assertSubmoduleNotUpdated(SUBMODULE1_NAME);
+        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
     }
 
-//    public void testNoSubmoduleProcessing() throws ScmException
-//    {
-//        client.setProcessSubmodules(false);
-//        client.checkout(context, null, handler);
-//        assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
-//
-//        assertSubmoduleNotUpdated(SUBMODULE1_NAME);
-//        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
-//    }
-//
-//    public void testAllSubmoduleProcessing() throws ScmException
-//    {
-//        client.setProcessSubmodules(true);
-//        client.checkout(context, null, handler);
-//        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
-//
-//        assertSubmoduleUpdated(SUBMODULE1_NAME);
-//        assertSubmoduleUpdated(SUBMODULE2_NAME);
-//    }
-//
-//    public void testSelectedSubmoduleProcessing() throws ScmException
-//    {
-//        client.setProcessSubmodules(true);
-//        client.setSubmoduleNames(asList(SUBMODULE1_NAME));
-//        client.checkout(context, null, handler);
-//        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
-//
-//        assertSubmoduleUpdated(SUBMODULE1_NAME);
-//        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
-//    }
+    public void testAllSubmoduleProcessing() throws ScmException
+    {
+        client.setProcessSubmodules(true);
+        client.checkout(context, null, handler);
+        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+
+        assertSubmoduleUpdated(SUBMODULE1_NAME);
+        assertSubmoduleUpdated(SUBMODULE2_NAME);
+    }
+
+    public void testSelectedSubmoduleProcessing() throws ScmException
+    {
+        client.setProcessSubmodules(true);
+        client.setSubmoduleNames(asList(SUBMODULE1_NAME));
+        client.checkout(context, null, handler);
+        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+
+        assertSubmoduleUpdated(SUBMODULE1_NAME);
+        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+    }
 
     private void assertSubmoduleNotUpdated(String name)
     {

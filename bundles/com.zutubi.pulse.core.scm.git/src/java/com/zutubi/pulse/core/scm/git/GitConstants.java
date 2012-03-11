@@ -2,6 +2,8 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.util.SystemUtils;
 
+import java.io.File;
+
 /**
  * Shared constants used by the git implementation.
  */
@@ -13,11 +15,29 @@ public class GitConstants
     public static final String PROPERTY_GIT_COMMAND = "pulse.git.command";
 
     /**
-     * The default git executable, usually "git" but "git.exe" on a windows
-     * system.  May be overridden with a system property.
+     * The default git executable, usually "git" except on Windows where it can be
+     * named variably.  May be overridden with a system property.
      */
-    public static final String DEFAULT_GIT = SystemUtils.IS_WINDOWS ? "git.exe" : "git";
-
+    public static final String DEFAULT_GIT;
+    static 
+    {
+        if (SystemUtils.IS_WINDOWS)
+        {
+            File inPath = SystemUtils.findInPath("git");
+            if (inPath == null)
+            {
+                DEFAULT_GIT = "git.exe";
+            }
+            else
+            {
+                DEFAULT_GIT = inPath.getName();
+            }
+        }
+        else
+        {
+            DEFAULT_GIT = "git";
+        }
+    }
     public static final String RESOURCE_NAME = "git";
 
     // Top level commands.
