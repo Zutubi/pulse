@@ -332,7 +332,8 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         removeDirectory(workingCopyDir);
-        runGit(null, "clone", gitUrl, workingCopyDir.getAbsolutePath());
+
+        runGit(workingCopyDir.getParentFile(), "clone", gitUrl, workingCopyDir.getName());
         createConfigFile(random);
 
         File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
@@ -373,7 +374,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
 
         removeDirectory(workingCopyDir);
-        runHg(null, "clone", repository, workingCopyDir.getAbsolutePath());
+        runHg(workingCopyDir.getParentFile(), "clone", repository, workingCopyDir.getName());
         createConfigFile(random);
 
         File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
