@@ -613,30 +613,19 @@
 ## Outputs a build/project status cell
 ##
 #macro(statusCell $result $showAnimated)
-    #if($result.succeeded() && $result.warningFeatureCount > 0)
-        <td class="warning">
-            #statusImage($result $showAnimated)
-        </td>
-        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="warning">
-            $result.state.prettyString
-        </td>
-    #else
-        <td class="$result.state.string">
-            #statusImage($result $showAnimated)
-        </td>
-        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="$result.state.string">
-            $result.state.prettyString
-        </td>
-    #end
+    <td class="$result.state.string">
+        #statusImage($result $showAnimated)
+    </td>
+    <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="$result.state.string">
+        $result.state.prettyString
+    </td>
 #end
 
 #macro(statusImage $result $showAnimated)
     #if($result.succeeded())
-        #if($result.warningFeatureCount > 0)
-            <img alt="warning" src="$base/images/error.gif"/>
-        #else
-            <img alt="success" src="$base/images/accept.gif"/>
-        #end
+        <img alt="success" src="$base/images/accept.gif"/>
+    #elseif($result.warned())
+        <img alt="warning" src="$base/images/error.gif"/>
     #elseif($result.skipped())
         <img alt="skipped" src="$base/images/none_blue.gif"/>
     #elseif($result.inProgress())

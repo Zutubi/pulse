@@ -4,8 +4,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
- * 
- *
+ * Simple notify condition for failed builds.
  */
 public class FailureNotifyCondition implements NotifyCondition
 {

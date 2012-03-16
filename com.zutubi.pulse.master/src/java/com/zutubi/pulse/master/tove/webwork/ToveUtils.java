@@ -615,22 +615,17 @@ public class ToveUtils
 
     public static String getStatusIcon(BuildResult result)
     {
-        return getStatusIcon(result.getState(), result.getWarningFeatureCount());
+        return getStatusIcon(result.getState());
     }
 
-    public static String getStatusIcon(ResultState state, int warningCount)
+    public static String getStatusIcon(ResultState state)
     {
         switch (state)
         {
             case SUCCESS:
-                if (warningCount == 0)
-                {
-                    return "accept.gif";
-                }
-                else
-                {
-                    return "error.gif";
-                }
+                return "accept.gif";
+            case WARNINGS:
+                return "error.gif";
             case ERROR:
             case FAILURE:
             case TERMINATED:
@@ -648,22 +643,17 @@ public class ToveUtils
 
     public static String getStatusClass(BuildResult result)
     {
-        return getStatusClass(result.getState(), result.getWarningFeatureCount());
+        return getStatusClass(result.getState());
     }
 
-    public static String getStatusClass(ResultState state, int warningCount)
+    public static String getStatusClass(ResultState state)
     {
         switch (state)
         {
             case SUCCESS:
-                if (warningCount == 0)
-                {
-                    return "success";
-                }
-                else
-                {
-                    return "warning";
-                }
+                return "success";
+            case WARNINGS:
+                return "warning";
             case ERROR:
             case FAILURE:
                 return "failure";

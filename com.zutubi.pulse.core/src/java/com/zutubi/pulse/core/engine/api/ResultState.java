@@ -47,6 +47,11 @@ public enum ResultState
     SUCCESS,
 
     /**
+     * The result completed successfully, but one or more warnings were recorded.
+     */
+    WARNINGS,
+    
+    /**
      * The result has completed and has failed due to a build problem.
      */
     FAILURE,
@@ -69,13 +74,22 @@ public enum ResultState
      */
     TERMINATED;
 
+    private static final ResultState[] HEALTHY_STATES = new ResultState[]{ SUCCESS, WARNINGS };
     private static final ResultState[] BROKEN_STATES = new ResultState[]{ FAILURE, ERROR, TERMINATED, CANCELLED };
-    private static final ResultState[] COMPLETED_STATES = new ResultState[]{SKIPPED, SUCCESS, FAILURE, ERROR, TERMINATED, CANCELLED };
+    private static final ResultState[] COMPLETED_STATES = new ResultState[]{SKIPPED, SUCCESS, WARNINGS, FAILURE, ERROR, TERMINATED, CANCELLED };
     private static final ResultState[] INCOMPLETE_STATES = new ResultState[]{PENDING, IN_PROGRESS, TERMINATING, CANCELLING};
     private static final ResultState[] TERMINATED_STATES = new ResultState[]{CANCELLED, TERMINATED};
     private static final ResultState[] TERMINATING_STATES = new ResultState[]{CANCELLING, TERMINATING};
 
-    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{SKIPPED, SUCCESS, CANCELLED, FAILURE, ERROR, TERMINATED};
+    private static final ResultState[] WORSE_STATE_ORDER = new ResultState[]{SKIPPED, SUCCESS, WARNINGS, CANCELLED, FAILURE, ERROR, TERMINATED};
+
+    /**
+     * @return the set of states that return true from {@link #isHealthy()}
+     */
+    public static ResultState[] getHealthyStates()
+    {
+        return HEALTHY_STATES;
+    }
 
     /**
      * @return the set of states that return true from {@link #isBroken()}
@@ -140,6 +154,15 @@ public enum ResultState
     public static ResultState fromPrettyString(String prettyString)
     {
         return EnumUtils.fromPrettyString(ResultState.class, prettyString);
+    }
+
+    /**
+     * @return true if this state indicates a result that is complete and
+     *         successful (potentially with warnings)
+     */
+    public boolean isHealthy()
+    {
+        return CollectionUtils.contains(HEALTHY_STATES, this);
     }
 
     /**

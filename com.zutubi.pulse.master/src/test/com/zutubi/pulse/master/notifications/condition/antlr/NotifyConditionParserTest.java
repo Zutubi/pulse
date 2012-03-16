@@ -10,8 +10,6 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.StringReader;
 
-/**
- */
 public class NotifyConditionParserTest extends PulseTestCase
 {
     protected void setUp() throws Exception
@@ -31,10 +29,28 @@ public class NotifyConditionParserTest extends PulseTestCase
         assertTrue(condition instanceof FalseNotifyCondition);
     }
 
+    public void testParseSkipped()
+    {
+        NotifyCondition condition = parseExpression("skipped");
+        assertTrue(condition instanceof SkippedNotifyCondition);
+    }
+
     public void testParseSuccess()
     {
         NotifyCondition condition = parseExpression("success");
         assertTrue(condition instanceof SuccessNotifyCondition);
+    }
+
+    public void testParseWarnings()
+    {
+        NotifyCondition condition = parseExpression("warnings");
+        assertTrue(condition instanceof WarningsNotifyCondition);
+    }
+
+    public void testParseHealthy()
+    {
+        NotifyCondition condition = parseExpression("healthy");
+        assertTrue(condition instanceof HealthyNotifyCondition);
     }
 
     public void testParseFailure()
@@ -49,6 +65,18 @@ public class NotifyConditionParserTest extends PulseTestCase
         assertTrue(condition instanceof ErrorNotifyCondition);
     }
 
+    public void testParseTerminated()
+    {
+        NotifyCondition condition = parseExpression("terminated");
+        assertTrue(condition instanceof TerminatedNotifyCondition);
+    }
+
+    public void testParseBroken()
+    {
+        NotifyCondition condition = parseExpression("broken");
+        assertTrue(condition instanceof BrokenNotifyCondition);
+    }
+
     public void testParseChanged()
     {
         NotifyCondition condition = parseExpression("changed");
@@ -59,6 +87,12 @@ public class NotifyConditionParserTest extends PulseTestCase
     {
         NotifyCondition condition = parseExpression("changed.by.me");
         assertTrue(condition instanceof ChangedByMeNotifyCondition);
+    }
+
+    public void testParseChangedByMeSinceHealthy()
+    {
+        NotifyCondition condition = parseExpression("changed.by.me.since.healthy");
+        assertTrue(condition instanceof ChangedByMeSinceHealthyNotifyCondition);
     }
 
     public void testParseChangedByMeSinceSuccess()
@@ -268,24 +302,24 @@ public class NotifyConditionParserTest extends PulseTestCase
         assertTrue(condition.satisfied(null, null));
     }
 
-    public void testUnsuccessfulBuilds()
+    public void testBrokenBuilds()
     {
-        NotifyCondition condition = parseExpression("unsuccessful.count.builds == 5");
+        NotifyCondition condition = parseExpression("broken.count.builds == 5");
         assertTrue(condition instanceof ComparisonNotifyCondition);
         ComparisonNotifyCondition comp = (ComparisonNotifyCondition) condition;
-        assertTrue(comp.getLeft() instanceof UnsuccessfulCountBuildsValue);
+        assertTrue(comp.getLeft() instanceof BrokenCountBuildsValue);
         assertTrue(comp.getRight() instanceof LiteralNotifyIntegerValue);
         assertEquals(5, comp.getRight().getValue(null, null));
     }
 
-    public void testUnsuccessfulDays()
+    public void testBrokenDays()
     {
-        NotifyCondition condition = parseExpression("5 <= unsuccessful.count.days");
+        NotifyCondition condition = parseExpression("5 <= broken.count.days");
         assertTrue(condition instanceof ComparisonNotifyCondition);
         ComparisonNotifyCondition comp = (ComparisonNotifyCondition) condition;
         assertTrue(comp.getLeft() instanceof LiteralNotifyIntegerValue);
         assertEquals(5, comp.getLeft().getValue(null, null));
-        assertTrue(comp.getRight() instanceof UnsuccessfulCountDaysValue);
+        assertTrue(comp.getRight() instanceof BrokenCountDaysValue);
     }
 
     public void testParamsCondition()
@@ -308,22 +342,22 @@ public class NotifyConditionParserTest extends PulseTestCase
 
     public void testParamsValue()
     {
-        NotifyCondition condition = parseExpression("unsuccessful.count.days(previous) < 5");
+        NotifyCondition condition = parseExpression("broken.count.days(previous) < 5");
         assertTrue(condition instanceof ComparisonNotifyCondition);
         ComparisonNotifyCondition comparison = (ComparisonNotifyCondition) condition;
         assertTrue(comparison.getLeft() instanceof PreviousNotifyIntegerValue);
-        assertTrue(((PreviousNotifyIntegerValue) comparison.getLeft()).getDelegate() instanceof UnsuccessfulCountDaysValue);
+        assertTrue(((PreviousNotifyIntegerValue) comparison.getLeft()).getDelegate() instanceof BrokenCountDaysValue);
         assertTrue(comparison.getRight() instanceof LiteralNotifyIntegerValue);
     }
 
     public void testFailingForXDays()
     {
-        parseExpression("unsuccessful.count.days(previous) < 5 and unsuccessful.count.days >= 5");
+        parseExpression("broken.count.days(previous) < 5 and broken.count.days >= 5");
     }
 
     public void testFailingForXBuilds()
     {
-        parseExpression("unsuccessful.count.builds == 3");
+        parseExpression("broken.count.builds == 3");
     }
 
     public void testUnrecognisedParameter()

@@ -3,8 +3,6 @@ package com.zutubi.pulse.core.model;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
-/**
- */
 public class CommandResultTest extends PulseTestCase
 {
     public void testCIB249()

@@ -1,4 +1,4 @@
-// $ANTLR 2.7.6 (20051207): "NotifyCondition.g" -> "NotifyConditionParser.java"$
+// $ANTLR 2.7.6 (2005-12-22): "NotifyCondition.g" -> "NotifyConditionParser.java"$
 
     package com.zutubi.pulse.master.notifications.condition.antlr;
 
@@ -130,16 +130,22 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		case INTEGER:
 		case LITERAL_true:
 		case LITERAL_false:
+		case LITERAL_skipped:
 		case LITERAL_success:
+		case LITERAL_warnings:
 		case LITERAL_failure:
 		case LITERAL_error:
+		case LITERAL_terminated:
+		case LITERAL_healthy:
+		case LITERAL_broken:
 		case LITERAL_changed:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
 		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+		case 32:
 		case LEFT_PAREN:
 		{
 			break;
@@ -165,14 +171,20 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case LITERAL_true:
 		case LITERAL_false:
+		case LITERAL_skipped:
 		case LITERAL_success:
+		case LITERAL_warnings:
 		case LITERAL_failure:
 		case LITERAL_error:
+		case LITERAL_terminated:
+		case LITERAL_healthy:
+		case LITERAL_broken:
 		case LITERAL_changed:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
+		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
 		{
 			boolsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -214,8 +226,8 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			break;
 		}
 		case INTEGER:
-		case 25:
-		case 26:
+		case 31:
+		case 32:
 		{
 			compareexpression();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -255,75 +267,129 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case LITERAL_success:
+		case LITERAL_skipped:
 		{
 			AST tmp12_AST = null;
 			tmp12_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp12_AST);
+			match(LITERAL_skipped);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case LITERAL_success:
+		{
+			AST tmp13_AST = null;
+			tmp13_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp13_AST);
 			match(LITERAL_success);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case LITERAL_warnings:
+		{
+			AST tmp14_AST = null;
+			tmp14_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp14_AST);
+			match(LITERAL_warnings);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_failure:
 		{
-			AST tmp13_AST = null;
-			tmp13_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp13_AST);
+			AST tmp15_AST = null;
+			tmp15_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp15_AST);
 			match(LITERAL_failure);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_error:
 		{
-			AST tmp14_AST = null;
-			tmp14_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp14_AST);
+			AST tmp16_AST = null;
+			tmp16_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp16_AST);
 			match(LITERAL_error);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case LITERAL_terminated:
+		{
+			AST tmp17_AST = null;
+			tmp17_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp17_AST);
+			match(LITERAL_terminated);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case LITERAL_healthy:
+		{
+			AST tmp18_AST = null;
+			tmp18_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp18_AST);
+			match(LITERAL_healthy);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case LITERAL_broken:
+		{
+			AST tmp19_AST = null;
+			tmp19_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp19_AST);
+			match(LITERAL_broken);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
 		case LITERAL_changed:
 		{
-			AST tmp15_AST = null;
-			tmp15_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp15_AST);
+			AST tmp20_AST = null;
+			tmp20_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp20_AST);
 			match(LITERAL_changed);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 21:
+		case 26:
 		{
-			AST tmp16_AST = null;
-			tmp16_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp16_AST);
-			match(21);
+			AST tmp21_AST = null;
+			tmp21_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp21_AST);
+			match(26);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 22:
+		case 27:
 		{
-			AST tmp17_AST = null;
-			tmp17_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp17_AST);
-			match(22);
+			AST tmp22_AST = null;
+			tmp22_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp22_AST);
+			match(27);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 23:
+		case 28:
 		{
-			AST tmp18_AST = null;
-			tmp18_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp18_AST);
-			match(23);
+			AST tmp23_AST = null;
+			tmp23_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp23_AST);
+			match(28);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 24:
+		case 29:
 		{
-			AST tmp19_AST = null;
-			tmp19_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp19_AST);
-			match(24);
+			AST tmp24_AST = null;
+			tmp24_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp24_AST);
+			match(29);
+			boolsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case 30:
+		{
+			AST tmp25_AST = null;
+			tmp25_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp25_AST);
+			match(30);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
@@ -347,49 +413,49 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case EQUAL:
 		{
-			AST tmp20_AST = null;
-			tmp20_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp20_AST);
+			AST tmp26_AST = null;
+			tmp26_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp26_AST);
 			match(EQUAL);
 			break;
 		}
 		case NOT_EQUAL:
 		{
-			AST tmp21_AST = null;
-			tmp21_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp21_AST);
+			AST tmp27_AST = null;
+			tmp27_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp27_AST);
 			match(NOT_EQUAL);
 			break;
 		}
 		case LESS_THAN:
 		{
-			AST tmp22_AST = null;
-			tmp22_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp22_AST);
+			AST tmp28_AST = null;
+			tmp28_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp28_AST);
 			match(LESS_THAN);
 			break;
 		}
 		case LESS_THAN_OR_EQUAL:
 		{
-			AST tmp23_AST = null;
-			tmp23_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp23_AST);
+			AST tmp29_AST = null;
+			tmp29_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp29_AST);
 			match(LESS_THAN_OR_EQUAL);
 			break;
 		}
 		case GREATER_THAN:
 		{
-			AST tmp24_AST = null;
-			tmp24_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp24_AST);
+			AST tmp30_AST = null;
+			tmp30_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp30_AST);
 			match(GREATER_THAN);
 			break;
 		}
 		case GREATER_THAN_OR_EQUAL:
 		{
-			AST tmp25_AST = null;
-			tmp25_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp25_AST);
+			AST tmp31_AST = null;
+			tmp31_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp31_AST);
 			match(GREATER_THAN_OR_EQUAL);
 			break;
 		}
@@ -414,15 +480,15 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case INTEGER:
 		{
-			AST tmp26_AST = null;
-			tmp26_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp26_AST);
+			AST tmp32_AST = null;
+			tmp32_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp32_AST);
 			match(INTEGER);
 			integer_AST = (AST)currentAST.root;
 			break;
 		}
-		case 25:
-		case 26:
+		case 31:
+		case 32:
 		{
 			intsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -431,9 +497,9 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			case LEFT_PAREN:
 			{
 				match(LEFT_PAREN);
-				AST tmp28_AST = null;
-				tmp28_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp28_AST);
+				AST tmp34_AST = null;
+				tmp34_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp34_AST);
 				match(LITERAL_previous);
 				match(RIGHT_PAREN);
 				break;
@@ -475,21 +541,21 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		AST intsymbol_AST = null;
 		
 		switch ( LA(1)) {
-		case 25:
+		case 31:
 		{
-			AST tmp30_AST = null;
-			tmp30_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp30_AST);
-			match(25);
+			AST tmp36_AST = null;
+			tmp36_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp36_AST);
+			match(31);
 			intsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 26:
+		case 32:
 		{
-			AST tmp31_AST = null;
-			tmp31_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp31_AST);
-			match(26);
+			AST tmp37_AST = null;
+			tmp37_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp37_AST);
+			match(32);
 			intsymbol_AST = (AST)currentAST.root;
 			break;
 		}
@@ -520,16 +586,22 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		"an integer",
 		"\"true\"",
 		"\"false\"",
+		"\"skipped\"",
 		"\"success\"",
+		"\"warnings\"",
 		"\"failure\"",
 		"\"error\"",
+		"\"terminated\"",
+		"\"healthy\"",
+		"\"broken\"",
 		"\"changed\"",
 		"\"changed.by.me\"",
+		"\"changed.by.me.since.healthy\"",
 		"\"changed.by.me.since.success\"",
 		"\"responsibility.taken\"",
 		"\"state.change\"",
-		"\"unsuccessful.count.builds\"",
-		"\"unsuccessful.count.days\"",
+		"\"broken.count.builds\"",
+		"\"broken.count.days\"",
 		"an opening parenthesis '('",
 		"a closing parenthesis ')'",
 		"a word",

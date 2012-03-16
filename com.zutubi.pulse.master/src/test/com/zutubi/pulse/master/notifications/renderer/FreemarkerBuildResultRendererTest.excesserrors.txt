@@ -23,7 +23,7 @@ New changes in this build:
     output dadada da dadad ad ad adadad ad ad ada d adada da...
 
 Error messages:
-  NOTE: This build has 3 more error messages that have not
+  NOTE: This build has 4 more error messages that have not
   been reported as the feature limit has been reached.
   * test error message
   - stage first stage :: first recipe@[pending]
@@ -33,16 +33,13 @@ Error messages:
       because it is really quite ridiculously long
   - stage third stage :: third recipe@[pending]
     * Error executing command 'test command'
+    * Command 'artifact command' failed
   - stage third stage :: third recipe@[pending] :: test command
     * bad stuff happened, so wrap this:
       0000000000000000000000000000000000000000000000000000000000
       00000000000
   - stage third stage :: third recipe@[pending] :: artifact command
     * artifacts let me down
-  - stage third stage :: third recipe@[pending] :: artifact command
-    :: first-artifact
-    first-artifact/testpath
-    * error message
 
 Warning messages:
   * warning message on result

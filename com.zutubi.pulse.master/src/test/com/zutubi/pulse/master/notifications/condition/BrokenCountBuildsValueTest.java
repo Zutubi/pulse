@@ -6,19 +6,20 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
+
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.mockito.AdditionalMatchers.aryEq;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import static java.util.Arrays.asList;
-import java.util.Collections;
-import java.util.List;
-
-public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
+public class BrokenCountBuildsValueTest extends PulseTestCase
 {
     private BuildManager buildManager;
-    private UnsuccessfulCountBuildsValue value;
+    private BrokenCountBuildsValue value;
     private Project project;
 
     protected void setUp() throws Exception
@@ -27,7 +28,7 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
 
         project = new Project();
         project.setId(12);
-        value = new UnsuccessfulCountBuildsValue();
+        value = new BrokenCountBuildsValue();
         value.setBuildManager(buildManager);
     }
 
@@ -66,7 +67,7 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
     private void setupCalls(BuildResult lastSuccess, long sinceBuildNumber, long buildNumber, int unsuccessfulCount)
     {
         List<BuildResult> lastSuccesses = lastSuccess == null ? Collections.<BuildResult>emptyList() : asList(lastSuccess);
-        stub(buildManager.queryBuilds(eq(project), aryEq(new ResultState[]{ResultState.SUCCESS}), anyLong(), eq(buildNumber - 1), anyInt(), anyInt(), eq(true), eq(false))).toReturn(lastSuccesses);
+        stub(buildManager.queryBuilds(eq(project), aryEq(ResultState.getHealthyStates()), anyLong(), eq(buildNumber - 1), anyInt(), anyInt(), eq(true), eq(false))).toReturn(lastSuccesses);
         stub(buildManager.getBuildCount(eq(project), eq(sinceBuildNumber), eq(buildNumber))).toReturn(unsuccessfulCount);
     }
 }

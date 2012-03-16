@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 /**
  * Helper base class for testing dependent sorting and related functionality.
  */
-public class DependentTestCase extends PulseTestCase
+public abstract class DependentTestCase extends PulseTestCase
 {
     protected TransitiveFunction<String> fn;
 

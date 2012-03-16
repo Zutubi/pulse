@@ -183,6 +183,10 @@
                 <ref local="removePersistentWorkDirOption"/>
                 <ref local="removeCheckoutScheme"/>
                 <ref local="addGitSubmoduleOptions"/>
+                <ref local="warningStatus"/>
+                <ref local="warningStatusConfiguration"/>
+                <ref local="warningStatusCustomConditions"/>
+                <ref local="warningStatusSelectedConditions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -960,5 +964,21 @@
 
     <bean id="addGitSubmoduleOptions" class="com.zutubi.pulse.master.upgrade.tasks.AddGitSubmoduleOptionsUpgradeTask">
         <property name="buildNumber" value="205000005"/>
+    </bean>
+
+    <bean id="warningStatus" class="com.zutubi.pulse.master.upgrade.tasks.WarningStatusUpgradeTask">
+        <property name="buildNumber" value="205001001"/>
+    </bean>
+
+    <bean id="warningStatusConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.WarningStatusConfigurationUpgradeTask">
+        <property name="buildNumber" value="205001002"/>
+    </bean>
+
+    <bean id="warningStatusCustomConditions" class="com.zutubi.pulse.master.upgrade.tasks.WarningStatusCustomConditionsUpgradeTask">
+        <property name="buildNumber" value="205001003"/>
+    </bean>
+
+    <bean id="warningStatusSelectedConditions" class="com.zutubi.pulse.master.upgrade.tasks.WarningStatusSelectedConditionsUpgradeTask">
+        <property name="buildNumber" value="205001004"/>
     </bean>
 </beans>

@@ -70,19 +70,25 @@ previnteger returns [NotifyValue r]
 boolsymbol
     : "true"
     | "false"
+    | "skipped"
     | "success"
+    | "warnings"
     | "failure"
     | "error"
+    | "terminated"
+    | "healthy"
+    | "broken"
     | "changed"
     | "changed.by.me"
+    | "changed.by.me.since.healthy"
     | "changed.by.me.since.success"
     | "responsibility.taken"
     | "state.change"
     ;
 
 intsymbol
-    : "unsuccessful.count.builds"
-    | "unsuccessful.count.days"
+    : "broken.count.builds"
+    | "broken.count.days"
     ;
 
 class NotifyConditionParser extends Parser;
@@ -126,19 +132,25 @@ integer
 boolsymbol
     : "true"
     | "false"
+    | "skipped"
     | "success"
+    | "warnings"
     | "failure"
     | "error"
+    | "terminated"
+    | "healthy"
+    | "broken"
     | "changed"
     | "changed.by.me"
+    | "changed.by.me.since.healthy"
     | "changed.by.me.since.success"
     | "responsibility.taken"
     | "state.change"
     ;
 
 intsymbol
-    : "unsuccessful.count.builds"
-    | "unsuccessful.count.days"
+    : "broken.count.builds"
+    | "broken.count.days"
     ;
     
 class NotifyConditionLexer extends Lexer;

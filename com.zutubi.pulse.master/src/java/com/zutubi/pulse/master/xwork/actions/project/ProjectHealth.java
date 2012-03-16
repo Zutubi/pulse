@@ -63,14 +63,11 @@ public enum ProjectHealth
         }
         else if (latestCompleted.succeeded())
         {
-            if (latestCompleted.getWarningFeatureCount() > 0)
-            {
-                return WARNINGS;
-            }
-            else
-            {
-                return OK;
-            }
+            return OK;
+        }
+        else if (latestCompleted.warned())
+        {
+            return WARNINGS;
         }
         else
         {

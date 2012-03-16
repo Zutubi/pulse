@@ -15,22 +15,44 @@ import java.util.List;
  * A condition that is a disjunction of some common simple conditions.
  */
 @SymbolicName("zutubi.selectedBuildsConditionConfig")
-@Form(labelWidth = 350, fieldOrder = {"unsuccessful", "statusChange", "includeChanges", "includeChangesByMe"})
+@Form(labelWidth = 350, fieldOrder = {"broken", "failed", "warnings", "statusChange", "includeChanges", "includeChangesByMe"})
 public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration implements Validateable
 {
-    private boolean unsuccessful;
+    private boolean broken;
+    private boolean failed;
+    private boolean warnings;
     private boolean includeChanges;
     private boolean includeChangesByMe;
     private boolean statusChange;
 
-    public boolean getUnsuccessful()
+    public boolean getBroken()
     {
-        return unsuccessful;
+        return broken;
     }
 
-    public void setUnsuccessful(boolean unsuccessful)
+    public void setBroken(boolean broken)
     {
-        this.unsuccessful = unsuccessful;
+        this.broken = broken;
+    }
+
+    public boolean isFailed()
+    {
+        return failed;
+    }
+
+    public void setFailed(boolean failed)
+    {
+        this.failed = failed;
+    }
+
+    public boolean isWarnings()
+    {
+        return warnings;
+    }
+
+    public void setWarnings(boolean warnings)
+    {
+        this.warnings = warnings;
     }
 
     public boolean getIncludeChanges()
@@ -79,22 +101,32 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
     private List<String> determineExpressions()
     {
         List<String> expressions = new LinkedList<String>();
-        if(unsuccessful)
+        if (broken)
         {
-            expressions.add("not " + NotifyConditionFactory.SUCCESS);
+            expressions.add(NotifyConditionFactory.BROKEN);
         }
 
-        if(includeChanges)
+        if (failed)
+        {
+            expressions.add(NotifyConditionFactory.FAILURE);
+        }
+
+        if (warnings)
+        {
+            expressions.add(NotifyConditionFactory.WARNINGS);
+        }
+
+        if (includeChanges)
         {
             expressions.add(NotifyConditionFactory.CHANGED);
         }
 
-        if(includeChangesByMe)
+        if (includeChangesByMe)
         {
             expressions.add(NotifyConditionFactory.CHANGED_BY_ME);
         }
 
-        if(statusChange)
+        if (statusChange)
         {
             expressions.add(NotifyConditionFactory.STATE_CHANGE);
         }

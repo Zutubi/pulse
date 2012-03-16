@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A build viewport allows random access to a list of builds, providing
@@ -106,7 +106,7 @@ public class BuildViewport
     public BuildResult getPreviousSuccessfulBuild()
     {
         return uniqueResult(
-                buildResultDao.findByBeforeBuild(buildId, 1, ResultState.SUCCESS)
+                buildResultDao.findByBeforeBuild(buildId, 1, ResultState.getHealthyStates())
         );
     }
 
@@ -132,7 +132,7 @@ public class BuildViewport
     public BuildResult getNextSuccessfulBuild()
     {
         return uniqueResult(
-                buildResultDao.findByAfterBuild(buildId, 1, ResultState.SUCCESS)
+                buildResultDao.findByAfterBuild(buildId, 1, ResultState.getHealthyStates())
         );
     }
 

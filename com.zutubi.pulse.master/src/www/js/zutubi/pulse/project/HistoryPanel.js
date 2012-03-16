@@ -52,9 +52,11 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
                         store: [
                             ['', '[any]'],
                             ['broken', '[any broken]'],
+                            ['healthy', '[any healthy]'],
                             ['error', 'error'],
                             ['failure', 'failure'],
                             ['terminated', 'terminated'],
+                            ['warnings', 'warnings'],
                             ['success', 'success']
                         ],
                         value: this.stateFilter,

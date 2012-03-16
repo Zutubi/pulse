@@ -1,4 +1,4 @@
-// $ANTLR 2.7.6 (20051207): NotifyCondition.g -> NotifyConditionTreeParserTokenTypes.txt$
+// $ANTLR 2.7.6 (2005-12-22): NotifyCondition.g -> NotifyConditionTreeParserTokenTypes.txt$
 NotifyConditionTreeParser    // output token vocab name
 LITERAL_and="and"=4
 LITERAL_or="or"=5
@@ -13,17 +13,23 @@ LITERAL_previous="previous"=13
 INTEGER("an integer")=14
 LITERAL_true="true"=15
 LITERAL_false="false"=16
-LITERAL_success="success"=17
-LITERAL_failure="failure"=18
-LITERAL_error="error"=19
-LITERAL_changed="changed"=20
-"changed.by.me"=21
-"changed.by.me.since.success"=22
-"responsibility.taken"=23
-"state.change"=24
-"unsuccessful.count.builds"=25
-"unsuccessful.count.days"=26
-LEFT_PAREN("an opening parenthesis '('")=27
-RIGHT_PAREN("a closing parenthesis ')'")=28
-WORD("a word")=29
-WHITESPACE=30
+LITERAL_skipped="skipped"=17
+LITERAL_success="success"=18
+LITERAL_warnings="warnings"=19
+LITERAL_failure="failure"=20
+LITERAL_error="error"=21
+LITERAL_terminated="terminated"=22
+LITERAL_healthy="healthy"=23
+LITERAL_broken="broken"=24
+LITERAL_changed="changed"=25
+"changed.by.me"=26
+"changed.by.me.since.healthy"=27
+"changed.by.me.since.success"=28
+"responsibility.taken"=29
+"state.change"=30
+"broken.count.builds"=31
+"broken.count.days"=32
+LEFT_PAREN("an opening parenthesis '('")=33
+RIGHT_PAREN("a closing parenthesis ')'")=34
+WORD("a word")=35
+WHITESPACE=36

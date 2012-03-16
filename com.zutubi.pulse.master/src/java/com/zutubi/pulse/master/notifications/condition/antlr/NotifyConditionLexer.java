@@ -1,4 +1,4 @@
-// $ANTLR 2.7.6 (20051207): "NotifyCondition.g" -> "NotifyConditionLexer.java"$
+// $ANTLR 2.7.6 (2005-12-22): "NotifyCondition.g" -> "NotifyConditionLexer.java"$
 
     package com.zutubi.pulse.master.notifications.condition.antlr;
 
@@ -24,22 +24,28 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(21));
-	literals.put(new ANTLRHashString("state.change", this), new Integer(24));
+	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(26));
+	literals.put(new ANTLRHashString("healthy", this), new Integer(23));
+	literals.put(new ANTLRHashString("state.change", this), new Integer(30));
 	literals.put(new ANTLRHashString("true", this), new Integer(15));
-	literals.put(new ANTLRHashString("changed", this), new Integer(20));
-	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(26));
+	literals.put(new ANTLRHashString("broken.count.builds", this), new Integer(31));
+	literals.put(new ANTLRHashString("changed", this), new Integer(25));
 	literals.put(new ANTLRHashString("false", this), new Integer(16));
-	literals.put(new ANTLRHashString("success", this), new Integer(17));
+	literals.put(new ANTLRHashString("success", this), new Integer(18));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
 	literals.put(new ANTLRHashString("previous", this), new Integer(13));
-	literals.put(new ANTLRHashString("failure", this), new Integer(18));
-	literals.put(new ANTLRHashString("changed.by.me.since.success", this), new Integer(22));
-	literals.put(new ANTLRHashString("responsibility.taken", this), new Integer(23));
-	literals.put(new ANTLRHashString("error", this), new Integer(19));
-	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(25));
+	literals.put(new ANTLRHashString("broken", this), new Integer(24));
+	literals.put(new ANTLRHashString("failure", this), new Integer(20));
+	literals.put(new ANTLRHashString("broken.count.days", this), new Integer(32));
+	literals.put(new ANTLRHashString("skipped", this), new Integer(17));
+	literals.put(new ANTLRHashString("changed.by.me.since.success", this), new Integer(28));
+	literals.put(new ANTLRHashString("changed.by.me.since.healthy", this), new Integer(27));
+	literals.put(new ANTLRHashString("warnings", this), new Integer(19));
+	literals.put(new ANTLRHashString("responsibility.taken", this), new Integer(29));
+	literals.put(new ANTLRHashString("error", this), new Integer(21));
+	literals.put(new ANTLRHashString("terminated", this), new Integer(22));
 }
 
 public Token nextToken() throws TokenStreamException {

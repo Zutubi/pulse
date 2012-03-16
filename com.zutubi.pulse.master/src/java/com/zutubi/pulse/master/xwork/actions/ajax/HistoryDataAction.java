@@ -26,8 +26,10 @@ public class HistoryDataAction extends ActionSupport
 {
     public static final String STATE_ANY = "";
     public static final String STATE_BROKEN = "broken";
+    public static final String STATE_HEALTHY = "healthy";
     public static final String STATE_FAILURE = "failure";
     public static final String STATE_ERROR = "error";
+    public static final String STATE_WARNINGS = "warnings";
     public static final String STATE_SUCCESS = "success";
     public static final String STATE_TERMINATED = "terminated";
 
@@ -37,9 +39,11 @@ public class HistoryDataAction extends ActionSupport
         NAME_TO_STATES = new TreeMap<String, ResultState[]>();
         NAME_TO_STATES.put(STATE_ANY, ResultState.getCompletedStates());
         NAME_TO_STATES.put(STATE_BROKEN, ResultState.getBrokenStates());
+        NAME_TO_STATES.put(STATE_HEALTHY, ResultState.getHealthyStates());
         NAME_TO_STATES.put(STATE_FAILURE, new ResultState[]{ResultState.FAILURE});
         NAME_TO_STATES.put(STATE_ERROR, new ResultState[]{ResultState.ERROR});
         NAME_TO_STATES.put(STATE_TERMINATED, new ResultState[]{ResultState.TERMINATED});
+        NAME_TO_STATES.put(STATE_WARNINGS, new ResultState[]{ResultState.WARNINGS});
         NAME_TO_STATES.put(STATE_SUCCESS, new ResultState[]{ResultState.SUCCESS});
     }
 

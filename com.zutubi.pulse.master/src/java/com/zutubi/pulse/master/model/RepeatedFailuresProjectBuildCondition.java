@@ -52,11 +52,11 @@ public class RepeatedFailuresProjectBuildCondition extends ProjectBuildCondition
     {
         if(UNITS_BUILDS.equals(units))
         {
-            return NotifyConditionFactory.UNSUCCESSFUL_COUNT_BUILDS + " == " + x;
+            return NotifyConditionFactory.BROKEN_COUNT_BUILDS + " == " + x;
         }
         else
         {
-            return NotifyConditionFactory.UNSUCCESSFUL_COUNT_DAYS + "(previous) < " + x + " and " + NotifyConditionFactory.UNSUCCESSFUL_COUNT_DAYS + " >= " + x;
+            return NotifyConditionFactory.BROKEN_COUNT_DAYS + "(previous) < " + x + " and " + NotifyConditionFactory.BROKEN_COUNT_DAYS + " >= " + x;
         }
     }
 }

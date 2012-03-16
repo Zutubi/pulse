@@ -176,6 +176,9 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             {
                 case SUCCESS:
                     break;
+                case WARNINGS:
+                    commandContext.warning("Command '" + commandLine + "' exited with code '" + result + "'");
+                    break;
                 case FAILURE:
                     commandContext.failure("Command '" + commandLine + "' exited with code '" + result + "'");
                     break;

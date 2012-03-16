@@ -12,7 +12,7 @@ import java.util.List;
  * Evaluates to the number of consecutive unsuccessful builds up to and
  * including the given build.
  */
-public class UnsuccessfulCountBuildsValue implements NotifyIntegerValue
+public class BrokenCountBuildsValue implements NotifyIntegerValue
 {
     private BuildManager buildManager;
 
@@ -23,12 +23,12 @@ public class UnsuccessfulCountBuildsValue implements NotifyIntegerValue
 
     public static int getValueForBuild(BuildResult result, BuildManager buildManager)
     {
-        if (result != null && !result.succeeded())
+        if (result != null && !result.healthy())
         {
             Project project = result.getProject();
-            List<BuildResult> lastSuccesses = buildManager.queryBuilds(project, new ResultState[]{ ResultState.SUCCESS }, -1, result.getNumber() - 1, 0, 1, true, false);
-            BuildResult lastSuccess = lastSuccesses.size() > 0 ? lastSuccesses.get(0) : null;
-            return buildManager.getBuildCount(project, lastSuccess == null ? 0 : lastSuccess.getNumber(), result.getNumber());
+            List<BuildResult> lastHealthies = buildManager.queryBuilds(project, ResultState.getHealthyStates(), -1, result.getNumber() - 1, 0, 1, true, false);
+            BuildResult lastHealthy = lastHealthies.size() > 0 ? lastHealthies.get(0) : null;
+            return buildManager.getBuildCount(project, lastHealthy == null ? 0 : lastHealthy.getNumber(), result.getNumber());
         }
 
         return 0;

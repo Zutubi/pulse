@@ -350,7 +350,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             return String.format("Project %s build %s %s",
                     getProjectName(result.getProject()),
                     result.getNumber(),
-                    (result.succeeded() ? "succeeded" : "failed")
+                    (result.healthy() ? "succeeded" : "failed")
             );
         }
 
@@ -413,7 +413,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             return String.format("Project %s build %s %s",
                     getProjectName(result.getProject()),
                     result.getNumber(),
-                    (result.succeeded() ? "succeeded" : "failed")
+                    (result.healthy() ? "succeeded" : "failed")
             );
         }
 
@@ -462,7 +462,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryTitle(BuildResult result)
         {
-            return String.format("Build %s %s", result.getNumber(), (result.succeeded() ? "succeeded" : "failed"));
+            return String.format("Build %s %s", result.getNumber(), (result.healthy() ? "succeeded" : "failed"));
         }
 
         public String getUID()
@@ -518,7 +518,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             return String.format("Project %s build %s %s",
                     getProjectName(result.getProject()),
                     result.getNumber(),
-                    (result.succeeded() ? "succeeded" : "failed")
+                    (result.healthy() ? "succeeded" : "failed")
             );
         }
 

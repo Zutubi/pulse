@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RegexPatternConfiguration;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.marshal.FileLoadException;
@@ -18,6 +16,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 
 /**
  * Tests for RegexPostProcessor.
@@ -400,6 +401,7 @@ public class RegexPostProcessorTest extends PulseTestCase
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         RegexPostProcessor pp = new RegexPostProcessor(config);
         pp.process(tempFile, new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, context));
+        result.complete();
         List<PersistentFeature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());

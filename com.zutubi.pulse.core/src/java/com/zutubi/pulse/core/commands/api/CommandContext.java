@@ -58,6 +58,14 @@ public interface CommandContext
     ResultState getResultState();
 
     /**
+     * Adds a warning the current command, recording the given message as a warning
+     * feature.  Warnings are used to report non-fatal problems.
+     *
+     * @param message warning message
+     */
+    void warning(String message);
+
+    /**
      * Fails the current command, and records the given message as an error
      * feature.  Failures are used to report normal build problems, e.g.
      * a compile error.

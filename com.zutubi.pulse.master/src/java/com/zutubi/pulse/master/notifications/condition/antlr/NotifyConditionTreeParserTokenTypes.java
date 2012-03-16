@@ -1,4 +1,4 @@
-// $ANTLR 2.7.6 (20051207): "NotifyCondition.g" -> "NotifyConditionLexer.java"$
+// $ANTLR 2.7.6 (2005-12-22): "NotifyCondition.g" -> "NotifyConditionLexer.java"$
 
     package com.zutubi.pulse.master.notifications.condition.antlr;
 
@@ -18,18 +18,24 @@ public interface NotifyConditionTreeParserTokenTypes {
 	int INTEGER = 14;
 	int LITERAL_true = 15;
 	int LITERAL_false = 16;
-	int LITERAL_success = 17;
-	int LITERAL_failure = 18;
-	int LITERAL_error = 19;
-	int LITERAL_changed = 20;
-	// "changed.by.me" = 21
-	// "changed.by.me.since.success" = 22
-	// "responsibility.taken" = 23
-	// "state.change" = 24
-	// "unsuccessful.count.builds" = 25
-	// "unsuccessful.count.days" = 26
-	int LEFT_PAREN = 27;
-	int RIGHT_PAREN = 28;
-	int WORD = 29;
-	int WHITESPACE = 30;
+	int LITERAL_skipped = 17;
+	int LITERAL_success = 18;
+	int LITERAL_warnings = 19;
+	int LITERAL_failure = 20;
+	int LITERAL_error = 21;
+	int LITERAL_terminated = 22;
+	int LITERAL_healthy = 23;
+	int LITERAL_broken = 24;
+	int LITERAL_changed = 25;
+	// "changed.by.me" = 26
+	// "changed.by.me.since.healthy" = 27
+	// "changed.by.me.since.success" = 28
+	// "responsibility.taken" = 29
+	// "state.change" = 30
+	// "broken.count.builds" = 31
+	// "broken.count.days" = 32
+	int LEFT_PAREN = 33;
+	int RIGHT_PAREN = 34;
+	int WORD = 35;
+	int WHITESPACE = 36;
 }

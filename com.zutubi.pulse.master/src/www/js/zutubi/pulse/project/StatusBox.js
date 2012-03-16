@@ -82,14 +82,9 @@ Zutubi.pulse.project.StatusBox = Ext.extend(Ext.BoxComponent, {
                 case 'in progress':
                     return 'inprogress';
                 case 'success':
-                    if (this.data.warnings && this.data.warnings > 0)
-                    {
-                        return 'warnings';
-                    }
-                    else
-                    {
-                        return 'ok'; 
-                    }
+                    return 'ok';
+                case 'warnings':
+                    return 'warnings';
                 case 'skipped':
                     return 'unknown';
                 default:

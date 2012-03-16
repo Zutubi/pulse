@@ -17,7 +17,7 @@ import java.util.List;
  * 24 hour periods that the build has been failing for.  It is not tied in
  * any way to boundaries between days.
  */
-public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
+public class BrokenCountDaysValue implements NotifyIntegerValue
 {
     private BuildManager buildManager;
 
@@ -28,15 +28,15 @@ public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
 
     public static int getValueForBuild(BuildResult result, BuildManager buildManager)
     {
-        if(result != null && !result.succeeded())
+        if(result != null && !result.healthy())
         {
             Project project = result.getProject();
-            List<BuildResult> lastSuccesses = buildManager.queryBuilds(project, new ResultState[]{ ResultState.SUCCESS }, -1, result.getNumber() - 1, 0, 1, true, false);
-            BuildResult lastSuccess = lastSuccesses.size() > 0 ? lastSuccesses.get(0) : null;
-            List<BuildResult> firstFailure = buildManager.queryBuilds(project, null, lastSuccess == null ? 1 : lastSuccess.getNumber() + 1, -1, 0, 1, false, false);
-            if(firstFailure.size() > 0)
+            List<BuildResult> lastlastHealthies = buildManager.queryBuilds(project, ResultState.getHealthyStates(), -1, result.getNumber() - 1, 0, 1, true, false);
+            BuildResult lastHealthy = lastlastHealthies.size() > 0 ? lastlastHealthies.get(0) : null;
+            List<BuildResult> firstBroken = buildManager.queryBuilds(project, null, lastHealthy == null ? 1 : lastHealthy.getNumber() + 1, -1, 0, 1, false, false);
+            if(firstBroken.size() > 0)
             {
-                long failingSince = firstFailure.get(0).getStamps().getEndTime();
+                long failingSince = firstBroken.get(0).getStamps().getEndTime();
                 return (int) ((result.getStamps().getEndTime() - failingSince) / Constants.DAY);
             }
         }

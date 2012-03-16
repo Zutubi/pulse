@@ -1150,11 +1150,11 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
     getImage: function(build)
     {
-        if (build.status === 'success')
+        if (build.status === 'success' || build.status === 'warnings')
         {
             return 'health/ok.gif';    
         }
-        else if (build.status === 'failure')
+        else if (build.status === 'failure' || build.status === 'error')
         {
             return 'health/broken.gif';
         }

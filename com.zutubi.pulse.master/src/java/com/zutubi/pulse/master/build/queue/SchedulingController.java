@@ -258,7 +258,7 @@ public class SchedulingController implements EventListener
             List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
             requestsToComplete.add(requestToComplete);
 
-            if (!result.succeeded())
+            if (!result.healthy())
             {
                 // Identify the queued requests that depend on this failed build so they can be cancelled.
                 Predicate<QueuedRequest> toCancelPredicate = new ConjunctivePredicate<QueuedRequest>(

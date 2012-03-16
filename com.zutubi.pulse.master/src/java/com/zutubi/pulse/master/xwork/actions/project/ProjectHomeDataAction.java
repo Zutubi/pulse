@@ -118,7 +118,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         
         ProjectHomeModel.StatisticsModel statistics = new ProjectHomeModel.StatisticsModel(
                 buildManager.getBuildCount(project, ResultState.getCompletedStates()),
-                buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS}),
+                buildManager.getBuildCount(project, ResultState.getHealthyStates()),
                 buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE})
         );
         
@@ -129,7 +129,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
             {
                 public boolean satisfied(RecipeResultNode recipeResultNode)
                 {
-                    return !recipeResultNode.getResult().succeeded();
+                    return !recipeResultNode.getResult().healthy();
                 }
             });
 

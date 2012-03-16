@@ -136,7 +136,7 @@ public class ApiUtils
     {
         details.put("status", result.getState().getPrettyString());
         details.put("completed", result.completed());
-        details.put("succeeded", result.succeeded());
+        details.put("succeeded", result.healthy());
         details.put("errorCount", result.getErrorFeatureCount());
         details.put("warningCount", result.getWarningFeatureCount());
 

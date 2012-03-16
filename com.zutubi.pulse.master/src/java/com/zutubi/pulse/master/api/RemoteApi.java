@@ -2447,68 +2447,6 @@ public class RemoteApi
     }
 
     /**
-     * Returns the latest build results for the given project that contain build warnings.  The
-     * returned results will only include completed builds, and are ordered most recent first.
-     *
-     * @param token       authentication token, see {@link #login}
-     * @param projectName name of the project to retrieve the build results of; may be the name of
-     *                    a project template in which case all concrete descendants of that
-     *                    template will be queried
-     * @param maxResults  the maximum number of builds to return
-     * @return {@xtype array<[RemoteApi.BuildResult]>} the latest completed builds for the given
-     *         project in which warning features were detected, ordered most recent first
-     * @throws IllegalArgumentException if the given project name is invalid
-     * @access requires view permission for the given project
-     * @see #getLatestBuildWithWarnings(String, String)
-     * @see #getLatestBuildForProject(String, String, boolean)
-     * @see #getLatestBuildsForProject(String, String, boolean, int)
-     */
-    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, final String projectName, final int maxResults)
-    {
-        tokenManager.loginUser(token);
-        try
-        {
-            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
-            {
-                public Vector<Hashtable<String, Object>> process()
-                {
-                    Project[] projects = internalGetProjectSet(projectName, true);
-                    return ApiUtils.mapBuilds(buildManager.queryBuildsWithMessages(projects, Feature.Level.WARNING, maxResults), true);
-                }
-            });
-        }
-        finally
-        {
-            tokenManager.logoutUser();
-        }
-    }
-
-    /**
-     * Equivalent to calling {@link #getLatestBuildsWithWarnings(String, String, int)} with
-     * maxResults set to one.
-     * <p/>
-     * The result of this function is either a single-element array, or an empty array if no such
-     * build exists.
-     *
-     * @param token       authentication token, see {@link #login}
-     * @param projectName name of the project to retrieve the build results of; may be the name of
-     *                    a project template in which case all concrete descendants of that
-     *                    template will be queried
-     * @return {@xtype array<[RemoteApi.BuildResult]>} a single element array containing the latest
-     *         completed build for the given project in which warning features were detected, or an
-     *         empty array if no such build exists
-     * @throws IllegalArgumentException if the given project name is invalid
-     * @access requires view permission for the given project
-     * @see #getLatestBuildsWithWarnings(String, String, int)
-     * @see #getLatestBuildForProject(String, String, boolean)
-     * @see #getLatestBuildsForProject(String, String, boolean, int)
-     */
-    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName)
-    {
-        return getLatestBuildsWithWarnings(token, projectName, 1);
-    }
-
-    /**
      * Returns the given personal build result for the calling user, if such a build exists.
      * <p/>
      * The result of this function is either a single-element array, or an empty array if no such

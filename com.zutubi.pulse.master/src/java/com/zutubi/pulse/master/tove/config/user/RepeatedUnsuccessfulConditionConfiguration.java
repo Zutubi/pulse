@@ -41,11 +41,11 @@ public class RepeatedUnsuccessfulConditionConfiguration extends SubscriptionCond
     {
         if(units == Units.BUILDS)
         {
-            return NotifyConditionFactory.UNSUCCESSFUL_COUNT_BUILDS + " == " + after;
+            return NotifyConditionFactory.BROKEN_COUNT_BUILDS + " == " + after;
         }
         else
         {
-            return NotifyConditionFactory.UNSUCCESSFUL_COUNT_DAYS + "(previous) < " + after + " and " + NotifyConditionFactory.UNSUCCESSFUL_COUNT_DAYS + " >= " + after;
+            return NotifyConditionFactory.BROKEN_COUNT_DAYS + "(previous) < " + after + " and " + NotifyConditionFactory.BROKEN_COUNT_DAYS + " >= " + after;
         }
     }
 

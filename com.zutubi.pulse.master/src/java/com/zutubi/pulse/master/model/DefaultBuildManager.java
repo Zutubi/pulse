@@ -247,7 +247,7 @@ public class DefaultBuildManager implements BuildManager
         }
         else if (isLatestSuccessful(buildId))
         {
-            return extractResult(buildResultDao.getLatestByUser(user, new ResultState[]{ResultState.SUCCESS}, 1));
+            return extractResult(buildResultDao.getLatestByUser(user, ResultState.getHealthyStates(), 1));
         }
         else if (isLatestBroken(buildId))
         {

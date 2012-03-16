@@ -47,6 +47,17 @@ public class CommandResult extends Result
         this.commandName = name;
     }
 
+    @Override
+    public void complete(long endTime)
+    {
+        if (hasArtifactMessages(Feature.Level.WARNING))
+        {
+            completionState = ResultState.getWorseState(completionState, ResultState.WARNINGS);
+        }
+        
+        super.complete(endTime);
+    }
+
     public void addArtifact(StoredArtifact artifact)
     {
         artifacts.add(artifact);
@@ -167,6 +178,7 @@ public class CommandResult extends Result
 
     public void update(CommandResult other)
     {
+        completionState = other.completionState;
         state = other.state;
 
         // Keep our own start time

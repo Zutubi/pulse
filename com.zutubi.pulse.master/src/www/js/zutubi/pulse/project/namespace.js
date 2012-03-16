@@ -230,10 +230,6 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                 return Zutubi.pulse.project.image('status', status) + ' ' +
                        Zutubi.pulse.project.renderers.resultElapsed(result.elapsed, result);
             }
-            else if (status === 'success' && result.warnings && result.warnings > 0)
-            {
-                return Zutubi.pulse.project.image('status', 'warnings') + ' success';
-            }
             else if (status === 'queued' && result.prettyQueueTime)
             {
                 return Zutubi.pulse.project.image('status', status) + ' ' +

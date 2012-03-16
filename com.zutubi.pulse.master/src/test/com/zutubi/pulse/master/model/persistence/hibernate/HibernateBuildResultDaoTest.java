@@ -162,6 +162,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result = new CommandResult("command name");
         result.commence();
         result.error("woops!");
+        result.complete();
         return result;
     }
 
@@ -171,6 +172,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result = new CommandResult("command name");
         result.commence();
         result.failure("oh no!");
+        result.complete();
         return result;
     }
 

@@ -3,15 +3,12 @@ package com.zutubi.pulse.core.commands;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.*;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_CUSTOM_FIELDS;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.logging.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 
@@ -22,6 +19,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_CUSTOM_FIELDS;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Default implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}.
@@ -69,6 +70,11 @@ public class DefaultCommandContext implements CommandContext
     public ResultState getResultState()
     {
         return result.getState();
+    }
+
+    public void warning(String message)
+    {
+        result.warning(message);
     }
 
     public void failure(String message)

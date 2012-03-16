@@ -49,7 +49,7 @@ public class ReportBuilder
             {
                 public boolean satisfied(BuildResult buildResult)
                 {
-                    return !seriesConfig.isSuccessfulOnly() || buildResult.succeeded();
+                    return !seriesConfig.isSuccessfulOnly() || buildResult.healthy();
                 }
             });
 

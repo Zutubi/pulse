@@ -129,7 +129,7 @@ public class RecipeProcessor
 
         RecipeStatus status = new RecipeStatus();
         BootstrapCommandConfiguration bootstrapConfig = new BootstrapCommandConfiguration(request.getBootstrapper());
-        if (pushContextAndExecute(context, bootstrapConfig, null, outputDir, status) || !status.isSuccess())
+        if (pushContextAndExecute(context, bootstrapConfig, null, outputDir, status) || !status.isOK())
         {
             return;
         }
@@ -144,7 +144,7 @@ public class RecipeProcessor
 
                 RetrieveDependenciesCommandConfiguration retrieveCommandConfig = new RetrieveDependenciesCommandConfiguration();
                 retrieveCommandConfig.setIvy(ivy);
-                if (pushContextAndExecute(context, retrieveCommandConfig, null, outputDir, status) || !status.isSuccess())
+                if (pushContextAndExecute(context, retrieveCommandConfig, null, outputDir, status) || !status.isOK())
                 {
                     return;
                 }
@@ -329,7 +329,7 @@ public class RecipeProcessor
         {
             for (CommandConfiguration commandConfig : config.getCommands().values())
             {
-                if (status.isSuccess() || commandConfig.isForce())
+                if (status.isOK() || commandConfig.isForce())
                 {
                     boolean recipeTerminated = pushContextAndExecute(context, commandConfig, loadInterceptor.getCommandScope(commandConfig.getName()), outputDir, status);
                     if (recipeTerminated)
@@ -559,9 +559,9 @@ public class RecipeProcessor
             return state;
         }
 
-        public boolean isSuccess()
+        public boolean isOK()
         {
-            return state == ResultState.SUCCESS;
+            return state.isHealthy();
         }
 
         public int nextCommandIndex()

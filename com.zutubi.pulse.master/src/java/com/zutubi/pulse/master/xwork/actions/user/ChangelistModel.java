@@ -32,7 +32,7 @@ public class ChangelistModel
     /**
      * The build result aggregation order
      */
-    private static final ResultState[] AGGREGATION_ORDER = new ResultState[]{ResultState.SUCCESS, ResultState.IN_PROGRESS, ResultState.FAILURE, ResultState.ERROR, ResultState.TERMINATED};
+    private static final ResultState[] AGGREGATION_ORDER = new ResultState[]{ResultState.SUCCESS, ResultState.WARNINGS, ResultState.IN_PROGRESS, ResultState.FAILURE, ResultState.ERROR, ResultState.TERMINATED};
 
     public ChangelistModel(PersistentChangelist changelist, String url, List<BuildResult> buildResults, CommitMessageSupport commitMessageSupport)
     {
@@ -50,16 +50,14 @@ public class ChangelistModel
 
         // Failed states trump everything, in progress trumps success
         ResultState aggregrateState = ResultState.SUCCESS;
-        int warningCount = 0;
         for (BuildResult build: buildResults)
         {
             aggregrateState = ResultState.getAggregate(aggregrateState, build.getState(), AGGREGATION_ORDER);
-            warningCount += build.getWarningFeatureCount();
         }
 
         aggregateStatus = aggregrateState.getPrettyString();
-        aggregateStatusClass= ToveUtils.getStatusClass(aggregrateState, warningCount);
-        aggregateStatusIcon = ToveUtils.getStatusIcon(aggregrateState, warningCount);
+        aggregateStatusClass= ToveUtils.getStatusClass(aggregrateState);
+        aggregateStatusIcon = ToveUtils.getStatusIcon(aggregrateState);
     }
 
     public long getId()

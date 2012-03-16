@@ -268,6 +268,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         CommandResult command = new CommandResult("test command");
         command.setId(200);
         command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
+        command.complete();
         thirdResult.add(command);
 
         command = new CommandResult("artifact command");
@@ -286,6 +287,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         artifact.addFeature(new PersistentFeature(Feature.Level.ERROR, "error 3: in this case a longer error message so i can see how the wrapping works on the artifact messages"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
+        command.complete();
         thirdResult.add(command);
         return result;
     }
@@ -327,6 +329,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
+        command.complete();
         thirdResult.add(command);
         thirdResult.setFailedTestResults(tests);
         TestResultSummary summary = tests.getSummary();
@@ -350,6 +353,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         CommandResult command = new CommandResult("failing tests");
         command.setId(23);
         command.failure("i failed");
+        command.complete();
         secondResult.add(command);
         createAndVerify("singelstagefailure", type, "http://host.url", result);
     }
@@ -397,6 +401,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         tests.add(new PersistentTestCaseResult("test case at top level", 0, FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
+        command.complete();
         thirdResult.add(command);
         thirdResult.setFailedTestResults(tests);
         TestResultSummary summary = tests.getSummary();
@@ -568,7 +573,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         dataMap.put("renderer", renderer);
         dataMap.put("baseUrl", baseUrl);
         dataMap.put("project", result.getProject());
-        dataMap.put("status", result.succeeded() ? "healthy" : "broken");
+        dataMap.put("status", result.healthy() ? "healthy" : "broken");
         dataMap.put("result", result);
         dataMap.put("model", result);
         dataMap.put("changelists", changelists);

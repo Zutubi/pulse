@@ -10,8 +10,8 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.notifications.NotificationAttachment;
-import com.zutubi.pulse.master.notifications.condition.UnsuccessfulCountBuildsValue;
-import com.zutubi.pulse.master.notifications.condition.UnsuccessfulCountDaysValue;
+import com.zutubi.pulse.master.notifications.condition.BrokenCountBuildsValue;
+import com.zutubi.pulse.master.notifications.condition.BrokenCountDaysValue;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 
@@ -34,7 +34,7 @@ public class DefaultRenderService implements RenderService
         dataMap.put("baseUrl", baseUrl);
         dataMap.put("externalUrls", new Urls(baseUrl));
         dataMap.put("project", project);
-        dataMap.put("status", result.succeeded() ? "healthy" : "broken");
+        dataMap.put("status", result.healthy() ? "healthy" : "broken");
         dataMap.put("result", result);
         dataMap.put("model", result);
         dataMap.put("changelists", buildManager.getChangesForBuild(result, true));
@@ -50,8 +50,8 @@ public class DefaultRenderService implements RenderService
                 dataMap.put("lastSuccess", lastSuccess);
             }
 
-            dataMap.put("unsuccessfulBuilds", UnsuccessfulCountBuildsValue.getValueForBuild(result, buildManager));
-            dataMap.put("unsuccessfulDays", UnsuccessfulCountDaysValue.getValueForBuild(result, buildManager));
+            dataMap.put("unsuccessfulBuilds", BrokenCountBuildsValue.getValueForBuild(result, buildManager));
+            dataMap.put("unsuccessfulDays", BrokenCountDaysValue.getValueForBuild(result, buildManager));
         }
 
         return dataMap;

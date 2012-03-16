@@ -7,19 +7,20 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.Constants;
+
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.mockito.AdditionalMatchers.aryEq;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import static java.util.Arrays.asList;
-import java.util.Collections;
-import java.util.List;
-
-public class UnsuccessfulCountDaysValueTest extends PulseTestCase
+public class BrokenCountDaysValueTest extends PulseTestCase
 {
     private BuildManager buildManager;
-    private UnsuccessfulCountDaysValue value;
+    private BrokenCountDaysValue value;
     private Project project;
 
     protected void setUp() throws Exception
@@ -27,7 +28,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         buildManager = mock(BuildManager.class);
         project = new Project();
         project.setId(99);
-        value = new UnsuccessfulCountDaysValue();
+        value = new BrokenCountDaysValue();
         value.setBuildManager(buildManager);
     }
 
@@ -89,7 +90,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
     private void setupCalls(long number, BuildResult lastSuccess, BuildResult... firstFailure)
     {
         List<BuildResult> lastSuccesses = lastSuccess == null ? Collections.<BuildResult>emptyList() : asList(lastSuccess);
-        stub(buildManager.queryBuilds(eq(project), aryEq(new ResultState[]{ResultState.SUCCESS}), eq(-1L), eq(number - 1), anyInt(), anyInt(), eq(true), eq(false))).toReturn(lastSuccesses);
+        stub(buildManager.queryBuilds(eq(project), aryEq(ResultState.getHealthyStates()), eq(-1L), eq(number - 1), anyInt(), anyInt(), eq(true), eq(false))).toReturn(lastSuccesses);
         long lastSuccessNumber = lastSuccess == null ? 1 : lastSuccess.getNumber() + 1;
         stub(buildManager.queryBuilds(eq(project), (ResultState[]) isNull(), eq(lastSuccessNumber), eq(-1L), anyInt(), anyInt(), eq(false), eq(false))).toReturn(asList(firstFailure));
     }

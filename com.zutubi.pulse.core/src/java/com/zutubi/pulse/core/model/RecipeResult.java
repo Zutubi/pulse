@@ -48,20 +48,17 @@ public class RecipeResult extends Result
     {
         results.add(result);
 
-        if (state != ResultState.ERROR)
+        switch (result.state)
         {
-            switch (result.state)
-            {
-                case ERROR:
-                    error("Error executing command '" + result.getCommandName() + "'");
-                    break;
-                case FAILURE:
-                    if (state != ResultState.FAILURE)
-                    {
-                        failure("Command '" + result.getCommandName() + "' failed");
-                    }
-                    break;
-            }
+            case ERROR:
+                error("Error executing command '" + result.getCommandName() + "'");
+                break;
+            case FAILURE:
+                failure("Command '" + result.getCommandName() + "' failed");
+                break;
+            case WARNINGS:
+                warning("Command '" + result.getCommandName() + "' reported warnings");
+                break;
         }
     }
 
@@ -86,7 +83,8 @@ public class RecipeResult extends Result
         // of the incoming result.
         if (!state.isTerminating())
         {
-            state = ResultState.getWorseState(this.state, result.getState());
+            completionState = ResultState.getWorseState(completionState, result.getCompletionState());
+            state = ResultState.getWorseState(state, result.getState());
         }
 
         // Copy across features

@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.commands.api;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 
@@ -12,6 +11,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * An implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}
@@ -47,6 +48,12 @@ public class TestCommandContext implements CommandContext
     public ResultState getResultState()
     {
         return resultState;
+    }
+
+    public void warning(String message)
+    {
+        addFeature(new Feature(Feature.Level.WARNING, message));
+        resultState = ResultState.WARNINGS;
     }
 
     /**

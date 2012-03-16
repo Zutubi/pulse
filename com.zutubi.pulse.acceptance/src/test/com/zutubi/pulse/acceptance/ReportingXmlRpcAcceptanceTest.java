@@ -471,15 +471,6 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     }
 
 
-    public void testGetLatestBuildsWithWarningsNoWarnings() throws Exception
-    {
-        ensureProjectHierarchy();
-
-        // No builds have warnings, but this sanity check found a login bug.
-        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.getLatestBuildsWithWarnings(PROJECT_HIERARCHY_TEMPLATE, 10);
-        assertEquals(0, builds.size());
-    }
-
     public void testGetArtifactFileListing() throws Exception
     {
         final String STAGE_NAME = "default";

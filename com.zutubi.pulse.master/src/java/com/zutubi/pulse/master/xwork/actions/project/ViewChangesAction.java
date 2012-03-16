@@ -136,7 +136,7 @@ public class ViewChangesAction extends BuildActionBase
             }
         });
         
-        previousSuccessful = buildManager.getPreviousBuildResultWithRevision(result, new ResultState[] { ResultState.SUCCESS });
+        previousSuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getHealthyStates());
         previousUnsuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getBrokenStates());
 
         return SUCCESS;

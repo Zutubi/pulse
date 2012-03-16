@@ -13,23 +13,26 @@ import java.util.Map;
 public class NotifyConditionFactory
 {
     // Primitive conditions
+    public static final String BROKEN = "broken";
     public static final String CHANGED = "changed";
     public static final String CHANGED_BY_ME = "changed.by.me";
+    public static final String CHANGED_BY_ME_SINCE_HEALTHY = "changed.by.me.since.healthy";
     public static final String CHANGED_BY_ME_SINCE_SUCCESS = "changed.by.me.since.success";
     public static final String ERROR = "error";
     public static final String FAILURE = "failure";
     public static final String FALSE = "false";
+    public static final String HEALTHY = "healthy";
     public static final String RESPONSIBILITY_TAKEN = "responsibility.taken";
+    public static final String SKIPPED = "skipped";
     public static final String SUCCESS = "success";
     public static final String STATE_CHANGE = "state.change";
+    public static final String TERMINATED = "terminated";
     public static final String TRUE = "true";
+    public static final String WARNINGS = "warnings";
 
     // Integer values
-    public static final String UNSUCCESSFUL_COUNT_BUILDS = "unsuccessful.count.builds";
-    public static final String UNSUCCESSFUL_COUNT_DAYS = "unsuccessful.count.days";
-
-    // String values
-    public static final String BUILD_SPECIFICATION_NAME = "build.specification.name";
+    public static final String BROKEN_COUNT_BUILDS = "broken.count.builds";
+    public static final String BROKEN_COUNT_DAYS = "broken.count.days";
 
     private final static Map<String, Class> typeMap = new HashMap<String, Class>();
 
@@ -38,19 +41,25 @@ public class NotifyConditionFactory
     static
     {
         // initialise the default notification types.
+        typeMap.put(BROKEN, BrokenNotifyCondition.class);
         typeMap.put(CHANGED, ChangedNotifyCondition.class);
         typeMap.put(CHANGED_BY_ME, ChangedByMeNotifyCondition.class);
+        typeMap.put(CHANGED_BY_ME_SINCE_HEALTHY, ChangedByMeSinceHealthyNotifyCondition.class);
         typeMap.put(CHANGED_BY_ME_SINCE_SUCCESS, ChangedByMeSinceSuccessNotifyCondition.class);
         typeMap.put(ERROR, ErrorNotifyCondition.class);
         typeMap.put(FAILURE, FailureNotifyCondition.class);
         typeMap.put(FALSE, FalseNotifyCondition.class);
+        typeMap.put(HEALTHY, HealthyNotifyCondition.class);
         typeMap.put(RESPONSIBILITY_TAKEN, ResponsibilityTakenNotifyCondition.class);
+        typeMap.put(SKIPPED, SkippedNotifyCondition.class);
         typeMap.put(SUCCESS, SuccessNotifyCondition.class);
         typeMap.put(STATE_CHANGE, StateChangeNotifyCondition.class);
+        typeMap.put(TERMINATED, TerminatedNotifyCondition.class);
         typeMap.put(TRUE, TrueNotifyCondition.class);
+        typeMap.put(WARNINGS, WarningsNotifyCondition.class);
 
-        typeMap.put(UNSUCCESSFUL_COUNT_BUILDS, UnsuccessfulCountBuildsValue.class);
-        typeMap.put(UNSUCCESSFUL_COUNT_DAYS, UnsuccessfulCountDaysValue.class);
+        typeMap.put(BROKEN_COUNT_BUILDS, BrokenCountBuildsValue.class);
+        typeMap.put(BROKEN_COUNT_DAYS, BrokenCountDaysValue.class);
     }
 
     public List<String> getAvailableConditions()

@@ -410,7 +410,7 @@ table.fill-content
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-centre, th.content-centre, td.content-right, td.content-large, td.image, td.note, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right, td.cancelling-right, td.cancelled-right
+h3.heading, div.box, th.heading, th.group, th.note, th.content, table.content th, th.content-row, td.content, table.content td, td.content-wrap, td.content-centre, th.content-centre, td.content-right, td.content-large, td.image, td.note, td.success, td.failure, td.test-failure, td.test-skipped, td.error, td.warning, td.warnings, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right, td.terminated-right, td.cancelling-right, td.cancelled-right
 {
     border: 1px solid #bbb;
     padding: 4px;
@@ -543,7 +543,7 @@ td.skipped, td.skipped-right
     color: #888;
 }
 
-td.warning, td.warning-right
+td.warning, td.warnings, td.warning-right
 {
     color: #d08000;
     font-weight: bold;
@@ -1276,6 +1276,12 @@ td.status-last
 .x-tree-node-collapsed .status-success, .x-tree-node-expanded .status-success, .x-tree-node-leaf .status-success
 {
     background-image: url(../images/accept.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .status-warnings, .x-tree-node-expanded .status-warnings, .x-tree-node-leaf .status-warnings
+{
+    background-image: url(../images/error.gif);
     width: 20px;
 }
 

@@ -19,6 +19,7 @@ public abstract class Result extends Entity
 
     // NOTE: if you add a field here, check the update() method in
     // CommandResult!
+    protected ResultState completionState = ResultState.SUCCESS;
     protected ResultState state = ResultState.PENDING;
     protected TimeStamps stamps = new TimeStamps();
     private File outputDir;
@@ -60,9 +61,19 @@ public abstract class Result extends Entity
         return getState().isTerminated();
     }
 
+    public boolean healthy()
+    {
+        return state.isHealthy();
+    }
+
     public boolean succeeded()
     {
         return ResultState.SUCCESS == getState();
+    }
+
+    public boolean warned()
+    {
+        return ResultState.WARNINGS == getState();
     }
 
     public boolean failed()
@@ -132,15 +143,7 @@ public abstract class Result extends Entity
 
     public void complete(long endTime)
     {
-        if (inProgress())
-        {
-            state = ResultState.SUCCESS;
-        }
-        else if (terminating())
-        {
-            state = state.getTerminatedState();
-        }
-
+        state = completionState;
         if (!stamps.started())
         {
             stamps.setStartTime(endTime);
@@ -148,19 +151,40 @@ public abstract class Result extends Entity
         stamps.setEndTime(endTime);
     }
 
-    public void failure()
+    private void broken(ResultState brokenState)
     {
         if (!state.isTerminating())
         {
-            state = ResultState.getWorseState(state, ResultState.FAILURE);
+            if (state.isCompleted())
+            {
+                state = ResultState.getWorseState(state, brokenState);
+            }
+            else
+            {
+                completionState = ResultState.getWorseState(completionState, brokenState);
+            }
         }
+    }
+
+    public void failure()
+    {
+        broken(ResultState.FAILURE);
     }
 
     public void error()
     {
-        if (!state.isTerminating())
+        broken(ResultState.ERROR);
+    }
+
+    public void warnings()
+    {
+        if (state.isCompleted())
         {
-            state = ResultState.getWorseState(state, ResultState.ERROR);
+            state = ResultState.getWorseState(state, ResultState.WARNINGS);
+        }
+        else
+        {
+            completionState = ResultState.getWorseState(completionState, ResultState.WARNINGS);
         }
     }
 
@@ -173,6 +197,13 @@ public abstract class Result extends Entity
     {
         if (!features.contains(feature))
         {
+            // Note error features may cause the result state to be unchanged, failure or error, we can't generically
+            // handle them here as we do warnings.
+            if (feature.getLevel() == Feature.Level.WARNING)
+            {
+                warnings();
+            }
+            
             features.add(feature);
         }
     }
@@ -191,24 +222,32 @@ public abstract class Result extends Entity
 
     public void warning(String message)
     {
+        warnings();
         addFeature(Feature.Level.WARNING, message);
     }
 
     public void cancel(String message)
     {
         state = ResultState.CANCELLING;
+        completionState = state.getTerminatedState();
         addFeature(Feature.Level.ERROR, message);
     }
 
     public void terminate(String message)
     {
         state = ResultState.TERMINATING;
+        completionState = state.getTerminatedState();
         addFeature(Feature.Level.ERROR, message);
     }
 
     public void error(BuildException e)
     {
         error(e.getMessage());
+    }
+
+    protected ResultState getCompletionState()
+    {
+        return completionState;
     }
 
     public ResultState getState()

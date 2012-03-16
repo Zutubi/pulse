@@ -18,7 +18,6 @@ import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -897,7 +896,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private void checkForTermination(RecipeController controller)
     {
         RecipeResultNode recipeResultNode = controller.getResultNode();
-        if (!recipeResultNode.getResult().succeeded())
+        if (!recipeResultNode.getResult().healthy())
         {
             String stageName = recipeResultNode.getStageName();
             if (projectConfig.getStage(stageName).isTerminateBuildOnFailure())
@@ -931,7 +930,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 public void run(RecipeResultNode recipeResultNode)
                 {
                     RecipeResult result = recipeResultNode.getResult();
-                    if (result != null && result.completed() && !result.succeeded())
+                    if (result != null && result.completed() && !result.healthy())
                     {
                         failures[0]++;
                     }
@@ -954,7 +953,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            if (!hard && buildResult.getWorstStageState() == ResultState.SUCCESS && !buildResult.isPersonal())
+            if (!hard && buildResult.getWorstStageState().isHealthy() && !buildResult.isPersonal())
             {
                 try
                 {

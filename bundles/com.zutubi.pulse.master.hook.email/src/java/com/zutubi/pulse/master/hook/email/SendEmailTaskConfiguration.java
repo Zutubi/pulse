@@ -257,7 +257,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     {
         if (sinceLastSuccess)
         {
-            BuildResult previousSuccess = buildManager.getPreviousBuildResultWithRevision(result, new ResultState[]{ResultState.SUCCESS});
+            BuildResult previousSuccess = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getHealthyStates());
             long lowestNumber = previousSuccess == null ? 1 : previousSuccess.getNumber() + 1;
             List<BuildResult> builds = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), lowestNumber, result.getNumber() - 1, 0, -1, false, false);
             builds.add(result);
