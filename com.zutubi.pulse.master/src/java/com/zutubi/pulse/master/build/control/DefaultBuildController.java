@@ -278,6 +278,7 @@ public class DefaultBuildController implements EventListener, BuildController
             else
             {
                 recipeResult.skip();
+                recipeResult.complete();
                 buildManager.save(recipeResult);
             }
         }
