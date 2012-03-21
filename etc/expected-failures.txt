@@ -1,0 +1,13 @@
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testPreBuildHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testPreStageHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testPostStageHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testManualHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testPostBuildHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testPostBuildHookCanAccessProjectAndStageProperties
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testManuallyTriggerPreBuildHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testManualTriggerNotAvailableWhenDisabled
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testManuallyTriggerPostStageHook
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testRestrictToStates
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testDisable
+com.zutubi.pulse.acceptance.BuildHookAcceptanceTest/testTriggerFromBuildPage
+

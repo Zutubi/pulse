@@ -88,7 +88,7 @@ public abstract class Result extends Entity
 
     public void skip()
     {
-        state = ResultState.SKIPPED;
+        completionState = ResultState.SKIPPED;
     }
 
     public boolean skipped()
