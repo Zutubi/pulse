@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
+import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.validation.annotations.Required;
 
 @Table(columns = {"resource", "displayVersion", "inverse", "optional"})
@@ -108,15 +110,22 @@ public class ResourceRequirementConfiguration extends AbstractConfiguration
         return (resource == null ? "?" : resource) + ":" + (!defaultVersion ? version : "[default]");
     }
 
-    public ResourceRequirement asResourceRequirement()
+    /**
+     * Converts this configuration into a usable requirement, resolving any variable references.
+     * 
+     * @param variables variables used to resolve references in the resource name or version
+     * @return a requirement corresponding to this configuration
+     */
+    public ResourceRequirement asResourceRequirement(VariableMap variables)
     {
         if (isDefaultVersion())
         {
-            return new ResourceRequirement(resource, inverse, optional);
+            return new ResourceRequirement(VariableResolver.safeResolveVariables(resource, variables), inverse, optional);
         }
         else
         {
-            return new ResourceRequirement(resource, version, inverse, optional);
+            return new ResourceRequirement(VariableResolver.safeResolveVariables(resource, variables),
+                    VariableResolver.safeResolveVariables(version, variables), inverse, optional);
         }
     }
 }

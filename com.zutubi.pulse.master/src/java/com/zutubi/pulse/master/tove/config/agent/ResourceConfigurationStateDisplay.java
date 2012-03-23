@@ -2,8 +2,10 @@ package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.InMemoryResourceRepository;
+import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -45,16 +47,22 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
 
         TreeNode<String> result = new TreeNode<String>(null);
         boolean incompatibilityFound = false;
-        ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement();
+        //ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement();
         List<ProjectConfiguration> configs = new LinkedList<ProjectConfiguration>(projectManager.getAllProjectConfigs(false));
         Collections.sort(configs, new NamedConfigurationComparator());
         for (ProjectConfiguration project: configs)
         {
-            List<ResourceRequirement> requirements = CollectionUtils.map(project.getRequirements(), fn);
+            PulseScope projectVariables = new PulseScope();
+            for (ResourcePropertyConfiguration property: project.getProperties().values())
+            {
+                projectVariables.add(property.asResourceProperty());
+            }
+            
+            List<ResourceRequirement> requirements = CollectionUtils.map(project.getRequirements(), new ResourceRequirementConfigurationToRequirement(projectVariables));
             if (resourceRepository.satisfies(requirements))
             {
                 String stagePart;
-                List<String> compatibleStages = getCompatibleStageNames(resourceRepository, fn, project);
+                List<String> compatibleStages = getCompatibleStageNames(resourceRepository, project, projectVariables);
                 int projectStageCount = project.getStages().size();
                 int compatibleStageCount = compatibleStages.size();
                 if (compatibleStageCount == projectStageCount)
@@ -109,11 +117,18 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
         }
     }
 
-    private List<String> getCompatibleStageNames(InMemoryResourceRepository resourceRepository, ResourceRequirementConfigurationToRequirement fn, ProjectConfiguration project)
+    private List<String> getCompatibleStageNames(InMemoryResourceRepository resourceRepository, ProjectConfiguration project, PulseScope projectVariables)
     {
         List<String> stageNames = new LinkedList<String>();
         for (BuildStageConfiguration stage: project.getStages().values())
         {
+            PulseScope stageVariables = projectVariables.createChild();
+            for (ResourcePropertyConfiguration property: stage.getProperties().values())
+            {
+                stageVariables.add(property.asResourceProperty());
+            }
+            
+            ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement(stageVariables);
             List<ResourceRequirement> requirements = CollectionUtils.map(stage.getRequirements(), fn);
             if (resourceRepository.satisfies(requirements))
             {

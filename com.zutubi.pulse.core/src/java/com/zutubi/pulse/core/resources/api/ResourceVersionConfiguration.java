@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Form(fieldOrder = {"value"})
 @SymbolicName("zutubi.resourceVersion")
-public class ResourceVersionConfiguration  extends AbstractConfiguration
+public class ResourceVersionConfiguration extends AbstractConfiguration
 {
     @ID
     private String value;

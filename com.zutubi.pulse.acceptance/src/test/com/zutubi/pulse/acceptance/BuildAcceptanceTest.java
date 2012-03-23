@@ -1,6 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -20,6 +31,8 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -28,15 +41,22 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
+import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -45,10 +65,15 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.httpclient.Header;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -57,31 +82,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -716,6 +716,27 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         assertEnvironment(projectName, 1, "PULSE_TEST-PROPERTY=test-value");
+    }
+
+    public void testResourceRequirementsReferencingProperties() throws Exception
+    {
+        String projectResourceName = random + "-project-resource";
+        String stageResourceName = random + "-stage-resource";
+        addResource(MASTER_AGENT_NAME, projectResourceName, "1.0");
+        addResource(MASTER_AGENT_NAME, stageResourceName, "2.0");
+
+        String projectName = random + "-project";
+        String projectPath = getPath(PROJECTS_SCOPE, projectName);
+        String stagePath = getPath(projectPath, "stages", "default");
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(projectResourceName, "${p.version}"));
+        rpcClient.RemoteApi.insertConfig(getPath(stagePath, "requirements"), createRequiredResource(stageResourceName, "${s.version}"));
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "p.version", "1.0");
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "s.version", "1.0");
+        rpcClient.RemoteApi.insertConfig(getPath(stagePath, "properties"), rpcClient.RemoteApi.createProperty("s.version", "2.0"));
+        
+        getBrowser().loginAsAdmin();
+        triggerSuccessfulBuild(projectName);
     }
 
     public void testProjectPropertyReferencesResourceProperty() throws Exception
@@ -1837,8 +1858,22 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
     private String addResource(String agent, String name) throws Exception
     {
+        return addResource(agent, name, null);
+    }
+
+    private String addResource(String agent, String name, String version) throws Exception
+    {
         Hashtable<String, Object> resource = rpcClient.RemoteApi.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", name);
+        if (version != null)
+        {
+            Hashtable<String, Object> versionConfig = rpcClient.RemoteApi.createDefaultConfig(ResourceVersionConfiguration.class);
+            versionConfig.put("value", version);
+            Hashtable<String, Object> versions = new Hashtable<String, Object>();
+            versions.put(version, versionConfig);
+            resource.put("versions", versions);
+        }
+        
         return rpcClient.RemoteApi.insertConfig(getPath(AGENTS_SCOPE, agent, "resources"), resource);
     }
 

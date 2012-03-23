@@ -3,13 +3,12 @@ package com.zutubi.tove.variables;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
+import static com.zutubi.util.CollectionUtils.asSet;
 import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
-
-import static com.zutubi.util.CollectionUtils.asSet;
 
 /**
  * Methods for analysing and replacing variables within strings.
@@ -601,6 +600,26 @@ public class VariableResolver
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Resolves variables in input non-strictly (variables that are not recognised are left
+     * unresolved), returning the original input if any syntax error is found.
+     * 
+     * @param input     the input to be resolved
+     * @param variables a set of variables to use for resolution
+     * @return the input with as many variables resolved as possible
+     */
+    public static String safeResolveVariables(String input, VariableMap variables)
+    {
+        try
+        {
+            return resolveVariables(input, variables, ResolutionStrategy.RESOLVE_NON_STRICT);
+        }
+        catch (ResolutionException e)
+        {
+            return input;
+        }
     }
 
     public static List<String> splitAndResolveVariable(String input, VariableMap variables, ResolutionStrategy resolutionStrategy) throws ResolutionException

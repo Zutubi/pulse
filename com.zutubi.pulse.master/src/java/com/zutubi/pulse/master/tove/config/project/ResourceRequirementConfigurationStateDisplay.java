@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -12,10 +14,7 @@ import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Formats state fields for resource requirements.
@@ -43,15 +42,33 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
      */
     public Object formatCollectionCompatibleAgents(Collection<ResourceRequirementConfiguration> requirementConfigurations, Configuration parentInstance)
     {
-        ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement();
-        List<ResourceRequirement> requirements = CollectionUtils.map(requirementConfigurations, fn);
-
+        List<ResourceRequirementConfiguration> requirementConfigs = new LinkedList<ResourceRequirementConfiguration>(requirementConfigurations);
+        PulseScope variables = new PulseScope();
         if (parentInstance instanceof BuildStageConfiguration)
         {
             ProjectConfiguration project = configurationProvider.getAncestorOfType(parentInstance, ProjectConfiguration.class);
-            CollectionUtils.map(project.getRequirements(), fn, requirements);
+            requirementConfigs.addAll(project.getRequirements());
+            for (ResourcePropertyConfiguration property: project.getProperties().values())
+            {
+                variables.add(property.asResourceProperty());
+            }
+            
+            BuildStageConfiguration stage = (BuildStageConfiguration) parentInstance;
+            for (ResourcePropertyConfiguration property: stage.getProperties().values())
+            {
+                variables.add(property.asResourceProperty());
+            }            
         }
-        
+        else
+        {
+            ProjectConfiguration project = (ProjectConfiguration) parentInstance;
+            for (ResourcePropertyConfiguration property: project.getProperties().values())
+            {
+                variables.add(property.asResourceProperty());
+            }            
+        }
+
+        List<ResourceRequirement> requirements = CollectionUtils.map(requirementConfigs, new ResourceRequirementConfigurationToRequirement(variables));
         Set<AgentConfiguration> compatibleAgents = resourceManager.getCapableAgents(requirements);
         int compatibleCount = compatibleAgents.size();
         if (compatibleCount == 0)

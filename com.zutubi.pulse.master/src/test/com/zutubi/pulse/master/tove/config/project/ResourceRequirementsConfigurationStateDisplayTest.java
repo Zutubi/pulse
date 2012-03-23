@@ -8,17 +8,16 @@ import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
+import static java.util.Arrays.asList;
 import org.mockito.Matchers;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class ResourceRequirementsConfigurationStateDisplayTest extends PulseTestCase
 {
@@ -76,7 +75,7 @@ public class ResourceRequirementsConfigurationStateDisplayTest extends PulseTest
 
     public void testNoAgents()
     {
-        assertEquals("none", display.formatCollectionCompatibleAgents(NONE_REQUIREMENT_CONFIGS,  new ProjectConfiguration()));
+        assertEquals("none", display.formatCollectionCompatibleAgents(NONE_REQUIREMENT_CONFIGS, new ProjectConfiguration()));
     }
 
     public void testOneAgent()
