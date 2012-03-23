@@ -205,6 +205,8 @@
     <bean id="buildRequestRegistry" class="com.zutubi.pulse.master.build.queue.BuildRequestRegistry" autowire="byName"/>
 
     <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
+    
+    <bean id="configurationVariableProvider" class="com.zutubi.pulse.master.tove.config.MasterConfigurationVariableProvider" autowire="byName"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir" value="#{userPaths.projectRoot}"/>
@@ -232,4 +234,6 @@
     <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init" autowire="byName"/>
 
     <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener" autowire="byName"/>
+
+    <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
 </beans>

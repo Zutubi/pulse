@@ -7,10 +7,6 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
 
-/**
- *
- *
- */
 @SymbolicName("zutubi.cvsConfigurationCheckHandler")
 @Wire
 public class CvsConfigurationCheckHandler extends AbstractConfigurationCheckHandler<CvsConfiguration>

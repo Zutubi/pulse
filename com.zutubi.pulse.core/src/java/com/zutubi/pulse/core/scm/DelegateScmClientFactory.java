@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
@@ -17,13 +18,17 @@ import java.util.Map;
 public class DelegateScmClientFactory implements ScmClientFactory<ScmConfiguration>
 {
     private Map<String, Map<Object, Object>> dataCaches = new HashMap<String, Map<Object, Object>>();
-
-    private ObjectFactory objectFactory;
-
     private Map<Class, ScmClientFactory> factories = new HashMap<Class, ScmClientFactory>();
-
+    private ObjectFactory objectFactory;
+    private ConfigurationVariableProvider configurationVariableProvider;
+    
     public ScmClient createClient(ScmConfiguration config) throws ScmException
     {
+        if (configurationVariableProvider != null)
+        {
+            config = configurationVariableProvider.resolveStringProperties(config);
+        }
+        
         ScmClientFactory factory = getFactory(config);
         @SuppressWarnings({"unchecked"})
         ScmClient client = factory.createClient(config);
@@ -67,5 +72,10 @@ public class DelegateScmClientFactory implements ScmClientFactory<ScmConfigurati
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setConfigurationVariableProvider(ConfigurationVariableProvider configurationVariableProvider)
+    {
+        this.configurationVariableProvider = configurationVariableProvider;
     }
 }

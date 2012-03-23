@@ -50,6 +50,7 @@ import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectBootstrapper;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
 import static com.zutubi.util.StringUtils.safeToString;
@@ -108,6 +109,8 @@ public class DefaultBuildController implements EventListener, BuildController
     private IvyManager ivyManager;
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory;
+    private ConfigurationVariableProvider configurationVariableProvider;
+    
     /**
      * A map of the recipe timeout callbacks.
      */
@@ -157,8 +160,9 @@ public class DefaultBuildController implements EventListener, BuildController
             buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig).getDescriptor());
             buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
             buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
-
-            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, projectConfig.getScm());
+            // We resolve the SCM properties on the master as the full context is not available on
+            // the agents.
+            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm()));
             for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
             {
                 buildContext.add(requestProperty);
@@ -1219,6 +1223,11 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setConfigurationVariableProvider(ConfigurationVariableProvider configurationVariableProvider)
+    {
+        this.configurationVariableProvider = configurationVariableProvider;
     }
 
     private static class ContainsMatchingPropertyPredicate implements Predicate<ResourceProperty>

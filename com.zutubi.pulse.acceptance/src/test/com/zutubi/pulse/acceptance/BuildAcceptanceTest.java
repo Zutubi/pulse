@@ -739,6 +739,17 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         triggerSuccessfulBuild(projectName);
     }
 
+    public void testScmReferencesProjectProperty() throws Exception
+    {
+        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false,
+                rpcClient.RemoteApi.getSubversionConfig("svn://localhost:3088/accept/$(branch)/triviant"),
+                rpcClient.RemoteApi.getAntConfig());
+        rpcClient.RemoteApi.insertProjectProperty(random, "branch", "trunk");
+        getBrowser().loginAsAdmin();
+        triggerSuccessfulBuild(random);
+        assertEnvironment(random, 1, "PULSE_SVN_URL=svn://localhost:3088/accept/trunk/triviant");
+    }
+
     public void testProjectPropertyReferencesResourceProperty() throws Exception
     {
         String resourceName = random + "-resource";

@@ -101,7 +101,8 @@ public class CheckAction extends ToveActionSupport
         // Instantiate the primary configuration object.
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager.getTemplateOwnerPath(path), configurationReferenceManager, configurationTemplateManager);
         Configuration instance = (Configuration) instantiator.instantiate(type, record);
-
+        instance.setConfigurationPath(path);
+        
         // Instantiate and execute the check handler.
         ConfigurationCheckHandler handler = (ConfigurationCheckHandler) instantiator.instantiate(checkType, checkRecord);
         Exception exception = null;
