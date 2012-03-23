@@ -10,6 +10,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.VariableMap;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -27,13 +28,16 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
     public VariableMap variablesForConfiguration(Configuration config)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
-        if (projectConfig != null)
+        if (StringUtils.stringSet(config.getConfigurationPath()))
         {
-            MasterBuildProperties.addProjectProperties(context, projectConfig);
-            for (ResourcePropertyConfiguration property: projectConfig.getProperties().values())
+            ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
+            if (projectConfig != null)
             {
-                context.add(property.asResourceProperty());
+                MasterBuildProperties.addProjectProperties(context, projectConfig);
+                for (ResourcePropertyConfiguration property: projectConfig.getProperties().values())
+                {
+                    context.add(property.asResourceProperty());
+                }
             }
         }
 
@@ -44,13 +48,18 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
     public <T extends Configuration> T resolveStringProperties(T config)
     {
         VariableMap variables = variablesForConfiguration(config);
+        if (variables.getVariables().isEmpty())
+        {
+            return config;
+        }
+        
         Class<? extends Configuration> clazz = config.getClass();
         try
         {
             CompositeType type = typeRegistry.getType(clazz);
             if (type != null)
             {
-                Configuration resolvedConfig = configurationProvider.deepClone(config);
+                Configuration resolvedConfig = clazz.newInstance();
                 resolveProperties(variables, type, config, resolvedConfig);
                 config = (T) resolvedConfig;
             }            
@@ -68,23 +77,12 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
         for (TypeProperty property: type.getProperties())
         {
             Type propertyType = property.getType();
-            if (propertyType instanceof SimpleType)
+            Object value = property.getValue(config);
+            if (value != null && propertyType instanceof SimpleType && type.getClazz().equals(String.class))
             {
-                SimpleType simpleType = (SimpleType) propertyType;
-                if (simpleType.getClazz().equals(String.class))
-                {
-                    resolveProperty(variables, property, config, resolvedConfig);
-                }
+                value = VariableResolver.safeResolveVariables((String) value, variables);
             }
-        }
-    }
-
-    private void resolveProperty(VariableMap variables, TypeProperty property, Configuration originalConfig, Configuration resolvedConfig) throws Exception
-    {
-        Object value = property.getValue(originalConfig);
-        if (value != null)
-        {
-            property.setValue(resolvedConfig, VariableResolver.safeResolveVariables((String) value, variables));
+            property.setValue(resolvedConfig, value);
         }
     }
 
