@@ -1553,7 +1553,8 @@ public class RemoteApi
                 CompositeType itemType = (CompositeType) type.getTargetType();
                 @SuppressWarnings("unchecked")
                 Collection<? extends Configuration> items = (Collection<? extends Configuration>) ((CollectionType) type).getItems(instance);
-                List<String> fields = stateDisplayManager.getCollectionDisplayFields(itemType, items, instance);
+                Configuration parentInstance = configurationProvider.get(PathUtils.getParentPath(path), Configuration.class);
+                List<String> fields = stateDisplayManager.getCollectionDisplayFields(itemType, items, parentInstance);
                 for (String field: fields)
                 {
                     result.put(field, stateDisplayManager.formatCollection(field, itemType, items, instance).toString());
