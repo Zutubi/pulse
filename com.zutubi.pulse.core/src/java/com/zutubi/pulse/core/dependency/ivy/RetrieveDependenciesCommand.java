@@ -6,7 +6,9 @@ import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -66,7 +68,8 @@ public class RetrieveDependenciesCommand implements Command
                         String stageName = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_STAGE));
                         String retrievalPattern = context.resolveVariables(context.getString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN));
                         boolean syncDestination = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, DEFAULT_SYNC_DESTINATION);
-
+                        boolean unzip = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_UNZIP_RETRIEVED_ARCHIVES, false);
+                        
                         String targetPattern = PathUtils.getPath(context.getWorkingDir().getAbsolutePath(), retrievalPattern);
                         IvyRetrievalReport retrievalReport = ivy.retrieveArtifacts(descriptor, stageName, targetPattern, syncDestination);
 
@@ -87,8 +90,16 @@ public class RetrieveDependenciesCommand implements Command
                             {
                                 ModuleRevisionId mrid = artifact.getModuleRevisionId();
                                 String targetPath = IvyPatternHelper.substitute(targetPattern, artifact);
-                                String feedback = I18N.format("retrieve.feedback", mrid.getName(), artifact.getName(), mrid.getRevision(), targetPath);
-                                outputWriter.println(feedback);
+                                outputWriter.println(I18N.format("retrieve.feedback", mrid.getName(), artifact.getName(), mrid.getRevision(), targetPath));
+                                File targetFile = new File(targetPath);
+                                if (unzip && targetPath.endsWith(".zip") && targetFile.isFile())
+                                {
+                                    File parentDir = targetFile.getParentFile();
+                                    outputWriter.println(I18N.format("unzipping", parentDir.getAbsolutePath()));
+                                    PulseZipUtils.extractZip(targetFile, parentDir);
+                                    outputWriter.println(I18N.format("unzipped"));
+                                    FileSystemUtils.delete(targetFile);
+                                }
                             }
                         }
                         return null;

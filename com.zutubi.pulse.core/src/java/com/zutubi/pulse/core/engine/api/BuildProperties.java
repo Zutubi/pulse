@@ -171,6 +171,11 @@ public class BuildProperties
      * (only available post-build).
      */
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
+    /**
+     * Indicates if zip files retrieved from the artifact repository should be automatically
+     * unzipped.
+     */
+    public static final String PROPERTY_UNZIP_RETRIEVED_ARCHIVES = "unzip.retrieved.archives";
 
     //-----------------------------------------------------------------------
     // Stage/Recipe level properties

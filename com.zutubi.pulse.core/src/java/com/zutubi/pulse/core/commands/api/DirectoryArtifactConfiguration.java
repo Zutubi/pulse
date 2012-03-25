@@ -16,7 +16,7 @@ import java.util.List;
  * @see DirectoryArtifact
  */
 @SymbolicName("zutubi.directoryArtifactConfig")
-@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "featured", "postProcessors", "calculateHash", "hashAlgorithm", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
+@Form(fieldOrder = {"name", "base", "inclusions", "exclusions", "captureAsZip", "featured", "postProcessors", "calculateHash", "hashAlgorithm", "index", "type", "failIfNotPresent", "ignoreStale", "followSymlinks", "publish", "artifactPattern"})
 public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurationSupport
 {
     private String base;
@@ -26,6 +26,7 @@ public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurat
     private List<String> exclusions = new LinkedList<String>();
     @Addable(value = "include", attribute = "pattern") @StringList
     private List<String> inclusions = new LinkedList<String>();
+    private boolean captureAsZip;
     @Wizard.Ignore
     private boolean followSymlinks;
 
@@ -77,6 +78,16 @@ public class DirectoryArtifactConfiguration extends FileSystemArtifactConfigurat
     public void setExclusions(List<String> exclusions)
     {
         this.exclusions = exclusions;
+    }
+
+    public boolean isCaptureAsZip()
+    {
+        return captureAsZip;
+    }
+
+    public void setCaptureAsZip(boolean captureAsZip)
+    {
+        this.captureAsZip = captureAsZip;
     }
 
     public boolean isFollowSymlinks()

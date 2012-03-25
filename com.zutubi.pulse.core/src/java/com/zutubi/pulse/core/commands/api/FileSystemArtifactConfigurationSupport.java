@@ -21,7 +21,6 @@ import java.util.List;
 @SymbolicName("zutubi.fileSystemArtifactConfigSupport")
 public abstract class FileSystemArtifactConfigurationSupport extends ArtifactConfigurationSupport
 {
-
     @ControllingCheckbox(checkedFields = {"hashAlgorithm"})
     private boolean calculateHash;
     @Required

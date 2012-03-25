@@ -187,6 +187,8 @@
                 <ref local="warningStatusConfiguration"/>
                 <ref local="warningStatusCustomConditions"/>
                 <ref local="warningStatusSelectedConditions"/>
+                <ref local="addCaptureAsZip"/>
+                <ref local="addDependencyUnzip"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -980,5 +982,13 @@
 
     <bean id="warningStatusSelectedConditions" class="com.zutubi.pulse.master.upgrade.tasks.WarningStatusSelectedConditionsUpgradeTask">
         <property name="buildNumber" value="205001004"/>
+    </bean>
+
+    <bean id="addCaptureAsZip" class="com.zutubi.pulse.master.upgrade.tasks.AddCaptureAsZipUpgradeTask">
+        <property name="buildNumber" value="205001005"/>
+    </bean>
+
+    <bean id="addDependencyUnzip" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyUnzipUpgradeTask">
+        <property name="buildNumber" value="205001006"/>
     </bean>
 </beans>

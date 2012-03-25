@@ -22,11 +22,12 @@ public class DependenciesConfiguration extends AbstractConfiguration
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
     @Required
+    private String version = "${build.number}";
+    @Required
     @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String retrievalPattern = "lib/[artifact](.[ext])";
-    
+    private boolean unzipRetrievedArchives;
     private boolean syncDestination = BuildProperties.DEFAULT_SYNC_DESTINATION;  
-    
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
@@ -36,9 +37,6 @@ public class DependenciesConfiguration extends AbstractConfiguration
     {
         setPermanent(true);
     }
-
-    @Required
-    private String version = "${build.number}";
 
     public List<DependencyConfiguration> getDependencies()
     {
@@ -58,6 +56,16 @@ public class DependenciesConfiguration extends AbstractConfiguration
     public void setRetrievalPattern(String retrievalPattern)
     {
         this.retrievalPattern = retrievalPattern;
+    }
+
+    public boolean isUnzipRetrievedArchives()
+    {
+        return unzipRetrievedArchives;
+    }
+
+    public void setUnzipRetrievedArchives(boolean unzipRetrievedArchives)
+    {
+        this.unzipRetrievedArchives = unzipRetrievedArchives;
     }
 
     public boolean isSyncDestination()
