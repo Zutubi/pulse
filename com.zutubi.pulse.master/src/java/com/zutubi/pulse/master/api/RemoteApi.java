@@ -1557,7 +1557,7 @@ public class RemoteApi
                 List<String> fields = stateDisplayManager.getCollectionDisplayFields(itemType, items, parentInstance);
                 for (String field: fields)
                 {
-                    result.put(field, stateDisplayManager.formatCollection(field, itemType, items, instance).toString());
+                    result.put(field, stateDisplayManager.formatCollection(field, itemType, items, parentInstance).toString());
                 }
             }
             else
