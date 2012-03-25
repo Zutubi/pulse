@@ -4,17 +4,21 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.patch.DefaultPatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extension manager for managing scm implementations
@@ -23,8 +27,9 @@ public class ScmExtensionManager extends AbstractExtensionManager
 {
     private static final Logger LOG = Logger.getLogger(ScmExtensionManager.class);
 
-    private DelegateScmClientFactory clientFactory;
+    private ObjectFactory objectFactory;
     private DefaultPatchFormatFactory patchFormatFactory;
+    private Map<Class, ScmClientFactory> factories = new HashMap<Class, ScmClientFactory>();
 
     protected String getExtensionPointId()
     {
@@ -68,7 +73,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
 
             try
             {
-                clientFactory.register(configClazz, factoryClazz);
+                registerClientFactory(configClazz, factoryClazz);
                 if (wcClazz != null)
                 {
                     WorkingCopyFactory.registerType(name, wcClazz);
@@ -88,6 +93,24 @@ public class ScmExtensionManager extends AbstractExtensionManager
         {
             LOG.severe("While registering SCM '" + name + "': " + e.getMessage(), e);
             handleExtensionError(extension, e);
+        }
+    }
+
+    public ScmClientFactory getClientFactory(ScmConfiguration config)
+    {
+        return factories.get(config.getClass());
+    }
+
+    <T extends ScmConfiguration> void registerClientFactory(Class<T> configType, Class<? extends ScmClientFactory<T>> factoryType) throws ScmException
+    {
+        try
+        {
+            ScmClientFactory<T> factory = objectFactory.buildBean(factoryType);
+            factories.put(configType, factory);
+        }
+        catch (Exception e)
+        {
+            throw new ScmException(e);
         }
     }
 
@@ -188,9 +211,9 @@ public class ScmExtensionManager extends AbstractExtensionManager
         }
     }
 
-    public void setScmClientFactory(DelegateScmClientFactory clientFactory)
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-        this.clientFactory = clientFactory;
+        this.objectFactory = objectFactory;
     }
 
     public void setPatchFormatFactory(DefaultPatchFormatFactory patchFormatFactory)

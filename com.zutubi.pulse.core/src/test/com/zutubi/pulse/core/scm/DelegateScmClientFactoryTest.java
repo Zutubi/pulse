@@ -6,10 +6,6 @@ import com.zutubi.pulse.core.scm.config.TestScmConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-/**
- *
- *
- */
 public class DelegateScmClientFactoryTest extends ZutubiTestCase
 {
     private DelegateScmClientFactory factory;
@@ -19,8 +15,10 @@ public class DelegateScmClientFactoryTest extends ZutubiTestCase
         super.setUp();
 
         factory = new DelegateScmClientFactory();
-        factory.setObjectFactory(new DefaultObjectFactory());
-        factory.register(TestScmConfiguration.class, TestScmClientFactory.class);
+        ScmExtensionManager extensionManager = new ScmExtensionManager();
+        extensionManager.setObjectFactory(new DefaultObjectFactory());
+        extensionManager.registerClientFactory(TestScmConfiguration.class, TestScmClientFactory.class);
+        factory.setScmExtensionManager(extensionManager);
     }
 
     protected void tearDown() throws Exception
