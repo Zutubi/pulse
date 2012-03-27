@@ -19,7 +19,7 @@ import java.util.Map;
 @SymbolicName("zutubi.userPreferencesConfig")
 @Classification(single = "settings")
 @Listing(order = {"dashboard", "browseView", "contacts", "subscriptions"})
-@Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
+@Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval", "defaultTimestampDisplay"})
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
     public static final String COLUMN_NUMBER = "number";
@@ -32,6 +32,12 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public static final String COLUMN_ELAPSED = "elapsed";
     
     public static final int DEFAULT_HISTORY_BUILDS_PER_PAGE = 10;
+
+    public enum TimestampDisplay
+    {
+        ABSOLUTE,
+        RELATIVE
+    }
 
     @StringList
     private List<String> aliases = new LinkedList<String>();
@@ -51,6 +57,8 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private int tailLines = 30;
     @Numeric(min = 1)
     private int myBuildsCount = 5;
+
+    private TimestampDisplay defaultTimestampDisplay = TimestampDisplay.RELATIVE;
 
     @Internal
     private String myBuildsColumns = defaultMyBuildsColumns();
@@ -146,6 +154,16 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setMyBuildsCount(int myBuildsCount)
     {
         this.myBuildsCount = myBuildsCount;
+    }
+
+    public TimestampDisplay getDefaultTimestampDisplay()
+    {
+        return defaultTimestampDisplay;
+    }
+
+    public void setDefaultTimestampDisplay(TimestampDisplay defaultTimestampDisplay)
+    {
+        this.defaultTimestampDisplay = defaultTimestampDisplay;
     }
 
     public String getMyBuildsColumns()

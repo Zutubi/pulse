@@ -94,6 +94,7 @@ public class CustomVelocityManager extends VelocityManager
             }
 
             context.put("refreshInterval", DEFAULT_REFRESH_INTERVAL);
+            context.put("absoluteTimestamps", false);
             String login = SecurityUtils.getLoggedInUsername();
             if (login != null)
             {
@@ -102,6 +103,10 @@ public class CustomVelocityManager extends VelocityManager
                 {
                     UserPreferencesConfiguration preferences = user.getPreferences();
                     context.put("refreshInterval", preferences.isRefreshingEnabled() ? preferences.getRefreshInterval() : 0);
+                    if (preferences.getDefaultTimestampDisplay() == UserPreferencesConfiguration.TimestampDisplay.ABSOLUTE)
+                    {
+                        context.put("absoluteTimestamps", true);
+                    }
                 }
                 
                 context.put("principle", user);

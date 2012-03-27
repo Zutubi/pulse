@@ -64,7 +64,11 @@
                         <img src="$base/images/user.gif" alt="author">
                         $change.author
                         <span class="unspacer"></span>
-                        #dateCellContent($change "" $change.getPrettyDate($locale) $change.prettyTime)
+                        <a href="#" class="unadorned" title="$change.getPrettyDate($locale)" onclick="toggleDisplay('time_${change.id}'); toggleDisplay('date_${change.id}'); return false;">
+                            <img alt="toggle format" src="$base/images/calendar.gif"/>
+                        </a>
+                        <span id="time_${change.id}" #if($absoluteTimestamps) style="display: none #end">$change.prettyTime</span>
+                        <span id="date_${change.id}" #if(!$absoluteTimestamps) style="display: none #end">$change.getPrettyDate($locale)</span>
                         <span class="unspacer"></span>
                         <a class="unadorned" href="$urls.buildChangelist($buildResult, $change.id)"><img src="$base/images/magnifier.gif" alt="view details"></a>
                         <a id="view.${change.id}" href="$urls.buildChangelist($buildResult, $change.id)">#wwtext("name=change.details")</a>

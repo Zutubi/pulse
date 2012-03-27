@@ -189,6 +189,7 @@
                 <ref local="warningStatusSelectedConditions"/>
                 <ref local="addCaptureAsZip"/>
                 <ref local="addDependencyUnzip"/>
+                <ref local="addTimestampDisplayPreference"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -990,5 +991,9 @@
 
     <bean id="addDependencyUnzip" class="com.zutubi.pulse.master.upgrade.tasks.AddDependencyUnzipUpgradeTask">
         <property name="buildNumber" value="205001006"/>
+    </bean>
+
+    <bean id="addTimestampDisplayPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddTimestampDisplayPreferenceUpgradeTask">
+        <property name="buildNumber" value="205001007"/>
     </bean>
 </beans>

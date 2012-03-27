@@ -905,8 +905,8 @@ Zutubi.ChangesTable.prototype = {
                                               '<a href="#" class="unadorned" title="{date}" onclick="toggleDisplay(\'{id}_{idSuffix}_time\'); toggleDisplay(\'{id}_{idSuffix}_date\'); return false;">' +
                                                   '<img alt="toggle format" src="{base}/images/calendar.gif"/>' +
                                               '</a> ' +
-                                              '<span id="{id}_{idSuffix}_time">{time}</span>' +
-                                              '<span id="{id}_{idSuffix}_date" style="display: none">{date}</span>' +
+                                              '<span id="{id}_{idSuffix}_time" style="display: {relativeDisplay}">{time}</span>' +
+                                              '<span id="{id}_{idSuffix}_date" style="display: {absoluteDisplay}">{date}</span>' +
                                           '</td>' +
                                           '<td class="content" id="${id}_{idSuffix}_cell">' +
                                               '<tpl if="shortComment">' +
@@ -992,6 +992,8 @@ Zutubi.ChangesTable.prototype = {
             {
                 change = changes[i];
                 change.base = window.baseUrl;
+                change.absoluteDisplay = window.preferences.absoluteTimestamps ? 'inline' : 'none';
+                change.relativeDisplay = window.preferences.absoluteTimestamps ? 'none' : 'inline';
                 change.idSuffix = this.idSuffix;
                 change.showWho = this.showWho;
                 if (!change.who)

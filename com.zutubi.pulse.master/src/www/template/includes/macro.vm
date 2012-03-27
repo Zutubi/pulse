@@ -554,40 +554,6 @@
 #end
 
 ##
-## Shared by date cell macros
-##
-#macro(dateCellContent $entity $type $date $time)
-    <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_${type}_time'); toggleDisplay('${entity.id}_${type}_date'); return false;">
-        <img alt="toggle format" src="$base/images/calendar.gif"/>
-    </a>
-    <span id="${entity.id}_${type}_time">$time</span>
-    <span id="${entity.id}_${type}_date" style="display: none">$date</span>
-#end
-
-##
-## Outputs a start timestamp cell with class based on $cssClass
-##
-#macro(dateClassCell $result)
-    <td class="$cssClass">
-    #if($result.commenced())
-        #dateCellContent($result "start" $result.stamps.getPrettyStartDate($locale) $result.stamps.prettyStartTime)
-    #else
-        n/a
-    #end
-    </td>
-#end
-
-##
-## Outputs a plain date cell with toggling.  $entity must have .id (unique),
-## .prettyDate and .prettyTime.
-##
-#macro(dateCell $entity)
-    <td class="content">
-        #dateCellContent($entity "" $entity.getPrettyDate($locale) $entity.prettyTime)
-    </td>
-#end
-
-##
 ## Outputs a content row for the tail of a content table
 ##
 #macro(contentRow $key $span)

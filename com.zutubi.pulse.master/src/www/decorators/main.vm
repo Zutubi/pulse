@@ -80,6 +80,10 @@
             
             window.formSubmitting = false;
             window.baseUrl = '$base';
+            window.preferences = {
+                absoluteTimestamps: $absoluteTimestamps,
+                refreshInterval: $refreshInterval
+            };
             window.sessionToken = '$sessionToken';
 
             var viewport;

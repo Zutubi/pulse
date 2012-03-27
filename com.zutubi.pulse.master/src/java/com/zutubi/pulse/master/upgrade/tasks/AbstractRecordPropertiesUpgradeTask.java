@@ -50,7 +50,6 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
             public Object process()
             {
                 Map<String, Record> recordsToUpgrade = recordLocator.locate(recordManager);
-                System.out.println("recordsToUpgrade.size() = " + recordsToUpgrade.size());
                 for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
                 {
                     String path = recordEntry.getKey();

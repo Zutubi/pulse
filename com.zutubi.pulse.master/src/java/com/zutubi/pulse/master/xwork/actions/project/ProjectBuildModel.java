@@ -52,9 +52,11 @@ public class ProjectBuildModel
     private String statusIcon;
     private CommentSummaryModel comments;
     private List<String> columns = new LinkedList<String>();
+    private boolean absoluteTimestamps;
 
-    public ProjectBuildModel(final BuildResult buildResult, ProjectsSummaryConfiguration configuration, final Urls urls)
+    public ProjectBuildModel(final BuildResult buildResult, ProjectsSummaryConfiguration configuration, final Urls urls, boolean absoluteTimestamps)
     {
+        this.absoluteTimestamps = absoluteTimestamps;
         number = buildResult.getNumber();
         state = buildResult.getState();
         status = formatStatus(buildResult, urls);
@@ -275,16 +277,18 @@ public class ProjectBuildModel
         else
         {
             String idSuffix = type + "." + buildResult.getId();
-            return merge("<a href='#' class='unadorned' title='${date}' onclick=\\\"toggleDisplay('${timeId}'); toggleDisplay('${dateId}'); return false;\\\">" +
+            return merge("<a href='#' class='unadorned' title='${date}' onclick=\"toggleDisplay('${timeId}'); toggleDisplay('${dateId}'); return false;\">" +
                                 "<img alt='toggle format' src='${base}images/calendar.gif'/>" +
                             "</a> " +
-                            "<span id='${timeId}'>${time}</span>" +
-                            "<span id='${dateId}' style='display: none'>${date}</span>",
+                            "<span id='${timeId}' style='display: ${relativeDisplay}'>${time}</span>" +
+                            "<span id='${dateId}' style='display: ${absoluteDisplay}'>${date}</span>",
                     asPair("base", urls.base()),
                     asPair("timeId", "time." + idSuffix),
                     asPair("dateId", "date." + idSuffix),
                     asPair("date", TimeStamps.getPrettyDate(time, ActionContext.getContext().getLocale())),
-                    asPair("time", TimeStamps.getPrettyTime(time)));
+                    asPair("time", TimeStamps.getPrettyTime(time)),
+                    asPair("absoluteDisplay", absoluteTimestamps ? "inline" : "none"),
+                    asPair("relativeDisplay", absoluteTimestamps ? "none" : "inline"));
         }
     }
 

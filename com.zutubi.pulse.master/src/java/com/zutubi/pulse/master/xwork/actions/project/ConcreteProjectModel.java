@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -58,12 +59,13 @@ public class ConcreteProjectModel extends ProjectModel
         {
             latestBuilds = latestBuilds.subList(0, configuration.getBuildsPerProject());
         }
-        
+
+        final boolean absoluteTimestamps = loggedInUser != null && loggedInUser.getPreferences().getDefaultTimestampDisplay() == UserPreferencesConfiguration.TimestampDisplay.ABSOLUTE;
         buildRows = CollectionUtils.map(latestBuilds, new Mapping<BuildResult, ProjectBuildModel>()
         {
             public ProjectBuildModel map(BuildResult buildResult)
             {
-                return new ProjectBuildModel(buildResult, configuration, urls);
+                return new ProjectBuildModel(buildResult, configuration, urls, absoluteTimestamps);
             }
         });
 

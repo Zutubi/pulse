@@ -85,8 +85,8 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             '<a href="#" class="unadorned" title="{absolute}" onclick="toggleDisplay(\'relative-{id}\'); toggleDisplay(\'absolute-{id}\'); return false;">' +
                 '<img alt="toggle format" src="{[window.baseUrl]}/images/calendar.gif"/>' +
             '</a> ' +
-            '<span id="relative-{id}">{relative}</span>' +
-            '<span id="absolute-{id}" style="display: none">{absolute}</span>'
+            '<span id="relative-{id}" style="display: {relativeDisplay}">{relative}</span>' +
+            '<span id="absolute-{id}" style="display: {absoluteDisplay}">{absolute}</span>'
         ),
         
         date: function(date) {
@@ -96,7 +96,9 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
                 return Zutubi.pulse.project.renderers.DATE_TEMPLATE.apply({
                     id: Ext.id(),
                     absolute: date.absolute,
-                    relative: date.relative
+                    absoluteDisplay: window.preferences.absoluteTimestamps ? 'inline' : 'none',
+                    relative: date.relative,
+                    relativeDisplay: window.preferences.absoluteTimestamps ? 'none' : 'inline'
                 });
             }
             else
