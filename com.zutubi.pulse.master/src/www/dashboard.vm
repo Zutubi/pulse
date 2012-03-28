@@ -44,7 +44,7 @@
             var responsibilities = data.responsibilities;
             if (responsibilities.length > 0)
             {
-                var template = new Ext.XTemplate('<div id="responsibilities" class="note">You are currently responsible for build issues for the following projects:' +
+                var template = new Ext.XTemplate('<div id="responsibilities" class="note" style="margin-bottom: 10px">You are currently responsible for build issues for the following projects:' +
                                                      '<ul class="fixing">' +
                                                          '<tpl for="responsibilities">' +
                                                              '<li id="{id}"><a href="{base}{url}">{project:htmlEncode}</a> [<a href="#" id="clear-{id}" onclick="clearResponsibility(\'{projectId}\'); return false">clear</a>]</li>' +
