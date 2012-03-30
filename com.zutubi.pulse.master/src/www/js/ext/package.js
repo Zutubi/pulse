@@ -1,4 +1,4 @@
-// dependency: ./ext-base.js
+// dependency: ./ext-base-debug.js
 // dependency: ./ext-all-debug.js
 
 /**
