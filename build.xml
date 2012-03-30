@@ -507,6 +507,9 @@
     <target name="run.accept.master" depends="build.acceptance, init">
         <property name="build.dir" value="com.zutubi.pulse.acceptance/build"/>
         <property name="report.dir" value="build/reports/junit"/>
+        <property name="included.tests" value=""/>
+        <property name="excluded.tests" value=""/>
+
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
@@ -536,6 +539,8 @@
             <sysproperty key="dev.package" value="build/pulse-dev-${pulse.version}.${extension}"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <sysproperty key="work.dir" value="working"/>
+            <sysproperty key="pulse.included.tests" value="${included.tests}"/>
+            <sysproperty key="pulse.excluded.tests" value="${excluded.tests}"/>
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>

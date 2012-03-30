@@ -1,5 +1,5 @@
 // dependency: ./ext-base.js
-// dependency: ./ext-all.js
+// dependency: ./ext-all-debug.js
 
 /**
  * A blank javascript file used as a transitive dependency

@@ -14,14 +14,21 @@ import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.IOUtils;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.json.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 public class AcceptanceTestUtils
 {
@@ -455,6 +462,34 @@ public class AcceptanceTestUtils
         File pluginJarFile = new File(tmpDir, id + ".jar");
         PulseZipUtils.createZip(pluginJarFile, unzipDir, null);
         return pluginJarFile;
+    }
+
+    private static Set<String> setFromSystemProperty(String property)
+    {
+        Set<String> set = null;
+        String value = System.getProperty(property);
+        if (StringUtils.stringSet(value))
+        {
+            set = new HashSet<String>(asList(value.split(",")));
+        }
+        return set;
+    }
+
+    public static boolean includeTestClass(Class<? extends TestCase> testClass)
+    {
+        Set<String> included = setFromSystemProperty("pulse.included.tests");
+        Set<String> excluded = setFromSystemProperty("pulse.excluded.tests");
+
+        String name = testClass.getSimpleName();
+        return (included == null || included.contains(name)) && (excluded == null || !excluded.contains(name));
+    }
+
+    public static void addClassToSuite(TestSuite targetSuite, Class<? extends TestCase> testClass)
+    {
+        if (includeTestClass(testClass))
+        {
+            targetSuite.addTestSuite(testClass);
+        }
     }
 
     private static void rewritePluginManifest(String id, String name, File unzipDir) throws IOException

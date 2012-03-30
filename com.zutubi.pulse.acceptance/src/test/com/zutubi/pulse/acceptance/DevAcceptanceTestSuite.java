@@ -2,97 +2,103 @@ package com.zutubi.pulse.acceptance;
 
 import junit.framework.TestSuite;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.addClassToSuite;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.includeTestClass;
+
 public class DevAcceptanceTestSuite
 {
     public static TestSuite suite()
     {
         TestSuite suite = new TestSuite();
         // need to run this one first as it runs through the installation setup.
-        suite.addTestSuite(SetupAcceptanceTest.class);
+        addClassToSuite(suite, SetupAcceptanceTest.class);
 
         // now we can run the rest of the tests.
 
         //---( xml rpc acceptance tests )---
-        suite.addTestSuite(ConfigXmlRpcAcceptanceTest.class);
-        suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
-        suite.addTestSuite(ReportingXmlRpcAcceptanceTest.class);
-        suite.addTestSuite(MonitorXmlRpcAcceptanceTest.class);
-        suite.addTestSuite(ResourceXmlRpcAcceptanceTest.class);
+        addClassToSuite(suite, ConfigXmlRpcAcceptanceTest.class);
+        addClassToSuite(suite, ProjectXmlRpcAcceptanceTest.class);
+        addClassToSuite(suite, ReportingXmlRpcAcceptanceTest.class);
+        addClassToSuite(suite, MonitorXmlRpcAcceptanceTest.class);
+        addClassToSuite(suite, ResourceXmlRpcAcceptanceTest.class);
         // these tests use the remote api exclusively, but does not test the xmlrpc interface.
-        suite.addTestSuite(LoggingAcceptanceTest.class);
-//        suite.addTestSuite(NotificationAcceptanceTest.class);
-        suite.addTestSuite(CustomProjectAcceptanceTest.class);
-        suite.addTestSuite(PluginRepositoryAcceptanceTest.class);
+        addClassToSuite(suite, LoggingAcceptanceTest.class);
+//        AcceptanceTestUtils.addClassToSuite(suite, NotificationAcceptanceTest.class);
+        addClassToSuite(suite, CustomProjectAcceptanceTest.class);
+        addClassToSuite(suite, PluginRepositoryAcceptanceTest.class);
 
-        suite.addTestSuite(RssAcceptanceTest.class);
-        suite.addTestSuite(HibernateStatisticsAcceptanceTest.class);
-        suite.addTestSuite(QuartzStatisticsAcceptanceTest.class);
+        addClassToSuite(suite, RssAcceptanceTest.class);
+        addClassToSuite(suite, HibernateStatisticsAcceptanceTest.class);
+        addClassToSuite(suite, QuartzStatisticsAcceptanceTest.class);
 
         //---( web ui acceptance tests )---
-        suite.addTestSuite(AgentsSectionAcceptanceTest.class);
-        suite.addTestSuite(AgentStatusAcceptanceTest.class);
-        suite.addTestSuite(AgentCommentAcceptanceTest.class);
-        suite.addTestSuite(AgentHistoryAcceptanceTest.class);
-        suite.addTestSuite(ConfigUIAcceptanceTest.class);
-        suite.addTestSuite(DeleteAcceptanceTest.class);
-        suite.addTestSuite(CloneAcceptanceTest.class);
-        suite.addTestSuite(PullUpAcceptanceTest.class);
-        suite.addTestSuite(PushDownAcceptanceTest.class);
-        suite.addTestSuite(CollapsedCollectionAcceptanceTest.class);
-        suite.addTestSuite(ConfigLinksAcceptanceTest.class);
-        suite.addTestSuite(ConfigActionsAcceptanceTest.class);
-        suite.addTestSuite(ConfigStateAcceptanceTest.class);
-        suite.addTestSuite(PluginUIAcceptanceTest.class);
-        suite.addTestSuite(GroupAcceptanceTest.class);
-        suite.addTestSuite(ProjectLabelAcceptanceTest.class);
-        suite.addTestSuite(ProjectPermissionsAcceptanceTest.class);
-        suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
-        suite.addTestSuite(UserAccessAcceptanceTest.class);
-        suite.addTestSuite(LicenseAcceptanceTest.class);
-        suite.addTestSuite(DashboardAcceptanceTest.class);
-        suite.addTestSuite(ProjectHomeAcceptanceTest.class);
-        suite.addTestSuite(ProjectHistoryAcceptanceTest.class);
-        suite.addTestSuite(ProjectLifecycleAcceptanceTest.class);
-        suite.addTestSuite(ProjectsSummaryAcceptanceTest.class);
-        suite.addTestSuite(ServerActivityAcceptanceTest.class);
-        suite.addTestSuite(ServerHistoryAcceptanceTest.class);
-        suite.addTestSuite(ServerMessagesAcceptanceTest.class);
-        suite.addTestSuite(ServerInfoAcceptanceTest.class);
-        suite.addTestSuite(BrowseScmAcceptanceTest.class);
-        suite.addTestSuite(ProjectReportsAcceptanceTest.class);
-        suite.addTestSuite(ProjectWorkingCopyAcceptanceTest.class);
-        suite.addTestSuite(UsersAcceptanceTest.class);
-        suite.addTestSuite(RememberMeAcceptanceTest.class);
-        suite.addTestSuite(AccessAcceptanceTest.class);
-        suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
-        suite.addTestSuite(InternationalisationAcceptanceTest.class);
+        addClassToSuite(suite, AgentsSectionAcceptanceTest.class);
+        addClassToSuite(suite, AgentStatusAcceptanceTest.class);
+        addClassToSuite(suite, AgentCommentAcceptanceTest.class);
+        addClassToSuite(suite, AgentHistoryAcceptanceTest.class);
+        addClassToSuite(suite, ConfigUIAcceptanceTest.class);
+        addClassToSuite(suite, DeleteAcceptanceTest.class);
+        addClassToSuite(suite, CloneAcceptanceTest.class);
+        addClassToSuite(suite, PullUpAcceptanceTest.class);
+        addClassToSuite(suite, PushDownAcceptanceTest.class);
+        addClassToSuite(suite, CollapsedCollectionAcceptanceTest.class);
+        addClassToSuite(suite, ConfigLinksAcceptanceTest.class);
+        addClassToSuite(suite, ConfigActionsAcceptanceTest.class);
+        addClassToSuite(suite, ConfigStateAcceptanceTest.class);
+        addClassToSuite(suite, PluginUIAcceptanceTest.class);
+        addClassToSuite(suite, GroupAcceptanceTest.class);
+        addClassToSuite(suite, ProjectLabelAcceptanceTest.class);
+        addClassToSuite(suite, ProjectPermissionsAcceptanceTest.class);
+        addClassToSuite(suite, AnonymousAccessAcceptanceTest.class);
+        addClassToSuite(suite, UserAccessAcceptanceTest.class);
+        addClassToSuite(suite, LicenseAcceptanceTest.class);
+        addClassToSuite(suite, DashboardAcceptanceTest.class);
+        addClassToSuite(suite, ProjectHomeAcceptanceTest.class);
+        addClassToSuite(suite, ProjectHistoryAcceptanceTest.class);
+        addClassToSuite(suite, ProjectLifecycleAcceptanceTest.class);
+        addClassToSuite(suite, ProjectsSummaryAcceptanceTest.class);
+        addClassToSuite(suite, ServerActivityAcceptanceTest.class);
+        addClassToSuite(suite, ServerHistoryAcceptanceTest.class);
+        addClassToSuite(suite, ServerMessagesAcceptanceTest.class);
+        addClassToSuite(suite, ServerInfoAcceptanceTest.class);
+        addClassToSuite(suite, BrowseScmAcceptanceTest.class);
+        addClassToSuite(suite, ProjectReportsAcceptanceTest.class);
+        addClassToSuite(suite, ProjectWorkingCopyAcceptanceTest.class);
+        addClassToSuite(suite, UsersAcceptanceTest.class);
+        addClassToSuite(suite, RememberMeAcceptanceTest.class);
+        addClassToSuite(suite, AccessAcceptanceTest.class);
+        if (includeTestClass(LdapAcceptanceTest.class))
+        {
+            suite.addTest(new EnableLdapTestSetup(new TestSuite(LdapAcceptanceTest.class)));
+        }
+        addClassToSuite(suite, InternationalisationAcceptanceTest.class);
 
         //---( build tests )---
-        suite.addTestSuite(BuildAcceptanceTest.class);
-        suite.addTestSuite(BuildNavigationAcceptanceTest.class);
-        suite.addTestSuite(BuildCommentAcceptanceTest.class);
-        suite.addTestSuite(BuildResponsibilityAcceptanceTest.class);
-        suite.addTestSuite(BuildPinningAcceptanceTest.class);
-        suite.addTestSuite(MavenAcceptanceTest.class);
-        suite.addTestSuite(PerforceAcceptanceTest.class);
-        suite.addTestSuite(BuildHookAcceptanceTest.class);
-        suite.addTestSuite(PersonalBuildAcceptanceTest.class);
-        suite.addTestSuite(BuildCommandEnableDisableAcceptanceTest.class);
-        suite.addTestSuite(BuildStageEnableDisableAcceptanceTest.class);
-        suite.addTestSuite(BuildPriorityAcceptanceTest.class);
+        addClassToSuite(suite, BuildAcceptanceTest.class);
+        addClassToSuite(suite, BuildNavigationAcceptanceTest.class);
+        addClassToSuite(suite, BuildCommentAcceptanceTest.class);
+        addClassToSuite(suite, BuildResponsibilityAcceptanceTest.class);
+        addClassToSuite(suite, BuildPinningAcceptanceTest.class);
+        addClassToSuite(suite, MavenAcceptanceTest.class);
+        addClassToSuite(suite, PerforceAcceptanceTest.class);
+        addClassToSuite(suite, BuildHookAcceptanceTest.class);
+        addClassToSuite(suite, PersonalBuildAcceptanceTest.class);
+        addClassToSuite(suite, BuildCommandEnableDisableAcceptanceTest.class);
+        addClassToSuite(suite, BuildStageEnableDisableAcceptanceTest.class);
+        addClassToSuite(suite, BuildPriorityAcceptanceTest.class);
 
         //--( 2.1: dependency tests)--
         suite.addTest(DependenciesTestSuite.suite());
 
-        suite.addTestSuite(CleanupAcceptanceTest.class);
-        suite.addTestSuite(CleanupUIAcceptanceTest.class);
+        addClassToSuite(suite, CleanupAcceptanceTest.class);
+        addClassToSuite(suite, CleanupUIAcceptanceTest.class);
 
         //--( dev tools tests)--
-        suite.addTestSuite(SynchroniseCommandAcceptanceTest.class);
-        suite.addTestSuite(ExpandCommandAcceptanceTest.class);
-        suite.addTestSuite(LocalBuildAcceptanceTest.class);
-        suite.addTestSuite(PersonalBuildCommandAcceptanceTest.class);
-        suite.addTestSuite(PostProcessCommandAcceptanceTest.class);
+        addClassToSuite(suite, SynchroniseCommandAcceptanceTest.class);
+        addClassToSuite(suite, ExpandCommandAcceptanceTest.class);
+        addClassToSuite(suite, LocalBuildAcceptanceTest.class);
+        addClassToSuite(suite, PersonalBuildCommandAcceptanceTest.class);
+        addClassToSuite(suite, PostProcessCommandAcceptanceTest.class);
 
         return suite;
     }

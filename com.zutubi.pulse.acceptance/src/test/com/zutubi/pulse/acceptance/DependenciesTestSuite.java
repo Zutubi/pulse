@@ -5,6 +5,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import com.zutubi.pulse.acceptance.utils.Repository;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.addClassToSuite;
+
 /**
  * This test suite includes all of the acceptance tests related to the
  * dependency feature set originally introduced in 2.1.
@@ -18,12 +20,12 @@ public class DependenciesTestSuite
     public static Test suite()
     {
         TestSuite dependencySuite = new TestSuite();
-        dependencySuite.addTestSuite(DependenciesAcceptanceTest.class);
-        dependencySuite.addTestSuite(DependenciesConfigurationAcceptanceTest.class);
-        dependencySuite.addTestSuite(DependenciesUIAcceptanceTest.class);
-        dependencySuite.addTestSuite(RebuildDependenciesAcceptanceTest.class);
-        dependencySuite.addTestSuite(BuildVersionAcceptanceTest.class);
-        dependencySuite.addTestSuite(RepositoryPermissionsAcceptanceTest.class);
+        addClassToSuite(dependencySuite, DependenciesAcceptanceTest.class);
+        addClassToSuite(dependencySuite, DependenciesConfigurationAcceptanceTest.class);
+        addClassToSuite(dependencySuite, DependenciesUIAcceptanceTest.class);
+        addClassToSuite(dependencySuite, RebuildDependenciesAcceptanceTest.class);
+        addClassToSuite(dependencySuite, BuildVersionAcceptanceTest.class);
+        addClassToSuite(dependencySuite, RepositoryPermissionsAcceptanceTest.class);
 
         // cleanup the artifact repository before continuing on.
         return new CleanArtifactRepository(dependencySuite);
