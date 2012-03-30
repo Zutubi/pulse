@@ -78,9 +78,12 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
         {
             Type propertyType = property.getType();
             Object value = property.getValue(config);
-            if (value != null && propertyType instanceof SimpleType && type.getClazz().equals(String.class))
+            if (value != null && propertyType instanceof PrimitiveType)
             {
-                value = VariableResolver.safeResolveVariables((String) value, variables);
+                PrimitiveType primitiveType = (PrimitiveType) propertyType;
+                String stringValue = primitiveType.unstantiate(value, null);
+                stringValue = VariableResolver.safeResolveVariables(stringValue, variables);
+                value = primitiveType.instantiate(stringValue, null);
             }
             property.setValue(resolvedConfig, value);
         }
