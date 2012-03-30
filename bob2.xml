@@ -28,7 +28,7 @@
 
     <recipe name="acceptance">
         <property name="targets" value="accept.master"/>
-        <ant name="build" targets="accept.master" args="-Dincluded.tests=$(included.tests) -Dexcluded.tests=$(excluded.tests) -Dskip.tests=$(skip.tests)">
+        <ant name="build" targets="accept.master" args="-Dskip.tests=$(skip.tests)">
             <macro-ref macro="$(capture-junit)"/>
             <dir-artifact name="acceptance output" base="working" fail-if-not-present="false">
 	        <include pattern="**/*"/>

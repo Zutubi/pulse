@@ -19,7 +19,6 @@ import junit.framework.TestSuite;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.json.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -464,10 +463,10 @@ public class AcceptanceTestUtils
         return pluginJarFile;
     }
 
-    private static Set<String> setFromSystemProperty(String property)
+    private static Set<String> setFromEnvironmentProperty(String property)
     {
         Set<String> set = null;
-        String value = System.getProperty(property);
+        String value = System.getenv(property);
         if (StringUtils.stringSet(value))
         {
             set = new HashSet<String>(asList(value.split(",")));
@@ -477,8 +476,8 @@ public class AcceptanceTestUtils
 
     public static boolean includeTestClass(Class<? extends TestCase> testClass)
     {
-        Set<String> included = setFromSystemProperty("pulse.included.tests");
-        Set<String> excluded = setFromSystemProperty("pulse.excluded.tests");
+        Set<String> included = setFromEnvironmentProperty("PULSE_INCLUDED_TESTS");
+        Set<String> excluded = setFromEnvironmentProperty("PULSE_EXCLUDED_TESTS");
 
         String name = testClass.getSimpleName();
         return (included == null || included.contains(name)) && (excluded == null || !excluded.contains(name));
