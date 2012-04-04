@@ -20,7 +20,6 @@ import com.zutubi.util.UnaryProcedure;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,11 +48,11 @@ public class ModuleDescriptorFactory
      *
      * @param project the configuration on which to base the descriptor
      * @return the created descriptor.
-     * @see #createRetrieveDescriptor(ProjectConfiguration, BuildResult)
+     * @see #createRetrieveDescriptor(ProjectConfiguration, BuildResult, String)
      */
     public IvyModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project)
     {
-        return createRetrieveDescriptor(project, null);
+        return createRetrieveDescriptor(project, null, null);
     }
 
     /**
@@ -65,28 +64,7 @@ public class ModuleDescriptorFactory
      * the recent build is used if possible.  This ensures that consistent artifacts
      * are used across an extended build.
      *
-     * @param project the configuration on which to base the descriptor
-     * @param result  the build result for the current build
-     * @return the created descriptor.
-     * @see #createRetrieveDescriptor(ProjectConfiguration, BuildResult)
-     */
-    public IvyModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result)
-    {
-        return createRetrieveDescriptor(project, result, null);
-    }
-
-    /**
-     * Create a module descriptor that contains the details necessary to retrieve the dependencies
-     * as defined by the configuration.
-     * <p/>
-     * When the specified build result indicates that one of the projects dependencies
-     * was rebuilt as part of the build, then the version of the dependency produced by
-     * the recent build is used if possible.  This ensures that consistent artifacts
-     * are used across an extended build.
-     * <p/>
-     * The revision field defines the revision of the generated module descriptor.
-     *
-     * @param project  the configuration on which to base the descriptor.
+     * @param project  the configuration on which to base the descriptor
      * @param result   the build result for the current build
      * @param revision the revision of the descriptor
      * @return the created descriptor.
@@ -94,29 +72,7 @@ public class ModuleDescriptorFactory
     public IvyModuleDescriptor createRetrieveDescriptor(ProjectConfiguration project, BuildResult result, String revision)
     {
         IvyModuleDescriptor ivyDescriptor = newDescriptor(project, result, revision);
-
         addDependencies(project, result, ivyDescriptor);
-
-        return ivyDescriptor;
-    }
-
-    /**
-     * Create a descriptor based on the specified configuration and the build result.  This is a
-     * complete descriptor that contains publish and retrieval information.
-     *
-     * @param project  the configuration on which to base the descriptor.
-     * @param result   the build result that contains the artifact details.
-     * @param revision the revision of the descriptor
-     * @return the created descriptor.
-     * @throws IOException is there is a problem creating the module descriptor.
-     */
-    public IvyModuleDescriptor createDescriptor(ProjectConfiguration project, BuildResult result, String revision) throws IOException
-    {
-        IvyModuleDescriptor ivyDescriptor = newDescriptor(project, result, revision);
-
-        addDependencies(project, result, ivyDescriptor);
-        addArtifacts(result, ivyDescriptor);
-
         return ivyDescriptor;
     }
 
@@ -184,7 +140,13 @@ public class ModuleDescriptorFactory
         return dependencyMrid;
     }
 
-    private void addArtifacts(BuildResult result, IvyModuleDescriptor ivyDescriptor)
+    /**
+     * Adds information about the artifacts to be published by the given build result to the give descriptor.
+     *
+     * @param result        the build that generated the artifacts to published
+     * @param ivyDescriptor descriptor to add the artifacts to
+     */
+    public void addArtifacts(BuildResult result, IvyModuleDescriptor ivyDescriptor)
     {
         final Collection<ArtifactDetail> artifacts = new LinkedList<ArtifactDetail>();
 

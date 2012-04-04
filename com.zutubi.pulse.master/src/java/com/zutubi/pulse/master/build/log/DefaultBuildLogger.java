@@ -79,6 +79,24 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
         logMarker(String.format("Post build hooks complete (%d hook%s run).", hookCount, hookCount == 1 ? "" : "s"));
     }
 
+    public void preIvyResolve()
+    {
+        logMarker("Resolving dependencies...");
+    }
+
+    public void postIvyResolve(String... errors)
+    {
+        if (errors.length == 0)
+        {
+            logMarker("Dependencies resolved.");
+        }
+        else
+        {
+            logMarker("Dependency resolution completed with errors:");
+            logErrors(errors);
+        }
+    }
+
     public void preIvyPublish()
     {
         logMarker("Publishing to internal repository...");
@@ -86,13 +104,22 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void postIvyPublish(String... errors)
     {
-        if (errors.length == 0) {
+        if (errors.length == 0)
+        {
             logMarker("Publish to internal repository complete.");
-        } else {
+        }
+        else
+        {
             logMarker("Publish to internal repository completed with errors:");
-            for (String error : errors) {
-                logMarker("    - " + error);
-            }
+            logErrors(errors);
+        }
+    }
+
+    private void logErrors(String... errors)
+    {
+        for (String error : errors)
+        {
+            logMarker("    - " + error);
         }
     }
 

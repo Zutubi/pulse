@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+@SuppressWarnings({"unchecked"})
 public class DependenciesAcceptanceTest extends AcceptanceTestBase
 {
     private Repository repository;
@@ -75,6 +76,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
         configurationHelper.insertProject(project.getConfig(), false);
+        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
     }
 
     public void testPublish_NoArtifacts() throws Exception
@@ -345,6 +347,71 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         checkCorrespondingStageFile(downstreamProject, STAGE_A, buildNumber);
         checkCorrespondingStageFile(downstreamProject, STAGE_B, buildNumber);
+    }
+
+    // CIB-2887: Different stages of the same build can retrieve artifacts from different revisions of the same
+    // upstream project.
+    public void testRetrieve_AllStagesSeeSameUpstreamRevision() throws Exception
+    {
+        final String STAGE1 = "stage1";
+        final String STAGE2 = "stage2";
+
+        // We need a second agent to run an upstream build while a downstream one is in progress.
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
+
+        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
+        upstreamProject.addStage(STAGE1);
+        upstreamProject.addArtifacts("art.jar");
+        upstreamProject.addFilesToCreate("art.jar");
+        insertProject(upstreamProject);
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+
+        // Set up a downstream project with two stages serialised by needing the master agent, using a wait project so
+        // we could hold up the first stage while we run another upstream build.  Add the revision to the retrieval
+        // pattern so we can verify both stages retrieve the same revision (1).
+        WaitProject downstreamProject = projects.createWaitAntProject(randomName + "-downstream", tmp, true);
+        downstreamProject.getConfig().getStages().clear();
+        downstreamProject.clearTriggers();
+        File baseDir = new File(tmp, randomName + "-base");
+        downstreamProject.getConfig().getBootstrap().setTempDirPattern(baseDir.getAbsolutePath() + "/$(stage)");
+        downstreamProject.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
+        DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
+        dependencyConfig.setStageType(DependencyConfiguration.StageType.ALL_STAGES);
+        AgentConfiguration masterAgent = configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME);
+        downstreamProject.addStage(STAGE1).setAgent(masterAgent);
+        downstreamProject.addStage(STAGE2).setAgent(masterAgent);
+        insertProject(downstreamProject);
+
+        // This should not be necessary, but the project insert does not preserve stage order.
+        Vector<String> stages = rpcClient.RemoteApi.getConfigListing("projects/" + downstreamProject.getName() + "/stages");
+        String firstStage = stages.get(0);
+        String secondStage = stages.get(1);
+
+        // Trigger the downstream build, allowing the first stage to get underway.  We both wait for the retrieval to
+        // complete and verify the revision by waiting for the right file.
+        buildRunner.triggerBuild(downstreamProject.getConfig());
+        waitForFile(new File(baseDir, firstStage + "/lib/art-1.jar"));
+
+        // Run another upstream build, which we want the second stage to ignore.
+        buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
+
+        // Releasing the first stage allows the second stage to run.  We verify its retrieval as above.
+        downstreamProject.releaseStage(firstStage);
+        waitForFile(new File(baseDir, secondStage + "/lib/art-1.jar"));
+
+        downstreamProject.releaseBuild();
+        rpcClient.RemoteApi.waitForBuildToComplete(downstreamProject.getName(), 1);
+    }
+
+    private void waitForFile(final File file)
+    {
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return file.isFile();
+            }
+        }, 30000, "File '" + file.getAbsolutePath() + "' to exist");
     }
 
     private void checkCorrespondingStageFile(DepAntProject project, String stage, int buildNumber) throws IOException

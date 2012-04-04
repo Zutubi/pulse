@@ -17,6 +17,17 @@ public interface BuildLogger extends HookLogger
     void postBuild();
     void postBuildCompleted();
 
+    /**
+     * Called prior to Ivy dependency resolution.
+     */
+    void preIvyResolve();
+    /**
+     * Called after Ivy dependency resolution.
+     *
+     * @param errors all problem messages reported by Ivy, empty on successful resolve
+     */
+    void postIvyResolve(String... errors);
+
     void preIvyPublish();
     void postIvyPublish(String... errors);
 

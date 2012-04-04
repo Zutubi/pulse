@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
@@ -29,7 +28,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -42,7 +40,6 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -53,9 +50,9 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.report.ResolveReport;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -64,6 +61,11 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -107,6 +109,8 @@ public class DefaultBuildController implements EventListener, BuildController
     private RecipeDispatchService recipeDispatchService;
 
     private IvyManager ivyManager;
+    private IvyClient ivy;
+    private IvyModuleDescriptor ivyModuleDescriptor;
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory;
     private ConfigurationVariableProvider configurationVariableProvider;
@@ -145,6 +149,8 @@ public class DefaultBuildController implements EventListener, BuildController
         try
         {
             project = projectManager.getProject(projectConfig.getProjectId(), false);
+            String repositoryUrl = configurationManager.getUserPaths().getRepositoryRoot().toURI().toString();
+            ivy = ivyManager.createIvyClient(repositoryUrl);
             moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
             previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
 
@@ -153,11 +159,11 @@ public class DefaultBuildController implements EventListener, BuildController
             buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
 
             buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
+            ivy.pushMessageLogger(buildLogger.getMessageLogger());
 
             buildContext = new PulseExecutionContext();
             MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
             MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
-            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, createModuleDescriptor(projectConfig).getDescriptor());
             buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
             buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_UNZIP_RETRIEVED_ARCHIVES, projectConfig.getDependencies().isUnzipRetrievedArchives());
             buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
@@ -296,13 +302,6 @@ public class DefaultBuildController implements EventListener, BuildController
         {
             throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
         }
-    }
-
-    private IvyModuleDescriptor createModuleDescriptor(ProjectConfiguration project)
-    {
-        IvyModuleDescriptor descriptor = moduleDescriptorFactory.createRetrieveDescriptor(project, buildResult);
-        descriptor.setStatus(buildResult.getStatus());
-        return descriptor;
     }
 
     private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
@@ -753,12 +752,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         addRevisionProperties(buildContext, buildResult);
 
-        String version = request.getVersion();
-        if (request.getOptions().isResolveVersion())
-        {
-            version = buildContext.resolveVariables(version);
-        }
-        buildResult.setVersion(version);
+        resolveDependencies();
 
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
@@ -767,6 +761,49 @@ public class DefaultBuildController implements EventListener, BuildController
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
         }
         buildManager.save(buildResult);
+    }
+
+    private void resolveDependencies()
+    {
+        String version = request.getVersion();
+        if (request.getOptions().isResolveVersion())
+        {
+            version = buildContext.resolveVariables(version);
+        }
+        buildResult.setVersion(version);
+
+        ivyModuleDescriptor = moduleDescriptorFactory.createRetrieveDescriptor(projectConfig, buildResult, version);
+        ivyModuleDescriptor.setStatus(buildResult.getStatus());
+
+        if (ivyModuleDescriptor.getDescriptor().getConfigurations().length > 0)
+        {
+            buildLogger.preIvyResolve();
+            ResolveReport resolveReport;
+            try
+            {
+                // Resolves the descriptor to the cache.
+                resolveReport = ivy.resolveDescriptor(ivyModuleDescriptor);
+                @SuppressWarnings("unchecked")
+                List<String> problemMessages = resolveReport.getAllProblemMessages();
+                if (problemMessages == null)
+                {
+                    problemMessages = Collections.emptyList();
+                }
+
+                // Delivery actually generates the resolved descriptor.
+                ivyModuleDescriptor = ivy.deliverDescriptor(ivyModuleDescriptor);
+                buildLogger.postIvyResolve(problemMessages.toArray(new String[problemMessages.size()]));
+            }
+            catch (Exception e)
+            {
+                throw new BuildException("Unable to resolve dependencies: " + e.getMessage(), e);
+            }
+        }
+
+        for (RecipeController recipeController: controllers)
+        {
+            recipeController.getAssignmentRequest().getRequest().getContext().addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ivyModuleDescriptor.getDescriptor());
+        }
     }
 
     private void getChanges(BuildRevision buildRevision)
@@ -1064,23 +1101,18 @@ public class DefaultBuildController implements EventListener, BuildController
         buildLogger.preIvyPublish();
         try
         {
-            String version = buildContext.getString(PROPERTY_BUILD_VERSION);
-
-            final IvyModuleDescriptor descriptor = moduleDescriptorFactory.createDescriptor(projectConfig, buildResult, version);
-            descriptor.setBuildNumber(buildResult.getNumber());
+            ivyModuleDescriptor.setBuildNumber(buildResult.getNumber());
+            moduleDescriptorFactory.addArtifacts(buildResult, ivyModuleDescriptor);
 
             long projectHandle = buildContext.getLong(PROPERTY_PROJECT_HANDLE, 0);
             if (projectHandle != 0)
             {
-                String path = descriptor.getPath();
+                String path = ivyModuleDescriptor.getPath();
                 repositoryAttributes.addAttribute(PathUtils.getParentPath(path), RepositoryAttributes.PROJECT_HANDLE, String.valueOf(projectHandle));
             }
 
-            String repositoryUrl = configurationManager.getUserPaths().getRepositoryRoot().toURI().toString();
-            final IvyClient ivy = ivyManager.createIvyClient(repositoryUrl);
-            ivy.pushMessageLogger(buildLogger.getMessageLogger());
-            ivy.publishArtifacts(descriptor);
-            ivy.publishDescriptor(descriptor);
+            ivy.publishArtifacts(ivyModuleDescriptor);
+            ivy.publishDescriptor(ivyModuleDescriptor);
             buildLogger.postIvyPublish();
         }
         catch (UnknownHostException e)

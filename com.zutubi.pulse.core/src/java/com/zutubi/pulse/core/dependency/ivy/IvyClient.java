@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.cache.RepositoryCacheManager;
@@ -101,6 +102,49 @@ public class IvyClient
         settings.setDefaultUseOrigin(true);
 
         this.ivy = Ivy.newInstance(settings);
+    }
+
+    /**
+     * Resolves all configurations mentioned in the given descriptor.  Note that this does not actually generate a
+     * resolved descriptor - see {@link #deliverDescriptor(IvyModuleDescriptor)} for how to do so.
+     *
+     * @param descriptor the descriptor to resolve
+     * @return Ivy report detailing what was resolve
+     * @throws IOException if a descriptor cannot be read/written
+     * @throws ParseException if a descriptor cannot be parsed
+     */
+    public ResolveReport resolveDescriptor(IvyModuleDescriptor descriptor) throws IOException, ParseException
+    {
+        return resolve(descriptor.getDescriptor(), descriptor.getDescriptor().getConfigurationsNames());
+    }
+
+    /**
+     * Delivers the given descriptor, i.e. generates a resolved version of it (with, for example, dynamic revisions
+     * replaced by their resolved counterparts).
+     *
+     * @param descriptor the descriptor to deliver
+     * @return a resolved version of the given descriptor
+     * @throws Exception on error
+     */
+    public synchronized IvyModuleDescriptor deliverDescriptor(IvyModuleDescriptor descriptor) throws Exception
+    {
+        // Deliver to a local temp file, and reload the descriptor from it.
+        File tmp = null;
+        try
+        {
+            tmp = FileSystemUtils.createTempDir();
+            File ivyFile = new File(tmp, "ivy.xml");
+            ModuleRevisionId mrid = descriptor.getDescriptor().getModuleRevisionId();
+            ivy.deliver(mrid, descriptor.getRevision(), ivyFile.getCanonicalPath());
+            IvyModuleDescriptor deliveredDescriptor = IvyModuleDescriptor.newInstance(ivyFile, configuration);
+            // Hackishly disconnect the descriptor from the temp file.
+            ReflectionUtils.setFieldValue(deliveredDescriptor.getDescriptor(), "resource", null);
+            return deliveredDescriptor;
+        }
+        finally
+        {
+            cleanupTempDir(tmp);
+        }
     }
 
     /**
@@ -225,17 +269,7 @@ public class IvyClient
         {
             URLHandlerRegistry.setDefault(originalDefault);
 
-            if (tmp != null)
-            {
-                try
-                {
-                    rmdir(tmp);
-                }
-                catch (IOException e)
-                {
-                    LOG.warning(I18N.format("warning.file.cleanup.failure", e.getMessage()));
-                }
-            }
+            cleanupTempDir(tmp);
         }
     }
 
@@ -404,17 +438,17 @@ public class IvyClient
      * caching the result.
      *
      * @param descriptor the descriptor whose dependencies are being resolved.
-     * @param conf       the (already encoded) name of the configuration to resolve
+     * @param confs      the (already encoded) names of the configuration to resolve
      * @return a resolve report.
      *
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    private ResolveReport resolve(ModuleDescriptor descriptor, String conf) throws IOException, ParseException
+    private ResolveReport resolve(ModuleDescriptor descriptor, String... confs) throws IOException, ParseException
     {
         ResolveOptions options = new ResolveOptions();
         options.setValidate(ivy.getSettings().doValidate());
-        options.setConfs(new String[]{conf});
+        options.setConfs(confs);
         options.setCheckIfChanged(true);
         options.setUseCacheOnly(false);
         return ivy.resolve(descriptor, options);
@@ -446,6 +480,21 @@ public class IvyClient
         catch (URISyntaxException e)
         {
             return false;
+        }
+    }
+
+    private void cleanupTempDir(File tmp)
+    {
+        if (tmp != null)
+        {
+            try
+            {
+                rmdir(tmp);
+            }
+            catch (IOException e)
+            {
+                LOG.warning(I18N.format("warning.file.cleanup.failure", e.getMessage()));
+            }
         }
     }
 }
