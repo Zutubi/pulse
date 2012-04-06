@@ -190,6 +190,8 @@
                 <ref local="addCaptureAsZip"/>
                 <ref local="addDependencyUnzip"/>
                 <ref local="addTimestampDisplayPreference"/>
+                <ref local="addDependencyLinks"/>
+                <ref local="dependencyLinkIndices"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -995,5 +997,18 @@
 
     <bean id="addTimestampDisplayPreference" class="com.zutubi.pulse.master.upgrade.tasks.AddTimestampDisplayPreferenceUpgradeTask">
         <property name="buildNumber" value="205001007"/>
+    </bean>
+
+    <bean id="addDependencyLinks" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="205001008"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.5.2-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dependencyLinkIndices" class="com.zutubi.pulse.master.upgrade.tasks.DependencyLinkIndicesUpgradeTask">
+        <property name="buildNumber" value="205001009"/>
     </bean>
 </beans>

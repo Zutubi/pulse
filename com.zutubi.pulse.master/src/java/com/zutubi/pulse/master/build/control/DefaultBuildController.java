@@ -52,6 +52,7 @@ import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ResolveReport;
 
 import java.io.File;
@@ -83,6 +84,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private EventManager eventManager;
     private ProjectManager projectManager;
     private BuildManager buildManager;
+    private DependencyManager dependencyManager;
     private TestManager testManager;
     private MasterLocationProvider masterLocationProvider;
     private MasterConfigurationManager configurationManager;
@@ -1037,6 +1039,8 @@ public class DefaultBuildController implements EventListener, BuildController
             // be traversed when this information is required.
             buildResult.calculateFeatureCounts();
 
+            dependencyManager.addDependencyLinks(buildResult);
+            
             long start = System.currentTimeMillis();
             testManager.index(buildResult);
             long duration = System.currentTimeMillis() - start;
@@ -1186,6 +1190,11 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setDependencyManager(DependencyManager dependencyManager)
+    {
+        this.dependencyManager = dependencyManager;
     }
 
     public void setTestManager(TestManager testManager)

@@ -67,6 +67,13 @@
         <property name="interceptorNames" ref="securityAndTransactionInterceptors"/>
     </bean>
 
+    <bean id="dependencyManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <bean class="com.zutubi.pulse.master.model.DefaultDependencyManager"/>
+        </property>
+        <property name="interceptorNames" ref="transactionInterceptors"/>
+    </bean>
+
     <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" init-method="init"/>
     <bean id="pollingService" class="com.zutubi.pulse.master.scm.polling.PollingService"/>
     <bean id="projectInitialisationService" class="com.zutubi.pulse.master.project.ProjectInitialisationService" init-method="init"/>
@@ -218,10 +225,9 @@
 
     <bean id="toveFileDocManager" class="com.zutubi.pulse.core.marshal.doc.ToveFileDocManager"/>
 
-    <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
+    <bean id="ivyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
         <property name="dataDir" value="#{userPaths.data}"/>
     </bean>
-    <alias name="dependencyManager" alias="ivyManager"/>
 
     <bean id="repositoryAttributes" class="com.zutubi.pulse.core.dependency.RepositoryAttributes" init-method="init">
         <constructor-arg index="0" value="#{userPaths.repositoryRoot}"/>

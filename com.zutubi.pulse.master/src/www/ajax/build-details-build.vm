@@ -11,30 +11,32 @@
             <th class="content">#wwtext("name=dependencies.column.stage")</th>
             <th class="content rightmost">#wwtext("name=dependencies.column.artifact")</th>
         </tr>
-    #foreach($detail in $dependencyDetails)
-        #if ($detail.reportAvailable)
-            #foreach($dependency in $detail.dependencies)
+    #foreach($stageArtifacts in $dependencyDetails)
+        #if ($stageArtifacts.artifactInformationAvailable)
+            #foreach($artifactSource in $stageArtifacts.retrievedArtifacts)
             <tr>
-                #if ($dependency.projectUrl)
-                    <td class="content leftmost"><a href="$dependency.projectUrl">#html($dependency.projectName)</a></td>
+                #if ($artifactSource.projectUrl)
+                    <td class="content leftmost"><a href="$artifactSource.projectUrl">#html($artifactSource.projectName)</a></td>
                 #else
-                    <td class="content leftmost">#html($dependency.projectName)</td>
+                    <td class="content leftmost">#html($artifactSource.projectName)</td>
                 #end
-                #if($dependency.buildUrl)
-                    <td class="content"><a href="$dependency.buildUrl">#html($dependency.buildName)</a></td>
+                #if($artifactSource.buildUrl)
+                    <td class="content"><a href="$artifactSource.buildUrl">$artifactSource.buildNumber</a></td>
+                #elseif ($artifactSource.hasBuildNumber)
+                    <td class="content">$artifactSource.buildNumber</td>
                 #else
-                    <td class="content">#html($dependency.buildName)</td>
+                    <td class="content">unknown</td>
                 #end
-                <td class="content">#html($dependency.stageName)</td>
-                #if ($dependency.artifactUrl)
-                    <td class="content rightmost"><a id='#id("${dependency.projectName}-${dependency.stageName}-${dependency.artifactName}")' href="$dependency.artifactUrl">#html($dependency.artifactName)</a></td>
+                <td class="content">#html($artifactSource.stageName)</td>
+                #if ($artifactSource.artifactUrl)
+                    <td class="content rightmost"><a id='#id("${artifactSource.projectName}-${artifactSource.stageName}-${artifactSource.artifactName}")' href="$artifactSource.artifactUrl">#html($artifactSource.artifactName)</a></td>
                 #else
-                    <td class="content rightmost">#html($dependency.artifactName)</td>
+                    <td class="content rightmost">#html($artifactSource.artifactName)</td>
                 #end
             </tr>
             #end
         #else
-            <td colspan="4" class="content leftmost rightmost"><b>#html($detail.stageName)</b> stage dependency details are not available.  They have most likely been cleaned up.</td>
+            <td colspan="4" class="content leftmost rightmost"><b>#html($stageArtifacts.stageName)</b> stage dependency details are not available.  They have most likely been cleaned up.</td>
         #end
     #end
     </table>

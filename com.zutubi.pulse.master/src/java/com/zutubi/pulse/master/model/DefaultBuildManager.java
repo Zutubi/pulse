@@ -171,7 +171,7 @@ public class DefaultBuildManager implements BuildManager
 
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
-        return buildResultDao.findByProjectAndNumber(project, number);
+        return buildResultDao.findByProjectAndNumber(project.getId(), number);
     }
 
     public BuildResult getByProjectAndVirtualId(Project project, String buildId)
@@ -599,7 +599,8 @@ public class DefaultBuildManager implements BuildManager
                 }
             }
         }
-        
+
+        buildResultDao.deleteDependenciesByBuild(build.getId());
         buildResultDao.delete(build);
     }
 

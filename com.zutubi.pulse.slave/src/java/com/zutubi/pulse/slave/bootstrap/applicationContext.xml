@@ -106,7 +106,7 @@
         <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
     </bean>
 
-    <bean id="dependencyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
+    <bean id="ivyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">
         <property name="dataDir">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName" value="configurationManager"/>
@@ -114,7 +114,6 @@
             </bean>
         </property>
     </bean>
-    <alias name="dependencyManager" alias="ivyManager"/>
 
     <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init"/>
     

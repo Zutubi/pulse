@@ -1276,6 +1276,106 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(0, results.size());
     }
 
+    public void testFindDependencyLinks()
+    {
+        Project p1 = new Project();
+        Project p2 = new Project();
+        Project p3 = new Project();
+        projectDao.save(p1);
+        projectDao.save(p2);
+        projectDao.save(p3);
+
+        BuildResult build1_1 = createCompletedBuild(p1, 1);
+        BuildResult build2_1 = createCompletedBuild(p2, 1);
+        BuildResult build2_2 = createCompletedBuild(p2, 2);
+        BuildResult build3_1 = createCompletedBuild(p3, 1);
+
+        buildResultDao.save(build1_1);
+        buildResultDao.save(build2_1);
+        buildResultDao.save(build3_1);
+        buildResultDao.save(build2_2);
+
+        buildResultDao.save(new BuildDependencyLink(build1_1.getId(), build2_1.getId()));
+        buildResultDao.save(new BuildDependencyLink(build1_1.getId(), build2_2.getId()));
+        buildResultDao.save(new BuildDependencyLink(build2_1.getId(), build3_1.getId()));
+
+        commitAndRefreshTransaction();
+
+        List<BuildDependencyLink> results = buildResultDao.findAllDependencies(build1_1.getId());
+        assertEquals(2, results.size());
+
+        results = buildResultDao.findAllUpstreamDependencies(build1_1.getId());
+        assertEquals(0, results.size());
+
+        results = buildResultDao.findAllDownstreamDependencies(build1_1.getId());
+        assertEquals(2, results.size());
+
+        results = buildResultDao.findAllDependencies(build2_1.getId());
+        assertEquals(2, results.size());
+        BuildDependencyLink link = results.get(0);
+        if (link.getUpstreamBuildId() == build2_1.getId())
+        {
+            assertEquals(build3_1.getId(), link.getDownstreamBuildId());
+            link = results.get(1);
+            assertEquals(build1_1.getId(), link.getUpstreamBuildId());
+            assertEquals(build2_1.getId(), link.getDownstreamBuildId());
+        }
+        else
+        {
+            assertEquals(build1_1.getId(), link.getUpstreamBuildId());
+            assertEquals(build2_1.getId(), link.getDownstreamBuildId());
+            link = results.get(1);
+            assertEquals(build2_1.getId(), link.getUpstreamBuildId());
+            assertEquals(build3_1.getId(), link.getDownstreamBuildId());
+        }
+
+        results = buildResultDao.findAllUpstreamDependencies(build2_1.getId());
+        assertEquals(1, results.size());
+        link = results.get(0);
+        assertEquals(build1_1.getId(), link.getUpstreamBuildId());
+        assertEquals(build2_1.getId(), link.getDownstreamBuildId());
+
+        results = buildResultDao.findAllDownstreamDependencies(build2_1.getId());
+        assertEquals(1, results.size());
+        link = results.get(0);
+        assertEquals(build2_1.getId(), link.getUpstreamBuildId());
+        assertEquals(build3_1.getId(), link.getDownstreamBuildId());
+    }
+
+    public void testDeleteDependencyLinks()
+    {
+        Project p1 = new Project();
+        Project p2 = new Project();
+        Project p3 = new Project();
+        projectDao.save(p1);
+        projectDao.save(p2);
+        projectDao.save(p3);
+
+        BuildResult build1_1 = createCompletedBuild(p1, 1);
+        BuildResult build2_1 = createCompletedBuild(p2, 1);
+        BuildResult build2_2 = createCompletedBuild(p2, 2);
+        BuildResult build3_1 = createCompletedBuild(p3, 1);
+
+        buildResultDao.save(build1_1);
+        buildResultDao.save(build2_1);
+        buildResultDao.save(build3_1);
+        buildResultDao.save(build2_2);
+
+        buildResultDao.save(new BuildDependencyLink(build1_1.getId(), build2_1.getId()));
+        buildResultDao.save(new BuildDependencyLink(build1_1.getId(), build2_2.getId()));
+        buildResultDao.save(new BuildDependencyLink(build2_1.getId(), build3_1.getId()));
+
+        commitAndRefreshTransaction();
+
+        assertEquals(2, buildResultDao.deleteDependenciesByBuild(build1_1.getId()));
+        assertEquals(0, buildResultDao.findAllDependencies(build1_1.getId()).size());
+
+        assertEquals(0, buildResultDao.deleteDependenciesByBuild(build2_2.getId()));
+
+        assertEquals(1, buildResultDao.deleteDependenciesByBuild(build3_1.getId()));
+        assertEquals(0, buildResultDao.findAllDependencies(build3_1.getId()).size());
+    }
+
     private List<BuildResult> save(BuildResult... results)
     {
         for (BuildResult result: results)
