@@ -102,6 +102,14 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("warning status" "separate warning status" "accept" false)
+            <td>
+                Builds (and the steps within them) that include warnings now complete with a new warning
+                status.  This makes it easier to find, subscribe to, and generally work with builds with
+                warnings.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("comments" "comment visibility" "accept" false)
             <td>
                 The visibility of builds comments has been raised, making them easier to notice and
@@ -120,6 +128,13 @@
             <td>
                 Properties can now be configured directly on agents, giving a simpler way to
                 parameterise your build depending on the machine it runs on.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("scmproperties" "scm properties" "accept" false)
+            <td>
+                SCM configuration can now reference project properties.  This allows you to parameterise
+                your SCM settings, making them easier to maintain across many projects.
             </td>
         </tr>
         <tr>
@@ -148,6 +163,20 @@
             <td>
                 A new hook point has been added, allowing you to run a task just before a build
                 stage is dispatched to an agent.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("archivedartifacts" "artifact archives" "accept" false)
+            <td>
+               Directory artifacts can now be captured as a single archive file.  When retrieved
+               in dependent builds, you can opt to have archives unpacked automatically.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("flexiblebootstrapping" "flexible bootstrapping" "accept" false)
+            <td>
+                The build bootstrapping step has been made more flexible.  You can now configure
+                the path for clean builds, and can choose to skip the SCM boostrap if desired.
             </td>
         </tr>
         <tr>
@@ -183,6 +212,13 @@
             <td>
                 The Perforce plugin has been enhanced to support streams, a kind of built-in
                  branching model in newer Perforce releases.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("gitsubmodules" "git submodule support" "accept" false)
+            <td>
+                The git plugin has been enhanced to support submodules, allowing Pulse to
+                automatically update selected (or all) submodules when bootstrapping builds.
             </td>
         </tr>
        <tr>
