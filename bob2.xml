@@ -52,7 +52,7 @@
 
     <recipe name="release">
         <executable name="prepare" exe="bash" args="prepare-release.sh $(pulse.version)"/>
-        <ant name="build" targets="accept.master">
+        <ant name="build" targets="package.master">
             <macro-ref macro="$(capture-junit)"/>
             <dir-artifact name="packages" base="build">
                 <include pattern="pulse-*$(pulse.version).*"/>
