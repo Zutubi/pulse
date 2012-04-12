@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.BuildOptionsForm;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The page shown when looking at a project in the configuration view.
@@ -40,7 +41,7 @@ public class ProjectConfigPage extends CompositePage
 
     public ProjectHierarchyPage clickHierarchy()
     {
-        browser.click(super.getHierarchyLocator());
+        browser.click(By.xpath(getHierarchyXPath()));
         return browser.createPage(ProjectHierarchyPage.class, project, template);
     }
 

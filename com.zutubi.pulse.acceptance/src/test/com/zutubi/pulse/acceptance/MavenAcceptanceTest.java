@@ -13,6 +13,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Pair;
+import org.openqa.selenium.By;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -78,7 +79,7 @@ public class MavenAcceptanceTest extends AcceptanceTestBase
 
         // We expect the artifacts page to contain an artifact called test reports.
         BuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(BuildArtifactsPage.class, random, buildNumber);
-        getBrowser().waitForLocator(artifactsPage.getArtifactLocator("test reports"));
+        getBrowser().waitForElement(By.xpath(artifactsPage.getArtifactXPath("test reports")));
     }
 
     private void assertDefaultRequirement(String projectName, String resourceName) throws Exception

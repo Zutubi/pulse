@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.dashboard;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * The summary tab for a personal build result.
@@ -24,7 +25,7 @@ public class PersonalBuildChangesPage extends SeleniumPage
 
     public String getCheckedOutRevision()
     {
-        String text = browser.getText("checked-out-revision");
+        String text = browser.getText(By.id("checked-out-revision"));
         text = text.trim();
         String[] pieces = text.split(" ");
         return pieces[pieces.length - 1];

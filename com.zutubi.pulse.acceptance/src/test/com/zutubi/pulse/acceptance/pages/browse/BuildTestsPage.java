@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The tests tab for a build result.
@@ -53,7 +54,7 @@ public class BuildTestsPage extends AbstractTestsPage
     
     public StageTestsPage clickStageAndWait(String stage)
     {
-        browser.click(getStageLinkLocator(stage));
+        browser.click(By.xpath(getStageLinkXPath(stage)));
         return browser.waitFor(StageTestsPage.class, projectName, buildId, stage);
     }
 
@@ -64,10 +65,10 @@ public class BuildTestsPage extends AbstractTestsPage
 
     public boolean isStageLinkPresent(String stage)
     {
-        return browser.isElementPresent(getStageLinkLocator(stage));
+        return browser.isElementPresent(By.xpath(getStageLinkXPath(stage)));
     }
 
-    private String getStageLinkLocator(String stage)
+    private String getStageLinkXPath(String stage)
     {
         return "//td[@id='stage-" + stage + "']/a";
     }

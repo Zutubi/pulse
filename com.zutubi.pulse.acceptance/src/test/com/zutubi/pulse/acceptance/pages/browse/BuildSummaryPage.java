@@ -84,7 +84,7 @@ public class BuildSummaryPage extends ResponsibilityPage implements CommentPage
      */
     public boolean isRightPaneVisible()
     {
-        return Boolean.valueOf(browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('build-summary-right').isVisible()"));
+        return (Boolean) browser.evaluateScript("return Ext.getCmp('build-summary-right').isVisible()");
     }
 
     public String getBuildTitle()
@@ -185,7 +185,7 @@ public class BuildSummaryPage extends ResponsibilityPage implements CommentPage
         return linksTable.isPresent();
     }
     
-    public int getRelatedLinksCount()
+    public long getRelatedLinksCount()
     {
         return linksTable.getLinkCount();
     }

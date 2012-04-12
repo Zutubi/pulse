@@ -10,6 +10,7 @@ import static com.zutubi.pulse.master.model.UserManager.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.WebUtils;
 
 /**
  * Test for user groups.
@@ -40,7 +41,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, null);
 
-        getBrowser().waitForElement(getGroupPath(random));
+        getBrowser().waitForElement(getGroupId(random));
         assertTrue(form.isFormPresent());
         assertTrue(form.checkFormValues(random, "", ""));
     }
@@ -71,7 +72,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, null, ServerPermission.CREATE_PROJECT.toString());
-        getBrowser().waitForElement(getGroupPath(random));
+        getBrowser().waitForElement(getGroupId(random));
         form.waitFor();
         form.applyFormElements(null, userHandle, null);
         form.waitFor();
@@ -104,7 +105,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
 
         GroupForm form = groupsPage.clickAddGroupAndWait();
         form.finishFormElements(random, userHandle, null);
-        getBrowser().waitForElement(getGroupPath(random));
+        getBrowser().waitForElement(getGroupId(random));
         getBrowser().logout();
 
         assertTrue(getBrowser().login(login, ""));
@@ -167,8 +168,8 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         getBrowser().logout();
     }
 
-    private String getGroupPath(String group)
+    private String getGroupId(String group)
     {
-        return PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, group);
+        return WebUtils.toValidHtmlName(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, group));
     }
 }

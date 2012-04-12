@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.components.table;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class LinkTable extends ContentTable
      */
     public boolean isLinkPresent(String linkName, String category)
     {
-        return browser.isElementPresent(getLinkId(linkName, category));
+        return browser.isElementIdPresent(getLinkId(linkName, category));
     }
 
     /**
@@ -62,7 +63,7 @@ public class LinkTable extends ContentTable
      */
     public void clickLink(String linkName, String category)
     {
-        browser.click(getLinkId(linkName, category));
+        browser.click(By.id(getLinkId(linkName, category)));
     }
 
     /**
@@ -94,9 +95,9 @@ public class LinkTable extends ContentTable
      *
      * @return the number of links shown in the table
      */
-    public int getLinkCount()
+    public long getLinkCount()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".getDynamicCount()"));
+        return (Long) browser.evaluateScript("return " + getComponentJS() + ".getDynamicCount();");
     }
 
     /**
@@ -119,7 +120,7 @@ public class LinkTable extends ContentTable
     public List<String> getLinkLabels()
     {
         List<String> result = new LinkedList<String>();
-        int count = getLinkCount();
+        long count = getLinkCount();
         for (int i = 0; i < count; i++)
         {
             result.add(getLinkLabel(i));

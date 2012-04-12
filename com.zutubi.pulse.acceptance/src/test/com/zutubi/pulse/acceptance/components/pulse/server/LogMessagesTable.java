@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.components.pulse.server;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.Component;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.pulse.server.LogMessagesTable JS component.
@@ -13,9 +14,9 @@ public class LogMessagesTable extends Component
         super(browser, id);
     }
     
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return getComponentJS() + ".dataExists()";
+        return "return " + getComponentJS() + ".dataExists();";
     }
 
     /**
@@ -23,9 +24,9 @@ public class LogMessagesTable extends Component
      * 
      * @return the entry count
      */
-    public int getEntryCount()
+    public long getEntryCount()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.length"));
+        return (Long) browser.evaluateScript("return " + getComponentJS() + ".data.length");
     }
 
     /**
@@ -36,6 +37,6 @@ public class LogMessagesTable extends Component
      */
     public String getEntryMessage(int index)
     {
-        return browser.getText(getId() + "-message-" + index);
+        return browser.getText(By.id(getId() + "-message-" + index));
     }
 }

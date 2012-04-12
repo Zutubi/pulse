@@ -76,7 +76,7 @@ public class ViewChangelistPage extends SeleniumPage
      * 
      * @return the number of builds that are linked to this change
      */
-    public int getBuildsCount()
+    public long getBuildsCount()
     {
         return buildsTable.getRowCount();
     }
@@ -92,7 +92,7 @@ public class ViewChangelistPage extends SeleniumPage
         return buildsTable.getBuilds();
     }
 
-    public int getFilesCount()
+    public long getFilesCount()
     {
         return filesTable.getRowCount();
     }
@@ -100,7 +100,7 @@ public class ViewChangelistPage extends SeleniumPage
     public Changelist getChangelist()
     {
         List<FileChange> fileChanges = new LinkedList<FileChange>();
-        int filesCount = getFilesCount();
+        long filesCount = getFilesCount();
         for (int i = 0; i < filesCount; i++)
         {
             Map<String,String> row = filesTable.getRow(i);

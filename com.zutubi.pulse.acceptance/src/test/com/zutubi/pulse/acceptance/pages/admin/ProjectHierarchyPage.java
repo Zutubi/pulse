@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import org.openqa.selenium.By;
 
 /**
  * The page shown when looking at a project in the hierarchy view.
@@ -17,7 +18,7 @@ public class ProjectHierarchyPage extends HierarchyPage
 
     public ProjectConfigPage clickConfigure()
     {
-        browser.click(LINK_CONFIGURE);
+        browser.click(By.id(LINK_CONFIGURE));
         return browser.createPage(ProjectConfigPage.class, baseName, template);
     }
 }

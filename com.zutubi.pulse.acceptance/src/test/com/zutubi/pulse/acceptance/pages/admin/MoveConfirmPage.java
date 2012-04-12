@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,12 +29,12 @@ public class MoveConfirmPage extends ConfigurationPanePage
 
     public void clickMove()
     {
-        browser.click(CONFIRM_LINK);
+        browser.click(By.id(CONFIRM_LINK));
     }
 
     public void clickCancel()
     {
-        browser.click(CANCEL_LINK);
+        browser.click(By.id(CANCEL_LINK));
     }
 
     public List<String> getDeletedPaths()

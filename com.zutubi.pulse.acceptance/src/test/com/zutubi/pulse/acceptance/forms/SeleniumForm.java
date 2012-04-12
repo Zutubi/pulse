@@ -4,7 +4,10 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.*;
 import static com.zutubi.util.StringUtils.stripLineBreaks;
 import junit.framework.Assert;
+import org.openqa.selenium.By;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -117,12 +120,12 @@ public abstract class SeleniumForm
         return browser.getSelectOptions(getFieldId(name));
     }
 
-    public String[] getComboBoxOptions(String name)
+    public List<String> getComboBoxOptions(String name)
     {
         return browser.getComboOptions(getFieldId(name));
     }
 
-    public String[] getComboBoxDisplays(String name)
+    public List<String> getComboBoxDisplays(String name)
     {
         return browser.getComboDisplays(getFieldId(name));
     }
@@ -203,7 +206,7 @@ public abstract class SeleniumForm
 
     private void submit(String id)
     {
-        browser.click("zfid." + id);
+        browser.click(By.id("zfid." + id));
         if (ajax)
         {
             browser.waitForVariable("formSubmitting", true);
@@ -228,7 +231,7 @@ public abstract class SeleniumForm
 
     public String getFieldErrorMessage(String name)
     {
-        return browser.getText("//div[@id='x-form-el-zfid."+name+"']");
+        return browser.getText(By.xpath("//div[@id='x-form-el-zfid."+name+"']"));
     }
 
     public boolean hasFieldError(String name)
@@ -236,14 +239,14 @@ public abstract class SeleniumForm
         return getFieldErrorMessage(name) != null;
     }
 
-    public String getFieldValue(String name)
+    public Object getFieldValue(String name)
     {
         int type = getFieldType(name);
         switch (type)
         {
             case ITEM_PICKER:
             case MULTI_SELECT:
-                return browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(name) + "').getValue();");
+                return browser.evaluateScript("return Ext.getCmp('" + getFieldId(name) + "').getValue();");
             default:
                 return browser.getValue(getFieldId(name));
         }
@@ -270,14 +273,14 @@ public abstract class SeleniumForm
             switch (type)
             {
                 case TEXTFIELD:
-                    browser.type(id, value);
+                    browser.type(By.id(id), value);
                     break;
                 case COMBOBOX:
                     setComponentValue(id, "'" + value + "'");
                     break;
                 case ITEM_PICKER:
                 case MULTI_SELECT:
-                    String[] values = convertMultiValue(value);
+                    List<String> values = convertMultiValue(value);
                     List<String> quotedValues = CollectionUtils.map(values, new Mapping<String, String>()
                     {
                         public String map(String s)
@@ -304,7 +307,7 @@ public abstract class SeleniumForm
         // Custom Ext widgets are tricky to manage.  Since we are
         // not testing the widgets themselves, just go direct to
         // the setValue method.
-        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
+        browser.evaluateScript("var field = Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
     }
 
     public boolean isFieldNotEmpty(String id)
@@ -356,21 +359,7 @@ public abstract class SeleniumForm
 
     private void forceButtonUpdate(String fieldName)
     {
-        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(fieldName) + "'); field.form.updateButtons()");
-    }
-
-    public String[] getFormValues()
-    {
-        String[] fieldNames = getActualFieldNames();
-        String[] formValues = new String[fieldNames.length];
-        CollectionUtils.mapToArray(fieldNames, new Mapping<String, String>()
-        {
-            public String map(String fieldName)
-            {
-                return getFieldValue(fieldName);
-            }
-        }, formValues);
-        return formValues;
+        browser.evaluateScript("var field = Ext.getCmp('" + getFieldId(fieldName) + "'); field.form.updateButtons()");
     }
 
     /**
@@ -401,7 +390,7 @@ public abstract class SeleniumForm
                 switch (types[i])
                 {
                     case SeleniumForm.TEXTFIELD:
-                        if (!ObjectUtils.equals(stripLineBreaks(values[i]), stripLineBreaks(getFieldValue(fieldName))))
+                        if (!ObjectUtils.equals(stripLineBreaks(values[i]), stripLineBreaks((String) getFieldValue(fieldName))))
                         {
                             return false;
                         }
@@ -427,16 +416,16 @@ public abstract class SeleniumForm
                     case SeleniumForm.MULTI_SELECT:
                         if (values[i] != null)
                         {
-                            String[] expected = convertMultiValue(values[i]);
-                            String fieldValue = getFieldValue(fieldName);
-                            String[] gotValues = fieldValue.length() == 0 ? new String[0] : fieldValue.split(",");
-                            if (expected.length != gotValues.length)
+                            List<String> expected = convertMultiValue(values[i]);
+                            @SuppressWarnings("unchecked")
+                            List<String> got = (List<String>) getFieldValue(fieldName);
+                            if (expected.size() != got.size())
                             {
                                 return false;
                             }
-                            for (int j = 0; j < expected.length; j++)
+                            for (int j = 0; j < expected.size(); j++)
                             {
-                                if (!ObjectUtils.equals(expected[j], gotValues[j]))
+                                if (!ObjectUtils.equals(expected.get(j), got.get(j)))
                                 {
                                     return false;
                                 }
@@ -452,26 +441,23 @@ public abstract class SeleniumForm
 
     public void setMultiValues(String name, String values)
     {
-        String[] set = convertMultiValue(values);
+        List<String> set = convertMultiValue(values);
 
-        String fieldLocator = getFieldId(name);
+        String fieldId = getFieldId(name);
         for (String value : set)
         {
-            browser.addSelection(fieldLocator, "value=" + value);
+            browser.addSelection(fieldId, "value=" + value);
         }
     }
 
-    public String[] convertMultiValue(String values)
+    public List<String> convertMultiValue(String values)
     {
-        String[] set;
+        List<String> set = new LinkedList<String>();
         if (values.length() > 0)
         {
-            set = values.split(",");
+            set.addAll(Arrays.asList(values.split(",")));
         }
-        else
-        {
-            set = new String[0];
-        }
+
         return set;
     }
 
@@ -501,7 +487,7 @@ public abstract class SeleniumForm
 
     public void triggerEvent(String fieldName, String eventType)
     {
-        browser.evalExpression("var field = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('" + eventType + "', field);");
+        browser.evaluateScript("var field = Ext.getCmp('" + getFieldId(fieldName) + "'); field.fireEvent('" + eventType + "', field);");
     }
 
     public abstract String getFormName();

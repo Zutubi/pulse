@@ -29,16 +29,16 @@ public class AgentStatisticsPage extends SeleniumPage
 
     public boolean isRecipeStatisticsPresent()
     {
-        return browser.isElementPresent(ID_RECIPE_STATS);
+        return browser.isElementIdPresent(ID_RECIPE_STATS);
     }
 
     public boolean isUsageStatisticsPresent()
     {
-        return browser.isElementPresent(ID_USAGE_STATS);
+        return browser.isElementIdPresent(ID_USAGE_STATS);
     }
 
     public boolean isUsageChartPresent()
     {
-        return browser.isElementPresent(ID_USAGE_CHART);
+        return browser.isElementIdPresent(ID_USAGE_CHART);
     }
 }

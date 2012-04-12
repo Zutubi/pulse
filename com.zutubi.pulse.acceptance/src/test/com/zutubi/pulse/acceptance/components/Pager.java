@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.components;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.Pager JS component.
@@ -26,7 +27,7 @@ public class Pager extends Component
      */
     public int getTotalItems()
     {
-        String text = browser.getText(id + ID_SUFFIX_TOTAL);
+        String text = browser.getText(By.id(id + ID_SUFFIX_TOTAL));
         String[] pieces = text.trim().split("\\s+");
         return Integer.parseInt(pieces[0]);
     }
@@ -36,9 +37,9 @@ public class Pager extends Component
      * 
      * @return the current page index
      */
-    public int getCurrentPage()
+    public long getCurrentPage()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.currentPage"));
+        return (Long) browser.evaluateScript("return " + getComponentJS() + ".data.currentPage;");
     }
 
     /**
@@ -66,7 +67,7 @@ public class Pager extends Component
      */
     public void clickFirst()
     {
-        browser.click(id + ID_SUFFIX_FIRST);
+        browser.click(By.id(id + ID_SUFFIX_FIRST));
     }
     
     /**
@@ -84,7 +85,7 @@ public class Pager extends Component
      */
     public void clickPrevious()
     {
-        browser.click(id + ID_SUFFIX_PREVIOUS);
+        browser.click(By.id(id + ID_SUFFIX_PREVIOUS));
     }
     
     /**
@@ -102,7 +103,7 @@ public class Pager extends Component
      */
     public void clickNext()
     {
-        browser.click(id + ID_SUFFIX_NEXT);
+        browser.click(By.id(id + ID_SUFFIX_NEXT));
     }
 
     /**
@@ -120,6 +121,6 @@ public class Pager extends Component
      */
     public void clickLast()
     {
-        browser.click(id + ID_SUFFIX_LAST);
+        browser.click(By.id(id + ID_SUFFIX_LAST));
     }
 }

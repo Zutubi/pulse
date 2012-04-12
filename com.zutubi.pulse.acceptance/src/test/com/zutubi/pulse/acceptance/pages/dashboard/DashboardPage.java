@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.xwork.actions.user.UserResponsibilityModel;
 import com.zutubi.util.Condition;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The dashboard page shows a user's configurable dashboard.
@@ -43,7 +44,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // continue to test the link itself on non-Windows systems.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardGroup('" + WebUtils.formUrlEncode(group) + "')");
+            browser.evaluateScript("hideDashboardGroup('" + WebUtils.formUrlEncode(group) + "')");
         }
         else
         {
@@ -64,7 +65,7 @@ public class DashboardPage extends ProjectsSummaryPage
         // As above, a workaround for Selenium/IE issues.
         if (SystemUtils.IS_WINDOWS)
         {
-            browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".hideDashboardProject('" + WebUtils.formUrlEncode(project) + "')");
+            browser.evaluateScript("hideDashboardProject('" + WebUtils.formUrlEncode(project) + "')");
         }
         else
         {
@@ -92,7 +93,7 @@ public class DashboardPage extends ProjectsSummaryPage
 
     public void clearResponsibility(String project)
     {
-        browser.click(getClearResponsibilityId(project));
+        browser.click(By.id(getClearResponsibilityId(project)));
     }
 
     public boolean isClearResponsibilityPresent(String project)

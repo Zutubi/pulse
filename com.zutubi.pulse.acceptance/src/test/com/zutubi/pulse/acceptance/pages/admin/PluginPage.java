@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * The plugin view page.
@@ -26,7 +27,7 @@ public class PluginPage extends SeleniumPage
 
     public String getState()
     {
-        return browser.getText("plugin.status");
+        return browser.getText(By.id("plugin.status"));
     }
 
     public boolean isErrorMessagePresent()
@@ -36,6 +37,6 @@ public class PluginPage extends SeleniumPage
 
     public String getErrorMessage()
     {
-        return browser.getText(ID_PLUGIN_ERROR);
+        return browser.getText(By.id(ID_PLUGIN_ERROR));
     }
 }

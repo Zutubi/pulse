@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.components.pulse.server;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.SummaryTable;
+import org.openqa.selenium.By;
 
 import java.util.Map;
 
@@ -28,8 +29,8 @@ public class QueuedBuildsTable extends SummaryTable
      */
     public void clickCancel(int index)
     {
-        String id = browser.evalExpression(getComponentJS() + ".data[" + index + "].id");
-        browser.click("cancel-" + id + "-button");        
+        long id = (Long) browser.evaluateScript("return " + getComponentJS() + ".data[" + index + "].id;");
+        browser.click(By.id("cancel-" + id + "-button"));        
     }
 
     /**

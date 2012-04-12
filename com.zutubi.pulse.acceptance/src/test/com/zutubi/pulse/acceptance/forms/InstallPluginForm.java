@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  */
@@ -29,12 +30,12 @@ public class InstallPluginForm
 
     public void cancel()
     {
-        browser.click(ID_CANCEL);
+        browser.click(By.id(ID_CANCEL));
     }
     
     public void continueFormElements(String path)
     {
-        browser.type(ID_PATH_FIELD, path);
-        browser.click(ID_CONTINUE);
+        browser.type(By.id(ID_PATH_FIELD), path);
+        browser.click(By.id(ID_CONTINUE));
     }
 }

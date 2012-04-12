@@ -1,9 +1,10 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.IDs;
+import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.DependencyForm;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * The project dependencies page.
@@ -17,7 +18,7 @@ public class ProjectDependenciesPage extends CompositePage
 
     public DependencyForm clickAdd()
     {
-        browser.click(ListPage.ADD_LINK);
+        browser.click(By.id(ListPage.ADD_LINK));
         return browser.createForm(DependencyForm.class);
     }
 
@@ -43,11 +44,11 @@ public class ProjectDependenciesPage extends CompositePage
     public DependencyForm clickView(String baseName)
     {
         String actionId = ListPage.ACTION_VIEW + ":" + baseName;
-        if (!browser.isElementPresent(actionId))
+        if (!browser.isElementIdPresent(actionId))
         {
             throw new RuntimeException();
         }
-        browser.click(actionId);
+        browser.click(By.id(actionId));
         return browser.createForm(DependencyForm.class);
     }
 

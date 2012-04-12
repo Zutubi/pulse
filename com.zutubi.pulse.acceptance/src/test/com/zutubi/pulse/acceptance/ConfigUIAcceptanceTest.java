@@ -2,39 +2,39 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
-import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.IOUtils;
-
-import java.util.*;
-
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
 import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Condition;
+import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
+import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
+import org.openqa.selenium.By;
+
+import java.util.*;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -74,8 +74,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().open(urls.adminProject(uriComponentEncode(random)) + Constants.Project.BOOTSTRAP);
         BootstrapForm form = getBrowser().createForm(BootstrapForm.class);
         form.waitFor();
-        String[] options = form.getComboBoxOptions(Constants.Project.Bootstrap.CHECKOUT_TYPE);
-        assertEquals("", options[0]);
+        List<String> options = form.getComboBoxOptions(Constants.Project.Bootstrap.CHECKOUT_TYPE);
+        assertEquals("", options.get(0));
     }
 
     public void testDeleteListItemFromTemplateChild() throws Exception
@@ -235,7 +235,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         listPage.waitFor();
         assertEquals("[view]", listPage.getCellContent(0, 1));
 
-        getBrowser().click("link=view");
+        By viewLink = By.linkText("view");
+        getBrowser().click(viewLink);
         ProjectAclForm form = getBrowser().createForm(ProjectAclForm.class);
         form.waitFor();
         assertTrue(form.checkFormValues("all users", "view"));
@@ -243,7 +244,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         listPage.waitFor();
 
         assertEquals("[]", listPage.getCellContent(0, 1));
-        getBrowser().click("link=view");
+        getBrowser().click(viewLink);
         form = getBrowser().createForm(ProjectAclForm.class);
         form.waitFor();
         assertTrue(form.checkFormValues("all users", ""));
@@ -533,7 +534,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         childHierarchyPage.waitFor();
         ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
         configPage.waitFor();
-        getBrowser().waitForLocator(configPage.getTreeLinkLocator("subversion configuration"));
+        getBrowser().waitForElement(By.xpath(configPage.getTreeLinkXPath("subversion configuration")));
         CompositePage scmPage = configPage.clickComposite("scm", "subversion configuration");
         scmPage.waitFor();
         SubversionForm subversionForm = getBrowser().createForm(SubversionForm.class);
@@ -842,8 +843,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, true);
 
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
-        String treeLink = configPage.getTreeLinkLocator("subversion configuration");
-        getBrowser().waitForLocator(treeLink);
+        By treeLink = By.xpath(configPage.getTreeLinkXPath("subversion configuration"));
+        getBrowser().waitForElement(treeLink);
         getBrowser().click(treeLink);
 
         SubversionForm subversionForm = getBrowser().createForm(SubversionForm.class);
@@ -860,7 +861,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.admin() + "scopish/");
         getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'scopish': references non-existant root scope 'scopish'", getBrowser().getText(IDs.ACTION_ERRORS));
+        assertEquals("Invalid path 'scopish': references non-existant root scope 'scopish'", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInvalidPathNonExistantCollectionItem() throws Exception
@@ -868,7 +869,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminUser("nosuchuser"));
         getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection", getBrowser().getText(IDs.ACTION_ERRORS));
+        assertEquals("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInvalidPathNonExistantTemplateItem() throws Exception
@@ -876,7 +877,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject("nosuchproject"));
         getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection", getBrowser().getText(IDs.ACTION_ERRORS));
+        assertEquals("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInvalidPathNonExistantProperty() throws Exception
@@ -884,7 +885,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
         getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'", getBrowser().getText(IDs.ACTION_ERRORS));
+        assertEquals("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'",
+                getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInvalidPathSimpleProperty() throws Exception
@@ -892,7 +894,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
         getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/global project template/name': references non-complex type", getBrowser().getText(IDs.ACTION_ERRORS));
+        assertEquals("Invalid path 'projects/global project template/name': references non-complex type", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInstanceErrorsDisplayed() throws Exception
@@ -922,7 +924,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().open(urls.adminSettings());
         ServerSettingsForm form = getBrowser().createForm(ServerSettingsForm.class);
         form.waitFor();
-        String originalUrl = form.getFieldValue("baseHelpUrl");
+        String originalUrl = (String) form.getFieldValue("baseHelpUrl");
         form.resetFormElements(null, null, "http://somehelpurl.com/" + random, null, null, null, null, null, null);
 
         form.waitFor();
@@ -941,7 +943,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         versionedType.put(Constants.Project.VersionedType.PULSE_FILE_NAME, "invalid.xml");
         rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), versionedType);
 
-        checkListedRecipes("");
+        checkListedRecipes();
     }
 
     public void testPunctuatedProjectName()
@@ -1204,8 +1206,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         BuildStageForm stageForm = getBrowser().createForm(BuildStageForm.class, false);
         stageForm.waitFor();
-        String[] stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
-        assertEquals(asList(expectedRecipes), asList(stages));
+        List<String> stages = stageForm.getComboBoxOptions(Constants.Project.Stage.RECIPE);
+        assertEquals(asList(expectedRecipes), stages);
     }
 
     private void insertProperty(String projectPath) throws Exception

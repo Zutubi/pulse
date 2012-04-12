@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * Abstract base for pages that show the user responsible for a build.
@@ -23,7 +24,7 @@ public abstract class ResponsibilityPage extends SeleniumPage
     {
         try
         {
-            return browser.isVisible(ID_RESPONSIBLE_PANEL);
+            return browser.isVisible(By.id(ID_RESPONSIBLE_PANEL));
         }
         catch (Exception e)
         {
@@ -36,14 +37,14 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public String getResponsibleMessage()
     {
-        return browser.getText(ID_RESPONSIBLE_MESSAGE);
+        return browser.getText(By.id(ID_RESPONSIBLE_MESSAGE));
     }
 
     public String getResponsibleComment()
     {
         if (browser.isElementIdPresent(ID_RESPONSIBLE_COMMENT))
         {
-            return browser.getText(ID_RESPONSIBLE_COMMENT);
+            return browser.getText(By.id(ID_RESPONSIBLE_COMMENT));
         }
         else
         {
@@ -53,7 +54,7 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public void clickClearResponsible()
     {
-        browser.click(ID_RESPONSIBLE_CLEAR);
+        browser.click(By.id(ID_RESPONSIBLE_CLEAR));
     }
 
     public boolean isClearResponsibilityPresent()
@@ -73,6 +74,6 @@ public abstract class ResponsibilityPage extends SeleniumPage
 
     public void clickAction(String actionName)
     {
-        browser.click(getActionId(actionName));
+        browser.click(By.id(getActionId(actionName)));
     }
 }

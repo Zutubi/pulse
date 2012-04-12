@@ -29,6 +29,6 @@ public class BrowsePage extends ProjectsSummaryPage
 
     public boolean isInvalidProjectPresent(String project)
     {
-        return browser.isElementPresent("invalid-" + project);
+        return browser.isElementIdPresent("invalid-" + project);
     }
 }

@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.util.Sort;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,15 +34,15 @@ public class SelectTypeState extends SeleniumForm
         return new int[]{ COMBOBOX };
     }
 
-    public String[] getOptions()
+    public List<String> getOptions()
     {
         return getComboBoxOptions(FIELD_NAME_SELECT);
     }
 
     public List<String> getSortedOptionList()
     {
-        String[] options = getComboBoxOptions(FIELD_NAME_SELECT);
-        Arrays.sort(options, new Sort.StringComparator());
-        return Arrays.asList(options);
+        List<String> options = getComboBoxOptions(FIELD_NAME_SELECT);
+        Collections.sort(options, new Sort.StringComparator());
+        return options;
     }
 }

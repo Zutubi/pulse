@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.components;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.TextBox component.
@@ -13,9 +14,9 @@ public class TextBox extends Component
     }
 
     @Override
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return getComponentJS() + ".el.isDisplayed()";
+        return "return " + getComponentJS() + ".el.isDisplayed();";
     }
 
     /**
@@ -25,6 +26,6 @@ public class TextBox extends Component
      */
     public String getText()
     {
-        return browser.getText(id + "-text");
+        return browser.getText(By.id(id + "-text"));
     }
 }

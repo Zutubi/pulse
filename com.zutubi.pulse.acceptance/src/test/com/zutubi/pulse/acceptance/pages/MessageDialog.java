@@ -1,16 +1,17 @@
 package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  * Base class for dialogs created by Ext.
  */
 public class MessageDialog
 {
-    private static final String LOCATOR_INPUT_SINGLE = "css=input.ext-mb-input";
-    private static final String LOCATOR_INPUT_MULTI = "css=textarea.ext-mb-textarea";
-    private static final String LOCATOR_OK = "css=button:contains('ok')";
-    private static final String LOCATOR_CANCEL = "css=button:contains('cancel')";
+    private static final String SELECTOR_INPUT_SINGLE = "input.ext-mb-input";
+    private static final String SELECTOR_INPUT_MULTI = "textarea.ext-mb-textarea";
+    private static final String XPATH_OK = "//button[contains(text(),'ok')]";
+    private static final String XPATH_CANCEL = "//button[contains(text(),'cancel')]";
 
     private SeleniumBrowser browser;
     private boolean multiline;
@@ -23,31 +24,31 @@ public class MessageDialog
 
     public void waitFor()
     {
-        browser.waitForLocator(LOCATOR_OK);
+        browser.waitForElement(By.xpath(XPATH_OK));
     }
 
     public boolean isVisible()
     {
-        return browser.isVisible(LOCATOR_OK);
+        return browser.isVisible(By.xpath(XPATH_OK));
     }
 
     public void typeInput(String text)
     {
-        browser.type(getInputLocator(), text);
+        browser.type(By.cssSelector(getInputSelector()), text);
     }
 
-    private String getInputLocator()
+    private String getInputSelector()
     {
-        return multiline ? LOCATOR_INPUT_MULTI : LOCATOR_INPUT_SINGLE;
+        return multiline ? SELECTOR_INPUT_MULTI : SELECTOR_INPUT_SINGLE;
     }
 
     public void clickOk()
     {
-        browser.click(LOCATOR_OK);
+        browser.click(By.xpath(XPATH_OK));
     }
 
     public void clickCancel()
     {
-        browser.click(LOCATOR_CANCEL);
+        browser.click(By.xpath(XPATH_CANCEL));
     }
 }

@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
+import org.openqa.selenium.By;
 
 public class ConvertToVersionedForm extends ConfigurationForm
 {
@@ -32,12 +33,12 @@ public class ConvertToVersionedForm extends ConfigurationForm
 
     public PulseFileSystemBrowserWindow clickBrowsePulseFileName()
     {
-        browser.click(getBrowseLinkId(FIELD_PULSE_FILE_NAME));
+        browser.click(By.id(getBrowseLinkId(FIELD_PULSE_FILE_NAME)));
         return new PulseFileSystemBrowserWindow(browser);
     }
 
     public String getPulseFileNameFieldValue()
     {
-        return getFieldValue(FIELD_PULSE_FILE_NAME);
+        return (String) getFieldValue(FIELD_PULSE_FILE_NAME);
     }
 }

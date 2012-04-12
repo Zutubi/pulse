@@ -10,6 +10,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -124,7 +125,7 @@ public class BuildChangesPage extends SeleniumPage
             int filesCount = getFilesCount(i + 1);
             for (int j = 0; j < filesCount; j++)
             {
-                String fileString = browser.getText(getChangelistFileId(i + 1, j + 1));
+                String fileString = browser.getText(By.id(getChangelistFileId(i + 1, j + 1)));
                 Matcher matcher = FILE_CHANGE_PATTERN.matcher(fileString);
                 if (!matcher.matches())
                 {
@@ -141,7 +142,7 @@ public class BuildChangesPage extends SeleniumPage
                     new Revision(headerPieces[0]),
                     0,
                     headerPieces[1],
-                    browser.getText(getChangelistCommentId(i + 1)),
+                    browser.getText(By.id(getChangelistCommentId(i + 1))),
                     fileChanges
             );
 
@@ -153,7 +154,7 @@ public class BuildChangesPage extends SeleniumPage
 
     public boolean isCompareToPopDownPresent()
     {
-        return browser.isElementPresent(ID_COMPARE_TO_POPUP_BUTTON);
+        return browser.isElementIdPresent(ID_COMPARE_TO_POPUP_BUTTON);
     }
     
     /**
@@ -163,6 +164,6 @@ public class BuildChangesPage extends SeleniumPage
      */
     public void clickCompareToPopDown()
     {
-        browser.click(ID_COMPARE_TO_POPUP_BUTTON);
+        browser.click(By.id(ID_COMPARE_TO_POPUP_BUTTON));
     }
 }

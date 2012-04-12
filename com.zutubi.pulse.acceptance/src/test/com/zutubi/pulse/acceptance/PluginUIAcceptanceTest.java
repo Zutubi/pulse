@@ -10,6 +10,7 @@ import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AG
 import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import org.openqa.selenium.By;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
+        getBrowser().waitForElement(By.id(pluginsPage.getActionId(ACTION_ENABLE, id)));
 
         assertEquals(STATE_DISABLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -140,11 +141,11 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickDisable(id);
 
-        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_ENABLE, id));
+        getBrowser().waitForElement(By.id(pluginsPage.getActionId(ACTION_ENABLE, id)));
 
         pluginsPage.clickEnable(id);
 
-        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_DISABLE, id));
+        getBrowser().waitForElement(By.id(pluginsPage.getActionId(ACTION_DISABLE, id)));
 
         assertEquals(STATE_ENABLED, pluginsPage.getPluginState(id));
         assertTrue(pluginsPage.isActionPresent(id, ACTION_DISABLE));
@@ -161,7 +162,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickUninstall(id);
 
-        getBrowser().waitForLocator(pluginsPage.getActionId(ACTION_UNINSTALL, id), true);
+        getBrowser().waitForElement(By.id(pluginsPage.getActionId(ACTION_UNINSTALL, id)), true);
 
         assertEquals(STATE_UNINSTALLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_ENABLE));

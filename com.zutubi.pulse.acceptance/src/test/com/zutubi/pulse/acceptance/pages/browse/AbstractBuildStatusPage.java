@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Pair;
+import org.openqa.selenium.By;
 
 /**
  * Abstract base for pages that show build status information.
@@ -24,7 +25,7 @@ public abstract class AbstractBuildStatusPage extends ResponsibilityPage
 
     public boolean isBuildBasicsPresent()
     {
-        return browser.isElementPresent(ID_BUILD_BASICS);
+        return browser.isElementIdPresent(ID_BUILD_BASICS);
     }
 
     public Pair<String, String> getBuildBasicsRow(int index)
@@ -39,7 +40,7 @@ public abstract class AbstractBuildStatusPage extends ResponsibilityPage
 
     public String getBasicsValue(String key)
     {
-        return browser.getText(getBasicsId(key));
+        return browser.getText(By.id(getBasicsId(key)));
     }
 
     private String getBasicsId(String key)
@@ -49,7 +50,7 @@ public abstract class AbstractBuildStatusPage extends ResponsibilityPage
     
     public boolean isFeaturesTablePresent(Feature.Level level)
     {
-        return browser.isElementPresent("features-" + level.getPrettyString());
+        return browser.isElementIdPresent("features-" + level.getPrettyString());
     }
 
     protected Pair<String, String> getRow(String tableId, int index)

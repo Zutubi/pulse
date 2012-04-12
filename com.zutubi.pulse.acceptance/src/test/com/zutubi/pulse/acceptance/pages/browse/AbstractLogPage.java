@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ public abstract class AbstractLogPage extends SeleniumPage
 
     public void clickDownloadLink()
     {
-        browser.click(ID_DOWNLOAD_FULL_LOG);
+        browser.click(By.id(ID_DOWNLOAD_FULL_LOG));
     }
 
     /**
@@ -37,7 +38,7 @@ public abstract class AbstractLogPage extends SeleniumPage
      */
     public String getLog()
     {
-        return browser.getText(getId());
+        return browser.getText(By.id(getId()));
     }
 
     public boolean logContains(String text)
@@ -63,7 +64,7 @@ public abstract class AbstractLogPage extends SeleniumPage
      */
     public TailSettingsDialog clickConfigureAndWaitForDialog()
     {
-        browser.click(ID_CONFIGURE);
+        browser.click(By.id(ID_CONFIGURE));
         TailSettingsDialog tailSettingsDialog = new TailSettingsDialog(browser);
         tailSettingsDialog.waitFor();
         return tailSettingsDialog;
@@ -77,7 +78,7 @@ public abstract class AbstractLogPage extends SeleniumPage
     public int getMaxLines()
     {
         Pattern pattern = Pattern.compile("max (\\d+) lines");
-        String text = browser.getText(ID_SETTINGS);
+        String text = browser.getText(By.id(ID_SETTINGS));
         Matcher matcher = pattern.matcher(text);
         matcher.find();
         return Integer.parseInt(matcher.group(1));

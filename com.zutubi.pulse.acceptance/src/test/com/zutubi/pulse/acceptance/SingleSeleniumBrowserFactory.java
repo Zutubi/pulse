@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import org.openqa.selenium.remote.UnreachableBrowserException;
+
 /**
  * The single selenium browser factory will only create a single browser
  * and return the same instance on request via {@link #newBrowser()}.
@@ -21,8 +23,6 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
         if (browser == null)
         {
             browser = new SeleniumBrowser();
-            browser.start();
-
         }
         return browser;
     }
@@ -31,24 +31,32 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
     {
         if (browser != null)
         {
-            if (browser.getPulsePort() == AcceptanceTestUtils.getPulsePort())
+            try
             {
-                // Reuse this browser.
-                browser.open(browser.getUrls().base());
-                browser.waitForPageToLoad();
-            
-                if (browser.isLoggedIn())
+                if (browser.getPulsePort() == AcceptanceTestUtils.getPulsePort())
                 {
-                    browser.logout();
+                    // Reuse this browser.
+                    browser.open(browser.getUrls().base());
+                    browser.waitForPageToLoad();
+                
+                    if (browser.isLoggedIn())
+                    {
+                        browser.logout();
+                    }
+                
+                    browser.open(browser.getUrls().base());
+                    browser.waitForPageToLoad();
                 }
-            
-                browser.open(browser.getUrls().base());
-                browser.waitForPageToLoad();
+                else
+                {
+                    // Force creation of a new browser.
+                    browser.quit();
+                    browser = null;
+                }
             }
-            else
+            catch (UnreachableBrowserException e)
             {
-                // Force creation of a new browser.
-                browser.stop();
+                // The browser looks to have died of its own accord.
                 browser = null;
             }
         }
@@ -59,7 +67,7 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
         cleanup();
         if (browser != null)
         {
-            browser.stop();
+            browser.quit();
             browser = null;
         }
     }

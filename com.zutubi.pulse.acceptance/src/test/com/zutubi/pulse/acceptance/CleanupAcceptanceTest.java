@@ -7,12 +7,12 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
+import org.openqa.selenium.By;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * The set of acceptance tests for the projects cleanup configuration.
@@ -390,7 +390,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         page.resetFilter();
 
         // if artifacts are available, we should have the build command open in the tree.
-        getBrowser().waitForLocator(page.getArtifactLocator("environment"));
+        getBrowser().waitForElement(By.xpath(page.getArtifactXPath("environment")));
         return page.isArtifactAvailable("environment");
     }
 

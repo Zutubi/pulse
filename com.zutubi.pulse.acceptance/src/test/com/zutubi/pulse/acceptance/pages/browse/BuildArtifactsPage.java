@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.vfs.provider.pulse.ArtifactFileObject;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The artifacts tab for a build result.
@@ -13,14 +14,14 @@ public class BuildArtifactsPage extends SeleniumPage
 {
     private static final String ID_TREE = "artifacts-tree";
     private static final String ID_COMBO = "filter-combo";
-    private static final String EXPRESSION_COMBO = "var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + ID_COMBO + "');";
+    private static final String EXPRESSION_COMBO = "var combo = Ext.getCmp('" + ID_COMBO + "');";
 
     private String projectName;
     private long buildId;
 
     public BuildArtifactsPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId)
     {
-        super(browser, urls, "artifacts-tree", "build " + buildId);
+        super(browser, urls, ID_TREE, "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }
@@ -39,7 +40,7 @@ public class BuildArtifactsPage extends SeleniumPage
 
     private void waitForLoad()
     {
-        browser.waitForCondition("var win = " + SeleniumBrowser.CURRENT_WINDOW + "; win.Ext && win.Ext.getCmp('artifacts-tree') && win.Ext.getCmp('artifacts-tree').loading === false");
+        browser.waitForCondition("return Ext && Ext.getCmp('artifacts-tree') && Ext.getCmp('artifacts-tree').loading === false");
     }
 
     /**
@@ -49,7 +50,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public String getCurrentFilter()
     {
-        return browser.evalExpression(EXPRESSION_COMBO + "combo.getValue();");
+        return (String) browser.evaluateScript(EXPRESSION_COMBO + " return combo.getValue();");
     }
 
     /**
@@ -77,28 +78,28 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public void clickSaveFilterAndWait()
     {
-        browser.click("save-filter-link");
+        browser.click(By.id("save-filter-link"));
         browser.waitForStatus("Filter saved.");
     }
 
     /**
-     * Generate the selenium locator for the named command node on the build artifacts page.
+     * Generate the link text for the named command node on the build artifacts page.
      *
      * @param command name of the command in question.
-     * @return the selenium locator for the command node
+     * @return the link text for the command node
      */
-    public String getCommandLocator(String command)
+    public String getCommandLinkText(String command)
     {
-        return "link=*command*::*" + command + "*";
+        return "command :: " + command;
     }
 
     /**
-     * Generate the selenium locator for a named artifact node on the build artifacts page.
+     * Generate the XPath expression for a named artifact node on the build artifacts page.
      *
      * @param artifact name of the artifact in question
-     * @return the selenium locator for the artifact node.
+     * @return the xpath expression for the artifact node.
      */
-    public String getArtifactLocator(String artifact)
+    public String getArtifactXPath(String artifact)
     {
         return "//a[contains(@class, 'x-tree-node-anchor')]/span[text()='" + artifact + "']";
     }
@@ -114,7 +115,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactListed(String artifactName)
     {
-        return browser.isElementPresent(getArtifactLocator(artifactName));
+        return browser.isElementPresent(By.xpath(getArtifactXPath(artifactName)));
     }
 
     /**
@@ -126,7 +127,7 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactAvailable(String artifactName)
     {
-        String iconCls = browser.getAttribute(getArtifactLocator(artifactName) + "/preceding::img[1]/@class");
+        String iconCls = browser.getAttribute(By.xpath(getArtifactXPath(artifactName) + "/preceding::img[1]"), "class");
         return !iconCls.contains(ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_BROKEN);
     }
 
@@ -141,12 +142,12 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public boolean isArtifactFileListed(String artifactName, String fileName)
     {
-        return browser.isElementPresent(getArtifactFileLocator(artifactName, fileName));
+        return browser.isElementPresent(By.xpath(getArtifactFileXPath(artifactName, fileName)));
     }
 
-    private String getArtifactFileLocator(String artifactName, String fileName)
+    private String getArtifactFileXPath(String artifactName, String fileName)
     {
-        return getArtifactLocator(artifactName) + "/ancestor::tbody[1]" + getArtifactLocator(fileName);
+        return getArtifactXPath(artifactName) + "/ancestor::tbody[1]" + getArtifactXPath(fileName);
     }
 
     /**
@@ -158,8 +159,8 @@ public class BuildArtifactsPage extends SeleniumPage
      */
     public String getArtifactFileHash(String artifactName, String fileName)
     {
-        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]/td[contains(@class, 'artifact-hash')]/div";
-        return browser.getText(locator).trim();
+        String xpath = getArtifactFileXPath(artifactName, fileName) + "/ancestor::tr[1]/td[contains(@class, 'artifact-hash')]/div";
+        return browser.getText(By.xpath(xpath)).trim();
     }
 
     /**
@@ -175,7 +176,7 @@ public class BuildArtifactsPage extends SeleniumPage
 
     private void clickArtifactFileAction(String artifactName, String fileName, String type)
     {
-        String locator = getArtifactFileLocator(artifactName, fileName) + "/ancestor::tr[1]//img[@alt='" + type + "']";
-        browser.click(locator);
+        String xpath = getArtifactFileXPath(artifactName, fileName) + "/ancestor::tr[1]//img[@alt='" + type + "']";
+        browser.click(By.xpath(xpath));
     }
 }

@@ -13,9 +13,9 @@ public class ContentTable extends Component
         super(browser, id);
     }
     
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return getComponentJS() + ".dataExists()";
+        return "return " + getComponentJS() + ".dataExists();";
     }
 
     /**
@@ -25,7 +25,7 @@ public class ContentTable extends Component
      */
     public String getTitle()
     {
-        return browser.evalExpression(getComponentJS() + ".title");
+        return (String) browser.evaluateScript("return " + getComponentJS() + ".title");
     }
 
     /**
@@ -33,9 +33,9 @@ public class ContentTable extends Component
      * 
      * @return the data length
      */
-    public int getDataLength()
+    public long getDataLength()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data.length"));
+        return (Long)(browser.evaluateScript("return " + getComponentJS() + ".data.length;"));
     }
 
     /**

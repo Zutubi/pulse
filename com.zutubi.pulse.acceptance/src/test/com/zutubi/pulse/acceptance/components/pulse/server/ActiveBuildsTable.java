@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.components.pulse.server;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.ContentTable;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import org.openqa.selenium.By;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,7 +25,7 @@ public class ActiveBuildsTable extends ContentTable
      *
      * @return the number of builds displayed
      */
-    public int getBuildCount()
+    public long getBuildCount()
     {
         return getDataLength();
     }
@@ -38,6 +39,9 @@ public class ActiveBuildsTable extends ContentTable
      */
     public ActiveBuild getBuild(int buildIndex)
     {
+        // We need to ensure the stage rows are visible to get their text.
+        expandAll();
+        
         int rowIndex = getRowIndexForBuild(buildIndex);
         String name = getCellContents(rowIndex, 0);
         String[] ownerId = name.split(" :: ");
@@ -46,12 +50,17 @@ public class ActiveBuildsTable extends ContentTable
         String actions = getCellContents(rowIndex, 3);
 
         ActiveBuild build = new ActiveBuild(ownerId[0], Integer.parseInt(ownerId[1].substring(6)), state, details.get("revision"), details.get("reason"), actions.contains("cancel"));
-        int stageCount = getStageCount(buildIndex);
+        long stageCount = getStageCount(buildIndex);
         for (int i = 0; i < stageCount; i++)
         {
             build.addStage(getStage(rowIndex + i + 1));
         }
         return build;
+    }
+
+    private void expandAll()
+    {
+        browser.evaluateScript(getComponentJS() + ".expandAll()");
     }
 
     private ActiveStage getStage(int rowIndex)
@@ -74,9 +83,9 @@ public class ActiveBuildsTable extends ContentTable
         return rowIndex;
     }
 
-    private int getStageCount(int buildIndex)
+    private long getStageCount(int buildIndex)
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".data[" + buildIndex + "].stages.length"));
+        return (Long) browser.evaluateScript("return " + getComponentJS() + ".data[" + buildIndex + "].stages.length;");
     }
 
     /**
@@ -86,8 +95,8 @@ public class ActiveBuildsTable extends ContentTable
      */
     public void clickCancel(int index)
     {
-        String id = browser.evalExpression(getComponentJS() + ".data[" + index + "].id");
-        browser.click("cancel-" + id + "-button");
+        Long id = (Long) browser.evaluateScript("return " + getComponentJS() + ".data[" + index + "].id;");
+        browser.click(By.id("cancel-" + id + "-button"));
     }
 
     private Map<String, String> parseDetails(String details)

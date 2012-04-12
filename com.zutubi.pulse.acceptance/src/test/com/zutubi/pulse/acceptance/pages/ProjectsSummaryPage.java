@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,8 +47,8 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public void clickProjectAction(String group, String project, String action)
     {
-        browser.click(getProjectMenuId(group, project) + "-link");
-        browser.waitAndClick(getProjectActionId(group, project, action));
+        browser.click(By.id(getProjectMenuId(group, project) + "-link"));
+        browser.waitAndClick(By.id(getProjectActionId(group, project, action)));
     }
 
     public String getGroupActionId(String group, String action)
@@ -62,7 +63,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
 
     public void clickGroupAction(String group, String action)
     {
-        browser.click(getGroupActionId(group, action));
+        browser.click(By.id(getGroupActionId(group, action)));
     }
 
     public String getGroupId(String group)
@@ -96,7 +97,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
     {
         String id = getProjectRowId(group, templateName) + ".building";
         browser.waitForElement(id);
-        return browser.getText(id);
+        return browser.getText(By.id(id));
     }
     
     public List<Long> getBuildIds(String group, String projectName)
@@ -106,7 +107,7 @@ public abstract class ProjectsSummaryPage extends SeleniumPage
         String rowId = getBuildLinkId(group, projectName, buildIndex);
         while (browser.isElementIdPresent(rowId))
         {
-            result.add(Long.parseLong(browser.getText(rowId).split("\\s+")[1]));
+            result.add(Long.parseLong(browser.getText(By.id(rowId)).split("\\s+")[1]));
             buildIndex++;
             rowId = getBuildLinkId(group, projectName, buildIndex);
         }

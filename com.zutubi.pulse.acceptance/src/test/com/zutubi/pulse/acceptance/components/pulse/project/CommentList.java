@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.components.pulse.project;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.Component;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.pulse.project.CommentList JS component.
@@ -14,9 +15,9 @@ public class CommentList extends Component
     }
 
     @Override
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return "var data = " + getComponentJS() + ".data; data && data.length > 0";
+        return "var data = " + getComponentJS() + ".data; return data && data.length > 0;";
     }
 
     /**
@@ -48,7 +49,7 @@ public class CommentList extends Component
      */
     public void clickDeleteLink(long commentId)
     {
-        browser.click(getDeleteLinkId(commentId));
+        browser.click(By.id(getDeleteLinkId(commentId)));
     }
 
     private String getDeleteLinkId(long commentId)

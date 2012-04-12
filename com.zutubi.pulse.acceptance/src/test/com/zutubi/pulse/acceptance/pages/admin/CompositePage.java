@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriPathEncode;
-import static java.util.Arrays.asList;
+import org.openqa.selenium.By;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class CompositePage extends ConfigPage
 
     public void clickConfigure()
     {
-        browser.click(CONFIGURE_LINK);
+        browser.click(By.id(CONFIGURE_LINK));
     }
 
     public String getActionId(String action)
@@ -67,7 +67,7 @@ public class CompositePage extends ConfigPage
 
     public void clickAction(String action)
     {
-        browser.click(getActionId(action));
+        browser.click(By.id(getActionId(action)));
     }
 
     public void clickActionAndWait(String action)
@@ -78,7 +78,7 @@ public class CompositePage extends ConfigPage
 
     public boolean isDescendantActionsPresent()
     {
-        return browser.isElementPresent("descendant.actions");
+        return browser.isElementIdPresent("descendant.actions");
     }
 
     public String getDescendantActionId(String action)
@@ -88,12 +88,12 @@ public class CompositePage extends ConfigPage
 
     public boolean isDescendantActionPresent(String action)
     {
-        return browser.isElementPresent(getDescendantActionId(action));
+        return browser.isElementIdPresent(getDescendantActionId(action));
     }
 
     public void clickDescendantAction(String action)
     {
-        browser.click(getDescendantActionId(action));
+        browser.click(By.id(getDescendantActionId(action)));
     }
 
     public void clickDescendantActionAndWait(String action)
@@ -130,7 +130,7 @@ public class CompositePage extends ConfigPage
 
     public void clickLink(String name)
     {
-        browser.click(getLinkId(name));
+        browser.click(By.id(getLinkId(name)));
     }
 
     private String getLinkId(String name)
@@ -140,12 +140,12 @@ public class CompositePage extends ConfigPage
 
     public boolean isAncestorNavigationPresent()
     {
-        return browser.isElementPresent(ID_ANCESTOR_NAV);
+        return browser.isElementIdPresent(ID_ANCESTOR_NAV);
     }
 
     public List<String> getAncestorNavigationOptions()
     {
-        return asList(browser.getComboOptions(ID_ANCESTOR_COMBO));
+        return browser.getComboOptions(ID_ANCESTOR_COMBO);
     }
     
     public CompositePage navigateToAncestorAndWait(String ancestor)
@@ -155,12 +155,12 @@ public class CompositePage extends ConfigPage
 
     public boolean isDescendantNavigationPresent()
     {
-        return browser.isElementPresent(ID_DESCENDANT_NAV);
+        return browser.isElementIdPresent(ID_DESCENDANT_NAV);
     }
 
     public List<String> getDescendantNavigationOptions()
     {
-        return asList(browser.getComboOptions(ID_DESCENDANT_COMBO));
+        return browser.getComboOptions(ID_DESCENDANT_COMBO);
     }
 
     public CompositePage navigateToDescendantAndWait(String ancestor)

@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
+import org.openqa.selenium.By;
 
 /**
  * Form for configuration of ant commands.
@@ -25,12 +26,12 @@ public class AntCommandForm extends ConfigurationForm
 
     public String getWorkingDirectoryFieldValue()
     {
-        return getFieldValue(FIELD_WORKING_DIR);
+        return (String) getFieldValue(FIELD_WORKING_DIR);
     }
 
     public String getBuildFileFieldValue()
     {
-        return getFieldValue(FIELD_BUILD_FILE);
+        return (String) getFieldValue(FIELD_BUILD_FILE);
     }
 
     public boolean isBrowseWorkingDirectoryLinkPresent()
@@ -45,13 +46,13 @@ public class AntCommandForm extends ConfigurationForm
 
     public PulseFileSystemBrowserWindow clickBrowseWorkingDirectory()
     {
-        browser.click(getBrowseLinkId(FIELD_WORKING_DIR));
+        browser.click(By.id(getBrowseLinkId(FIELD_WORKING_DIR)));
         return new PulseFileSystemBrowserWindow(browser);
     }
 
     public PulseFileSystemBrowserWindow clickBrowseBuildFile()
     {
-        browser.click(getBrowseLinkId(FIELD_BUILD_FILE));
+        browser.click(By.id(getBrowseLinkId(FIELD_BUILD_FILE)));
         return new PulseFileSystemBrowserWindow(browser);
     }
 }

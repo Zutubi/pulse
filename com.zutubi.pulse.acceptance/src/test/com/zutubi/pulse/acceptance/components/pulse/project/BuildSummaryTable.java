@@ -25,7 +25,7 @@ public class BuildSummaryTable extends SummaryTable
     public List<BuildInfo> getBuilds()
     {
         List<BuildInfo> result = new LinkedList<BuildInfo>();
-        int count = getRowCount();
+        long count = getRowCount();
         for (int i = 0; i < count; i++)
         {
             result.add(new BuildInfo(getRow(i)));

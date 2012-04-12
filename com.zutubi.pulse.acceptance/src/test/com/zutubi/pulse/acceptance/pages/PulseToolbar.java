@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  * The Pulse toolbar is the toolbar at the very top of the Pulse page,
@@ -44,7 +45,7 @@ public class PulseToolbar
 
     public void clickNextSuccessfulBuildLink()
     {
-        browser.click(ID_NEXT_SUCCESSFUL_LINK);
+        browser.click(By.id(ID_NEXT_SUCCESSFUL_LINK));
     }
 
     public boolean isPreviousSuccessfulBuildLinkPresent()
@@ -54,7 +55,7 @@ public class PulseToolbar
 
     public void clickPreviousSuccessfulBuildLink()
     {
-        browser.click(ID_PREVIOUS_SUCCESSFUL_LINK);
+        browser.click(By.id(ID_PREVIOUS_SUCCESSFUL_LINK));
     }
 
     public boolean isNextBrokenBuildLinkPresent()
@@ -64,7 +65,7 @@ public class PulseToolbar
 
     public void clickNextBrokenBuildLink()
     {
-        browser.click(ID_NEXT_BROKEN_LINK);
+        browser.click(By.id(ID_NEXT_BROKEN_LINK));
     }
 
     public boolean isPreviousBrokenBuildLinkPresent()
@@ -74,7 +75,7 @@ public class PulseToolbar
 
     public void clickPreviousBrokenBuildLink()
     {
-        browser.click(ID_PREVIOUS_BROKEN_LINK);
+        browser.click(By.id(ID_PREVIOUS_BROKEN_LINK));
     }
 
     public boolean isLatestBuildLinkPresent()
@@ -84,12 +85,12 @@ public class PulseToolbar
 
     public void clickLatestBuildLink()
     {
-        browser.click(ID_LATEST_LINK);
+        browser.click(By.id(ID_LATEST_LINK));
     }
 
     public void clickOnNavMenu()
     {
-        this.browser.click(ID_BUILD_MENU);
+        this.browser.click(By.id(ID_BUILD_MENU));
     }
 
     public boolean isBuildNavItemPresent(int buildNumber)
@@ -99,12 +100,12 @@ public class PulseToolbar
 
     public void clickBuildNavItem(int buildNumber)
     {
-        browser.click(PREFIX_ID_BUILD_ITEM + buildNumber);
+        browser.click(By.id(PREFIX_ID_BUILD_ITEM + buildNumber));
     }
 
     public boolean isBuildNavLinkPresent(int buildNumber)
     {
-        return browser.isElementPresent("//span[@id='"+ID_BUILD_LINK+"']/a[text()='build " + buildNumber + "']");
+        return browser.isElementPresent(By.xpath("//span[@id='"+ID_BUILD_LINK+"']/a[text()='build " + buildNumber + "']"));
     }
 
     public boolean isProjectLinkPresent()

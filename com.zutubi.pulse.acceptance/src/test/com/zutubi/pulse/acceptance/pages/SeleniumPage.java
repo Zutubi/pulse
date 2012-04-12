@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-
 import static com.zutubi.util.WebUtils.toValidHtmlName;
 
 /**
@@ -93,7 +92,7 @@ public abstract class SeleniumPage
     
     public boolean isPresent()
     {
-        return browser.isElementPresent("id=" + toValidHtmlName(id));
+        return browser.isElementIdPresent(toValidHtmlName(id));
     }
 
     public String getTitle()

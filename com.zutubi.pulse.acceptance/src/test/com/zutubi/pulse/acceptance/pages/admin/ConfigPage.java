@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import org.openqa.selenium.By;
 
 /**
  * Base for config pages that appear when the "configuration" tab is selected
@@ -27,44 +28,44 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public CompositePage clickComposite(String relativePath, String displayName)
     {
-        browser.click(getTreeLinkLocator(displayName));
+        browser.click(By.xpath(getTreeLinkXPath(displayName)));
         return browser.createPage(CompositePage.class, PathUtils.getPath(getPath(), relativePath));
     }
 
     public ListPage clickCollection(String baseName, String displayName)
     {
-        browser.click(getTreeLinkLocator(displayName));
+        browser.click(By.xpath(getTreeLinkXPath(displayName)));
         return browser.createPage(ListPage.class, PathUtils.getPath(getId(), baseName));
     }
 
     public void expandTreeNode(String path)
     {
-        String nodeExpression = SeleniumBrowser.CURRENT_WINDOW + ".configTree.getNodeByConfigPath('" + path + "')";
-        browser.evalExpression(nodeExpression + ".expand(false, false);");
-        browser.waitForCondition(nodeExpression + ".isExpanded();");
+        String nodeExpression = "configTree.getNodeByConfigPath('" + path + "')";
+        browser.evaluateScript(nodeExpression + ".expand(false, false);");
+        browser.waitForCondition("return " + nodeExpression + ".isExpanded();");
     }
 
-    public String getTreeLinkLocator(String displayName)
+    public String getTreeLinkXPath(String displayName)
     {
         return "//div[@id='config-tree']//a[span='" + displayName + "']";
     }
 
     public boolean isTreeLinkPresent(String displayName)
     {
-        return browser.isElementPresent(getTreeLinkLocator(displayName));
+        return browser.isElementPresent(By.xpath(getTreeLinkXPath(displayName)));
     }
 
     public boolean isTreeLinkVisible(String displayName)
     {
-        return browser.isVisible(getTreeLinkLocator(displayName));
+        return browser.isVisible(By.xpath(getTreeLinkXPath(displayName)));
     }
     
     public void clickCollapseAll()
     {
-        browser.click(ID_COLLAPSE_ALL);
+        browser.click(By.id(ID_COLLAPSE_ALL));
     }
 
-    protected String getHierarchyLocator()
+    protected String getHierarchyXPath()
     {
         return "//span[text()='hierarchy']";
     }
@@ -101,7 +102,7 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public String getStateField(String name)
     {
-        return browser.getText(getStateFieldId(name));
+        return browser.getText(By.id(getStateFieldId(name)));
     }
 
     public boolean isStateFieldExpandable(String field)
@@ -111,23 +112,23 @@ public abstract class ConfigPage extends ConfigurationPanePage
 
     public boolean isStateFieldExpandVisible(String field)
     {
-        return browser.isVisible(getStateFieldExpandId(field));
+        return browser.isVisible(By.id(getStateFieldExpandId(field)));
     }
 
     public void expandStateField(String field)
     {
-        browser.click(getStateFieldExpandId(field));
+        browser.click(By.id(getStateFieldExpandId(field)));
         browser.waitForVisible(getStateFieldCollapseId(field));
     }
 
     public boolean isStateFieldCollapseVisible(String field)
     {
-        return browser.isVisible(getStateFieldCollapseId(field));
+        return browser.isVisible(By.id(getStateFieldCollapseId(field)));
     }
 
     public void collapseStateField(String field)
     {
-        browser.click(getStateFieldCollapseId(field));
+        browser.click(By.id(getStateFieldCollapseId(field)));
         browser.waitForVisible(getStateFieldExpandId(field));
     }
 

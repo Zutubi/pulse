@@ -35,7 +35,6 @@ public class AgentsPage extends SeleniumPage
     public void waitFor()
     {
         super.waitFor();
-        browser.waitForVariable("panel");
         browser.waitForVariable("panel.initialised");
     }
     

@@ -12,9 +12,12 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
+import org.openqa.selenium.By;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -22,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -117,7 +117,7 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public void clickTransitionLink(Project.Transition transition)
     {
-        browser.click(getTransitionId(transition));
+        browser.click(By.id(getTransitionId(transition)));
     }
 
     private String getTransitionId(Project.Transition transition)
@@ -162,7 +162,7 @@ public class ProjectHomePage extends ResponsibilityPage
      *
      * @return the number of entries in the current activity table
      */
-    public int getActivityCount()
+    public long getActivityCount()
     {
         return activityTable.getRowCount();
     }
@@ -191,7 +191,7 @@ public class ProjectHomePage extends ResponsibilityPage
     private int getActivityCountForState(String state)
     {
         int count = 0;
-        int rows = activityTable.getRowCount();
+        long rows = activityTable.getRowCount();
         for (int i = 0; i < rows; i++)
         {
             Map<String,String> row = activityTable.getRow(i);
@@ -262,7 +262,7 @@ public class ProjectHomePage extends ResponsibilityPage
      *
      * @return the number of recently completed builds displayed
      */
-    public int getRecentBuildsCount()
+    public long getRecentBuildsCount()
     {
         return recentTable.getRowCount();
     }
@@ -284,7 +284,7 @@ public class ProjectHomePage extends ResponsibilityPage
      *
      * @return the number of recent changes displayed
      */
-    public int getChangesCount()
+    public long getChangesCount()
     {
         return changesTable.getRowCount();
     }
@@ -298,7 +298,7 @@ public class ProjectHomePage extends ResponsibilityPage
     public List<Changelist> getChanges()
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        int count = getChangesCount();
+        long count = getChangesCount();
         for (int i = 0; i < count; i++)
         {
             Map<String, String> row = changesTable.getRow(i);

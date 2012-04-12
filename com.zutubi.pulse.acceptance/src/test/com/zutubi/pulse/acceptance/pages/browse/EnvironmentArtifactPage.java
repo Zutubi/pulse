@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 public class EnvironmentArtifactPage extends CommandArtifactPage
 {
     private static final String ARTIFACT_PATH = "environment/env.txt";
+    private static final String LINE_PREFIX = "\\d+\\s*";
 
     public EnvironmentArtifactPage(SeleniumBrowser browser, Urls urls, String projectName, long buildId, String stageName, String commandName)
     {
@@ -17,22 +18,22 @@ public class EnvironmentArtifactPage extends CommandArtifactPage
 
     public boolean isPropertyPresent(String property)
     {
-        return browser.isRegexPresent("(\\d)+" + property + "=");
+        return browser.isRegexPresent(LINE_PREFIX + property + "=");
     }
 
     public boolean isPropertyPresentWithValue(String property, String value)
     {
-        return browser.isRegexPresent("(\\d)+" + property + "=" + value);
+        return browser.isRegexPresent(LINE_PREFIX + property + "=" + value);
     }
 
     public boolean isPulsePropertyPresent(String property)
     {
-        return browser.isRegexPresent("(\\d)+" + prefixedProperty(property));
+        return browser.isRegexPresent(LINE_PREFIX + prefixedProperty(property));
     }
 
     public boolean isPulsePropertyPresentWithValue(String property, String value)
     {
-        return browser.isRegexPresent("(\\d)+" + prefixedProperty(property) + value);
+        return browser.isRegexPresent(LINE_PREFIX + prefixedProperty(property) + value);
     }
 
     private String prefixedProperty(String property)

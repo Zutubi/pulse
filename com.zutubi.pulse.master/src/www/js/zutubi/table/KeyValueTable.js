@@ -63,6 +63,13 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
         return this.getKeys().length;
     },
     
+    expand: function()
+    {
+        this.el.addClass('xz-keyvalue-expanded');
+        this.el.removeClass('xz-keyvalue-collapsed');
+        this.expanded = true;
+    },
+    
     renderData: function()
     {
         var keys, previousRow, i, key, value, renderedValue, args, moreRow, table;
@@ -103,9 +110,7 @@ Zutubi.table.KeyValueTable = Ext.extend(Zutubi.table.ContentTable, {
             table = this;
             moreRow.addClassOnOver('project-highlighted');
             moreRow.on('click', function() {
-                table.el.addClass('xz-keyvalue-expanded');
-                table.el.removeClass('xz-keyvalue-collapsed');
-                table.expanded = true;
+                table.expand();
             });
         }
     }

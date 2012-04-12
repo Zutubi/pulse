@@ -17,7 +17,10 @@ public class KeyValueTable extends ContentTable
 
     public Map<String, String> getKeyValuePairs()
     {
-        int count = getKeyValuePairCount();
+        // Expand to make all rows visible, allowing us to get the text
+        expand();
+        
+        long count = getKeyValuePairCount();
         Map<String, String> values = new HashMap<String, String>();
         for (int i = 1; i <= count; i++)
         {
@@ -26,9 +29,14 @@ public class KeyValueTable extends ContentTable
         
         return values;
     }
-
-    private int getKeyValuePairCount()
+    
+    public void expand()
     {
-        return Integer.parseInt(browser.evalExpression(getComponentJS() + ".getCount()"));
+        browser.evaluateScript(getComponentJS() + ".expand()");
+    }
+
+    private long getKeyValuePairCount()
+    {
+        return (Long) browser.evaluateScript("return " + getComponentJS() + ".getCount();");
     }
 }

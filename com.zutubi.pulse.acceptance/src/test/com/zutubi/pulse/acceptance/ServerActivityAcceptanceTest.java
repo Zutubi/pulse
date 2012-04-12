@@ -37,6 +37,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         super.setUp();
         rpcClient.loginAsAdmin();
         rpcClient.TestApi.ensureQueuesRunning();
+        rpcClient.cancelIncompleteBuilds();
         removeNonMasterAgents();
         getBrowser().loginAsAdmin();
     }

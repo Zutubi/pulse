@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.dashboard;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 public class MyPreferencesPage extends SeleniumPage
 {
@@ -14,7 +15,7 @@ public class MyPreferencesPage extends SeleniumPage
     @Override
     public boolean isPresent()
     {
-        return browser.isElementPresent("//a[@id=\"tab.dashboard.preferences\" and contains(@class, 'active')]");
+        return browser.isElementPresent(By.xpath("//a[@id=\"tab.dashboard.preferences\" and contains(@class, 'active')]"));
     }
 
     public String getUrl()

@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The page shown when looking at an agent in the configuration view.
@@ -36,7 +37,7 @@ public class AgentConfigPage extends CompositePage
 
     public AgentHierarchyPage clickHierarchy()
     {
-        browser.click(super.getHierarchyLocator());
+        browser.click(By.xpath(getHierarchyXPath()));
         return browser.createPage(AgentHierarchyPage.class, agent, template);
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * The project reports page shows trend reports for a project.
@@ -55,6 +56,6 @@ public class ProjectReportsPage extends ResponsibilityPage
 
     public void clickApply()
     {
-        browser.click("reports-apply");
+        browser.click(By.id("reports-apply"));
     }
 }

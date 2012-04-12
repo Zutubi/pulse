@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
+import org.openqa.selenium.By;
 
 /**
  * A summary table of synchronisation messages.
@@ -51,8 +52,8 @@ public class SynchronisationMessageTable extends SummaryTable
     public String clickAndWaitForMessageStatus(int index)
     {
         String linkId = String.format("synch-%d-link", index);
-        browser.click(linkId);
-        final String popupId = String.format("sync-%d", index);
+        browser.click(By.id(linkId));
+        final By popupId = By.id(String.format("sync-%d", index));
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()

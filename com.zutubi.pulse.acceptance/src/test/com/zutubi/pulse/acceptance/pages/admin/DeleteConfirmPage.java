@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import org.openqa.selenium.By;
 
 /**
  * The delete record confirmation page, which shows the necessary actions for
@@ -35,12 +36,12 @@ public class DeleteConfirmPage extends ConfigurationPanePage
 
     public void clickDelete()
     {
-        browser.click(CONFIRM_LINK);
+        browser.click(By.id(CONFIRM_LINK));
     }
 
     public void clickCancel()
     {
-        browser.click(CANCEL_LINK);
+        browser.click(By.id(CANCEL_LINK));
     }
 
     public ListPage confirmDeleteListItem()

@@ -195,7 +195,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         AgentForm agentForm = getBrowser().createForm(AgentForm.class, true);
         agentForm.waitFor();
-        assertEquals(asList("", HOST_1, HOST_2), asList(agentForm.getComboBoxOptions("host")));
+        assertEquals(asList("", HOST_1, HOST_2), agentForm.getComboBoxOptions("host"));
     }
     
     public void testAgentsExecutingBuild() throws Exception

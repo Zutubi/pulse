@@ -8,13 +8,12 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItemInArray;
 
 /**
  * Acceptance tests for project ACLs
@@ -46,10 +45,10 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
 
         ProjectAclForm aclForm = getBrowser().createForm(ProjectAclForm.class);
         aclForm.waitFor();
-        String[] groups = aclForm.getComboBoxOptions("group");
+        List<String> groups = aclForm.getComboBoxOptions("group");
         // Two options could just be the default plus the current value.  As
         // there are at least 3 groups, we can safely assert more than 2.
-        assertTrue(groups.length > 2);
+        assertTrue(groups.size() > 2);
     }
 
     public void testPermissionLabels() throws Exception
@@ -63,15 +62,15 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
 
         ProjectAclForm aclForm = getBrowser().createForm(ProjectAclForm.class);
         aclForm.waitFor();
-        String[] actionDisplays = aclForm.getComboBoxDisplays("allowedActions.choice");
-        assertThat(actionDisplays, hasItemInArray("administer"));
-        assertThat(actionDisplays, hasItemInArray("cancel build"));
-        assertThat(actionDisplays, hasItemInArray("view source"));
+        List<String> actionDisplays = aclForm.getComboBoxDisplays("allowedActions.choice");
+        assertThat(actionDisplays, hasItem("administer"));
+        assertThat(actionDisplays, hasItem("cancel build"));
+        assertThat(actionDisplays, hasItem("view source"));
 
-        String[] actionValues = aclForm.getComboBoxOptions("allowedActions.choice");
-        assertThat(actionValues, hasItemInArray("administer"));
-        assertThat(actionValues, hasItemInArray("cancelBuild"));
-        assertThat(actionValues, hasItemInArray("viewSource"));
+        List<String> actionValues = aclForm.getComboBoxOptions("allowedActions.choice");
+        assertThat(actionValues, hasItem("administer"));
+        assertThat(actionValues, hasItem("cancelBuild"));
+        assertThat(actionValues, hasItem("viewSource"));
     }
 
     public void testCleanPermission() throws Exception

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import org.openqa.selenium.By;
 
 /**
  * The check form.
@@ -32,13 +33,12 @@ public class CheckForm extends SeleniumForm
 
     public boolean isResultOk()
     {
-        String checkOK = browser.evalVariable("checkOK");
-        return Boolean.valueOf(checkOK);
+        return (Boolean) browser.evaluateScript("return checkOK");
     }
 
     public String getResultMessage()
     {
-        return browser.getText("check.result");
+        return browser.getText(By.id("check.result"));
     }
 
     public void waitForCheck()

@@ -17,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import org.openqa.selenium.By;
 
 import java.util.Hashtable;
 
@@ -108,15 +109,15 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
-        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
+        assertTrue(((String) form.getFieldValue("pulseFileString")).contains(EXPECTED_FILE_CONTENT));
         form.saveFormElements(new String[]{null});
 
         projectPage.waitFor();
-        getBrowser().waitForLocator(projectPage.getTreeLinkLocator("custom pulse file"));
+        getBrowser().waitForElement(By.xpath(projectPage.getTreeLinkXPath("custom pulse file")));
         projectPage.clickComposite("type", "custom pulse file");
 
         form.waitFor();
-        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
+        assertTrue(((String) form.getFieldValue("pulseFileString")).contains(EXPECTED_FILE_CONTENT));
     }
 
     public void testPrepareActionCancel() throws Exception
@@ -144,7 +145,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
 
         // Make sure the arg was prepared from the current project config
-        assertTrue(form.getFieldValue("pulseFileString").contains(EXPECTED_FILE_CONTENT));
+        assertTrue(((String) form.getFieldValue("pulseFileString")).contains(EXPECTED_FILE_CONTENT));
         form.saveFormElements("<?xml version=\"1.0\"?><project><nosuchtag/></project>");
         form.waitFor();
 

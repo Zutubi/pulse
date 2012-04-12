@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import org.openqa.selenium.By;
+
 /**
  */
 public class IDs
@@ -15,37 +17,37 @@ public class IDs
     public static String GENERIC_ERROR = "generic-error";
     public static String ACTION_ERRORS = "action-errors";
 
-    private static String buildTab(String name)
+    private static By buildTab(String name)
     {
-        return "tab.build." + name;
+        return By.id("tab.build." + name);
     }
 
-    public static String buildLogsTab()
+    public static By buildLogsTab()
     {
         return buildTab("logs");
     }
 
-    public static String buildDetailsTab()
+    public static By buildDetailsTab()
     {
         return buildTab("details");
     }
 
-    public static String buildChangesTab()
+    public static By buildChangesTab()
     {
         return buildTab("changes");
     }
 
-    public static String buildTestsTab()
+    public static By buildTestsTab()
     {
         return buildTab("tests");
     }
 
-    public static String buildFileTab()
+    public static By buildFileTab()
     {
         return buildTab("file");
     }
 
-    public static String buildArtifactsTab()
+    public static By buildArtifactsTab()
     {
         return buildTab("artifacts");
     }

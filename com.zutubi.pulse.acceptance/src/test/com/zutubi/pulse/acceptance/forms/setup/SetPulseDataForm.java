@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.master.tove.config.setup.SetupDataConfiguration;
+import org.openqa.selenium.By;
 
 public class SetPulseDataForm extends SeleniumForm
 {
@@ -31,7 +32,7 @@ public class SetPulseDataForm extends SeleniumForm
 
     public PulseFileSystemBrowserWindow clickBrowseData()
     {
-        browser.click(getBrowseLinkId(FIELD_DATA));
+        browser.click(By.id(getBrowseLinkId(FIELD_DATA)));
         return new PulseFileSystemBrowserWindow(browser);
     }
 }

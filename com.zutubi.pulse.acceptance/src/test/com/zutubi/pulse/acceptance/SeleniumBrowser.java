@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -11,6 +11,17 @@ import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 import freemarker.template.utility.StringUtil;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +29,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -33,14 +42,6 @@ import static org.hamcrest.Matchers.containsString;
  */
 public class SeleniumBrowser
 {
-    private static final String PROPERTY_SELENIUM_BROWSER = "SELENIUM_BROWSER";
-
-    /**
-     * Javascript expression that will provide access to the current window namespace.
-     * As such, this is needed to gain access to the dom tree within selenium tests.
-     */
-    public static final String CURRENT_WINDOW = "selenium.browserbot.getCurrentWindow()";
-
     public static final long DEFAULT_TIMEOUT = 60000;
     public static final long PAGELOAD_TIMEOUT = 60000;
     public static final long WAITFOR_TIMEOUT = 60000;
@@ -49,46 +50,34 @@ public class SeleniumBrowser
     public static final long WAITFOR_INTERVAL = 300;
     public static final long REFRESH_INTERVAL = 1000;
 
-    private static final int SELENIUM_PORT = 4446;
-    
     private Selenium selenium;
     private int pulsePort;
-    private String browser;
-    private boolean started = false;
+    private WebDriver webDriver;
     private Urls urls;
 
-    private boolean captureNetworkTraffic;
-
-    private static String getBrowserProperty()
+    private static WebDriver createWebDriver()
     {
-        // System properties (-D...).  This option is for running
-        // the acceptance tests directly within IDEA.
-        String browser = System.getProperty("selenium.browser");
-        if (browser == null)
+        if (SystemUtils.IS_WINDOWS)
         {
-            // Execution environment.  This option is for running
-            // the acceptance tests via ant.  It is awkward to pass
-            // -D properties through to the junit process.
-            browser = System.getenv(PROPERTY_SELENIUM_BROWSER);
+            return new InternetExplorerDriver();
         }
-        if (browser == null)
+        else if (SystemUtils.IS_MAC)
         {
-            if (SystemUtils.IS_WINDOWS)
-            {
-                return "*iexploreproxy";
-            }
-            else if (SystemUtils.IS_MAC)
-            {
-                return "*safari";
-            }
-            else
-            {
-                return "*firefox";
-            }
+            return new ChromeDriver();
         }
-        return browser;
+        else
+        {
+            FirefoxProfile profile = new FirefoxProfile();
+            String logFile = System.getProperty("selenium.firefox.log");
+            if (logFile != null)
+            {
+                profile.setPreference("webdriver.log.file", logFile);
+            }
+         
+            profile.setEnableNativeEvents(true);
+            return new FirefoxDriver(profile);
+        }
     }
-
 
     /**
      * Create a new instance of the selenium browser, using the browser and port
@@ -97,19 +86,20 @@ public class SeleniumBrowser
      */
     public SeleniumBrowser()
     {
-        this(AcceptanceTestUtils.getPulsePort(), getBrowserProperty());
+        this(AcceptanceTestUtils.getPulsePort(), createWebDriver());
     }
 
     public SeleniumBrowser(int port)
     {
-        this(port, getBrowserProperty());
+        this(port, createWebDriver());
     }
 
-    public SeleniumBrowser(int port, String browser)
+    public SeleniumBrowser(int port, WebDriver webDriver)
     {
-        this.browser = browser;
+        this.webDriver = webDriver;
+        webDriver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
         String baseUrl = AcceptanceTestUtils.getPulseUrl(port);
-        selenium = new DefaultSelenium("localhost", SELENIUM_PORT, browser, baseUrl);
+        selenium = new WebDriverBackedSelenium(webDriver, baseUrl);
         this.pulsePort = port;
         urls = new Urls(baseUrl);
     }
@@ -124,43 +114,15 @@ public class SeleniumBrowser
      */
     public synchronized void newSession()
     {
-        stop();
-        start();
+        webDriver.manage().deleteAllCookies();
+        webDriver.get(urls.base());
     }
 
-    /**
-     * Start a browser if it is not already started.
-     */
-    public synchronized void start()
+    public void quit()
     {
-        if (!started)
-        {
-            if (captureNetworkTraffic)
-            {
-                selenium.start("captureNetworkTraffic=true");
-            }
-            else
-            {
-                selenium.start();
-            }
-            
-            selenium.setTimeout(String.valueOf(DEFAULT_TIMEOUT));
-            started = true;
-        }
+        webDriver.quit();
     }
-
-    /**
-     * Stop the browser if it has been started.
-     */
-    public synchronized void stop()
-    {
-        if (started)
-        {
-            selenium.stop();
-            started = false;
-        }
-    }
-
+    
     /**
      * Check if the native browser being driven by selenium is an
      * instance of firefox.
@@ -169,7 +131,7 @@ public class SeleniumBrowser
      */
     public boolean isFirefox()
     {
-        return browser.contains("firefox");
+        return webDriver instanceof FirefoxDriver;
     }
 
     /**
@@ -325,12 +287,22 @@ public class SeleniumBrowser
         }
     }
 
+    /**
+     * Goes to the login page and logs in with the given credentials.
+     * 
+     * @param username user to log in as
+     * @param password the given user's password
+     * @return true if the login was successful, false if it failed
+     */
     public boolean login(String username, String password)
     {
         LoginPage page = openAndWaitFor(LoginPage.class);
         return page.login(username, password);
     }
 
+    /**
+     * Goes to the login page and logs in as the admin user.
+     */
     public void loginAsAdmin()
     {
         login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
@@ -346,10 +318,13 @@ public class SeleniumBrowser
         {
             throw new IllegalStateException("Can not logout when no logout link is available.");
         }
-        click("//span[@id='logout']/a");
+        click(By.xpath("//span[@id='logout']/a"));
         waitForPageToLoad();
     }
 
+    /**
+     * @return true if the web browser session has an active login
+     */
     public boolean isLoggedIn()
     {
         return isElementIdPresent(IDs.ID_LOGOUT);
@@ -365,50 +340,91 @@ public class SeleniumBrowser
         selenium.open(location);
     }
 
-    public void click(String locator)
+    /**
+     * Clicks on an element.  Respects the implicit wait period.
+     * 
+     * @param by element locator
+     */
+    public void click(By by)
     {
-        selenium.click(locator);
+        webDriver.findElement(by).click();
     }
 
-    public void doubleClick(String locator)
+    /**
+     * Double clicks on an element.  Respects the implicit wait period.
+     * 
+     * @param by element locator
+     */
+    public void doubleClick(By by)
     {
-        selenium.doubleClick(locator);
+        Actions builder = new Actions(webDriver);
+        builder.doubleClick(webDriver.findElement(by));
+        builder.build().perform();
     }
 
+    /**
+     * Refreshes the current web page.  This does not wait for the page to load
+     * after refreshing.
+     */
     public void refresh()
     {
         selenium.refresh();
     }
 
-    public void type(String id, String value)
+    /**
+     * Types the given value into a text field or area.  Any existing text is
+     * cleared first.
+     * 
+     * @param by    locator of the text field/area
+     * @param value the text to type
+     */
+    public void type(By by, String value)
     {
-        selenium.type(id, value);
-    }
-
-    public void addSelection(String fieldLocator, String value)
-    {
-        selenium.addSelection(fieldLocator, value);
+        WebElement element = webDriver.findElement(by);
+        element.clear();
+        element.sendKeys(value);
     }
 
     /**
-     * Verifies that the specified element is somewhere on the page.
-     * @param id   id identifying the element
-     * @return  true if the element is present, false otherwise.
+     * Adds a selection to the current value of a multi-value element.
+     * 
+     * @param fieldId identifier of the field
+     * @param value   value to add
+     */
+    public void addSelection(String fieldId, String value)
+    {
+        selenium.addSelection(fieldId, value);
+    }
+
+    /**
+     * Checks if the specified element is on the current page.  Respects the
+     * implicit wait period.
+     * 
+     * @param id id identifying the element
+     * @return true if the element is present, false otherwise.
      */
     public boolean isElementIdPresent(String id)
     {
-        return selenium.isElementPresent(WebUtils.toValidHtmlName(id));
+        return isElementPresent(By.id(WebUtils.toValidHtmlName(id)));
     }
 
-    public boolean isElementPresent(String locator)
+    /**
+     * Checks if the specified element is on the current page.  Respects the 
+     * implicit wait period.
+     * 
+     * @param by locator of the element to check for
+     * @return true iff the given element is present (it need not be visible)
+     */
+    public boolean isElementPresent(By by)
     {
-        return selenium.isElementPresent(locator);
+        return webDriver.findElements(by).size() > 0;
     }
 
     /**
      * Check if the specified text is present on the current page.
-     * @param text  the required text
-     * @return  true if the text is present, false otherwise.
+     * 
+     * @param text the required text
+     * @return true if the text is present, false otherwise.
      */
     public boolean isTextPresent(String text)
     {
@@ -417,8 +433,9 @@ public class SeleniumBrowser
 
     /**
      * Check if the text matching the regex is present on the current page.
-     * @param regex  the regex
-     * @return  true if a match is present, false otherwise.
+     * 
+     * @param regex the regex
+     * @return true if a match is present, false otherwise.
      */
     public boolean isRegexPresent(String regex)
     {
@@ -431,8 +448,9 @@ public class SeleniumBrowser
 
     /**
      * Check if a link with the specified id is present in the current page.
-     * @param id    the link id
-     * @return  true if the requested link is found, false otherwise
+     * 
+     * @param id the link id
+     * @return true if the requested link is found, false otherwise
      */
     public boolean isLinkPresent(String id)
     {
@@ -441,22 +459,31 @@ public class SeleniumBrowser
 
     /**
      * Check if a link to the specified href is present in the current page.
-     * @param href  the href / target of the link
-     * @return  true if the requested link is found, false otherwise
+     * 
+     * @param href the href / target of the link
+     * @return true if the requested link is found, false otherwise
      */
     public boolean isLinkToPresent(String href)
     {
-        return selenium.isElementPresent("//a[@href=\"" + href + "\"]");
+        return isElementPresent(By.xpath("//a[@href=\"" + href + "\"]"));
     }
-
+    
     /**
      * Check if the specified element is visible.
-     * @param locator   the locator identifying the element
+     * 
+     * @param by the method by which to identify the element
      * @return  true if the element is visible, false otherwise.
      */
-    public boolean isVisible(String locator)
+    public boolean isVisible(By by)
     {
-        return selenium.isVisible(locator);
+        try
+        {
+            return webDriver.findElement(by).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
     }
 
     public boolean isEditable(String fieldId)
@@ -469,14 +496,9 @@ public class SeleniumBrowser
         return Arrays.asList(selenium.getAllWindowTitles()).contains(windowName);
     }
 
-    public String evalVariable(String variable)
+    public Object evaluateScript(String expression)
     {
-        return selenium.getEval(CURRENT_WINDOW + "." + variable);
-    }
-
-    public String evalExpression(String expression)
-    {
-        return selenium.getEval(expression);
+        return ((JavascriptExecutor) webDriver).executeScript(expression);
     }
 
     public String getBodyText()
@@ -484,47 +506,15 @@ public class SeleniumBrowser
         return selenium.getBodyText();
     }
 
-    public String getText(String locator)
+    public String getText(By by)
     {
-        // I've experienced Selenium throwing errors from getText saying the
-        // element cannot be found, despite an immediately preceding call to
-        // isElementPresent returning true.  This was on a page with no
-        // JavaScript magic.  The ugliness below is intended to work around
-        // this.  It's not a replacement for waiting for an element to be
-        // present first.
-        int retries = 0;
-        while (retries++ < 3)
-        {
-            if (selenium.isElementPresent(locator))
-            {
-                try
-                {
-                    return selenium.getText(locator);
-                }
-                catch (SeleniumException e)
-                {
-                    // Ignore this one.
-                }
-            }
-
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                // Just keep un truckin'
-            }
-        }
-
-        // Give it one more go - if selenium throws the caller gets it full in
-        // the face this time.
-        return selenium.getText(locator);
+        WebElement element = webDriver.findElement(by);
+        return element.getText().trim();
     }
 
-    public String getAttribute(String locator)
+    public String getAttribute(By by, String attribute)
     {
-        return selenium.getAttribute(locator);
+        return webDriver.findElement(by).getAttribute(attribute);
     }
 
     public String[] getAllLinks()
@@ -532,9 +522,9 @@ public class SeleniumBrowser
         return selenium.getAllLinks();
     }
 
-    public String getCellContents(String tableLocator, int row, int column)
+    public String getCellContents(String tableId, int row, int column)
     {
-        return selenium.getTable(WebUtils.toValidHtmlName(tableLocator + "." + row + "." + column));
+        return selenium.getTable(WebUtils.toValidHtmlName(tableId) + "." + row + "." + column);
     }
 
     public String[] getSelectOptions(String fieldId)
@@ -593,15 +583,25 @@ public class SeleniumBrowser
         waitForVariable(variable, false);
     }
 
-    public void waitForVariable(String variable, boolean inverse)
+    public void waitForVariable(final String variable, final boolean inverse)
     {
-        waitForCondition((inverse ? "!" : "") + CURRENT_WINDOW + "." + variable, WAITFOR_TIMEOUT);
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, WAITFOR_TIMEOUT/1000);
+        wait.until(new ExpectedCondition<Object>()
+        {
+            public Object apply(WebDriver webDriver)
+            {
+                JavascriptExecutor executor = (JavascriptExecutor) webDriver;
+                return executor.executeScript("var r = " + variable + " !== undefined && " +
+                                                           variable + " !== null && " +
+                                                           variable + " !== false; return " + (inverse ? "!" : "") + "r");
+            }
+        });
     }
 
-    public void waitAndClick(String id)
+    public void waitAndClick(By by)
     {
-        waitForElement(id);
-        click(id);
+        waitForElement(by);
+        click(by);
     }
 
     public void waitForElement(String id)
@@ -609,22 +609,24 @@ public class SeleniumBrowser
         waitForElement(id, WAITFOR_TIMEOUT);
     }
 
-    public void waitForElement(String id, long timeout)
+    public WebElement waitForElement(final String id, long timeout)
     {
-        waitForCondition(getElementExistenceCondition(id), timeout);
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000);
+        return wait.until(new ExpectedCondition<WebElement>()
+        {
+            public WebElement apply( WebDriver webDriver)
+            {
+                return webDriver.findElement(By.id(id));
+            }
+        });
     }
 
-    public String getElementExistenceCondition(String id)
+    public void waitForElement(By by)
     {
-        return "selenium.browserbot.findElementOrNull('id=" + WebUtils.toValidHtmlName(id) + "') != null";
-    }
-
-    public void waitForLocator(String locator)
-    {
-        waitForLocator(locator, false);
+        waitForElement(by, false);
     }
     
-    public void waitForLocator(final String locator, final boolean invert)
+    public void waitForElement(final By by, final boolean invert)
     {
         try
         {
@@ -632,10 +634,10 @@ public class SeleniumBrowser
             {
                 public boolean satisfied()
                 {
-                    boolean present = selenium.isElementPresent(locator);
+                    boolean present = webDriver.findElements(by).size() > 0;
                     return (present && !invert || !present && invert);
                 }
-            }, WAITFOR_TIMEOUT, WAITFOR_INTERVAL, "locator '" + locator + "' to be present.");
+            }, WAITFOR_TIMEOUT, WAITFOR_INTERVAL, "element '" + by + "' to be present.");
         }
         catch (TimeoutException e)
         {
@@ -649,17 +651,16 @@ public class SeleniumBrowser
         waitForCondition(condition, WAITFOR_TIMEOUT);
     }
 
-    public void waitForCondition(String condition, long timeout)
+    public void waitForCondition(final String condition, long timeout)
     {
-        try
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000);
+        wait.until(new ExpectedCondition<Object>()
         {
-            selenium.waitForCondition(condition, Long.toString(timeout));
-        }
-        catch (SeleniumException e)
-        {
-            File failureFile = captureFailure();
-            throw new SeleniumException("Selenium timeout (see: " + failureFile.getName() + "): " + e.getMessage(), e);
-        }
+            public Object apply(WebDriver webDriver)
+            {
+                return ((JavascriptExecutor) webDriver).executeScript(condition);
+            }
+        });
     }
 
     public void waitForVisible(final String locator)
@@ -704,11 +705,11 @@ public class SeleniumBrowser
         {
             public boolean satisfied()
             {
-                return StringUtils.stringSet(getText(IDs.STATUS_MESSAGE));
+                return StringUtils.stringSet(getText(By.id(IDs.STATUS_MESSAGE)));
             }
         }, WAITFOR_TIMEOUT, "status message to be set.");
 
-        String text = getText(IDs.STATUS_MESSAGE);
+        String text = getText(By.id(IDs.STATUS_MESSAGE));
         assertThat(text, containsString(message));
     }
 
@@ -739,7 +740,7 @@ public class SeleniumBrowser
         {
             public boolean satisfied()
             {
-                return CollectionUtils.contains(texts, getText(WebUtils.toValidHtmlName(id)));
+                return CollectionUtils.contains(texts, getText(By.id(WebUtils.toValidHtmlName(id))));
             }
         }, "one of the following texts '" + Arrays.asList(texts) + "' in element '" + id + "'");
     }
@@ -775,33 +776,6 @@ public class SeleniumBrowser
             {
                 e.printStackTrace(System.err);
             }
-        }
-    }
-
-    public void setCaptureNetworkTraffic(boolean b)
-    {
-        captureNetworkTraffic = b;
-    }
-
-    public void resetCapturedNetworkTraffic()
-    {
-        getCapturedNetworkTraffic();
-    }
-    
-    public String getCapturedNetworkTraffic()
-    {
-        return selenium.captureNetworkTraffic("xml");
-    }
-
-    public void captureScreenshot(File screenshotFile)
-    {
-        try
-        {
-            selenium.captureScreenshot(screenshotFile.getCanonicalPath());
-        }
-        catch (IOException e)
-        {
-            throw new SeleniumException(e);
         }
     }
 
@@ -861,11 +835,11 @@ public class SeleniumBrowser
             indexExpression = "0";
         }
 
-        evalExpression(
-                "var combo = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "');" +
-                "combo.setValue('" + StringUtil.javaScriptStringEnc(value) + "');" +
-                "var store = combo.getStore();" +
-                "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
+        evaluateScript(
+                "var combo = Ext.getCmp('" + comboId + "');" +
+                        "combo.setValue('" + StringUtil.javaScriptStringEnc(value) + "');" +
+                        "var store = combo.getStore();" +
+                        "combo.fireEvent('select', combo, store.getAt(" + indexExpression + "));"
         );
     }
 
@@ -878,7 +852,7 @@ public class SeleniumBrowser
      */
     public String getComboValue(String comboId)
     {
-        return evalExpression(CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "').getValue()");
+        return (String) evaluateScript("return Ext.getCmp('" + comboId + "').getValue()");
     }
 
     /**
@@ -888,16 +862,16 @@ public class SeleniumBrowser
      * @param comboId component id of the combo
      * @return available options in the combo
      */
-    public String[] getComboOptions(String comboId)
+    @SuppressWarnings("unchecked")
+    public List<String> getComboOptions(String comboId)
     {
-        String js = "var result = function() { " +
-                        "var combo = " + CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "'); " +
+        String js = "return function() { " +
+                        "var combo = Ext.getCmp('" + comboId + "'); " +
                         "var values = []; " +
                         "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
                         "return values; " +
-                    "}(); " +
-                    "result";
-        return evalExpression(js).split(",");
+                    "}();";
+        return (List<String>) evaluateScript(js);
     }
 
     /**
@@ -907,15 +881,15 @@ public class SeleniumBrowser
      * @param comboId component id of the combo
      * @return displayed strings for available options in the combo
      */
-    public String[] getComboDisplays(String comboId)
+    @SuppressWarnings("unchecked")
+    public List<String> getComboDisplays(String comboId)
     {
-        String js = "var result = function() { " +
-                        "var combo = " + CURRENT_WINDOW + ".Ext.getCmp('" + comboId + "'); " +
+        String js = "return function() { " +
+                        "var combo = Ext.getCmp('" + comboId + "'); " +
                         "var values = []; " +
                         "combo.store.each(function(r) { values.push(r.get(combo.displayField)); }); " +
                         "return values; " +
-                    "}(); " +
-                    "result";
-        return evalExpression(js).split(",");
+                    "}();";
+        return (List<String>) evaluateScript(js);
     }
 }

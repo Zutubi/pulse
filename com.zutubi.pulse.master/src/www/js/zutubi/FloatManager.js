@@ -32,6 +32,13 @@ Zutubi.FloatManager = (function() {
         }
     }
 
+    function moveChildren(destEl, srcEl)
+    {
+        srcEl.select('> *').each(function (el) {
+            destEl.appendChild(el);
+        });
+    }
+
     function hideAll()
     {
         var category, id, cls;
@@ -42,6 +49,7 @@ Zutubi.FloatManager = (function() {
             cls = clsByCategory[category];
             unpress(id, cls);
             Ext.get(getWindowId(category)).setDisplayed(false);
+            moveChildren(Ext.get(id), Ext.get(category + ID_SUFFIX_WINDOW_CONTENT));
         }
 
         idByCategory = {};
@@ -79,7 +87,7 @@ Zutubi.FloatManager = (function() {
         }
     };
 
-    return {
+    return {        
         /**
          * Function to show or hide a small floating window.  Used to popup full
          * comments from summaries and lists of build results.  Note that it is
@@ -92,7 +100,7 @@ Zutubi.FloatManager = (function() {
          */
         showHideFloat: function(category, id, align, cls)
         {
-            var windowId, windowEl, displayedId, displayedCls, contentId, linkEl;
+            var windowId, windowEl, displayedId, displayedCls, contentId, contentEl, linkEl, toggledEl;
 
             if (!align)
             {
@@ -115,10 +123,14 @@ Zutubi.FloatManager = (function() {
             windowEl = Ext.get(windowId);
             displayedId = idByCategory[category];
             displayedCls = clsByCategory[category];
-            if(windowEl && displayedId === id)
+            contentId = category + ID_SUFFIX_WINDOW_CONTENT;
+            toggledEl = Ext.get(id);
+            if (windowEl && displayedId === id)
             {
                 unpress(id, displayedCls);
                 windowEl.setDisplayed(false);
+                contentEl = Ext.get(contentId);
+                moveChildren(toggledEl, contentEl);
                 delete idByCategory[category];
                 delete clsByCategory[category];
                 if (--displayedCategories === 0)
@@ -128,14 +140,19 @@ Zutubi.FloatManager = (function() {
             }
             else
             {
-                contentId = category + ID_SUFFIX_WINDOW_CONTENT;
-                if(!windowEl)
+                if (!windowEl)
                 {
                     windowEl = Ext.DomHelper.append(document.body, '<div id="' + windowId + '" class="floating floating-widget" style="display: none;"><div id="' + contentId + '"></div></div>', true);
+                    contentEl = Ext.get(contentId);                
                 }
-                else if(windowEl.isDisplayed())
+                else
                 {
-                    unpress(displayedId);
+                    contentEl = Ext.get(contentId);                
+                    if (windowEl.isDisplayed())
+                    {
+                        moveChildren(Ext.get(displayedId), contentEl);
+                        unpress(displayedId, displayedCls);
+                    }
                 }
 
                 idByCategory[category] = id;
@@ -145,7 +162,7 @@ Zutubi.FloatManager = (function() {
                     Ext.getDoc().on('mousedown', onMouseDown);
                 }
 
-                Ext.getDom(contentId).innerHTML = Ext.getDom(id).innerHTML;
+                moveChildren(contentEl, toggledEl);
 
                 press(id, cls);
                 if (!windowEl.isDisplayed())

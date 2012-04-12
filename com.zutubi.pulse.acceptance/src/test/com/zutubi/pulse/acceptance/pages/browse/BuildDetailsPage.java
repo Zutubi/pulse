@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Pair;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,24 +40,24 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public void clickStageAndWait(String stageName)
     {
-        browser.click("xpath=//a/span[text()='" + stageName + "']");
+        browser.click(By.xpath("//a/span[text()='" + stageName + "']"));
         waitForPaneToLoad();
     }
 
     public void clickCommandAndWait(String stageName, String commandName)
     {
-        browser.click("xpath=//a/span[text()='" + stageName + "']/ancestor::li[1]//a/span[text()='" + commandName + "']");
+        browser.click(By.xpath("//a/span[text()='" + stageName + "']/ancestor::li[1]//a/span[text()='" + commandName + "']"));
         waitForPaneToLoad();
     }
 
     private void waitForPaneToLoad()
     {
-        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".paneLoading === false");
+        browser.waitForCondition("return paneLoading === false");
     }
 
     public boolean isCustomFieldsTablePresent()
     {
-        return browser.isElementPresent(ID_CUSTOM_FIELDS);
+        return browser.isElementIdPresent(ID_CUSTOM_FIELDS);
     }
 
     public Pair<String, String> getCustomField(int index)
@@ -71,7 +72,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public boolean isDependenciesTablePresent()
     {
-        return browser.isElementPresent(ID_RETRIEVED_DEPENDENCIES);
+        return browser.isElementIdPresent(ID_RETRIEVED_DEPENDENCIES);
     }
 
     public DependencyRow getDependencyRow(int row)
@@ -87,7 +88,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public boolean isStageBasicsPresent()
     {
-        return browser.isElementPresent(ID_STAGE_BASICS);
+        return browser.isElementIdPresent(ID_STAGE_BASICS);
     }
     
     public Pair<String, String> getStageBasicsRow(int index)
@@ -97,7 +98,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
     
     public boolean isCommandBasicsPresent()
     {
-        return browser.isElementPresent(ID_COMMAND_BASICS);
+        return browser.isElementIdPresent(ID_COMMAND_BASICS);
     }
     
     public Pair<String, String> getCommandBasicsRow(int index)
@@ -107,7 +108,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public boolean isCommandPropertiesPresent()
     {
-        return browser.isElementPresent(ID_COMMAND_PROPERTIES);
+        return browser.isElementIdPresent(ID_COMMAND_PROPERTIES);
     }
     
     public Pair<String, String> getCommandPropertiesRow(int index)
@@ -117,7 +118,7 @@ public class BuildDetailsPage extends AbstractBuildStatusPage
 
     public boolean isCommandImplicitArtifactsPresent()
     {
-        return browser.isElementPresent(ID_COMMAND_IMPLICIT_ARTIFACTS);
+        return browser.isElementIdPresent(ID_COMMAND_IMPLICIT_ARTIFACTS);
     }
     
     public ImplicitArtifactRow getCommandImplicitArtifactRow(int index)

@@ -33,7 +33,7 @@ public abstract class Component
      */
     public boolean isPresent()
     {
-        return Boolean.valueOf(browser.evalExpression(getPresentExpression()));
+        return (Boolean) browser.evaluateScript(getPresentScript());
     }
 
     /**
@@ -43,21 +43,21 @@ public abstract class Component
      */
     public void waitFor(long timeout)
     {
-        browser.waitForCondition(getPresentExpression(), timeout);
+        browser.waitForCondition(getPresentScript(), timeout);
     }
 
     /**
-     * Returns a JS expression that can be evaluated to determine if the
-     * component is present.  The default just checks for the component's main
-     * element's existence.  Subclasses may override this if they need more
-     * complex checks (e.g. for components that may be hidden).
+     * Returns a JS script that can be evaluated to determine if the component
+     * is present.  The default just checks for the component's main element's
+     * existence.  Subclasses may override this if they need more complex
+     * checks (e.g. for components that may be hidden).
      *  
-     * @return a JS expression that evaluates to true if this component is
-     *         present on the page
+     * @return a JS script that returns true if this component is present on
+     *         the page (it must return a boolean value)
      */
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getDom('" + id + "') != null";
+        return "return Ext.getDom('" + id + "') != null";
     }
 
     /**
@@ -67,6 +67,6 @@ public abstract class Component
      */
     protected String getComponentJS()
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + id + "')";
+        return "Ext.getCmp('" + id + "')";
     }
 }

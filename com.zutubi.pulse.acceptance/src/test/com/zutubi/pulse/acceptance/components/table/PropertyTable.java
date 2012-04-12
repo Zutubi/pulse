@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.components.table;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.table.PropertyTable component.
@@ -44,6 +45,6 @@ public class PropertyTable extends ContentTable
      */
     public String getValue(String rowName)
     {
-        return browser.getText(getValueCellId(rowName));
+        return browser.getText(By.id(getValueCellId(rowName)));
     }
 }

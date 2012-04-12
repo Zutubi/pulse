@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  */
@@ -45,13 +46,13 @@ public abstract class AbstractTestsPage extends SeleniumPage
         browser.click(getCrumbLinkLocator(WebUtils.toValidHtmlName("suitecrumb-" + suitePath)));
     }
 
-    private String getCrumbLinkLocator(String id)
+    private By getCrumbLinkLocator(String id)
     {
-        return "//span[@id='" + id + "']/a";
+        return By.xpath("//span[@id='" + id + "']/a");
     }
 
     public void clickSuiteLink(String suite)
     {
-        browser.click(WebUtils.toValidHtmlName("suite-" + suite));
+        browser.click(By.id(WebUtils.toValidHtmlName("suite-" + suite)));
     }
 }

@@ -14,8 +14,8 @@ public class FeatureList extends Component
     }
 
     @Override
-    protected String getPresentExpression()
+    protected String getPresentScript()
     {
-        return getComponentJS() + ".data != null";
+        return "return " + getComponentJS() + ".data != null;";
     }
 }

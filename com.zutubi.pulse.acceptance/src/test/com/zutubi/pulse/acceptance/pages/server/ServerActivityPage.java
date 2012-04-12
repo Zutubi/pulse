@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.components.pulse.server.ActiveBuildsTable;
 import com.zutubi.pulse.acceptance.components.pulse.server.QueuedBuildsTable;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 /**
  * The server activity page shows the server queues and active builds.
@@ -56,7 +57,7 @@ public class ServerActivityPage extends SeleniumPage
      */
     public String getBuildQueueStatus()
     {
-        return browser.evalExpression(getQueueStatusExpression(QUEUE_BUILD));
+        return (String) browser.evaluateScript("return " + getQueueStatusExpression(QUEUE_BUILD));
     }
 
     /**
@@ -84,7 +85,7 @@ public class ServerActivityPage extends SeleniumPage
      */
     public void clickBuildQueueToggle()
     {
-        browser.click("build-queue-toggle-text");
+        browser.click(By.id("build-queue-toggle-text"));
     }
     
     /**
@@ -94,7 +95,7 @@ public class ServerActivityPage extends SeleniumPage
      */
     public String getStageQueueStatus()
     {
-        return browser.evalExpression(getQueueStatusExpression(QUEUE_STAGE));
+        return (String) browser.evaluateScript("return " + getQueueStatusExpression(QUEUE_STAGE));
     }
 
     /**
@@ -122,23 +123,23 @@ public class ServerActivityPage extends SeleniumPage
      */
     public void clickStageQueueToggle()
     {
-        browser.click("stage-queue-toggle-text");
+        browser.click(By.id("stage-queue-toggle-text"));
     }
     
     private boolean canToggleQueue(String queuePrefix, String text)
     {
-        String toggleText = browser.evalExpression(getQueueToggleExpression(queuePrefix) + ".text");
-        String toggleEnabled = browser.evalExpression(getQueueToggleExpression(queuePrefix) + ".enabled");
-        return Boolean.parseBoolean(toggleEnabled) && toggleText.equals(text);
+        String toggleText = (String) browser.evaluateScript("return " + getQueueToggleExpression(queuePrefix) + ".text");
+        Boolean toggleEnabled = (Boolean) browser.evaluateScript("return " + getQueueToggleExpression(queuePrefix) + ".enabled");
+        return toggleEnabled && toggleText.equals(text);
     }
 
     private String getQueueStatusExpression(String queuePrefix)
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + queuePrefix + "-queue-state').text";
+        return "Ext.getCmp('" + queuePrefix + "-queue-state').text";
     }
 
     private String getQueueToggleExpression(String queuePrefix)
     {
-        return SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + queuePrefix + "-queue-toggle')";
+        return "Ext.getCmp('" + queuePrefix + "-queue-toggle')";
     }
 }

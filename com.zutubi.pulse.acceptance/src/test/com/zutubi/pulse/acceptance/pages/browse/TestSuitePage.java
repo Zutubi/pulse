@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The tests page for a specific suite result.
@@ -42,17 +43,17 @@ public class TestSuitePage extends AbstractTestsPage
 
     public String getCurrentFilter()
     {
-        return browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Ext.getCmp('" + ID_COMBO + "').getValue();");
+        return (String) browser.evaluateScript("return Ext.getCmp('" + ID_COMBO + "').getValue();");
     }
 
     public void setFilterAndWait(String filter)
     {
         browser.setComboByValue(ID_COMBO, filter);
-        browser.waitForCondition(SeleniumBrowser.CURRENT_WINDOW + ".filtering === false");
+        browser.waitForCondition("return filtering === false");
     }
 
     public boolean isTestCaseVisible(String caseName)
     {
-        return browser.isVisible("//td[text()='" + caseName + "']");
+        return browser.isVisible(By.xpath("//td[text()='" + caseName + "']"));
     }
 }

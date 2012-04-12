@@ -5,10 +5,10 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
+import static com.zutubi.util.CollectionUtils.asPair;
+import org.openqa.selenium.By;
 
 import java.io.File;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class LoginPage extends SeleniumPage
 {
@@ -66,7 +66,7 @@ public class LoginPage extends SeleniumPage
 
     public SignupPage clickSignup()
     {
-        browser.click(SIGNUP_ID);
+        browser.click(By.id(SIGNUP_ID));
         browser.waitForPageToLoad();
         return browser.createPage(SignupPage.class);
     }

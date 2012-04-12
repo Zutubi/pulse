@@ -16,6 +16,7 @@ import com.zutubi.util.Condition;
 import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.FileSystemUtils;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.openqa.selenium.By;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.File;
@@ -139,7 +140,7 @@ public class UpgradeAcceptanceTest extends AcceptanceTestBase
         // check that we have received the upgrade preview, and that the data is as expected.
         assertTrue(getBrowser().isTextPresent("Upgrade Preview"));
 
-        getBrowser().click("continue");
+        getBrowser().click(By.id("continue"));
         getBrowser().waitForElement("upgrade.progress", 120 * SECOND);
 
         // waiting..
@@ -151,7 +152,7 @@ public class UpgradeAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isTextPresent("Upgrade Complete"));
         assertTrue(getBrowser().isTextPresent("The upgrade has been successful"));
 
-        getBrowser().click("continue");
+        getBrowser().click(By.id("continue"));
 
         TestUtils.waitForCondition(new Condition()
         {

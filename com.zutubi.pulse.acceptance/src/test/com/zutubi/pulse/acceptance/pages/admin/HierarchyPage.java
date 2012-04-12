@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import org.openqa.selenium.By;
 
 /**
  * The page shown when looking at the hierarchy view of a templated scope.
@@ -60,11 +61,6 @@ public class HierarchyPage extends ConfigurationPanePage
         return urls.admin() + scope + "/";
     }
 
-    public String getTreeItemLocator(String baseName)
-    {
-        return "link=" + baseName;
-    }
-
     public void open()
     {
         browser.open(getUrl());
@@ -78,30 +74,30 @@ public class HierarchyPage extends ConfigurationPanePage
         waitForActionToComplete();
 
         // Choose our panel and wait for it.
-        String linkLocator = getTreeItemLocator(baseName);
-        browser.waitForLocator(linkLocator);
-        browser.click(linkLocator);
+        By panelLink = By.linkText(baseName);
+        browser.waitForElement(panelLink);
+        browser.click(panelLink);
         super.waitFor();
     }
 
     public boolean isTreeItemPresent(String baseName)
     {
-        return browser.isElementPresent(getTreeItemLocator(baseName));
+        return browser.isElementPresent(By.linkText(baseName));
     }
 
     public boolean isTreeItemVisible(String baseName)
     {
-        return browser.isVisible(getTreeItemLocator(baseName));
+        return browser.isVisible(By.linkText(baseName));
     }
 
     public void expandTreeItem(String baseName)
     {
-        browser.doubleClick(getTreeItemLocator(baseName));
+        browser.doubleClick(By.linkText(baseName));
     }
 
     public void selectTreeItem(String baseName)
     {
-        browser.waitAndClick(getTreeItemLocator(baseName));
+        browser.waitAndClick(By.linkText(baseName));
     }
 
     public boolean isAddPresent()
@@ -111,12 +107,12 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public void clickAdd()
     {
-        browser.waitAndClick(LINK_ADD);
+        browser.waitAndClick(By.id(LINK_ADD));
     }
 
     public void clickAddTemplate()
     {
-        browser.waitAndClick(LINK_ADD_TEMPLATE);
+        browser.waitAndClick(By.id(LINK_ADD_TEMPLATE));
     }
 
     public boolean isClonePresent()
@@ -126,12 +122,12 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public void clickClone()
     {
-        browser.waitAndClick(LINK_CLONE);
+        browser.waitAndClick(By.id(LINK_CLONE));
     }
 
     public void clickSmartClone()
     {
-        browser.waitAndClick(LINK_SMART_CLONE);
+        browser.waitAndClick(By.id(LINK_SMART_CLONE));
     }
 
     public boolean isIntroduceParentPresent()
@@ -141,7 +137,7 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public void clickIntroduceParent()
     {
-        browser.waitAndClick(LINK_INTRODUCE_PARENT);
+        browser.waitAndClick(By.id(LINK_INTRODUCE_PARENT));
     }
     
     public boolean isMovePresent()
@@ -151,7 +147,7 @@ public class HierarchyPage extends ConfigurationPanePage
     
     public void clickMove()
     {
-        browser.waitAndClick(LINK_MOVE);
+        browser.waitAndClick(By.id(LINK_MOVE));
     }
 
     public void setTemplate(boolean template)
@@ -161,7 +157,7 @@ public class HierarchyPage extends ConfigurationPanePage
 
     public DeleteConfirmPage clickDelete()
     {
-        browser.waitAndClick(LINK_DELETE);
+        browser.waitAndClick(By.id(LINK_DELETE));
         return browser.createPage(DeleteConfirmPage.class, getId(), false);
     }
 }

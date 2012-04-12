@@ -6,10 +6,9 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
+import static java.util.Arrays.asList;
 
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests for the agent history tab.
@@ -20,6 +19,7 @@ public class AgentHistoryAcceptanceTest extends HistoryAcceptanceTestBase
     {
         super.setUp();
 
+        rpcClient.TestApi.cancelActiveBuilds();
         rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 

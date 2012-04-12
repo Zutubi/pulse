@@ -20,7 +20,7 @@ public class SummaryTable extends ContentTable
      *
      * @return the number of data rows shown
      */
-    public int getRowCount()
+    public long getRowCount()
     {
         return getDataLength();
     }
@@ -37,7 +37,7 @@ public class SummaryTable extends ContentTable
      */
     public Map<String, String> getRow(int index)
     {
-        String[] columnNames = browser.evalExpression(getComponentJS() + ".getColumnNames()").split(",");
+        String[] columnNames = ((String) browser.evaluateScript("return " + getComponentJS() + ".getColumnNames();")).split(",");
         Map<String, String> result = new LinkedHashMap<String, String>();
         for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
         {

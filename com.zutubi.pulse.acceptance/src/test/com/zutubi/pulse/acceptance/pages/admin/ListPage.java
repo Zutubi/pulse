@@ -11,6 +11,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
 
 import static com.zutubi.util.WebUtils.uriPathEncode;
+import org.openqa.selenium.By;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
@@ -81,12 +82,12 @@ public class ListPage extends ConfigPage
 
     public void clickAdd()
     {
-        browser.click(ADD_LINK);
+        browser.click(By.id(ADD_LINK));
     }
 
     public void clickAction(String baseName, String action)
     {
-        browser.click(getActionId(action, baseName));
+        browser.click(By.id(getActionId(action, baseName)));
     }
 
     public void clickView(String baseName)
@@ -115,8 +116,8 @@ public class ListPage extends ConfigPage
     public DeleteConfirmPage clickDelete(String baseName)
     {
         String actionId = getActionId("delete", baseName);
-        boolean isHide = "hide".equals(browser.getText(actionId));
-        browser.click(actionId);
+        boolean isHide = "hide".equals(browser.getText(By.id(actionId)));
+        browser.click(By.id(actionId));
         return browser.createPage(DeleteConfirmPage.class, PathUtils.getPath(path, baseName), isHide);
     }
 
@@ -144,7 +145,7 @@ public class ListPage extends ConfigPage
 
     private void clickRefreshingAction(String baseName, String action)
     {
-        browser.click(getActionId(action, baseName));
+        browser.click(By.id(getActionId(action, baseName)));
         browser.waitForVariable("actionInProgress", true);
     }
 

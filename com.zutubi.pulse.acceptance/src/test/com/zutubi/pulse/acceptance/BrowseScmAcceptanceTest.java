@@ -15,6 +15,7 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * A high level acceptance test that checks the ability to browse and select
@@ -205,7 +206,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
                 Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME
         );
-        getBrowser().waitAndClick(ListPage.ADD_LINK);
+        getBrowser().waitAndClick(By.id(ListPage.ADD_LINK));
 
         SelectTypeState commandType = new SelectTypeState(getBrowser());
         commandType.waitFor();

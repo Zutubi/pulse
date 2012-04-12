@@ -14,14 +14,14 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfi
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.WebUtils;
+import static java.util.Arrays.asList;
+import org.openqa.selenium.By;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static java.util.Arrays.asList;
 
 /**
  * Tests for cloning both of top-level template collection items and of
@@ -241,7 +241,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
         hierarchyPage.expandTreeItem(parentCloneName);
-        getBrowser().waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
+        getBrowser().waitForElement(By.linkText(childCloneName));
     }
 
     public void testCloneProjectHierarchyValidation() throws Exception
@@ -329,7 +329,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
         assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
         hierarchyPage.expandTreeItem(parentCloneName);
-        getBrowser().waitForLocator(hierarchyPage.getTreeItemLocator(childCloneName));
+        getBrowser().waitForElement(By.linkText(childCloneName));
     }
 
     public void testSmartCloneWithInternalReference() throws Exception

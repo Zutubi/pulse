@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
+import org.openqa.selenium.By;
 
 public class HibernateStatisticsPage extends SeleniumPage
 {
@@ -26,9 +27,8 @@ public class HibernateStatisticsPage extends SeleniumPage
         return "link.toggle";
     }
 
-    public void clickToggleAndWait()
+    public void clickToggle()
     {
-        browser.click(getToggleId());
-        browser.waitForPageToLoad();
+        browser.click(By.id(getToggleId()));
     }
 }

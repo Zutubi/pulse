@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 /**
  * The pulse file tab for a build result.
@@ -35,11 +36,11 @@ public class BuildFilePage extends SeleniumPage
 
     public boolean isDownloadLinkPresent()
     {
-        return browser.isElementPresent(ID_DOWNLOAD_LINK);
+        return browser.isElementIdPresent(ID_DOWNLOAD_LINK);
     }
 
     public void clickDownload()
     {
-        browser.click(ID_DOWNLOAD_LINK);
+        browser.click(By.id(ID_DOWNLOAD_LINK));
     }
 }

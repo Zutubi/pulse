@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.StringUtils;
+import org.openqa.selenium.By;
 
 import java.util.List;
 
@@ -67,7 +68,7 @@ public abstract class AbstractHistoryPage extends SeleniumPage
      */
     public void clearStateFilter()
     {
-        browser.click(ID_STATE_FILTER_CLEAR);
+        browser.click(By.id(ID_STATE_FILTER_CLEAR));
     }
     
     /**
@@ -86,7 +87,7 @@ public abstract class AbstractHistoryPage extends SeleniumPage
      *
      * @return the number of entries in the builds table
      */
-    public int getBuildCount()
+    public long getBuildCount()
     {
         return builds.getRowCount();
     }

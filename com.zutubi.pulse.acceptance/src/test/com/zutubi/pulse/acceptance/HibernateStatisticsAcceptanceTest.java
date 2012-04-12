@@ -25,7 +25,7 @@ public class HibernateStatisticsAcceptanceTest extends AcceptanceTestBase
         assertTrue(statsPage.isPresent());
         assertFalse(statsPage.isEnabled());
 
-        statsPage.clickToggleAndWait();
+        statsPage.clickToggle();
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()
@@ -34,7 +34,7 @@ public class HibernateStatisticsAcceptanceTest extends AcceptanceTestBase
             }
         }, TIMEOUT, "statistics to be enabled");
 
-        statsPage.clickToggleAndWait();
+        statsPage.clickToggle();
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()

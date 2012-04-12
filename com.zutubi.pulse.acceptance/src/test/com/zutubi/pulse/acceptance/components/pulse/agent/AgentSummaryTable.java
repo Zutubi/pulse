@@ -4,6 +4,7 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.SummaryTable;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import org.openqa.selenium.By;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ import java.util.*;
  */
 public class AgentSummaryTable extends SummaryTable
 {
-    private static final String EXPRESSION_MENU = "var menu = " + SeleniumBrowser.CURRENT_WINDOW + ".Ext.get('menus-window');";
+    private static final String EXPRESSION_MENU = "var menu = Ext.get('menus-window');";
     private static final Set<String> TABS = new HashSet<String>(Arrays.asList("status", "statistics", "history", "info", "messages", "configuration"));
     
     public AgentSummaryTable(SeleniumBrowser browser, String id)
@@ -28,7 +29,7 @@ public class AgentSummaryTable extends SummaryTable
     public List<AgentInfo> getAgents()
     {
         List<AgentInfo> result = new LinkedList<AgentInfo>();
-        int count = getRowCount();
+        long count = getRowCount();
         for (int i = 0; i < count; i++)
         {
             result.add(new AgentInfo(getRow(i)));
@@ -62,22 +63,22 @@ public class AgentSummaryTable extends SummaryTable
     
     public void clickAgentActionsAndWait(long agentId)
     {
-        browser.evalExpression(SeleniumBrowser.CURRENT_WINDOW + ".Zutubi.FloatManager.hideAll()");
-        browser.click("aactions-" + agentId + "-button");
-        browser.waitForCondition(EXPRESSION_MENU + " menu && menu.isVisible()");
+        browser.evaluateScript("Zutubi.FloatManager.hideAll()");
+        browser.click(By.id("aactions-" + agentId + "-button"));
+        browser.waitForCondition(EXPRESSION_MENU + " return menu && menu.isVisible()");
     }
 
     public void clickAction(long agentId, String action)
     {
         clickAgentActionsAndWait(agentId);
-        browser.click(action + "-aactions-" + agentId);
+        browser.click(By.id(action + "-aactions-" + agentId));
     }
     
     public List<String> getActions(long agentId)
     {
         clickAgentActionsAndWait(agentId);
-        String idString = browser.evalExpression(EXPRESSION_MENU + " var ids = []; menu.select('a').each(function(item) { ids.push(item.id); }); ids.join(',')");
-        String[] ids = idString.split(",");
+        @SuppressWarnings("unchecked")
+        List<String> ids = (List<String>) browser.evaluateScript(EXPRESSION_MENU + " var ids = []; menu.select('a').each(function(item) { ids.push(item.id); }); return ids");
         List<String> result = new LinkedList<String>();
         for (String id: ids)
         {

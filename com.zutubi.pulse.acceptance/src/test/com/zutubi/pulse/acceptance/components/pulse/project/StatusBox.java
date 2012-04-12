@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.components.pulse.project;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.Component;
+import org.openqa.selenium.By;
 
 /**
  * Corresponds to the Zutubi.pulse.project.StatusBox component.
@@ -20,7 +21,7 @@ public class StatusBox extends Component
      */
     public String getTitle()
     {
-        return browser.getText(getId() + "-title");
+        return browser.getText(By.id(getId() + "-title"));
     }
 
     /**
@@ -54,6 +55,6 @@ public class StatusBox extends Component
      */
     public String getValue(String propertyName)
     {
-        return browser.getText(getValueId(propertyName));
+        return browser.getText(By.id(getValueId(propertyName)));
     }
 }

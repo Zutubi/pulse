@@ -87,7 +87,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
             // cleanup selenium if it was used.
             if (browser != null)
             {
-                browser.stop();
+                browser.quit();
                 browser = null;
             }
         }
@@ -399,7 +399,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         SetPulseDataForm form = browser.createForm(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
 
-        String dataDir = form.getFormValues()[0];
+        String dataDir = (String) form.getFieldValue(form.getFieldNames()[0]);
 
         // set the data directory
         form.nextFormElements(expected.getConfiguredDataDirectory());
@@ -566,7 +566,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     private SeleniumBrowser initSelenium(RuntimeContext context)
     {
         SeleniumBrowser browser = new SeleniumBrowser(Integer.parseInt(context.getPort()));
-        browser.start();
         browser.open((context.getContextPath() != null ? context.getContextPath() : ""));
         return browser;
     }
