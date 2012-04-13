@@ -1224,6 +1224,13 @@ td.status-last
     background-color: #f2f2ff;
 }
 
+.change-via
+{
+    padding: 5px;
+    border-bottom: dotted 1px #bbb;
+    background-color: #f8f8ff;
+}
+
 .change-comment
 {
     padding: 5px 5px 5px 10px;

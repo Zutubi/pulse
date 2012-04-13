@@ -34,7 +34,7 @@ public class ChangedNotifyCondition implements NotifyCondition
         {
             public Boolean process()
             {
-                return buildManager.getChangesForBuild(result, false).size() > 0;
+                return buildManager.getChangesForBuild(result, 0, false).size() > 0;
             }
         });
     }

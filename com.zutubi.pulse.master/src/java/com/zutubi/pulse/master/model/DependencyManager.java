@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+
 import java.util.List;
 
 /**
@@ -15,8 +17,9 @@ public interface DependencyManager
      * an index of dependency information.
      *
      * @param build the build to add upstream links for, must be complete
+     * @param ivyModuleDescriptor
      */
-    void addDependencyLinks(BuildResult build);
+    void addDependencyLinks(BuildResult build, IvyModuleDescriptor ivyModuleDescriptor);
 
     /**
      * Loads dependency information for the given build.  The information is derived for each stage
@@ -26,4 +29,17 @@ public interface DependencyManager
      * @return dependency information for each stage in the given build
      */
     List<StageRetrievedArtifacts> loadRetrievedArtifacts(BuildResult build);
+
+    /**
+     * Returns all new upstream changes in a build since a given build.  The upstream dependency
+     * graphs of the build and since build are compared to find where new upstream builds have been
+     * used.  For each new upstream build, the changes after the since upstream build are added to
+     * the result.
+     * 
+     * @param build      the build to find upstream changes for
+     * @param sinceBuild an earlier build of the same project used as the point after which to find
+     *                   changes
+     * @return all new upstream changes that may have influenced build since sinceBuild
+     */
+    List<UpstreamChangelist> getUpstreamChangelists(BuildResult build, BuildResult sinceBuild);
 }

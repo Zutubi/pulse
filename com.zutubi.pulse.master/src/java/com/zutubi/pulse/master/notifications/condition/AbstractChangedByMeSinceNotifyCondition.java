@@ -33,7 +33,7 @@ public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyC
             public Boolean process()
             {
                 // Check for direct changes on the build we have first.
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, false);
+                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, 0, false);
                 ByMePredicate predicate = new ByMePredicate(user);
                 if (CollectionUtils.contains(changelists, predicate))
                 {
@@ -48,7 +48,7 @@ public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyC
                 List<BuildResult> resultRange = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), lowestNumber, result.getNumber() - 1, 0, -1, false, false);
                 for (BuildResult r: resultRange)
                 {
-                    changelists  = buildManager.getChangesForBuild(r, false);
+                    changelists  = buildManager.getChangesForBuild(r, 0, false);
                     if (CollectionUtils.contains(changelists, predicate))
                     {
                         return true;

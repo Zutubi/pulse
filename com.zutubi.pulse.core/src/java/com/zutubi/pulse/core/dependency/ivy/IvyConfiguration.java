@@ -20,8 +20,9 @@ import java.util.Map;
  */
 public class IvyConfiguration
 {
-    private static final String DEFAULT_PATTERN_ARTIFACT = "([organisation]/)[module]/([stage]/)[artifact](-[revision])(.[ext])";
-    private static final String DEFAULT_PATTERN_IVY = "([organisation]/)[module]/ivy(-[revision]).xml";
+    private static final String DEFAULT_PATTERN_MODULE = "([organisation]/)[module]";
+    private static final String DEFAULT_PATTERN_ARTIFACT = DEFAULT_PATTERN_MODULE + "/([stage]/)[artifact](-[revision])(.[ext])";
+    private static final String DEFAULT_PATTERN_IVY = DEFAULT_PATTERN_MODULE + "/ivy(-[revision]).xml";
 
     private static final String IVY_CACHE_DIR = "ivy.cache.dir";
     private static final String IVY_CACHE_RESOLUTION = "ivy.cache.resolution";
@@ -38,6 +39,10 @@ public class IvyConfiguration
      * The pattern used to construct paths to artifacts within the repository.
      */
     private String artifactPattern = DEFAULT_PATTERN_ARTIFACT;
+    /**
+     * The pattern used to construct paths to a module directory within the repository.
+     */
+    private String modulePattern = DEFAULT_PATTERN_MODULE;
     /**
      * The pattern used to construct paths to ivy files within the repository.
      */
@@ -58,9 +63,10 @@ public class IvyConfiguration
     {
     }
 
-    public IvyConfiguration(File repositoryBase, String artifactPattern, String ivyPattern)
+    public IvyConfiguration(File repositoryBase, String modulePattern, String artifactPattern, String ivyPattern)
     {
         this(repositoryBase.toURI().toString());
+        this.modulePattern = modulePattern;
         this.artifactPattern = artifactPattern;
         this.ivyPattern = ivyPattern;
     }
@@ -68,6 +74,18 @@ public class IvyConfiguration
     public IvyConfiguration(String repositoryBase)
     {
         this.repositoryBase = repositoryBase;
+    }
+
+    /**
+     * The module pattern defines the expected layout of module directories within the repository.
+     *
+     * @return the module pattern
+     *
+     * @see #getModulePath(org.apache.ivy.core.module.id.ModuleRevisionId) 
+     */
+    public String getModulePattern()
+    {
+        return modulePattern;
     }
 
     /**
@@ -185,6 +203,18 @@ public class IvyConfiguration
         {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    /**
+     * Get the path of the module directory for the module defined by the module revision id.
+     * This path is relative to the base of the repository.
+     *
+     * @param mrid      the id uniquely identifying the module of interest
+     * @return the path relative to the base of the repository
+     */
+    public String getModulePath(ModuleRevisionId mrid)
+    {
+        return IvyPatternHelper.substitute(getModulePattern(), mrid);
     }
 
     /**

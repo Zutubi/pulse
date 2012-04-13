@@ -69,7 +69,7 @@
 
     <bean id="dependencyManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <bean class="com.zutubi.pulse.master.model.DefaultDependencyManager"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultDependencyManager" init-method="init"/>
         </property>
         <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>

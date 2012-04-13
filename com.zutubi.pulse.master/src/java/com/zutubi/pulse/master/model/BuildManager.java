@@ -232,15 +232,18 @@ public interface BuildManager
     List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max);
 
     /**
-     * Returns all changes associated with the given build result.
-     * 
-     * @param result     the result to retrieve changes for
-     * @param allowEmpty if true, the result may contain changelists with no
-     *                   files; if false, empty changelists are filtered out
-     * @return the changes associated with the given build
+     * Returns all changes associated with the given build result, optionally
+     * since another earlier build.
+     *
+     * @param result           the result to retrieve changes for
+     * @param sinceBuildNumber if greater than zero, the number of the build to
+     *                         get changes since (changes in the since build
+     *                         itself are not included)
+     * @param allowEmpty       if true, the result may contain changelists with
+     *                         no files; if false, empty changelists are
      */
     @SecureParameter(parameterIndex = 0, action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getChangesForBuild(BuildResult result, boolean allowEmpty);
+    List<PersistentChangelist> getChangesForBuild(BuildResult result, long sinceBuildNumber, boolean allowEmpty);
 
     /**
      * Gets the number of files in the given changelist, without loading them

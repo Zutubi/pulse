@@ -16,7 +16,8 @@ import java.util.List;
  */
 public abstract class RefactorArtifactRepositoryUpgradeTask extends AbstractUpgradeTask
 {
-    private String ivyPattern = "([organisation]/)[module]/ivy-[revision].xml";
+    private static final String MODULE_PATTERN = "([organisation]/)[module]";
+    private static final String IVY_PATTERN = MODULE_PATTERN + "/ivy-[revision].xml";
 
     private File repositoryBase = null;
 
@@ -37,7 +38,7 @@ public abstract class RefactorArtifactRepositoryUpgradeTask extends AbstractUpgr
             }
         });
 
-        IvyConfiguration existingIvyConfiguration = new IvyConfiguration(repositoryBase, existingArtifactPattern, ivyPattern);
+        IvyConfiguration existingIvyConfiguration = new IvyConfiguration(repositoryBase, MODULE_PATTERN, existingArtifactPattern, IVY_PATTERN);
 
         for (File ivyFile : ivyFiles)
         {

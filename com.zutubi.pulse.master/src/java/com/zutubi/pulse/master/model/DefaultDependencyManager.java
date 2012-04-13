@@ -1,26 +1,32 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Pair;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
+import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;
-import java.util.*;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Default implementation of DependencyManager.
@@ -29,38 +35,51 @@ public class DefaultDependencyManager implements DependencyManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultDependencyManager.class);
     
+    private File repositoryRoot;
+    
     private BuildResultDao buildResultDao;
+    private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider  configurationProvider;
     private MasterLocationProvider masterLocationProvider;
     private ProjectManager projectManager;
+    private RepositoryAttributes repositoryAttributes;
 
-    public void addDependencyLinks(BuildResult build)
+    public void init()
     {
-        List<StageRetrievedArtifacts> stageDependencyDetails = loadRetrievedArtifacts(build);
-        Set<Pair<Long, Long>> upstreamBuilds = new HashSet<Pair<Long, Long>>();
-        for (StageRetrievedArtifacts details: stageDependencyDetails)
+        repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+    }
+    
+    public void addDependencyLinks(BuildResult build, IvyModuleDescriptor ivyModuleDescriptor)
+    {
+        IvyConfiguration configuration = new IvyConfiguration(repositoryRoot.toURI().toString());
+        DependencyDescriptor[] dependencies = ivyModuleDescriptor.getDescriptor().getDependencies();
+        for (DependencyDescriptor dependency: dependencies)
         {
-            if (details.isArtifactInformationAvailable())
+            ModuleRevisionId mrid = dependency.getDependencyRevisionId();
+            String ivyPath = configuration.getIvyPath(mrid);
+            File ivyFile = new File(repositoryRoot, ivyPath);
+            if (ivyFile.isFile())
             {
-                for (RetrievedArtifactSource dependency: details.getRetrievedArtifacts())
+                try
                 {
-                    Project project = projectManager.getProject(dependency.getProjectName(), true);
-                    if (project != null && dependency.hasBuildNumber())
+                    IvyModuleDescriptor upstreamDescriptor = IvyModuleDescriptor.newInstance(ivyFile, configuration);
+                    String upstreamModulePath = configuration.getModulePath(upstreamDescriptor.getModuleRevisionId());
+                    String attribute = repositoryAttributes.getAttribute(upstreamModulePath, RepositoryAttributes.PROJECT_HANDLE);
+                    if (attribute != null)
                     {
-                        upstreamBuilds.add(asPair(project.getId(), dependency.getBuildNumber()));
+                        long projectHandle = Long.parseLong(attribute);
+                        ProjectConfiguration projectConfig = configurationProvider.get(projectHandle, ProjectConfiguration.class);
+                        Project project = projectManager.getProject(projectConfig.getProjectId(), true);
+                        BuildResult upstreamBuild = buildManager.getByProjectAndNumber(project, upstreamDescriptor.getBuildNumber());
+                        BuildDependencyLink link = new BuildDependencyLink(upstreamBuild.getId(), build.getId());
+                        buildResultDao.save(link);
                     }
                 }
-            }
-        }
-
-        for (Pair<Long, Long> upstream: upstreamBuilds)
-        {
-            BuildResult upstreamBuild = buildResultDao.findByProjectAndNumber(upstream.first, upstream.second);
-            if (upstreamBuild != null)
-            {
-                BuildDependencyLink link = new BuildDependencyLink(upstreamBuild.getId(), build.getId());
-                buildResultDao.save(link);
+                catch (Exception e)
+                {
+                    LOG.warning(e);
+                }
             }
         }
     }
@@ -108,8 +127,7 @@ public class DefaultDependencyManager implements DependencyManager
 
     private List<RetrievedArtifactSource> processRetrievalReport(IvyRetrievalReport report) throws Exception
     {
-        String masterLocation = masterLocationProvider.getMasterUrl();
-        final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
+        String masterLocation = masterLocationProvider.getMasterLocation();
         IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
         Urls urls = new Urls(configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
@@ -159,9 +177,108 @@ public class DefaultDependencyManager implements DependencyManager
         return dependencies;
     }
 
+    public BuildGraph getUpstreamDependencyGraph(BuildResult build)
+    {
+        BuildGraph.Node root = new BuildGraph.Node(build);
+        BuildGraph graph = new BuildGraph(root);
+        addUpstreamNodes(graph, root);
+        return graph;
+    }
+    
+    private void addUpstreamNodes(BuildGraph graph, BuildGraph.Node node)
+    {
+        List<BuildDependencyLink> upstreamLinks = buildResultDao.findAllUpstreamDependencies(node.getBuild().getId());
+        for (BuildDependencyLink upstreamLink: upstreamLinks)
+        {
+            BuildGraph.Node upstreamNode = graph.findNodeByBuildId(upstreamLink.getUpstreamBuildId());
+            if (upstreamNode == null)
+            {
+                BuildResult upstreamBuild = buildResultDao.findById(upstreamLink.getUpstreamBuildId());
+                upstreamNode = new BuildGraph.Node(upstreamBuild);
+                node.connectNode(upstreamNode);
+                addUpstreamNodes(graph, upstreamNode);
+            }
+            else
+            {
+                node.connectNode(upstreamNode);                
+            }
+        }
+    }
+    
+    public List<UpstreamChangelist> getUpstreamChangelists(final BuildResult build, BuildResult sinceBuild)
+    {
+        final BuildGraph buildGraph = getUpstreamDependencyGraph(build);
+        final BuildGraph sinceGraph = getUpstreamDependencyGraph(sinceBuild);
+        
+        final List<UpstreamChangelist> upstreamChangelists = new LinkedList<UpstreamChangelist>();
+        
+        buildGraph.forEach(new UnaryProcedure<BuildGraph.Node>()
+        {
+            public void run(BuildGraph.Node node)
+            {
+                if (node.getBuild() == build)
+                {
+                    // Skip the root.
+                    return;
+                }
+                
+                List<BuildResult> buildPath = buildGraph.getBuildPath(node);
+                BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
+                long sinceNumber;
+                if (sinceNode == null)
+                {
+                    // The project was not upstream last time, so just include changes directly on
+                    // the upstream build.
+                    sinceNumber = 0;
+                }
+                else if (sinceNode.getBuild().getId() != node.getBuild().getId())
+                {
+                    // A different build of the project was upstream last time, get changes since
+                    // that build.
+                    sinceNumber = sinceNode.getBuild().getNumber();
+                }
+                else
+                {
+                    // Since build used the same upstream build, no changes to record.
+                    return;
+                }
+                
+                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(node.getBuild(), sinceNumber, true);
+                for (final PersistentChangelist changelist: changelists)
+                {
+                    UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()
+                    {
+                        public boolean satisfied(UpstreamChangelist upstreamChange)
+                        {
+                            return upstreamChange.getChangelist().isEquivalent(changelist);
+                        }
+                    });
+                    
+                    if (upstreamChangelist == null)
+                    {
+                        upstreamChangelist = new UpstreamChangelist(changelist, buildPath);
+                        upstreamChangelists.add(upstreamChangelist);
+                    }
+                    else
+                    {
+                        // We've seen this change before, just add another context path.
+                        upstreamChangelist.addUpstreamContext(buildPath);
+                    }
+                }
+            }
+        });
+        
+        return upstreamChangelists;
+    }
+
     public void setBuildResultDao(BuildResultDao buildResultDao)
     {
         this.buildResultDao = buildResultDao;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -184,4 +301,8 @@ public class DefaultDependencyManager implements DependencyManager
         this.projectManager = projectManager;
     }
 
+    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
+    {
+        this.repositoryAttributes = repositoryAttributes;
+    }
 }

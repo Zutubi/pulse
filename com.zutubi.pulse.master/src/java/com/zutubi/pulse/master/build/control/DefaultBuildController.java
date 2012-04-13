@@ -1039,7 +1039,7 @@ public class DefaultBuildController implements EventListener, BuildController
             // be traversed when this information is required.
             buildResult.calculateFeatureCounts();
 
-            dependencyManager.addDependencyLinks(buildResult);
+            dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
             
             long start = System.currentTimeMillis();
             testManager.index(buildResult);

@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.util.FileSystemUtils;
+import static com.zutubi.util.FileSystemUtils.rmdir;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -38,8 +39,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
-
-import static com.zutubi.util.FileSystemUtils.rmdir;
 
 /**
  * The ivy client provides the core interface for interacting with ivy processes, encapsulating
@@ -255,7 +254,7 @@ public class IvyClient
             PublishOptions options = new PublishOptions();
             options.setOverwrite(true);
             options.setUpdate(true);
-            options.setHaltOnMissing(false); // we dont care about missing artifacts here, just that the ivy file gets published.
+            options.setHaltOnMissing(false); // we don't care about missing artifacts here, just that the ivy file gets published.
             options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
             options.setSrcIvyPattern(ivyFile.getCanonicalPath());
 

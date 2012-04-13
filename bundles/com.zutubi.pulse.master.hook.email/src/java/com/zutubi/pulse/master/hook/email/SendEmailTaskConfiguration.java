@@ -39,14 +39,13 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
+import static java.util.Arrays.asList;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 /**
  * A build hook task that sends email notifications to project contacts and/or
@@ -274,7 +273,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
-            for (PersistentChangelist change : buildManager.getChangesForBuild(build, true))
+            for (PersistentChangelist change : buildManager.getChangesForBuild(build, 0, true))
             {
                 String scmLogin = change.getAuthor();
                 // Only bother to map and add if we haven't already done so.

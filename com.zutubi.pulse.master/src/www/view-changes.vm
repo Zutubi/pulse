@@ -9,6 +9,108 @@
     #end
 #end
 
+#macro(upstreamContext $context)
+    #foreach($upstreamBuild in $context)
+        #if ($velocityCount > 1) &gt; #end
+            <a href="$urls.project($upstreamBuild.project)">$webwork.htmlEncode($upstreamBuild.project.name)</a> :: <a href="$urls.build($upstreamBuild)">build $upstreamBuild.number</a>
+    #end
+#end
+
+#macro(changelistModel $prefix $model)
+    #set($change = $model.changelist)
+    #set($changeIndex = $velocityCount)
+    $action.updateChangeUrl($model)
+    #set($url = $action.getChangeUrl())
+    #set($preferredBuild = $model.preferredBuild)
+    #set($commitMessageSupport = $action.getCommitMessageSupport($model))
+    #set($commentId = "${change.id}_comment")
+    <table id="${prefix}.${changeIndex}" class="change">
+        <tr>
+            <td class="change-heading">
+                <img src="$base/images/page_code.gif" alt="change">
+                #if($url)<a href="$url">#end$!webwork.htmlEncode($change.revision)#if($url)</a>#end
+                <span class="unspacer"></span>
+                <img src="$base/images/user.gif" alt="author">
+                $change.author
+                <span class="unspacer"></span>
+                <a href="#" class="unadorned" title="$change.getPrettyDate($locale)" onclick="toggleDisplay('time_${change.id}'); toggleDisplay('date_${change.id}'); return false;">
+                    <img alt="toggle format" src="$base/images/calendar.gif"/>
+                </a>
+                <span id="time_${change.id}" #if($absoluteTimestamps) style="display: none #end">$change.prettyTime</span>
+                <span id="date_${change.id}" #if(!$absoluteTimestamps) style="display: none #end">$change.getPrettyDate($locale)</span>
+                <span class="unspacer"></span>
+                <a class="unadorned" href="$urls.buildChangelist($preferredBuild, $change.id)"><img src="$base/images/magnifier.gif" alt="view details"></a>
+                <a id="view.${change.id}" href="$urls.buildChangelist($preferredBuild, $change.id)">#wwtext("name=change.details")</a>
+            </td>
+        </tr>
+        #if($model.upstreamContexts.size() > 0)
+        <tr>
+            <td class="change-via" id="${prefix}.${changeIndex}.via">
+                Via:
+            #if($model.upstreamContexts.size() > 1)
+                <ul class="points">
+                #foreach($context in $model.upstreamContexts)
+                    <li>
+                        #upstreamContext($context)
+                    </li>
+                #end
+                </ul>
+            #else
+                #upstreamContext($model.upstreamContexts.get(0))
+            #end
+            </td>
+        </tr>
+        #end
+        <tr>
+            <td class="change-comment" id="${prefix}.${changeIndex}.comment">
+    #if ($commitMessageSupport.length > 300)
+        $commitMessageSupport.trim(300)
+        #showHideButton("comments" "${commentId}" "tr-br?")
+                <div id="$commentId" style="display: none">
+                    <table class="content" style="margin: 0">
+                        <tr>
+                            <th class="heading">
+                                <span class="action">
+                                    <a href="#" onclick="Zutubi.FloatManager.showHideFloat('comments', '$commentId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                                </span>
+                                #wwtext("name=change.comment")
+                            </th>
+                        </tr>
+                        <tr>
+                            <td><pre>$commitMessageSupport.wrap(80)</pre></td>
+                        </tr>
+                    </table>
+                </div>
+    #else
+                $commitMessageSupport.wrap(80)
+    #end
+            </td>
+        </tr>
+    #if($model.changeCount > 0)
+        <tr>
+            <td class="change-files">
+                <ul>
+        #if($model.changeCount < 5)
+            #set($limit = $model.changeCount - 1)
+            #set($remaining = 0)
+        #else
+            #set($limit = 4)
+            #set($remaining = $model.changeCount - 5)
+        #end
+        #foreach($i in [0..$limit])
+            #set($file = $model.changes.get($i))
+                    <li id="${prefix}.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
+        #end
+        #if($remaining > 0)
+                    <li>... ($remaining #wwtext("name=change.more.files"))</li>
+        #end
+                </ul>
+            </td>
+        </tr>
+    #end
+    </table>
+#end
+
 #helpTag("Build+Changes+Tab")
 #authorisationTags($principle)
 #buildTags($project $buildResult "changes")
@@ -49,79 +151,7 @@
         ## Changes list (one table per change)
         ##-------------------------------------------------------------------------
         #foreach($model in $changelists)
-            #set($change = $model.changelist)
-            #set($changeIndex = $velocityCount)
-            $action.updateChangeUrl($change)
-            #set($url = $action.getChangeUrl())
-            #set($commitMessageSupport = $action.getCommitMessageSupport($change))
-            #set($commentId = "${change.id}_comment")
-            <table id="change.${changeIndex}" class="change">
-                <tr>
-                    <td class="change-heading">
-                        <img src="$base/images/page_code.gif" alt="change">
-                        #if($url)<a href="$url">#end$!webwork.htmlEncode($change.revision)#if($url)</a>#end
-                        <span class="unspacer"></span>
-                        <img src="$base/images/user.gif" alt="author">
-                        $change.author
-                        <span class="unspacer"></span>
-                        <a href="#" class="unadorned" title="$change.getPrettyDate($locale)" onclick="toggleDisplay('time_${change.id}'); toggleDisplay('date_${change.id}'); return false;">
-                            <img alt="toggle format" src="$base/images/calendar.gif"/>
-                        </a>
-                        <span id="time_${change.id}" #if($absoluteTimestamps) style="display: none #end">$change.prettyTime</span>
-                        <span id="date_${change.id}" #if(!$absoluteTimestamps) style="display: none #end">$change.getPrettyDate($locale)</span>
-                        <span class="unspacer"></span>
-                        <a class="unadorned" href="$urls.buildChangelist($buildResult, $change.id)"><img src="$base/images/magnifier.gif" alt="view details"></a>
-                        <a id="view.${change.id}" href="$urls.buildChangelist($buildResult, $change.id)">#wwtext("name=change.details")</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="change-comment" id="change.${changeIndex}.comment">
-            #if ($commitMessageSupport.length > 300)
-                $commitMessageSupport.trim(300)
-                #showHideButton("comments" "${commentId}" "tr-br?")
-                        <div id="$commentId" style="display: none">
-                            <table class="content" style="margin: 0">
-                                <tr>
-                                    <th class="heading">
-                                        <span class="action">
-                                            <a href="#" onclick="Zutubi.FloatManager.showHideFloat('comments', '$commentId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
-                                        </span>
-                                        #wwtext("name=change.comment")
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <td><pre>$commitMessageSupport.wrap(80)</pre></td>
-                                </tr>
-                            </table>
-                        </div>
-            #else
-                        $commitMessageSupport.wrap(80)
-            #end
-                    </td>
-                </tr>
-            #if($model.changeCount > 0)
-                <tr>
-                    <td class="change-files">
-                        <ul>
-                #if($model.changeCount < 5)
-                    #set($limit = $model.changeCount - 1)
-                    #set($remaining = 0)
-                #else
-                    #set($limit = 4)
-                    #set($remaining = $model.changeCount - 5)
-                #end
-                #foreach($i in [0..$limit])
-                    #set($file = $model.changes.get($i))
-                            <li id="change.${changeIndex}.file.${velocityCount}">$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.toString()</li>
-                #end
-                #if($remaining > 0)
-                            <li>... ($remaining #wwtext("name=change.more.files"))</li>
-                #end
-                        </ul>
-                    </td>
-                </tr>
-            #end
-            </table>
+            #changelistModel("change" $model)
         #end
         </div>
     #else
@@ -129,7 +159,20 @@
             #wwtext("name=changes.none")
         </p>
     #end
+
+    #if($upstreamChangelists.size() > 0)
+        <h2 class="section">#wwtext("name=upstream.changes")</h2>
     
+        <div id="upstream-changelist-tables">
+        ##-------------------------------------------------------------------------
+        ## Upstream changes list (one table per change)
+        ##-------------------------------------------------------------------------
+        #foreach($model in $upstreamChangelists)
+            #changelistModel("upstream" $model)
+        #end
+        </div>
+    #end
+
     ##-------------------------------------------------------------------------
     ## Popup to select change to compare against.
     ##-------------------------------------------------------------------------

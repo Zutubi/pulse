@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
+import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
@@ -20,8 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.master.committransformers.SubstitutionUtils.processSubstitution;
 
 /**
  * Action to provide data for the build summary tab.
@@ -122,7 +121,7 @@ public class BuildSummaryDataAction extends BuildStatusActionBase
 
     private void addRelatedLinks(BuildResult buildResult)
     {
-        List<PersistentChangelist> changelists = buildManager.getChangesForBuild(buildResult, true);
+        List<PersistentChangelist> changelists = buildManager.getChangesForBuild(buildResult, 0, true);
 
         List<LinkSubstitution> substitutions = gatherLinkSubstitutions(buildResult.getProject().getConfig());
         for (LinkSubstitution substitution: substitutions)

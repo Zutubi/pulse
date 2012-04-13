@@ -68,7 +68,7 @@ public class RefactorArtifactRepositoryUpgradeTaskTest extends ZutubiTestCase
 
     private void setupRepository(String artifactPattern) throws Exception
     {
-        IvyConfiguration config = new IvyConfiguration(repositoryBase, artifactPattern, "([organisation]/)[module]/ivy(-[revision]).xml");
+        IvyConfiguration config = new IvyConfiguration(repositoryBase, "([organisation]/)[module]", artifactPattern, "([organisation]/)[module]/ivy(-[revision]).xml");
         IvyClient ivyClient = new IvyClient(config);
 
         IvyModuleDescriptor descriptorA = new IvyModuleDescriptor("org", "moduleA", "revision", config);

@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * The IvyModuleDescriptorParser is a wrapper around Ivy's parsers
- * that provides synchronisation.  The ivy parser uses un synchronised
+ * that provides synchronisation.  The ivy parser uses unsynchronised
  * access to a static instance of a SimpleDateFormat.
  */
 public class IvyModuleDescriptorParser
