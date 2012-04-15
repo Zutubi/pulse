@@ -24,10 +24,7 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Constants;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -358,102 +355,116 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void run()
     {
+        RetryHandler retryHandler = new RetryHandler(1, TimeUnit.SECONDS, 30, TimeUnit.MINUTES);
+        retryHandler.setBackoff(true);
+        retryHandler.setExponentialBackoff(true);
+
         try
         {
             lock.lock();
-            // wait for changes to either of the inbound queues. When change detected,
-            // copy the new data into the internal queue (to minimize locked time) and
-            // start processing.  JS: extended lock time to simplify snapshotting:
-            // review iff this leads to a performance issue (seems unlikely).
-
             while (!stopRequested)
             {
-                LOG.finer("Begin assignment loop");
-                final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
-                long currentTime = clock.getCurrentTimeMillis();
-
-                // Notes on the agent pool:
-                // With the introduction of priority ordering to the request queue, we need provide
-                // better control over the agents available for recipe assignment.  In short, the
-                // set of agents available to any particular recipe request needs to be a subset of
-                // what was available to earlier requests.  Otherwise, an agent becoming available
-                // half way through the processing of the request queue can 'activate' a low priority
-                // request when it should have been used for a higher priority request.
-                final List<Agent> agentPool = new LinkedList<Agent>();
-                agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
-                {
-                    public void run(List<Agent> agents)
-                    {
-                        agentPool.addAll(agents);
-                    }
-                });
-                
-                LOG.finest("  agent pool acquired");
-                for (final RecipeAssignmentRequest request : requestQueue)
-                {
-                    final long recipeId = request.getRequest().getId();
-                    if (request.hasTimedOut(currentTime))
-                    {
-                        LOG.finest("  request " + recipeId + " timed out");
-                        doneRequests.add(request);
-                        eventManager.publish(new RecipeErrorEvent(this, recipeId, I18N.format("recipe.assignment.timeout")));
-                    }
-                    else
-                    {
-                        LOG.finest("  trying to dispatch request " + recipeId);
-                        agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
-                        {
-                            // Note that this method must be fast - we are locking agents.
-                            // The lock is require to prevent the agent state changing
-                            // before we assign the recipe to it.
-                            public void run(final List<Agent> agents)
-                            {
-                                // The agent pool can only contain agents that are currently available.  
-                                CollectionUtils.filterInPlace(agentPool, new Predicate<Agent>()
-                                {
-                                    public boolean satisfied(Agent agent)
-                                    {
-                                        return agents.contains(agent);
-                                    }
-                                });
-
-                                Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
-                                for (Agent agent : agentList)
-                                {
-                                    // can the request be sent to this service?
-                                    if (request.isFulfilledBy(agent))
-                                    {
-                                        LOG.finest("  dispatching request " + recipeId + " to agent '" + agent.getName() + "'");
-                                        eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
-                                        doneRequests.add(request);
-                                        break;
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-
-                LOG.finer("End assignment loop (dispatched " + doneRequests.size() + " requests)");
-                requestQueue.removeAll(doneRequests);
-
-                try
-                {
-                    // Wake up when there is something to do, and also
-                    // periodically to check for timed-out requests.
-                    lockCondition.await(sleepInterval, TimeUnit.MILLISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
-                }
+                doAssignmentIteration(retryHandler);
             }
+
             executor.shutdown();
         }
         finally
         {
             isRunning = false;
             lock.unlock();
+        }
+    }
+
+    private void doAssignmentIteration(RetryHandler retryHandler)
+    {
+        try
+        {
+            LOG.finer("Begin assignment loop");
+            final List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
+            long currentTime = clock.getCurrentTimeMillis();
+
+            // Notes on the agent pool:
+            // With the introduction of priority ordering to the request queue, we need provide
+            // better control over the agents available for recipe assignment.  In short, the
+            // set of agents available to any particular recipe request needs to be a subset of
+            // what was available to earlier requests.  Otherwise, an agent becoming available
+            // half way through the processing of the request queue can 'activate' a low priority
+            // request when it should have been used for a higher priority request.
+            final List<Agent> agentPool = new LinkedList<Agent>();
+            agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
+            {
+                public void run(List<Agent> agents)
+                {
+                    agentPool.addAll(agents);
+                }
+            });
+
+            LOG.finest("  agent pool acquired");
+            for (final RecipeAssignmentRequest request : requestQueue)
+            {
+                final long recipeId = request.getRequest().getId();
+                if (request.hasTimedOut(currentTime))
+                {
+                    LOG.finest("  request " + recipeId + " timed out");
+                    doneRequests.add(request);
+                    eventManager.publish(new RecipeErrorEvent(this, recipeId, I18N.format("recipe.assignment.timeout")));
+                }
+                else
+                {
+                    LOG.finest("  trying to dispatch request " + recipeId);
+                    agentManager.withAvailableAgents(new UnaryProcedure<List<Agent>>()
+                    {
+                        // Note that this method must be fast - we are locking agents.
+                        // The lock is require to prevent the agent state changing
+                        // before we assign the recipe to it.
+                        public void run(final List<Agent> agents)
+                        {
+                            // The agent pool can only contain agents that are currently available.
+                            CollectionUtils.filterInPlace(agentPool, new Predicate<Agent>()
+                            {
+                                public boolean satisfied(Agent agent)
+                                {
+                                    return agents.contains(agent);
+                                }
+                            });
+
+                            Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
+                            for (Agent agent : agentList)
+                            {
+                                // can the request be sent to this service?
+                                if (request.isFulfilledBy(agent))
+                                {
+                                    LOG.finest("  dispatching request " + recipeId + " to agent '" + agent.getName() + "'");
+                                    eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
+                                    doneRequests.add(request);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            LOG.finer("End assignment loop (dispatched " + doneRequests.size() + " requests)");
+            requestQueue.removeAll(doneRequests);
+
+            try
+            {
+                // Wake up when there is something to do, and also
+                // periodically to check for timed-out requests.
+                lockCondition.await(sleepInterval, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
+            }
+
+            retryHandler.reset();
+        }
+        catch (Throwable t)
+        {
+            retryHandler.handle(t);
         }
     }
 
