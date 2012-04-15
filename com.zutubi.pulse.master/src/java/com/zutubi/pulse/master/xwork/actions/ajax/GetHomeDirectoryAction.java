@@ -2,10 +2,11 @@ package com.zutubi.pulse.master.xwork.actions.ajax;
 
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import static com.zutubi.util.FileSystemUtils.normaliseSeparators;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import static com.zutubi.util.io.FileSystemUtils.normaliseSeparators;
 
 /**
  * An action that provides access to the users home directory location.

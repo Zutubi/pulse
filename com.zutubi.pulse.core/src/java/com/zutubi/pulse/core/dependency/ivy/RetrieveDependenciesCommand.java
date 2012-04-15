@@ -5,11 +5,10 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.NullaryFunctionE;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
 import org.apache.ivy.core.IvyPatternHelper;
@@ -22,6 +21,8 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.*;
 import java.net.URL;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This

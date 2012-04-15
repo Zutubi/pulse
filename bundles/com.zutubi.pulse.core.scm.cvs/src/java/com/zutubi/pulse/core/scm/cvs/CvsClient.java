@@ -7,10 +7,10 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.CleanupInputStream;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -19,7 +19,7 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import java.io.*;
 import java.util.*;
 
-import static com.zutubi.util.FileSystemUtils.createFile;
+import static com.zutubi.util.io.FileSystemUtils.createFile;
 
 /**
  * The CvsClient provides all interactions with a cvs repository.

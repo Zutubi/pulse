@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;

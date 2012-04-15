@@ -1,9 +1,14 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.math.AggregationFunction;
 
-import static java.util.Arrays.asList;
 import java.util.*;
+
+import static java.util.Arrays.asList;
 
 /**
  * Represents a node in a hierarchical structure.  Nodes can hold an arbitrary

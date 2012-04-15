@@ -52,6 +52,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 

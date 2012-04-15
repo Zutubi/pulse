@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.HSQLDBUtils;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -147,7 +147,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
      * Copy the named file to the destination if and only if the file exists.
      * @param dest  the destination of the copy
      * @param file  the source of the copy
-     * @see com.zutubi.util.FileSystemUtils#copy(java.io.File, java.io.File[])
+     * @see com.zutubi.util.io.FileSystemUtils#copy(java.io.File, java.io.File[])
      * @throws IOException on error.
      */
     private void conditionalCopy(File dest, File file) throws IOException

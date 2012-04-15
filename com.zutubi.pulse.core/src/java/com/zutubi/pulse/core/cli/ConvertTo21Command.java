@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

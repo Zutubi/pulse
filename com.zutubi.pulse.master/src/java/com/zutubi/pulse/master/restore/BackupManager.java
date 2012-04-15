@@ -10,7 +10,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

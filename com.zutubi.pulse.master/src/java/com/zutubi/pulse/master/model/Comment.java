@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import java.util.Locale;
 

@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.config.DevConfigSetup;
 import com.zutubi.pulse.dev.ui.ConsoleUI;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.cli.*;
 
 import java.util.*;

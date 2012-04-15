@@ -6,14 +6,14 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.util.FileSystemUtils.*;
+import static com.zutubi.util.io.FileSystemUtils.*;
 
 /**
  * The Project Repository Bootstrapper checks out a project into the project recipes

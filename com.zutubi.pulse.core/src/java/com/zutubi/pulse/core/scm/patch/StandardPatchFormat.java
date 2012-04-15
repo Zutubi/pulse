@@ -10,8 +10,8 @@ import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.ui.api.UserInterface;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

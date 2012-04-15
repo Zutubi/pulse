@@ -9,11 +9,11 @@ import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;

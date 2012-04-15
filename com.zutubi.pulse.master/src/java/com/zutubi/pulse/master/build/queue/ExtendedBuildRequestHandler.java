@@ -12,8 +12,8 @@ import com.zutubi.pulse.master.model.RebuildBuildReason;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
-import com.zutubi.util.TreeNode;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.HashMap;
 import java.util.LinkedList;

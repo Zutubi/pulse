@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

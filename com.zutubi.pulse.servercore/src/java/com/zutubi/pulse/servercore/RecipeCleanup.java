@@ -2,7 +2,7 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import com.zutubi.util.FileSystem;
+import com.zutubi.util.io.FileSystem;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.ConcurrentUtils;
+import com.zutubi.util.concurrent.ConcurrentUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;

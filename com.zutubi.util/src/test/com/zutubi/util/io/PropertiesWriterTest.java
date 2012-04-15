@@ -1,8 +1,7 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.FileSystemUtils;
-import junit.framework.AssertionFailedError;
 import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.AssertionFailedError;
 
 import java.io.*;
 import java.util.Properties;

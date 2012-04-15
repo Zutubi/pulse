@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.util.FileSystemUtils;
-import static com.zutubi.util.FileSystemUtils.rmdir;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.ivy.Ivy;
@@ -39,6 +38,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
+
+import static com.zutubi.util.io.FileSystemUtils.rmdir;
 
 /**
  * The ivy client provides the core interface for interacting with ivy processes, encapsulating

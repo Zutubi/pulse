@@ -1,8 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildArtifactsPage;
@@ -10,13 +7,17 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.io.FileSystemUtils;
 import org.openqa.selenium.By;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.INCLUSIONS;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The acceptance tests for the Pulse builtin maven 1.x and 2.x integration.

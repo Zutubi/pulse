@@ -3,10 +3,10 @@ package com.zutubi.tove.squeezer.squeezers;
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.adt.Pair;
 
 import java.util.*;
 

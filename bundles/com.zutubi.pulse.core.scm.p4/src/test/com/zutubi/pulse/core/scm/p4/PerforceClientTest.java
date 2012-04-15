@@ -8,10 +8,10 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.IOAssertions;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.junit.IOAssertions;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

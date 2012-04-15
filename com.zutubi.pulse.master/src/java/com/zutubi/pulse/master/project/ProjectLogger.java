@@ -6,8 +6,8 @@ import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEven
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.MultipleFileInputStream;
 import com.zutubi.util.io.Tail;

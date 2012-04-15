@@ -1,6 +1,5 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.tove.transaction.TransactionManager;
 
 import java.io.File;

@@ -6,8 +6,8 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.Clock;
-import com.zutubi.util.SystemClock;
+import com.zutubi.util.time.Clock;
+import com.zutubi.util.time.SystemClock;
 
 /**
  * A predicate that is satisfied if the project is ready to be polled

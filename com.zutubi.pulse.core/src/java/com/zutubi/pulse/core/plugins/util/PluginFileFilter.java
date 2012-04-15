@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins.util;
 
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

@@ -7,14 +7,12 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
-import static com.zutubi.pulse.master.database.DatabaseConfig.*;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.Condition;
-import static com.zutubi.util.Constants.SECOND;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.openqa.selenium.By;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,6 +25,9 @@ import java.sql.DriverManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import static com.zutubi.pulse.master.database.DatabaseConfig.*;
+import static com.zutubi.util.Constants.SECOND;
 
 public class UpgradeAcceptanceTest extends AcceptanceTestBase
 {

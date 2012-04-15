@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 

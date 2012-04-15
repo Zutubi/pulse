@@ -3,7 +3,7 @@ package com.zutubi.pulse.slave.command;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

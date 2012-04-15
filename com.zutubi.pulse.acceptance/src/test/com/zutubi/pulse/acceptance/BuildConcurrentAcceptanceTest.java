@@ -1,20 +1,21 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import static com.zutubi.pulse.acceptance.Constants.WAIT_ANT_REPOSITORY;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 {

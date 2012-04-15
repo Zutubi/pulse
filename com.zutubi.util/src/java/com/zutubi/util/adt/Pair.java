@@ -1,4 +1,6 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
+
+import com.zutubi.util.ObjectUtils;
 
 /**
  * Simple struct to hold two objects.

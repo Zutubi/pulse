@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
 import com.zutubi.pulse.acceptance.utils.Repository;
@@ -13,18 +12,20 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
-import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
-import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
-import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.openqa.selenium.By;
 
 import java.io.File;
 import java.util.*;
+
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.*;
+import static com.zutubi.pulse.master.tove.config.user.UserConfigurationActions.ACTION_SET_PASSWORD;
+import static com.zutubi.tove.config.ConfigurationRefactoringManager.ACTION_CLONE;
+import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!

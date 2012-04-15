@@ -52,7 +52,7 @@ import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
+import com.zutubi.util.time.TimeStamps;
 import org.apache.ivy.core.report.ResolveReport;
 
 import java.io.File;

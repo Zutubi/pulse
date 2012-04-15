@@ -20,7 +20,7 @@ import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 

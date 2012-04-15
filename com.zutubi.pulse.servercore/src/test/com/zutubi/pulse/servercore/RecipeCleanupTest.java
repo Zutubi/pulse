@@ -3,12 +3,13 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystem;
+import com.zutubi.util.io.FileSystem;
 import org.mockito.InOrder;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.mockito.Mockito.*;
 
 public class RecipeCleanupTest extends PulseTestCase
 {

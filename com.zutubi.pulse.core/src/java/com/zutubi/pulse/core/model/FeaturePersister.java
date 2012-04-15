@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.pulse.core.util.api.XMLUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.Attribute;
@@ -20,6 +19,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 /**
  * A FeaturePersister is used to read/write artifact feature information

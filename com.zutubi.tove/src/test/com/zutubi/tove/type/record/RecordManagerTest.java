@@ -12,8 +12,8 @@ import com.zutubi.tove.type.record.events.RecordEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.tove.type.record.store.FileSystemRecordStore;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;

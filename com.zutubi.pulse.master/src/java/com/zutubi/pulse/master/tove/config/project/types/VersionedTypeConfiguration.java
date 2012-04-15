@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmFileAction;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 /**
  * Pulse file project where the pulse file is stored in the project's SCM.

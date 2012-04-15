@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.time;
 
 /**
  * Implementation of {@link Clock} that uses the system clock - i.e. the

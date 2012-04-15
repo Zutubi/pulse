@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.core.util.JDBCUtils;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

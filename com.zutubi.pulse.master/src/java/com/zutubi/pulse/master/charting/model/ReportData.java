@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.charting.model;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.Collections;

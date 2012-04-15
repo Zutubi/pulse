@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.plugins.*;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;

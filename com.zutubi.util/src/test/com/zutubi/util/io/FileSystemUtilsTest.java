@@ -1,8 +1,6 @@
-package com.zutubi.util;
+package com.zutubi.util.io;
 
-import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.IsDirectoryPredicate;
-import com.zutubi.util.io.IsFilePredicate;
+import com.zutubi.util.*;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -12,8 +10,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.zutubi.util.FileSystemUtils.NORMAL_SEPARATOR;
-import static com.zutubi.util.FileSystemUtils.relativePath;
+import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
+import static com.zutubi.util.io.FileSystemUtils.relativePath;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {

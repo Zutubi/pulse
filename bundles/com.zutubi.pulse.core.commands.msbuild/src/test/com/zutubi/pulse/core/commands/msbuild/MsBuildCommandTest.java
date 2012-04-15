@@ -3,8 +3,8 @@ package com.zutubi.pulse.core.commands.msbuild;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

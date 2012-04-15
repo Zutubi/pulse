@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.build.queue.graph;
 
 import com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 
 /**
  * The status filter trims the nodes in a dependency tree that

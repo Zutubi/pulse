@@ -1,12 +1,17 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.util.*;
+import com.zutubi.util.InCollectionPredicate;
+import com.zutubi.util.InvertedPredicate;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCase
 {
@@ -103,12 +108,12 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     {
         File failureFile = new File(tempDir, "failures.txt");
         FileSystemUtils.createFile(failureFile,
-                StringUtils.join("\n",
-                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
-                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
-                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
-                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
-                        makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
+                                   StringUtils.join("\n",
+                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
+                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
+                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
+                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
+                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
         );
 
         Config config = new Config(failureFile.getName());

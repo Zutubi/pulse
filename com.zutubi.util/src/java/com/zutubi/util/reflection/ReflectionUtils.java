@@ -1,6 +1,10 @@
 package com.zutubi.util.reflection;
 
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.Pair;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;

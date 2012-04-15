@@ -10,8 +10,8 @@ import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.slave.MasterProxyFactory;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

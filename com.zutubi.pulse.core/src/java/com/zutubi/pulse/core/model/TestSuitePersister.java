@@ -3,16 +3,16 @@ package com.zutubi.pulse.core.model;
 import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.util.api.XMLUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.Constants;
-import static com.zutubi.util.Constants.UTF8;
+import com.zutubi.util.io.FileSystemUtils;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
+import static com.zutubi.util.Constants.UTF8;
 
 /**
  */

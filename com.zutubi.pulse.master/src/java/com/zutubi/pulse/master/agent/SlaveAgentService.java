@@ -10,10 +10,8 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
-import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -23,6 +21,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general

@@ -3,11 +3,12 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorTestCase;
 import com.zutubi.pulse.core.postprocessors.api.TestPostProcessorContext;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class CustomFieldsPostProcessorTest extends PostProcessorTestCase
 {

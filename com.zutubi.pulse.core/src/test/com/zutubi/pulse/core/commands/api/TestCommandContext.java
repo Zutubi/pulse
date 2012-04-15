@@ -3,8 +3,8 @@ package com.zutubi.pulse.core.commands.api;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.adt.Pair;
 
 import java.io.File;
 import java.util.HashMap;

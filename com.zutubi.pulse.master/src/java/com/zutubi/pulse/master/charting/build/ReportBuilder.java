@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.*;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.*;

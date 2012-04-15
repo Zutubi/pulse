@@ -2,8 +2,8 @@ package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

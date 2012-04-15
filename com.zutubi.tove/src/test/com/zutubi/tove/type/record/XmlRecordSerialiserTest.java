@@ -1,6 +1,5 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;

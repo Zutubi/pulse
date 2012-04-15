@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore.util.logging;
 
-import com.zutubi.util.CircularBuffer;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.CircularBuffer;
 
 import java.util.Iterator;
 import java.util.List;

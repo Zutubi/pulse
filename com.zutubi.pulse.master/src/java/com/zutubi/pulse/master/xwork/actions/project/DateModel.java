@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import java.util.Locale;
 

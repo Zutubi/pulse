@@ -15,6 +15,7 @@ import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import com.zutubi.util.adt.Pair;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 

@@ -7,15 +7,17 @@ import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.*;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.

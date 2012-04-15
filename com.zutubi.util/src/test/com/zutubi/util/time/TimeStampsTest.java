@@ -1,8 +1,7 @@
-package com.zutubi.util;
+package com.zutubi.util.time;
 
-import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.Constants;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 /**
  *

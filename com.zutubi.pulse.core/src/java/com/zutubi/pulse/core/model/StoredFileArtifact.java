@@ -2,9 +2,9 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.net.URLConnection;
 import java.util.*;

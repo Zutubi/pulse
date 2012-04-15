@@ -1,5 +1,8 @@
 package com.zutubi.util;
 
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.adt.TreeNode;
+
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.util.*;

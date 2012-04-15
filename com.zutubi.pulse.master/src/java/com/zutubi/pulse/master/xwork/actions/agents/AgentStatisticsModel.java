@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.charting.render.ChartUtils;
 import com.zutubi.pulse.master.tove.config.project.reports.ChartColours;
 import com.zutubi.pulse.master.xwork.actions.GraphModel;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.block.BlockBorder;

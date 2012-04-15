@@ -13,18 +13,19 @@ import com.zutubi.tove.transaction.UserTransaction;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.FalsePredicate;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.validation.annotations.Required;
+
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import java.util.*;
 
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {

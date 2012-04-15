@@ -5,8 +5,8 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.tove.config.setup.SetupDataConfiguration;
 import com.zutubi.pulse.master.tove.webwork.TransientAction;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 

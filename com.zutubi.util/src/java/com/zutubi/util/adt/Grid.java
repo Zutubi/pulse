@@ -1,7 +1,11 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
+
+import com.zutubi.util.Point;
+import com.zutubi.util.UnaryProcedure;
+
+import java.util.Iterator;
 
 import static java.util.Arrays.asList;
-import java.util.Iterator;
 
 /**
  * A grid is a basic abstraction over a two-dimensional space.  Each point in

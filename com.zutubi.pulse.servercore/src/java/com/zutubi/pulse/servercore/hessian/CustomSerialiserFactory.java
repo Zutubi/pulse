@@ -5,8 +5,8 @@ import com.caucho.hessian.io.Deserializer;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.hessian.io.Serializer;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.util.HashMap;

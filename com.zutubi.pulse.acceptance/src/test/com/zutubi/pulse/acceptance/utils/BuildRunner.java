@@ -3,12 +3,13 @@ package com.zutubi.pulse.acceptance.utils;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.lang.reflect.Array;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The build runner is an acceptance test support class that caters specifically

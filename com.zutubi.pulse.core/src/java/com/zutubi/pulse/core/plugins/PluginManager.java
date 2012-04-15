@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtension;

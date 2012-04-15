@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.io;
 
 import java.io.File;
 import java.io.FilenameFilter;

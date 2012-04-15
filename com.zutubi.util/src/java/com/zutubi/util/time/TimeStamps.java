@@ -1,4 +1,6 @@
-package com.zutubi.util;
+package com.zutubi.util.time;
+
+import com.zutubi.util.Constants;
 
 import java.io.Serializable;
 import java.text.DateFormat;

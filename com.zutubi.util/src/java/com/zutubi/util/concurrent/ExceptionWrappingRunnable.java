@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.concurrent;
 
 /**
  * An adapter to the runnable interface that can be used to run things that

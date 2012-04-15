@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.expand;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.List;

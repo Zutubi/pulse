@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.agent;
 
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

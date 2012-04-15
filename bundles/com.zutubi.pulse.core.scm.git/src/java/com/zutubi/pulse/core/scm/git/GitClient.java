@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

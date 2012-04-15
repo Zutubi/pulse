@@ -10,7 +10,7 @@ import com.zutubi.pulse.servercore.*;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.slave.repository.SlaveFileRepository;
-import com.zutubi.util.FileSystem;
+import com.zutubi.util.io.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

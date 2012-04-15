@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.local;
 
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.UriParser;

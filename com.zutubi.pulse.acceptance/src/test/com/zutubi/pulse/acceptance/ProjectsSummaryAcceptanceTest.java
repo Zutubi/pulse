@@ -5,11 +5,12 @@ import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.Constants.SECOND;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
+
+import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Tests for the shared projects summary parts of the dashboard and browse

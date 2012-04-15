@@ -1,10 +1,13 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class TreeNodeTest extends ZutubiTestCase
 {

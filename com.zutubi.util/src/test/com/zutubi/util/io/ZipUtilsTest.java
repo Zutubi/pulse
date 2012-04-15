@@ -1,6 +1,7 @@
-package com.zutubi.util;
+package com.zutubi.util.io;
 
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.junit.IOAssertions;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;

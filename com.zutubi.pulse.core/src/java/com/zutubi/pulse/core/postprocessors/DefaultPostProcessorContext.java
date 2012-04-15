@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.postprocessors;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.FieldScope;
@@ -9,11 +8,13 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Map;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Holds contextual information for the post processing of a single artifact

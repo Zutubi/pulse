@@ -6,16 +6,21 @@ import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.TestUtils;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Condition;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.openqa.selenium.By;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 
 /**
  * Tests for the plugin management UI.

@@ -3,12 +3,13 @@ package com.zutubi.pulse.servercore.services;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
-import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 /**
  */

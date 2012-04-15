@@ -2,8 +2,8 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.Pair;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.adt.Pair;
 import org.openqa.selenium.By;
 
 import java.util.LinkedList;

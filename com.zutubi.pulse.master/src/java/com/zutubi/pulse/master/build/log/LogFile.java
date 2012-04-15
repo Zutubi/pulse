@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.build.log;
 
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
-import com.zutubi.util.CircularBuffer;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.ZipUtils;
+import com.zutubi.util.adt.CircularBuffer;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.Tail;
+import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;

@@ -5,7 +5,11 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
 /**
- * Generic utilities for dealng with objects.
+ * Generic utilities for dealing with objects.
  */
 public class ObjectUtils
 {

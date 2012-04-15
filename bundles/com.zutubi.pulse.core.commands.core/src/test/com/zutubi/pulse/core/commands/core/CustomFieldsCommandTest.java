@@ -3,10 +3,11 @@ package com.zutubi.pulse.core.commands.core;
 import com.zutubi.pulse.core.commands.api.CommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.engine.api.FieldScope;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Map;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class CustomFieldsCommandTest extends CommandTestCase
 {

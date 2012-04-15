@@ -5,8 +5,8 @@ import com.zutubi.tove.transaction.TransactionException;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

@@ -5,9 +5,9 @@ import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.dev.config.DevConfig;
 import com.zutubi.pulse.dev.ui.ConsoleUI;
 import com.zutubi.pulse.dev.util.OptionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.config.PropertiesConfig;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.cli.*;
 
 import java.io.File;

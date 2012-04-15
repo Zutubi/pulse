@@ -1,6 +1,4 @@
-package com.zutubi.util;
-
-import com.zutubi.util.io.IOUtils;
+package com.zutubi.util.io;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

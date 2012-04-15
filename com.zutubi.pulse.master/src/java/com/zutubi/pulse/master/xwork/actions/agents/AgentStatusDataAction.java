@@ -16,7 +16,7 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import java.io.File;
 import java.util.Collections;

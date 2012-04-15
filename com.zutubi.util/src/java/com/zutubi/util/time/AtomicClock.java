@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.time;
 
 import java.util.concurrent.atomic.AtomicLong;
 

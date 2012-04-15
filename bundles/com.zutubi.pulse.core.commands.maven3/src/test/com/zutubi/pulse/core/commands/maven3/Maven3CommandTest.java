@@ -4,11 +4,12 @@ import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.IOException;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class Maven3CommandTest extends ExecutableCommandTestCase
 {

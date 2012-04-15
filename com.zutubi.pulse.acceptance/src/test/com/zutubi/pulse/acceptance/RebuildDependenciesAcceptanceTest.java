@@ -2,20 +2,21 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
-import static com.zutubi.pulse.master.model.Project.State.IDLE;
-import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
+import static com.zutubi.pulse.master.model.Project.State.IDLE;
+import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 {

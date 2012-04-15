@@ -3,13 +3,13 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 import org.mockito.Matchers;
-import static org.mockito.Matchers.anyString;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.doReturn;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 
 public class StateDisplayRendererTest extends PulseTestCase
 {

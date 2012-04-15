@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

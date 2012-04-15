@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.util.hibernate;
 
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.SessionImplementor;
-import org.hibernate.type.Type;
 import org.hibernate.type.LongType;
+import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
 import org.hsqldb.Types;
 
@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * A mutable type implementation for identifying com.zutubi.util.TimeStamps to
+ * A mutable type implementation for identifying com.zutubi.util.time.TimeStamps to
  * hibernates type system.
  */
 public class TimeStampsType implements CompositeUserType

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 

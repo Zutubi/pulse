@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.Result;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 /**
  * Base for JSON models for various results.

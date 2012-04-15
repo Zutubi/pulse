@@ -4,9 +4,9 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.FixedFuture;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.concurrent.FixedFuture;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

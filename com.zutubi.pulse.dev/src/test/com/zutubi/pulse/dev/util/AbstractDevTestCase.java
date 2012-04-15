@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.util;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.dev.config.DevConfig;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.io.IOUtils;
 

@@ -1,10 +1,12 @@
 package com.zutubi.util;
 
+import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.math.IntegerAddition;
-import static java.util.Arrays.asList;
 
 import java.util.*;
+
+import static java.util.Arrays.asList;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {

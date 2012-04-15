@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
@@ -14,10 +13,12 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.servercore.repository.FileRepository;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A bootstrapper that applies a patch to a working directory bootstrapped

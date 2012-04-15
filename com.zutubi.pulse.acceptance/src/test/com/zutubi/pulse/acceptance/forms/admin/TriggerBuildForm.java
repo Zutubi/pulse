@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.util.LinkedList;
 import java.util.List;

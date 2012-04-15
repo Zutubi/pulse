@@ -5,14 +5,19 @@ import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
-import static com.zutubi.util.Constants.MINUTE;
-import static java.util.Arrays.asList;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.io.FileSystemUtils;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static com.zutubi.util.Constants.MINUTE;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for {@link com.zutubi.pulse.master.api.MonitorApi} XML-RPC methods.

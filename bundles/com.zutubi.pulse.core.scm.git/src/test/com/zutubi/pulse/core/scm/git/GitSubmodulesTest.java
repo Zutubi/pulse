@@ -1,14 +1,15 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class GitSubmodulesTest extends GitClientTestBase
 {

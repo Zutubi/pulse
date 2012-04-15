@@ -14,8 +14,8 @@ import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.ui.TestUI;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

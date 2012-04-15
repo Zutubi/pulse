@@ -3,15 +3,16 @@ package com.zutubi.pulse.servercore.cleanup;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
-import com.zutubi.util.FileSystemUtils;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 public class FileDeletionServiceTest extends PulseTestCase
 {

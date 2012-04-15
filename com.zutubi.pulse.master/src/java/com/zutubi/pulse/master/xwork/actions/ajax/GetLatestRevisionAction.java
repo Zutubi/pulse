@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;

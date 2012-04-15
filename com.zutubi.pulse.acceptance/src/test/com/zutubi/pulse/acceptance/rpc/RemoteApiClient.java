@@ -28,7 +28,11 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Condition;
+import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Arrays;
 import java.util.Hashtable;

@@ -1,13 +1,14 @@
 package com.zutubi.tove.type.record;
 
 import com.zutubi.util.BinaryProcedure;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static java.util.Arrays.asList;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 public class RecordUtilsTest extends ZutubiTestCase
 {

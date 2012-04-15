@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import static com.zutubi.util.CollectionUtils.asPair;
 import static java.util.Arrays.asList;

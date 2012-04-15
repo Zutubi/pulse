@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 /**
  * Represents a file or directory stored in an SCM.

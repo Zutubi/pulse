@@ -1,14 +1,13 @@
 package com.zutubi.pulse.servercore.dependency.ivy;
 
-import com.caucho.hessian.io.AbstractSerializer;
 import com.caucho.hessian.io.AbstractHessianOutput;
-import com.zutubi.util.FileSystemUtils;
+import com.caucho.hessian.io.AbstractSerializer;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-
-import java.io.IOException;
-import java.io.File;
-
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * An implementation of the hessian serialiser interface that handles

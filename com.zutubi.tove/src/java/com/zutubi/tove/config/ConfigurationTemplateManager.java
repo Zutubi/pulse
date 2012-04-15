@@ -20,6 +20,7 @@ import com.zutubi.tove.type.record.events.RecordEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.util.*;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;

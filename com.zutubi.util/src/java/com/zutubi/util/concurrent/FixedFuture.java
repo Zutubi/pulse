@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.concurrent;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

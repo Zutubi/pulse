@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.FileSystem;
+import com.zutubi.util.io.FileSystem;
 
 import java.io.File;
 import java.util.Arrays;

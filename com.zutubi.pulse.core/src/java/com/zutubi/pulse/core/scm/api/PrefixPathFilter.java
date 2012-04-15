@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.FileSystemUtils;
 
 /**
  * A predicate that rejects all path strings that do not have the

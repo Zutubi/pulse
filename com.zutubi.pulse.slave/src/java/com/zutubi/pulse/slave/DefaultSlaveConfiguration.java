@@ -3,9 +3,9 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.*;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 

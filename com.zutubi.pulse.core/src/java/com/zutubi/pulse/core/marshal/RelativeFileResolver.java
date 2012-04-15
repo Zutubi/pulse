@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.InputStream;
 

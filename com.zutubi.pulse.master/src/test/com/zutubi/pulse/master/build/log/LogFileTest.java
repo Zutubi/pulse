@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.build.log;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

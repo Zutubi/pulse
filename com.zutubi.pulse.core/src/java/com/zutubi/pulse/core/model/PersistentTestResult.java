@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.postprocessors.api.TestResult;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 /**
  * Abstract base for test suites and cases.

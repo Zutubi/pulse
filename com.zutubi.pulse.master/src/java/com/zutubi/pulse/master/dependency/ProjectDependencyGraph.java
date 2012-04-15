@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.dependency;
 
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 
 /**
  * Holds trees with upstream and downstream dependencies for a project.  Note

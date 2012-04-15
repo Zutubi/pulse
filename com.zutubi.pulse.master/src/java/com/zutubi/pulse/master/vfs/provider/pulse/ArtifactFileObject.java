@@ -3,8 +3,7 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -14,6 +13,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.util.CollectionUtils.asMap;
 
 /**
  * Represents a single artifact in an artifacts tree.

@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.AgentRequirements;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import java.util.List;
 

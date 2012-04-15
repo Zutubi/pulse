@@ -8,9 +8,9 @@ import com.zutubi.pulse.master.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.master.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.master.upgrade.UpgradeTask;
 import com.zutubi.pulse.master.upgrade.UpgradeableComponent;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.List;

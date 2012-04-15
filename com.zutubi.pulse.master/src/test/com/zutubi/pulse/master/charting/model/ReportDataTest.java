@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.charting.model;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 public class ReportDataTest extends PulseTestCase
 {

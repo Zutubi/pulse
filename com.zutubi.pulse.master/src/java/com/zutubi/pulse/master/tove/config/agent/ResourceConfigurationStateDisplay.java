@@ -14,7 +14,7 @@ import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.NamedConfigurationComparator;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.Collection;
 import java.util.Collections;

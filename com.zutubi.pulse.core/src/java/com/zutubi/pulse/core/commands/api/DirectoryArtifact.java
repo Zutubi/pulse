@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;

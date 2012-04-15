@@ -3,16 +3,17 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.*;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.

@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.ui.TestUI;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.CompositeConfig;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

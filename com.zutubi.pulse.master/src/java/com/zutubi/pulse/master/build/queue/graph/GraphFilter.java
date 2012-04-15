@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.build.queue.graph;
 
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.TreeNode;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +61,7 @@ public abstract class GraphFilter implements  UnaryProcedure<TreeNode<BuildGraph
      * @param node  the node being checked.
      * @return true if the node is part of a downstream graph, false otherwise.
      *
-     * @see #isUpstream(com.zutubi.util.TreeNode)
+     * @see #isUpstream(com.zutubi.util.adt.TreeNode)
      */
     protected boolean isDownstream(TreeNode<BuildGraphData> node)
     {

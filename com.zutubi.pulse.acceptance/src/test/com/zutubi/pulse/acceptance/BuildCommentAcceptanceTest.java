@@ -6,7 +6,7 @@ import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;

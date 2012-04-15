@@ -6,9 +6,9 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;

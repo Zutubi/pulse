@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -6,7 +6,7 @@ import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

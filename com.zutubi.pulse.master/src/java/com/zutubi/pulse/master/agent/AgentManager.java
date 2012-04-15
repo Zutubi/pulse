@@ -9,8 +9,8 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.Pair;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.Pair;
 
 import java.util.List;
 

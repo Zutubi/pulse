@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
@@ -11,19 +10,21 @@ import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.BufferingCharHandler;
 import com.zutubi.pulse.dev.bootstrap.DefaultDevPaths;
 import com.zutubi.pulse.dev.bootstrap.DevPaths;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Base helper class for tests the work with dev tools packages/commands.

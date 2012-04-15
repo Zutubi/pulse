@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.concurrent;
 
 import com.zutubi.util.logging.Logger;
 

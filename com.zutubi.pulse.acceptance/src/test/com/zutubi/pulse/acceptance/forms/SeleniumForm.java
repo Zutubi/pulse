@@ -2,13 +2,15 @@ package com.zutubi.pulse.acceptance.forms;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.stripLineBreaks;
+import com.zutubi.util.adt.Pair;
 import junit.framework.Assert;
 import org.openqa.selenium.By;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.util.StringUtils.stripLineBreaks;
 
 /**
  * Base for form classes: supports methods for reading and writing fields and

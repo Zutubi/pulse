@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.dev.client.UserAbortException;
 import com.zutubi.pulse.dev.sync.SynchronisePluginsClientFactory;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

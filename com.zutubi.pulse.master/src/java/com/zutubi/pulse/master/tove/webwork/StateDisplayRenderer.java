@@ -5,8 +5,8 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.util.TreeNode;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.Collection;
 

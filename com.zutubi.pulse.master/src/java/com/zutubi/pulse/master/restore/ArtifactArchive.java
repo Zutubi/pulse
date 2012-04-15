@@ -4,9 +4,9 @@ import com.zutubi.pulse.master.util.monitor.FeedbackAware;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;

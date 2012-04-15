@@ -14,7 +14,7 @@ import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;

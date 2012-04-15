@@ -8,7 +8,11 @@ import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.SecurityUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import org.apache.tools.ant.DirectoryScanner;
 

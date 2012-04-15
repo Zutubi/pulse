@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.repository.MasterFileRepository;
 import com.zutubi.pulse.servercore.*;
-import com.zutubi.util.FileSystem;
+import com.zutubi.util.io.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

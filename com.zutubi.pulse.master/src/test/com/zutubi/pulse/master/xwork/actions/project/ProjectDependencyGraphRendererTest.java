@@ -7,15 +7,16 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.Grid;
-import com.zutubi.util.GridCell;
 import com.zutubi.util.Point;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.Grid;
+import com.zutubi.util.adt.GridCell;
+import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
 
 public class ProjectDependencyGraphRendererTest extends PulseTestCase
 {

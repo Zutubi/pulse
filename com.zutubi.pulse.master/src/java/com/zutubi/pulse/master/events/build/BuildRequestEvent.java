@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 
 import java.util.Collection;
 import java.util.LinkedList;

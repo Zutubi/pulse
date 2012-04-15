@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
-import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
+import com.zutubi.util.adt.Pair;
 
 import java.util.*;
 

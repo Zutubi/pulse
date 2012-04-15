@@ -1,9 +1,15 @@
 package com.zutubi.pulse.master.dependency;
 
-import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Point;
+import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 
 /**

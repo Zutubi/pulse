@@ -24,8 +24,13 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.time.Clock;
+import com.zutubi.util.time.SystemClock;
 
 import java.util.Collection;
 import java.util.Iterator;

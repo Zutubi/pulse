@@ -1,5 +1,7 @@
-package com.zutubi.util;
+package com.zutubi.util.junit;
 
+import com.zutubi.util.IdentityFunction;
+import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.io.IOUtils;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;

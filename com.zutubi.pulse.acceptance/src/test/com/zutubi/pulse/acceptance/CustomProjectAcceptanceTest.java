@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.util.ConcurrentUtils;
+import com.zutubi.util.concurrent.ConcurrentUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -36,8 +36,8 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
             public String call() throws Exception
             {
                 return rpcClient.RemoteApi.insertProject(randomName(), ProjectManager.GLOBAL_PROJECT_NAME, false,
-                        rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
-                        rpcClient.RemoteApi.getCustomTypeConfig(pulseFileString));
+                                                         rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY),
+                                                         rpcClient.RemoteApi.getCustomTypeConfig(pulseFileString));
             }
         }, 4, TimeUnit.SECONDS, null);
         

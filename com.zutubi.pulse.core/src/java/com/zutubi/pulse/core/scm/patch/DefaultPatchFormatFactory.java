@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.patch;
 
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.File;

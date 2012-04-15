@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 

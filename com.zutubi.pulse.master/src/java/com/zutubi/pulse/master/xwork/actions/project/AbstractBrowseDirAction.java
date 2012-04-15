@@ -4,8 +4,8 @@ import com.zutubi.pulse.master.xwork.actions.DirectoryEntry;
 import com.zutubi.pulse.servercore.filesystem.File;
 import com.zutubi.pulse.servercore.filesystem.FileSystem;
 import com.zutubi.pulse.servercore.filesystem.FileSystemException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;

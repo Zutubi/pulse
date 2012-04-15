@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.test.api;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;

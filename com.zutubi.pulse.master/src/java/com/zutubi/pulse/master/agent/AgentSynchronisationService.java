@@ -12,6 +12,8 @@ import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.time.Clock;
+import com.zutubi.util.time.SystemClock;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;

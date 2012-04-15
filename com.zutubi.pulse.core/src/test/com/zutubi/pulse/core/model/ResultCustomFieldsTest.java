@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Map;
+
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 public class ResultCustomFieldsTest extends PulseTestCase
 {

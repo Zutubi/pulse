@@ -7,7 +7,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Map;
 

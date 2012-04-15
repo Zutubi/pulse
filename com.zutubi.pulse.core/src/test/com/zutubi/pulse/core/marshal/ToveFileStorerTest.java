@@ -9,9 +9,8 @@ import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.variables.GenericVariable;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.IOAssertions;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.junit.IOAssertions;
 import nu.xom.Element;
 
 import java.io.ByteArrayInputStream;

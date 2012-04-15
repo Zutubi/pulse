@@ -8,9 +8,9 @@ import com.zutubi.pulse.master.database.HSQLDBUtils;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.StartupException;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

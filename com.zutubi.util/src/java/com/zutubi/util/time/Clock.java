@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.time;
 
 /**
  * Abstraction around the current time.  This allows time-dependent classes to

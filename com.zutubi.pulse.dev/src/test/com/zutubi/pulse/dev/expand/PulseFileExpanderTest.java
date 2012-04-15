@@ -9,8 +9,8 @@ import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;

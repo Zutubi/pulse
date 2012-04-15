@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleRevisionId;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import java.io.File;

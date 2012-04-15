@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.ZipUtils;
+import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.io.ZipUtils;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 
 import java.io.File;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
-import static com.zutubi.util.FileSystemUtils.delete;
+import static com.zutubi.util.io.FileSystemUtils.delete;
 import static com.zutubi.util.io.IOUtils.copyFile;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -1,11 +1,12 @@
 package com.zutubi.pulse.servercore;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
 import com.zutubi.tove.variables.api.VariableMap;
-import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.util.io.FileSystemUtils.encodeFilenameComponent;
 
 /**
  * Holding class for various pieces of data identifying a recipe and its

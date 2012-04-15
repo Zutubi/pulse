@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.util.Grid;
+import com.zutubi.util.adt.Grid;
 
 /**
  * JSON structure for the project dependencies page.

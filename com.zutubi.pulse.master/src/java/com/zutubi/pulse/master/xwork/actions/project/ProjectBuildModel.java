@@ -18,8 +18,8 @@ import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.time.TimeStamps;
 import flexjson.JSON;
 
 import java.util.LinkedList;

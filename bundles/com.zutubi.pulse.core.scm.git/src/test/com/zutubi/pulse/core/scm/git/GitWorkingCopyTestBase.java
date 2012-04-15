@@ -3,13 +3,12 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +16,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 public abstract class GitWorkingCopyTestBase extends PulseTestCase
 {

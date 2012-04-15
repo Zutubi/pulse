@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferListener;
 import com.zutubi.pulse.master.util.monitor.FeedbackAware;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

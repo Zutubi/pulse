@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
 /**
  * A simple grid cell, which holds arbitrary data.

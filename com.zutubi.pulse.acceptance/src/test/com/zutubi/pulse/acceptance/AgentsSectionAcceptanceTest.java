@@ -10,14 +10,15 @@ import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.util.Condition;
-import com.zutubi.util.FileSystemUtils;
-import static java.util.Arrays.asList;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance test for basic agents section functionality.

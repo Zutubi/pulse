@@ -1,10 +1,10 @@
-package com.zutubi.util;
+package com.zutubi.util.concurrent;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.concurrent.*;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class ConcurrentUtilsTest extends ZutubiTestCase
 {

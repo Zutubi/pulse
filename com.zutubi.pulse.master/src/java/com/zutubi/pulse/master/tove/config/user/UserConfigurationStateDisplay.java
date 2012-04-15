@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.tove.config.user;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.security.LastAccessManager;
 import com.zutubi.pulse.master.tove.format.MessagesAware;
-import com.zutubi.util.TimeStamps;
 import com.zutubi.util.Constants;
+import com.zutubi.util.time.TimeStamps;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

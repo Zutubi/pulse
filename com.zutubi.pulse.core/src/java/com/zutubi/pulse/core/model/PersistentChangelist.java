@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TimeStamps;
+import com.zutubi.util.time.TimeStamps;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.*;

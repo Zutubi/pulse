@@ -1,13 +1,15 @@
 package com.zutubi.util;
 
-import static com.zutubi.util.SecurityUtils.*;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static com.zutubi.util.Constants.UTF8;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+
+import static com.zutubi.util.Constants.UTF8;
+import static com.zutubi.util.SecurityUtils.*;
 
 public class SecurityUtilsTest extends ZutubiTestCase
 {

@@ -5,9 +5,9 @@ import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.IOAssertions;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.junit.IOAssertions;
 
 import java.io.*;
 import java.net.URISyntaxException;

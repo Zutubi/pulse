@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.velocity;
 
+import com.zutubi.jsdeps.JavascriptDependencies;
+import com.zutubi.jsdeps.JavascriptDependenciesException;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.io.FileSuffixPredicate;
-import com.zutubi.jsdeps.JavascriptDependencies;
-import com.zutubi.jsdeps.JavascriptDependenciesException;
+import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;

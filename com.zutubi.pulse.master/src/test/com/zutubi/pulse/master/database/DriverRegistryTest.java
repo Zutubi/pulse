@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.database;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 

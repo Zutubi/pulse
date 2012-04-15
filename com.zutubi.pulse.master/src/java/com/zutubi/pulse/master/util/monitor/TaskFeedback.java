@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.util.monitor;
 
-import com.zutubi.util.TimeStamps;
-import com.zutubi.util.Clock;
-import com.zutubi.util.SystemClock;
+import com.zutubi.util.time.Clock;
+import com.zutubi.util.time.SystemClock;
+import com.zutubi.util.time.TimeStamps;
 
 public class TaskFeedback<T extends Task>
 {

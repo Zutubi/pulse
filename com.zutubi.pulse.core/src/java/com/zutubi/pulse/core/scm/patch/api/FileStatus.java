@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.patch.api;
 
 import com.zutubi.diff.PatchType;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.util.Collections;
 import java.util.HashMap;

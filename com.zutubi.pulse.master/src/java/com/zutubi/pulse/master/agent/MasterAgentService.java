@@ -16,8 +16,8 @@ import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

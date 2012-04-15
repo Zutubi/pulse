@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 

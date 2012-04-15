@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.TestClock;
+import com.zutubi.util.time.TestClock;
 
 public class TaskFeedbackTest extends PulseTestCase
 {

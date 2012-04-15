@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.util.process;
 
-import static com.zutubi.pulse.core.test.EqualityAssertions.assertListEquals;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.pulse.core.test.EqualityAssertions.assertListEquals;
 
 public class AsyncProcessTest extends PulseTestCase
 {

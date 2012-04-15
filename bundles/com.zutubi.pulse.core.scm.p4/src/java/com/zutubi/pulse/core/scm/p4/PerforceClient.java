@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
 import com.zutubi.util.*;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.*;
 import java.text.ParseException;

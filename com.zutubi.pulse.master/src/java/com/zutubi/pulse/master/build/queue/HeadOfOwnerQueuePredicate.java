@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.ReverseListIterator;
+import com.zutubi.util.adt.ReverseListIterator;
 
 import java.util.LinkedList;
 

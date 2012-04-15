@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 
 /**
  * The transitive filter trims the children of dependencies where

@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfiguration;
-import com.zutubi.util.TreeNode;
+import com.zutubi.util.adt.TreeNode;
 
 import java.util.Collections;
 import java.util.LinkedList;

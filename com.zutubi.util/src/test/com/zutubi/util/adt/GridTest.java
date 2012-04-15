@@ -1,5 +1,7 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
+import com.zutubi.util.Point;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 public class GridTest extends ZutubiTestCase

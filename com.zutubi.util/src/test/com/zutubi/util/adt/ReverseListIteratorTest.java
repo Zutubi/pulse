@@ -1,11 +1,12 @@
-package com.zutubi.util;
+package com.zutubi.util.adt;
 
 import com.zutubi.util.junit.ZutubiTestCase;
-import static java.util.Arrays.asList;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class ReverseListIteratorTest extends ZutubiTestCase
 {

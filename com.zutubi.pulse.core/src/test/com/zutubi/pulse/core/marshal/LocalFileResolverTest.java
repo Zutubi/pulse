@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.marshal;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

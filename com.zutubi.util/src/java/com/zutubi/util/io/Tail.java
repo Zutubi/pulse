@@ -1,8 +1,8 @@
 package com.zutubi.util.io;
 
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
 
 import java.io.File;
 import java.io.IOException;

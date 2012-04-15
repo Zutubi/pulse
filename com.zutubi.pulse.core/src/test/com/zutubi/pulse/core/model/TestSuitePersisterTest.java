@@ -1,12 +1,13 @@
 package com.zutubi.pulse.core.model;
 
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import nu.xom.ParsingException;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 public class TestSuitePersisterTest extends PulseTestCase
 {

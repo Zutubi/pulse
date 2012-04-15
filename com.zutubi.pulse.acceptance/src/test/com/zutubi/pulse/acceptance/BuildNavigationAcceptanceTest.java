@@ -8,7 +8,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.PersonalBuildSummaryPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 

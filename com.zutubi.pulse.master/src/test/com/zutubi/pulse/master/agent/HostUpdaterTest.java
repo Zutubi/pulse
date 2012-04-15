@@ -14,7 +14,7 @@ import com.zutubi.pulse.servercore.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 

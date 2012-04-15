@@ -26,6 +26,8 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.*;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.io.FileSystemUtils;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

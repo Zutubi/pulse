@@ -1,6 +1,6 @@
 package com.zutubi.util;
 
-import static com.zutubi.util.Constants.UTF8;
+import com.zutubi.util.adt.Pair;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Miscellaneous utility methods useful for web-related things like URLs, HTML,

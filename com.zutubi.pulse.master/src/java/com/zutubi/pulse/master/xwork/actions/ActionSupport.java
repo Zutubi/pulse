@@ -19,6 +19,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.time.TimeStamps;
 import freemarker.template.utility.StringUtil;
 
 import java.io.UnsupportedEncodingException;

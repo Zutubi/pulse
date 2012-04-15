@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.zutubi.util.FileSystemUtils.encodeFilenameComponent;
+import static com.zutubi.util.io.FileSystemUtils.encodeFilenameComponent;
 
 public class SynchronisationTaskFactoryTest extends PulseTestCase
 {

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.util;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.IOAssertions;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.ZipUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.ZipUtils;
+import com.zutubi.util.junit.IOAssertions;
 
 import java.io.*;
 import java.util.Map;

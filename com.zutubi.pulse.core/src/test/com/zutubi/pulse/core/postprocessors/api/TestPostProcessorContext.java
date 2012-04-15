@@ -4,10 +4,11 @@ import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.FieldScope;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Pair;
+import com.zutubi.util.adt.Pair;
 
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * An implementation of {@link com.zutubi.pulse.core.postprocessors.api.PostProcessorContext}

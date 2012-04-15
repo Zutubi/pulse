@@ -6,9 +6,9 @@ import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.adt.Pair;
 
 import java.util.*;
 

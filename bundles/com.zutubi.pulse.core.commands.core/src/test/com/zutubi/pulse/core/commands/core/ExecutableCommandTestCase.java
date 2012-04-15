@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

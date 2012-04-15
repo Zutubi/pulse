@@ -3,7 +3,11 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.junit.IOAssertions;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.File;

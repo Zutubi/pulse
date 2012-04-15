@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.database;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.DelegatingInvocationHandler;

@@ -3,10 +3,10 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.IOAssertions;
 import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.junit.IOAssertions;
 
 import java.io.File;
 import java.io.IOException;

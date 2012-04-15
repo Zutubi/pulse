@@ -22,9 +22,9 @@ import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 

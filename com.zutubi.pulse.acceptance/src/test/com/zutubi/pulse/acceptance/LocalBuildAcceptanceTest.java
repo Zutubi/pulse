@@ -1,17 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
+
+import java.io.File;
+import java.io.IOException;
+
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
 import static com.zutubi.pulse.dev.local.LocalBuildOptions.DEFAULT_OUTPUT_DIRECTORY;
 import static com.zutubi.pulse.dev.local.LocalBuildOptions.DEFAULT_PULSE_FILE;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-
-import java.io.File;
-import java.io.IOException;
 
 public class LocalBuildAcceptanceTest extends DevToolsTestBase
 {

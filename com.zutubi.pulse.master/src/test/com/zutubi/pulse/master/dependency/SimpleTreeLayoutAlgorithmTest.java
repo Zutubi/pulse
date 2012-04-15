@@ -1,7 +1,12 @@
 package com.zutubi.pulse.master.dependency;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.*;
+import com.zutubi.util.Point;
+import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.Grid;
+import com.zutubi.util.adt.GridCell;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.adt.TreeNode;
 
 import static java.util.Arrays.asList;
 

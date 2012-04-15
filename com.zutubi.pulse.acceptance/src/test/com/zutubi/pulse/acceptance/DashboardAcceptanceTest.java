@@ -5,9 +5,9 @@ import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.adt.Pair;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;

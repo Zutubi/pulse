@@ -32,8 +32,8 @@ import com.zutubi.tove.config.FakeConfigurationProvider;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Pair;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;

@@ -1,6 +1,10 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.SystemUtils;
+import com.zutubi.util.concurrent.ConcurrentUtils;
+import com.zutubi.util.io.FileSystem;
 
 import java.io.File;
 import java.io.FilenameFilter;

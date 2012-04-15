@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.Pair;
 
 import java.util.Collections;
 import java.util.LinkedList;
