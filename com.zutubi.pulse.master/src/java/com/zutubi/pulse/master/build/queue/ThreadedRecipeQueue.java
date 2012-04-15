@@ -355,7 +355,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void run()
     {
-        RetryHandler retryHandler = new RetryHandler(1, TimeUnit.SECONDS, 30, TimeUnit.MINUTES);
+        RetryHandler retryHandler = new RetryHandler(1, TimeUnit.SECONDS, 1800, TimeUnit.SECONDS);
         retryHandler.setBackoff(true);
         retryHandler.setExponentialBackoff(true);
 
