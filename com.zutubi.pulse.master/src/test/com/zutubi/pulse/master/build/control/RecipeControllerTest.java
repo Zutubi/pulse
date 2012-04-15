@@ -334,21 +334,6 @@ public class RecipeControllerTest extends PulseTestCase
         {
             return recipeDir;
         }
-
-        public boolean hasPrepared(long recipeId)
-        {
-            return preparedRecipes.contains(recipeId);
-        }
-
-        public boolean hasCollected(long recipeId)
-        {
-            return collectedRecipes.containsKey(recipeId);
-        }
-
-        public boolean hasCleaned(long recipeId)
-        {
-            return cleanedRecipes.containsKey(recipeId);
-        }
     }
 
     class RecordingRecipeQueue implements RecipeQueue

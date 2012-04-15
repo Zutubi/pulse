@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.User;
 
 import java.util.Date;
 import java.util.List;
@@ -57,8 +60,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     CommandResult findCommandResult(long id);
 
-    RecipeResultNode findRecipeResultNode(long id);
-
     RecipeResult findRecipeResult(long id);
 
     int getBuildCount(Project project, ResultState[] states);
@@ -88,8 +89,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      * @return a list of old personal build results. 
      */
     List<BuildResult> getOldestCompletedBuilds(User user, int offset);
-
-    List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit);
 
     RecipeResultNode findResultNodeByResultId(long id);
 
@@ -160,43 +159,4 @@ public interface BuildResultDao extends EntityDao<BuildResult>
      * @return a build result for the latest build.
      */
     BuildResult findByLatestBuild(final long buildId, final ResultState... states);
-
-    /**
-     * Saves a new or updated dependency link.
-     *
-     * @param link the link to save
-     */
-    void save(BuildDependencyLink link);
-
-    /**
-     * Returns all links that reference the given build (either upstream or downstream).
-     *
-     * @param buildId id of the build to get dependencies for
-     * @return links for all dependencies involving the given build
-     */
-    List<BuildDependencyLink> findAllDependencies(long buildId);
-
-    /**
-     * Returns all links to upstream dependencies for the given build.
-     *
-     * @param buildId id of the build to get upstream dependencies for
-     * @return links for all upstream dependencies of the given build
-     */
-    List<BuildDependencyLink> findAllUpstreamDependencies(long buildId);
-
-    /**
-     * Returns all links to downstream dependencies for the given build.
-     *
-     * @param buildId id of the build to get downstream dependencies for
-     * @return links for all downstream dependencies of the given build
-     */
-    List<BuildDependencyLink> findAllDownstreamDependencies(long buildId);
-
-    /**
-     * Deletes all dependency links that reference the given build.
-     *
-     * @param buildId id of the build to delete links for
-     * @return the number of links deleted
-     */
-    int deleteDependenciesByBuild(long buildId);
 }

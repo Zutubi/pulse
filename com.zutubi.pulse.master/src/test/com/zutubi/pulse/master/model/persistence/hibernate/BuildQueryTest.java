@@ -10,12 +10,12 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * See also {@link HibernateBuildResultDaoTest}.
  */
 public class BuildQueryTest extends MasterPersistenceTestCase
 {
@@ -47,9 +47,9 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     {
         allResults = new LinkedList<BuildResult>();
 
-        createBuild(p1, 1, ResultState.SUCCESS, 10000, 11000, false);
+        createBuild(p1, 1, ResultState.SUCCESS, 10000, 11000);
         createBuild(p2, 2, ResultState.SUCCESS, 11500, 11900);
-        createBuild(p1, 3, ResultState.SUCCESS, 12000, 13000, false);
+        createBuild(p1, 3, ResultState.SUCCESS, 12000, 13000);
         createBuild(p2, 4, ResultState.SUCCESS, 13333, 13999);
         createBuild(p1, 5, ResultState.FAILURE, 14000, 15000);
         createBuild(p2, 6, ResultState.ERROR, 15000, 15821);
@@ -57,7 +57,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         createBuild(p2, 8, ResultState.ERROR, 17777, 17777);
         createBuild(p1, 9, ResultState.ERROR, 18000, 19000);
         createBuild(p2, 10, ResultState.ERROR, 19005, 19006);
-        createBuild(p1, 11, ResultState.ERROR, 20000, 21000, false);
+        createBuild(p1, 11, ResultState.ERROR, 20000, 21000);
         createBuild(p2, 12, ResultState.ERROR, 21100, 21900);
         createBuild(p1, 13, ResultState.SUCCESS, 22000, 23000);
         createBuild(p2, 14, ResultState.SUCCESS, 23332, 23880);
@@ -71,11 +71,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     }
 
     private void createBuild(Project project, int number, ResultState state, int start, int end)
-    {
-        createBuild(project, number, state, start, end, true);
-    }
-    
-    private void createBuild(Project project, int number, ResultState state, int start, int end, boolean hasWorkDir)
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, number, false);
         result.commence(start);
@@ -242,10 +237,5 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         List<BuildResult> copy = new LinkedList<BuildResult>(allResults);
         Collections.reverse(copy);
         return copy;
-    }
-
-    List<String> getStringList(String ...strings)
-    {
-        return Arrays.asList(strings);
     }
 }

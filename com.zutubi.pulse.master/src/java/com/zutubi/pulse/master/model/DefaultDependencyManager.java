@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
-import com.zutubi.pulse.master.model.persistence.BuildResultDao;
+import com.zutubi.pulse.master.model.persistence.BuildDependencyLinkDao;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -17,7 +17,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
@@ -28,6 +27,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.zutubi.util.WebUtils.uriComponentEncode;
+
 /**
  * Default implementation of DependencyManager.
  */
@@ -37,7 +38,7 @@ public class DefaultDependencyManager implements DependencyManager
     
     private File repositoryRoot;
     
-    private BuildResultDao buildResultDao;
+    private BuildDependencyLinkDao buildDependencyLinkDao;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider  configurationProvider;
@@ -73,7 +74,7 @@ public class DefaultDependencyManager implements DependencyManager
                         Project project = projectManager.getProject(projectConfig.getProjectId(), true);
                         BuildResult upstreamBuild = buildManager.getByProjectAndNumber(project, upstreamDescriptor.getBuildNumber());
                         BuildDependencyLink link = new BuildDependencyLink(upstreamBuild.getId(), build.getId());
-                        buildResultDao.save(link);
+                        buildDependencyLinkDao.save(link);
                     }
                 }
                 catch (Exception e)
@@ -187,13 +188,13 @@ public class DefaultDependencyManager implements DependencyManager
     
     private void addUpstreamNodes(BuildGraph graph, BuildGraph.Node node)
     {
-        List<BuildDependencyLink> upstreamLinks = buildResultDao.findAllUpstreamDependencies(node.getBuild().getId());
+        List<BuildDependencyLink> upstreamLinks = buildDependencyLinkDao.findAllUpstreamDependencies(node.getBuild().getId());
         for (BuildDependencyLink upstreamLink: upstreamLinks)
         {
             BuildGraph.Node upstreamNode = graph.findNodeByBuildId(upstreamLink.getUpstreamBuildId());
             if (upstreamNode == null)
             {
-                BuildResult upstreamBuild = buildResultDao.findById(upstreamLink.getUpstreamBuildId());
+                BuildResult upstreamBuild = buildManager.getBuildResult(upstreamLink.getUpstreamBuildId());
                 upstreamNode = new BuildGraph.Node(upstreamBuild);
                 node.connectNode(upstreamNode);
                 addUpstreamNodes(graph, upstreamNode);
@@ -271,9 +272,9 @@ public class DefaultDependencyManager implements DependencyManager
         return upstreamChangelists;
     }
 
-    public void setBuildResultDao(BuildResultDao buildResultDao)
+    public void setBuildDependencyLinkDao(BuildDependencyLinkDao buildDependencyLinkDao)
     {
-        this.buildResultDao = buildResultDao;
+        this.buildDependencyLinkDao = buildDependencyLinkDao;
     }
 
     public void setBuildManager(BuildManager buildManager)

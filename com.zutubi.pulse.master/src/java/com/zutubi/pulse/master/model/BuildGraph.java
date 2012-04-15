@@ -26,6 +26,14 @@ public class BuildGraph
     }
 
     /**
+     * @return the root node for this graph
+     */
+    public Node getRoot()
+    {
+        return root;
+    }
+
+    /**
      * Returns the node representing the given build, if any.
      * 
      * @param buildId id of the build to find the node for
@@ -108,6 +116,34 @@ public class BuildGraph
     public void forEach(UnaryProcedure<Node> fn)
     {
         root.forEach(fn, new HashSet<Node>());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        BuildGraph that = (BuildGraph) o;
+
+        if (root != null ? !root.equals(that.root) : that.root != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return root != null ? root.hashCode() : 0;
     }
 
     /**
@@ -228,14 +264,26 @@ public class BuildGraph
                 return false;
             }
 
-            Node that = (Node) o;
-            return build.equals(that.build);
+            Node node = (Node) o;
+
+            if (build != null ? !build.equals(node.build) : node.build != null)
+            {
+                return false;
+            }
+            if (connected != null ? !connected.equals(node.connected) : node.connected != null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         @Override
         public int hashCode()
         {
-            return build.hashCode();
+            int result = build != null ? build.hashCode() : 0;
+            result = 31 * result + (connected != null ? connected.hashCode() : 0);
+            return result;
         }
 
         @Override

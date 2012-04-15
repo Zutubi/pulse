@@ -74,6 +74,16 @@ This context requires:
         <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
 
+    <bean id="buildDependencyLinkDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target">
+            <bean class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildDependencyLinkDao">
+                <property name="sessionFactory" ref="sessionFactory"/>
+            </bean>
+        </property>
+        <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
+    </bean>
+
     <bean id="changelistDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="target">

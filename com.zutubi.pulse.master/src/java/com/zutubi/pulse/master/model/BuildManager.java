@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -12,8 +11,7 @@ import com.zutubi.tove.security.AccessManager;
 import java.util.List;
 
 /**
- * 
- *
+ * Handles high level management of build results.
  */
 public interface BuildManager
 {
@@ -25,10 +23,14 @@ public interface BuildManager
 
     void save(PersistentChangelist changelist);
 
+    /**
+     * Retrieves a build result by its database id.
+     *
+     * @param id id of the build to find
+     * @return the found build, or null if there is no such build
+     */
     @SecureResult
     BuildResult getBuildResult(long id);
-
-    RecipeResultNode getRecipeResultNode(long id);
 
     RecipeResultNode getResultNodeByResultId(long id);
 
@@ -47,8 +49,6 @@ public interface BuildManager
 
     StoredArtifact getArtifact(long id);
 
-    StoredFileArtifact getFileArtifact(long id);
-
     @SecureResult
     List<BuildResult> getPersonalBuilds(User user);
 
@@ -60,9 +60,6 @@ public interface BuildManager
 
     @SecureResult
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst);
-
-    @SecureResult
-    List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max);
 
     @SecureResult
     List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
@@ -183,10 +180,9 @@ public interface BuildManager
     BuildResult getByProjectAndMetabuildId(Project project, long metaBuildId);
 
     /**
-     * Retrieve the build result that occured immediately before the specified build result.
+     * Retrieve the build result that occurred immediately before the specified build result.
      *
-     * @param result
-     *
+     * @param result a build to find the previous build for
      * @return a build result or null if the specified build result is the first.
      */
     @SecureResult
@@ -241,6 +237,8 @@ public interface BuildManager
      *                         itself are not included)
      * @param allowEmpty       if true, the result may contain changelists with
      *                         no files; if false, empty changelists are
+     * @return all changes associated with the given build and, if requested,
+     *         earlier builds after a since marker
      */
     @SecureParameter(parameterIndex = 0, action = AccessManager.ACTION_VIEW)
     List<PersistentChangelist> getChangesForBuild(BuildResult result, long sinceBuildNumber, boolean allowEmpty);

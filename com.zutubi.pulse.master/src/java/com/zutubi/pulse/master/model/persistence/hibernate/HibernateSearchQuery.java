@@ -20,7 +20,7 @@ import java.util.List;
  * The SearchQuery provides access to the hibernate Criteria API to allow for arbitrary search queries to be
  * executed.
  *
- * In implementation, it is a wrapper around teh Criteria API that handles the hibernate session management.
+ * In implementation, it is a wrapper around the Criteria API that handles the hibernate session management.
  */
 public class HibernateSearchQuery<T> implements Serializable
 {

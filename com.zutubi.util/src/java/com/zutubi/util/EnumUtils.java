@@ -45,7 +45,7 @@ public class EnumUtils
     }
 
     /**
-     * Convert the enums name into a machine readable equivalent, replacing '_' with '' and lowercasing.
+     * Converts the enums name into a machine readable equivalent, replacing '_' with '' and lowercasing.
      *
      * @param name  the name of the enum to be converted
      * @return  the converted string
@@ -56,8 +56,8 @@ public class EnumUtils
     }
 
     /**
-     * Convert a pretty string version of an enumerations name into its name so that the
-     * enumaration instance can be retrieved via {@link java.lang.Enum#valueOf(Class, String)}
+     * Converts a pretty string version of an enumeration's name into its name so that the
+     * enumeration instance can be retrieved via {@link java.lang.Enum#valueOf(Class, String)}
      * 
      * @param prettyString  the pretty string form of the enumerations name
      * @return  the enumerations name.
@@ -69,9 +69,17 @@ public class EnumUtils
         return prettyString.replace(' ', '_').toUpperCase();
     }
 
+    /**
+     * Converts a pretty string version of an enumeration's name into the enumeration instance.
+     *
+     * @param type          type of the enumeration to convert to
+     * @param prettyString  the pretty string form of the enumerations name
+     * @return  the enumeration instance
+     *
+     * @see #toPrettyString(Enum)
+     */
     public static <V extends Enum<V>> V fromPrettyString(Class<V> type, String prettyString)
     {
-        String name = prettyString.replace(' ', '_').toUpperCase();
-        return Enum.valueOf(type, name);
+        return Enum.valueOf(type, fromPrettyString(prettyString));
     }
 }

@@ -69,18 +69,6 @@ public class InMemoryEntityDao<T extends Entity> implements EntityDao<T>
         return null;
     }
 
-    public <U extends T> U findByIdAndType(long id, Class<U> type)
-    {
-        for (T t : entities)
-        {
-            if (t.getId() == id)
-            {
-                return type.cast(t);
-            }
-        }
-        return null;
-    }
-
     public void refresh(T entity)
     {
 

@@ -14,6 +14,7 @@ This context exports:
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
     <util:list id="hibernateMappings">
+        <value>com/zutubi/pulse/master/model/persistence/hibernate/BuildDependencyLink.hbm.xml</value>
         <value>com/zutubi/pulse/master/model/persistence/hibernate/BuildResult.hbm.xml</value>
         <value>com/zutubi/pulse/master/model/persistence/hibernate/Changelist.hbm.xml</value>
         <value>com/zutubi/pulse/master/model/persistence/hibernate/CommandResult.hbm.xml</value>

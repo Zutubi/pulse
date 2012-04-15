@@ -3,11 +3,12 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.UnaryProcedure;
-import static java.util.Arrays.asList;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class BuildGraphTest extends PulseTestCase
 {
@@ -70,7 +71,7 @@ public class BuildGraphTest extends PulseTestCase
 
     public void testGetBuildPathRoot()
     {
-        assertEquals(Collections.emptyList(), graph.getBuildPath(n1));
+        assertEquals(Collections.<BuildResult>emptyList(), graph.getBuildPath(n1));
     }
 
     public void testGetBuildPathChild()
@@ -80,12 +81,16 @@ public class BuildGraphTest extends PulseTestCase
 
     public void testGetBuildPathDiamond()
     {
-        assertEquals(asList(n2.getBuild(), n4.getBuild()), graph.getBuildPath(n4));
+        List<BuildResult> buildPath = graph.getBuildPath(n4);
+        assertTrue(buildPath.equals(asList(n2.getBuild(), n4.getBuild())) ||
+                   buildPath.equals(asList(n3.getBuild(), n4.getBuild())));
     }
 
     public void testGetBuildPathDiamondChild()
     {
-        assertEquals(asList(n2.getBuild(), n4.getBuild(), n5.getBuild()), graph.getBuildPath(n5));
+        List<BuildResult> buildPath = graph.getBuildPath(n5);
+        assertTrue(buildPath.equals(asList(n2.getBuild(), n4.getBuild(), n5.getBuild())) ||
+                   buildPath.equals(asList(n3.getBuild(), n4.getBuild(), n5.getBuild())));
     }
 
     public void testFindNodeByProjectsNoSuchProject()

@@ -172,20 +172,6 @@
         <property name="total" column="TOTAL" type="int"/>
     </class>
 
-    <class name="com.zutubi.pulse.master.model.BuildDependencyLink" table="BUILD_DEPENDENCY_LINK" lazy="false">
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <property name="upstreamBuildId" type="long">
-            <column name="UPSTREAM_BUILD_ID" not-null="true" index="idx_builddependencylink_upstreambuildid"/>
-        </property>
-
-        <property name="downstreamBuildId" type="long">
-            <column name="DOWNSTREAM_BUILD_ID" not-null="true" index="idx_builddependencylink_downstreambuildid"/>
-        </property>
-    </class>
-
     <query name="findResultNodeByResultId"><![CDATA[
         from RecipeResultNode n
         where n.result.id = :id

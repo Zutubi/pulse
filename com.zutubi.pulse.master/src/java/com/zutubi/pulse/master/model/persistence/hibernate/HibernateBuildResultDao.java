@@ -5,7 +5,10 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
@@ -245,11 +248,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (CommandResult) findAnyType(id, CommandResult.class);
     }
 
-    public RecipeResultNode findRecipeResultNode(long id)
-    {
-        return (RecipeResultNode) findAnyType(id, RecipeResultNode.class);
-    }
-
     public RecipeResult findRecipeResult(long id)
     {
         return (RecipeResult) findAnyType(id, RecipeResult.class);
@@ -483,18 +481,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     return queryObject.list();
                 }
             });
-        }
-
-        return Collections.emptyList();
-    }
-
-    public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
-    {
-        int total = getBuildCount(project, states, null, true);
-        if (total > limit)
-        {
-            // Clean out the difference
-            return queryBuilds(new Project[]{project}, states, 0, 0, 0, total - limit, false);
         }
 
         return Collections.emptyList();
@@ -806,63 +792,5 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public void save(CommandResult result)
     {
         getHibernateTemplate().saveOrUpdate(result);
-    }
-
-    public void save(BuildDependencyLink link)
-    {
-        getHibernateTemplate().saveOrUpdate(link);
-    }
-
-    public List<BuildDependencyLink> findAllDependencies(final long buildId)
-    {
-        return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
-        {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
-            {
-                Query query = session.createQuery("from BuildDependencyLink where downstreamBuildId = :build or upstreamBuildId = :build");
-                query.setLong("build", buildId);
-                return query.list();
-            }
-        });
-    }
-
-    public List<BuildDependencyLink> findAllUpstreamDependencies(final long buildId)
-    {
-        return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
-        {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
-            {
-                Query query = session.createQuery("from BuildDependencyLink where downstreamBuildId = :build");
-                query.setLong("build", buildId);
-                return query.list();
-            }
-        });
-    }
-
-    public List<BuildDependencyLink> findAllDownstreamDependencies(final long buildId)
-    {
-        return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
-        {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
-            {
-                Query query = session.createQuery("from BuildDependencyLink where upstreamBuildId = :build");
-                query.setLong("build", buildId);
-                return query.list();
-            }
-        });
-    }
-
-    public int deleteDependenciesByBuild(final long buildId)
-    {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
-        {
-            public Integer doInHibernate(Session session) throws HibernateException, SQLException
-            {
-                Query queryObject = session.createQuery("delete from BuildDependencyLink where upstreamBuildId = :build or downstreamBuildId = :build");
-                queryObject.setLong("build", buildId);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.executeUpdate();
-            }
-        });
     }
 }

@@ -1,13 +1,10 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
-import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -23,9 +20,9 @@ import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.dependency.ivy.MasterIvyModuleRevisionId;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.master.model.persistence.ArtifactDao;
+import com.zutubi.pulse.master.model.persistence.BuildDependencyLinkDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
-import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
@@ -41,6 +38,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
+
 /**
  * The build manager interface implementation.
  */
@@ -51,8 +51,8 @@ public class DefaultBuildManager implements BuildManager
     private AccessManager accessManager;
     private EventManager eventManager;
     private BuildResultDao buildResultDao;
+    private BuildDependencyLinkDao buildDependencyLinkDao;
     private ArtifactDao artifactDao;
-    private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private MasterConfigurationManager configurationManager;
     private DatabaseConsole databaseConsole;
@@ -85,11 +85,6 @@ public class DefaultBuildManager implements BuildManager
     public BuildResult getBuildResult(long id)
     {
         return buildResultDao.findById(id);
-    }
-
-    public RecipeResultNode getRecipeResultNode(long id)
-    {
-        return buildResultDao.findRecipeResultNode(id);
     }
 
     public RecipeResultNode getResultNodeByResultId(long id)
@@ -276,11 +271,6 @@ public class DefaultBuildManager implements BuildManager
         return artifactDao.findById(id);
     }
 
-    public StoredFileArtifact getFileArtifact(long id)
-    {
-        return fileArtifactDao.findById(id);
-    }
-
     public List<BuildResult> getPersonalBuilds(User user)
     {
         return buildResultDao.findByUser(user);
@@ -299,11 +289,6 @@ public class DefaultBuildManager implements BuildManager
     public List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
         return buildResultDao.queryBuilds(project, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
-    }
-
-    public List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max)
-    {
-        return buildResultDao.queryBuildsWithMessages(projects, level, max);
     }
 
     public Revision getPreviousRevision(Project project)
@@ -612,7 +597,7 @@ public class DefaultBuildManager implements BuildManager
             }
         }
 
-        buildResultDao.deleteDependenciesByBuild(build.getId());
+        buildDependencyLinkDao.deleteDependenciesByBuild(build.getId());
         buildResultDao.delete(build);
     }
 
@@ -703,40 +688,6 @@ public class DefaultBuildManager implements BuildManager
         }));
     }
 
-    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
-    {
-        this.repositoryAttributes = repositoryAttributes;
-    }
-
-    public void setAccessManager(AccessManager accessManager)
-    {
-        this.accessManager = accessManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
-    public void setFileDeletionService(FileDeletionService fileDeletionService)
-    {
-        this.fileDeletionService = fileDeletionService;
-    }
-
-    /**
-     * A simple callback interface used to aid the recipe cleanup process.  Implementations
-     * of this interface will clean up specific portions of a recipe.
-     */
-    private interface RecipeCleanup
-    {
-        /**
-         * Cleanup the specified recipe
-         *
-         * @param recipe    the recipe to be cleaned.
-         */
-        void cleanup(RecipeResult recipe);
-    }
-
     /**
      * Recurse over the list of nodes and there children, executing the recipe clean for each
      * of the nodes.
@@ -819,11 +770,6 @@ public class DefaultBuildManager implements BuildManager
         this.changelistDao = changelistDao;
     }
 
-    public void setFileArtifactDao(FileArtifactDao fileArtifactDao)
-    {
-        this.fileArtifactDao = fileArtifactDao;
-    }
-
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -837,5 +783,44 @@ public class DefaultBuildManager implements BuildManager
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
+    {
+        this.repositoryAttributes = repositoryAttributes;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setFileDeletionService(FileDeletionService fileDeletionService)
+    {
+        this.fileDeletionService = fileDeletionService;
+    }
+
+    public void setBuildDependencyLinkDao(BuildDependencyLinkDao buildDependencyLinkDao)
+    {
+        this.buildDependencyLinkDao = buildDependencyLinkDao;
+    }
+
+    /**
+     * A simple callback interface used to aid the recipe cleanup process.  Implementations
+     * of this interface will clean up specific portions of a recipe.
+     */
+    private interface RecipeCleanup
+    {
+        /**
+         * Cleanup the specified recipe
+         *
+         * @param recipe    the recipe to be cleaned.
+         */
+        void cleanup(RecipeResult recipe);
     }
 }

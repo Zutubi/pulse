@@ -12,12 +12,12 @@ import java.util.List;
 public interface DependencyManager
 {
     /**
-     * Records links from the given build to all upstream dependencies - that is builds that it
-     * retrieved artifacts from.  This should be done for each build as it completes to build up
-     * an index of dependency information.
+     * Records links from the given build to all upstream dependencies as defined in the build's
+     * module descriptor.  This should be done for each build as it completes to build up an index
+     * of dependency information.
      *
-     * @param build the build to add upstream links for, must be complete
-     * @param ivyModuleDescriptor
+     * @param build               the build to add upstream links for, must be complete
+     * @param ivyModuleDescriptor the resolved module descriptor for the build
      */
     void addDependencyLinks(BuildResult build, IvyModuleDescriptor ivyModuleDescriptor);
 
