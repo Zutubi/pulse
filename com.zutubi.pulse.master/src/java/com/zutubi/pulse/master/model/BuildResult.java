@@ -439,9 +439,13 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
         {
             return "personal";
         }
-        else
+        else if (project != null && project.getName() != null)
         {
             return project.getName();
+        }
+        else
+        {
+            return "<unknown>";
         }
     }
 
@@ -521,5 +525,11 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
         {
             fn.run(stage);
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return getOwnerName() + " :: build " + number; 
     }
 }

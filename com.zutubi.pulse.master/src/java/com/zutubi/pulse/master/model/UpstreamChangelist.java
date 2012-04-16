@@ -54,4 +54,38 @@ public class UpstreamChangelist
     {
         upstreamContexts.add(new LinkedList<BuildResult>(context));
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        UpstreamChangelist that = (UpstreamChangelist) o;
+
+        if (changelist != null ? !changelist.equals(that.changelist) : that.changelist != null)
+        {
+            return false;
+        }
+        if (upstreamContexts != null ? !upstreamContexts.equals(that.upstreamContexts) : that.upstreamContexts != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = changelist != null ? changelist.hashCode() : 0;
+        result = 31 * result + (upstreamContexts != null ? upstreamContexts.hashCode() : 0);
+        return result;
+    }
 }

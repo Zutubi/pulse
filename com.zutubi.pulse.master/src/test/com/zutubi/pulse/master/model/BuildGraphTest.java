@@ -3,12 +3,9 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.UnaryProcedure;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import static java.util.Arrays.asList;
+
+import java.util.*;
 
 public class BuildGraphTest extends PulseTestCase
 {
@@ -64,33 +61,40 @@ public class BuildGraphTest extends PulseTestCase
         assertSame(n5, graph.findNodeByBuildId(5));
     }
 
-    public void testGetBuildPathUnknownNode()
+    public void testGetBuildPathsUnknownNode()
     {
-        assertNull(graph.getBuildPath(createNode(99)));
+        assertEquals(0, graph.getBuildPaths(createNode(99)).size());
     }
 
-    public void testGetBuildPathRoot()
+    public void testGetBuildPathsRoot()
     {
-        assertEquals(Collections.<BuildResult>emptyList(), graph.getBuildPath(n1));
+        assertEquals(singlePathSet(), graph.getBuildPaths(n1));
     }
 
     public void testGetBuildPathChild()
     {
-        assertEquals(asList(n2.getBuild()), graph.getBuildPath(n2));
+        assertEquals(singlePathSet(n2.getBuild()), graph.getBuildPaths(n2));
     }
 
     public void testGetBuildPathDiamond()
     {
-        List<BuildResult> buildPath = graph.getBuildPath(n4);
-        assertTrue(buildPath.equals(asList(n2.getBuild(), n4.getBuild())) ||
-                   buildPath.equals(asList(n3.getBuild(), n4.getBuild())));
+        Set<List<BuildResult>> expected = singlePathSet(n2.getBuild(), n4.getBuild());
+        expected.add(asList(n3.getBuild(), n4.getBuild()));
+        assertEquals(expected, graph.getBuildPaths(n4));
     }
 
     public void testGetBuildPathDiamondChild()
     {
-        List<BuildResult> buildPath = graph.getBuildPath(n5);
-        assertTrue(buildPath.equals(asList(n2.getBuild(), n4.getBuild(), n5.getBuild())) ||
-                   buildPath.equals(asList(n3.getBuild(), n4.getBuild(), n5.getBuild())));
+        Set<List<BuildResult>> expected = singlePathSet(n2.getBuild(), n4.getBuild(), n5.getBuild());
+        expected.add(asList(n3.getBuild(), n4.getBuild(), n5.getBuild()));
+        assertEquals(expected, graph.getBuildPaths(n5));
+    }
+
+    public Set<List<BuildResult>> singlePathSet(BuildResult... builds)
+    {
+        HashSet<List<BuildResult>> result = new HashSet<List<BuildResult>>();
+        result.add(asList(builds));
+        return result;
     }
 
     public void testFindNodeByProjectsNoSuchProject()

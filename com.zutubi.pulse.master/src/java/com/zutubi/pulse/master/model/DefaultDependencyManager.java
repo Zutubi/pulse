@@ -17,6 +17,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
@@ -26,8 +27,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.util.WebUtils.uriComponentEncode;
+import java.util.Set;
 
 /**
  * Default implementation of DependencyManager.
@@ -223,53 +223,47 @@ public class DefaultDependencyManager implements DependencyManager
                     return;
                 }
                 
-                List<BuildResult> buildPath = buildGraph.getBuildPath(node);
-                BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
-                long sinceNumber;
-                if (sinceNode == null)
+                Set<List<BuildResult>> buildPaths = buildGraph.getBuildPaths(node);
+                for (List<BuildResult> buildPath: buildPaths)
                 {
-                    // The project was not upstream last time, so just include changes directly on
-                    // the upstream build.
-                    sinceNumber = 0;
-                }
-                else if (sinceNode.getBuild().getId() != node.getBuild().getId())
-                {
-                    // A different build of the project was upstream last time, get changes since
-                    // that build.
-                    sinceNumber = sinceNode.getBuild().getNumber();
-                }
-                else
-                {
-                    // Since build used the same upstream build, no changes to record.
-                    return;
-                }
-                
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(node.getBuild(), sinceNumber, true);
-                for (final PersistentChangelist changelist: changelists)
-                {
-                    UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()
+                    BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
+                    if (sinceNode != null && sinceNode.getBuild().getId() != node.getBuild().getId())
                     {
-                        public boolean satisfied(UpstreamChangelist upstreamChange)
-                        {
-                            return upstreamChange.getChangelist().isEquivalent(changelist);
-                        }
-                    });
-                    
-                    if (upstreamChangelist == null)
-                    {
-                        upstreamChangelist = new UpstreamChangelist(changelist, buildPath);
-                        upstreamChangelists.add(upstreamChangelist);
-                    }
-                    else
-                    {
-                        // We've seen this change before, just add another context path.
-                        upstreamChangelist.addUpstreamContext(buildPath);
+                        // A different build of the project was upstream last time, get changes since
+                        // that build.
+                        addUpstreamChangesForPath(buildPath, node, sinceNode, upstreamChangelists);
                     }
                 }
             }
         });
         
         return upstreamChangelists;
+    }
+
+    private void addUpstreamChangesForPath(List<BuildResult> buildPath, BuildGraph.Node node, BuildGraph.Node sinceNode, List<UpstreamChangelist> upstreamChangelists)
+    {
+        List<PersistentChangelist> changelists = buildManager.getChangesForBuild(node.getBuild(), sinceNode.getBuild().getNumber(), true);
+        for (final PersistentChangelist changelist: changelists)
+        {
+            UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()
+            {
+                public boolean satisfied(UpstreamChangelist upstreamChange)
+                {
+                    return upstreamChange.getChangelist().isEquivalent(changelist);
+                }
+            });
+            
+            if (upstreamChangelist == null)
+            {
+                upstreamChangelist = new UpstreamChangelist(changelist, buildPath);
+                upstreamChangelists.add(upstreamChangelist);
+            }
+            else
+            {
+                // We've seen this change before, just add another context path.
+                upstreamChangelist.addUpstreamContext(buildPath);
+            }
+        }
     }
 
     public void setBuildDependencyLinkDao(BuildDependencyLinkDao buildDependencyLinkDao)

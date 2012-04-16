@@ -45,28 +45,30 @@ public class BuildGraph
     }
 
     /**
-     * Returns the build path for a given node.  This is a sequence of build results found on nodes
-     * between the root (excluded) and the given node (included).
+     * Returns all possible build paths for a given node.  Each path is a sequence of build results
+     * found on nodes between the root (excluded) and the given node (included).
      * 
      * @param node the node to get the path for
-     * @return path of build results from the root to the given node, or null if the node is not
-     *         found in this graph
+     * @return all possible paths of build results from the root to the given node, empty if the
+     *         node is not found in this graph (or is the root itself).
      */
-    public List<BuildResult> getBuildPath(Node node)
+    public Set<List<BuildResult>> getBuildPaths(Node node)
     {
-        List<Node> path = root.getPath(node);
-        if (path == null)
+        Set<List<Node>> paths = root.getPaths(node);
+        Set<List<BuildResult>> buildPaths = new HashSet<List<BuildResult>>();
+        return CollectionUtils.map(paths, new Mapping<List<Node>, List<BuildResult>>()
         {
-            return null;
-        }
-        
-        return CollectionUtils.map(path, new Mapping<Node, BuildResult>()
-        {
-            public BuildResult map(Node node)
+            public List<BuildResult> map(List<Node> path)
             {
-                return node.getBuild();
+                return CollectionUtils.map(path, new Mapping<Node, BuildResult>()
+                {
+                    public BuildResult map(Node node)
+                    {
+                        return node.getBuild();
+                    }
+                });
             }
-        });
+        }, buildPaths);
     }
 
     /**
@@ -228,28 +230,30 @@ public class BuildGraph
             }
         }
 
-        List<Node> getPath(Node node)
+        Set<List<Node>> getPaths(Node node)
         {
+            Set<List<Node>> result = new HashSet<List<Node>>();
             if (node == this)
             {
-                return Collections.emptyList();
+                result.add(Collections.<Node>emptyList());
             }
             else
             {
                 for (Node n: connected)
                 {
-                    List<Node> relativePath = n.getPath(node);
-                    if (relativePath != null)
+                    Set<List<Node>> relativePaths = n.getPaths(node);
+                    for (List<Node> relativePath: relativePaths)
                     {
                         List<Node> path = new LinkedList<Node>();
                         path.add(n);
                         path.addAll(relativePath);
-                        return path;
+                        result.add(path);
                     }
                 }
                 
-                return null;
             }
+            
+            return result;
         }
 
         @Override
