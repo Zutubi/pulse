@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -493,11 +492,6 @@ public class SeleniumBrowser
         return selenium.isEditable(fieldId);
     }
 
-    public boolean isWindowPresent(String windowName)
-    {
-        return Arrays.asList(selenium.getAllWindowTitles()).contains(windowName);
-    }
-
     public Object evaluateScript(String expression)
     {
         return ((JavascriptExecutor) webDriver).executeScript(expression);
@@ -544,11 +538,6 @@ public class SeleniumBrowser
         return selenium.getTitle();
     }
 
-    public String getCookie(String name)
-    {
-        return selenium.getCookieByName(name);
-    }
-
     public boolean isCookiePresent(String name)
     {
         return selenium.isCookiePresent(name);
@@ -557,17 +546,6 @@ public class SeleniumBrowser
     public void deleteAllCookies()
     {
         selenium.deleteAllVisibleCookies();
-    }
-
-    public String getCookie()
-    {
-        return selenium.getCookie();
-    }
-
-    public void setCookie(String name, String value)
-    {
-        String cookieOptions = "";
-        selenium.createCookie(name + "=" + value, cookieOptions);    
     }
 
     public void waitForPageToLoad()
@@ -684,17 +662,6 @@ public class SeleniumBrowser
         }
     }
 
-    public void waitForWindow(final String windowName)
-    {
-        TestUtils.waitForCondition(new Condition()
-        {
-            public boolean satisfied()
-            {
-                return isWindowPresent(windowName);
-            }
-        }, WAITFOR_TIMEOUT, "Timeout waiting for " + windowName + " window.");
-    }
-
     /**
      * Waits for the pop-down status pane to appear with the given message.
      *
@@ -729,22 +696,6 @@ public class SeleniumBrowser
                 return selenium.isElementPresent(WebUtils.toValidHtmlName(id));
             }
         }, "element '" + id + "'");
-    }
-
-    public void refreshUntilText(final String id, final String... texts)
-    {
-        refreshUntilText(id, REFRESH_TIMEOUT, texts);
-    }
-
-    public void refreshUntilText(final String id, long timeout, final String... texts)
-    {
-        refreshUntil(timeout, new Condition()
-        {
-            public boolean satisfied()
-            {
-                return CollectionUtils.contains(texts, getText(By.id(WebUtils.toValidHtmlName(id))));
-            }
-        }, "one of the following texts '" + Arrays.asList(texts) + "' in element '" + id + "'");
     }
 
     public void refreshUntil(long timeout, Condition condition, String conditionText)
