@@ -22,6 +22,7 @@ public class DependenciesTestSuite
         TestSuite dependencySuite = new TestSuite();
         addClassToSuite(dependencySuite, DependenciesAcceptanceTest.class);
         addClassToSuite(dependencySuite, DependenciesConfigurationAcceptanceTest.class);
+        addClassToSuite(dependencySuite, DependenciesWithChangesAcceptanceTest.class);
         addClassToSuite(dependencySuite, DependenciesUIAcceptanceTest.class);
         addClassToSuite(dependencySuite, RebuildDependenciesAcceptanceTest.class);
         addClassToSuite(dependencySuite, BuildVersionAcceptanceTest.class);

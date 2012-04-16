@@ -50,13 +50,13 @@
             #if($model.upstreamContexts.size() > 1)
                 <ul class="points">
                 #foreach($context in $model.upstreamContexts)
-                    <li>
+                    <li id="${prefix}.${changeIndex}.via.${velocityCount}">
                         #upstreamContext($context)
                     </li>
                 #end
                 </ul>
             #else
-                #upstreamContext($model.upstreamContexts.get(0))
+                <span id="${prefix}.${changeIndex}.via.1">#upstreamContext($model.upstreamContexts.get(0))</span>
             #end
             </td>
         </tr>

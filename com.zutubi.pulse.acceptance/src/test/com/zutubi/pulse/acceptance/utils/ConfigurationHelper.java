@@ -262,7 +262,8 @@ public class ConfigurationHelper
     }
 
     /**
-     * Convenience method for inserting a new ProjectConfiguration instance.
+     * Convenience method for inserting a new ProjectConfiguration instance.  If the project is not
+     * a template, this method will wait for it to initialise before returning.
      *
      * @param project  the project to be inserted.
      * @param template if true, a project template is created, otherwise a
@@ -273,7 +274,12 @@ public class ConfigurationHelper
     public String insertProject(ProjectConfiguration project, boolean template) throws Exception
     {
         String globalTemplateProjectPath = PROJECTS_SCOPE + "/" + GLOBAL_PROJECT_NAME;
-        return insertTemplatedConfig(globalTemplateProjectPath, project, template);
+        String path = insertTemplatedConfig(globalTemplateProjectPath, project, template);
+        if (!template)
+        {
+            remoteApi.waitForProjectToInitialise(project.getName());
+        }
+        return path;
     }
 
 

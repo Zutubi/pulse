@@ -257,7 +257,6 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
         WaitProject project = projectConfigurations.createWaitAntProject(projectName, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
         configurationHelper.insertProject(project.getConfig(), false);
-        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
         return project;

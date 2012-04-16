@@ -23,6 +23,7 @@ import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.AntProjectHelper;
 import com.zutubi.pulse.acceptance.utils.Repository;
+import com.zutubi.pulse.acceptance.utils.TriviAntProject;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.BootstrapCommand;
@@ -81,10 +82,7 @@ import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -174,13 +172,14 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testChangesBetweenBuilds() throws Exception
     {
         // Run an initial build
-        rpcClient.RemoteApi.insertSimpleProject(random);
+        TriviAntProject project = projectConfigurations.createTrivialAntProject(random);
+        configurationHelper.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.runBuild(random);
 
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
-        String revisionString = editAndCommitBuildFile();
+        String revisionString = project.editAndCommitBuildFile(CHANGE_COMMENT, random);
         long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         // Check the changes tab.
@@ -272,13 +271,15 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String unviewableProject = random + "-unviewable";
         String regularUser = random + "-user";
         
-        rpcClient.RemoteApi.insertSimpleProject(viewableProject);
-        String unviewableProjectPath = rpcClient.RemoteApi.insertSimpleProject(unviewableProject);
+        TriviAntProject viewable = projectConfigurations.createTrivialAntProject(viewableProject);
+        configurationHelper.insertProject(viewable.getConfig(), false);
+        TriviAntProject unviewable = projectConfigurations.createTrivialAntProject(unviewableProject);
+        configurationHelper.insertProject(unviewable.getConfig(), false);
         rpcClient.RemoteApi.insertTrivialUser(regularUser);
         
         // Remove permissions that allow normal users to view the invisible
         // project (so only admin can see it).
-        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(unviewableProjectPath, Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(unviewable.getConfig().getConfigurationPath(), Constants.Project.PERMISSIONS, PathUtils.WILDCARD_ANY_ELEMENT));
         
         rpcClient.RemoteApi.runBuild(viewableProject);
         rpcClient.RemoteApi.runBuild(unviewableProject);
@@ -286,7 +287,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // Commit a change to the repository.  Note monitoring the SCM is
         // disabled for these projects, so no chance of a build being started
         // by this change.
-        String revisionString = editAndCommitBuildFile();
+        String revisionString = viewable.editAndCommitBuildFile(CHANGE_COMMENT, random);
         
         long viewableBuildNumber = rpcClient.RemoteApi.runBuild(viewableProject);
         long unviewableBuildNumber = rpcClient.RemoteApi.runBuild(unviewableProject);
@@ -332,14 +333,12 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         final String FISHEYE_BASE = "http://fisheye";
         final String FISHEYE_PROJECT = "project";
 
-        String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
-        Hashtable<String, Object> changeViewer = rpcClient.RemoteApi.createDefaultConfig(FisheyeConfiguration.class);
-        changeViewer.put("baseURL", FISHEYE_BASE);
-        changeViewer.put("projectPath", FISHEYE_PROJECT);
-        rpcClient.RemoteApi.insertConfig(PathUtils.getPath(projectPath, "changeViewer"), changeViewer);
+        TriviAntProject project = projectConfigurations.createTrivialAntProject(random);
+        FisheyeConfiguration changeViewer = new FisheyeConfiguration(FISHEYE_BASE, FISHEYE_PROJECT);
+        project.getConfig().setChangeViewer(changeViewer);
 
         rpcClient.RemoteApi.runBuild(random);
-        String revisionString = editAndCommitBuildFile();
+        String revisionString = project.editAndCommitBuildFile(CHANGE_AUTHOR, random);
         long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         String changelistLink = FISHEYE_BASE + "/changelog/" + FISHEYE_PROJECT + "/?cs=" + revisionString;
@@ -356,32 +355,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().isLinkToPresent(prefixPart + filePart + "?r=" + revisionString));
         assertTrue(getBrowser().isLinkToPresent(prefixPart + "~raw,r=" + revisionString + "/" + filePart));
         assertTrue(getBrowser().isLinkToPresent(prefixPart + filePart + "?r1=" + new Revision(revisionString).calculatePreviousNumericalRevision() + "&r2=" + revisionString));
-    }
-
-    private String editAndCommitBuildFile() throws IOException, SVNException
-    {
-        return editAndCommitFile(TRIVIAL_ANT_REPOSITORY, CHANGE_FILENAME, CHANGE_COMMENT,
-                "<?xml version=\"1.0\"?>\n" +
-                "<project default=\"default\">\n" +
-                "    <target name=\"default\">\n" +
-                "        <echo message=\"" + random + "\"/>\n" +
-                "    </target>\n" +
-                "</project>");
-    }
-
-    private String editAndCommitFile(String repository, String filename, String comment, String newContent) throws IOException, SVNException
-    {
-        File wcDir = createTempDirectory();
-        SubversionWorkspace workspace = new SubversionWorkspace(wcDir, CHANGE_AUTHOR, CHANGE_AUTHOR);
-        try
-        {
-            workspace.doCheckout(repository);
-            return workspace.editAndCommitFile(filename, comment, newContent);
-        }
-        finally
-        {
-            IOUtils.close(workspace);
-        }
     }
 
     private void assertBuildFileChangelist(Changelist changelist, String revisionString)
@@ -477,6 +450,21 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(summaryPage.isFeaturedArtifactsTablePresent());
         assertEquals("stage :: " + DEFAULT_STAGE, summaryPage.getFeaturedArtifactsRow(0));
         assertEquals("features", summaryPage.getFeaturedArtifactsRow(1));
+    }
+
+    private String editAndCommitFile(String repository, String filename, String comment, String newContent) throws IOException, SVNException
+    {
+        File wcDir = FileSystemUtils.createTempDir(getName());
+        SubversionWorkspace workspace = new SubversionWorkspace(wcDir, CHANGE_AUTHOR, CHANGE_AUTHOR);
+        try
+        {
+            workspace.doCheckout(repository);
+            return workspace.editAndCommitFile(filename, comment, newContent);
+        }
+        finally
+        {
+            IOUtils.close(workspace);
+        }
     }
 
     /*
@@ -648,7 +636,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             final WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
             configurationHelper.insertProject(project.getConfig(), false);
             
-            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
             
@@ -1351,7 +1338,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             
             configurationHelper.insertProject(project.getConfig(), false);
             
-            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
             
@@ -1489,7 +1475,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
             configurationHelper.insertProject(project.getConfig(), false);
 
-            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 

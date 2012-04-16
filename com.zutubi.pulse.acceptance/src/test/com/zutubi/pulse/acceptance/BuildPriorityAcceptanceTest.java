@@ -278,17 +278,11 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         }
     }
 
-
     private void insertProjects(WaitProject... projects) throws Exception
     {
         for (WaitProject project: projects)
         {
             configurationHelper.insertProject(project.getConfig(), false);
-        }
-
-        for (WaitProject project: projects)
-        {
-            rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
         }
     }
 }

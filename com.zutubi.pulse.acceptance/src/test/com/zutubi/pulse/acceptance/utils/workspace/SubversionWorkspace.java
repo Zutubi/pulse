@@ -102,6 +102,17 @@ public class SubversionWorkspace implements Closeable
         copyClient.doCopy(copySources, SVNURL.parseURIDecoded(toUrl), false, true, true, comment, null);
     }
 
+    /**
+     * Conveience method to edit and commit a file.
+     * 
+     * @param filename   path of the file, relative to the workspace root, to edit
+     * @param comment    commit comment
+     * @param newContent new content of the edited file, in its entirety (note that this must differ
+     *                   from the current content or no change will be committed)
+     * @return the committed revision
+     * @throws IOException on an error writing to the file
+     * @throws SVNException on any error interacting with svn
+     */
     public String editAndCommitFile(String filename, String comment, String newContent) throws IOException, SVNException
     {
         File file = new File(workingDir, filename);

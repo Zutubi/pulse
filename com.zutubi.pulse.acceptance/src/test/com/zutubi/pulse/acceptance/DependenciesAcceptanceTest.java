@@ -69,7 +69,6 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
         configurationHelper.insertProject(project.getConfig(), false);
-        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
     }
 
     public void testPublish_NoArtifacts() throws Exception

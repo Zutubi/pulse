@@ -95,7 +95,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig(), false);
 
-        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 
@@ -141,8 +140,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig(), false);
         configurationHelper.insertProject(project2.getConfig(), false);
-        rpcClient.RemoteApi.waitForProjectToInitialise(project1.getName());
-        rpcClient.RemoteApi.waitForProjectToInitialise(project2.getName());
         rpcClient.RemoteApi.triggerBuild(project1.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project1.getName(), 1);
         rpcClient.RemoteApi.triggerBuild(project2.getName());
@@ -200,7 +197,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
         configurationHelper.insertProject(project.getConfig(), false);
-        rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 

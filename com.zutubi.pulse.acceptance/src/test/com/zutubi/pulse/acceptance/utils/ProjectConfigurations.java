@@ -135,9 +135,19 @@ public class ProjectConfigurations
         return project;
     }
 
-    public AntProjectHelper createTrivialAntProject(String projectName) throws Exception
+    /**
+     * Creates a new ant project using the trivial repository (a simple build.xml file).
+     * 
+     * @param projectName name of the project to create
+     * @return the new project
+     * @throws Exception on error
+     */
+    public TriviAntProject createTrivialAntProject(String projectName) throws Exception
     {
-        return createAntProject(projectName, Constants.TRIVIAL_ANT_REPOSITORY);
+        TriviAntProject project = new TriviAntProject(new ProjectConfiguration(projectName), configurationHelper);
+        configureBaseProject(project, true);
+        configureSvnScm(project, Constants.TRIVIAL_ANT_REPOSITORY);
+        return project;
     }
 
     public AntProjectHelper createAntProject(String projectName, String svnUrl) throws Exception
