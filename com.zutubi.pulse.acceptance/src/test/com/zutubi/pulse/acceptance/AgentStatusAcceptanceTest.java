@@ -5,20 +5,19 @@ import com.zutubi.pulse.acceptance.components.table.PropertyTable;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatusPage;
 import com.zutubi.pulse.acceptance.pages.agents.ExecutingStageTable;
 import com.zutubi.pulse.acceptance.pages.agents.SynchronisationMessageTable;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
-
-import java.io.File;
-
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.File;
 
 /**
  * Tests for the agent status tab.
@@ -27,8 +26,6 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
 {
     private static final String TEST_DESCRIPTION = "test description";
 
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private File tempDir;
 
     @Override
@@ -39,10 +36,6 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
         rpcClient.cancelIncompleteBuilds();
         removeNonMasterAgents();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-        projects = new ProjectConfigurations(configurationHelper);
 
         tempDir = FileSystemUtils.createTempDir(getName());
     }
@@ -261,7 +254,7 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(projectName, tempDir, false);
+        WaitProject project = projectConfigurations.createWaitAntProject(projectName, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
         configurationHelper.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());

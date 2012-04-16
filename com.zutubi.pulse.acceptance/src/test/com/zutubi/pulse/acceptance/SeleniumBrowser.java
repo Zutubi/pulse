@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -11,6 +12,8 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.*;
 import com.zutubi.util.io.FileSystemUtils;
 import freemarker.template.utility.StringUtil;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -31,10 +34,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * A utility class for managing and interacting with the selenium instance.
@@ -99,7 +98,7 @@ public class SeleniumBrowser
     public SeleniumBrowser(int port, WebDriver webDriver)
     {
         this.webDriver = webDriver;
-        webDriver.manage().timeouts().implicitlyWait(500, TimeUnit.MILLISECONDS);
+        webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         String baseUrl = AcceptanceTestUtils.getPulseUrl(port);
         selenium = new WebDriverBackedSelenium(webDriver, baseUrl);
         this.pulsePort = port;

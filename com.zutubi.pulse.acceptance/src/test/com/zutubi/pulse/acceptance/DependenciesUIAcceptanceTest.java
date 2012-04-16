@@ -3,11 +3,13 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.DepAntProject;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
-
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
@@ -15,8 +17,6 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     private Repository repository;
     private String randomName;
     private BuildRunner buildRunner;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -30,11 +30,6 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
         repository.clean();
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -54,7 +49,7 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifactA.jar");
         projectA.addFilesToCreate("build/artifactA.jar");
         insertProject(projectA);
@@ -63,13 +58,13 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
         BuildDetailsPage detailsPage = getBrowser().openAndWaitFor(BuildDetailsPage.class, projectA.getName(), projectABuildNumber);
         assertFalse(detailsPage.isDependenciesTablePresent());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addArtifacts("build/artifactB.jar");
         projectB.addFilesToCreate("build/artifactB.jar");
         insertProject(projectB);
         long projectBBuildNumber = buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
+        DepAntProject dependentProject = projectConfigurations.createDepAntProject(randomName + "C");
         dependentProject.addDependency(projectA);
         dependentProject.addDependency(projectB);
         insertProject(dependentProject);
@@ -97,13 +92,13 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifactA.jar");
         projectA.addFilesToCreate("build/artifactA.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject dependentProject = projects.createDepAntProject(randomName + "C");
+        DepAntProject dependentProject = projectConfigurations.createDepAntProject(randomName + "C");
         dependentProject.addDependency(projectA);
         insertProject(dependentProject);
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
@@ -122,12 +117,12 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
@@ -154,14 +149,14 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
 
     public void testProjectDependenciesTab() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA).setTransitive(true);
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(randomName + "C");
         projectC.addDependency(projectB);
         insertProject(projectC);
 

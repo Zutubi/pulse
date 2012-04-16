@@ -6,10 +6,6 @@ import com.zutubi.pulse.acceptance.forms.admin.ConvertToVersionedForm;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
-import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
-import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -25,19 +21,12 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 {
     private static final long TIMEOUT = 30000;
     
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
-
     protected void setUp() throws Exception
     {
         super.setUp();
 
         getBrowser().loginAsAdmin();
         rpcClient.loginAsAdmin();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-        projects = new ProjectConfigurations(configurationHelper);
     }
 
     protected void tearDown() throws Exception
@@ -109,7 +98,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
     // --( test rendering browse link for project to versioned transformation )---
     public void testBrowseLinkAvailableForVersionedProjectConversion() throws Exception
     {
-        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
+        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction("convertToVersioned");
 
@@ -200,7 +189,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseAddingCommandToExistingProject() throws Exception
     {
-        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), false);
+        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "/" +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
@@ -226,7 +215,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig(boolean template) throws Exception
     {
-        configurationHelper.insertProject(projects.createTestAntProject(random).getConfig(), template);
+        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), template);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +

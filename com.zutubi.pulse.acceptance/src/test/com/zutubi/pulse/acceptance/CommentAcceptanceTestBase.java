@@ -4,19 +4,15 @@ import com.zutubi.pulse.acceptance.pages.ConfirmDialog;
 import com.zutubi.pulse.acceptance.pages.agents.CommentPage;
 import com.zutubi.pulse.acceptance.pages.browse.AddCommentDialog;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
-import com.zutubi.pulse.acceptance.utils.ConfigurationHelperFactory;
-import com.zutubi.pulse.acceptance.utils.SingletonConfigurationHelperFactory;
 import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.CommentContainer;
 import com.zutubi.util.Condition;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * Helper base class for tests of comment pages.
@@ -26,7 +22,6 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
     protected static final String TEST_USER = "comment-user";
     protected static final String TEST_COMMENT = "a comment here";
 
-    protected ConfigurationHelper configurationHelper;
     protected UserConfigurations users;
 
     @Override
@@ -35,9 +30,6 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         super.setUp();
 
         rpcClient.loginAsAdmin();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
 
         users = new UserConfigurations();
         if (!configurationHelper.isUserExists(TEST_USER))

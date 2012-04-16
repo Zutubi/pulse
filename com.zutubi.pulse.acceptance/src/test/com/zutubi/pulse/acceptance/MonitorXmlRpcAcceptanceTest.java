@@ -1,23 +1,23 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.Constants.MINUTE;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
+import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
-import static com.zutubi.util.Constants.MINUTE;
-import static java.util.Arrays.asList;
 
 /**
  * Tests for {@link com.zutubi.pulse.master.api.MonitorApi} XML-RPC methods.
@@ -80,12 +80,8 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         File tempDir = createTempDirectory();
         try
         {
-            ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-            ConfigurationHelper configurationHelper = factory.create(rpcClient.RemoteApi);
-            ProjectConfigurations projects  = new ProjectConfigurations(configurationHelper);
-
             // Start an initial build, check it shows up as in progress.
-            WaitProject project = projects.createWaitAntProject(random, tempDir, true);
+            WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, true);
             configurationHelper.insertProject(project.getConfig(), false);
             rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());
             rpcClient.RemoteApi.triggerBuild(project.getName());

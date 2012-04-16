@@ -208,34 +208,36 @@ public class DefaultDependencyManager implements DependencyManager
     
     public List<UpstreamChangelist> getUpstreamChangelists(final BuildResult build, BuildResult sinceBuild)
     {
-        final BuildGraph buildGraph = getUpstreamDependencyGraph(build);
-        final BuildGraph sinceGraph = getUpstreamDependencyGraph(sinceBuild);
-        
         final List<UpstreamChangelist> upstreamChangelists = new LinkedList<UpstreamChangelist>();
-        
-        buildGraph.forEach(new UnaryProcedure<BuildGraph.Node>()
+        if (sinceBuild != null)
         {
-            public void run(BuildGraph.Node node)
+            final BuildGraph buildGraph = getUpstreamDependencyGraph(build);
+            final BuildGraph sinceGraph = getUpstreamDependencyGraph(sinceBuild);
+                    
+            buildGraph.forEach(new UnaryProcedure<BuildGraph.Node>()
             {
-                if (node.getBuild() == build)
+                public void run(BuildGraph.Node node)
                 {
-                    // Skip the root.
-                    return;
-                }
-                
-                Set<List<BuildResult>> buildPaths = buildGraph.getBuildPaths(node);
-                for (List<BuildResult> buildPath: buildPaths)
-                {
-                    BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
-                    if (sinceNode != null && sinceNode.getBuild().getId() != node.getBuild().getId())
+                    if (node.getBuild() == build)
                     {
-                        // A different build of the project was upstream last time, get changes since
-                        // that build.
-                        addUpstreamChangesForPath(buildPath, node, sinceNode, upstreamChangelists);
+                        // Skip the root.
+                        return;
+                    }
+                    
+                    Set<List<BuildResult>> buildPaths = buildGraph.getBuildPaths(node);
+                    for (List<BuildResult> buildPath: buildPaths)
+                    {
+                        BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
+                        if (sinceNode != null && sinceNode.getBuild().getId() != node.getBuild().getId())
+                        {
+                            // A different build of the project was upstream last time, get changes since
+                            // that build.
+                            addUpstreamChangesForPath(buildPath, node, sinceNode, upstreamChangelists);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         
         return upstreamChangelists;
     }

@@ -5,7 +5,8 @@ import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectDependenciesPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.DepAntProject;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -26,20 +27,12 @@ import java.util.Vector;
  */
 public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 {
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
-
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
 
         rpcClient.loginAsAdmin();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -132,14 +125,14 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
     public void testCircularDependencyCheck() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(random + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(random + "A");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(random + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(random + "B");
         projectB.addDependency(projectA).setTransitive(true);
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(random + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(random + "C");
         projectC.addDependency(projectB);
         insertProject(projectC);
 

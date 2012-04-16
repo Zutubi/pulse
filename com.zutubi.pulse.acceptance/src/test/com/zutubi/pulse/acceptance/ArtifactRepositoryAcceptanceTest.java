@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.AntProjectHelper;
+import com.zutubi.pulse.acceptance.utils.MavenProjectHelper;
+import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.commands.maven2.Maven2CommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -9,8 +11,6 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 {
     private String random = null;
     private Repository repository = null;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -19,10 +19,6 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         random = randomName();
 
         rpcClient.loginAsAdmin();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-        projects = new ProjectConfigurations(configurationHelper);
 
         repository = new Repository();
         repository.clean();
@@ -80,7 +76,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
     private int createAndRunMavenProject(String projectName, String pom, String goals) throws Exception
     {
-        MavenProjectHelper project = projects.createDepMavenProject(projectName);
+        MavenProjectHelper project = projectConfigurations.createDepMavenProject(projectName);
         Maven2CommandConfiguration command = (Maven2CommandConfiguration) project.getDefaultCommand();
         command.setPomFile(pom);
         command.setSettingsFile("settings.xml");
@@ -93,7 +89,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
 
     private int createAndRunIvyAntProject(String target) throws Exception
     {
-        AntProjectHelper project = projects.createIvyAntProject(random);
+        AntProjectHelper project = projectConfigurations.createIvyAntProject(random);
         AntCommandConfiguration command = (AntCommandConfiguration) project.getDefaultCommand();
         command.setTargets(target);
         

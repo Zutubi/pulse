@@ -1,21 +1,29 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.*;
+import static com.zutubi.util.Constants.MEGABYTE;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.*;
@@ -24,23 +32,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
-import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATEST;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
-import static com.zutubi.util.Constants.MEGABYTE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-
 @SuppressWarnings({"unchecked"})
 public class DependenciesAcceptanceTest extends AcceptanceTestBase
 {
     private Repository repository;
     private String randomName;
     private BuildRunner buildRunner;
-    private ProjectConfigurations projects;
-    private ConfigurationHelper configurationHelper;
 
     private File tmp;
 
@@ -56,12 +53,6 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         randomName = randomName();
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
-
         tmp = createTempDirectory();
     }
 
@@ -84,7 +75,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     public void testPublish_NoArtifacts() throws Exception
     {
         // configure project.
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         insertProject(project);
 
         int buildNumber = buildRunner.triggerSuccessfulBuild(project.getConfig());
@@ -94,7 +85,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublish_SingleArtifact() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
@@ -108,7 +99,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublish_MultipleArtifacts() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar", "build/another-artifact.jar");
         project.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
         insertProject(project);
@@ -123,7 +114,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublish_MultipleStages() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar");
         project.addStage("stage");
         project.addFilesToCreate("build/artifact.jar");
@@ -138,7 +129,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublishFails_MissingArtifacts() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("incorrect/path/artifact.jar");
         insertProject(project);
@@ -153,7 +144,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublish_StatusConfiguration() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.getConfig().getDependencies().setStatus(STATUS_RELEASE);
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
@@ -168,7 +159,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testPublish_DefaultStatus() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
@@ -183,7 +174,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     {
         try
         {
-            DepAntProject project = projects.createDepAntProject(randomName);
+            DepAntProject project = projectConfigurations.createDepAntProject(randomName);
             project.getConfig().getDependencies().setStatus("invalid");
             project.addArtifacts("build/artifact.jar");
             insertProject(project);
@@ -196,7 +187,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRemoteTriggerWithCustomStatus() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
         insertProject(project);
@@ -210,7 +201,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_SingleArtifact() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
@@ -219,7 +210,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
@@ -231,14 +222,14 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_MultipleArtifacts() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar", "build/another-artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar", "build/another-artifact.jar");
         insertProject(projectA);
 
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar", "lib/another-artifact.jar");
         insertProject(projectB);
@@ -250,7 +241,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_ZipAndUnpack() throws Exception
     {
-        DepAntProject upstream = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstream = projectConfigurations.createDepAntProject(randomName + "-upstream");
         upstream.addFilesToCreate("build/artifact.jar", "build/another/artifact.jar");
         DirectoryArtifactConfiguration dirArtifact = upstream.addDirArtifact("archive", "build");
         dirArtifact.setCaptureAsZip(true);
@@ -258,7 +249,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(upstream.getConfig());
 
-        DepAntProject downstream = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstream = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstream.getConfig().getDependencies().setUnzipRetrievedArchives(true);
         downstream.addDependency(upstream.getConfig());
         downstream.addExpectedFiles("lib/artifact.jar", "lib/another/artifact.jar");
@@ -272,7 +263,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     public void testRetrieve_SpecificStage() throws Exception
     {
         // need different recipes that produce different artifacts.
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addRecipe("recipeA").addArtifacts("build/artifactA.jar");
         project.addRecipe("recipeB").addArtifacts("build/artifactB.jar");
         project.addStage("A").setRecipe("recipeA");
@@ -292,7 +283,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_CorrespondingStages() throws Exception
     {
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream", false);
         upstreamProject.addRecipe("recipeA").addArtifacts("build/artifactA.jar");
         upstreamProject.addRecipe("recipeB").addArtifacts("build/artifactB.jar");
         upstreamProject.addStage("Stage A").setRecipe("recipeA");
@@ -302,7 +293,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
-        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream", false);
+        DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream", false);
         DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
         dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
 
@@ -323,7 +314,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         final String STAGE_A = "Stage A";
         final String STAGE_B = "Stage B";
 
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream", false);
         upstreamProject.addRecipe(RECIPE).addArtifacts(ARTIFACT);
         upstreamProject.addStage(STAGE_A).setRecipe(RECIPE);
         upstreamProject.addStage(STAGE_B).setRecipe(RECIPE);
@@ -333,7 +324,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
         AgentConfiguration masterAgent = configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME);
-        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream", false);
+        DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream", false);
         DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
         dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
         downstreamProject.addRecipe(RECIPE).addArtifacts("lib/" + ARTIFACT);
@@ -361,7 +352,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         // We need a second agent to run an upstream build while a downstream one is in progress.
         rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
 
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream", false);
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream", false);
         upstreamProject.addStage(STAGE1);
         upstreamProject.addArtifacts("art.jar");
         upstreamProject.addFilesToCreate("art.jar");
@@ -371,7 +362,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         // Set up a downstream project with two stages serialised by needing the master agent, using a wait project so
         // we could hold up the first stage while we run another upstream build.  Add the revision to the retrieval
         // pattern so we can verify both stages retrieve the same revision (1).
-        WaitProject downstreamProject = projects.createWaitAntProject(randomName + "-downstream", tmp, true);
+        WaitProject downstreamProject = projectConfigurations.createWaitAntProject(randomName + "-downstream", tmp, true);
         downstreamProject.getConfig().getStages().clear();
         downstreamProject.clearTriggers();
         File baseDir = new File(tmp, randomName + "-base");
@@ -425,7 +416,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_SpecificRevision() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/default-artifact.jar");
         projectA.addFilesToCreate("build/default-artifact.jar");
         insertProject(projectA);
@@ -434,7 +425,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         int buildNumber = buildRunner.triggerSuccessfulBuild(projectA.getConfig());
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
 
         DependencyConfiguration dependencyConfig = projectB.addDependency(projectA.getConfig());
@@ -450,19 +441,19 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_MultipleProjects() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addFilesToCreate("build/projectB-artifact.jar");
         insertProject(projectB);
         buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(randomName + "C");
         projectC.addDependency(projectA.getConfig());
         projectC.addDependency(projectB.getConfig());
         projectC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
@@ -474,13 +465,13 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_TransitiveDependencies() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addDependency(projectA.getConfig()).setTransitive(true);
         projectB.addFilesToCreate("build/projectB-artifact.jar");
@@ -488,7 +479,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(projectB);
         buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(randomName + "C");
         projectC.addDependency(projectB.getConfig());
         projectC.addExpectedFiles("lib/projectA-artifact.jar", "lib/projectB-artifact.jar");
         insertProject(projectC);
@@ -499,13 +490,13 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieve_TransitiveDependenciesDisabled() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA.getConfig());
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addArtifacts("build/projectB-artifact.jar");
         projectB.addDependency(projectA.getConfig());
         projectB.addFilesToCreate("build/projectB-artifact.jar");
@@ -514,7 +505,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectB.getConfig());
 
-        DepAntProject projectC = projects.createDepAntProject(randomName + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(randomName + "C");
         projectC.addDependency(projectB.getConfig()).setTransitive(false);
         projectC.addExpectedFiles("lib/projectB-artifact.jar");
         projectC.addNotExpectedFiles("lib/projectA-artifact.jar");
@@ -526,13 +517,13 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRetrieveFails_MissingDependencies() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         insertProject(projectA);
 
         // do not build projectA simulating dependency not available.
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact.jar");
         insertProject(projectB);
@@ -547,14 +538,14 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     // CIB-2503
     public void testRetrieve_AfterUpstreamRename() throws Exception
     {
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream");
         upstreamProject.addArtifacts("build/artifact.jar");
         upstreamProject.addFilesToCreate("build/artifact.jar");
         insertProject(upstreamProject);
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
-        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstreamProject.addDependency(upstreamProject.getConfig());
         downstreamProject.addExpectedFiles("lib/artifact.jar");
         insertProject(downstreamProject);
@@ -575,14 +566,14 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     // CIB-2626
     public void testRetrieve_AfterUpstreamDelete() throws Exception
     {
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream");
         upstreamProject.addArtifacts("build/artifact.jar");
         upstreamProject.addFilesToCreate("build/artifact.jar");
         insertProject(upstreamProject);
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
-        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstreamProject.addDependency(upstreamProject.getConfig());
         insertProject(downstreamProject);
 
@@ -597,12 +588,12 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     
     public void testDependentBuild_TriggeredOnSuccess() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         insertProject(projectB);
 
@@ -613,10 +604,10 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testDependentBuildReason() throws Exception
     {
-        DepAntProject upstream = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstream = projectConfigurations.createDepAntProject(randomName + "-upstream");
         insertProject(upstream);
 
-        DepAntProject downstream = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstream = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstream.addDependency(upstream);
         insertProject(downstream);
 
@@ -630,10 +621,10 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildBuildReason() throws Exception
     {
-        DepAntProject upstream = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstream = projectConfigurations.createDepAntProject(randomName + "-upstream");
         insertProject(upstream);
 
-        DepAntProject downstream = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstream = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstream.addDependency(upstream);
         insertProject(downstream);
 
@@ -647,13 +638,13 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testDependentBuild_PropagateStatus() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.getConfig().getDependencies().setStatus(STATUS_RELEASE);
         projectA.addFilesToCreate("build/artifact.jar");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
 
@@ -672,13 +663,13 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testDependentBuild_PropagateVersion() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.getConfig().getDependencies().setVersion("FIXED");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
 
         DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
@@ -695,7 +686,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRepositoryFormat_OrgSpecified() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.getConfig().setOrganisation("org");
         project.addArtifacts("build/artifact.jar");
         project.addFilesToCreate("build/artifact.jar");
@@ -708,7 +699,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testDirectoryArtifactRoundTrip() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addDirArtifact("dirArtifact", "build/blah");
         projectA.addFilesToCreate("build/blah/artifact-A.jar");
         projectA.addFilesToCreate("build/blah/artifact-B.jar");
@@ -718,7 +709,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact-A.jar");
         projectB.addExpectedFiles("lib/artifact-B.jar");
@@ -731,7 +722,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testArtifactWithNoExtension() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "Upstream");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "Upstream");
         projectA.addArtifact("fileArtifact", "build/artifactWithNoExtension");
         projectA.addFilesToCreate("build/artifactWithNoExtension");
         insertProject(projectA);
@@ -740,7 +731,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "Downstream");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "Downstream");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifactWithNoExtension");
         insertProject(projectB);
@@ -752,7 +743,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testDirectoryOfMixedExtensionArtifacts() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "Upstream");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "Upstream");
         projectA.addDirArtifact("dirArtifact", "build/blah");
         projectA.addFilesToCreate("build/blah/artifact-A.jar");
         projectA.addFilesToCreate("build/blah/artifact-B");
@@ -763,7 +754,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "Downstream");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "Downstream");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/artifact-A.jar");
         projectB.addExpectedFiles("lib/artifact-B");
@@ -777,7 +768,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testArtifactPattern() throws Exception
     {
-        DepAntProject project = projects.createDepAntProject(randomName);
+        DepAntProject project = projectConfigurations.createDepAntProject(randomName);
         project.addArtifacts("build/artifact-12345.jar").get(0).setArtifactPattern("(.+)-[0-9]+\\.(.+)");
         project.addFilesToCreate("build/artifact-12345.jar");
         insertProject(project);
@@ -814,7 +805,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     // CIB-2171
     public void testDependencyStatusUpdates() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.getConfig().getDependencies().setStatus(STATUS_INTEGRATION);
@@ -822,7 +813,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         DependencyConfiguration dependency = projectB.addDependency(projectA.getConfig());
         dependency.setRevision(LATEST + STATUS_INTEGRATION);
         projectB.addExpectedFiles("lib/artifact-1.jar");
@@ -852,12 +843,12 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     // CIB-2194
     public void testDownstreamRetrieval() throws Exception
     {
-        DepAntProject projectA = projects.createDepAntProject(randomName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "A");
         projectA.addArtifacts("build/projectA-artifact.jar");
         projectA.addFilesToCreate("build/projectA-artifact.jar");
         insertProject(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "B");
         projectB.addDependency(projectA.getConfig());
         projectB.addExpectedFiles("lib/projectA-artifact.jar");
         insertProject(projectB);
@@ -873,11 +864,11 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         String revision = setupPropagateWorkspace();
 
         String projectAName = randomName + "-upstream";
-        ProjectConfigurationHelper projectA = projects.createAntProject(projectAName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectAName);
+        ProjectConfigurationHelper projectA = projectConfigurations.createAntProject(projectAName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectAName);
         insertProject(projectA);
 
         String projectBName = randomName + "-downstream";
-        ProjectConfigurationHelper projectB = projects.createAntProject(projectBName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectBName);
+        ProjectConfigurationHelper projectB = projectConfigurations.createAntProject(projectBName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectBName);
         projectB.addDependency(projectA);
         DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
         trigger.setPropagateRevision(true);
@@ -913,11 +904,11 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
             IOUtils.joinStreams(new ByteArrayInputStream(oneMegabyte), out);
         }
 
-        DepAntProject upstreamProject = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject upstreamProject = projectConfigurations.createDepAntProject(randomName + "-upstream");
         upstreamProject.getRecipe(DEFAULT_RECIPE).addArtifact("BIG ARTIFACT", largeArtifact.getCanonicalPath().replace('\\', '/'));
         insertProject(upstreamProject);
 
-        DepAntProject downstreamProject = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream");
         downstreamProject.addDependency(upstreamProject.getConfig());
         downstreamProject.addExpectedFiles("lib/BIGFILE");
         insertProject(downstreamProject);
@@ -957,7 +948,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     public void testProjectDependsOnMultipleStagesOfUpstreamProject() throws Exception
     {
         // Create a project with 2 stages, each creating distinct artifacts.
-        DepAntProject projectA = projects.createDepAntProject(randomName + "-upstream");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(randomName + "-upstream");
         projectA.addRecipe("stage-A").addArtifacts("build/stage-A-artifact.jar");
         projectA.addStage("stage-A").setRecipe("stage-A");
         projectA.addFilesToCreateInStage("stage-A", "build/stage-A-artifact.jar");
@@ -970,7 +961,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        DepAntProject projectB = projects.createDepAntProject(randomName + "-downstream");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(randomName + "-downstream");
         projectB.addDependency(projectA, "stage-A", "stage-B");
 
         projectB.addExpectedFiles("lib/stage-A-artifact.jar", "lib/stage-B-artifact.jar");
@@ -1033,7 +1024,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     private void runTestForCharacterSupport(char c) throws Exception
     {
         String projectName = getName() + c + RandomUtils.randomString(5);
-        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(projectName + "A");
         projectA.setOrganisation("org" + c + "name");
         projectA.addArtifact("file", "build/artifactA-" + c + ".jar");
         projectA.addDirArtifact("dir", "build/dir");
@@ -1051,7 +1042,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         assertIvyInRepository(projectA, buildNumber);
 
-        DepAntProject projectB = projects.createDepAntProject(projectName + "B");
+        DepAntProject projectB = projectConfigurations.createDepAntProject(projectName + "B");
         projectB.addDependency(projectA, "stage" + c + "name");
         projectB.addExpectedFiles("lib/artifactA-" + resolvedChar + ".jar", "lib/artifactB-" + resolvedChar + ".jar", "lib/artifactC-" + resolvedChar + ".jar");
 

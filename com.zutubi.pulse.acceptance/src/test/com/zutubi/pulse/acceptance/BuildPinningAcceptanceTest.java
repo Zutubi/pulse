@@ -1,19 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.util.Hashtable;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for pinning and unpinning builds.
@@ -25,8 +25,6 @@ public class BuildPinningAcceptanceTest extends AcceptanceTestBase
     private static final int PIN_TIMEOUT = 30000;
 
     private BuildRunner buildRunner;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private File tempDir;
     private UserConfigurations users;
     private ProjectConfiguration testProject;
@@ -42,13 +40,9 @@ public class BuildPinningAcceptanceTest extends AcceptanceTestBase
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         if (!configurationHelper.isProjectExists(TEST_PROJECT))
         {
-            configurationHelper.insertProject(projects.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
+            configurationHelper.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
         }
 
         users = new UserConfigurations();

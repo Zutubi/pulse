@@ -2,9 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
@@ -13,10 +17,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -30,8 +30,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
     private static final String BUILDS_PER_PROJECT = "buildsPerProject";
     
     private String userPath;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private BuildRunner buildRunner;
     
     protected void setUp() throws Exception
@@ -43,9 +41,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         assertTrue(getBrowser().login(user, ""));
         
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-        projects = new ProjectConfigurations(configurationHelper);
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
     }
 
@@ -169,7 +164,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         {
             setDashboard(asPair(BUILDS_PER_PROJECT, 2));
 
-            WaitProject project = projects.createWaitAntProject(random, tmpDir, true);
+            WaitProject project = projectConfigurations.createWaitAntProject(random, tmpDir, true);
             configurationHelper.insertProject(project.getConfig(), false);
 
             DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);

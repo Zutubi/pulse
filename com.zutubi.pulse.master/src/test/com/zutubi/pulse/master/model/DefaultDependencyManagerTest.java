@@ -153,6 +153,11 @@ public class DefaultDependencyManagerTest extends PulseTestCase
         assertEquals(0, dependencyManager.getUpstreamChangelists(build1_2, build1_1).size());
     }
 
+    public void testGetUpstreamChangesNoSinceBuild()
+    {
+        assertEquals(0, dependencyManager.getUpstreamChangelists(build1_1, null).size());
+    }
+
     public void testGetUpstreamChangesFirstUpstreamBuild()
     {
         // Since build graph:
@@ -162,7 +167,7 @@ public class DefaultDependencyManagerTest extends PulseTestCase
         // 2_1 - 1_2
         BuildResult build1_2 = createBuild(project1, 2);
         link(build2_1, build1_2);
-        
+
         assertEquals(0, dependencyManager.getUpstreamChangelists(build1_2, build1_1).size());
     }
 

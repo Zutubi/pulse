@@ -101,7 +101,18 @@ public class SubversionWorkspace implements Closeable
         SVNCopySource[] copySources = {new SVNCopySource(SVNRevision.UNDEFINED, SVNRevision.HEAD, SVNURL.parseURIDecoded(fromUrl))};
         copyClient.doCopy(copySources, SVNURL.parseURIDecoded(toUrl), false, true, true, comment, null);
     }
-    
+
+    public String editAndCommitFile(String filename, String comment, String newContent) throws IOException, SVNException
+    {
+        File file = new File(workingDir, filename);
+        if (!file.exists())
+        {
+            throw new AssertionError("Attempt to edit file that does not exist (" + filename + ")");
+        }
+        FileSystemUtils.createFile(file, newContent);
+        return doCommit(comment, file);
+    }
+
     /**
      * Cleanup resources held by this instance.  This includes cleaning up the working
      * directory.

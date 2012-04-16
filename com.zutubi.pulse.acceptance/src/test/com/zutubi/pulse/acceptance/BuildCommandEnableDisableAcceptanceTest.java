@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.SleepCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -14,8 +15,6 @@ import java.util.Vector;
 
 public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
-    private ProjectConfigurations projects;
-    private ConfigurationHelper configurationHelper;
     private BuildRunner buildRunner;
 
     @Override
@@ -23,10 +22,6 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
         rpcClient.loginAsAdmin();
     }
@@ -34,7 +29,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
     // base line test.
     public void testEnabledCommands() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addCommand(newCommand("sleep1"));
         project.addCommand(newCommand("sleep2"));
 
@@ -52,7 +47,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableCommand() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addCommand(newCommand("sleep")).setEnabled(false);
 
         configurationHelper.insertProject(project.getConfig(), false);
@@ -68,7 +63,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableCommandInFailingBuild() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createFailAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createFailAntProject(randomName());
         project.addCommand(newCommand("sleep", true)).setEnabled(false);
         project.getDefaultCommand().setForce(true);
 
@@ -84,7 +79,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableMultipleCommands() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addCommand(newCommand("sleep")).setEnabled(false);
         project.getDefaultCommand().setEnabled(false);
 
@@ -101,7 +96,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testToggleEnableDisable() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 

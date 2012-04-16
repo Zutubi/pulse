@@ -2,18 +2,18 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.
@@ -22,8 +22,6 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 {
     private static final int WAIT_FOR_TIMEOUT = 20000;
 
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private BuildRunner buildRunner;
 
     private File tempDir;
@@ -35,10 +33,6 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
         tempDir = FileSystemUtils.createTempDir();
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
         rpcClient.loginAsAdmin();
     }
@@ -112,7 +106,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
     public void testStagePriorities() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(randomName(), tempDir, false);
+        WaitProject project = projectConfigurations.createWaitAntProject(randomName(), tempDir, false);
         project.addStage("B").setPriority(2);
         project.addStage("C").setPriority(4);
         project.addStage("D").setPriority(-1);
@@ -269,7 +263,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
     private WaitProject createProject(String suffix) throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix), false);
+        WaitProject project = projectConfigurations.createWaitAntProject(randomName() + "-" + suffix, new File(tempDir, suffix), false);
         // projects can only be built on the master to ensure that we get expected queing behaviour.
         bindStagesToMaster(project);
         return project;

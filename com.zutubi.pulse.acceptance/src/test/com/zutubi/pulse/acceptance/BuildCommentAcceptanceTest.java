@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
-import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.io.FileSystemUtils;
@@ -21,7 +20,6 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
     private static final String TEST_PROJECT = "comment-test-project";
 
     private BuildRunner buildRunner;
-    private ProjectConfigurations projects;
     private File tempDir;
     private ProjectConfiguration testProject;
     private int buildNumber;
@@ -37,10 +35,9 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
-        projects = new ProjectConfigurations(configurationHelper);
         if (!configurationHelper.isProjectExists(TEST_PROJECT))
         {
-            configurationHelper.insertProject(projects.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
+            configurationHelper.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
         }
 
         testProject = configurationHelper.getConfigurationReference("projects/" + TEST_PROJECT, ProjectConfiguration.class);
@@ -80,7 +77,7 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
     // Checks that the build controller updating a build does not result in comments being lost.
     public void testAddCommentToInProgressBuild() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(random, tempDir, false);
+        WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
         configurationHelper.insertProject(project.getConfig(), false);
 
         List<String> requestIds = buildRunner.triggerBuild(project);

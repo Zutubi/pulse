@@ -5,7 +5,10 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.PersonalBuildSummaryPage;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.io.FileSystemUtils;
@@ -22,8 +25,6 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
     //      and testing of a single project.
 
     private BuildRunner buildRunner;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private UserConfigurations users;
     private String projectName;
     private PulseToolbar toolbar;
@@ -35,10 +36,6 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         users = new UserConfigurations();
 
         rpcClient.loginAsAdmin();
@@ -60,7 +57,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         projectName = randomName() + "\"' ;?&<html>";
 
         // create project.
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(projectName);
         configurationHelper.insertProject(project.getConfig(), false);
 
         getBrowser().loginAsAdmin();
@@ -182,7 +179,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         // create project and user.
         projectName = randomName();
 
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(projectName);
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(projectName);
         configurationHelper.insertProject(project.getConfig(), false);
 
         String userName = randomName();

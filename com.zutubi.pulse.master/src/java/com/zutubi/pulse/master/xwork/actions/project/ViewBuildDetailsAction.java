@@ -26,7 +26,7 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
 
     public boolean isDependencyDetailsPresent()
     {
-        return CollectionUtils.contains(dependencyDetails, new Predicate<StageRetrievedArtifacts>()
+        return dependencyDetails != null && CollectionUtils.contains(dependencyDetails, new Predicate<StageRetrievedArtifacts>()
         {
             public boolean satisfied(StageRetrievedArtifacts stageDependencyDetails)
             {

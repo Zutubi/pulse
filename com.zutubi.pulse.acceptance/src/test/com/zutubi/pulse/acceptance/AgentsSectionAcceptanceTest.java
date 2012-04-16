@@ -7,18 +7,17 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentStatisticsPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
+import static java.util.Arrays.asList;
 
 import java.io.File;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
-import static java.util.Arrays.asList;
 
 /**
  * Acceptance test for basic agents section functionality.
@@ -29,8 +28,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     private static final String HOST_LOCALHOST = "localhost";
     private static final String STATUS_DISABLE_ON_IDLE = "disable on idle";
 
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private File tempDir;
 
     @Override
@@ -40,12 +37,6 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.loginAsAdmin();
         removeNonMasterAgents();
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
-
         tempDir = FileSystemUtils.createTempDir(getName());
     }
 
@@ -100,7 +91,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
         long agentId = rpcClient.TestApi.getAgentId(LOCAL_AGENT);
 
-        WaitProject project = projects.createWaitAntProject(randomName(), tempDir, false);
+        WaitProject project = projectConfigurations.createWaitAntProject(randomName(), tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
         configurationHelper.insertProject(project.getConfig(), false);
 
@@ -144,8 +135,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
-        WaitProject project1 = projects.createWaitAntProject(random + "-1", tempDir, false);
-        WaitProject project2 = projects.createWaitAntProject(random + "-2", tempDir, false);
+        WaitProject project1 = projectConfigurations.createWaitAntProject(random + "-1", tempDir, false);
+        WaitProject project2 = projectConfigurations.createWaitAntProject(random + "-2", tempDir, false);
         project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
         project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
         configurationHelper.insertProject(project1.getConfig(), false);
@@ -206,7 +197,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         final AgentSummaryTable summaryTable = agentsPage.getAgentSummaryTable();
         assertNull(summaryTable.getAgent(AgentManager.MASTER_AGENT_NAME).executingOwner);
 
-        WaitProject project = projects.createWaitAntProject(random, tempDir, false);
+        WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
         project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
         configurationHelper.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.waitForProjectToInitialise(project.getName());

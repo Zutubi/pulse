@@ -1,22 +1,23 @@
 package com.zutubi.pulse.acceptance;
 
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
+import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.time.TimeStamps;
 import junit.framework.AssertionFailedError;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getPulseUrl;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * The base class for all acceptance level tests.  It provides some useful
@@ -33,7 +34,13 @@ public abstract class AcceptanceTestBase extends PulseTestCase
      */
     public static final String AGENT_NAME = "localhost";
 
+    /**
+     * We reuse the same configuration helper instance as it is expensive to initialise.
+     */
+    protected static ConfigurationHelper configurationHelper;
+
     protected RpcClient rpcClient;
+    protected ProjectConfigurations projectConfigurations;
     protected String baseUrl;
 
     protected Urls urls;
@@ -48,6 +55,18 @@ public abstract class AcceptanceTestBase extends PulseTestCase
 
         baseUrl = getPulseUrl();
         rpcClient = new RpcClient();
+        if (configurationHelper == null)
+        {
+            configurationHelper = new ConfigurationHelper();
+            configurationHelper.setRemoteApi(rpcClient.RemoteApi);
+            configurationHelper.init();
+        }
+        else
+        {
+            configurationHelper.setRemoteApi(rpcClient.RemoteApi);
+        }
+        
+        projectConfigurations = new ProjectConfigurations(configurationHelper);
         random = randomName();
 
         browserFactory = new SingleSeleniumBrowserFactory();

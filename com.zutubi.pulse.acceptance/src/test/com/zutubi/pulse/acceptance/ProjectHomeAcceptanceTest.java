@@ -1,25 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.utils.*;
-import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
-import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
-import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.scm.api.Changelist;
-import com.zutubi.pulse.core.scm.api.FileChange;
-import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.util.Condition;
-import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-import org.tmatesoft.svn.core.SVNException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
@@ -30,8 +10,28 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.WaitProject;
+import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
+import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
+import org.tmatesoft.svn.core.SVNException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
 
 public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 {
@@ -56,8 +56,6 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
     private static final String COMMENT_BROKEN = "I broke it!";
     private static final String COMMENT_FIXED = "Phew, nobody noticed.";
 
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
     private BuildRunner buildRunner;
 
     private File tempDir;
@@ -68,10 +66,6 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         super.setUp();
         tempDir = FileSystemUtils.createTempDir();
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
         rpcClient.loginAsAdmin();
     }
@@ -118,7 +112,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
     public void testBuildActivity() throws Exception
     {
-        WaitProject project = projects.createWaitAntProject(random, new File(tempDir, random), false);
+        WaitProject project = projectConfigurations.createWaitAntProject(random, new File(tempDir, random), false);
         configurationHelper.insertProject(project.getConfig(), false);
 
         buildRunner.triggerBuild(project);

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.utils.*;
+import com.zutubi.pulse.acceptance.utils.BuildRunner;
+import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
@@ -12,8 +13,6 @@ import java.util.Vector;
 
 public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 {
-    private ProjectConfigurations projects;
-    private ConfigurationHelper configurationHelper;
     private BuildRunner buildRunner;
 
     @Override
@@ -21,10 +20,6 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
     {
         super.setUp();
 
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
         rpcClient.loginAsAdmin();
     }
@@ -32,7 +27,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
     // base line test.
     public void testEnabledStages() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addStage("stage1");
         project.addStage("stage2");
 
@@ -50,7 +45,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableStage() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addStage("disabled").setEnabled(false);
 
         configurationHelper.insertProject(project.getConfig(), false);
@@ -66,7 +61,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableStageInFailingBuild() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createFailAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createFailAntProject(randomName());
         project.addStage("disabled").setEnabled(false);
 
         configurationHelper.insertProject(project.getConfig(), false);
@@ -81,7 +76,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableMultipleStages() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addStage("disabled").setEnabled(false);
         project.getDefaultStage().setEnabled(false);
 
@@ -97,7 +92,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
 
     public void testToggleEnableDisable() throws Exception
     {
-        ProjectConfigurationHelper project = projects.createTrivialAntProject(randomName());
+        ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         configurationHelper.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 

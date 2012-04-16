@@ -1,10 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
+import static com.zutubi.pulse.master.model.Project.State.IDLE;
+import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
@@ -13,18 +18,11 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_MILESTONE;
-import static com.zutubi.pulse.master.model.Project.State.IDLE;
-import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-
 public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 {
     private File tmpDir;
     private String projectName;
     private BuildRunner buildRunner;
-    private ConfigurationHelper configurationHelper;
-    private ProjectConfigurations projects;
 
     protected void setUp() throws Exception
     {
@@ -40,11 +38,6 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         projectName = randomName();
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
-
-        ConfigurationHelperFactory factory = new SingletonConfigurationHelperFactory();
-        configurationHelper = factory.create(rpcClient.RemoteApi);
-
-        projects = new ProjectConfigurations(configurationHelper);
     }
 
     @Override
@@ -66,10 +59,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildSingleDependency() throws Exception
     {
-        WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
+        WaitProject projectA = projectConfigurations.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -95,13 +88,13 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildMultipleDependencies() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
+        final WaitProject projectA = projectConfigurations.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        final WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         insertProject(projectB);
 
-        WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
+        WaitProject projectC = projectConfigurations.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectA);
         projectC.addDependency(projectB);
         insertProject(projectC);
@@ -123,7 +116,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
                     return false;
                 }
             }
-        }, rpcClient.RemoteApi.BUILD_TIMEOUT, "a dependency to start building");
+        }, RemoteApiClient.BUILD_TIMEOUT, "a dependency to start building");
 
         if (rpcClient.RemoteApi.getBuildStatus(projectA.getName(), 1) == ResultState.IN_PROGRESS)
         {
@@ -158,14 +151,14 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildTransitiveDependency() throws Exception
     {
-        final WaitProject projectA = projects.createWaitAntProject(projectName + "A", tmpDir, false);
+        final WaitProject projectA = projectConfigurations.createWaitAntProject(projectName + "A", tmpDir, false);
         insertProject(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        final WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
+        final WaitProject projectC = projectConfigurations.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB);
         insertProject(projectC);
 
@@ -199,17 +192,17 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildUsesTransitiveProperty() throws Exception
     {
-        final ProjectConfigurationHelper projectA = projects.createTrivialAntProject(projectName + "A");
+        final ProjectConfigurationHelper projectA = projectConfigurations.createTrivialAntProject(projectName + "A");
         insertProject(projectA);
         // even though project a is not rebuilt as part of the rebuild, project b does depend on it
         // so we require it to have been built at least once for project b to be successful.
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        final WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
+        final WaitProject projectC = projectConfigurations.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB).setTransitive(false);
         insertProject(projectC);
 
@@ -236,20 +229,20 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildUsesStatusProperty() throws Exception
     {
-        final ProjectConfigurationHelper projectA = projects.createTrivialAntProject(projectName + "A");
+        final ProjectConfigurationHelper projectA = projectConfigurations.createTrivialAntProject(projectName + "A");
         projectA.getConfig().getDependencies().setStatus(IvyStatus.STATUS_RELEASE);
         insertProject(projectA);
         buildRunner.triggerSuccessfulBuild(projectA);
 
-        final WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        final WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA).setRevision(REVISION_LATEST_RELEASE);
         insertProject(projectB);
 
-        final WaitProject projectC = projects.createWaitAntProject(projectName + "C", tmpDir, false);
+        final WaitProject projectC = projectConfigurations.createWaitAntProject(projectName + "C", tmpDir, false);
         projectC.addDependency(projectB).setRevision(REVISION_LATEST_MILESTONE);
         insertProject(projectC);
 
-        final WaitProject projectD = projects.createWaitAntProject(projectName + "D", tmpDir, false);
+        final WaitProject projectD = projectConfigurations.createWaitAntProject(projectName + "D", tmpDir, false);
         projectD.addDependency(projectC).setRevision(REVISION_LATEST_INTEGRATION);
         insertProject(projectD);
 
@@ -284,10 +277,10 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     public void testRebuildStopsOnFailure() throws Exception
     {
-        ProjectConfigurationHelper projectA = projects.createFailAntProject(projectName + "A");
+        ProjectConfigurationHelper projectA = projectConfigurations.createFailAntProject(projectName + "A");
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         insertProject(projectB);
 
@@ -311,19 +304,19 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForAgentToBeIdle(AGENT_NAME);
 
         // project A -> project B -> project C
-        DepAntProject projectA = projects.createDepAntProject(projectName + "A");
+        DepAntProject projectA = projectConfigurations.createDepAntProject(projectName + "A");
         projectA.addArtifacts("build/artifact.jar");
         projectA.addFilesToCreate("build/artifact.jar");
         projectA.clearTriggers();                   // do not want dependency trigger firing.
         projectA.getDefaultStage().setAgent(null);  // allow project A to run on any agent.
         insertProject(projectA);
 
-        WaitProject projectB = projects.createWaitAntProject(projectName + "B", tmpDir, false);
+        WaitProject projectB = projectConfigurations.createWaitAntProject(projectName + "B", tmpDir, false);
         projectB.addDependency(projectA);
         projectB.clearTriggers();                   // do not want dependency trigger firing.
         insertProject(projectB);
 
-        DepAntProject projectC = projects.createDepAntProject(projectName + "C");
+        DepAntProject projectC = projectConfigurations.createDepAntProject(projectName + "C");
         projectC.addDependency(projectB);
          // ensure we see the revision of the artifact being delivered
         projectC.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
