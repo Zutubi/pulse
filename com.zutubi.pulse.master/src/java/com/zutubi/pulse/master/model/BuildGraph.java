@@ -3,34 +3,26 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.DAGraph;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A build dependency graph, linking a root build to all of its dependencies in one direction
  * (either upstream or downstream) transitively.  This is a DAG (Directed Acyclic Graph).
  */
-public class BuildGraph
+public class BuildGraph extends DAGraph<BuildResult>
 {
-    private Node root;
-
     /**
      * Creates a new graph rooted at the given node.
-     * 
+     *
      * @param root the root of the graph
      */
-    BuildGraph(Node root)
+    public BuildGraph(Node<BuildResult> root)
     {
-        this.root = root;
-    }
-
-    /**
-     * @return the root node for this graph
-     */
-    public Node getRoot()
-    {
-        return root;
+        super(root);
     }
 
     /**
@@ -39,9 +31,15 @@ public class BuildGraph
      * @param buildId id of the build to find the node for
      * @return the node for the given build, or null if there is no such node
      */
-    public Node findNodeByBuildId(long buildId)
+    public Node<BuildResult> findNodeByBuildId(final long buildId)
     {
-        return root.findByBuildId(buildId);
+        return findNodeByPredicate(new Predicate<DAGraph.Node<BuildResult>>()
+        {
+            public boolean satisfied(DAGraph.Node<BuildResult> node)
+            {
+                return node.getData().getId() == buildId;
+            }
+        });
     }
 
     /**
@@ -52,13 +50,13 @@ public class BuildGraph
      * @return all possible paths of build results from the root to the given node, empty if the
      *         node is not found in this graph (or is the root itself).
      */
-    public Set<BuildPath> getBuildPaths(Node node)
+    public Set<BuildPath> getBuildPaths(Node<BuildResult> node)
     {
-        Set<List<Node>> paths = root.getPaths(node);
+        Set<List<Node<BuildResult>>> paths = getAllPathsTo(node);
         Set<BuildPath> buildPaths = new HashSet<BuildPath>();
-        return CollectionUtils.map(paths, new Mapping<List<Node>, BuildPath>()
+        return CollectionUtils.map(paths, new Mapping<List<Node<BuildResult>>, BuildPath>()
         {
-            public BuildPath map(List<Node> path)
+            public BuildPath map(List<Node<BuildResult>> path)
             {
                 return new BuildPath(path);
             }
@@ -75,9 +73,9 @@ public class BuildGraph
      *                  the root of this graph
      * @return the node found by traversing the full path, or null if no such node could be found
      */
-    public Node findNodeByProjects(BuildPath buildPath)
+    public Node<BuildResult> findNodeByProjects(BuildPath buildPath)
     {
-        Node node = root;
+        Node<BuildResult> node = getRoot();
         for (BuildResult build: buildPath)
         {
             node = nextByProjectId(node, build.getProject().getId());
@@ -90,11 +88,11 @@ public class BuildGraph
         return node;
     }
 
-    private Node nextByProjectId(Node node, long projectId)
+    private Node<BuildResult> nextByProjectId(Node<BuildResult> node, long projectId)
     {
-        for (Node connected: node.getConnected())
+        for (Node<BuildResult> connected: node.getConnected())
         {
-            if (connected.getBuild().getProject().getId() == projectId)
+            if (connected.getData().getProject().getId() == projectId)
             {
                 return connected;
             }
@@ -103,191 +101,4 @@ public class BuildGraph
         return null;
     }
 
-    /**
-     * Applies the given procedure to all nodes in this graph, starting at the root and working
-     * downwards in depth-first fashion.
-     * 
-     * @param fn procedure to apply to each node
-     */
-    public void forEach(UnaryProcedure<Node> fn)
-    {
-        root.forEach(fn, new HashSet<Node>());
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        BuildGraph that = (BuildGraph) o;
-
-        if (root != null ? !root.equals(that.root) : that.root != null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return root != null ? root.hashCode() : 0;
-    }
-
-    /**
-     * A single node in a build graph, representing a specific build.
-     */
-    public static class Node
-    {
-        private BuildResult build;
-        private Set<Node> connected = new HashSet<Node>();
-
-        Node(BuildResult build)
-        {
-            this.build = build;
-        }
-        
-        void connectNode(Node node)
-        {
-            connected.add(node);
-        }
-
-        /**
-         * @return the build represented by this node
-         */
-        public BuildResult getBuild()
-        {
-            return build;
-        }
-
-        /**
-         * @return the set of all nodes reachable from this one.
-         */
-        public Set<Node> getConnected()
-        {
-            return Collections.unmodifiableSet(connected);
-        }
-
-        Node findByBuildId(final long buildId)
-        {
-            return findByPredicate(new Predicate<Node>()
-            {
-                public boolean satisfied(Node node)
-                {
-                    return node.getBuild().getId() == buildId;
-                }
-            });
-        }
-
-        Node findByPredicate(Predicate<Node> predicate)
-        {
-            if (predicate.satisfied(this))
-            {
-                return this;
-            }
-            else
-            {
-                for (Node node: connected)
-                {
-                    Node found = node.findByPredicate(predicate);
-                    if (found != null)
-                    {
-                        return found;
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        void forEach(UnaryProcedure<Node> fn, Set<Node> visited)
-        {
-            if (visited.contains(this))
-            {
-                return;
-            }
-            
-            visited.add(this);
-            fn.run(this);
-            
-            for (Node node: connected)
-            {
-                node.forEach(fn, visited);
-            }
-        }
-
-        Set<List<Node>> getPaths(Node node)
-        {
-            Set<List<Node>> result = new HashSet<List<Node>>();
-            if (node == this)
-            {
-                result.add(Collections.<Node>emptyList());
-            }
-            else
-            {
-                for (Node n: connected)
-                {
-                    Set<List<Node>> relativePaths = n.getPaths(node);
-                    for (List<Node> relativePath: relativePaths)
-                    {
-                        List<Node> path = new LinkedList<Node>();
-                        path.add(n);
-                        path.addAll(relativePath);
-                        result.add(path);
-                    }
-                }
-                
-            }
-            
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o)
-            {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass())
-            {
-                return false;
-            }
-
-            Node node = (Node) o;
-
-            if (build != null ? !build.equals(node.build) : node.build != null)
-            {
-                return false;
-            }
-            if (connected != null ? !connected.equals(node.connected) : node.connected != null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            int result = build != null ? build.hashCode() : 0;
-            result = 31 * result + (connected != null ? connected.hashCode() : 0);
-            return result;
-        }
-
-        @Override
-        public String toString()
-        {
-            return build.getProject().getName() + " :: build " + build.getNumber(); 
-        }
-    }
 }

@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.DAGraph;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -92,11 +93,11 @@ public class DefaultChangelistManager implements ChangelistManager
             final BuildGraph buildGraph = dependencyManager.getUpstreamDependencyGraph(build);
             final BuildGraph sinceGraph = dependencyManager.getUpstreamDependencyGraph(sinceBuild);
 
-            buildGraph.forEach(new UnaryProcedure<BuildGraph.Node>()
+            buildGraph.forEach(new UnaryProcedure<DAGraph.Node<BuildResult>>()
             {
-                public void run(BuildGraph.Node node)
+                public void run(DAGraph.Node<BuildResult> node)
                 {
-                    if (node.getBuild() == build)
+                    if (node.getData() == build)
                     {
                         // Skip the root.
                         return;
@@ -105,8 +106,8 @@ public class DefaultChangelistManager implements ChangelistManager
                     Set<BuildPath> buildPaths = buildGraph.getBuildPaths(node);
                     for (BuildPath buildPath: buildPaths)
                     {
-                        BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
-                        if (sinceNode != null && sinceNode.getBuild().getId() != node.getBuild().getId())
+                        DAGraph.Node<BuildResult> sinceNode = sinceGraph.findNodeByProjects(buildPath);
+                        if (sinceNode != null && sinceNode.getData().getId() != node.getData().getId())
                         {
                             // A different build of the project was upstream last time, get changes since
                             // that build.
@@ -120,9 +121,9 @@ public class DefaultChangelistManager implements ChangelistManager
         return upstreamChangelists;
     }
 
-    private void addUpstreamChangesForPath(BuildPath buildPath, BuildGraph.Node node, BuildGraph.Node sinceNode, List<UpstreamChangelist> upstreamChangelists)
+    private void addUpstreamChangesForPath(BuildPath buildPath, DAGraph.Node<BuildResult> node, DAGraph.Node<BuildResult> sinceNode, List<UpstreamChangelist> upstreamChangelists)
     {
-        List<PersistentChangelist> changelists = getChangesForBuild(node.getBuild(), sinceNode.getBuild().getNumber(), true);
+        List<PersistentChangelist> changelists = getChangesForBuild(node.getData(), sinceNode.getData().getNumber(), true);
         for (final PersistentChangelist changelist: changelists)
         {
             UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()

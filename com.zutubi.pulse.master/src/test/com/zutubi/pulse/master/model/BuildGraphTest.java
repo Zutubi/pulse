@@ -2,14 +2,10 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.DAGraph;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 public class BuildGraphTest extends PulseTestCase
 {
@@ -18,16 +14,15 @@ public class BuildGraphTest extends PulseTestCase
     // 1 <   > 4 - 5
     //     3
     private BuildGraph graph;
-    private BuildGraph.Node n1;
-    private BuildGraph.Node n2;
-    private BuildGraph.Node n3;
-    private BuildGraph.Node n4;
-    private BuildGraph.Node n5;
+    private DAGraph.Node<BuildResult> n2;
+    private DAGraph.Node<BuildResult> n3;
+    private DAGraph.Node<BuildResult> n4;
+    private DAGraph.Node<BuildResult> n5;
 
     @Override
     protected void setUp() throws Exception
     {
-        n1 = createNode(1);
+        DAGraph.Node<BuildResult> n1 = createNode(1);
         n2 = createNode(2);
         n3 = createNode(3);
         n4 = createNode(4);
@@ -40,16 +35,6 @@ public class BuildGraphTest extends PulseTestCase
         graph = new BuildGraph(n1);
     }
 
-    public void testFindByBuildIdNotFound()
-    {
-        assertNull(graph.findNodeByBuildId(99));
-    }
-
-    public void testFindByBuildIdRoot()
-    {
-        assertSame(n1, graph.findNodeByBuildId(1));
-    }
-
     public void testFindByBuildIdChild()
     {
         assertSame(n2, graph.findNodeByBuildId(2));
@@ -60,38 +45,16 @@ public class BuildGraphTest extends PulseTestCase
         assertSame(n4, graph.findNodeByBuildId(4));
     }
 
-    public void testFindByBuildIdDiamondChild()
-    {
-        assertSame(n5, graph.findNodeByBuildId(5));
-    }
-
-    public void testGetBuildPathsUnknownNode()
-    {
-        assertEquals(0, graph.getBuildPaths(createNode(99)).size());
-    }
-
-    public void testGetBuildPathsRoot()
-    {
-        assertEquals(singlePathSet(), graph.getBuildPaths(n1));
-    }
-
     public void testGetBuildPathChild()
     {
-        assertEquals(singlePathSet(n2.getBuild()), graph.getBuildPaths(n2));
+        assertEquals(singlePathSet(n2.getData()), graph.getBuildPaths(n2));
     }
 
     public void testGetBuildPathDiamond()
     {
-        Set<BuildPath> expected = singlePathSet(n2.getBuild(), n4.getBuild());
-        expected.add(new BuildPath(n3.getBuild(), n4.getBuild()));
+        Set<BuildPath> expected = singlePathSet(n2.getData(), n4.getData());
+        expected.add(new BuildPath(n3.getData(), n4.getData()));
         assertEquals(expected, graph.getBuildPaths(n4));
-    }
-
-    public void testGetBuildPathDiamondChild()
-    {
-        Set<BuildPath> expected = singlePathSet(n2.getBuild(), n4.getBuild(), n5.getBuild());
-        expected.add(new BuildPath(n3.getBuild(), n4.getBuild(), n5.getBuild()));
-        assertEquals(expected, graph.getBuildPaths(n5));
     }
 
     public Set<BuildPath> singlePathSet(BuildResult... builds)
@@ -130,24 +93,9 @@ public class BuildGraphTest extends PulseTestCase
         assertSame(n5, graph.findNodeByProjects(new BuildPath(createBuild(3), createBuild(4), createBuild(5))));
     }
 
-    public void testForEach()
+    private DAGraph.Node<BuildResult> createNode(long buildId)
     {
-        final List<BuildGraph.Node> traversalOrder = new LinkedList<BuildGraph.Node>();
-        graph.forEach(new UnaryProcedure<BuildGraph.Node>()
-        {
-            public void run(BuildGraph.Node node)
-            {
-                traversalOrder.add(node);
-            }
-        });
-        
-        // The order of children is arbitrary for each node, so we have two possible orders
-        assertTrue(traversalOrder.equals(asList(n1, n2, n4, n5, n3)) || traversalOrder.equals(asList(n1, n3, n4, n5, n2)));
-    }
-    
-    private BuildGraph.Node createNode(long buildId)
-    {
-        return new BuildGraph.Node(createBuild(buildId));
+        return new DAGraph.Node<BuildResult>(createBuild(buildId));
     }
 
     private BuildResult createBuild(long buildId)

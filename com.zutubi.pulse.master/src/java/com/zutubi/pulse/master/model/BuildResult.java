@@ -539,10 +539,11 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
      */
     public static class CompareByOwnerThenNumber implements Comparator<BuildResult>
     {
+        private NamedEntityComparator nameComparator = new NamedEntityComparator();
+
         public int compare(BuildResult b1, BuildResult b2)
         {
-            NamedEntityComparator comparator = new NamedEntityComparator();
-            int result = comparator.compare(b1.getOwner(), b2.getOwner());
+            int result = nameComparator.compare(b1.getOwner(), b2.getOwner());
             if (result == 0)
             {
                 result = (int) (b1.getNumber() - b2.getNumber());

@@ -15,6 +15,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
+import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
@@ -188,22 +189,22 @@ public class DefaultDependencyManager implements DependencyManager
 
     public BuildGraph getDependencyGraph(BuildResult build, LinkedBuildIdFinder finder)
     {
-        BuildGraph.Node root = new BuildGraph.Node(build);
+        DAGraph.Node<BuildResult> root = new DAGraph.Node<BuildResult>(build);
         BuildGraph graph = new BuildGraph(root);
         addLinkedNodes(graph, root, finder);
         return graph;
     }
 
-    private void addLinkedNodes(BuildGraph graph, BuildGraph.Node node, LinkedBuildIdFinder finder)
+    private void addLinkedNodes(BuildGraph graph, DAGraph.Node<BuildResult> node, LinkedBuildIdFinder finder)
     {
-        List<Long> linkedIds = finder.getLinkedBuilds(node.getBuild().getId());
+        List<Long> linkedIds = finder.getLinkedBuilds(node.getData().getId());
         for (Long linkedId: linkedIds)
         {
-            BuildGraph.Node linkedNode = graph.findNodeByBuildId(linkedId);
+            DAGraph.Node<BuildResult> linkedNode = graph.findNodeByBuildId(linkedId);
             if (linkedNode == null)
             {
                 BuildResult linkedBuild = buildManager.getBuildResult(linkedId);
-                linkedNode = new BuildGraph.Node(linkedBuild);
+                linkedNode = new DAGraph.Node<BuildResult>(linkedBuild);
                 node.connectNode(linkedNode);
                 addLinkedNodes(graph, linkedNode, finder);
             }

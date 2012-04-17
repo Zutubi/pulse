@@ -1,11 +1,13 @@
 package com.zutubi.pulse.master.model;
 
+import com.zutubi.util.adt.DAGraph;
+
 public class DefaultDependencyManagerTest extends BuildRelatedManagerTestCase
 {
     public void testUpstreamGraphTrivial()
     {
         // 1_1
-        BuildGraph expected = new BuildGraph(new BuildGraph.Node(build1_1));
+        BuildGraph expected = new BuildGraph(new DAGraph.Node<BuildResult>(build1_1));
         assertEquals(expected, dependencyManager.getUpstreamDependencyGraph(build1_1));
     }
 
@@ -14,8 +16,8 @@ public class DefaultDependencyManagerTest extends BuildRelatedManagerTestCase
         // 1_1 - 2_1
         link(build1_1, build2_1);
 
-        BuildGraph.Node root = new BuildGraph.Node(build2_1);
-        root.connectNode(new BuildGraph.Node(build1_1));
+        DAGraph.Node<BuildResult> root = new DAGraph.Node<BuildResult>(build2_1);
+        root.connectNode(new DAGraph.Node<BuildResult>(build1_1));
         BuildGraph expected = new BuildGraph(root);
 
         assertEquals(expected, dependencyManager.getUpstreamDependencyGraph(build2_1));
@@ -29,9 +31,9 @@ public class DefaultDependencyManagerTest extends BuildRelatedManagerTestCase
         link(build1_1, build3_1);
         link(build2_1, build3_1);
 
-        BuildGraph.Node root = new BuildGraph.Node(build3_1);
-        root.connectNode(new BuildGraph.Node(build1_1));
-        root.connectNode(new BuildGraph.Node(build2_1));
+        DAGraph.Node<BuildResult> root = new DAGraph.Node<BuildResult>(build3_1);
+        root.connectNode(new DAGraph.Node<BuildResult>(build1_1));
+        root.connectNode(new DAGraph.Node<BuildResult>(build2_1));
         BuildGraph expected = new BuildGraph(root);
 
         assertEquals(expected, dependencyManager.getUpstreamDependencyGraph(build3_1));
@@ -47,10 +49,10 @@ public class DefaultDependencyManagerTest extends BuildRelatedManagerTestCase
         link(build2_1, build4_1);
         link(build3_1, build4_1);
 
-        BuildGraph.Node n1 = new BuildGraph.Node(build1_1);
-        BuildGraph.Node n2 = new BuildGraph.Node(build2_1);
-        BuildGraph.Node n3 = new BuildGraph.Node(build3_1);
-        BuildGraph.Node n4 = new BuildGraph.Node(build4_1);
+        DAGraph.Node<BuildResult> n1 = new DAGraph.Node<BuildResult>(build1_1);
+        DAGraph.Node<BuildResult> n2 = new DAGraph.Node<BuildResult>(build2_1);
+        DAGraph.Node<BuildResult> n3 = new DAGraph.Node<BuildResult>(build3_1);
+        DAGraph.Node<BuildResult> n4 = new DAGraph.Node<BuildResult>(build4_1);
         n2.connectNode(n1);
         n3.connectNode(n1);
         n4.connectNode(n2);

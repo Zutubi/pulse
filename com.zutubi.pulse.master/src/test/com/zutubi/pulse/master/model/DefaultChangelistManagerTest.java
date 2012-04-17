@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.ChangelistComparator;
+import com.zutubi.util.adt.DAGraph;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -108,7 +109,7 @@ public class DefaultChangelistManagerTest extends BuildRelatedManagerTestCase
 
         // The change to project4 is reachable via two paths, we need to get them in order.
         BuildGraph upstream1_2 = dependencyManager.getUpstreamDependencyGraph(build1_2);
-        BuildGraph.Node node4_2 = upstream1_2.findNodeByBuildId(build4_2.getId());
+        DAGraph.Node<BuildResult> node4_2 = upstream1_2.findNodeByBuildId(build4_2.getId());
         Iterator<BuildPath> pathsIt = upstream1_2.getBuildPaths(node4_2).iterator();
         UpstreamChangelist change4 = new UpstreamChangelist(createChangelist(project4, 2), pathsIt.next());
         change4.addUpstreamContext(pathsIt.next());

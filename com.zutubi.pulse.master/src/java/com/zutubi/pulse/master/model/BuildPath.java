@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import com.zutubi.util.adt.DAGraph;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,15 +30,9 @@ public class BuildPath implements Iterable<BuildResult>
      *
      * @param path a path of graph nodes to extract builds from
      */
-    public BuildPath(List<BuildGraph.Node> path)
+    public BuildPath(List<DAGraph.Node<BuildResult>> path)
     {
-        this.builds = CollectionUtils.map(path, new Mapping<BuildGraph.Node, BuildResult>()
-        {
-            public BuildResult map(BuildGraph.Node node)
-            {
-                return node.getBuild();
-            }
-        });
+        this.builds = CollectionUtils.map(path, new DAGraph.Node.ToDataMapping<BuildResult>());
     }
 
     /**
