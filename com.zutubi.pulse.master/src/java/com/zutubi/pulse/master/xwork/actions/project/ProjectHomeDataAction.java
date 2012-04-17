@@ -268,7 +268,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
     private void addChanges()
     {
-        List<PersistentChangelist> latestChanges = buildManager.getLatestChangesForProject(getProject(), 10);
+        List<PersistentChangelist> latestChanges = changelistManager.getLatestChangesForProject(getProject(), 10);
         ProjectConfiguration projectConfiguration = getProject().getConfig();
         final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
         final Collection<CommitMessageTransformerConfiguration> transformers = projectConfiguration.getCommitMessageTransformers().values();

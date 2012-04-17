@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.security.SecureParameter;
@@ -20,8 +22,6 @@ public interface BuildManager
     void save(RecipeResultNode node);
 
     void save(RecipeResult result);
-
-    void save(PersistentChangelist changelist);
 
     /**
      * Retrieves a build result by its database id.
@@ -211,57 +211,6 @@ public interface BuildManager
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     Revision getPreviousRevision(Project project);
 
-    /**
-     * Returns the most recent changelists submitted by the given user.
-     *
-     * @param user the user to get the changelists for
-     * @param max  the maximum number of results to return
-     * @return a list of up to max of the most recent changes for the user
-     */
-    @SecureParameter(parameterType = User.class, action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getLatestChangesForUser(User user, int max);
-
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getLatestChangesForProject(Project project, int max);
-
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max);
-
-    /**
-     * Returns all changes associated with the given build result, optionally
-     * since another earlier build.
-     *
-     * @param result           the result to retrieve changes for
-     * @param sinceBuildNumber if greater than zero, the number of the build to
-     *                         get changes since (changes in the since build
-     *                         itself are not included)
-     * @param allowEmpty       if true, the result may contain changelists with
-     *                         no files; if false, empty changelists are
-     * @return all changes associated with the given build and, if requested,
-     *         earlier builds after a since marker
-     */
-    @SecureParameter(parameterIndex = 0, action = AccessManager.ACTION_VIEW)
-    List<PersistentChangelist> getChangesForBuild(BuildResult result, long sinceBuildNumber, boolean allowEmpty);
-
-    /**
-     * Gets the number of files in the given changelist, without loading them
-     * all into memory.
-     * 
-     * @param changelist the changelist to get the size of
-     * @return the number of files changed in the given changelist
-     */
-    int getChangelistSize(PersistentChangelist changelist);
-    
-    /**
-     * Gets a page of the files changed in the given changelist.
-     * 
-     * @param changelist changelist to get files from
-     * @param offset     zero-base offset of the first file to retrieve
-     * @param max        maximum number of files to retrieve
-     * @return the given window from the list of files in the given changelist
-     */
-    List<PersistentFileChange> getChangelistFiles(PersistentChangelist changelist, int offset, int max);
-    
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void deleteAllBuilds(Project project);
 

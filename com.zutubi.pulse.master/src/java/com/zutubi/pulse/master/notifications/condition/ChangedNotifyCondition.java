@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.notifications.condition;
 
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ChangelistManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.NullaryFunction;
@@ -13,7 +13,7 @@ import com.zutubi.util.NullaryFunction;
 public class ChangedNotifyCondition implements NotifyCondition
 {
     private TransactionContext transactionContext;
-    private BuildManager buildManager;
+    private ChangelistManager changelistManager;
 
     /**
      * Create a new condition
@@ -34,14 +34,14 @@ public class ChangedNotifyCondition implements NotifyCondition
         {
             public Boolean process()
             {
-                return buildManager.getChangesForBuild(result, 0, false).size() > 0;
+                return changelistManager.getChangesForBuild(result, 0, false).size() > 0;
             }
         });
     }
 
-    public void setBuildManager(BuildManager buildManager)
+    public void setChangelistManager(ChangelistManager changelistManager)
     {
-        this.buildManager = buildManager;
+        this.changelistManager = changelistManager;
     }
 
     public void setTransactionContext(TransactionContext transactionContext)

@@ -8,7 +8,6 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.xwork.TextProviderSupport;
@@ -53,7 +52,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected ProjectManager projectManager;
     protected UserManager userManager;
     protected ConfigurationSecurityManager configurationSecurityManager;
-    protected ChangelistDao changelistDao;
+    protected ChangelistManager changelistManager;
     protected ObjectFactory objectFactory;
     private User loggedInUser = null;
 
@@ -218,7 +217,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         List<CommitMessageTransformerConfiguration> transformers = new LinkedList<CommitMessageTransformerConfiguration>();
 
-        Set<Long> ids = changelistDao.getAllAffectedProjectIds(changelist);
+        Set<Long> ids = changelistManager.getAffectedProjectIds(changelist);
         for(Project project: projectManager.getProjects(ids, false))
         {
             transformers.addAll(project.getConfig().getCommitMessageTransformers().values());
@@ -325,9 +324,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         this.configurationSecurityManager = configurationSecurityManager;
     }
 
-    public void setChangelistDao(ChangelistDao changelistDao)
+    public void setChangelistManager(ChangelistManager changelistManager)
     {
-        this.changelistDao = changelistDao;
+        this.changelistManager = changelistManager;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

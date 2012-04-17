@@ -6,7 +6,10 @@ import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.agent.Agent;
@@ -75,11 +78,6 @@ public class DefaultBuildManager implements BuildManager
     public void save(RecipeResult result)
     {
         buildResultDao.save(result);
-    }
-
-    public void save(PersistentChangelist changelist)
-    {
-        changelistDao.save(changelist);
     }
 
     public BuildResult getBuildResult(long id)
@@ -321,49 +319,6 @@ public class DefaultBuildManager implements BuildManager
         }
 
         return previousRevision;
-    }
-
-    public List<PersistentChangelist> getLatestChangesForUser(User user, int max)
-    {
-        return changelistDao.findLatestByUser(user, max);
-    }
-
-    public List<PersistentChangelist> getLatestChangesForProject(Project project, int max)
-    {
-        return changelistDao.findLatestByProject(project, max);
-    }
-
-    public List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max)
-    {
-        return changelistDao.findLatestByProjects(projects, max);
-    }
-
-    public List<PersistentChangelist> getChangesForBuild(BuildResult result, long sinceBuildNumber, boolean allowEmpty)
-    {
-        List<PersistentChangelist> changelists = new LinkedList<PersistentChangelist>();
-
-        // Get changes for all results after since, up to and including to.
-        if (sinceBuildNumber > 0 && sinceBuildNumber < result.getNumber() - 1)
-        {
-            List<BuildResult> resultRange = queryBuilds(result.getProject(), ResultState.getCompletedStates(), sinceBuildNumber + 1, result.getNumber() - 1, 0, -1, true, false);
-            for(BuildResult r: resultRange)
-            {
-                changelists.addAll(changelistDao.findByResult(r.getId(), allowEmpty));
-            }
-        }
-        
-        changelists.addAll(changelistDao.findByResult(result.getId(), allowEmpty));        
-        return changelists;
-    }
-
-    public int getChangelistSize(PersistentChangelist changelist)
-    {
-        return changelistDao.getSize(changelist);
-    }
-    
-    public List<PersistentFileChange> getChangelistFiles(PersistentChangelist changelist, int offset, int max)
-    {
-        return changelistDao.getFiles(changelist, offset, max);
     }
 
     public void deleteAllBuilds(Project project)

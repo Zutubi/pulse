@@ -6,23 +6,21 @@ import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.UnknownBuildReason;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestCase
 {
@@ -32,11 +30,13 @@ public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestC
 
     private BuildResult builds[] = new BuildResult[4];
     private BuildManager buildManager;
+    private ChangelistManager changelistManager;
     private ChangedByMeSinceSuccessNotifyCondition condition = new ChangedByMeSinceSuccessNotifyCondition();
 
     protected void setUp() throws Exception
     {
         buildManager = mock(BuildManager.class);
+        changelistManager = mock(ChangelistManager.class);
 
         builds[0] = createSuccessfulBuild(1);
         builds[1] = createFailedBuild(2);
@@ -74,12 +74,13 @@ public class ChangedByMeSinceSuccessNotificationConditionTest extends PulseTestC
         });
 
         condition.setBuildManager(buildManager);
+        condition.setChangelistManager(changelistManager);
         condition.setTransactionContext(new TransactionContext());
     }
 
     private void setChanges(BuildResult build, UserConfiguration... authors)
     {
-        stub(buildManager.getChangesForBuild(build, 0, false)).toReturn(CollectionUtils.map(authors, new Mapping<UserConfiguration, PersistentChangelist>()
+        stub(changelistManager.getChangesForBuild(build, 0, false)).toReturn(CollectionUtils.map(authors, new Mapping<UserConfiguration, PersistentChangelist>()
         {
             public PersistentChangelist map(UserConfiguration author)
             {

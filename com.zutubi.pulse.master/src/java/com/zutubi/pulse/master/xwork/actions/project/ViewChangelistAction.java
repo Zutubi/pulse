@@ -114,7 +114,7 @@ public class ViewChangelistAction extends ActionSupport
 
     public String execute()
     {
-        changelist = changelistDao.findById(id);
+        changelist = changelistManager.getChangelist(id);
         if (changelist == null)
         {
             addActionError("Unknown changelist '" + id + "'");

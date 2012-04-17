@@ -31,17 +31,22 @@ public interface DependencyManager
     List<StageRetrievedArtifacts> loadRetrievedArtifacts(BuildResult build);
 
     /**
-     * Returns all new upstream changes in a build since a given build.  The upstream dependency
-     * graphs of the build and since build are compared to find where new upstream builds have been
-     * used.  For each new upstream build, the changes after the since upstream build are added to
-     * the result.  Note that build graphs can change shape over time.  Upstream changes are only
-     * identified between builds of the same project that are in the same position in the build
-     * graph.
-     * 
-     * @param build      the build to find upstream changes for
-     * @param sinceBuild an earlier build of the same project used as the point after which to find
-     *                   changes
-     * @return all new upstream changes that may have influenced build since sinceBuild
+     * Gets the graph of all builds that are upstream of a given build dependency-wise.  This is
+     * all builds that the given build depended upon (transitively).  The root of the graph is the
+     * given build.
+     *
+     * @param build build to get the upstream graph for
+     * @return all builds that are upstream of the given build, graphed by dependency links
      */
-    List<UpstreamChangelist> getUpstreamChangelists(BuildResult build, BuildResult sinceBuild);
+    BuildGraph getUpstreamDependencyGraph(BuildResult build);
+
+    /**
+     * Gets the graph of all builds that are downstream of a given build dependency-wise.  This is
+     * all builds that depended upon the given build (transitively).  The root of the graph is the
+     * given build.
+     *
+     * @param build build to get the downstream graph for
+     * @return all builds that are downstream of the given build, graphed by dependency links
+     */
+    BuildGraph getDownstreamDependencyGraph(BuildResult build);
 }

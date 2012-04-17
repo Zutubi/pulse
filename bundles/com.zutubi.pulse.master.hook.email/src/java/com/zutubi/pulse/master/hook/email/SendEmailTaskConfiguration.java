@@ -39,13 +39,14 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
-import static java.util.Arrays.asList;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 /**
  * A build hook task that sends email notifications to project contacts and/or
@@ -75,6 +76,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     private BuildResultRenderer buildResultRenderer;
     private ConfigurationProvider configurationProvider;
     private BuildManager buildManager;
+    private ChangelistManager changelistManager;
     private UserManager userManager;
     private ScmManager scmManager;
     private EmailService emailService;
@@ -201,7 +203,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), ResultNotifier.getFailureLimit());
 
             GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
-            RenderedResult rendered = renderService.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
+            RenderedResult rendered = renderService.renderResult(buildResult, globalConfiguration.getBaseUrl(), template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
 
@@ -210,7 +212,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             bodyPart.setContent(rendered.getContent(), mimeType);
             message.addBodyPart(bodyPart);
 
-            for (NotificationAttachment attachment: renderService.getAttachments(buildResult, attachLogs, logLineLimit, false, configurationManager))
+            for (NotificationAttachment attachment: renderService.getAttachments(buildResult, attachLogs, logLineLimit, false))
             {
                 message.addBodyPart(attachment.asBodyPart());
             }
@@ -273,7 +275,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
-            for (PersistentChangelist change : buildManager.getChangesForBuild(build, 0, true))
+            for (PersistentChangelist change : changelistManager.getChangesForBuild(build, 0, true))
             {
                 String scmLogin = change.getAuthor();
                 // Only bother to map and add if we haven't already done so.
@@ -359,6 +361,11 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setChangelistManager(ChangelistManager changelistManager)
+    {
+        this.changelistManager = changelistManager;
     }
 
     public void setUserManager(UserManager userManager)

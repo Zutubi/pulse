@@ -12,7 +12,7 @@ import java.util.List;
 public class UpstreamChangelist
 {
     private PersistentChangelist changelist;
-    private List<List<BuildResult>> upstreamContexts = new LinkedList<List<BuildResult>>();
+    private List<BuildPath> upstreamContexts = new LinkedList<BuildPath>();
 
     /**
      * Creates a new upstream changelist for the given actual changelist found via the given build
@@ -21,7 +21,7 @@ public class UpstreamChangelist
      * @param changelist the actual changelist
      * @param context    path in the upstream build graph at which the change was found
      */
-    public UpstreamChangelist(PersistentChangelist changelist, List<BuildResult> context)
+    public UpstreamChangelist(PersistentChangelist changelist, BuildPath context)
     {
         this.changelist = changelist;
         upstreamContexts.add(context);
@@ -36,23 +36,23 @@ public class UpstreamChangelist
     }
 
     /**
-     * Indicates which upstream builds the change was found in.  Each item in the list is a single
-     * chain of upstream builds, indicating the dependency path from the affected build (not
-     * included in the list) to the build which directly included the change (the last item in the
-     * list).  Multiple contexts are possible as the same changelist may be found via different
-     * paths through the build dependency graph.  Shorter context paths appear earlier in this case.
+     * Indicates which upstream builds the change was found in.  Each item in the list is a path of
+     * upstream builds, indicating the dependency path from the affected build (not included in the
+     * path) to the build which directly included the change (the last item in the path).  Multiple
+     * contexts are possible as the same changelist may be found via different paths through the
+     * build dependency graph.  Shorter context paths appear earlier in this case.
      * 
      * @return a list of all build dependency graph paths from the affected build to the builds
      *         which this change directly affected
      */
-    public List<List<BuildResult>> getUpstreamContexts()
+    public List<BuildPath> getUpstreamContexts()
     {
         return upstreamContexts;
     }
 
-    void addUpstreamContext(List<BuildResult> context)
+    void addUpstreamContext(BuildPath context)
     {
-        upstreamContexts.add(new LinkedList<BuildResult>(context));
+        upstreamContexts.add(context);
     }
 
     @Override

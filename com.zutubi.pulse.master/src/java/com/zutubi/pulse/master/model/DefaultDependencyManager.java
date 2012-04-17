@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.WebManager;
@@ -14,10 +13,8 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
@@ -27,7 +24,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * Default implementation of DependencyManager.
@@ -180,90 +178,38 @@ public class DefaultDependencyManager implements DependencyManager
 
     public BuildGraph getUpstreamDependencyGraph(BuildResult build)
     {
-        BuildGraph.Node root = new BuildGraph.Node(build);
-        BuildGraph graph = new BuildGraph(root);
-        addUpstreamNodes(graph, root);
-        return graph;
-    }
-    
-    private void addUpstreamNodes(BuildGraph graph, BuildGraph.Node node)
-    {
-        List<BuildDependencyLink> upstreamLinks = buildDependencyLinkDao.findAllUpstreamDependencies(node.getBuild().getId());
-        for (BuildDependencyLink upstreamLink: upstreamLinks)
-        {
-            BuildGraph.Node upstreamNode = graph.findNodeByBuildId(upstreamLink.getUpstreamBuildId());
-            if (upstreamNode == null)
-            {
-                BuildResult upstreamBuild = buildManager.getBuildResult(upstreamLink.getUpstreamBuildId());
-                upstreamNode = new BuildGraph.Node(upstreamBuild);
-                node.connectNode(upstreamNode);
-                addUpstreamNodes(graph, upstreamNode);
-            }
-            else
-            {
-                node.connectNode(upstreamNode);                
-            }
-        }
-    }
-    
-    public List<UpstreamChangelist> getUpstreamChangelists(final BuildResult build, BuildResult sinceBuild)
-    {
-        final List<UpstreamChangelist> upstreamChangelists = new LinkedList<UpstreamChangelist>();
-        if (sinceBuild != null)
-        {
-            final BuildGraph buildGraph = getUpstreamDependencyGraph(build);
-            final BuildGraph sinceGraph = getUpstreamDependencyGraph(sinceBuild);
-                    
-            buildGraph.forEach(new UnaryProcedure<BuildGraph.Node>()
-            {
-                public void run(BuildGraph.Node node)
-                {
-                    if (node.getBuild() == build)
-                    {
-                        // Skip the root.
-                        return;
-                    }
-                    
-                    Set<List<BuildResult>> buildPaths = buildGraph.getBuildPaths(node);
-                    for (List<BuildResult> buildPath: buildPaths)
-                    {
-                        BuildGraph.Node sinceNode = sinceGraph.findNodeByProjects(buildPath);
-                        if (sinceNode != null && sinceNode.getBuild().getId() != node.getBuild().getId())
-                        {
-                            // A different build of the project was upstream last time, get changes since
-                            // that build.
-                            addUpstreamChangesForPath(buildPath, node, sinceNode, upstreamChangelists);
-                        }
-                    }
-                }
-            });
-        }
-        
-        return upstreamChangelists;
+        return getDependencyGraph(build, new UpstreamBuildIdFinder());
     }
 
-    private void addUpstreamChangesForPath(List<BuildResult> buildPath, BuildGraph.Node node, BuildGraph.Node sinceNode, List<UpstreamChangelist> upstreamChangelists)
+    public BuildGraph getDownstreamDependencyGraph(BuildResult build)
     {
-        List<PersistentChangelist> changelists = buildManager.getChangesForBuild(node.getBuild(), sinceNode.getBuild().getNumber(), true);
-        for (final PersistentChangelist changelist: changelists)
+        return getDependencyGraph(build, new DownstreamBuildIdFinder());
+    }
+
+    public BuildGraph getDependencyGraph(BuildResult build, LinkedBuildIdFinder finder)
+    {
+        BuildGraph.Node root = new BuildGraph.Node(build);
+        BuildGraph graph = new BuildGraph(root);
+        addLinkedNodes(graph, root, finder);
+        return graph;
+    }
+
+    private void addLinkedNodes(BuildGraph graph, BuildGraph.Node node, LinkedBuildIdFinder finder)
+    {
+        List<Long> linkedIds = finder.getLinkedBuilds(node.getBuild().getId());
+        for (Long linkedId: linkedIds)
         {
-            UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()
+            BuildGraph.Node linkedNode = graph.findNodeByBuildId(linkedId);
+            if (linkedNode == null)
             {
-                public boolean satisfied(UpstreamChangelist upstreamChange)
-                {
-                    return upstreamChange.getChangelist().isEquivalent(changelist);
-                }
-            });
-            
-            if (upstreamChangelist == null)
-            {
-                upstreamChangelist = new UpstreamChangelist(changelist, buildPath);
-                upstreamChangelists.add(upstreamChangelist);
+                BuildResult linkedBuild = buildManager.getBuildResult(linkedId);
+                linkedNode = new BuildGraph.Node(linkedBuild);
+                node.connectNode(linkedNode);
+                addLinkedNodes(graph, linkedNode, finder);
             }
             else
             {
-                // We've seen this change before, just add another context path.
-                upstreamChangelist.addUpstreamContext(buildPath);
+                node.connectNode(linkedNode);
             }
         }
     }
@@ -301,5 +247,48 @@ public class DefaultDependencyManager implements DependencyManager
     public void setRepositoryAttributes(RepositoryAttributes repositoryAttributes)
     {
         this.repositoryAttributes = repositoryAttributes;
+    }
+
+    /**
+     * Abstraction over the lookup of builds linked via dependencies, so algorithms can be written independently of the
+     * dependency direction.
+     */
+    private interface LinkedBuildIdFinder
+    {
+        List<Long> getLinkedBuilds(long id);
+    }
+
+    /**
+     * Finds all build ids upstream of a given build id.
+     */
+    private class UpstreamBuildIdFinder implements LinkedBuildIdFinder
+    {
+        public List<Long> getLinkedBuilds(long id)
+        {
+            return CollectionUtils.map(buildDependencyLinkDao.findAllUpstreamDependencies(id), new Mapping<BuildDependencyLink, Long>()
+            {
+                public Long map(BuildDependencyLink link)
+                {
+                    return link.getUpstreamBuildId();
+                }
+            });
+        }
+    }
+
+    /**
+     * Finds all build ids downstream of a given build id.
+     */
+    private class DownstreamBuildIdFinder implements LinkedBuildIdFinder
+    {
+        public List<Long> getLinkedBuilds(long id)
+        {
+            return CollectionUtils.map(buildDependencyLinkDao.findAllDownstreamDependencies(id), new Mapping<BuildDependencyLink, Long>()
+            {
+                public Long map(BuildDependencyLink link)
+                {
+                    return link.getDownstreamBuildId();
+                }
+            });
+        }
     }
 }

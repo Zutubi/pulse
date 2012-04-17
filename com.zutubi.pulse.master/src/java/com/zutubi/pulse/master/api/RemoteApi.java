@@ -88,6 +88,7 @@ public class RemoteApi
     private ActionManager actionManager;
     private AgentManager agentManager;
     private BuildManager buildManager;
+    private ChangelistManager changelistManager;
     private ProjectManager projectManager;
     private UserManager userManager;
     private ScmManager scmManager;
@@ -2704,7 +2705,7 @@ public class RemoteApi
                 public Vector<Hashtable<String, Object>> process()
                 {
                     Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
-                    List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build, 0, true);
+                    List<PersistentChangelist> changelists = changelistManager.getChangesForBuild(build, 0, true);
                     for (PersistentChangelist change : changelists)
                     {
                         result.add(convertChangelist(change));
@@ -4839,6 +4840,11 @@ public class RemoteApi
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setChangelistManager(ChangelistManager changelistManager)
+    {
+        this.changelistManager = changelistManager;
     }
 
     public void setProjectManager(ProjectManager projectManager)

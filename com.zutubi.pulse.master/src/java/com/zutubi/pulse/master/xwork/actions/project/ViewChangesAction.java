@@ -5,15 +5,18 @@ import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
+import com.zutubi.pulse.master.model.BuildPath;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.DependencyManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UpstreamChangelist;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -29,8 +32,6 @@ public class ViewChangesAction extends BuildActionBase
     private String changeUrl;
     private List<ChangelistModel> changelists;
     private List<ChangelistModel> upstreamChangelists;
-    
-    private DependencyManager dependencyManager;
     
     public long getSinceBuild()
     {
@@ -129,18 +130,18 @@ public class ViewChangesAction extends BuildActionBase
             }
         }
 
-        List<PersistentChangelist> rawChangelists = buildManager.getChangesForBuild(result, sinceBuild, true);
+        List<PersistentChangelist> rawChangelists = changelistManager.getChangesForBuild(result, sinceBuild, true);
         final ChangelistComparator changelistComparator = new ChangelistComparator();
         Collections.sort(rawChangelists, changelistComparator);
         changelists = CollectionUtils.map(rawChangelists, new Mapping<PersistentChangelist, ChangelistModel>()
         {
             public ChangelistModel map(PersistentChangelist persistentChangelist)
             {
-                return new ChangelistModel(persistentChangelist, buildManager.getChangelistSize(persistentChangelist), buildManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT));
+                return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT));
             }
         });
         
-        List<UpstreamChangelist> rawUpstreamChangelists = dependencyManager.getUpstreamChangelists(result, sinceResult);
+        List<UpstreamChangelist> rawUpstreamChangelists = changelistManager.getUpstreamChangelists(result, sinceResult);
         Collections.sort(rawUpstreamChangelists, new Comparator<UpstreamChangelist>()
         {
             public int compare(UpstreamChangelist o1, UpstreamChangelist o2)
@@ -154,7 +155,7 @@ public class ViewChangesAction extends BuildActionBase
             public ChangelistModel map(UpstreamChangelist upstreamChangelist)
             {
                 PersistentChangelist persistentChangelist = upstreamChangelist.getChangelist();
-                return new ChangelistModel(persistentChangelist, buildManager.getChangelistSize(persistentChangelist), buildManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT), upstreamChangelist.getUpstreamContexts());
+                return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT), upstreamChangelist.getUpstreamContexts());
             }
         });
         
@@ -164,24 +165,19 @@ public class ViewChangesAction extends BuildActionBase
         return SUCCESS;
     }
 
-    public void setDependencyManager(DependencyManager dependencyManager)
-    {
-        this.dependencyManager = dependencyManager;
-    }
-
     public class ChangelistModel
     {
         private PersistentChangelist changelist;
         private int changeCount;
         private List<PersistentFileChange> changes;
-        private List<List<BuildResult>> upstreamContexts = new LinkedList<List<BuildResult>>();
+        private List<BuildPath> upstreamContexts = new LinkedList<BuildPath>();
         
         public ChangelistModel(PersistentChangelist changelist, int changeCount, List<PersistentFileChange> changes)
         {
-            this(changelist, changeCount, changes, Collections.<List<BuildResult>>emptyList());
+            this(changelist, changeCount, changes, Collections.<BuildPath>emptyList());
         }
 
-        public ChangelistModel(PersistentChangelist changelist, int changeCount, List<PersistentFileChange> changes, List<List<BuildResult>> upstreamContexts)
+        public ChangelistModel(PersistentChangelist changelist, int changeCount, List<PersistentFileChange> changes, List<BuildPath> upstreamContexts)
         {
             this.changelist = changelist;
             this.changeCount = changeCount;
@@ -202,7 +198,7 @@ public class ViewChangesAction extends BuildActionBase
             }
             else
             {
-                List<BuildResult> firstContext = upstreamContexts.get(0);
+                BuildPath firstContext = upstreamContexts.get(0);
                 return firstContext.get(firstContext.size() - 1);
             }
         }
@@ -222,7 +218,7 @@ public class ViewChangesAction extends BuildActionBase
             return changes;
         }
 
-        public List<List<BuildResult>> getUpstreamContexts()
+        public List<BuildPath> getUpstreamContexts()
         {
             return upstreamContexts;
         }

@@ -6,10 +6,8 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.security.Principle;
@@ -44,9 +42,7 @@ public class ResultNotifier implements EventListener
 
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
-    private BuildResultRenderer buildResultRenderer;
     private EventManager eventManager;
-    private BuildManager buildManager;
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
     private UserManager userManager;
@@ -87,7 +83,7 @@ public class ResultNotifier implements EventListener
         // We use a render cache
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
-        Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
         Collection<SubscriptionConfiguration> subscriptions = configurationProvider.getAll(SubscriptionConfiguration.class);
         for (SubscriptionConfiguration subscription : subscriptions)
@@ -106,7 +102,7 @@ public class ResultNotifier implements EventListener
                 if (canView(userConfig, buildResult))
                 {
                     String templateName = subscription.getTemplate();
-                    RenderedResult rendered = renderService.renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
+                    RenderedResult rendered = renderService.renderResult(buildResult, dataMap, templateName, renderCache);
                     notifiedContactPoints.add(contactPoint.getHandle());
 
                     notifyContactPoint(contactPoint, buildResult, rendered, subscription);
@@ -129,7 +125,7 @@ public class ResultNotifier implements EventListener
             List<NotificationAttachment> attachments = null;
             if (contactPoint.supportsAttachments())
             {
-                attachments = renderService.getAttachments(buildResult, subscription.isAttachLogs(), subscription.getLogLineLimit(), true, configurationManager);
+                attachments = renderService.getAttachments(buildResult, subscription.isAttachLogs(), subscription.getLogLineLimit(), true);
             }
             contactPoint.notify(rendered, attachments);
         }
@@ -202,16 +198,6 @@ public class ResultNotifier implements EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
-    {
-        this.buildResultRenderer = buildResultRenderer;
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

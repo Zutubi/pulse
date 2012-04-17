@@ -163,7 +163,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
-        Map<String, Object> dataMap = renderService.getDataMap(result, getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = renderService.getDataMap(result, getBaseUrl());
         buildResultRenderer.render(result, dataMap, "html-email", w);
         return w.toString();
     }

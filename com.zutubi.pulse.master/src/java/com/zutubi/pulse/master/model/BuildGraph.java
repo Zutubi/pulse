@@ -52,21 +52,15 @@ public class BuildGraph
      * @return all possible paths of build results from the root to the given node, empty if the
      *         node is not found in this graph (or is the root itself).
      */
-    public Set<List<BuildResult>> getBuildPaths(Node node)
+    public Set<BuildPath> getBuildPaths(Node node)
     {
         Set<List<Node>> paths = root.getPaths(node);
-        Set<List<BuildResult>> buildPaths = new HashSet<List<BuildResult>>();
-        return CollectionUtils.map(paths, new Mapping<List<Node>, List<BuildResult>>()
+        Set<BuildPath> buildPaths = new HashSet<BuildPath>();
+        return CollectionUtils.map(paths, new Mapping<List<Node>, BuildPath>()
         {
-            public List<BuildResult> map(List<Node> path)
+            public BuildPath map(List<Node> path)
             {
-                return CollectionUtils.map(path, new Mapping<Node, BuildResult>()
-                {
-                    public BuildResult map(Node node)
-                    {
-                        return node.getBuild();
-                    }
-                });
+                return new BuildPath(path);
             }
         }, buildPaths);
     }
@@ -81,7 +75,7 @@ public class BuildGraph
      *                  the root of this graph
      * @return the node found by traversing the full path, or null if no such node could be found
      */
-    public Node findNodeByProjects(List<BuildResult> buildPath)
+    public Node findNodeByProjects(BuildPath buildPath)
     {
         Node node = root;
         for (BuildResult build: buildPath)

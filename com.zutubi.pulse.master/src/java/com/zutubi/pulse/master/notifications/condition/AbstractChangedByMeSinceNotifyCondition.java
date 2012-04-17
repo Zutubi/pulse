@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ChangelistManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.CollectionUtils;
@@ -17,6 +18,7 @@ import java.util.List;
 public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyCondition
 {
     private BuildManager buildManager;
+    private ChangelistManager changelistManager;
     private TransactionContext transactionContext;
 
     public abstract boolean satisfied(BuildResult result, UserConfiguration user);
@@ -33,7 +35,7 @@ public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyC
             public Boolean process()
             {
                 // Check for direct changes on the build we have first.
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, 0, false);
+                List<PersistentChangelist> changelists = changelistManager.getChangesForBuild(result, 0, false);
                 ByMePredicate predicate = new ByMePredicate(user);
                 if (CollectionUtils.contains(changelists, predicate))
                 {
@@ -48,7 +50,7 @@ public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyC
                 List<BuildResult> resultRange = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), lowestNumber, result.getNumber() - 1, 0, -1, false, false);
                 for (BuildResult r: resultRange)
                 {
-                    changelists  = buildManager.getChangesForBuild(r, 0, false);
+                    changelists  = changelistManager.getChangesForBuild(r, 0, false);
                     if (CollectionUtils.contains(changelists, predicate))
                     {
                         return true;
@@ -63,6 +65,11 @@ public abstract class AbstractChangedByMeSinceNotifyCondition implements NotifyC
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setChangelistManager(ChangelistManager changelistManager)
+    {
+        this.changelistManager = changelistManager;
     }
 
     public void setTransactionContext(TransactionContext transactionContext)

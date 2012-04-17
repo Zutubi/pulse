@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.notifications.condition;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ChangelistManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.CollectionUtils;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ChangedByMeNotifyCondition implements NotifyCondition
 {
     private TransactionContext transactionContext;
-    private BuildManager buildManager;
+    private ChangelistManager changelistManager;
 
     /**
      * Create a new condition
@@ -37,15 +37,15 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
         {
             public Boolean process()
             {
-                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result, 0, false);
+                List<PersistentChangelist> changelists = changelistManager.getChangesForBuild(result, 0, false);
                 return CollectionUtils.contains(changelists, new ByMePredicate(user));
             }
         });
     }
 
-    public void setBuildManager(BuildManager buildManager)
+    public void setChangelistManager(ChangelistManager changelistManager)
     {
-        this.buildManager = buildManager;
+        this.changelistManager = changelistManager;
     }
 
     public void setTransactionContext(TransactionContext transactionContext)

@@ -70,13 +70,13 @@ public class ChangelistDataAction extends ActionSupport
 
     public String execute()
     {
-        PersistentChangelist changelist = changelistDao.findById(id);
+        PersistentChangelist changelist = changelistManager.getChangelist(id);
         if (changelist == null)
         {
             throw new LookupErrorException("Unknown changelist [" + id + "]");
         }
 
-        int fileCount = changelistDao.getSize(changelist);
+        int fileCount = changelistManager.getChangelistSize(changelist);
         int pageCount = (fileCount + FILES_PER_PAGE - 1) / FILES_PER_PAGE;
         if (startPage < 0)
         {
@@ -103,7 +103,7 @@ public class ChangelistDataAction extends ActionSupport
             }
         }
 
-        Set<Long> buildIds = changelistDao.getAllAffectedResultIds(changelist);
+        Set<Long> buildIds = changelistManager.getAffectedBuildIds(changelist);
         List<BuildResult> buildResults = new LinkedList<BuildResult>();
         for (Long id : buildIds)
         {
@@ -155,7 +155,7 @@ public class ChangelistDataAction extends ActionSupport
         ChangelistModel changelistModel = new ChangelistModel(changelist, changeViewer, transformers);
         model = new ChangelistViewModel(changelistModel, builds, new PagerModel(fileCount, FILES_PER_PAGE, startPage));
 
-        List<PersistentFileChange> files = changelistDao.getFiles(changelist, startPage * FILES_PER_PAGE, FILES_PER_PAGE);
+        List<PersistentFileChange> files = changelistManager.getChangelistFiles(changelist, startPage * FILES_PER_PAGE, FILES_PER_PAGE);
         if (projectWithChangeViewer == null)
         {
             // No need to create ChangeContext and all which that entails.

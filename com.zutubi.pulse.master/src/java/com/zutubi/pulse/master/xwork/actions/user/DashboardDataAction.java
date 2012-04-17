@@ -145,14 +145,14 @@ public class DashboardDataAction extends ActionSupport
                 List<ProjectsModel> projectsModels = helper.createProjectsModels(user, dashboardConfig, user.getDashboardCollapsed(), urls, projectPredicate, groupPredicate, showUngrouped);
                 sorter.sort(projectsModels);
     
-                List<PersistentChangelist> changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
+                List<PersistentChangelist> changelists = changelistManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
                 Collections.sort(changelists, new ChangelistComparator());
     
                 Set<Project> projects = userManager.getUserProjects(user, projectManager);
                 List<PersistentChangelist> projectChangelists = new LinkedList<PersistentChangelist>();
                 if (projects.size() > 0 && dashboardConfig.isShowProjectChanges())
                 {
-                    projectChangelists.addAll(buildManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
+                    projectChangelists.addAll(changelistManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), dashboardConfig.getProjectChangeCount()));
                 }
     
                 model = new DashboardModel(contactPointsWithErrors, responsibilities, user.getDashboardFilter(), projectsModels, mapChangelists(changelists), mapChangelists(projectChangelists));
@@ -183,7 +183,7 @@ public class DashboardDataAction extends ActionSupport
                 Revision revision = changelist.getRevision();
                 if (revision != null)
                 {
-                    for (long id: changelistDao.getAllAffectedProjectIds(changelist))
+                    for (long id: changelistManager.getAffectedProjectIds(changelist))
                     {
                         try
                         {
@@ -217,7 +217,7 @@ public class DashboardDataAction extends ActionSupport
     {
         try
         {
-            Set<Long> ids = changelistDao.getAllAffectedResultIds(changelist);
+            Set<Long> ids = changelistManager.getAffectedBuildIds(changelist);
             List<BuildResult> buildResults = new LinkedList<BuildResult>();
             for (Long id : ids)
             {

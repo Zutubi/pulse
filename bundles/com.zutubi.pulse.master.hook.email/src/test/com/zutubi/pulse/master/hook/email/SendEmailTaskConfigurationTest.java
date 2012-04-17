@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.hook.email;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
 import com.zutubi.pulse.master.model.UserManager;
@@ -68,7 +67,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         emailService = new RecordingEmailService();
 
         RenderService renderService = mock(RenderService.class);
-        doReturn(new RenderedResult("subject", "content", "mimeType")).when(renderService).renderResult(Matchers.<BuildResult>anyObject(), anyString(), Matchers.<BuildManager>anyObject(), Matchers.<BuildResultRenderer>anyObject(), anyString());
+        doReturn(new RenderedResult("subject", "content", "mimeType")).when(renderService).renderResult(Matchers.<BuildResult>anyObject(), anyString(), anyString());
 
         MasterConfigurationManager configurationManager = mock(MasterConfigurationManager.class);
         doReturn(null).when(configurationManager).getDataDirectory();

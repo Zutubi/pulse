@@ -5,26 +5,27 @@ import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ChangelistManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.util.RandomUtils;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.Arrays;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+
 public class ChangedByMeNotifyConditionTest extends PulseTestCase
 {
-    private BuildManager buildManager;
+    private ChangelistManager changelistManager;
     private ChangedByMeNotifyCondition condition = new ChangedByMeNotifyCondition();
 
     protected void setUp() throws Exception
     {
-        buildManager = mock(BuildManager.class);
+        changelistManager = mock(ChangelistManager.class);
 
-        condition.setBuildManager(buildManager);
+        condition.setChangelistManager(changelistManager);
         condition.setTransactionContext(new TransactionContext());
     }
 
@@ -61,7 +62,7 @@ public class ChangedByMeNotifyConditionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult();
         result.setId(RandomUtils.randomInt());
-        stub(buildManager.getChangesForBuild(result, 0, false)).toReturn(Arrays.asList(changes));
+        stub(changelistManager.getChangesForBuild(result, 0, false)).toReturn(Arrays.asList(changes));
         result.setRevision(new Revision("1"));
         return result;
     }
