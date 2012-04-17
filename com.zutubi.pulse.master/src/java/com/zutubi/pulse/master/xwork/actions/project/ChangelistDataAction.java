@@ -19,7 +19,6 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -123,20 +122,7 @@ public class ChangelistDataAction extends ActionSupport
             }
         }
 
-        Collections.sort(buildResults, new Comparator<BuildResult>()
-        {
-            public int compare(BuildResult b1, BuildResult b2)
-            {
-                Sort.StringComparator comparator = new Sort.StringComparator();
-                int result = comparator.compare(b1.getProject().getName(), b2.getProject().getName());
-                if (result == 0)
-                {
-                    result = (int) (b1.getNumber() - b2.getNumber());
-                }
-
-                return result;
-            }
-        });
+        Collections.sort(buildResults, new BuildResult.CompareByOwnerThenNumber());
 
         ChangeViewerConfiguration changeViewer = projectWithChangeViewer == null ? null : projectWithChangeViewer.getConfig().getChangeViewer();
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());

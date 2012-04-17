@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.server;
 
+import com.zutubi.pulse.core.model.EntityComparator;
 import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
@@ -14,9 +15,9 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
+import com.zutubi.util.Sort;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,20 +78,7 @@ public class ServerActivityDataAction extends ActionSupport
         
         // Ordering by reverse of id makes builds activated first later in the
         // list, giving the effect of builds moving down the page.
-        Collections.sort(activeBuilds, new Comparator<BuildResult>()
-        {
-            public int compare(BuildResult o1, BuildResult o2)
-            {
-                if (o1.getId() > o2.getId())
-                {
-                    return -1;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-        });
+        Collections.sort(activeBuilds, new Sort.InverseComparator<BuildResult>(new EntityComparator<BuildResult>()));
         
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         for (BuildRequestEvent requestEvent: queuedBuilds)

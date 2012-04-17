@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
 import com.zutubi.pulse.core.model.ChangelistComparator;
-import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.*;
@@ -235,20 +234,7 @@ public class DashboardDataAction extends ActionSupport
                 }
             }
 
-            Collections.sort(buildResults, new Comparator<BuildResult>()
-            {
-                public int compare(BuildResult b1, BuildResult b2)
-                {
-                    NamedEntityComparator comparator = new NamedEntityComparator();
-                    int result = comparator.compare(b1.getProject(), b2.getProject());
-                    if (result == 0)
-                    {
-                        result = (int) (b1.getNumber() - b2.getNumber());
-                    }
-
-                    return result;
-                }
-            });
+            Collections.sort(buildResults, new BuildResult.CompareByOwnerThenNumber());
 
             return buildResults;
         }

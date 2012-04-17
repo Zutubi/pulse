@@ -10,7 +10,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -124,14 +123,7 @@ public class ViewServerQueuesAction extends ActionSupport
     private void sortBuilds()
     {
         Collections.sort(buildQueue);
-
-        Collections.sort(executingBuilds, new Comparator<BuildResult>()
-        {
-            public int compare(BuildResult o1, BuildResult o2)
-            {
-                return (int) (o1.getStamps().getStartTime() - o2.getStamps().getStartTime());
-            }
-        });
+        Collections.sort(executingBuilds, new BuildResult.ByStartTimeComparator());
     }
 
     public void setFatController(FatController fatController)
@@ -148,4 +140,5 @@ public class ViewServerQueuesAction extends ActionSupport
     {
         this.buildManager = buildManager;
     }
+
 }

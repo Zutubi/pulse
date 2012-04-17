@@ -10,6 +10,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -531,5 +532,34 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
     public String toString()
     {
         return getOwnerName() + " :: build " + number; 
+    }
+
+    /**
+     * Comparator to sort builds by owner then number.
+     */
+    public static class CompareByOwnerThenNumber implements Comparator<BuildResult>
+    {
+        public int compare(BuildResult b1, BuildResult b2)
+        {
+            NamedEntityComparator comparator = new NamedEntityComparator();
+            int result = comparator.compare(b1.getOwner(), b2.getOwner());
+            if (result == 0)
+            {
+                result = (int) (b1.getNumber() - b2.getNumber());
+            }
+
+            return result;
+        }
+    }
+
+    /**
+     * Comparator to sort builds by their start time.
+     */
+    public static class ByStartTimeComparator implements Comparator<BuildResult>
+    {
+        public int compare(BuildResult b1, BuildResult b2)
+        {
+            return (int) (b1.getStamps().getStartTime() - b2.getStamps().getStartTime());
+        }
     }
 }
