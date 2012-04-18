@@ -16,7 +16,9 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.process.ProcessControl;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.*;
@@ -28,6 +30,10 @@ import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.zutubi.util.CollectionUtils.asSet;
 
 public class SubversionWorkingCopyTest extends PulseTestCase
 {
@@ -361,28 +367,28 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertFalse(fs.isDirectory());
     }
 
-    public void getLocalStatusMergeEdited() throws Exception
+    public void testGetLocalStatusMergeEdited() throws Exception
     {
         long rev = branchEdit("file1");
         doMerge(rev);
         assertSimpleStatus("file1", FileStatus.State.MODIFIED);
     }
 
-    public void getLocalStatusMergeAdded() throws Exception
+    public void testGetLocalStatusMergeAdded() throws Exception
     {
         long rev = branchAdd("newfile");
         doMerge(rev);
         assertSimpleStatus("newfile", FileStatus.State.ADDED);
     }
 
-    public void getLocalStatusMergeDeleted() throws Exception
+    public void testGetLocalStatusMergeDeleted() throws Exception
     {
         long rev = branchDelete("file1");
         doMerge(rev);
         assertSimpleStatus("file1", FileStatus.State.DELETED);
     }
 
-    public void getLocalStatusMergeMoved() throws Exception
+    public void testGetLocalStatusMergeMoved() throws Exception
     {
         long rev = branchMove("file1", "movedfile1");
         doMerge(rev);
@@ -392,7 +398,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertAdded(status, "movedfile1", false);
     }
 
-    public void getLocalStatusMergeMovedDir() throws Exception
+    public void testGetLocalStatusMergeMovedDir() throws Exception
     {
         long rev = branchMove("dir2", "moveddir2");
         doMerge(rev);
@@ -406,7 +412,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertAdded(status, "moveddir2/file2", false);
     }
 
-    public void getLocalStatusMergeConflict() throws Exception
+    public void testGetLocalStatusMergeConflict() throws Exception
     {
         edit("file1");
         long rev = branchEdit("file1");
@@ -414,7 +420,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertSimpleStatus("file1", FileStatus.State.UNRESOLVED);
     }
 
-    public void getLocalStatusMergeEditDeleted() throws Exception
+    public void testGetLocalStatusMergeEditDeleted() throws Exception
     {
         edit("file1");
         long rev = branchDelete("file1");
@@ -497,9 +503,14 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("dir1/file1");
         edit("dir1/file2");
         WorkingCopyStatus wcs = wc.getLocalStatus(context, "dir1");
-        assertEquals(2, wcs.getFileStatuses().size());
-        assertEquals("dir1/file1", wcs.getFileStatuses().get(0).getPath());
-        assertEquals("dir1/file2", wcs.getFileStatuses().get(1).getPath());
+        Set<String> paths = CollectionUtils.map(wcs.getFileStatuses(), new Mapping<FileStatus, String>() {
+
+            public String map(FileStatus fileStatus)
+            {
+                return fileStatus.getPath();
+            }
+        }, new HashSet<String>(2));
+        assertEquals(asSet("dir1/file1", "dir1/file2"), paths);
     }
 
     public void testUpdateAlreadyUpToDate() throws Exception

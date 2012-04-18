@@ -403,7 +403,7 @@ public class SubversionWorkingCopy implements WorkingCopy, WorkingCopyStatusBuil
 
     private FileStatus convertStatus(File base, ConfigSupport configSupport, SVNStatus svnStatus, List<String> propertyChangedPaths)
     {
-        SVNStatusType contentsStatus = svnStatus.getContentsStatus();
+        SVNStatusType contentsStatus = svnStatus.getCombinedNodeAndContentsStatus();
         String path = svnStatus.getFile().getPath();
         boolean directory = svnStatus.getKind() == SVNNodeKind.DIR;
 
