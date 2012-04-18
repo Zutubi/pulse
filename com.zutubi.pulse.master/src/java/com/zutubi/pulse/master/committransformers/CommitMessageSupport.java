@@ -20,7 +20,7 @@ public class CommitMessageSupport
     public CommitMessageSupport(String comment, Collection<CommitMessageTransformerConfiguration> transformers)
     {
         this.transformers = transformers;
-        this.comment = comment;
+        this.comment = comment == null ? "" : comment;
     }
 
     protected CommitMessageBuilder applyTransformers()
@@ -48,7 +48,15 @@ public class CommitMessageSupport
 
     public int getLength()
     {
-        return applyTransformers().getLength();
+        try
+        {
+            return applyTransformers().getLength();
+        }
+        catch (Exception e)
+        {
+            LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
+            return comment.length();
+        }
     }
 
     public String trim(int length)

@@ -329,7 +329,7 @@ public class SubversionClientTest extends PulseTestCase
         }
         catch (ScmException e)
         {
-            assertEquals("svn: No such revision 9", e.getMessage());
+            assertThat(e.getMessage(), containsString("No such revision 9"));
         }
     }
 
