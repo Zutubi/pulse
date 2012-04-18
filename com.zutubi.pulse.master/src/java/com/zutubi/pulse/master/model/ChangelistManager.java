@@ -110,6 +110,18 @@ public interface ChangelistManager
     Set<Long> getAffectedBuildIds(PersistentChangelist changelist);
 
     /**
+     * Returns all graphs for builds affected by this change.  The roots of the graphs are builds
+     * directly affected, the remainder of the graphs represent builds indirectly affected by
+     * being downstream dependencies.  Note that the same build may appear in multiple graphs,
+     * although it will always be represented by the same node instance (the node is shared between
+     * graphs in this case).
+     * 
+     * @param changelist the changelist to get affected builds for
+     * @return graphs of all builds affected by the change, either directly or indirectly 
+     */
+    List<BuildGraph> getAffectedBuilds(PersistentChangelist changelist);
+    
+    /**
      * Returns all new upstream changes in a build since a given build.  The upstream dependency
      * graphs of the build and since build are compared to find where new upstream builds have been
      * used.  For each new upstream build, the changes after the since upstream build are added to

@@ -6,17 +6,19 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.util.CollectionUtils;
+import static java.util.Arrays.asList;
+import org.mockito.Matchers;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
+import java.util.Set;
 
 /**
  * Helper base class for testing managers that deal with builds/changes/dependencies.  Sets up some
@@ -54,7 +56,16 @@ public abstract class BuildRelatedManagerTestCase extends PulseTestCase
             {
                 Long buildId = (Long) invocationOnMock.getArguments()[0];
                 BuildResult build = buildManager.getBuildResult(buildId);
-                return asList(createChangelist(build.getProject(), build.getNumber()));
+                return asList(createChangelist(build.getProject(), build.getNumber(), build.getId()));
+            }
+        });
+        
+        stub(changelistDao.getAllAffectedResultIds(Matchers.<PersistentChangelist>anyObject())).toAnswer(new Answer<Set<Long>>()
+        {
+            public Set<Long> answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                PersistentChangelist changelist = (PersistentChangelist) invocationOnMock.getArguments()[0];
+                return CollectionUtils.asSet(changelist.getResultId());
             }
         });
 
@@ -95,7 +106,7 @@ public abstract class BuildRelatedManagerTestCase extends PulseTestCase
         return build;
     }
 
-    protected PersistentChangelist createChangelist(Project project, long buildNumber)
+    protected PersistentChangelist createChangelist(Project project, long buildNumber, long buildId)
     {
         // Changes are created in a particular manner so we can map them back to the builds they
         // came from for later verification.  Ids sort by project then number, also used as time
@@ -103,6 +114,7 @@ public abstract class BuildRelatedManagerTestCase extends PulseTestCase
         long id = project.getId() * 10000 + buildNumber;
         PersistentChangelist changelist = new PersistentChangelist(new Revision(buildNumber), id, project.getName(), "", Collections.<PersistentFileChange>emptyList());
         changelist.setId(id);
+        changelist.setResultId(buildId);
         return changelist;
     }
 

@@ -50,9 +50,20 @@ Zutubi.pulse.project.ChangelistPanel = Ext.extend(Zutubi.ActivePanel, {
                     ]
                 }, {
                     id: this.id + '-builds',
-                    xtype: 'xzbuildsummarytable',
+                    xtype: 'xzsummarytable',
                     title: 'all builds affected by this change',
-                    selectedColumns: ['project', 'number', 'status'],
+                    columns: [{
+                            name: 'project',
+                            renderer: function(project, build) {
+                                return '<img alt="-" src="' + window.baseUrl +
+                                       '/images/default/s.gif" style="width: ' +
+                                        (build.depth * 16) + 'px; height: 16px;"/> ' +
+                                       Zutubi.pulse.project.renderers.project(project);
+                            }
+                        },
+                        Zutubi.pulse.project.configs.build.number,
+                        Zutubi.pulse.project.configs.result.status
+                    ],
                     emptyMessage: 'no builds found',
                     customisable: false
                 }, {

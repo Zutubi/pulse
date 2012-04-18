@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildGraph;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmManager;
@@ -19,10 +19,11 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.util.*;
 
@@ -43,7 +44,6 @@ public class ChangelistDataAction extends ActionSupport
     private String projectName;
     private ChangelistViewModel model;
 
-    private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
     private ScmManager scmManager;
 
@@ -102,32 +102,23 @@ public class ChangelistDataAction extends ActionSupport
             }
         }
 
-        Set<Long> buildIds = changelistManager.getAffectedBuildIds(changelist);
-        List<BuildResult> buildResults = new LinkedList<BuildResult>();
-        for (Long id : buildIds)
+        List<BuildGraph> buildGraphs = changelistManager.getAffectedBuilds(changelist);
+        if (contextProject == null)
         {
-            try
-            {
-                BuildResult buildResult = buildManager.getBuildResult(id);
-                buildResults.add(buildResult);
-                if (contextProject == null && projectWithChangeViewer == null &&
-                    buildResult.getProject().getConfig().getChangeViewer() != null)
-                {
-                    projectWithChangeViewer = buildResult.getProject();
-                }
-            }
-            catch (AccessDeniedException e)
-            {
-                // User can't view this one, just continue.
-            }
+            projectWithChangeViewer = findProjectWithChangeViewer(buildGraphs);
         }
 
-        Collections.sort(buildResults, new BuildResult.CompareByOwnerThenNumber());
+        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
+        List<TreeBuildModel> treeBuilds = new LinkedList<TreeBuildModel>();
+        List<DAGraph.Node<BuildResult>> roots = CollectionUtils.map(buildGraphs, new DAGraph.ToRootMapping<BuildResult>());
+        Comparator<DAGraph.Node<BuildResult>> nodeComparator = new DAGraph.Node.CompareByData<BuildResult>(new BuildResult.CompareByOwnerThenNumber());
+        Collections.sort(roots, nodeComparator);
+        for (DAGraph.Node<BuildResult> root: roots)
+        {
+            addBuilds(root, nodeComparator, urls, treeBuilds, 0);
+        }
 
         ChangeViewerConfiguration changeViewer = projectWithChangeViewer == null ? null : projectWithChangeViewer.getConfig().getChangeViewer();
-        Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        List<BuildModel> builds = CollectionUtils.map(buildResults, new BuildResultToModelMapping(urls));
-
         Collection<CommitMessageTransformerConfiguration> transformers;
         if(contextProject == null)
         {
@@ -139,7 +130,7 @@ public class ChangelistDataAction extends ActionSupport
         }
 
         ChangelistModel changelistModel = new ChangelistModel(changelist, changeViewer, transformers);
-        model = new ChangelistViewModel(changelistModel, builds, new PagerModel(fileCount, FILES_PER_PAGE, startPage));
+        model = new ChangelistViewModel(changelistModel, treeBuilds, new PagerModel(fileCount, FILES_PER_PAGE, startPage));
 
         List<PersistentFileChange> files = changelistManager.getChangelistFiles(changelist, startPage * FILES_PER_PAGE, FILES_PER_PAGE);
         if (projectWithChangeViewer == null)
@@ -153,6 +144,38 @@ public class ChangelistDataAction extends ActionSupport
         }
 
         return SUCCESS;
+    }
+
+    private void addBuilds(DAGraph.Node<BuildResult> node, Comparator<DAGraph.Node<BuildResult>> nodeComparator, Urls urls, List<TreeBuildModel> treeBuilds, int depth)
+    {
+        treeBuilds.add(new TreeBuildModel(node.getData(), urls, depth));
+        List<DAGraph.Node<BuildResult>> connected = new LinkedList<DAGraph.Node<BuildResult>>(node.getConnected());
+        Collections.sort(connected, nodeComparator);
+        for (DAGraph.Node<BuildResult> child: connected)
+        {
+            addBuilds(child, nodeComparator, urls, treeBuilds, depth + 1);
+        }
+    }
+
+    private Project findProjectWithChangeViewer(List<BuildGraph> buildGraphs)
+    {
+        for (BuildGraph buildGraph: buildGraphs)
+        {
+            DAGraph.Node<BuildResult> nodeWithChangeViewer = buildGraph.findNodeByPredicate(new Predicate<DAGraph.Node<BuildResult>>()
+            {
+                public boolean satisfied(DAGraph.Node<BuildResult> buildResultNode)
+                {
+                    return buildResultNode.getData().getProject().getConfig().getChangeViewer() != null;
+                }
+            });
+            
+            if (nodeWithChangeViewer != null)
+            {
+                return nodeWithChangeViewer.getData().getProject();
+            }
+        }
+        
+        return null;
     }
 
     private void addSimpleFileModels(List<PersistentFileChange> files)
@@ -252,12 +275,6 @@ public class ChangelistDataAction extends ActionSupport
         }
     }
 
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
-
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -268,14 +285,30 @@ public class ChangelistDataAction extends ActionSupport
         this.scmManager = scmManager;
     }
 
+    public static class TreeBuildModel extends BuildModel
+    {
+        private int depth;
+
+        public TreeBuildModel(BuildResult buildResult, Urls urls, int depth)
+        {
+            super(buildResult, urls, false);
+            this.depth = depth;
+        }
+
+        public int getDepth()
+        {
+            return depth;
+        }
+    }
+    
     public static class ChangelistViewModel
     {
         private ChangelistModel changelist;
-        private List<BuildModel> builds;
+        private List<TreeBuildModel> builds;
         private List<ChangelistFileModel> files = new LinkedList<ChangelistFileModel>();
         private PagerModel pager;
 
-        public ChangelistViewModel(ChangelistModel changelist, List<BuildModel> builds, PagerModel pager)
+        public ChangelistViewModel(ChangelistModel changelist, List<TreeBuildModel> builds, PagerModel pager)
         {
             this.changelist = changelist;
             this.builds = builds;
@@ -287,7 +320,7 @@ public class ChangelistDataAction extends ActionSupport
             return changelist;
         }
 
-        public List<BuildModel> getBuilds()
+        public List<TreeBuildModel> getBuilds()
         {
             return builds;
         }

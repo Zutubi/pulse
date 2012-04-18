@@ -323,5 +323,38 @@ public class DAGraph<T>
                 return new Node<T>(data);
             }
         }
+
+        /**
+         * Comparator that sorts nodes by their data, using a comparator over the data type.
+         * 
+         * @param <T> type of the node data
+         */
+        public static class CompareByData<T> implements Comparator<Node<T>>
+        {
+            private Comparator<T> dataComparator;
+
+            public CompareByData(Comparator<T> dataComparator)
+            {
+                this.dataComparator = dataComparator;
+            }
+
+            public int compare(Node<T> node1, Node<T> node2)
+            {
+                return dataComparator.compare(node1.getData(), node2.getData());
+            }
+        }
+    }
+
+    /**
+     * Maps from a graph to that graph's root node.
+     * 
+     * @param <T> type of the graph data
+     */
+    public static class ToRootMapping<T> implements Mapping<DAGraph<T>, Node<T>>
+    {
+        public Node<T> map(DAGraph<T> graph)
+        {
+            return graph.getRoot();
+        }
     }
 }

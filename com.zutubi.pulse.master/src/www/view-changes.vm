@@ -10,7 +10,7 @@
 #end
 
 #macro(upstreamContext $context)
-    #foreach($upstreamBuild in $context)
+    #foreach($upstreamBuild in $context.builds)
         #if ($velocityCount > 1) &gt; #end
             <a href="$urls.project($upstreamBuild.project)">$webwork.htmlEncode($upstreamBuild.project.name)</a> :: <a href="$urls.build($upstreamBuild)">build $upstreamBuild.number</a>
     #end

@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.ChangelistComparator;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.util.adt.DAGraph;
+import static java.util.Arrays.asList;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class DefaultChangelistManagerTest extends BuildRelatedManagerTestCase
 {
@@ -63,7 +63,7 @@ public class DefaultChangelistManagerTest extends BuildRelatedManagerTestCase
         link(build2_1, build1_1);
         link(build2_2, build1_2);
 
-        List<UpstreamChangelist> expected = asList(new UpstreamChangelist(createChangelist(project2, 2), new BuildPath(build2_2)));
+        List<UpstreamChangelist> expected = asList(new UpstreamChangelist(createChangelist(project2, 2, 0), new BuildPath(build2_2)));
         assertEquals(expected, changelistManager.getUpstreamChangelists(build1_2, build1_1));
     }
 
@@ -111,18 +111,36 @@ public class DefaultChangelistManagerTest extends BuildRelatedManagerTestCase
         BuildGraph upstream1_2 = dependencyManager.getUpstreamDependencyGraph(build1_2);
         DAGraph.Node<BuildResult> node4_2 = upstream1_2.findNodeByBuildId(build4_2.getId());
         Iterator<BuildPath> pathsIt = upstream1_2.getBuildPaths(node4_2).iterator();
-        UpstreamChangelist change4 = new UpstreamChangelist(createChangelist(project4, 2), pathsIt.next());
+        UpstreamChangelist change4 = new UpstreamChangelist(createChangelist(project4, 2, 0), pathsIt.next());
         change4.addUpstreamContext(pathsIt.next());
 
         List<UpstreamChangelist> expected = asList(
                 change4,
-                new UpstreamChangelist(createChangelist(project3, 2), new BuildPath(build3_2)),
-                new UpstreamChangelist(createChangelist(project2, 2), new BuildPath(build2_2))
+                new UpstreamChangelist(createChangelist(project3, 2, 0), new BuildPath(build3_2)),
+                new UpstreamChangelist(createChangelist(project2, 2, 0), new BuildPath(build2_2))
         );
 
         List<UpstreamChangelist> got = changelistManager.getUpstreamChangelists(build1_2, build1_1);
         sortChangelists(got);
         assertEquals(expected, got);
+    }
+
+    public void testGetAffectedBuildsNoDependencies()
+    {
+        PersistentChangelist changelist = createChangelist(project1, 1, build1_1.getId());
+        List<BuildGraph> expected = asList(new BuildGraph(new DAGraph.Node<BuildResult>(build1_1)));
+        assertEquals(expected, changelistManager.getAffectedBuilds(changelist));
+    }
+
+    public void testGetAffectedBuildsWithDependencies()
+    {
+        // 2_1 - 1_1
+        link(build2_1, build1_1);
+        PersistentChangelist changelist = createChangelist(project2, 1, build2_1.getId());
+        DAGraph.Node<BuildResult> root = new DAGraph.Node<BuildResult>(build2_1);
+        root.connectNode(new DAGraph.Node<BuildResult>(build1_1));
+        List<BuildGraph> expected = asList(new BuildGraph(root));
+        assertEquals(expected, changelistManager.getAffectedBuilds(changelist));
     }
 
     private void sortChangelists(List<UpstreamChangelist> changelists)

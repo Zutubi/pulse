@@ -1,8 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.browse.BuildChangesPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
+import com.zutubi.pulse.acceptance.pages.browse.ViewChangelistPage;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.TriviAntProject;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
@@ -49,7 +52,7 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerSuccessfulBuild(upstream);
         rpcClient.RemoteApi.waitForBuildToComplete(downstream.getName(), 2);
 
-        // Now check the upstream change appears.
+        // Now check the upstream change appears in the changes affecting the downstream build.
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, downstream.getName(), 2L);
         assertEquals(1, changesPage.getUpstreamChangeCount());
@@ -59,6 +62,16 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         assertEquals("/accept/trunk/triviant/build.xml", changelist.getChanges().get(0).getPath());
 
         assertEquals(asList(asList(asPair(upstream.getName(), 2L))), changesPage.getUpstreamChangeVia(1));
+        
+        // Verify that the downstream build appears in the builds affected by the change.  It should
+        // appear twice - it is directly affected and also indirectly via upstream.
+        ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class,
+                upstream.getName(), 2L, changesPage.getChangeIds().get(0), changelist.getRevision().toString());
+        assertEquals(asList(
+                new BuildInfo(downstream.getName(), 2, ResultState.SUCCESS, null),
+                new BuildInfo(upstream.getName(), 2, ResultState.SUCCESS, null),
+                  new BuildInfo(downstream.getName(), 2, ResultState.SUCCESS, null)
+        ), changelistPage.getBuilds());
     }
 
     public void testSameChangeToMultipleUpstreamBuilds() throws Exception
@@ -87,7 +100,8 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerSuccessfulBuild(util);
         rpcClient.RemoteApi.waitForBuildToComplete(app.getName(), 2);
 
-        // Now check the upstream change appears via multiple paths.
+        // Now check the upstream change appears via multiple paths when looking at the changes to
+        // the app project.
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, app.getName(), 2L);
         assertEquals(1, changesPage.getUpstreamChangeCount());
@@ -123,5 +137,19 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
                 asList(asPair(util.getName(), 2L)),
                 asList(asPair(lib.getName(), 2L), asPair(util.getName(), 2L))
         ), vias);
+
+        // Verify that the lib and app builds appear via all possible paths in the builds affected
+        // by the change.
+        ViewChangelistPage changelistPage = getBrowser().openAndWaitFor(ViewChangelistPage.class,
+                util.getName(), 2L, changesPage.getChangeIds().get(0), changelist.getRevision().toString());
+        assertEquals(asList(
+                new BuildInfo(app.getName(), 2, ResultState.SUCCESS, null),
+                new BuildInfo(lib.getName(), 2, ResultState.SUCCESS, null),
+                  new BuildInfo(app.getName(), 2, ResultState.SUCCESS, null),
+                new BuildInfo(util.getName(), 2, ResultState.SUCCESS, null),
+                  new BuildInfo(app.getName(), 2, ResultState.SUCCESS, null),
+                  new BuildInfo(lib.getName(), 2, ResultState.SUCCESS, null),
+                    new BuildInfo(app.getName(), 2, ResultState.SUCCESS, null)
+        ), changelistPage.getBuilds());
     }
 }

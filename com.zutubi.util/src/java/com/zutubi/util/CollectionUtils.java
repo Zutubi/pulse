@@ -98,14 +98,14 @@ public class CollectionUtils
         return result;
     }
 
-    public static <T, U> List<U> map(Iterable<T> l, Mapping<T, U> m)
+    public static <T, U> List<U> map(Iterable<T> l, Mapping<? super T, U> m)
     {
         List<U> result = new LinkedList<U>();
         map(l, m, result);
         return result;
     }
 
-    public static <T, U, V extends Collection<U>> V map(Iterable<T> in, Mapping<T, U> m, V out)
+    public static <T, U, V extends Collection<U>> V map(Iterable<T> in, Mapping<? super T, U> m, V out)
     {
         for(T t: in)
         {

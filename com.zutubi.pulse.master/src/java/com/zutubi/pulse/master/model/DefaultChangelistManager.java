@@ -85,6 +85,42 @@ public class DefaultChangelistManager implements ChangelistManager
         return changelistDao.getAllAffectedResultIds(changelist);
     }
 
+    public List<BuildGraph> getAffectedBuilds(PersistentChangelist changelist)
+    {
+        List<BuildGraph> graphs = new LinkedList<BuildGraph>();
+        for (Long directlyAffectedId: getAffectedBuildIds(changelist))
+        {
+            // Check the graphs we've created thus far to see if the build is already represented.
+            // If so, we reuse that node as the root of this graph.
+            DAGraph.Node<BuildResult> existingNode = findNode(graphs, directlyAffectedId);
+            if (existingNode == null)
+            {
+                BuildResult directlyAffected = buildManager.getBuildResult(directlyAffectedId);
+                graphs.add(dependencyManager.getDownstreamDependencyGraph(directlyAffected));
+            }
+            else
+            {
+                graphs.add(new BuildGraph(existingNode));
+            }
+        }
+        
+        return graphs;
+    }
+
+    private DAGraph.Node<BuildResult> findNode(List<BuildGraph> graphs, Long buildId)
+    {
+        for (BuildGraph graph: graphs)
+        {
+            DAGraph.Node<BuildResult> node = graph.findNodeByBuildId(buildId);
+            if (node != null)
+            {
+                return node;
+            }
+        }
+        
+        return null;
+    }
+
     public List<UpstreamChangelist> getUpstreamChangelists(final BuildResult build, BuildResult sinceBuild)
     {
         final List<UpstreamChangelist> upstreamChangelists = new LinkedList<UpstreamChangelist>();
