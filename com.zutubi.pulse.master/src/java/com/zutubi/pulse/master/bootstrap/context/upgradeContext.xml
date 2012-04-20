@@ -192,6 +192,7 @@
                 <ref local="addTimestampDisplayPreference"/>
                 <ref local="addDependencyLinks"/>
                 <ref local="dependencyLinkIndices"/>
+                <ref local="sendEmailUpstreamCommitters"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1010,5 +1011,9 @@
 
     <bean id="dependencyLinkIndices" class="com.zutubi.pulse.master.upgrade.tasks.DependencyLinkIndicesUpgradeTask">
         <property name="buildNumber" value="205001009"/>
+    </bean>
+
+    <bean id="sendEmailUpstreamCommitters" class="com.zutubi.pulse.master.upgrade.tasks.SendEmailUpstreamCommittersUpgradeTask">
+        <property name="buildNumber" value="205002001"/>
     </bean>
 </beans>

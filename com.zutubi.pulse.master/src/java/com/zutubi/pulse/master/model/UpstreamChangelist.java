@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.util.Mapping;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -87,5 +88,16 @@ public class UpstreamChangelist
         int result = changelist != null ? changelist.hashCode() : 0;
         result = 31 * result + (upstreamContexts != null ? upstreamContexts.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Maps from an upstream changelist to the actual changelist.
+     */
+    public static class ToChangelistMapping implements Mapping<UpstreamChangelist, PersistentChangelist>
+    {
+        public PersistentChangelist map(UpstreamChangelist upstreamChangelist)
+        {
+            return upstreamChangelist.changelist;
+        }
     }
 }

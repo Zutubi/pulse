@@ -39,7 +39,6 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
-import static java.util.Arrays.asList;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
@@ -47,12 +46,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Arrays.asList;
+
 /**
  * A build hook task that sends email notifications to project contacts and/or
  * users that committed changes that affected the build.
  */
 @SymbolicName("zutubi.sendEmailTaskConfig")
-@Form(fieldOrder = {"template", "attachLogs", "logLineLimit", "emailContacts", "emailCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+@Form(fieldOrder = {"template", "attachLogs", "logLineLimit", "emailContacts", "emailCommitters", "includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
 @CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
 @Wire
 public class SendEmailTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
@@ -64,8 +65,9 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     @Numeric(min = 0, max = 250)
     private int logLineLimit = 50;
     private boolean emailContacts;
-    @ControllingCheckbox(checkedFields = {"emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+    @ControllingCheckbox(checkedFields = {"includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
     private boolean emailCommitters;
+    private boolean includeUpstreamCommitters;
     @Required
     private String emailDomain;
     private boolean sinceLastSuccess = false;
@@ -125,6 +127,16 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     public boolean isEmailCommitters()
     {
         return emailCommitters;
+    }
+
+    public boolean isIncludeUpstreamCommitters()
+    {
+        return includeUpstreamCommitters;
+    }
+
+    public void setIncludeUpstreamCommitters(boolean includeUpstreamCommitters)
+    {
+        this.includeUpstreamCommitters = includeUpstreamCommitters;
     }
 
     public void setEmailCommitters(boolean emailCommitters)
@@ -274,7 +286,15 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         Set<String> seenLogins = new HashSet<String>();
         for (BuildResult build: builds)
         {
-            for (PersistentChangelist change : changelistManager.getChangesForBuild(build, 0, true))
+            List<PersistentChangelist> changelists = changelistManager.getChangesForBuild(build, 0, true);
+            if (includeUpstreamCommitters)
+            {
+                BuildResult sinceBuild = buildManager.getPreviousBuildResult(build);
+                List<UpstreamChangelist> upstreamChangelists = changelistManager.getUpstreamChangelists(build, sinceBuild);
+                CollectionUtils.map(upstreamChangelists, new UpstreamChangelist.ToChangelistMapping(), changelists);
+            }
+
+            for (PersistentChangelist change : changelists)
             {
                 String scmLogin = change.getAuthor();
                 // Only bother to map and add if we haven't already done so.

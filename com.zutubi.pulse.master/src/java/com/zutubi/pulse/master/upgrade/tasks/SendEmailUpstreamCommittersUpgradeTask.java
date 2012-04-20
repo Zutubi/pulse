@@ -8,20 +8,17 @@ import java.util.List;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 /**
- * Adds new fields to email committers hook tasks:
- * - sinceLastSuccess
- * - useScmEmails
+ * Adds a new includeUpstreamCommitters option to the send email hook tasks.
  */
-public class EmailCommittersSinceSuccessUpgradeTask extends AbstractRecordPropertiesUpgradeTask
+public class SendEmailUpstreamCommittersUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {
     private static final String SCOPE_PROJECTS = "projects";
     private static final String PROPERTY_HOOKS = "buildHooks";
     private static final String PROPERTY_TASK = "task";
 
-    private static final String PROPERTY_SINCE_SUCCESS = "sinceLastSuccess";
-    private static final String PROPERTY_SCM_EMAILS = "useScmEmails";
+    private static final String PROPERTY_INCLUDE_UPSTREAM = "includeUpstreamCommitters";
 
-    private static final String TYPE_EMAIL_COMMITTERS = "zutubi.emailCommittersTaskConfig";
+    private static final String TYPE_SEND_EMAIL = "zutubi.sendEmailTaskConfig";
 
     public boolean haltOnFailure()
     {
@@ -30,14 +27,12 @@ public class EmailCommittersSinceSuccessUpgradeTask extends AbstractRecordProper
 
     protected RecordLocator getRecordLocator()
     {
-        // Find all hook tasks, filter down to email committers.
         RecordLocator triggerLocator = RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_PROJECTS, WILDCARD_ANY_ELEMENT, PROPERTY_HOOKS, WILDCARD_ANY_ELEMENT, PROPERTY_TASK));
-        return RecordLocators.newTypeFilter(triggerLocator, TYPE_EMAIL_COMMITTERS);
+        return RecordLocators.newTypeFilter(triggerLocator, TYPE_SEND_EMAIL);
     }
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SINCE_SUCCESS, "false"),
-                             RecordUpgraders.newAddProperty(PROPERTY_SCM_EMAILS, "false"));
+        return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_INCLUDE_UPSTREAM, "false"));
     }
 }

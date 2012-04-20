@@ -1023,6 +1023,26 @@ public class DefaultBuildController implements EventListener, BuildController
             buildResult.complete();
             buildLogger.completed(buildResult);
 
+            // Make these DB updates before the post-build event goes out, in case they influence things that hang off
+            // that event (such as hooks).
+            buildManager.save(buildResult);
+            if (ivyModuleDescriptor != null)
+            {
+                dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
+            }
+
+            // calculate the feature counts at the end of the build so that the result hierarchy does not need to
+            // be traversed when this information is required.
+            buildResult.calculateFeatureCounts();
+
+            long start = System.currentTimeMillis();
+            testManager.index(buildResult);
+            long duration = System.currentTimeMillis() - start;
+            if (duration > 300000)
+            {
+                LOG.warning("Test case indexing for project %s took %f seconds", projectConfig.getName(), duration / 1000.0);
+            }
+
             if (!hard)
             {
                 // The timing of this event is important: handlers of this event
@@ -1036,23 +1056,7 @@ public class DefaultBuildController implements EventListener, BuildController
                 buildLogger.postBuildCompleted();
             }
 
-            // calculate the feature counts at the end of the build so that the result hierarchy does not need to
-            // be traversed when this information is required.
-            buildResult.calculateFeatureCounts();
-
-            if (ivyModuleDescriptor != null)
-            {
-                dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
-            }
-            
-            long start = System.currentTimeMillis();
-            testManager.index(buildResult);
-            long duration = System.currentTimeMillis() - start;
-            if (duration > 300000)
-            {
-                LOG.warning("Test case indexing for project %s took %f seconds", projectConfig.getName(), duration / 1000.0);
-            }
-
+            // Another save is required as hooks may change the build.
             buildManager.save(buildResult);
         }
         catch (Exception e)
