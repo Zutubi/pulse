@@ -8,7 +8,7 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.master.notifications.renderer.DefaultRenderService;
+import com.zutubi.pulse.master.notifications.renderer.RenderService;
 import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
 import com.zutubi.pulse.master.security.Principle;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
@@ -46,7 +46,7 @@ public class ResultNotifier implements EventListener
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
     private UserManager userManager;
-    private DefaultRenderService renderService = new DefaultRenderService();
+    private RenderService renderService;
 
     public void init()
     {
@@ -203,6 +203,11 @@ public class ResultNotifier implements EventListener
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setRenderService(RenderService renderService)
+    {
+        this.renderService = renderService;
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)

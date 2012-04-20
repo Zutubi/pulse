@@ -82,7 +82,10 @@ import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -173,7 +176,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         // Run an initial build
         TriviAntProject project = projectConfigurations.createTrivialAntProject(random);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.runBuild(random);
 
         // Commit a change to the repository.  Note monitoring the SCM is
@@ -272,9 +275,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String regularUser = random + "-user";
         
         TriviAntProject viewable = projectConfigurations.createTrivialAntProject(viewableProject);
-        configurationHelper.insertProject(viewable.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(viewable.getConfig(), false);
         TriviAntProject unviewable = projectConfigurations.createTrivialAntProject(unviewableProject);
-        configurationHelper.insertProject(unviewable.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(unviewable.getConfig(), false);
         rpcClient.RemoteApi.insertTrivialUser(regularUser);
         
         // Remove permissions that allow normal users to view the invisible
@@ -634,7 +637,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         try
         {
             final WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
-            configurationHelper.insertProject(project.getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
             
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
@@ -879,7 +882,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         FileArtifactConfiguration explicitArtifact = project.addArtifact("explicit", "build.xml");
         FileArtifactConfiguration featuredArtifact = project.addArtifact("featured", "build.xml");
         featuredArtifact.setFeatured(true);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         long buildNumber = rpcClient.RemoteApi.runBuild(projectName);
 
@@ -965,7 +968,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         FileArtifactConfiguration hashedArtifact = project.addArtifact(NAME_HASHED, BUILD_FILE);
         hashedArtifact.setCalculateHash(true);
         hashedArtifact.setHashAlgorithm(CommandContext.HashAlgorithm.MD5);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
@@ -1318,7 +1321,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             final WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
 
             DirectoryArtifactConfiguration reportsArtifact = new DirectoryArtifactConfiguration("test reports", "reports/xml");
-            PostProcessorConfiguration junitProcessor = configurationHelper.getPostProcessor(JUNIT_PROCESSOR, JUnitReportPostProcessorConfiguration.class);
+            PostProcessorConfiguration junitProcessor = CONFIGURATION_HELPER.getPostProcessor(JUNIT_PROCESSOR, JUnitReportPostProcessorConfiguration.class);
             reportsArtifact.addPostProcessor(junitProcessor);
             
             SleepCommandConfiguration command = new SleepCommandConfiguration("noop");
@@ -1336,7 +1339,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             reportsArtifact = project.addDirArtifact("test reports", "reports/xml");
             reportsArtifact.addPostProcessor(junitProcessor);
             
-            configurationHelper.insertProject(project.getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
             
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
@@ -1472,8 +1475,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             final WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
             final String tempDirPattern = tempDir.getAbsolutePath() + "/base";
             project.getConfig().getBootstrap().setTempDirPattern(tempDirPattern);
-            project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
-            configurationHelper.insertProject(project.getConfig(), false);
+            project.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(AgentManager.MASTER_AGENT_NAME));
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
@@ -1729,7 +1732,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         AntProjectHelper project = projectConfigurations.createTrivialAntProject(random);
         project.addProperty("env", "value").setAddToEnvironment(true);
         project.addProperty("notenv", "value").setAddToEnvironment(false);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("new", "newvalue");
@@ -1754,7 +1757,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         AntProjectHelper project = projectConfigurations.createTrivialAntProject(random);
         project.addProperty("env", "value").setAddToEnvironment(true);
         project.addProperty("notenv", "value").setAddToEnvironment(false);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("env", "newvalue");
@@ -1775,7 +1778,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         AntProjectHelper project = projectConfigurations.createTrivialAntProject(random);
         project.getConfig().getOptions().setIsolateChangelists(true);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
         

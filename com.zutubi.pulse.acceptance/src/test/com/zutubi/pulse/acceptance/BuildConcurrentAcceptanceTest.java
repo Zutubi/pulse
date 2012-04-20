@@ -194,7 +194,7 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
 
     private void bindStagesToMaster(ProjectConfigurationHelper project) throws Exception
     {
-        AgentConfiguration master = configurationHelper.getMasterAgentReference();
+        AgentConfiguration master = CONFIGURATION_HELPER.getMasterAgentReference();
         for (BuildStageConfiguration stage : project.getStages())
         {
             stage.setAgent(master);
@@ -213,7 +213,7 @@ public class BuildConcurrentAcceptanceTest extends AcceptanceTestBase
     {
         for (ProjectConfigurationHelper project: projects)
         {
-            configurationHelper.insertProject(project.getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         }
     }
 }

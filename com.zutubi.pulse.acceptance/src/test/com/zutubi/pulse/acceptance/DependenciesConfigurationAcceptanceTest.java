@@ -45,7 +45,7 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
     }
 
     public void testDependencyCanNotReferenceOwningProject() throws Exception

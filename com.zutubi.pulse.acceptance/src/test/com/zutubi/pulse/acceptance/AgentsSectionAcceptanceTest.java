@@ -56,7 +56,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
     {
         final String AGENT = "offline-agent";
 
-        configurationHelper.insertAgent(new AgentConfiguration(AGENT, HOST_LOCALHOST, 8899));
+        CONFIGURATION_HELPER.insertAgent(new AgentConfiguration(AGENT, HOST_LOCALHOST, 8899));
 
         getBrowser().loginAsAdmin();
         final AgentsPage agentsPage = getBrowser().openAndWaitFor(AgentsPage.class);
@@ -68,7 +68,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableEnable() throws Exception
     {
-        configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
+        CONFIGURATION_HELPER.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
         rpcClient.RemoteApi.waitForAgentToBeIdle(LOCAL_AGENT);
         long agentId = rpcClient.TestApi.getAgentId(LOCAL_AGENT);
         
@@ -88,12 +88,12 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     public void testDisableOnIdle() throws Exception
     {
-        configurationHelper.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
+        CONFIGURATION_HELPER.insertAgent(new AgentConfiguration(LOCAL_AGENT, HOST_LOCALHOST, 8890));
         long agentId = rpcClient.TestApi.getAgentId(LOCAL_AGENT);
 
         WaitProject project = projectConfigurations.createWaitAntProject(randomName(), tempDir, false);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(LOCAL_AGENT));
-        configurationHelper.insertProject(project.getConfig(), false);
+        project.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(LOCAL_AGENT));
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
@@ -130,16 +130,16 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         String agent1 = LOCAL_AGENT + "-1";
         String agent2 = LOCAL_AGENT + "-2";
 
-        configurationHelper.insertAgent( new AgentConfiguration(agent1, HOST_LOCALHOST, 8890));
-        configurationHelper.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
+        CONFIGURATION_HELPER.insertAgent( new AgentConfiguration(agent1, HOST_LOCALHOST, 8890));
+        CONFIGURATION_HELPER.insertAgent(new AgentConfiguration(agent2, HOST_LOCALHOST, 8890));
 
         String random = randomName();
         WaitProject project1 = projectConfigurations.createWaitAntProject(random + "-1", tempDir, false);
         WaitProject project2 = projectConfigurations.createWaitAntProject(random + "-2", tempDir, false);
-        project1.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent1));
-        project2.getDefaultStage().setAgent(configurationHelper.getAgentReference(agent2));
-        configurationHelper.insertProject(project1.getConfig(), false);
-        configurationHelper.insertProject(project2.getConfig(), false);
+        project1.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(agent1));
+        project2.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(agent2));
+        CONFIGURATION_HELPER.insertProject(project1.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project2.getConfig(), false);
         rpcClient.RemoteApi.triggerBuild(project1.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project1.getName(), 1);
         rpcClient.RemoteApi.triggerBuild(project2.getName());
@@ -173,9 +173,9 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         String agent2 = random + "-2";
         String agent3 = random + "-3";
 
-        configurationHelper.insertAgent( new AgentConfiguration(agent1, HOST_1, 8890));
-        configurationHelper.insertAgent( new AgentConfiguration(agent2, HOST_2, 8890));
-        configurationHelper.insertAgent( new AgentConfiguration(agent3, HOST_1, 8890));
+        CONFIGURATION_HELPER.insertAgent( new AgentConfiguration(agent1, HOST_1, 8890));
+        CONFIGURATION_HELPER.insertAgent( new AgentConfiguration(agent2, HOST_2, 8890));
+        CONFIGURATION_HELPER.insertAgent( new AgentConfiguration(agent3, HOST_1, 8890));
 
         getBrowser().loginAsAdmin();
 
@@ -195,8 +195,8 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         assertNull(summaryTable.getAgent(AgentManager.MASTER_AGENT_NAME).executingOwner);
 
         WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME));
-        configurationHelper.insertProject(project.getConfig(), false);
+        project.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(AgentManager.MASTER_AGENT_NAME));
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
 

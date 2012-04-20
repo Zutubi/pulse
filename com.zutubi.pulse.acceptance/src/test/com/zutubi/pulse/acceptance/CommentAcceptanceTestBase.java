@@ -32,9 +32,9 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
 
         users = new UserConfigurations();
-        if (!configurationHelper.isUserExists(TEST_USER))
+        if (!CONFIGURATION_HELPER.isUserExists(TEST_USER))
         {
-            configurationHelper.insertUser(users.createSimpleUser(TEST_USER));
+            CONFIGURATION_HELPER.insertUser(users.createSimpleUser(TEST_USER));
         }
     }
 
@@ -78,7 +78,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
 
     protected void addAndDeleteCommentOnPage(final CommentPage page) throws Exception
     {
-        configurationHelper.insertUser(users.createSimpleUser(random));
+        CONFIGURATION_HELPER.insertUser(users.createSimpleUser(random));
 
         addCommentOnPage(page);
         final long commentId = getLatestCommentId();
@@ -116,8 +116,8 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         String user1 = random + "-user1";
         String user2 = random + "-user2";
 
-        configurationHelper.insertUser(users.createSimpleUser(user1));
-        configurationHelper.insertUser(users.createSimpleUser(user2));
+        CONFIGURATION_HELPER.insertUser(users.createSimpleUser(user1));
+        CONFIGURATION_HELPER.insertUser(users.createSimpleUser(user2));
 
 
         RpcClient user1Client = new RpcClient();

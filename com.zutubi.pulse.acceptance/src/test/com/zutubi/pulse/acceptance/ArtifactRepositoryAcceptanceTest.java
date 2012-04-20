@@ -82,7 +82,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         command.setSettingsFile("settings.xml");
         command.setGoals(goals);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         return rpcClient.RemoteApi.runBuild(projectName);
     }
@@ -93,7 +93,7 @@ public class ArtifactRepositoryAcceptanceTest extends AcceptanceTestBase
         AntCommandConfiguration command = (AntCommandConfiguration) project.getDefaultCommand();
         command.setTargets(target);
         
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         return rpcClient.RemoteApi.runBuild(random);
     }

@@ -68,7 +68,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     private void insertProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
     }
 
     public void testPublish_NoArtifacts() throws Exception
@@ -322,7 +322,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
 
-        AgentConfiguration masterAgent = configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME);
+        AgentConfiguration masterAgent = CONFIGURATION_HELPER.getAgentReference(AgentManager.MASTER_AGENT_NAME);
         DepAntProject downstreamProject = projectConfigurations.createDepAntProject(randomName + "-downstream", false);
         DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
         dependencyConfig.setStageType(DependencyConfiguration.StageType.CORRESPONDING_STAGES);
@@ -369,7 +369,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         downstreamProject.getConfig().getDependencies().setRetrievalPattern("lib/[artifact]-[revision].[ext]");
         DependencyConfiguration dependencyConfig = downstreamProject.addDependency(upstreamProject.getConfig());
         dependencyConfig.setStageType(DependencyConfiguration.StageType.ALL_STAGES);
-        AgentConfiguration masterAgent = configurationHelper.getAgentReference(AgentManager.MASTER_AGENT_NAME);
+        AgentConfiguration masterAgent = CONFIGURATION_HELPER.getAgentReference(AgentManager.MASTER_AGENT_NAME);
         downstreamProject.addStage(STAGE1).setAgent(masterAgent);
         downstreamProject.addStage(STAGE2).setAgent(masterAgent);
         insertProject(downstreamProject);
@@ -550,7 +550,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         insertProject(downstreamProject);
 
         upstreamProject.getConfig().setName(randomName + "-upstream-renamed");
-        configurationHelper.update(upstreamProject.getConfig(), false);
+        CONFIGURATION_HELPER.update(upstreamProject.getConfig(), false);
 
         buildRunner.triggerSuccessfulBuild(upstreamProject.getConfig());
         

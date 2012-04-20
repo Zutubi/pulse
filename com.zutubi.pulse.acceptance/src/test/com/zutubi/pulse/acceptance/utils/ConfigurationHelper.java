@@ -65,6 +65,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ConfigurationHelper
 {
+    private boolean initialised = false;
+    
     private MasterConfigurationRegistry configurationRegistry;
     private TypeRegistry typeRegistry;
     private RemoteApiClient remoteApi;
@@ -76,6 +78,11 @@ public class ConfigurationHelper
 
     public void init() throws TypeException
     {
+        if (initialised)
+        {
+            return;
+        }
+        
         configurationRegistry = new MasterConfigurationRegistry();
         configurationRegistry.setActionManager(new ActionManager());
 
@@ -155,6 +162,8 @@ public class ConfigurationHelper
         register(UnitTestPlusPlusReportPostProcessorConfiguration.class);
         register(VisualStudioPostProcessorConfiguration.class);
         register(XCodePostProcessorConfiguration.class);
+        
+        initialised = true;
     }
 
     public <T extends Configuration> void register(Class<T> type) throws TypeException
@@ -457,7 +466,7 @@ public class ConfigurationHelper
             }
         }
     }
-
+    
     public void setRemoteApi(RemoteApiClient remoteApi)
     {
         this.remoteApi = remoteApi;

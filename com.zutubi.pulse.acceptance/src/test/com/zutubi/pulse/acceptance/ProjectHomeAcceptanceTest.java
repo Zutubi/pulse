@@ -113,7 +113,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
     public void testBuildActivity() throws Exception
     {
         WaitProject project = projectConfigurations.createWaitAntProject(random, new File(tempDir, random), false);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         buildRunner.triggerBuild(project);
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);

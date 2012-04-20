@@ -58,7 +58,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
 
         // create project.
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(projectName);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         getBrowser().loginAsAdmin();
 
@@ -180,11 +180,11 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         projectName = randomName();
 
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(projectName);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         String userName = randomName();
         UserConfiguration user = users.createSimpleUser(userName);
-        configurationHelper.insertUser(user);
+        CONFIGURATION_HELPER.insertUser(user);
 
         // user needs 'run personal build' permissions.
         rpcClient.RemoteApi.ensureUserCanRunPersonalBuild(userName);

@@ -40,10 +40,10 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
     public void testChangeToUpstreamBuild() throws Exception
     {
         TriviAntProject upstream = projectConfigurations.createTrivialAntProject(random + "-upstream");
-        configurationHelper.insertProject(upstream.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(upstream.getConfig(), false);
         TriviAntProject downstream = projectConfigurations.createTrivialAntProject(random + "-downstream");
         downstream.addDependency(upstream);
-        configurationHelper.insertProject(downstream.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(downstream.getConfig(), false);
 
         // Run two upstream builds with a change between.  Wait for the second triggered downstream
         // build to complete.
@@ -70,7 +70,7 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         assertEquals(asList(
                 new BuildInfo(downstream.getName(), 2, ResultState.SUCCESS, null),
                 new BuildInfo(upstream.getName(), 2, ResultState.SUCCESS, null),
-                  new BuildInfo(downstream.getName(), 2, ResultState.SUCCESS, null)
+                new BuildInfo(downstream.getName(), 2, ResultState.SUCCESS, null)
         ), changelistPage.getBuilds());
     }
 
@@ -82,14 +82,14 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         //  |      /
         // lib  <-+
         TriviAntProject util = projectConfigurations.createTrivialAntProject(random + "-util");
-        configurationHelper.insertProject(util.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(util.getConfig(), false);
         TriviAntProject lib = projectConfigurations.createTrivialAntProject(random + "-lib");
         lib.addDependency(util);
-        configurationHelper.insertProject(lib.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(lib.getConfig(), false);
         TriviAntProject app = projectConfigurations.createTrivialAntProject(random + "-app");
         app.addDependency(util);
         app.addDependency(lib);
-        configurationHelper.insertProject(app.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(app.getConfig(), false);
 
         // Run two util builds with a change between.  Wait for the second triggered app build to
         // complete.  Note the projects all use the same repo, so to ensure they all see this change

@@ -25,13 +25,27 @@ public interface RenderService
     /**
      * Renders the given build result using the given details.
      *
-     * @param buildResult         the result to be rendered
-     * @param baseUrl             configured base url for the pulse instance
-     * @param template            name of the template to use
+     * @param buildResult the result to be rendered
+     * @param baseUrl     configured base url for the pulse instance
+     * @param template    name of the template to use
+     * 
      * @return a rendered result
      */
     RenderedResult renderResult(BuildResult buildResult, String baseUrl, String template);
 
+    /**
+     * Renders the given build result using the given data map and template.
+     * 
+     * @param result   the build result to be rendered
+     * @param dataMap  map of variables to use in template resolution 
+     * @param template name of the template to use
+     * @param cache    a cache of already-rendered results, keyed by template name; the caller is
+     *                 responsible for ensuring the cache is not used with difference results or
+     *                 data maps
+     * @return the rendered result
+     */
+    RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, String template, Map<String, RenderedResult> cache);
+    
     /**
      * Returns a set of build stage log file attachments based on the given configuration.
      *

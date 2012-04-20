@@ -37,8 +37,8 @@ public abstract class AcceptanceTestBase extends PulseTestCase
     /**
      * We reuse the same configuration helper instance as it is expensive to initialise.
      */
-    protected static ConfigurationHelper configurationHelper;
-
+    protected static final ConfigurationHelper CONFIGURATION_HELPER = new ConfigurationHelper();
+    
     protected RpcClient rpcClient;
     protected ProjectConfigurations projectConfigurations;
     protected String baseUrl;
@@ -55,18 +55,11 @@ public abstract class AcceptanceTestBase extends PulseTestCase
 
         baseUrl = getPulseUrl();
         rpcClient = new RpcClient();
-        if (configurationHelper == null)
-        {
-            configurationHelper = new ConfigurationHelper();
-            configurationHelper.setRemoteApi(rpcClient.RemoteApi);
-            configurationHelper.init();
-        }
-        else
-        {
-            configurationHelper.setRemoteApi(rpcClient.RemoteApi);
-        }
         
-        projectConfigurations = new ProjectConfigurations(configurationHelper);
+        CONFIGURATION_HELPER.setRemoteApi(rpcClient.RemoteApi);
+        CONFIGURATION_HELPER.init();
+
+        projectConfigurations = new ProjectConfigurations(CONFIGURATION_HELPER);
         random = randomName();
 
         browserFactory = new SingleSeleniumBrowserFactory();

@@ -98,7 +98,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
     // --( test rendering browse link for project to versioned transformation )---
     public void testBrowseLinkAvailableForVersionedProjectConversion() throws Exception
     {
-        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
         ProjectConfigPage projectPage = getBrowser().openAndWaitFor(ProjectConfigPage.class, random, false);
         projectPage.clickAction("convertToVersioned");
 
@@ -189,7 +189,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     public void testBrowseAddingCommandToExistingProject() throws Exception
     {
-        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), false);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) + "/" +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +
@@ -215,7 +215,7 @@ public class BrowseScmAcceptanceTest extends AcceptanceTestBase
 
     private AntCommandForm insertTestSvnProjectAndNavigateToCommandConfig(boolean template) throws Exception
     {
-        configurationHelper.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), template);
+        CONFIGURATION_HELPER.insertProject(projectConfigurations.createTestAntProject(random).getConfig(), template);
         getBrowser().open(urls.adminProject(WebUtils.uriComponentEncode(random)) +
                 Constants.Project.TYPE + "/" +
                 Constants.Project.MultiRecipeType.RECIPES + "/" +

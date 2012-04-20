@@ -40,18 +40,18 @@ public class BuildPinningAcceptanceTest extends AcceptanceTestBase
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
-        if (!configurationHelper.isProjectExists(TEST_PROJECT))
+        if (!CONFIGURATION_HELPER.isProjectExists(TEST_PROJECT))
         {
-            configurationHelper.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
         }
 
         users = new UserConfigurations();
-        if (!configurationHelper.isUserExists(TEST_USER))
+        if (!CONFIGURATION_HELPER.isUserExists(TEST_USER))
         {
-            configurationHelper.insertUser(users.createSimpleUser(TEST_USER));
+            CONFIGURATION_HELPER.insertUser(users.createSimpleUser(TEST_USER));
         }
 
-        testProject = configurationHelper.getConfigurationReference("projects/" + TEST_PROJECT, ProjectConfiguration.class);
+        testProject = CONFIGURATION_HELPER.getConfigurationReference("projects/" + TEST_PROJECT, ProjectConfiguration.class);
     }
 
     @Override

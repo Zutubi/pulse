@@ -147,7 +147,7 @@ public class ReflectionUtils
      *                  hierarchy, may be null to indicate the entire hierarchy
      *                  should be traversed
      * @return the set of all fields declared by the given class and its
-     *         supertypes found by traversing the hierachy up to the stop class
+     *         supertypes found by traversing the hierarchy up to the stop class
      *
      * @see #getSupertypes(Class, Class, boolean)
      */

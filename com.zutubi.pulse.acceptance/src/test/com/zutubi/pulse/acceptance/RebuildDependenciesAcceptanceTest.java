@@ -53,7 +53,7 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
 
     private ProjectConfigurationHelper insertProject(ProjectConfigurationHelper project) throws Exception
     {
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         return project;
     }
 

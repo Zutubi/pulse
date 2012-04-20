@@ -255,8 +255,8 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
     private WaitProject startBuildOnAgent(String projectName, String agentName) throws Exception
     {
         WaitProject project = projectConfigurations.createWaitAntProject(projectName, tempDir, false);
-        project.getDefaultStage().setAgent(configurationHelper.getAgentReference(agentName));
-        configurationHelper.insertProject(project.getConfig(), false);
+        project.getDefaultStage().setAgent(CONFIGURATION_HELPER.getAgentReference(agentName));
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         rpcClient.RemoteApi.triggerBuild(project.getName());
         rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
         return project;

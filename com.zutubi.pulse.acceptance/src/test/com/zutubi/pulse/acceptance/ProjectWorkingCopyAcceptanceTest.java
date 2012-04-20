@@ -202,18 +202,18 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
 
     private ProjectConfiguration createProject(String projectName, String targetAgentName) throws Exception
     {
-        AgentConfiguration targetAgent = configurationHelper.getAgentReference(targetAgentName);
+        AgentConfiguration targetAgent = CONFIGURATION_HELPER.getAgentReference(targetAgentName);
 
         AntProjectHelper project = projectConfigurations.createTrivialAntProject(projectName);
         project.getStage(DEFAULT_STAGE).setAgent(targetAgent);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         return project.getConfig();
     }
 
     private UserConfiguration createUser(String name) throws Exception
     {
         UserConfiguration user = users.createSimpleUser(name);
-        configurationHelper.insertUser(user);
+        CONFIGURATION_HELPER.insertUser(user);
         return user;
     }
 
@@ -222,6 +222,6 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         BootstrapConfiguration bootstrap = project.getBootstrap();
         bootstrap.setCheckoutType(CheckoutType.INCREMENTAL_CHECKOUT);
         bootstrap.setBuildType(BuildType.INCREMENTAL_BUILD);
-        configurationHelper.update(bootstrap);
+        CONFIGURATION_HELPER.update(bootstrap);
     }
 }

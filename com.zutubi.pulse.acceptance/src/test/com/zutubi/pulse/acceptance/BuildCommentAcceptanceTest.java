@@ -35,12 +35,12 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
 
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
 
-        if (!configurationHelper.isProjectExists(TEST_PROJECT))
+        if (!CONFIGURATION_HELPER.isProjectExists(TEST_PROJECT))
         {
-            configurationHelper.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(projectConfigurations.createTrivialAntProject(TEST_PROJECT).getConfig(), false);
         }
 
-        testProject = configurationHelper.getConfigurationReference("projects/" + TEST_PROJECT, ProjectConfiguration.class);
+        testProject = CONFIGURATION_HELPER.getConfigurationReference("projects/" + TEST_PROJECT, ProjectConfiguration.class);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
     public void testAddCommentToInProgressBuild() throws Exception
     {
         WaitProject project = projectConfigurations.createWaitAntProject(random, tempDir, false);
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         List<String> requestIds = buildRunner.triggerBuild(project);
         Hashtable<String, Object> request = rpcClient.RemoteApi.waitForBuildRequestToBeActivated(requestIds.get(0));

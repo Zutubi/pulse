@@ -31,7 +31,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         project.addStage("stage1");
         project.addStage("stage2");
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
@@ -48,7 +48,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addStage("disabled").setEnabled(false);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
@@ -64,7 +64,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         ProjectConfigurationHelper project = projectConfigurations.createFailAntProject(randomName());
         project.addStage("disabled").setEnabled(false);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
@@ -80,7 +80,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
         project.addStage("disabled").setEnabled(false);
         project.getDefaultStage().setEnabled(false);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(project.getName(), 1);
@@ -93,7 +93,7 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
     public void testToggleEnableDisable() throws Exception
     {
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));

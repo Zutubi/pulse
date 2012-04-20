@@ -271,7 +271,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
 
     private void bindStagesToMaster(WaitProject project) throws Exception
     {
-        AgentConfiguration master = configurationHelper.getMasterAgentReference();
+        AgentConfiguration master = CONFIGURATION_HELPER.getMasterAgentReference();
         for (BuildStageConfiguration stage : project.getStages())
         {
             stage.setAgent(master);
@@ -282,7 +282,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
     {
         for (WaitProject project: projects)
         {
-            configurationHelper.insertProject(project.getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         }
     }
 }

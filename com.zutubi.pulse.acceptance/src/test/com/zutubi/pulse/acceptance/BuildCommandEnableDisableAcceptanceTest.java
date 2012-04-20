@@ -33,7 +33,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         project.addCommand(newCommand("sleep1"));
         project.addCommand(newCommand("sleep2"));
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
@@ -50,7 +50,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
         project.addCommand(newCommand("sleep")).setEnabled(false);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
@@ -67,7 +67,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         project.addCommand(newCommand("sleep", true)).setEnabled(false);
         project.getDefaultCommand().setForce(true);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         Vector<Hashtable<String, Object>> commands = getCommands(project.getName(), DEFAULT_STAGE, 1);
@@ -83,7 +83,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
         project.addCommand(newCommand("sleep")).setEnabled(false);
         project.getDefaultCommand().setEnabled(false);
 
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         // check the output of the build.
@@ -97,7 +97,7 @@ public class BuildCommandEnableDisableAcceptanceTest extends AcceptanceTestBase
     public void testToggleEnableDisable() throws Exception
     {
         ProjectConfigurationHelper project = projectConfigurations.createTrivialAntProject(randomName());
-        configurationHelper.insertProject(project.getConfig(), false);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
         buildRunner.triggerAndWaitForBuild(project);
 
         assertEquals(SUCCESS, rpcClient.RemoteApi.getBuildStatus(project.getName(), 1));

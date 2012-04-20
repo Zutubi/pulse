@@ -165,7 +165,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             setDashboard(asPair(BUILDS_PER_PROJECT, 2));
 
             WaitProject project = projectConfigurations.createWaitAntProject(random, tmpDir, true);
-            configurationHelper.insertProject(project.getConfig(), false);
+            CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
             DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
             List<Long> buildIds = dashboard.getBuildIds(null, random);
