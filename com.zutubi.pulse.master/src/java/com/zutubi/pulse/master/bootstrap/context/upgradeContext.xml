@@ -193,6 +193,8 @@
                 <ref local="addDependencyLinks"/>
                 <ref local="dependencyLinkIndices"/>
                 <ref local="sendEmailUpstreamCommitters"/>
+                <ref local="changedCustomConditions"/>
+                <ref local="changedSelectedBuildsConditions"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1015,5 +1017,13 @@
 
     <bean id="sendEmailUpstreamCommitters" class="com.zutubi.pulse.master.upgrade.tasks.SendEmailUpstreamCommittersUpgradeTask">
         <property name="buildNumber" value="205002001"/>
+    </bean>
+
+    <bean id="changedCustomConditions" class="com.zutubi.pulse.master.upgrade.tasks.ChangedCustomConditionsUpgradeTask">
+        <property name="buildNumber" value="205002002"/>
+    </bean>
+
+    <bean id="changedSelectedBuildsConditions" class="com.zutubi.pulse.master.upgrade.tasks.ChangedSelectedBuildsConditionsUpgradeTask">
+        <property name="buildNumber" value="205002003"/>
     </bean>
 </beans>

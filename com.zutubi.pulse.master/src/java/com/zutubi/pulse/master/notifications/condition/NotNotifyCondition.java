@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.notifications.condition;
 
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 public class NotNotifyCondition implements NotifyCondition
@@ -12,9 +12,9 @@ public class NotNotifyCondition implements NotifyCondition
         this.condition = condition;
     }
 
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(NotifyConditionContext context, UserConfiguration user)
     {
-        return !condition.satisfied(result, user);
+        return !condition.satisfied(context, user);
     }
 
     public NotifyCondition getCondition()

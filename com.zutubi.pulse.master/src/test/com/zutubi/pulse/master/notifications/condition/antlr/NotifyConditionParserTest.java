@@ -4,11 +4,13 @@ import antlr.MismatchedTokenException;
 import antlr.collections.AST;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.notifications.condition.*;
 import com.zutubi.pulse.master.validation.validators.SubscriptionConditionValidator;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.StringReader;
+import java.util.EnumSet;
 
 public class NotifyConditionParserTest extends PulseTestCase
 {
@@ -85,20 +87,30 @@ public class NotifyConditionParserTest extends PulseTestCase
 
     public void testParseChangedByMe()
     {
-        NotifyCondition condition = parseExpression("changed.by.me");
-        assertTrue(condition instanceof ChangedByMeNotifyCondition);
+        NotifyCondition condition = parseExpression("changed(by.me)");
+        assertTrue(condition instanceof ChangedNotifyCondition);
+        assertEquals(EnumSet.of(ChangedNotifyCondition.Modifier.BY_ME), ((ChangedNotifyCondition) condition).getModifiers());
     }
 
     public void testParseChangedByMeSinceHealthy()
     {
-        NotifyCondition condition = parseExpression("changed.by.me.since.healthy");
-        assertTrue(condition instanceof ChangedByMeSinceHealthyNotifyCondition);
+        NotifyCondition condition = parseExpression("changed(by.me, since.healthy)");
+        assertTrue(condition instanceof ChangedNotifyCondition);
+        assertEquals(EnumSet.of(ChangedNotifyCondition.Modifier.BY_ME, ChangedNotifyCondition.Modifier.SINCE_HEALTHY), ((ChangedNotifyCondition)condition).getModifiers());
     }
 
     public void testParseChangedByMeSinceSuccess()
     {
-        NotifyCondition condition = parseExpression("changed.by.me.since.success");
-        assertTrue(condition instanceof ChangedByMeSinceSuccessNotifyCondition);
+        NotifyCondition condition = parseExpression("changed(by.me, since.success)");
+        assertTrue(condition instanceof ChangedNotifyCondition);
+        assertEquals(EnumSet.of(ChangedNotifyCondition.Modifier.BY_ME, ChangedNotifyCondition.Modifier.SINCE_SUCCESS), ((ChangedNotifyCondition)condition).getModifiers());
+    }
+
+    public void testParseChangedByMeIncludeUpstreamSinceSuccess()
+    {
+        NotifyCondition condition = parseExpression("changed(by.me, include.upstream, since.success)");
+        assertTrue(condition instanceof ChangedNotifyCondition);
+        assertEquals(EnumSet.of(ChangedNotifyCondition.Modifier.BY_ME, ChangedNotifyCondition.Modifier.INCLUDE_UPSTREAM, ChangedNotifyCondition.Modifier.SINCE_SUCCESS), ((ChangedNotifyCondition)condition).getModifiers());
     }
 
     public void testParseResponsibilityTaken()
@@ -171,109 +183,109 @@ public class NotifyConditionParserTest extends PulseTestCase
     public void testEqualExpressionEqual()
     {
         NotifyCondition condition = parseExpression("10 == 10");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testEqualExpressionGreater()
     {
         NotifyCondition condition = parseExpression("10 == 2");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testEqualExpressionLess()
     {
         NotifyCondition condition = parseExpression("0 == 2");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testNotEqualExpressionEqual()
     {
         NotifyCondition condition = parseExpression("10 != 10");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testNotEqualExpressionGreater()
     {
         NotifyCondition condition = parseExpression("100 != 2");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testNotEqualExpressionLess()
     {
         NotifyCondition condition = parseExpression("1 != 2");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterExpressionEqual()
     {
         NotifyCondition condition = parseExpression("4 > 4");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterExpressionGreater()
     {
         NotifyCondition condition = parseExpression("5 > 2");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterExpressionLess()
     {
         NotifyCondition condition = parseExpression("1 > 2");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterEqualExpressionEqual()
     {
         NotifyCondition condition = parseExpression("4 >= 4");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterEqualExpressionGreater()
     {
         NotifyCondition condition = parseExpression("5 >= 2");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testGreaterEqualExpressionLess()
     {
         NotifyCondition condition = parseExpression("1 >= 2");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testLessExpressionEqual()
     {
         NotifyCondition condition = parseExpression("4 < 4");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testLessExpressionGreater()
     {
         NotifyCondition condition = parseExpression("30 < 20");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testLessExpressionLess()
     {
         NotifyCondition condition = parseExpression("1 < 2");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testLessEqualExpressionEqual()
     {
         NotifyCondition condition = parseExpression("4 <= 4");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testLessEqualExpressionGreater()
     {
         NotifyCondition condition = parseExpression("50 <= 49");
-        assertFalse(condition.satisfied(null, null));
+        assertFalse(condition.satisfied(createContext(), null));
     }
 
     public void testLessEqualExpressionLess()
     {
         NotifyCondition condition = parseExpression("1 <= 200000");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testJustInteger()
@@ -299,7 +311,7 @@ public class NotifyConditionParserTest extends PulseTestCase
     public void testComparisonInBooleanExpression()
     {
         NotifyCondition condition = parseExpression("true and 3 > 2 or false");
-        assertTrue(condition.satisfied(null, null));
+        assertTrue(condition.satisfied(createContext(), null));
     }
 
     public void testBrokenBuilds()
@@ -391,6 +403,11 @@ public class NotifyConditionParserTest extends PulseTestCase
         {
             assertEquals(error, e.getMessage());
         }
+    }
+
+    private NotifyConditionContext createContext()
+    {
+        return new NotifyConditionContext(null);
     }
 
     private CompoundNotifyCondition assertAnd(NotifyCondition condition)

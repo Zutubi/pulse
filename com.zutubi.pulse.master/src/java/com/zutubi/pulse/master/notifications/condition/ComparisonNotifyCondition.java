@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.notifications.condition;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
@@ -138,10 +139,11 @@ public class ComparisonNotifyCondition implements NotifyCondition
         this.op = op;
     }
 
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(NotifyConditionContext context, UserConfiguration user)
     {
-        Comparable leftValue = left.getValue(result, user);
-        Comparable rightValue = right.getValue(result, user);
+        BuildResult buildResult = context.getBuildResult();
+        Comparable leftValue = left.getValue(buildResult, user);
+        Comparable rightValue = right.getValue(buildResult, user);
 
         return op.evaluate(leftValue, rightValue);
     }

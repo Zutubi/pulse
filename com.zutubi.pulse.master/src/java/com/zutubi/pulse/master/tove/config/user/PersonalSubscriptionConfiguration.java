@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -18,8 +19,9 @@ public class PersonalSubscriptionConfiguration extends SubscriptionConfiguration
 {
     private ConfigurationProvider configurationProvider;
 
-    public boolean conditionSatisfied(BuildResult buildResult)
+    public boolean conditionSatisfied(NotifyConditionContext context)
     {
+        BuildResult buildResult = context.getBuildResult();
         return buildResult.isPersonal() && buildResult.getUser().getConfig().equals(configurationProvider.getAncestorOfType(this, UserConfiguration.class));
     }
 

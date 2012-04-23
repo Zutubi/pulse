@@ -10,26 +10,28 @@ LESS_THAN_OR_EQUAL=10
 GREATER_THAN=11
 GREATER_THAN_OR_EQUAL=12
 LITERAL_previous="previous"=13
-INTEGER("an integer")=14
-LITERAL_true="true"=15
-LITERAL_false="false"=16
-LITERAL_skipped="skipped"=17
-LITERAL_success="success"=18
-LITERAL_warnings="warnings"=19
-LITERAL_failure="failure"=20
-LITERAL_error="error"=21
-LITERAL_terminated="terminated"=22
-LITERAL_healthy="healthy"=23
-LITERAL_broken="broken"=24
-LITERAL_changed="changed"=25
-"changed.by.me"=26
-"changed.by.me.since.healthy"=27
-"changed.by.me.since.success"=28
-"responsibility.taken"=29
-"state.change"=30
-"broken.count.builds"=31
-"broken.count.days"=32
-LEFT_PAREN("an opening parenthesis '('")=33
-RIGHT_PAREN("a closing parenthesis ')'")=34
-WORD("a word")=35
-WHITESPACE=36
+LITERAL_changed="changed"=14
+"by.me"=15
+"include.upstream"=16
+"since.healthy"=17
+"since.success"=18
+INTEGER("an integer")=19
+LITERAL_true="true"=20
+LITERAL_false="false"=21
+LITERAL_skipped="skipped"=22
+LITERAL_success="success"=23
+LITERAL_warnings="warnings"=24
+LITERAL_failure="failure"=25
+LITERAL_error="error"=26
+LITERAL_terminated="terminated"=27
+LITERAL_healthy="healthy"=28
+LITERAL_broken="broken"=29
+"responsibility.taken"=30
+"state.change"=31
+"broken.count.builds"=32
+"broken.count.days"=33
+LEFT_PAREN("an opening parenthesis '('")=34
+RIGHT_PAREN("a closing parenthesis ')'")=35
+COMMA("a comma")=36
+WORD("a word")=37
+WHITESPACE=38

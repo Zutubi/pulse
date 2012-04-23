@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -59,18 +60,18 @@ public class ProjectSubscriptionConfigurationTest extends PulseTestCase
 
     public void testAllProjects()
     {
-        assertTrue(suscription.conditionSatisfied(createBuild(project1)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project2)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project3)));
+        assertTrue(suscription.conditionSatisfied(createContext(project1)));
+        assertTrue(suscription.conditionSatisfied(createContext(project2)));
+        assertTrue(suscription.conditionSatisfied(createContext(project3)));
     }
 
     public void testNoProjects()
     {
         suscription.setAllProjects(false);
 
-        assertFalse(suscription.conditionSatisfied(createBuild(project1)));
-        assertFalse(suscription.conditionSatisfied(createBuild(project2)));
-        assertFalse(suscription.conditionSatisfied(createBuild(project3)));
+        assertFalse(suscription.conditionSatisfied(createContext(project1)));
+        assertFalse(suscription.conditionSatisfied(createContext(project2)));
+        assertFalse(suscription.conditionSatisfied(createContext(project3)));
     }
 
     public void testSpecificProjects()
@@ -78,9 +79,9 @@ public class ProjectSubscriptionConfigurationTest extends PulseTestCase
         suscription.setAllProjects(false);
         suscription.setProjects(asList(project1.getConfig(), project3.getConfig()));
 
-        assertTrue(suscription.conditionSatisfied(createBuild(project1)));
-        assertFalse(suscription.conditionSatisfied(createBuild(project2)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project3)));
+        assertTrue(suscription.conditionSatisfied(createContext(project1)));
+        assertFalse(suscription.conditionSatisfied(createContext(project2)));
+        assertTrue(suscription.conditionSatisfied(createContext(project3)));
     }
 
     public void testByLabel()
@@ -88,9 +89,9 @@ public class ProjectSubscriptionConfigurationTest extends PulseTestCase
         suscription.setAllProjects(false);
         suscription.setLabels(asList(LABEL_EVEN));
 
-        assertFalse(suscription.conditionSatisfied(createBuild(project1)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project2)));
-        assertFalse(suscription.conditionSatisfied(createBuild(project3)));
+        assertFalse(suscription.conditionSatisfied(createContext(project1)));
+        assertTrue(suscription.conditionSatisfied(createContext(project2)));
+        assertFalse(suscription.conditionSatisfied(createContext(project3)));
     }
 
     public void testByProjectAndLabel()
@@ -99,22 +100,22 @@ public class ProjectSubscriptionConfigurationTest extends PulseTestCase
         suscription.setProjects(asList(project2.getConfig()));
         suscription.setLabels(asList(LABEL_ODD));
 
-        assertTrue(suscription.conditionSatisfied(createBuild(project1)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project2)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project3)));
+        assertTrue(suscription.conditionSatisfied(createContext(project1)));
+        assertTrue(suscription.conditionSatisfied(createContext(project2)));
+        assertTrue(suscription.conditionSatisfied(createContext(project3)));
     }
     
     public void testNoCondition()
     {
         suscription.setCondition(null);
         
-        assertTrue(suscription.conditionSatisfied(createBuild(project1)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project2)));
-        assertTrue(suscription.conditionSatisfied(createBuild(project3)));
+        assertTrue(suscription.conditionSatisfied(createContext(project1)));
+        assertTrue(suscription.conditionSatisfied(createContext(project2)));
+        assertTrue(suscription.conditionSatisfied(createContext(project3)));
     }
 
-    private BuildResult createBuild(Project project)
+    private NotifyConditionContext createContext(Project project)
     {
-        return new BuildResult(new UnknownBuildReason(), project, 1, false);
+        return new NotifyConditionContext(new BuildResult(new UnknownBuildReason(), project, 1, false));
     }
 }

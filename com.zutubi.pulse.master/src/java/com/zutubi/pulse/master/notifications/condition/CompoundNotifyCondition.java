@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.notifications.condition;
 
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.util.LinkedList;
@@ -25,13 +25,13 @@ public class CompoundNotifyCondition implements NotifyCondition
         this.disjunctive = disjunctive;
     }
 
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(NotifyConditionContext context, UserConfiguration user)
     {
         boolean ret = !disjunctive;
 
         for (NotifyCondition child : children)
         {
-            if (child.satisfied(result, user) == disjunctive)
+            if (child.satisfied(context, user) == disjunctive)
             {
                 ret = disjunctive;
                 break;

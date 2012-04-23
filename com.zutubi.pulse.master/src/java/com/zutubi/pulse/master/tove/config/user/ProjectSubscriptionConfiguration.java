@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.user;
 import antlr.collections.AST;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.notifications.condition.FalseNotifyCondition;
 import com.zutubi.pulse.master.notifications.condition.NotifyCondition;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
@@ -97,9 +98,10 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
         this.condition = condition;
     }
 
-    public boolean conditionSatisfied(BuildResult result)
+    public boolean conditionSatisfied(NotifyConditionContext context)
     {
-        return !result.isPersonal() && projectMatches(result.getProject()) && getNotifyCondition().satisfied(result, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
+        BuildResult result = context.getBuildResult();
+        return !result.isPersonal() && projectMatches(result.getProject()) && getNotifyCondition().satisfied(context, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
     }
 
     private boolean projectMatches(Project project)

@@ -1,16 +1,17 @@
 package com.zutubi.pulse.master.notifications.condition;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
- * 
- *
+ * A condition that is true for builds that succeeded.
  */
 public class SuccessNotifyCondition implements NotifyCondition
 {
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(NotifyConditionContext context, UserConfiguration user)
     {
-        return result != null && result.succeeded();
+        BuildResult buildResult = context.getBuildResult();
+        return buildResult != null && buildResult.succeeded();
     }
 }

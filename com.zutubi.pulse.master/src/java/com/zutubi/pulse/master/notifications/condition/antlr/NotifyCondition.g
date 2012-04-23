@@ -28,6 +28,7 @@ cond returns [NotifyCondition r]
     | #("not" a=cond) { r = new NotNotifyCondition(a); }
     | r=comp
     | r=prev
+    | r=change
     | c:boolsymbol { r = factory.createCondition(c.getText()); }
     ;
 
@@ -51,6 +52,20 @@ prev returns [NotifyCondition r]
     : #("previous" r=cond) { r = factory.build(PreviousNotifyCondition.class, new Class[]{ NotifyCondition.class }, new Object[]{ r }); }
     ;
 
+change returns [ChangedNotifyCondition r]
+{
+    r = factory.build(ChangedNotifyCondition.class);
+}
+    : #("changed" (changemod[r])*)
+    ;
+
+changemod [ChangedNotifyCondition c]
+    : "by.me"            { c.addModifier(ChangedNotifyCondition.Modifier.BY_ME); }
+    | "include.upstream" { c.addModifier(ChangedNotifyCondition.Modifier.INCLUDE_UPSTREAM); }
+    | "since.healthy"    { c.addModifier(ChangedNotifyCondition.Modifier.SINCE_HEALTHY); }
+    | "since.success"    { c.addModifier(ChangedNotifyCondition.Modifier.SINCE_SUCCESS); }
+    ;
+
 integer returns [NotifyValue r]
 {
     r = null;
@@ -66,7 +81,7 @@ previnteger returns [NotifyValue r]
 }
     : #("previous" r=integer) { r = factory.build(PreviousNotifyIntegerValue.class, new Class[]{ NotifyIntegerValue.class }, new Object[]{ r }); }
     ;
-    
+
 boolsymbol
     : "true"
     | "false"
@@ -78,10 +93,6 @@ boolsymbol
     | "terminated"
     | "healthy"
     | "broken"
-    | "changed"
-    | "changed.by.me"
-    | "changed.by.me.since.healthy"
-    | "changed.by.me.since.success"
     | "responsibility.taken"
     | "state.change"
     ;
@@ -116,6 +127,7 @@ notexpression
 
 boolexpression
     : boolsymbol (LEFT_PAREN! "previous"^ RIGHT_PAREN!)?
+    | "changed"^ (LEFT_PAREN! changedmodifier (COMMA! changedmodifier)* RIGHT_PAREN!)?
     | LEFT_PAREN! orexpression RIGHT_PAREN!
     | compareexpression
     ;
@@ -129,6 +141,13 @@ integer
     | intsymbol (LEFT_PAREN! "previous"^ RIGHT_PAREN!)?
     ;
 
+changedmodifier
+    : "by.me"
+    | "include.upstream"
+    | "since.healthy"
+    | "since.success"
+    ;
+
 boolsymbol
     : "true"
     | "false"
@@ -140,10 +159,6 @@ boolsymbol
     | "terminated"
     | "healthy"
     | "broken"
-    | "changed"
-    | "changed.by.me"
-    | "changed.by.me.since.healthy"
-    | "changed.by.me.since.success"
     | "responsibility.taken"
     | "state.change"
     ;
@@ -194,6 +209,12 @@ options {
 }
     : ')';
 
+COMMA
+options {
+    paraphrase = "a comma";
+}
+    : ',';
+    
 WHITESPACE
     :   (' ' | '\t' | '\r' | '\n') { $setType(Token.SKIP); }
     ;

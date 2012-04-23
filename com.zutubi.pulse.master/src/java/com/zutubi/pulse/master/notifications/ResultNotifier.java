@@ -15,8 +15,12 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SubscriptionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -47,6 +51,9 @@ public class ResultNotifier implements EventListener
     private AccessManager accessManager;
     private UserManager userManager;
     private RenderService renderService;
+    private TransactionManager transactionManager;
+    private ObjectFactory objectFactory;
+    private TransactionContext transactionContext;
 
     public void init()
     {
@@ -76,37 +83,43 @@ public class ResultNotifier implements EventListener
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent event = (BuildCompletedEvent) evt;
-        BuildResult buildResult = event.getBuildResult();
+        final BuildResult buildResult = event.getBuildResult();
 
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
-        // We use a render cache
-        Set<Long> notifiedContactPoints = new HashSet<Long>();
+        // Evaluate all of the conditions first, in a single transaction so the session is shared.
+        Set<SubscriptionConfiguration> subscriptionsToNotify = transactionContext.executeInsideTransaction(new NullaryFunction<Set<SubscriptionConfiguration>>()
+        {
+            public Set<SubscriptionConfiguration> process()
+            {
+                Set<SubscriptionConfiguration> subscriptionsToNotify = new HashSet<SubscriptionConfiguration>();
+                Set<Long> contactPointsToNotify = new HashSet<Long>();
+                NotifyConditionContext context = objectFactory.buildBean(NotifyConditionContext.class, new Class[]{BuildResult.class}, new Object[]{buildResult});
+                for (SubscriptionConfiguration subscription : configurationProvider.getAll(SubscriptionConfiguration.class))
+                {
+                    ContactConfiguration contactPoint = subscription.getContact();
+                    if (!contactPointsToNotify.contains(contactPoint.getHandle()) && subscription.conditionSatisfied(context))
+                    {
+                        contactPointsToNotify.add(contactPoint.getHandle());
+                        subscriptionsToNotify.add(subscription);
+                    }
+                }
+
+                return subscriptionsToNotify;
+            }
+        });
+
+        // Now render and send notifications.
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
         Map<String, Object> dataMap = renderService.getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
-
-        Collection<SubscriptionConfiguration> subscriptions = configurationProvider.getAll(SubscriptionConfiguration.class);
-        for (SubscriptionConfiguration subscription : subscriptions)
+        for (SubscriptionConfiguration subscription: subscriptionsToNotify)
         {
-            // filter out contact points that we have already notified.
-            ContactConfiguration contactPoint = subscription.getContact();
-            if (notifiedContactPoints.contains(contactPoint.getHandle()))
+            UserConfiguration userConfig = configurationProvider.getAncestorOfType(subscription, UserConfiguration.class);
+            if (canView(userConfig, buildResult))
             {
-                continue;
-            }
-
-            // determine which of these subscriptions should be notified.
-            if (subscription.conditionSatisfied(buildResult))
-            {
-                UserConfiguration userConfig = configurationProvider.getAncestorOfType(subscription, UserConfiguration.class);
-                if (canView(userConfig, buildResult))
-                {
-                    String templateName = subscription.getTemplate();
-                    RenderedResult rendered = renderService.renderResult(buildResult, dataMap, templateName, renderCache);
-                    notifiedContactPoints.add(contactPoint.getHandle());
-
-                    notifyContactPoint(contactPoint, buildResult, rendered, subscription);
-                }
+                String templateName = subscription.getTemplate();
+                RenderedResult rendered = renderService.renderResult(buildResult, dataMap, templateName, renderCache);
+                notifyContactPoint(subscription.getContact(), buildResult, rendered, subscription);
             }
         }
     }
@@ -223,5 +236,15 @@ public class ResultNotifier implements EventListener
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setTransactionContext(TransactionContext transactionContext)
+    {
+        this.transactionContext = transactionContext;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

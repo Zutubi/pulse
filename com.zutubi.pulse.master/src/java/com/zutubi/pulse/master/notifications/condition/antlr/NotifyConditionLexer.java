@@ -24,28 +24,29 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(26));
-	literals.put(new ANTLRHashString("healthy", this), new Integer(23));
-	literals.put(new ANTLRHashString("state.change", this), new Integer(30));
-	literals.put(new ANTLRHashString("true", this), new Integer(15));
-	literals.put(new ANTLRHashString("broken.count.builds", this), new Integer(31));
-	literals.put(new ANTLRHashString("changed", this), new Integer(25));
-	literals.put(new ANTLRHashString("false", this), new Integer(16));
-	literals.put(new ANTLRHashString("success", this), new Integer(18));
-	literals.put(new ANTLRHashString("not", this), new Integer(6));
-	literals.put(new ANTLRHashString("or", this), new Integer(5));
-	literals.put(new ANTLRHashString("and", this), new Integer(4));
+	literals.put(new ANTLRHashString("warnings", this), new Integer(24));
+	literals.put(new ANTLRHashString("success", this), new Integer(23));
+	literals.put(new ANTLRHashString("changed", this), new Integer(14));
+	literals.put(new ANTLRHashString("healthy", this), new Integer(28));
+	literals.put(new ANTLRHashString("include.upstream", this), new Integer(16));
 	literals.put(new ANTLRHashString("previous", this), new Integer(13));
-	literals.put(new ANTLRHashString("broken", this), new Integer(24));
-	literals.put(new ANTLRHashString("failure", this), new Integer(20));
-	literals.put(new ANTLRHashString("broken.count.days", this), new Integer(32));
-	literals.put(new ANTLRHashString("skipped", this), new Integer(17));
-	literals.put(new ANTLRHashString("changed.by.me.since.success", this), new Integer(28));
-	literals.put(new ANTLRHashString("changed.by.me.since.healthy", this), new Integer(27));
-	literals.put(new ANTLRHashString("warnings", this), new Integer(19));
-	literals.put(new ANTLRHashString("responsibility.taken", this), new Integer(29));
-	literals.put(new ANTLRHashString("error", this), new Integer(21));
-	literals.put(new ANTLRHashString("terminated", this), new Integer(22));
+	literals.put(new ANTLRHashString("state.change", this), new Integer(31));
+	literals.put(new ANTLRHashString("broken", this), new Integer(29));
+	literals.put(new ANTLRHashString("broken.count.builds", this), new Integer(32));
+	literals.put(new ANTLRHashString("error", this), new Integer(26));
+	literals.put(new ANTLRHashString("broken.count.days", this), new Integer(33));
+	literals.put(new ANTLRHashString("terminated", this), new Integer(27));
+	literals.put(new ANTLRHashString("by.me", this), new Integer(15));
+	literals.put(new ANTLRHashString("or", this), new Integer(5));
+	literals.put(new ANTLRHashString("skipped", this), new Integer(22));
+	literals.put(new ANTLRHashString("true", this), new Integer(20));
+	literals.put(new ANTLRHashString("and", this), new Integer(4));
+	literals.put(new ANTLRHashString("not", this), new Integer(6));
+	literals.put(new ANTLRHashString("responsibility.taken", this), new Integer(30));
+	literals.put(new ANTLRHashString("failure", this), new Integer(25));
+	literals.put(new ANTLRHashString("false", this), new Integer(21));
+	literals.put(new ANTLRHashString("since.success", this), new Integer(18));
+	literals.put(new ANTLRHashString("since.healthy", this), new Integer(17));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -109,6 +110,12 @@ tryAgain:
 					theRetToken=_returnToken;
 					break;
 				}
+				case ',':
+				{
+					mCOMMA(true);
+					theRetToken=_returnToken;
+					break;
+				}
 				case '\t':  case '\n':  case '\r':  case ' ':
 				{
 					mWHITESPACE(true);
@@ -164,8 +171,8 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt38=0;
-		_loop38:
+		int _cnt47=0;
+		_loop47:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -197,10 +204,10 @@ tryAgain:
 			}
 			default:
 			{
-				if ( _cnt38>=1 ) { break _loop38; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt47>=1 ) { break _loop47; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			}
-			_cnt38++;
+			_cnt47++;
 		} while (true);
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -216,17 +223,17 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt41=0;
-		_loop41:
+		int _cnt50=0;
+		_loop50:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt41>=1 ) { break _loop41; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt50>=1 ) { break _loop50; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt41++;
+			_cnt50++;
 		} while (true);
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -333,6 +340,19 @@ tryAgain:
 		int _saveIndex;
 		
 		match(')');
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mCOMMA(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = COMMA;
+		int _saveIndex;
+		
+		match(',');
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));

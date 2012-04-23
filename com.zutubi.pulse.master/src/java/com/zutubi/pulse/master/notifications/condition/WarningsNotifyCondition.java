@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.notifications.condition;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
@@ -8,8 +9,9 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
  */
 public class WarningsNotifyCondition implements NotifyCondition
 {
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(NotifyConditionContext context, UserConfiguration user)
     {
-        return result != null && result.warned();
+        BuildResult buildResult = context.getBuildResult();
+        return buildResult != null && buildResult.warned();
     }
 }

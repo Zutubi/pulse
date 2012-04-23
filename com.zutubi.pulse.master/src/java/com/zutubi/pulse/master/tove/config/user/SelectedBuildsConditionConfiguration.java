@@ -1,9 +1,12 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.notifications.condition.ChangedNotifyCondition;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
+import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -15,15 +18,19 @@ import java.util.List;
  * A condition that is a disjunction of some common simple conditions.
  */
 @SymbolicName("zutubi.selectedBuildsConditionConfig")
-@Form(labelWidth = 350, fieldOrder = {"broken", "failed", "warnings", "statusChange", "includeChanges", "includeChangesByMe"})
+@Form(labelWidth = 350, fieldOrder = {"broken", "failed", "warnings", "statusChange", "includeChanges", "changesByMe", "changesSinceHealthy", "changesSinceSuccess", "upstreamChanges"})
 public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration implements Validateable
 {
     private boolean broken;
     private boolean failed;
     private boolean warnings;
-    private boolean includeChanges;
-    private boolean includeChangesByMe;
     private boolean statusChange;
+    @ControllingCheckbox(checkedFields = {"changesByMe", "changesSinceHealthy", "changesSinceSuccess", "upstreamChanges"})
+    private boolean includeChanges;
+    private boolean changesByMe;
+    private boolean changesSinceHealthy;
+    private boolean changesSinceSuccess;
+    private boolean upstreamChanges;
 
     public boolean getBroken()
     {
@@ -55,6 +62,16 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
         this.warnings = warnings;
     }
 
+    public boolean getStatusChange()
+    {
+        return statusChange;
+    }
+
+    public void setStatusChange(boolean statusChange)
+    {
+        this.statusChange = statusChange;
+    }
+
     public boolean getIncludeChanges()
     {
         return includeChanges;
@@ -65,24 +82,44 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
         this.includeChanges = includeChanges;
     }
 
-    public boolean getIncludeChangesByMe()
+    public boolean getChangesByMe()
     {
-        return includeChangesByMe;
+        return changesByMe;
     }
 
-    public void setIncludeChangesByMe(boolean includeChangesByMe)
+    public void setChangesByMe(boolean changesByMe)
     {
-        this.includeChangesByMe = includeChangesByMe;
+        this.changesByMe = changesByMe;
     }
 
-    public boolean getStatusChange()
+    public boolean isChangesSinceHealthy()
     {
-        return statusChange;
+        return changesSinceHealthy;
     }
 
-    public void setStatusChange(boolean statusChange)
+    public void setChangesSinceHealthy(boolean changesSinceHealthy)
     {
-        this.statusChange = statusChange;
+        this.changesSinceHealthy = changesSinceHealthy;
+    }
+
+    public boolean isChangesSinceSuccess()
+    {
+        return changesSinceSuccess;
+    }
+
+    public void setChangesSinceSuccess(boolean changesSinceSuccess)
+    {
+        this.changesSinceSuccess = changesSinceSuccess;
+    }
+
+    public boolean isUpstreamChanges()
+    {
+        return upstreamChanges;
+    }
+
+    public void setUpstreamChanges(boolean upstreamChanges)
+    {
+        this.upstreamChanges = upstreamChanges;
     }
 
     public String getExpression()
@@ -118,18 +155,36 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
 
         if (includeChanges)
         {
-            expressions.add(NotifyConditionFactory.CHANGED);
+            List<ChangedNotifyCondition.Modifier> modifiers = new LinkedList<ChangedNotifyCondition.Modifier>();
+            if (changesByMe)
+            {
+                modifiers.add(ChangedNotifyCondition.Modifier.BY_ME);
+            }
+
+            if (changesSinceHealthy)
+            {
+                modifiers.add(ChangedNotifyCondition.Modifier.SINCE_HEALTHY);
+            }
+
+            if (changesSinceSuccess)
+            {
+                modifiers.add(ChangedNotifyCondition.Modifier.SINCE_SUCCESS);
+            }
+
+            if (upstreamChanges)
+            {
+                modifiers.add(ChangedNotifyCondition.Modifier.INCLUDE_UPSTREAM);
+            }
+
+            String modifierExpression = "";
+            if (modifiers.size() > 0)
+            {
+                modifierExpression = "(" + StringUtils.join(",", CollectionUtils.map(modifiers, new ChangedNotifyCondition.Modifier.ToTextMapping())) + ")";
+            }
+
+            expressions.add("changed" + modifierExpression);
         }
 
-        if (includeChangesByMe)
-        {
-            expressions.add(NotifyConditionFactory.CHANGED_BY_ME);
-        }
-
-        if (statusChange)
-        {
-            expressions.add(NotifyConditionFactory.STATE_CHANGE);
-        }
         return expressions;
     }
 

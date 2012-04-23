@@ -14,10 +14,6 @@ public class NotifyConditionFactory
 {
     // Primitive conditions
     public static final String BROKEN = "broken";
-    public static final String CHANGED = "changed";
-    public static final String CHANGED_BY_ME = "changed.by.me";
-    public static final String CHANGED_BY_ME_SINCE_HEALTHY = "changed.by.me.since.healthy";
-    public static final String CHANGED_BY_ME_SINCE_SUCCESS = "changed.by.me.since.success";
     public static final String ERROR = "error";
     public static final String FAILURE = "failure";
     public static final String FALSE = "false";
@@ -42,10 +38,6 @@ public class NotifyConditionFactory
     {
         // initialise the default notification types.
         typeMap.put(BROKEN, BrokenNotifyCondition.class);
-        typeMap.put(CHANGED, ChangedNotifyCondition.class);
-        typeMap.put(CHANGED_BY_ME, ChangedByMeNotifyCondition.class);
-        typeMap.put(CHANGED_BY_ME_SINCE_HEALTHY, ChangedByMeSinceHealthyNotifyCondition.class);
-        typeMap.put(CHANGED_BY_ME_SINCE_SUCCESS, ChangedByMeSinceSuccessNotifyCondition.class);
         typeMap.put(ERROR, ErrorNotifyCondition.class);
         typeMap.put(FAILURE, FailureNotifyCondition.class);
         typeMap.put(FALSE, FalseNotifyCondition.class);
@@ -96,6 +88,11 @@ public class NotifyConditionFactory
         }
         Class definition = typeMap.get(token);
         return (T) objectFactory.buildBean(definition);
+    }
+
+    public <T> T build(Class<T> clazz)
+    {
+        return objectFactory.buildBean(clazz);
     }
 
     public <T> T build(Class<T> clazz, Class[] argTypes, Object[] args)

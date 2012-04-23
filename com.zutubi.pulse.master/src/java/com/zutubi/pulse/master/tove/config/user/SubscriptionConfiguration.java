@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
@@ -65,5 +65,5 @@ public abstract class SubscriptionConfiguration extends AbstractNamedConfigurati
         this.logLineLimit = logLineLimit;
     }
 
-    public abstract boolean conditionSatisfied(BuildResult buildResult);
+    public abstract boolean conditionSatisfied(NotifyConditionContext context);
 }
