@@ -8,6 +8,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.DAGraph;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -95,8 +96,15 @@ public class DefaultChangelistManager implements ChangelistManager
             DAGraph.Node<BuildResult> existingNode = findNode(graphs, directlyAffectedId);
             if (existingNode == null)
             {
-                BuildResult directlyAffected = buildManager.getBuildResult(directlyAffectedId);
-                graphs.add(dependencyManager.getDownstreamDependencyGraph(directlyAffected));
+                try
+                {
+                    BuildResult directlyAffected = buildManager.getBuildResult(directlyAffectedId);
+                    graphs.add(dependencyManager.getDownstreamDependencyGraph(directlyAffected));
+                }
+                catch (AccessDeniedException e)
+                {
+                    // Ignore builds the user cannot access.
+                }
             }
             else
             {

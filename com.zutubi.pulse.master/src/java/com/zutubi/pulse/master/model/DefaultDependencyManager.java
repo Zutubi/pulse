@@ -15,18 +15,18 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * Default implementation of DependencyManager.
@@ -203,10 +203,17 @@ public class DefaultDependencyManager implements DependencyManager
             DAGraph.Node<BuildResult> linkedNode = graph.findNodeByBuildId(linkedId);
             if (linkedNode == null)
             {
-                BuildResult linkedBuild = buildManager.getBuildResult(linkedId);
-                linkedNode = new DAGraph.Node<BuildResult>(linkedBuild);
-                node.connectNode(linkedNode);
-                addLinkedNodes(graph, linkedNode, finder);
+                try
+                {
+                    BuildResult linkedBuild = buildManager.getBuildResult(linkedId);
+                    linkedNode = new DAGraph.Node<BuildResult>(linkedBuild);
+                    node.connectNode(linkedNode);
+                    addLinkedNodes(graph, linkedNode, finder);
+                }
+                catch (AccessDeniedException e)
+                {
+                    // Ignore builds the user cannot access.
+                }
             }
             else
             {

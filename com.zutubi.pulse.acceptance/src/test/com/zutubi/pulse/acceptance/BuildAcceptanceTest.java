@@ -339,6 +339,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         TriviAntProject project = projectConfigurations.createTrivialAntProject(random);
         FisheyeConfiguration changeViewer = new FisheyeConfiguration(FISHEYE_BASE, FISHEYE_PROJECT);
         project.getConfig().setChangeViewer(changeViewer);
+        CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
 
         rpcClient.RemoteApi.runBuild(random);
         String revisionString = project.editAndCommitBuildFile(CHANGE_AUTHOR, random);
@@ -1263,9 +1264,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(testsPage.getTestSummary().getTotal() > 0);
         StageTestsPage stageTestsPage = testsPage.clickStageAndWait("default");
         TestSuitePage topSuitePage = stageTestsPage.clickSuiteAndWait(PROCESSOR_SUITE);
-        TestSuitePage nestedSuitePath = topSuitePage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
+        TestSuitePage nestedSuitePage = topSuitePage.clickSuiteAndWait("com.zutubi.testant.UnitTest");
 
-        nestedSuitePath.clickSuiteCrumb(PROCESSOR_SUITE);
+        nestedSuitePage.clickSuiteCrumb(PROCESSOR_SUITE);
         topSuitePage.waitFor();
         topSuitePage.clickStageCrumb();
         stageTestsPage.waitFor();
