@@ -5,9 +5,7 @@ import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 
-import java.text.DateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,6 +21,7 @@ public class DefaultAgent implements Agent
     private AgentStatus status;
     private Host host;
     private long lastPingTime = 0;
+    private long lastOnlineTime = 0;
     private long recipeId = -1;
     private AgentService agentService;
     private String pingError = null;
@@ -96,21 +95,24 @@ public class DefaultAgent implements Agent
         return lastPingTime != 0;
     }
 
-    public String getPrettyPingTime()
-    {
-        if (hasBeenPinged())
-        {
-            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(new Date(lastPingTime));
-        }
-        else
-        {
-            return "<never>";
-        }
-    }
-
     public long getSecondsSincePing()
     {
         return (System.currentTimeMillis() - lastPingTime) / 1000;
+    }
+
+    public long getLastOnlineTime()
+    {
+        return lastOnlineTime;
+    }
+
+    public boolean hasBeenOnline()
+    {
+        return lastOnlineTime != 0;
+    }
+
+    public long getSecondsSinceOnline()
+    {
+        return (System.currentTimeMillis() - lastOnlineTime) / 1000;
     }
 
     public long getRecipeId()
@@ -166,6 +168,10 @@ public class DefaultAgent implements Agent
     public synchronized void updateStatus(AgentStatus status, long recipeId, String pingError)
     {
         lastPingTime = System.currentTimeMillis();
+        if (status.isOnline())
+        {
+            lastOnlineTime = lastPingTime;
+        }
         this.status = status;
         this.recipeId = recipeId;
         this.pingError = pingError;
@@ -176,6 +182,7 @@ public class DefaultAgent implements Agent
         DefaultAgent existingAgent = (DefaultAgent) agent;
         status = existingAgent.status;
         lastPingTime = existingAgent.lastPingTime;
+        lastOnlineTime = existingAgent.lastOnlineTime;
         recipeId = existingAgent.recipeId;
         pingError = existingAgent.pingError;
     }

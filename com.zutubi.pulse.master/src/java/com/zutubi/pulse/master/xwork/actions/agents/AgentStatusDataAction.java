@@ -92,6 +92,16 @@ public class AgentStatusDataAction extends AgentActionBase
                     model.addStatus(I18N.format("agent.ping.error"), agent.getPingError());
                 }
 
+                if (agent.hasBeenOnline())
+                {
+                    model.addStatus(I18N.format("agent.last.online"), TimeStamps.getPrettyDate(agent.getLastOnlineTime(), getLocale()));
+                    model.addStatus(I18N.format("agent.since.online"), Long.toString(agent.getSecondsSinceOnline()) + " seconds");
+                }
+                else
+                {
+                    model.addStatus(I18N.format("agent.last.online"), I18N.format("agent.online.never"));
+                }
+
                 long recipeId = agent.getRecipeId();
                 if (recipeId != HostStatus.NO_RECIPE)
                 {

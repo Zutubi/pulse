@@ -62,7 +62,8 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
 
         KeyValueTable statusTable = statusPage.getStatusTable();
         assertTrue(statusTable.isPresent());
-        assertTrue(statusTable.getKeyValuePairs().containsKey("time of last ping"));
+        assertTrue(statusTable.getKeyValuePairs().containsKey("last ping time"));
+        assertTrue(statusTable.getKeyValuePairs().containsKey("online ping time"));
     }
     
     public void testAgentStatusExecutingBuild() throws Exception
