@@ -9,6 +9,7 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.StageLogPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
 import com.zutubi.pulse.master.build.log.LogFile;
 import com.zutubi.pulse.master.build.log.RecipeLogFile;
@@ -245,8 +246,21 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         taskForm.finishFormElements("nosuchexe", null, tempDir.getAbsolutePath(), null, null);
 
         waitForHook(PROJECT_NAME);
-        int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
-        assertEquals(ResultState.ERROR, rpcClient.RemoteApi.getBuildStatus(PROJECT_NAME, buildNumber));
+        final int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                try
+                {
+                    return rpcClient.RemoteApi.getBuildStatus(PROJECT_NAME, buildNumber) == ResultState.ERROR;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, TASK_TIMEOUT, "build to change to error state");
     }
 
     public void testRestrictToStates() throws Exception
@@ -261,6 +275,8 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         addDumpEnvTask("${project}");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        // Give the hooks a little time to run.
+        Thread.sleep(2000);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
@@ -272,6 +288,8 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         assertEquals("disabled", hookPage.getStateField("state"));
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        // Give the hooks a little time to run.
+        Thread.sleep(2000);
         assertFalse(new File(tempDir, "args.txt").exists());
     }
 
@@ -465,6 +483,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     private List<String> getArgs() throws IOException
     {
         File argFile = new File(tempDir, "args.txt");
+        TestUtils.waitForCondition(new FileExistsCondition(argFile), TASK_TIMEOUT, "file '" + argFile.getAbsolutePath() + "' to exist");
         String args = IOUtils.fileToString(argFile);
         return Arrays.asList(args.split("\\r?\\n"));
     }
