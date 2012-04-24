@@ -101,16 +101,16 @@ public class TailBuildLogAction extends StageActionBase
         }
         else
         {
-            // By default, go to the first stage (if any) as this is generally
+            // By default, go to the first stage with a log (if any) as this is generally
             // more useful than the overall build log.
             List<RecipeResultNode> recipeResultNodes = buildResult.getStages();
-            if (recipeResultNodes.size() > 0)
+            for (RecipeResultNode resultNode: recipeResultNodes)
             {
-                RecipeResultNode resultNode = recipeResultNodes.get(0);
                 logFile = new RecipeLogFile(buildResult, resultNode.getResult().getId(), paths);
                 if (logFile.exists())
                 {
                     setStageName(resultNode.getStageName());
+                    break;
                 }
             }
 
