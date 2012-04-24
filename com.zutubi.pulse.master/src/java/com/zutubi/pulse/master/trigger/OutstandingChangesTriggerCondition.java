@@ -36,7 +36,7 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
     public boolean satisfied(Project project)
     {
         OutstandingChangesTriggerConditionConfiguration config = (OutstandingChangesTriggerConditionConfiguration) getConfig();
-        Revision previousRevision = buildManager.getPreviousRevision(project);
+        Revision previousRevision = null;
         if (config.isCheckQueued())
         {
             BuildRevision latestQueued = getLatestQueuedRevision(project);
@@ -55,6 +55,11 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
             }
         }
 
+        if (previousRevision == null)
+        {
+            previousRevision = buildManager.getPreviousRevision(project);
+        }
+        
         return previousRevision == null || hasChangedSince(project, previousRevision);
     }
 
