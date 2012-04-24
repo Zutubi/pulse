@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunctionE;
@@ -21,8 +22,6 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.*;
 import java.net.URL;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This
@@ -87,6 +86,9 @@ public class RetrieveDependenciesCommand implements Command
                         }
                         else
                         {
+                            outputWriter.println();
+                            outputWriter.println(I18N.format("retrieve.summary"));
+                            
                             for (Artifact artifact : retrievalReport.getRetrievedArtifacts())
                             {
                                 ModuleRevisionId mrid = artifact.getModuleRevisionId();

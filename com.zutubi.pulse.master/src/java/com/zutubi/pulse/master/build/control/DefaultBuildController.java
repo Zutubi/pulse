@@ -802,8 +802,6 @@ public class DefaultBuildController implements EventListener, BuildController
             }
         }
 
-        dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
-
         for (RecipeController recipeController: controllers)
         {
             recipeController.getAssignmentRequest().getRequest().getContext().addValue(NAMESPACE_INTERNAL, PROPERTY_DEPENDENCY_DESCRIPTOR, ivyModuleDescriptor.getDescriptor());
@@ -1027,6 +1025,10 @@ public class DefaultBuildController implements EventListener, BuildController
             // Make these DB updates before the post-build event goes out, in case they influence things that hang off
             // that event (such as hooks).
             buildManager.save(buildResult);
+            if (ivyModuleDescriptor != null)
+            {
+                dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
+            }
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.

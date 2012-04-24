@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
-import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import com.zutubi.util.Constants;
 import com.zutubi.util.io.NullOutputStream;
 import com.zutubi.util.logging.Logger;
+import org.apache.ivy.util.Message;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,9 +12,6 @@ import java.io.OutputStream;
 /**
  * An implementation of the ivy message logger base class that redirects some of the log
  * messages to an output stream.
- *
- * The logging level of messages logged to the output stream are controlled via the usual
- * means, the logging.properties files, setting a logging level to this class.
  */
 public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractMessageLogger
 {
@@ -63,7 +60,7 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
     {
         try
         {
-            if (isLoggable(level))
+            if (level <= Message.MSG_INFO)
             {
                 // some of the messages from ivy have new line characters at the end, others do not.  So
                 // that we get something sensible in our logs, we apply a new line when necessary.
@@ -78,19 +75,5 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
         {
             LOG.error(e);
         }
-    }
-
-    /**
-     * Indicates whether or not messages at the specified logging level should
-     * be logged.  If we return false, any messages at that level should be ignored.
-     *
-     * @param level the logging level in question.
-     *
-     * @return true if a message at that logging level should be logged, false if it should
-     * be ignored.
-     */
-    private boolean isLoggable(int level)
-    {
-        return LOG.isLoggable(toLevel(level));
     }
 }

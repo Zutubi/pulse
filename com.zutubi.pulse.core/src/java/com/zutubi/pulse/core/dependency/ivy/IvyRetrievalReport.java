@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.dependency.ivy;
 
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Constants;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.cache.ArtifactOrigin;
@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * This report can be persisted to xml format.
  *
- * Note that non of the contents of this report are encoded and so can
+ * Note that none of the contents of this report are encoded and so can
  * be used directly.
  */
 public class IvyRetrievalReport
