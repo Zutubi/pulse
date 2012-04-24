@@ -15,6 +15,7 @@ import java.util.List;
 @SymbolicName("zutubi.projectAclConfig")
 @Table(columns = {"group", "allowedActions"})
 @Form(fieldOrder = {"group", "allowedActions"})
+@PermissionConfiguration
 public class ProjectAclConfiguration extends AbstractConfiguration
 {
     @Reference

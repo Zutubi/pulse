@@ -2,9 +2,12 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
+import com.zutubi.tove.annotations.PermissionConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.ComplexType;
+import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
@@ -155,6 +158,20 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
                 }
                 else
                 {
+                    if (!AccessManager.ACTION_VIEW.equals(action))
+                    {
+                        ComplexType type = configurationTemplateManager.getType(path);
+                        if (type != null && type.getTargetType() instanceof CompositeType)
+                        {
+                            CompositeType compositeType = (CompositeType) type.getTargetType();
+                            if (compositeType.hasAnnotation(PermissionConfiguration.class, true))
+                            {
+                                // Only admins can update permissions.
+                                action = AccessManager.ACTION_ADMINISTER;
+                            }
+                        }
+                    }
+
                     if(AccessManager.ACTION_CREATE.equals(action) || AccessManager.ACTION_DELETE.equals(action))
                     {
                         // Create and delete permissions are translated to a write to

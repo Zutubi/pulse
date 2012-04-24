@@ -1,10 +1,7 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
-import com.zutubi.tove.annotations.ItemPicker;
-import com.zutubi.tove.annotations.Reference;
-import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.annotations.Table;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
@@ -17,6 +14,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.agentAclConfig")
 @Table(columns = {"group", "allowedActions"})
+@PermissionConfiguration
 public class AgentAclConfiguration extends AbstractConfiguration
 {
     @Reference

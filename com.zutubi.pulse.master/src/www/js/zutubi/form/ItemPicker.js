@@ -593,8 +593,11 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
         this.addButton.disable();
         this.removeButton.disable();
-        this.upButton.disable();
-        this.downButton.disable();
+        if (this.allowReordering)
+        {
+            this.upButton.disable();
+            this.downButton.disable();
+        }
         this.view.disabled = true;
     },
 
@@ -612,8 +615,11 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
         this.addButton.enable();
         this.removeButton.enable();
-        this.upButton.enable();
-        this.downButton.enable();
+        if (this.allowReordering)
+        {
+            this.upButton.enable();
+            this.downButton.enable();
+        }
         this.view.disabled = false;
     },
     
