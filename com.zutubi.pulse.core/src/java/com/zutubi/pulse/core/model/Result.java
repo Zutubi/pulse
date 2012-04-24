@@ -151,6 +151,21 @@ public abstract class Result extends Entity
         stamps.setEndTime(endTime);
     }
 
+    public void abort(String message)
+    {
+        addFeature(Feature.Level.ERROR, message);
+        if (state.isTerminating())
+        {
+            completionState = state.getTerminatedState();
+        }
+        else
+        {
+            completionState = ResultState.ERROR;
+        }
+        
+        complete();
+    }
+
     private void broken(ResultState brokenState)
     {
         if (!state.isTerminating())

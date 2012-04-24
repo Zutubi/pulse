@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
@@ -40,9 +42,6 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -411,8 +410,7 @@ public class DefaultBuildManager implements BuildManager
         if (build != null && !build.completed())
         {
             build.abortUnfinishedRecipes();
-            build.error(message);
-            build.complete();
+            build.abort(message);
             build.calculateFeatureCounts();
             save(build);
         }

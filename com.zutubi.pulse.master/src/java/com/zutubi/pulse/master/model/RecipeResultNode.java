@@ -106,9 +106,8 @@ public class RecipeResultNode extends Entity
     {
         if (!result.completed())
         {
-            result.error("Recipe aborted");
             result.abortUnfinishedCommands();
-            result.complete();
+            result.abort("Recipe aborted");
         }
     }
 
