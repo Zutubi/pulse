@@ -667,7 +667,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertEquals(0, loadedProperties.size());
     }
 
-    public void testDeleteAllHitsInherited() throws Exception
+    public void testDeleteAllHidesInherited() throws Exception
     {
         String random = randomName();
         String parent = random + "-parent";

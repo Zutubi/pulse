@@ -158,7 +158,7 @@ public class ConfigurationSecurityManager implements com.zutubi.events.EventList
                 }
                 else
                 {
-                    if (!AccessManager.ACTION_VIEW.equals(action))
+                    if (!AccessManager.ACTION_VIEW.equals(action) && configurationTemplateManager.pathExists(path))
                     {
                         ComplexType type = configurationTemplateManager.getType(path);
                         if (type != null && type.getTargetType() instanceof CompositeType)
