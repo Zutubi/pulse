@@ -156,7 +156,20 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         assertActiveStage(stage, "default", ResultState.PENDING, "[default]", null);
         build = active.getBuild(1);
         assertActiveBuild(build, project1, 1, ResultState.IN_PROGRESS, REVISION_WAIT_ANT, BUILD_REASON, true);
-        
+
+        // Check the remote API reports the same active builds.
+        Vector<Hashtable<String, Object>> activeBuilds = rpcClient.RemoteApi.getActiveBuilds();
+        assertEquals(2, activeBuilds.size());
+        Hashtable<String, Object> activeBuild = activeBuilds.get(0);
+        assertEquals(project2, activeBuild.get("project"));
+        assertEquals("1", activeBuild.get("id"));
+        assertEquals(ResultState.PENDING.getPrettyString(), activeBuild.get("status"));
+
+        activeBuild = activeBuilds.get(1);
+        assertEquals(project1, activeBuild.get("project"));
+        assertEquals("1", activeBuild.get("id"));
+        assertEquals(ResultState.IN_PROGRESS.getPrettyString(), activeBuild.get("status"));
+
         waitForBuildToComplete(project1, 1);
         waitForBuildToComplete(project2, 1);
         

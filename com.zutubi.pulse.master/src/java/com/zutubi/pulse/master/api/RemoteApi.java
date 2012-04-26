@@ -21,6 +21,7 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.statistics.AgentStatistics;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.build.queue.*;
 import com.zutubi.pulse.master.charting.build.DefaultCustomFieldSource;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
@@ -3730,6 +3731,54 @@ public class RemoteApi
         result.put("revision", revisionString);
 
         return result;
+    }
+
+    /**
+     * Returns an array of all active build requests.  These builds have had
+     * their stages queued and may be pending, in progress, or terminating.
+     * Active personal builds are included.  The most recently activated build
+     * is first in the array.
+     * <p/>
+     * The returned array is filtered: requests queued for projects that you do
+     * not have permission to view are not returned, nor are personal builds
+     * for other users (unless you have admin access).
+     *
+     * @param token authentication token, see {@link #login(String, String)}
+     * @return {@xtype array<[RemoteApi.BuildResult]>} all active builds that
+     *         you have permission to view
+     * @access available to all users, though the result is filtered by project
+     *         view permission
+     */
+    public Vector<Hashtable<String, Object>> getActiveBuilds(String token)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            BuildQueueSnapshot snapshot = fatController.snapshotBuildQueue();
+            List<BuildResult> filteredQueue = new LinkedList<BuildResult>();
+            for (ActivatedRequest activatedRequest : snapshot.getActivatedRequests())
+            {
+                BuildController controller = activatedRequest.getController();
+                BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
+                if (buildResult != null && !buildResult.completed() && accessManager.hasPermission(AccessManager.ACTION_VIEW, buildResult))
+                {
+                    filteredQueue.add(buildResult);
+                }
+            }
+
+            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildResult, Hashtable<String, Object>>()
+            {
+                public Hashtable<String, Object> map(BuildResult build)
+                {
+                    return ApiUtils.convertBuild(build, true);
+                }
+            }));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
     }
 
     /**

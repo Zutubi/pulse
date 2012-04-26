@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.api;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -46,6 +47,8 @@ public class ApiUtils
         Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
         buildDetails.put("id", (int) build.getNumber());
         buildDetails.put("project", build.getProject().getName());
+        buildDetails.put("owner", getOwner(build));
+        buildDetails.put("personal", build.isPersonal());
         buildDetails.put("revision", getBuildRevision(build));
         buildDetails.put("tests", convertTests(build.getTestSummary()));
         buildDetails.put("version", getBuildVersion(build));
@@ -65,6 +68,12 @@ public class ApiUtils
         }
 
         return buildDetails;
+    }
+
+    private static String getOwner(BuildResult build)
+    {
+        NamedEntity owner = build.getOwner();
+        return owner == null ? "" : owner.getName();
     }
 
     /**
