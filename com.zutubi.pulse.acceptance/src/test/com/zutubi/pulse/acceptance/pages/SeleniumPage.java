@@ -10,7 +10,7 @@ import static com.zutubi.util.WebUtils.toValidHtmlName;
  */
 public abstract class SeleniumPage
 {
-    public static final String TITLE_PREFIX = ":: pulse [alpha] :: ";
+    public static final String TITLE_PREFIX = ":: pulse [beta] :: ";
 
     protected SeleniumBrowser browser;
     /**

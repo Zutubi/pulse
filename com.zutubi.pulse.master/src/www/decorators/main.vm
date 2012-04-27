@@ -47,7 +47,7 @@
         <meta http-equiv="Pragma" content="no-cache"/>
         <meta http-equiv="Expires" content="0"/>
         <meta http-equiv="Cache-Control" content="no-cache"/>
-		<title>:: pulse [alpha] :: #if ($title) $title #end</title>
+		<title>:: pulse [beta] :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
         <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css?#version()"/>
