@@ -35,7 +35,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -64,6 +63,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3733,14 +3734,14 @@ public class RemoteApi
     }
 
     /**
-     * Returns an array of all active build requests.  These builds have had
-     * their stages queued and may be pending, in progress, or terminating.
-     * Active personal builds are included.  The most recently activated build
-     * is first in the array.
+     * Returns an array of all active builds.  These builds have had their
+     * stages queued and may be pending, in progress, or terminating.  Active
+     * personal builds are included.  The most recently activated build is
+     * first in the array.
      * <p/>
-     * The returned array is filtered: requests queued for projects that you do
-     * not have permission to view are not returned, nor are personal builds
-     * for other users (unless you have admin access).
+     * The returned array is filtered: builds of projects that you do not have
+     * permission to view are not returned, nor are personal builds for other
+     * users (unless you have admin access).
      *
      * @param token authentication token, see {@link #login(String, String)}
      * @return {@xtype array<[RemoteApi.BuildResult]>} all active builds that

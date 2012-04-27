@@ -431,7 +431,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         SelectTypeState hookType = new SelectTypeState(getBrowser());
         hookType.waitFor();
-        assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig", "zutubi.preStageHookConfig"), hookType.getSortedOptionList());
+        assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig", "zutubi.preStageHookConfig", "zutubi.terminateStageHookConfig"), hookType.getSortedOptionList());
         hookType.nextFormElements(symbolicName);
         return hookType;
     }
