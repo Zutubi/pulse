@@ -35,6 +35,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -63,8 +64,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3754,25 +3753,31 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            BuildQueueSnapshot snapshot = fatController.snapshotBuildQueue();
-            List<BuildResult> filteredQueue = new LinkedList<BuildResult>();
-            for (ActivatedRequest activatedRequest : snapshot.getActivatedRequests())
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
             {
-                BuildController controller = activatedRequest.getController();
-                BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
-                if (buildResult != null && !buildResult.completed() && accessManager.hasPermission(AccessManager.ACTION_VIEW, buildResult))
+                public Vector<Hashtable<String, Object>> process()
                 {
-                    filteredQueue.add(buildResult);
+                    BuildQueueSnapshot snapshot = fatController.snapshotBuildQueue();
+                    List<BuildResult> filteredQueue = new LinkedList<BuildResult>();
+                    for (ActivatedRequest activatedRequest : snapshot.getActivatedRequests())
+                    {
+                        BuildController controller = activatedRequest.getController();
+                        BuildResult buildResult = buildManager.getBuildResult(controller.getBuildResultId());
+                        if (buildResult != null && !buildResult.completed() && accessManager.hasPermission(AccessManager.ACTION_VIEW, buildResult))
+                        {
+                            filteredQueue.add(buildResult);
+                        }
+                    }
+        
+                    return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildResult, Hashtable<String, Object>>()
+                    {
+                        public Hashtable<String, Object> map(BuildResult build)
+                        {
+                            return ApiUtils.convertBuild(build, true);
+                        }
+                    }));
                 }
-            }
-
-            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildResult, Hashtable<String, Object>>()
-            {
-                public Hashtable<String, Object> map(BuildResult build)
-                {
-                    return ApiUtils.convertBuild(build, true);
-                }
-            }));
+            });
         }
         finally
         {

@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
@@ -18,8 +19,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Acceptance tests for the server/activity page.
@@ -162,12 +161,12 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         assertEquals(2, activeBuilds.size());
         Hashtable<String, Object> activeBuild = activeBuilds.get(0);
         assertEquals(project2, activeBuild.get("project"));
-        assertEquals("1", activeBuild.get("id"));
+        assertEquals(1, activeBuild.get("id"));
         assertEquals(ResultState.PENDING.getPrettyString(), activeBuild.get("status"));
 
         activeBuild = activeBuilds.get(1);
         assertEquals(project1, activeBuild.get("project"));
-        assertEquals("1", activeBuild.get("id"));
+        assertEquals(1, activeBuild.get("id"));
         assertEquals(ResultState.IN_PROGRESS.getPrettyString(), activeBuild.get("status"));
 
         waitForBuildToComplete(project1, 1);
