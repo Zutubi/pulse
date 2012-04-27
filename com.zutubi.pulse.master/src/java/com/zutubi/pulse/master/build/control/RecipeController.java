@@ -3,7 +3,9 @@ package com.zutubi.pulse.master.build.control;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
@@ -16,24 +18,25 @@ import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.RecipeLogger;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
-import com.zutubi.pulse.master.events.build.PostStageEvent;
-import com.zutubi.pulse.master.events.build.PreStageEvent;
-import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -44,13 +47,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
-import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  *
@@ -304,7 +300,7 @@ public class RecipeController
         {
             // This terminate must have come in before the recipe commenced.
             // Now we know who to tell to stop processing the recipe!
-            agentService.terminateRecipe(recipeResult.getId());
+            sendTerminateRequest();
         }
         buildManager.save(recipeResult);
         logger.log(event, recipeResult);
@@ -560,7 +556,7 @@ public class RecipeController
             // Tell the agent service that it can stop trying to execute this
             // recipe.  We *must* have received the commenced event before we
             // can do this.
-            agentService.terminateRecipe(recipeResult.getId());
+            sendTerminateRequest();
         }
         else
         {
@@ -572,6 +568,12 @@ public class RecipeController
                 complete();
             }
         }
+    }
+
+    private void sendTerminateRequest()
+    {
+        agentService.terminateRecipe(recipeResult.getId());
+        publishEvent(new TerminateStageEvent(this, buildResult, recipeResultNode, recipeContext));
     }
 
     public RecipeResult getResult()
