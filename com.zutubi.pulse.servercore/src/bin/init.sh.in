@@ -165,12 +165,17 @@ esac
 
 # Resolve the architecture
 DIST_ARCH=`uname -p | tr [:upper:] [:lower:] | tr -d [:blank:]`
+BITS="32"
 if [ "$DIST_ARCH" = "unknown" ]
 then
     DIST_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
 fi
 case "$DIST_ARCH" in
-    'amd64' | 'athlon' | 'ia32' | 'ia64' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
+    'amd64' | 'ia64' | 'x86_64')
+        DIST_ARCH="x86"
+        BITS="64"
+        ;;
+    'athlon' | 'ia32' | 'i386' | 'i486' | 'i586' | 'i686')
         DIST_ARCH="x86"
         ;;
     'ip27')
@@ -200,11 +205,8 @@ outputFile() {
 }
 
 # Decide on the wrapper binary to use.
-# If a 32-bit wrapper binary exists then it will work on 32 or 64 bit
-#  platforms, if the 64-bit binary exists then the distribution most
-#  likely wants to use long names.  Otherwise, look for the default.
 # For macosx, we also want to look for universal binaries.
-WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
+WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-$BITS"
 if [ -x "$WRAPPER_TEST_CMD" ]
 then
     WRAPPER_CMD="$WRAPPER_TEST_CMD"
