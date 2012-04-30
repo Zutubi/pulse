@@ -7,17 +7,16 @@ import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import static com.zutubi.tove.type.record.PathUtils.*;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -402,9 +401,30 @@ public class ConfigurationRefactoringManager
      * @return true iff the path may be pushed down to at least one of its
      *         children
      */
-    public boolean canPushDown(String path)
+    public boolean canPushDown(final String path)
     {
-        return !getPushDownChildren(path).isEmpty();
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Boolean>()
+        {
+            public Boolean process()
+            {
+                String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+                if (templateOwnerPath == null)
+                {
+                    return false;
+                }
+
+                TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
+                for (TemplateNode childNode: node.getChildren())
+                {
+                    if (canPushDown(path, childNode.getId()))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        });
     }
     
     /**
