@@ -1394,6 +1394,11 @@ public class RemoteApiClient extends ApiClient
         return call("getBuildQueueSnapshot");
     }
 
+    public Vector<Hashtable<String, Object>> getActiveBuilds() throws Exception
+    {
+        return call("getActiveBuilds");
+    }
+
     public boolean cancelQueuedBuildRequest(String id) throws Exception
     {
         return (Boolean) call("cancelQueuedBuildRequest", id);
