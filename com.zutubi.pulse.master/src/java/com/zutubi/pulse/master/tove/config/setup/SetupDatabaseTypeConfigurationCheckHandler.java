@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
-import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.tove.config.AbstractDatabaseConfigurationCheckHandler;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.tove.config.api.AbstractConfigurationCheckHandler;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.DelegatingInvocationHandler;
 
 import java.io.File;
@@ -19,11 +17,8 @@ import java.sql.DriverManager;
  * JDBC connection.
  */
 @SymbolicName("zutubi.setupDatabaseTypeConfigurationCheckHandler")
-public class SetupDatabaseTypeConfigurationCheckHandler extends AbstractConfigurationCheckHandler<SetupDatabaseTypeConfiguration>
+public class SetupDatabaseTypeConfigurationCheckHandler extends AbstractDatabaseConfigurationCheckHandler<SetupDatabaseTypeConfiguration>
 {
-    private static final Logger LOG = Logger.getLogger(SetupDatabaseTypeConfigurationCheckHandler.class);
-    private static final String MYSQL_INSANITY = "** BEGIN NESTED EXCEPTION **";
-
     public void test(SetupDatabaseTypeConfiguration configuration) throws Exception
     {
         DatabaseType type = configuration.getType();
@@ -54,15 +49,7 @@ public class SetupDatabaseTypeConfigurationCheckHandler extends AbstractConfigur
             }
             catch (Exception e)
             {
-                LOG.warning(e);
-                String message = e.getMessage();
-                int i = message.indexOf(MYSQL_INSANITY);
-                if(i >= 0)
-                {
-                    message = message.substring(0, i).trim();
-                }
-
-                throw new PulseException(message, e);
+                processException(e);
             }
         }
     }
