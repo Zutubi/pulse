@@ -1,6 +1,7 @@
 package com.zutubi.util.reflection;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -48,6 +49,21 @@ public class DelegatingInvocationHandler<T> implements InvocationHandler
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        return method.invoke(delegate, args);
+        try
+        {
+            return method.invoke(delegate, args);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw e.getTargetException();
+        }
     }
 }
