@@ -15,6 +15,7 @@ import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
@@ -25,8 +26,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -215,11 +214,12 @@ public class LsAction extends VFSActionSupport
         {
             sortChildren(fileObject, children);
             extFiles = new ExtFile[children.length];
+            final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
             CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
             {
                 public ExtFile map(FileObject child)
                 {
-                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
+                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
                     if (!extFile.isLeaf() && currentDepth < depth)
                     {
                         try
