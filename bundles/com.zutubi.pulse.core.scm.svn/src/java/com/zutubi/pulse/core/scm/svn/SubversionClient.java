@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
@@ -22,11 +23,10 @@ import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.io.*;
 import org.tmatesoft.svn.core.io.diff.SVNDiffWindow;
 import org.tmatesoft.svn.core.wc.*;
+import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 
 import java.io.*;
 import java.util.*;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A connection to a subversion server.
@@ -424,6 +424,10 @@ public class SubversionClient implements ScmClient
         {
             throw convertException(e);
         }
+        finally
+        {
+            dispose(updateClient);
+        }
 
         return new Revision(svnRevision.getNumber());
     }
@@ -783,13 +787,14 @@ public class SubversionClient implements ScmClient
         {
             addIgnoreDirs(context);
         }
-        
+
+        SVNUpdateClient client = null;
         try
         {
             // CIB-610: cleanup before update in case WC is locked.
             cleanup(context);
 
-            SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
+            client = new SVNUpdateClient(authenticationManager, null);
             if (handler != null)
             {
                 client.setEventHandler(new ChangeEventHandler(handler));
@@ -810,6 +815,10 @@ public class SubversionClient implements ScmClient
                 throw new ScmException(e);
             }
         }
+        finally
+        {
+            dispose(client);
+        }
         return rev;
     }
 
@@ -820,14 +829,19 @@ public class SubversionClient implements ScmClient
 
     private void cleanup(ExecutionContext context) throws ScmException
     {
-        SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
+        SVNWCClient wcClient = null;
         try
         {
+            wcClient = new SVNWCClient(authenticationManager, null);
             wcClient.doCleanup(context.getWorkingDir());
         }
         catch (SVNException e)
         {
             throw convertException(e);
+        }
+        finally
+        {
+            dispose(wcClient);
         }
     }
 
@@ -914,6 +928,8 @@ public class SubversionClient implements ScmClient
 
     public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
     {
+        SVNCommitClient commitClient = null;
+        SVNCopyClient copyClient = null;
         try
         {
             SVNURL svnUrl = SVNURL.parseURIDecoded(name);
@@ -923,7 +939,7 @@ public class SubversionClient implements ScmClient
                 if (moveExisting)
                 {
                     // Delete existing path
-                    SVNCommitClient commitClient = new SVNCommitClient(authenticationManager, null);
+                    commitClient = new SVNCommitClient(authenticationManager, null);
                     commitClient.doDelete(new SVNURL[] { svnUrl }, "[pulse] deleting old tag");
                 }
                 else
@@ -932,7 +948,7 @@ public class SubversionClient implements ScmClient
                 }
             }
 
-            SVNCopyClient copyClient = new SVNCopyClient(authenticationManager, null);
+            copyClient = new SVNCopyClient(authenticationManager, null);
             SVNRevision copyRevision = convertRevision(revision);
             SVNCopySource[] copySources = new SVNCopySource[]{new SVNCopySource(SVNRevision.UNDEFINED, copyRevision, repository.getLocation())};
             copyClient.doCopy(copySources, svnUrl, false, true, true, "[pulse] applying tag", null);
@@ -940,6 +956,30 @@ public class SubversionClient implements ScmClient
         catch (SVNException e)
         {
             throw convertException(e);
+        }
+        finally
+        {
+            dispose(commitClient);
+            dispose(copyClient);
+        }
+    }
+
+    private void dispose(SVNBasicClient client)
+    {
+        // This should really be handled by SVNKit, but alas it leaks like a sieve.
+        if (client != null)
+        {
+            SvnOperationFactory operationsFactory = client.getOperationsFactory();
+            if (operationsFactory != null)
+            {
+                ISVNRepositoryPool repositoryPool = operationsFactory.getRepositoryPool();
+                if (repositoryPool != null)
+                {
+                    repositoryPool.dispose();
+                }
+
+                operationsFactory.dispose();
+            }
         }
     }
 
