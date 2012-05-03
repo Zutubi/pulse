@@ -38,7 +38,7 @@ public class GitConstants
             DEFAULT_GIT = "git";
         }
     }
-    public static final String  RESOURCE_NAME = "git";
+    public static final String RESOURCE_NAME = "git";
 
     // Top level commands.
 
