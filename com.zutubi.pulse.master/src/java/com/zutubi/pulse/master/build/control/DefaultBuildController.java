@@ -466,6 +466,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
 
         buildLogger.prepare();
+        buildLogger.preamble(buildResult);
         buildLogger.preBuild();
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
         buildLogger.preBuildCompleted();

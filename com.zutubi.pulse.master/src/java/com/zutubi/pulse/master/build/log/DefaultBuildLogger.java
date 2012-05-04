@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.dependency.ivy.IvyMessageOutputStreamAdapter;
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.util.AbstractMessageLogger;
 import org.apache.ivy.util.MessageLogger;
-
-import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.toLevel;
 
 public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger
 {
@@ -18,6 +18,22 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
     public DefaultBuildLogger(LogFile logFile)
     {
         super(logFile);
+    }
+
+    public void preamble(BuildResult build)
+    {
+        if (build.isPersonal())
+        {
+            logMarker(build.getOwnerName() + " personal build " + build.getNumber());
+            logMarker("Project " + build.getProject().getName());
+        }
+        else
+        {
+            logMarker("Project '" + build.getProject().getName() + "' build " + build.getNumber() + ".");
+        }
+
+        Version version = Version.getVersion();
+        logMarker("Pulse version " + version.getVersionNumber() + " (#" + version.getBuildNumber() + ").");
     }
 
     public void preBuild()

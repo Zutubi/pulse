@@ -5,6 +5,8 @@ import org.apache.ivy.util.MessageLogger;
 
 public interface BuildLogger extends HookLogger
 {
+    void preamble(BuildResult build);
+    
     void preBuild();
     void preBuildCompleted();
 
