@@ -1,13 +1,13 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
+<content tag="header.javascript">
+    ext/StatusBar.js
+    projects.js
+</content>
 <html>
 <head>
     <title>#wwtext("name=dashboard")</title>
-    #javascript()
-        ext/StatusBar.js
-        projects.js
-    #end
     <script type="text/javascript">
         var view;
         var projectsTable;
