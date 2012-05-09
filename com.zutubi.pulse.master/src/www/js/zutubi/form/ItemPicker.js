@@ -110,7 +110,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         });
 
         this.removeButton = new Ext.Button({
-            id: 'x-item-picker-remove',
+            id: this.id + '-remove',
             icon: window.baseUrl + '/images/buttons/sb-delete.gif'
         });
         this.removeButton.on('click', this.onRemove, this);
@@ -120,14 +120,14 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         if (this.allowReordering)
         {
             this.upButton = new Ext.Button({
-                id: 'x-item-picker-up',
+                id: this.id + '-up',
                 icon: window.baseUrl + '/images/buttons/sb-up.gif'
             });
             this.upButton.on('click', this.onUp, this);
             icons.add(this.upButton);
             icons.add({xtype:'spacer',flex:1});
             this.downButton = new Ext.Button({
-                id: 'x-item-picker-down',
+                id: this.id + '-down',
                 icon: window.baseUrl + '/images/buttons/sb-down.gif'
             });
             this.downButton.on('click', this.onDown, this);
@@ -136,7 +136,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
         }
 
         this.addButton = new Ext.Button({
-            id: 'x-item-picker-add',
+            id: this.id + '-add',
             icon: window.baseUrl + '/images/buttons/sb-add.gif'
         });
         this.addButton.on('click', this.onAdd, this);
