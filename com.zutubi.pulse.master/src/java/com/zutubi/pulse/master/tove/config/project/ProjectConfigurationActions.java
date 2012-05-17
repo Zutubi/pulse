@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * Action links for the project config page.
@@ -60,7 +61,7 @@ public class ProjectConfigurationActions
         return deeplyValid;
     }
 
-    public List<String> getActions(ProjectConfiguration instance)
+    public List<String> getActions(final ProjectConfiguration instance)
     {
         // Templates are considered initialised
         boolean initialised = true;
@@ -68,7 +69,23 @@ public class ProjectConfigurationActions
         if (instance.isConcrete())
         {
             result.add(ACTION_MARK_CLEAN);
-            Project project = projectManager.getProject(instance.getProjectId(), true);
+            Project project = null;
+            try
+            {
+                // Security checks are done at a higher level, and should not apply here.
+                project = SecurityUtils.callAsSystem(new Callable<Project>()
+                {
+                    public Project call()
+                    {
+                        return projectManager.getProject(instance.getProjectId(), true);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
+
             if (project != null)
             {
                 Project.State state = project.getState();
