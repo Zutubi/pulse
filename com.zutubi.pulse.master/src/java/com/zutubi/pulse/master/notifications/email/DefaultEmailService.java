@@ -85,7 +85,7 @@ public class DefaultEmailService implements EmailService
             {
                 if (!reuseSession && transport != null)
                 {
-                    transport.close();
+                    safeClose(transport);
                 }
             }
         }
@@ -107,18 +107,23 @@ public class DefaultEmailService implements EmailService
     {
         if (sharedTransport != null)
         {
-            try
-            {
-                sharedTransport.close();
-            }
-            catch (MessagingException e)
-            {
-                LOG.warning(e);
-            }
+            safeClose(sharedTransport);
 
             sharedConfig = null;
             sharedSession = null;
             sharedTransport = null;
+        }
+    }
+
+    private void safeClose(Transport transport)
+    {
+        try
+        {
+            transport.close();
+        }
+        catch (MessagingException e)
+        {
+            LOG.info(e);
         }
     }
 
