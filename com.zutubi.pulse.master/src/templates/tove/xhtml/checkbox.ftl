@@ -6,6 +6,7 @@
     fc.checked = true;
 </#if>
     fc.width = 14;
+    fc.boxLabel = '';
     fc.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fc.id };
 
     ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}__default', value: 'false'}));
