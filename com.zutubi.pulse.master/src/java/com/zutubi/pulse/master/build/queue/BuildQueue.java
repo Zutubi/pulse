@@ -20,7 +20,7 @@ import java.util.*;
  * Request assimilation is the process by which two requests are considered to produce
  * the exact same result and are therefore merged into one request to avoid an unnecessary
  * build.  The assimilation of requests happens at the earliest possible opportunity to
- * avoid reduntant builds showing up in the queue snapshot.
+ * avoid redundant builds showing up in the queue snapshot.
  * <p/>
  * Two requests can be assimilated under the following conditions:
  * <lu>
@@ -53,7 +53,7 @@ public class BuildQueue
 
     /**
      * When paused, this build queue will suspend activating requests until
-     * the queue is unpaused.
+     * the queue is resumed.
      */
     private volatile boolean paused = false;
 
@@ -68,7 +68,7 @@ public class BuildQueue
      * Those requests that are placed earlier in the list will be given the opportunity
      * to be activated ahead of those that appear later in the list.
      *
-     * @param requests the requests to be enqueued.
+     * @param requests the requests to be queued.
      */
     public synchronized void enqueue(List<QueuedRequest> requests)
     {
@@ -197,7 +197,7 @@ public class BuildQueue
     }
 
     /**
-     * Unpause the activation of this build queue.
+     * Un-pause the activation of this build queue.
      *
      * @throws IllegalStateException    if the current thread does not hold a lock on the build queue.
      * @throws IllegalArgumentException if the build queue is not already paused.
@@ -267,7 +267,7 @@ public class BuildQueue
     }
 
     /**
-     * Assimilate the requests into the existing queued entried if possible.
+     * Assimilate the requests into the existing queued entries if possible.
      *
      * @param requests  the requests to be assimilated.
      * @return true if the requests were assimilated, false otherwise.
@@ -372,7 +372,7 @@ public class BuildQueue
     }
 
     /**
-     * Return a count of the number of actived requests.
+     * Return a count of the number of activated requests.
      *
      * @return the number of activated requests.
      */

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.master.webwork.Urls;
+
 import static com.zutubi.util.WebUtils.toValidHtmlName;
 
 /**
@@ -10,7 +11,7 @@ import static com.zutubi.util.WebUtils.toValidHtmlName;
  */
 public abstract class SeleniumPage
 {
-    public static final String TITLE_PREFIX = ":: pulse [beta] :: ";
+    public static final String TITLE_PREFIX = ":: pulse :: ";
 
     protected SeleniumBrowser browser;
     /**

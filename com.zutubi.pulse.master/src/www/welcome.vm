@@ -14,7 +14,7 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.5 Beta!  This page provides information on common next steps and important
+        Welcome to Pulse 2.5!  This page provides information on common next steps and important
         new features in the 2.5 release.
     </p>
     <p>
