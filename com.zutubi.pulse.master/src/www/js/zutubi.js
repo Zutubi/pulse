@@ -1103,7 +1103,7 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'next-successful',
                 image: this.getImage(this.nextSuccessful),
-                title: 'next successful (build ' + this.nextSuccessful.number + ')',
+                title: 'next healthy (build ' + this.nextSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.nextSuccessful)
             });
         }
@@ -1121,7 +1121,7 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
             items.push({
                 id: 'previous-successful',
                 image: this.getImage(this.previousSuccessful),
-                title: 'previous successful (build ' + this.previousSuccessful.number + ')',
+                title: 'previous healthy (build ' + this.previousSuccessful.number + ')',
                 url: this.getUrl(this.personalBuild, this.previousSuccessful)
             });
         }
@@ -1150,11 +1150,15 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
 
     getImage: function(build)
     {
-        if (build.status === 'success' || build.status === 'warnings')
+        if (build.status === 'success')
         {
             return 'health/ok.gif';    
         }
-        else if (build.status === 'failure' || build.status === 'error')
+        else if (build.status == 'warnings')
+        {
+            return 'health/warnings.gif';
+        }
+        else if (build.status === 'failure' || build.status === 'error' || build.status === 'cancelled' || build.status === 'terminated')
         {
             return 'health/broken.gif';
         }
