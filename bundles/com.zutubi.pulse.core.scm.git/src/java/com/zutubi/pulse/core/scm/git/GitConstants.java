@@ -64,6 +64,7 @@ public class GitConstants
     public static final String FLAG_FIND_COPIES = "-C";
     public static final String FLAG_CACHED = "--cached";
     public static final String FLAG_VERBOSE = "--verbose";
+    public static final String FLAG_SKIP = "--skip";
 
     public static final String FLAG_SEPARATOR = "--";
     
