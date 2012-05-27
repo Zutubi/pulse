@@ -162,6 +162,16 @@ public class GitClientTest extends GitClientTestBase
         assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
     }
 
+    public void testGetLatestRevisionLatestFiltered() throws ScmException
+    {
+        // CIB-2918: Git retrieval of latest revision fails if last commit is filtered out by exclusions.
+        client.setFilterPaths(Collections.<String>emptyList(), asList("a.txt", "c.txt", "d.txt"));
+        client.init(scmContext, new ScmFeedbackAdapter());
+        Revision rev = client.getLatestRevision(scmContext);
+
+        assertEquals(REVISION_MASTER_PREVIOUS, rev.getRevisionString());
+    }
+
     public void testGetLatestRevisionOnBranch() throws ScmException
     {
         client.setBranch(BRANCH_SIMPLE);

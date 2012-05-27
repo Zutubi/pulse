@@ -93,6 +93,7 @@ public class GitConstants
     public static final String FLAG_VERBOSE = "--verbose";
     public static final String FLAG_INIT = "--init";
     public static final String FLAG_RECURSIVE = "--recursive";
+    public static final String FLAG_SKIP = "--skip";
 
     public static final String FLAG_SEPARATOR = "--";
 

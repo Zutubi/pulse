@@ -406,7 +406,7 @@ public class GitClient implements ScmClient
         try
         {
             NativeGit git = preparePersistentDirectory(context);
-            GitLogEntry entry = git.log(null, getRemoteBranchRef(), 1).get(0);
+            GitLogEntry entry = git.log(getRemoteBranchRef(), 1).get(0);
             return new Revision(entry.getId());
         }
         finally

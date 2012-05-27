@@ -1,12 +1,13 @@
 package com.zutubi.pulse.master.agent.statistics;
 
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
-import static com.zutubi.util.CollectionUtils.map;
-import static com.zutubi.util.CollectionUtils.reduce;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.math.LongAddition;
 
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.map;
+import static com.zutubi.util.CollectionUtils.reduce;
 
 /**
  * Wrapper around statistics for a single agent over multiple days which

@@ -31,7 +31,7 @@ public class NativeGit
     private static final Logger LOG_COMMANDS = Logger.getLogger(NativeGit.class.getPackage().getName() + ".commands");
 
     /**
-     * Sentinal value used to detect separate parts of log entries.  A GUID is
+     * Sentinel value used to detect separate parts of log entries.  A GUID is
      * used to prevent false positives in commit comments.  To be extra
      * paranoid we start with a # as it is difficult to have one in a commit
      * comment (it is a comment character).
@@ -159,33 +159,50 @@ public class NativeGit
 
     public List<GitLogEntry> log() throws ScmException
     {
-        return log(null, null, -1);
+        return log(null, null);
     }
 
     public List<GitLogEntry> log(int changes) throws ScmException
     {
-        return log(null, null, changes);
+        return log(null, changes);
+    }
+
+    public List<GitLogEntry> log(String ref, int changes) throws ScmException
+    {
+        List<GitLogEntry> found = new LinkedList<GitLogEntry>();
+        int scanned = 0;
+        while (found.size() < changes)
+        {
+            List<String> command = getCommonLogCommand();
+
+            if (scanned > 0)
+            {
+                command.add(FLAG_SKIP);
+                command.add(Integer.toString(scanned));
+            }
+
+            int max = changes - found.size();
+            scanned += max;
+
+            command.add(FLAG_CHANGES);
+            command.add(Integer.toString(max));
+
+            if (ref != null)
+            {
+                command.add(ref);
+            }
+
+            LogOutputHandler handler = new LogOutputHandler(includedPaths, excludedPaths);
+            runWithHandler(handler, null, true, command.toArray(new String[command.size()]));
+            found.addAll(handler.getEntries());
+        }
+
+        return found;
     }
 
     public List<GitLogEntry> log(String from, String to) throws ScmException
     {
-        return log(from, to, -1);
-    }
-
-    public List<GitLogEntry> log(String from, String to, int changes) throws ScmException
-    {
-        List<String> command = new LinkedList<String>();
-        command.add(getGitCommand());
-        command.add(COMMAND_LOG);
-        command.add(FLAG_NAME_STATUS);
-        command.add(FLAG_SHOW_MERGE_FILES);
-        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b%n" + LOG_SENTINAL);
-        command.add(FLAG_REVERSE);
-        if (changes != -1)
-        {
-            command.add(FLAG_CHANGES);
-            command.add(Integer.toString(changes));
-        }
+        List<String> command = getCommonLogCommand();
         if (to != null)
         {
             if (from == null)
@@ -199,10 +216,20 @@ public class NativeGit
         }
 
         LogOutputHandler handler = new LogOutputHandler(includedPaths, excludedPaths);
-
         runWithHandler(handler, null, true, command.toArray(new String[command.size()]));
-
         return handler.getEntries();
+    }
+
+    private List<String> getCommonLogCommand()
+    {
+        List<String> command = new LinkedList<String>();
+        command.add(getGitCommand());
+        command.add(COMMAND_LOG);
+        command.add(FLAG_NAME_STATUS);
+        command.add(FLAG_SHOW_MERGE_FILES);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b%n" + LOG_SENTINAL);
+        command.add(FLAG_REVERSE);
+        return command;
     }
 
     public void checkout(ScmFeedbackHandler handler, String branch) throws ScmException
@@ -528,9 +555,9 @@ public class NativeGit
                         logEntry.setComment(comment.trim());
                         raw.add(str);
 
-                        // Until sentinal or until the end.  Note that most of
+                        // Until sentinel or until the end.  Note that most of
                         // the time a blank line appears at the end of the
-                        // files, but we use the sentinal as a more reliable
+                        // files, but we use the sentinel as a more reliable
                         // way to detect termination.
                         boolean logEntryHasFiles = false;
                         while (i.hasNext() && !(str = i.next()).equals(LOG_SENTINAL))

@@ -3,8 +3,9 @@ package com.zutubi.pulse.master.agent.statistics;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 
-import static java.util.Arrays.asList;
 import java.util.LinkedList;
+
+import static java.util.Arrays.asList;
 
 public class AgentStatisticsTest extends PulseTestCase
 {
