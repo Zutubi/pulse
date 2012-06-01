@@ -50,7 +50,8 @@ public class AgentsPage extends SeleniumPage
         {
             public boolean satisfied()
             {
-                openAndWaitFor();
+                browser.refresh();
+                agentSummaryTable.waitFor(SeleniumBrowser.DEFAULT_TIMEOUT);
                 final String currentStatus = agentSummaryTable.getStatus(agent);
                 return candidateSet.contains(currentStatus);
             }

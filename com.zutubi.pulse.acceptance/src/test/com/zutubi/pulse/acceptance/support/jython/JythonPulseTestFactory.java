@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance.support.jython;
 
-import com.sun.script.jython.JythonScriptEngine;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.PulseTestFactory;
@@ -8,12 +7,12 @@ import com.zutubi.util.io.IOUtils;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.*;
 
 /**
- *
- *
+ * Implementation of PulseTestFactory backed by embedded Jython.
  */
 public class JythonPulseTestFactory implements PulseTestFactory
 {
@@ -21,7 +20,7 @@ public class JythonPulseTestFactory implements PulseTestFactory
 
     public JythonPulseTestFactory() throws ScriptException, FileNotFoundException
     {
-        ScriptEngine jythonEngine = new JythonScriptEngine();
+        ScriptEngine jythonEngine = new ScriptEngineManager().getEngineByName("python");
 
         invocableEngine = (Invocable) jythonEngine;
 

@@ -68,7 +68,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         // step five. configuring the server essentials.
         checkServerSettings();
 
-        assertTrue(getBrowser().isTextPresent("system setup"));
         getBrowser().waitForElement("welcome.heading", 60000);
 
         // one complete, we should see the home page, and it should contain the following:
@@ -84,8 +83,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
 
     private void checkSetPulseData()
     {
-        assertPulseTabsNotVisible();
-
         SetPulseDataForm form = getBrowser().createForm(SetPulseDataForm.class);
         assertTrue(form.isFormPresent());
         assertTrue(form.isBrowseDataLinkPresent());
@@ -98,19 +95,8 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         form.nextFormElements("data");
     }
 
-    private void assertPulseTabsNotVisible()
-    {
-        assertFalse(getBrowser().isElementIdPresent("tab.projects"));
-        assertFalse(getBrowser().isElementIdPresent("tab.projects"));
-        assertFalse(getBrowser().isElementIdPresent("tab.queues"));
-        assertFalse(getBrowser().isElementIdPresent("tab.agents"));
-        assertFalse(getBrowser().isElementIdPresent("tab.administration"));
-    }
-
     private void checkSetupDatabase()
     {
-        assertPulseTabsNotVisible();
-
         SetupDatabaseTypeForm form = getBrowser().createForm(SetupDatabaseTypeForm.class);
         form.waitFor();
         assertFalse("Detail fields should be disabled for embedded database", form.isEditable("host"));
@@ -119,10 +105,7 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
 
     private void checkLicenseDetails()
     {
-        assertPulseTabsNotVisible();
-
         PulseLicenseForm licenseForm = getBrowser().createForm(PulseLicenseForm.class);
-
         licenseForm.waitFor();
 
         // check that license is required.
@@ -150,8 +133,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
 
     private void checkCreateAdmin()
     {
-        assertPulseTabsNotVisible();
-
         CreateAdminForm createAdminForm = getBrowser().createForm(CreateAdminForm.class);
 
         // create admin.
@@ -167,11 +148,8 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
 
     private void checkServerSettings()
     {
-        assertPulseTabsNotVisible();
-
         ServerSettingsForm settingsForm = getBrowser().createForm(ServerSettingsForm.class);
         settingsForm.waitFor();
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
-
 }

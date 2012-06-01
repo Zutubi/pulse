@@ -57,7 +57,7 @@
         <dependency org="com.dumbster" name="com.dumbster.smtp" rev="20090217" conf="external,build->default;src->src"/>
         <dependency org="com.svnkit" name="com.svnkit" rev="1.3.5" conf="external,build->default;src->src"/>
 
-        <dependency org="org.python" name="org.jython" rev="20080715" conf="external,build->default;src->src"/>
+        <dependency org="org.python" name="org.jython" rev="2.5.2" conf="external,build->default;src->src"/>
         <dependency org="javax.script" name="javax.script.api" rev="1.0.0" conf="external,build->default;src->src"/>
 
     </dependencies>
