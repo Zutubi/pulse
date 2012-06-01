@@ -48,7 +48,7 @@ public class SeleniumBrowser
     public static final long WAITFOR_TIMEOUT = 60000;
     public static final long REFRESH_TIMEOUT = 60000;
 
-    public static final long WAITFOR_INTERVAL = 300;
+    public static final long WAITFOR_INTERVAL = 3000;
     public static final long REFRESH_INTERVAL = 1000;
 
     private Selenium selenium;
@@ -578,52 +578,51 @@ public class SeleniumBrowser
         });
     }
 
-    public void waitAndClick(By by)
+    public WebElement waitForElement(String id)
     {
-        waitForElement(by);
-        click(by);
-    }
-
-    public void waitForElement(String id)
-    {
-        waitForElement(id, WAITFOR_TIMEOUT);
+        return waitForElement(id, WAITFOR_TIMEOUT);
     }
 
     public WebElement waitForElement(final String id, long timeout)
     {
-        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000);
+        return waitForElement(By.id(id), timeout);
+    }
+
+    public WebElement waitForElement(By by)
+    {
+        return waitForElement(by, WAITFOR_TIMEOUT);
+    }
+
+    public WebElement waitForElement(final By by, long timeout)
+    {
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000, 5000).ignoring(RuntimeException.class);
         return wait.until(new ExpectedCondition<WebElement>()
         {
-            public WebElement apply( WebDriver webDriver)
+            public WebElement apply(WebDriver webDriver)
             {
-                return webDriver.findElement(By.id(id));
+                List<WebElement> elements = webDriver.findElements(by);
+                return elements.isEmpty() ? null : elements.get(0);
             }
         });
     }
 
-    public void waitForElement(By by)
+    public void waitAndClick(By by)
     {
-        waitForElement(by, false);
+        waitForElement(by, WAITFOR_TIMEOUT);
+        click(by);
     }
-    
-    public void waitForElement(final By by, final boolean invert)
+
+    public void waitForElementToDisappear(final By by)
     {
-        try
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, WAITFOR_TIMEOUT/1000, WAITFOR_INTERVAL).ignoring(RuntimeException.class);
+        wait.until(new ExpectedCondition<Boolean>()
         {
-            TestUtils.waitForCondition(new Condition()
+            public Boolean apply(WebDriver webDriver)
             {
-                public boolean satisfied()
-                {
-                    boolean present = webDriver.findElements(by).size() > 0;
-                    return (present && !invert || !present && invert);
-                }
-            }, WAITFOR_TIMEOUT, WAITFOR_INTERVAL, "element '" + by + "' to be present.");
-        }
-        catch (TimeoutException e)
-        {
-            File failureFile = captureFailure();
-            throw new SeleniumException(e.getMessage() + " (see: " + failureFile.getName() + ")");
-        }
+                List<WebElement> elements = webDriver.findElements(by);
+                return elements.isEmpty();
+            }
+        });
     }
 
     public void waitForCondition(String condition)

@@ -167,7 +167,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
         PluginsPage pluginsPage = installPlugin(id);
         pluginsPage.clickUninstall(id);
 
-        getBrowser().waitForElement(By.id(pluginsPage.getActionId(ACTION_UNINSTALL, id)), true);
+        getBrowser().waitForElementToDisappear(By.id(pluginsPage.getActionId(ACTION_UNINSTALL, id)));
 
         assertEquals(STATE_UNINSTALLING, pluginsPage.getPluginState(id));
         assertFalse(pluginsPage.isActionPresent(id, ACTION_ENABLE));
