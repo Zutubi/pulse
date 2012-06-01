@@ -92,6 +92,15 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
         return getProject().getId();
     }
 
+    public long getBuildResultId()
+    {
+        BuildResult result = getBuildResult();
+        if (result != null)
+        {
+            return result.getId();
+        }
+        return -1;
+    }
+
     public abstract BuildResult getBuildResult();
-    public abstract long getBuildResultId();
 }

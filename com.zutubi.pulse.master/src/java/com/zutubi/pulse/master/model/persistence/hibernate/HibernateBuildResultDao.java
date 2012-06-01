@@ -491,18 +491,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (RecipeResultNode) findUniqueByNamedQuery("findResultNodeByResultId", "id", id, true);
     }
 
-    public BuildResult findLatest()
+    public BuildResult findLatest(final ResultState... inStates)
     {
-        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.createQuery("from BuildResult result order by result.stamps.endTime desc");
-                queryObject.setMaxResults(1);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.uniqueResult();
-            }
-        });
+        return findLatestByProject(null, inStates);
     }
 
     public CommandResult findCommandResultByArtifact(final long artifactId)
@@ -523,19 +514,18 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public BuildResult findLatestSuccessfulByProject(Project project)
+    public BuildResult findLatestByProject(final Project project, final ResultState... inStates)
     {
-        BuildResult result = (BuildResult) findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
-        if (result != null)
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
         {
-            initialise(result);
-        }
-        return result;
-    }
-
-    public BuildResult findLatestSuccessful()
-    {
-        return (BuildResult) findFirstByNamedQuery("findLatestSuccessful", false);
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, project, inStates, false);
+                criteria.setMaxResults(1);
+                criteria.addOrder(Order.desc("id"));
+                return criteria.uniqueResult();
+            }
+        });
     }
 
     public BuildResult findByRecipeId(long id)

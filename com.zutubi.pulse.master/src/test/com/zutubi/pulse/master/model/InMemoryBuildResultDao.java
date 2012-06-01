@@ -156,7 +156,7 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
-    public BuildResult findLatest()
+    public BuildResult findLatest(ResultState... inStates)
     {
         throw new RuntimeException("Not yet implemented");
     }
@@ -166,7 +166,7 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
-    public BuildResult findLatestSuccessfulByProject(Project project)
+    public BuildResult findLatestByProject(Project project, ResultState... inStates)
     {
         throw new RuntimeException("Not yet implemented");
     }

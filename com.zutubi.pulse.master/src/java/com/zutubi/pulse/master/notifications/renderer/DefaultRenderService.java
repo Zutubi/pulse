@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
 import com.zutubi.pulse.core.engine.api.Feature;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -47,10 +48,10 @@ public class DefaultRenderService implements RenderService
 
         if (!result.succeeded())
         {
-            BuildResult lastSuccess = buildManager.getLatestSuccessfulBuildResult();
-            if (lastSuccess != null)
+            BuildResult lastHealthy = buildManager.getLatestBuildResult(result.getProject(), ResultState.getHealthyStates());
+            if (lastHealthy != null)
             {
-                dataMap.put("lastSuccess", lastSuccess);
+                dataMap.put("lastHealthy", lastHealthy);
             }
 
             dataMap.put("unsuccessfulBuilds", BrokenCountBuildsValue.getValueForBuild(result, buildManager));

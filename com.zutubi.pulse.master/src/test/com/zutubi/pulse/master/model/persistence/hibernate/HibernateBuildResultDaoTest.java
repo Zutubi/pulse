@@ -799,22 +799,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
     }
 
-    public void testFindLatestSuccessful()
-    {
-        createFindLatestSuccessfulTestData();
-
-        BuildResult result = buildResultDao.findLatestSuccessful();
-        assertEquals(4, result.getNumber());
-    }
-
     public void testFindLatestSuccessfulByProject()
     {
         createFindLatestSuccessfulTestData();
 
-        BuildResult result = buildResultDao.findLatestSuccessfulByProject(projectA);
+        BuildResult result = buildResultDao.findLatestByProject(projectA, ResultState.SUCCESS);
         assertEquals(4, result.getNumber());
 
-        result = buildResultDao.findLatestSuccessfulByProject(projectB);
+        result = buildResultDao.findLatestByProject(projectB, ResultState.SUCCESS);
         assertEquals(4, result.getNumber());
     }
 

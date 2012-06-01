@@ -13,9 +13,9 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -29,7 +29,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -42,7 +41,6 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -53,7 +51,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.TimeStamps;
@@ -66,6 +63,11 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -97,7 +99,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private int pendingRecipes = 0;
     private CallbackService callbackService;
 
-    private BuildResult previousSuccessful;
+    private BuildResult previousHealthy;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
     private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
@@ -154,7 +156,7 @@ public class DefaultBuildController implements EventListener, BuildController
             String repositoryUrl = configurationManager.getUserPaths().getRepositoryRoot().toURI().toString();
             ivy = ivyManager.createIvyClient(repositoryUrl);
             moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
-            previousSuccessful = buildManager.getLatestSuccessfulBuildResult(project);
+            previousHealthy = buildManager.getLatestBuildResult(project, ResultState.getHealthyStates());
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             File buildDir = paths.getBuildDir(buildResult);
@@ -271,7 +273,7 @@ public class DefaultBuildController implements EventListener, BuildController
                     assignmentRequest.setPriority(request.getProjectConfig().getOptions().getPriority());
                 }
 
-                RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stageConfig.getHandle());
+                RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
                 RecipeController rc = new RecipeController(projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector);
                 rc.setRecipeQueue(recipeQueue);
                 rc.setBuildManager(buildManager);
@@ -759,9 +761,9 @@ public class DefaultBuildController implements EventListener, BuildController
 
         buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
-        if (previousSuccessful != null)
+        if (previousHealthy != null)
         {
-            buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
+            buildResult.getStamps().setEstimatedRunningTime(previousHealthy.getStamps().getElapsed());
         }
         buildManager.save(buildResult);
     }

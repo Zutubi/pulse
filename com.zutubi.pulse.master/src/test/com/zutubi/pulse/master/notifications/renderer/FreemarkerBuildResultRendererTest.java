@@ -239,6 +239,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         Project project = createProject();
         BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), project, 90, false);
         initialiseResult(previous);
+        previous.setId(previous.getId() - 1);
         previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
         BuildResult result = createSuccessfulBuild();
         result.failure("i failed");
@@ -566,7 +567,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return s.replace("\r", "");
     }
 
-    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<PersistentChangelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
+    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<PersistentChangelist> changelists, BuildResult lastHealthy, int unsuccessfulBuilds, int unsuccessfulDays)
     {
 
         Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -580,9 +581,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("warningLevel", Feature.Level.WARNING);
 
-        if(lastSuccess != null)
+        if(lastHealthy != null)
         {
-            dataMap.put("lastSuccess", lastSuccess);
+            dataMap.put("lastHealthy", lastHealthy);
             dataMap.put("unsuccessfulBuilds", unsuccessfulBuilds);
             dataMap.put("unsuccessfulDays", unsuccessfulDays);
         }

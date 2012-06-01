@@ -126,13 +126,10 @@ public interface BuildManager
     List<BuildResult> getBuildsCompletedSince(Project[] projects, long sinceTime);
 
     @SecureResult
-    BuildResult getLatestBuildResult(Project project);
+    BuildResult getLatestBuildResult(Project project, ResultState... inStates);
 
     @SecureResult
-    BuildResult getLatestSuccessfulBuildResult(Project project);
-
-    @SecureResult
-    BuildResult getLatestSuccessfulBuildResult();
+    BuildResult getLatestBuildResult(ResultState... inStates);
 
     @SecureResult
     BuildResult getByProjectAndNumber(final Project project, final long number);

@@ -41,14 +41,4 @@ public class LatestBuildFileObject extends AbstractBuildFileObject
             return null;
         }
     }
-
-    public long getBuildResultId()
-    {
-        BuildResult result = getBuildResult();
-        if (result != null)
-        {
-            return result.getId();
-        }
-        return -1;
-    }
 }

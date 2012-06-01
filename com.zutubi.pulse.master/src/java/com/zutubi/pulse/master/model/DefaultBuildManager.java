@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
@@ -42,6 +40,9 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -171,13 +172,21 @@ public class DefaultBuildManager implements BuildManager
         {
             return getLatestBuildResult(project);
         }
+        else if (isLatestCompleted(buildId))
+        {
+            return getLatestBuildResult(project, ResultState.getCompletedStates());
+        }
+        else if (isLatestHealthy(buildId))
+        {
+            return getLatestBuildResult(project, ResultState.getHealthyStates());
+        }
         else if (isLatestSuccessful(buildId))
         {
-            return getLatestSuccessfulBuildResult(project);
+            return getLatestBuildResult(project, ResultState.SUCCESS);
         }
         else if (isLatestBroken(buildId))
         {
-            return extractResult(queryBuilds(project, ResultState.getBrokenStates(), -1, -1, 1, 1, true, true));
+            return getLatestBuildResult(project, ResultState.getBrokenStates());
         }
         else
         {
@@ -208,6 +217,16 @@ public class DefaultBuildManager implements BuildManager
     private boolean isLatest(String buildId)
     {
         return buildId.equals("latest");
+    }
+
+    private boolean isLatestCompleted(String buildId)
+    {
+        return buildId.equals("complete") || buildId.equals("completed") || buildId.equals("latestcomplete") || buildId.equals("latestcompleted");
+    }
+
+    private boolean isLatestHealthy(String buildId)
+    {
+        return buildId.equals("healthy") || buildId.equals("latesthealthy");
     }
 
     private boolean isLatestSuccessful(String buildId)
@@ -452,29 +471,19 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findCommandResult(commandResultId).getArtifact(artifactName);
     }
 
-    public BuildResult getLatestBuildResult(Project project)
-    {
-        List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
-        if (results.size() > 0)
-        {
-            return results.get(0);
-        }
-        return null;
-    }
-
     public BuildResult getLatestBuildResult()
     {
         return buildResultDao.findLatest();
     }
 
-    public BuildResult getLatestSuccessfulBuildResult(Project project)
+    public BuildResult getLatestBuildResult(Project project, ResultState... inStates)
     {
-        return buildResultDao.findLatestSuccessfulByProject(project);
+        return buildResultDao.findLatestByProject(project, inStates);
     }
 
-    public BuildResult getLatestSuccessfulBuildResult()
+    public BuildResult getLatestBuildResult(ResultState... inStates)
     {
-        return buildResultDao.findLatestSuccessful();
+        return buildResultDao.findLatest(inStates);
     }
 
     public void cleanup(BuildResult build, BuildCleanupOptions options)

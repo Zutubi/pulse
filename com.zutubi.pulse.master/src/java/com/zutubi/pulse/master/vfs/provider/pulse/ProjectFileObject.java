@@ -22,6 +22,12 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
     {
         nodesDefinitions.put("builds", BuildsFileObject.class);
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
+        nodesDefinitions.put("completed", LatestBrokenBuildFileObject.class);
+        nodesDefinitions.put("latestcompleted", LatestBrokenBuildFileObject.class);
+        nodesDefinitions.put("broken", LatestBrokenBuildFileObject.class);
+        nodesDefinitions.put("latestbroken", LatestBrokenBuildFileObject.class);
+        nodesDefinitions.put("healthy", LatestHealthyBuildFileObject.class);
+        nodesDefinitions.put("latesthealthy", LatestHealthyBuildFileObject.class);
         nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("scm", ScmRootFileObject.class);

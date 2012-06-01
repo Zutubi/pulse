@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
@@ -225,7 +226,7 @@ public class PersonalBuildAction extends ActionSupport
         }
         else if (revision.equals(WorkingCopy.REVISION_LAST_KNOWN_GOOD.getRevisionString()))
         {
-            BuildResult lastKnownGood = buildManager.getLatestSuccessfulBuildResult(project);
+            BuildResult lastKnownGood = buildManager.getLatestBuildResult(project, ResultState.getHealthyStates());
             if (lastKnownGood == null)
             {
                 // Let it float.
