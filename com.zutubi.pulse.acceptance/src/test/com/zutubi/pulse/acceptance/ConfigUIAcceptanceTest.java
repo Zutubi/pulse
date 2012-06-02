@@ -2,39 +2,40 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
-import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.ProjectTypeSelectionConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 
 import java.util.*;
+
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_INHERITED;
+import static com.zutubi.pulse.acceptance.pages.admin.ListPage.ANNOTATION_NONE;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.P4PASSWD;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfigurationActions.ACTION_PAUSE;
+import static com.zutubi.tove.security.AccessManager.ACTION_DELETE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -96,7 +97,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         labelsPage.waitFor();
         String baseName = getNewestListItem(labelsPath);
-        assertTrue(labelsPage.isItemPresent(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE));
+        labelsPage.waitForItem(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE);
         DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
         deleteConfirmPage.waitFor();
         labelsPage = deleteConfirmPage.confirmDeleteListItem();
@@ -134,7 +135,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         labelForm.cancelFormElements("");
 
         labelsPage.waitFor();
-        assertTrue(labelsPage.isItemPresent(labelBaseName, ANNOTATION_NONE));
+        labelsPage.waitForItem(labelBaseName, ANNOTATION_NONE);
     }
 
     private String insertLabel(String projectPath) throws Exception
@@ -357,7 +358,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         ListPage propertiesPage = getBrowser().openAndWaitFor(ListPage.class, childPropertiesPath);
-        assertTrue(propertiesPage.isItemPresent("p1", ListPage.ANNOTATION_HIDDEN));
+        propertiesPage.waitForItem("p1", ListPage.ANNOTATION_HIDDEN);
         propertiesPage.clickAdd();
 
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
@@ -397,10 +398,10 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(path));
-        assertTrue(listPage.isItemPresent("p1", ANNOTATION_NONE, ACTION_DOWN));
+        listPage.waitForItem("p1", ANNOTATION_NONE, ACTION_DOWN);
         assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
-        assertTrue(listPage.isItemPresent("p2", ANNOTATION_NONE, ACTION_DOWN, ACTION_UP));
-        assertTrue(listPage.isItemPresent("p3", ANNOTATION_NONE, ACTION_UP));
+        listPage.waitForItem("p2", ANNOTATION_NONE, ACTION_DOWN, ACTION_UP);
+        listPage.waitForItem("p3", ANNOTATION_NONE, ACTION_UP);
         assertFalse(listPage.isActionLinkPresent("p3", ACTION_DOWN));
     }
 
@@ -454,8 +455,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, triggersPath);
         assertFalse(listPage.isOrderColumnPresent(2));
-        assertTrue(listPage.isItemPresent("t1", ANNOTATION_NONE));
-        assertTrue(listPage.isItemPresent("t2", ANNOTATION_NONE));
+        listPage.waitForItem("t1", ANNOTATION_NONE);
+        listPage.waitForItem("t2", ANNOTATION_NONE);
         assertFalse(listPage.isActionLinkPresent("t1", ACTION_UP));
         assertFalse(listPage.isActionLinkPresent("t1", ACTION_DOWN));
         assertFalse(listPage.isActionLinkPresent("t2", ACTION_UP));
@@ -470,9 +471,9 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(getBrowser().login(random, ""));
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
-        assertTrue(listPage.isItemPresent("p1", ANNOTATION_NONE));
-        assertTrue(listPage.isItemPresent("p2", ANNOTATION_NONE));
-        assertTrue(listPage.isItemPresent("p3", ANNOTATION_NONE));
+        listPage.waitForItem("p1", ANNOTATION_NONE);
+        listPage.waitForItem("p2", ANNOTATION_NONE);
+        listPage.waitForItem("p3", ANNOTATION_NONE);
         assertFalse(listPage.isActionLinkPresent("p1", ACTION_UP));
         assertFalse(listPage.isActionLinkPresent("p1", ACTION_DOWN));
         assertFalse(listPage.isActionLinkPresent("p2", ACTION_UP));
@@ -726,10 +727,10 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         wizard.addProject(random);
 
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "stages"));
-        assertTrue(listPage.isItemPresent("default", ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE));
+        listPage.waitForItem("default", ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE);
 
         listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, random, "triggers"));
-        assertTrue(listPage.isItemPresent("scm trigger", ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE, ACTION_PAUSE));
+        listPage.waitForItem("scm trigger", ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE, ACTION_PAUSE);
     }
 
     public void testDefaultProjectConfigNotCreatedWhenAlreadyInherited()
@@ -744,10 +745,10 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         addInheritingProject(parentName, childName);
 
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, childName, "stages"));
-        assertTrue(listPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE));
+        listPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE);
 
         listPage = getBrowser().openAndWaitFor(ListPage.class, getPath(PROJECTS_SCOPE, childName, "triggers"));
-        assertTrue(listPage.isItemPresent("scm trigger", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE, ACTION_PAUSE));
+        listPage.waitForItem("scm trigger", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE, ACTION_PAUSE);
     }
 
     public void testValidationInWizard()
@@ -860,41 +861,42 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.admin() + "scopish/");
-        getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'scopish': references non-existant root scope 'scopish'", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
+        waitForActionError("Invalid path 'scopish': references non-existant root scope 'scopish'");
     }
 
     public void testInvalidPathNonExistantCollectionItem() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminUser("nosuchuser"));
-        getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
+        waitForActionError("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection");
     }
 
     public void testInvalidPathNonExistantTemplateItem() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject("nosuchproject"));
-        getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
+        waitForActionError("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection");
     }
 
     public void testInvalidPathNonExistantProperty() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");
-        getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'",
-                getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
+        waitForActionError("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'");
     }
 
     public void testInvalidPathSimpleProperty() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(GLOBAL_PROJECT_NAME) + "name/");
-        getBrowser().isElementIdPresent(IDs.GENERIC_ERROR);
-        assertEquals("Invalid path 'projects/global project template/name': references non-complex type", getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
+        waitForActionError("Invalid path 'projects/global project template/name': references non-complex type");
+    }
+
+    private void waitForActionError(String message)
+    {
+        By actionErrorsId = By.id(IDs.ACTION_ERRORS);
+        getBrowser().waitForElement(actionErrorsId);
+        assertEquals(message, getBrowser().getText(By.id(IDs.ACTION_ERRORS)));
     }
 
     public void testInstanceErrorsDisplayed() throws Exception

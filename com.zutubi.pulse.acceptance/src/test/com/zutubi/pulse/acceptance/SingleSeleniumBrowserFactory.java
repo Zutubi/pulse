@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.acceptance.pages.LoginPage;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 /**
@@ -36,16 +38,15 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
                 if (browser.getPulsePort() == AcceptanceTestUtils.getPulsePort())
                 {
                     // Reuse this browser.
-                    browser.open(browser.getUrls().base());
-                    browser.waitForPageToLoad();
-                
-                    if (browser.isLoggedIn())
+                    try
                     {
-                        browser.logout();
+                        returnToLogin();
                     }
-                
-                    browser.open(browser.getUrls().base());
-                    browser.waitForPageToLoad();
+                    catch (Exception e)
+                    {
+                        // Give it one more shot.
+                        returnToLogin();
+                    }
                 }
                 else
                 {
@@ -60,6 +61,20 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
                 browser = null;
             }
         }
+    }
+
+    private void returnToLogin()
+    {
+        if (browser.isLoggedIn())
+        {
+            browser.logout();
+        }
+        else
+        {
+            browser.createPage(LoginPage.class).open();
+        }
+
+        browser.createForm(LoginForm.class).waitFor();
     }
 
     public void stop()

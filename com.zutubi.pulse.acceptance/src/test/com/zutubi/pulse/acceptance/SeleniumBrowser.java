@@ -8,7 +8,10 @@ import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.*;
+import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import freemarker.template.utility.StringUtil;
 import org.openqa.selenium.*;
@@ -32,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.getWorkingDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -455,7 +459,7 @@ public class SeleniumBrowser
      */
     public boolean isLinkPresent(String id)
     {
-        return CollectionUtils.contains(selenium.getAllLinks(), WebUtils.toValidHtmlName(id));
+        return isElementPresent(By.linkText(WebUtils.toValidHtmlName(id)));
     }
 
     /**
@@ -603,6 +607,12 @@ public class SeleniumBrowser
                 List<WebElement> elements = webDriver.findElements(by);
                 return elements.isEmpty() ? null : elements.get(0);
             }
+
+            @Override
+            public String toString()
+            {
+                return "Element '" + by + "' to be present.";
+            }
         });
     }
 
@@ -621,6 +631,12 @@ public class SeleniumBrowser
             {
                 List<WebElement> elements = webDriver.findElements(by);
                 return elements.isEmpty();
+            }
+
+            @Override
+            public String toString()
+            {
+                return "Element '" + by + "' to be *not* present.";
             }
         });
     }
@@ -644,21 +660,13 @@ public class SeleniumBrowser
 
     public void waitForVisible(final String locator)
     {
-        try
+        TestUtils.waitForCondition(new Condition()
         {
-            TestUtils.waitForCondition(new Condition()
+            public boolean satisfied()
             {
-                public boolean satisfied()
-                {
-                    return selenium.isVisible(locator);
-                }
-            }, WAITFOR_TIMEOUT, "locator '" + locator + "' to become visible.");
-        }
-        catch (TimeoutException e)
-        {
-            File failureFile = captureFailure();
-            throw new SeleniumException(e.getMessage() + " (see: " + failureFile.getName() + ")", e);
-        }
+                return selenium.isVisible(locator);
+            }
+        }, WAITFOR_TIMEOUT, "locator '" + locator + "' to become visible.");
     }
 
     /**
@@ -706,8 +714,7 @@ public class SeleniumBrowser
             long remainingTime = endTime - System.currentTimeMillis();
             if (remainingTime <= 0)
             {
-                File failureFile = captureFailure();
-                throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText + " (see: " + failureFile.getName() + ")");
+                throw new TimeoutException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
             }
 
             try
@@ -731,34 +738,13 @@ public class SeleniumBrowser
         }
     }
 
-    public File captureFailure()
+    public File captureFailure(String testName)
     {
-        int i = 1;
-        File failureFile;
-        do
-        {
-            failureFile = new File("working", "failure-" + i + ".txt");
-            i++;
-        }
-        while(failureFile.exists());
-
+        File failureFile = new File(getWorkingDirectory(), testName + "-failure.txt");
         try
         {
-            String text;
-            try
-            {
-                text = selenium.getBodyText();
-            }
-            catch (Exception e)
-            {
-                StringWriter stringWriter = new StringWriter();
-                PrintWriter printWriter = new PrintWriter(stringWriter);
-                printWriter.println("Unable to get body text using selenium:");
-                e.printStackTrace(printWriter);
-                text = stringWriter.toString();
-            }
-
-            FileSystemUtils.createFile(failureFile, text);
+            captureBodyText(failureFile);
+            captureScreenshot(failureFile);
         }
         catch (IOException e)
         {
@@ -766,6 +752,43 @@ public class SeleniumBrowser
         }
 
         return failureFile;
+    }
+
+    private void captureBodyText(File failureFile) throws IOException
+    {
+        String text;
+        try
+        {
+            text = selenium.getBodyText();
+        }
+        catch (Exception e)
+        {
+            text = stackTraceAsString(e, "Unable to get body text using selenium:");
+        }
+
+        FileSystemUtils.createFile(failureFile, text);
+    }
+
+    private void captureScreenshot(File failureFile) throws IOException
+    {
+        String screenshotFilename = failureFile.getAbsolutePath().replace(".txt", ".png");
+        try
+        {
+            selenium.captureScreenshot(screenshotFilename);
+        }
+        catch (Exception e)
+        {
+            FileSystemUtils.createFile(new File(screenshotFilename + ".txt"), stackTraceAsString(e, "Unable to capture screenshot with selenium"));
+        }
+    }
+
+    private String stackTraceAsString(Exception e, String prelude)
+    {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        printWriter.println(prelude);
+        e.printStackTrace(printWriter);
+        return stringWriter.toString();
     }
 
     /**

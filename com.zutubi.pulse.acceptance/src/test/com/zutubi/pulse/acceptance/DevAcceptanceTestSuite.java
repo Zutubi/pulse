@@ -31,10 +31,10 @@ public class DevAcceptanceTestSuite
 //        addClassToSuite(suite, QuartzStatisticsAcceptanceTest.class);
 //
 //        //---( web ui acceptance tests )---
-        addClassToSuite(suite, AgentsSectionAcceptanceTest.class);
-        addClassToSuite(suite, AgentStatusAcceptanceTest.class);
-        addClassToSuite(suite, AgentCommentAcceptanceTest.class);
-        addClassToSuite(suite, AgentHistoryAcceptanceTest.class);
+//        addClassToSuite(suite, AgentsSectionAcceptanceTest.class);
+//        addClassToSuite(suite, AgentStatusAcceptanceTest.class);
+//        addClassToSuite(suite, AgentCommentAcceptanceTest.class);
+//        addClassToSuite(suite, AgentHistoryAcceptanceTest.class);
         addClassToSuite(suite, ConfigUIAcceptanceTest.class);
 //        addClassToSuite(suite, DeleteAcceptanceTest.class);
 //        addClassToSuite(suite, CloneAcceptanceTest.class);

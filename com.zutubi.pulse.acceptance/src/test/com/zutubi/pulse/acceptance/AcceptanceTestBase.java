@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.utils.ConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurations;
+import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -111,7 +112,8 @@ public abstract class AcceptanceTestBase extends PulseTestCase
     public void runBare() throws Throwable
     {
         // leave a trace in the output so that we can see the progress of the tests.
-        System.out.print(getClass().getName() + ":" + getName() + " ");
+        String testName = getClass().getName() + "-" + getName();
+        System.out.print(testName + " ");
         System.out.flush(); // flush here since we do not write a full line above.
 
         long startTime = 0;
@@ -124,6 +126,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
             runTest();
 
             System.out.print("[success]");
+            printElapsed(startTime);
         }
         catch (Throwable t)
         {
@@ -136,13 +139,34 @@ public abstract class AcceptanceTestBase extends PulseTestCase
                 System.out.print("[error]");
             }
 
+            printElapsed(startTime);
+            t.printStackTrace();
+
+            // Lame but effective way of catching both our own and selenium's Timeout
+            if (t instanceof TimeoutException || t instanceof org.openqa.selenium.TimeoutException)
+            {
+                try
+                {
+                    getBrowser().captureFailure(testName);
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Couldn't save failure files:");
+                    e.printStackTrace();
+                }
+            }
+
             throw t;
         }
         finally
         {
-            System.out.println(" " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - startTime));
             tearDown();
         }
+    }
+
+    private void printElapsed(long startTime)
+    {
+        System.out.println(" " + TimeStamps.getPrettyElapsed(System.currentTimeMillis() - startTime));
     }
 
     protected void removeNonMasterAgents() throws Exception

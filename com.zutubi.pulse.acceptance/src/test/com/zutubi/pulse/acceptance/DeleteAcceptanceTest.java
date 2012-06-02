@@ -58,7 +58,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         ListPage labelList = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
-        assertTrue(labelList.isItemPresent(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE));
+        labelList.waitForItem(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE);
         DeleteConfirmPage confirmPage = labelList.clickDelete(baseName);
         confirmPage.waitFor();
         assertTasks(confirmPage, labelPath, ACTION_DELETE_RECORD);
@@ -76,13 +76,13 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         ListPage labelList = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(labelPath));
         String baseName = PathUtils.getBaseName(labelPath);
-        assertTrue(labelList.isItemPresent(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE));
+        labelList.waitForItem(baseName, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE);
         DeleteConfirmPage confirmPage = labelList.clickDelete(baseName);
         confirmPage.waitFor();
         confirmPage.clickCancel();
 
         labelList.waitFor();
-        assertTrue(labelList.isItemPresent(baseName, ANNOTATION_NONE));
+        labelList.waitForItem(baseName, ANNOTATION_NONE);
     }
 
     public void testCancelDeleteProject() throws Exception
@@ -224,7 +224,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         ListPage triggersPage = getBrowser().openAndWaitFor(ListPage.class, PathUtils.getParentPath(triggerPath));
-        assertTrue(triggersPage.isItemPresent("test", ANNOTATION_NONE));
+        triggersPage.waitForItem("test", ANNOTATION_NONE);
 
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, refereeName, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
@@ -347,7 +347,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage usersPage = getBrowser().openAndWaitFor(ListPage.class, MasterConfigurationRegistry.USERS_SCOPE);
-        assertTrue(usersPage.isItemPresent(random, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE, ACTION_SET_PASSWORD));
+        usersPage.waitForItem(random, ANNOTATION_NONE, ACTION_VIEW, ACTION_DELETE, ACTION_SET_PASSWORD);
         DeleteConfirmPage confirmPage = usersPage.clickDelete(random);
         confirmPage.waitFor();
         assertTasks(confirmPage, path, ACTION_DELETE_RECORD, path, "delete user state");
@@ -370,7 +370,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         ListPage cleanupsPage = getBrowser().openAndWaitFor(ListPage.class, cleanupsPath);
         cleanupsPage.expandTreeNode(cleanupsPath);
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
         assertTrue(cleanupsPage.isTreeLinkPresent("default"));
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -380,7 +380,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         confirmPage.clickDelete();
 
         cleanupsPage.waitFor();
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
+        cleanupsPage.waitForItem("default", ANNOTATION_HIDDEN, ACTION_RESTORE);
         assertFalse(cleanupsPage.isTreeLinkPresent("default"));
     }
 
@@ -395,14 +395,14 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         String cleanupsPath = getPath(projectPath, "cleanup");
 
         ListPage cleanupsPage = getBrowser().openAndWaitFor(ListPage.class, cleanupsPath);
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         confirmPage.clickCancel();
 
         cleanupsPage.waitFor();
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
     }
 
     private void setupTemplateProjectWithDefaultCleanup(String name) throws Exception
@@ -430,7 +430,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage cleanupsPage = getBrowser().openAndWaitFor(ListPage.class, parentCleanupsPath);
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -439,7 +439,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         confirmPage.clickDelete();
 
         cleanupsPage.waitFor();
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
+        cleanupsPage.waitForItem("default", ANNOTATION_HIDDEN, ACTION_RESTORE);
         assertFalse(rpcClient.RemoteApi.configPathExists(childCleanupPath));
     }
 
@@ -463,7 +463,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage cleanupsPage = getBrowser().openAndWaitFor(ListPage.class, parentCleanupsPath);
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -472,7 +472,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         confirmPage.clickDelete();
 
         cleanupsPage.waitFor();
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
+        cleanupsPage.waitForItem("default", ANNOTATION_HIDDEN, ACTION_RESTORE);
         assertFalse(rpcClient.RemoteApi.configPathExists(childCleanupPath));
     }
 
@@ -490,13 +490,13 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage cleanupsPage = getBrowser().openAndWaitFor(ListPage.class, cleanupsPath);
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_HIDDEN, ACTION_RESTORE));
+        cleanupsPage.waitForItem("default", ANNOTATION_HIDDEN, ACTION_RESTORE);
         cleanupsPage.expandTreeNode(cleanupsPath);
         assertFalse(cleanupsPage.isTreeLinkPresent("default"));
 
         cleanupsPage.clickRestore("default");
         cleanupsPage.waitFor();
-        assertTrue(cleanupsPage.isItemPresent("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE));
+        cleanupsPage.waitForItem("default", ANNOTATION_INHERITED, ACTION_VIEW, ACTION_CLONE, ACTION_DELETE);
         cleanupsPage.expandTreeNode(cleanupsPath);
         assertTrue(cleanupsPage.isTreeLinkPresent("default"));
     }
@@ -520,14 +520,14 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage reqsPage = getBrowser().openAndWaitFor(ListPage.class, childReqsPath);
-        assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE));
+        reqsPage.waitForItem(baseName, ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE);
         DeleteConfirmPage confirmPage = reqsPage.clickDelete(baseName);
         confirmPage.waitFor();
         assertTasks(confirmPage, childReqPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
         reqsPage.waitFor();
-        assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_HIDDEN, ACTION_RESTORE));
+        reqsPage.waitForItem(baseName, ANNOTATION_HIDDEN, ACTION_RESTORE);
         assertFalse(rpcClient.RemoteApi.configPathExists(childReqPath));
     }
 
@@ -551,11 +551,11 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
 
         ListPage reqsPage = getBrowser().openAndWaitFor(ListPage.class, childReqsPath);
-        assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_HIDDEN, ACTION_RESTORE));
+        reqsPage.waitForItem(baseName, ANNOTATION_HIDDEN, ACTION_RESTORE);
         reqsPage.clickRestore(baseName);
 
         reqsPage.waitFor();
-        assertTrue(reqsPage.isItemPresent(baseName, ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE));
+        reqsPage.waitForItem(baseName, ANNOTATION_INHERITED, ACTION_VIEW, ACTION_DELETE);
         assertTrue(rpcClient.RemoteApi.configPathExists(childReqPath));
     }
 

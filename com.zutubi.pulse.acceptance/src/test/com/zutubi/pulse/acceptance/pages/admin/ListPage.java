@@ -5,13 +5,15 @@ import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.acceptance.forms.admin.PullUpForm;
 import com.zutubi.pulse.acceptance.forms.admin.PushDownForm;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
+import org.openqa.selenium.By;
 
 import static com.zutubi.util.WebUtils.uriPathEncode;
-import org.openqa.selenium.By;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
@@ -159,14 +161,25 @@ public class ListPage extends ConfigPage
         return browser.isElementIdPresent("order-overridden");
     }
 
-    public boolean isItemPresent(String baseName, String annotation, String... actions)
+    public void waitForItem(final String baseName, final String annotation, final String... actions)
+    {
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return isItemPresent(baseName, annotation, actions);
+            }
+        }, SeleniumBrowser.WAITFOR_TIMEOUT, "item to be present");
+    }
+
+    private boolean isItemPresent(String baseName, String annotation, String... actions)
     {
         if (!isItemPresent(baseName))
         {
             return false;
         }
 
-        if(annotation == null)
+        if (annotation == null)
         {
             annotation = ListPage.ANNOTATION_NONE;
         }
@@ -175,7 +188,7 @@ public class ListPage extends ConfigPage
             return false;
         }
 
-        for(String action: actions)
+        for (String action: actions)
         {
             if (!isActionLinkPresent(baseName, action))
             {
@@ -184,5 +197,4 @@ public class ListPage extends ConfigPage
         }
         return true;
     }
-
 }
