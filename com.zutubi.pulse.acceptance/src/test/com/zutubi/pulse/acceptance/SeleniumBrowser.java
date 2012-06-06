@@ -49,7 +49,6 @@ import static org.hamcrest.Matchers.containsString;
 public class SeleniumBrowser
 {
     public static final long DEFAULT_TIMEOUT = 60000;
-    public static final long PAGELOAD_TIMEOUT = 60000;
     public static final long WAITFOR_TIMEOUT = 60000;
     public static final long REFRESH_TIMEOUT = 60000;
 
@@ -108,11 +107,6 @@ public class SeleniumBrowser
         selenium = new WebDriverBackedSelenium(webDriver, baseUrl);
         this.pulsePort = port;
         urls = new Urls(baseUrl);
-    }
-
-    public Urls getUrls()
-    {
-        return urls;
     }
 
     /**
@@ -354,7 +348,6 @@ public class SeleniumBrowser
     public void click(By by)
     {
         WebElement element = webDriver.findElement(by);
-        new Actions(webDriver).moveToElement(element).build().perform();
         element.click();
     }
 
