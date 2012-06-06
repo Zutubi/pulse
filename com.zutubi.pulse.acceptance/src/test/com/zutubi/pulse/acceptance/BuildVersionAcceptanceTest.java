@@ -5,14 +5,15 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * A set of acceptance tests for the build version functionality.  This includes
@@ -102,7 +103,6 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
         // we should be prompted for a revision and a pname value.
         TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
         form.waitFor();
-        assertTrue(form.isFormPresent());
 
         // leave the revision blank
         form.triggerFormElements(asPair("version", "OH_HAI"));

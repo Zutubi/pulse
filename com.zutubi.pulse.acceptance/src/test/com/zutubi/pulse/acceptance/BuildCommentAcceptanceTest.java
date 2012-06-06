@@ -92,7 +92,7 @@ public class BuildCommentAcceptanceTest extends CommentAcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildToComplete(project.getName(), buildNumber);
 
         page.openAndWaitFor();
-        assertTrue(getBrowser().isTextPresent(TEST_COMMENT));
+        getBrowser().waitForTextPresent(TEST_COMMENT);
     }
 
     public void testRemoteApi() throws Exception

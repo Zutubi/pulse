@@ -2,7 +2,9 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.webwork.Urls;
+import com.zutubi.util.Condition;
 import org.openqa.selenium.By;
 
 import static com.zutubi.util.CollectionUtils.asPair;
@@ -40,6 +42,15 @@ public class LoginPage extends SeleniumPage
                 asPair(FIELD_PASSWORD, password),
                 asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe))
         );
+
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return browser.isElementIdPresent("mainForm-action-errors") || browser.isLoggedIn();
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "login to complete");
+
         return !form.isFormPresent();
     }
 
@@ -56,7 +67,6 @@ public class LoginPage extends SeleniumPage
     public SignupPage clickSignup()
     {
         browser.click(By.id(SIGNUP_ID));
-        browser.waitForPageToLoad();
         return browser.createPage(SignupPage.class);
     }
 }

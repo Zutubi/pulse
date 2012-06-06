@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectLogPage;
 import com.zutubi.pulse.core.test.TestUtils;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
@@ -12,6 +11,8 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
 
 import java.util.Hashtable;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 
 /**
  * Tests the initialisation/destroy cycle for projects.
@@ -128,7 +129,7 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(ProjectLogPage.class, project);
-        assertTrue(getBrowser().isTextPresent("Reinitialising"));
+        getBrowser().waitForTextPresent("Reinitialising");
     }
 
     private static class ProjectStateCondition implements Condition

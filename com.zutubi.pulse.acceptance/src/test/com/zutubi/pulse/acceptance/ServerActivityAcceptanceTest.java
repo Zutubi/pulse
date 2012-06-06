@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Acceptance tests for the server/activity page.
@@ -184,7 +185,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, 1L);
-        assertTrue(getBrowser().isTextPresent("Forceful termination requested by 'admin'"));
+        getBrowser().waitForTextPresent("Forceful termination requested by 'admin'");
     }
 
     /**

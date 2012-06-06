@@ -4,9 +4,10 @@ import com.zutubi.pulse.acceptance.components.Pager;
 import com.zutubi.pulse.acceptance.pages.AbstractHistoryPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
-import static java.util.Arrays.asList;
 
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Helper base class for build history acceptance tests.
@@ -32,7 +33,6 @@ public class HistoryAcceptanceTestBase extends AcceptanceTestBase
     protected void setFilterAndWait(AbstractHistoryPage historyPage, String stateFilter)
     {
         historyPage.setStateFilter(stateFilter);
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
     }
 

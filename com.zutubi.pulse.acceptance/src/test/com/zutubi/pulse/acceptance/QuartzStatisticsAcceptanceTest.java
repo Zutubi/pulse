@@ -17,6 +17,6 @@ public class QuartzStatisticsAcceptanceTest extends AcceptanceTestBase
         final QuartzStatisticsPage statsPage = getBrowser().openAndWaitFor(QuartzStatisticsPage.class);
         assertTrue(statsPage.isPresent());
 
-        assertTrue(getBrowser().isTextPresent("callback-triggers"));
+        getBrowser().waitForTextPresent("callback-triggers");
     }
 }

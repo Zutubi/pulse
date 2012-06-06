@@ -137,6 +137,9 @@ Zutubi.pulse.project.HistoryPanel = Ext.extend(Zutubi.ActivePanel, {
     {
         var location;
 
+        // Reset status before firing off a load so the tests can detect the updated page.
+        panel.initialised = false;
+
         location = this.pagerUrl + this.data.pager.currentPage + '/';
         if (filter)
         {

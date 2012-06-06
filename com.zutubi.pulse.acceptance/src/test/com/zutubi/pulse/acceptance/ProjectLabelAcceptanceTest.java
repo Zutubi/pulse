@@ -214,7 +214,7 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
 
         NewLabelForm renameForm = getBrowser().createForm(NewLabelForm.class);
         renameForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("rename all labels?"));        
+        getBrowser().waitForTextPresent("rename all labels?");
         renameForm.cancelFormElements("");
         
         labelsPage.waitFor();
@@ -227,7 +227,7 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         labelForm.saveFormElements(thirdName);
 
         renameForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("rename all labels?"));
+        getBrowser().waitForTextPresent("rename all labels?");
         renameForm.submitFormElements("all", thirdName);
 
         labelsPage.waitFor();
@@ -240,7 +240,7 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         labelForm.saveFormElements(finalName);
 
         renameForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("rename all labels?"));
+        getBrowser().waitForTextPresent("rename all labels?");
         renameForm.submitFormElements("one", finalName);
 
         labelsPage.waitFor();

@@ -1,17 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -34,8 +23,6 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -50,16 +37,10 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.*;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -68,16 +49,11 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.httpclient.Header;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -86,6 +62,30 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -146,7 +146,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, 1L);
         assertFalse(changesPage.hasChanges());
         assertFalse(changesPage.isCompareToPopDownPresent());
-        assertTrue(getBrowser().isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
+        getBrowser().waitForTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
 
         // Check some properties
         EnvironmentArtifactPage envPage = getBrowser().openAndWaitFor(EnvironmentArtifactPage.class, random, 1L, "default", "build");
@@ -169,7 +169,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // Unlike where there are no previous builds, in this case we expect
         // the compare-to pop down.
         assertTrue(changesPage.isCompareToPopDownPresent());
-        assertTrue(getBrowser().isTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none")));
+        getBrowser().waitForTextPresent(Messages.getInstance(ViewChangesAction.class).format("changes.none"));
     }
 
     public void testChangesBetweenBuilds() throws Exception
@@ -188,7 +188,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // Check the changes tab.
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTrue(getBrowser().isTextPresent(changesPage.formatChangesSince(buildNumber)));
+        getBrowser().waitForTextPresent(changesPage.formatChangesSince(buildNumber));
 
         List<Changelist> changelists = changesPage.getChangelists();
         assertEquals(1, changelists.size());
@@ -249,7 +249,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, random, buildNumber);
-        assertTrue(getBrowser().isTextPresent(String.format("%d more files", CHANGE_COUNT - 5)));
+        getBrowser().waitForTextPresent(String.format("%d more files", CHANGE_COUNT - 5));
 
         List<Long> changeIds = changesPage.getChangeIds();
         assertEquals(1, changeIds.size());
@@ -260,7 +260,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertFalse(changelistPage.isPreviousLinkPresent());
 
         changelistPage.clickNext();
-        getBrowser().waitForPageToLoad();
         changelistPage.waitFor();
         changelist = changelistPage.getChangelist();
         assertEquals(CHANGE_COUNT - 100, changelist.getChanges().size());
@@ -590,11 +589,11 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.ERROR));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.WARNING));
         assertTrue(detailsPage.isFeaturesTablePresent(Feature.Level.INFO));
-        assertTrue(getBrowser().isTextPresent("error feature"));
-        assertTrue(getBrowser().isTextPresent("warning feature"));
-        assertTrue(getBrowser().isTextPresent("info feature"));
-        assertTrue(getBrowser().isTextPresent("context line 1"));
-        assertTrue(getBrowser().isTextPresent("info context line 2"));
+        getBrowser().waitForTextPresent("error feature");
+        getBrowser().waitForTextPresent("warning feature");
+        getBrowser().waitForTextPresent("info feature");
+        getBrowser().waitForTextPresent("context line 1");
+        getBrowser().waitForTextPresent("info context line 2");
     }
 
     private void insertFeaturesProcessor(String projectName, String processorName) throws Exception
@@ -806,7 +805,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         goToEnv(projectName, 1);
-        assertTrue(getBrowser().isTextPresent(suppressedName));
+        getBrowser().waitForTextPresent(suppressedName);
         assertFalse(getBrowser().isTextPresent(suppressedValue));
     }
 
@@ -820,7 +819,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         goToArtifact(random, 1, OutputProducingCommandSupport.OUTPUT_NAME, OutputProducingCommandSupport.OUTPUT_FILE);
-        assertTrue(getBrowser().isTextPresent(TRIVIAL_ANT_REPOSITORY));
+        getBrowser().waitForTextPresent(TRIVIAL_ANT_REPOSITORY);
     }
 
     public void testBuildLogs() throws Exception
@@ -833,19 +832,18 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // The logs tab, which should show us the first stage.
         BuildLogsPage logsPage = getBrowser().openAndWaitFor(BuildLogsPage.class, random, 1L, DEFAULT_STAGE);
         assertTrue(logsPage.isLogAvailable());
-        assertTrue(getBrowser().isTextPresent(MESSAGE_RECIPE_COMPLETED));
+        getBrowser().waitForTextPresent(MESSAGE_RECIPE_COMPLETED);
 
         if (getBrowser().isFirefox())
         {
             logsPage.clickDownloadLink();
-            getBrowser().waitForPageToLoad();
-            assertTrue(getBrowser().isTextPresent(MESSAGE_CHECKING_REQUIREMENTS));
+            getBrowser().waitForTextPresent(MESSAGE_CHECKING_REQUIREMENTS);
         }
 
         // Direct to the build log (high-level build messages).
         BuildLogPage logPage = getBrowser().openAndWaitFor(BuildLogPage.class, random, 1L);
         assertTrue(logPage.isLogAvailable());
-        assertTrue(getBrowser().isTextPresent(MESSAGE_BUILD_COMPLETED));
+        getBrowser().waitForTextPresent(MESSAGE_BUILD_COMPLETED);
 
         StageLogPage stageLogPage = getBrowser().createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
         if (getBrowser().isFirefox())
@@ -861,14 +859,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             stageLogPage.waitFor();
         }
         assertTrue(stageLogPage.isLogAvailable());
-        assertTrue(getBrowser().isTextPresent(MESSAGE_RECIPE_COMPLETED));
+        getBrowser().waitForTextPresent(MESSAGE_RECIPE_COMPLETED);
 
         // Change the settings via the popup
         int maxLines = stageLogPage.getMaxLines();
         TailSettingsDialog dialog = stageLogPage.clickConfigureAndWaitForDialog();
         dialog.setMaxLines(maxLines + 5);
         dialog.clickApply();
-        getBrowser().waitForPageToLoad();
         assertEquals(maxLines + 5, stageLogPage.getMaxLines());
     }
 
@@ -908,8 +905,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         page.clickSaveFilterAndWait();
 
         getBrowser().refresh();
-        page.waitForReload();
-        
+
         assertEquals("featured", page.getCurrentFilter());
         assertFalse(page.isArtifactListed(OutputProducingCommandSupport.OUTPUT_NAME));
         assertFalse(page.isArtifactListed(explicitArtifact.getName()));
@@ -930,7 +926,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         getBrowser().open(permalink + "/output.txt");
-        getBrowser().waitForPageToLoad(30 * SECOND);
 
         assertTrue(getBrowser().getBodyText().contains("BUILD SUCCESSFUL"));
     }
@@ -1024,7 +1019,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // we should be prompted for a revision and a pname value.
         TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
         form.waitFor();
-        assertTrue(form.isFormPresent());
+        form.waitFor();
 
         // leave the revision blank
         form.triggerFormElements(asPair("status", STATUS_INTEGRATION));
@@ -1134,7 +1129,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
         goToEnv(projectName, 1);
-        assertTrue(getBrowser().isTextPresent(agentValue));
+        getBrowser().waitForTextPresent(agentValue);
         assertFalse(getBrowser().isTextPresent(projectValue));
     }
 
@@ -1518,7 +1513,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTrue(getBrowser().isTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE)));
+        getBrowser().waitForTextPresent(String.format("Build terminated due to failure of stage '%s'", DEFAULT_STAGE));
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.FAILURE, build);
@@ -1556,7 +1551,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, buildId);
-        assertTrue(getBrowser().isTextPresent("Build terminated due to the stage failure limit (1) being reached"));
+        getBrowser().waitForTextPresent("Build terminated due to the stage failure limit (1) being reached");
 
         Hashtable<String, Object> build = rpcClient.RemoteApi.getBuild(random, (int)buildId);
         assertResultState(ResultState.FAILURE, build);
@@ -1612,7 +1607,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         BuildFilePage buildFilePage = getBrowser().openAndWaitFor(BuildFilePage.class, random, buildId);
         assertTrue(buildFilePage.isDownloadLinkPresent());
         assertTrue(buildFilePage.isHighlightedFilePresent());
-        assertTrue(getBrowser().isTextPresent("default-recipe=\"default\""));
+        getBrowser().waitForTextPresent("default-recipe=\"default\"");
     }
     
     public void testCleanBuild() throws Exception
@@ -1639,7 +1634,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             getBrowser().loginAsAdmin();
 
             getBrowser().openAndWaitFor(CommandArtifactPage.class, projectName, buildId, DEFAULT_STAGE, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTrue(getBrowser().isTextPresent("build.xml"));
+            getBrowser().waitForTextPresent("build.xml");
 
             AgentStatusPage statusPage = getBrowser().openAndWaitFor(AgentStatusPage.class, agentName);
             SynchronisationMessageTable.SynchronisationMessage synchronisationMessage = statusPage.getSynchronisationMessagesTable().getMessage(0);
@@ -1688,7 +1683,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             getBrowser().loginAsAdmin();
 
             getBrowser().openAndWaitFor(CommandArtifactPage.class, projectName, buildId, SECOND_STAGE_NAME, BootstrapCommandConfiguration.COMMAND_NAME, BootstrapCommand.OUTPUT_NAME + "/" + BootstrapCommand.FILES_FILE);
-            assertTrue(getBrowser().isTextPresent("build.xml"));
+            getBrowser().waitForTextPresent("build.xml");
         }
         finally
         {
@@ -1831,7 +1826,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         goToEnv(projectName, buildId);
         for (String env : envs)
         {
-            assertTrue(getBrowser().isTextPresent(env));
+            getBrowser().waitForTextPresent(env);
         }
     }
 
@@ -1845,7 +1840,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         BuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(BuildArtifactsPage.class, projectName, buildId);
         artifactsPage.setFilterAndWait("");
         artifactsPage.clickArtifactFileDownload(artifact, file);
-        getBrowser().waitForPageToLoad(10 * SECOND);
     }
 
     private String addResource(String agent, String name) throws Exception

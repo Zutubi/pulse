@@ -6,9 +6,10 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
-import static java.util.Arrays.asList;
 
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests for the agent history tab.
@@ -39,7 +40,6 @@ public class AgentHistoryAcceptanceTest extends HistoryAcceptanceTestBase
             assertEmptyHistory(historyPage);
 
             historyPage.clearStateFilter();
-            getBrowser().waitForPageToLoad();
             historyPage.waitFor();
             assertEquals(HistoryDataAction.STATE_ANY, historyPage.getStateFilter());
             assertEmptyHistory(historyPage);

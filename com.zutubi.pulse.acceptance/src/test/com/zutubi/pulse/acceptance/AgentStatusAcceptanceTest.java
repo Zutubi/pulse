@@ -8,16 +8,17 @@ import com.zutubi.pulse.acceptance.pages.agents.SynchronisationMessageTable;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.servercore.agent.SynchronisationTask;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
+
+import static com.zutubi.pulse.master.agent.AgentSynchronisationService.COMPLETED_MESSAGE_LIMIT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Tests for the agent status tab.
@@ -139,7 +140,7 @@ public class AgentStatusAcceptanceTest extends AcceptanceTestBase
         SynchronisationMessageTable messagesTable = statusPage.getSynchronisationMessagesTable();
         assertTrue(getBrowser().isElementIdPresent(messagesTable.getId()));
         assertEquals(0, messagesTable.getRowCount());
-        assertTrue(getBrowser().isTextPresent("no synchronisation messages found"));
+        getBrowser().waitForTextPresent("no synchronisation messages found");
     }
 
     public void testSimpleSynchronisationMessage() throws Exception

@@ -37,7 +37,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
     {
         // first we deal with the pulse home property configuration.
         getBrowser().open(urls.base() + "setup/setupData!input.action");
-        getBrowser().waitForPageToLoad();
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
@@ -71,26 +70,26 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         getBrowser().waitForElement("welcome.heading", 60000);
 
         // one complete, we should see the home page, and it should contain the following:
-        assertTrue(getBrowser().isTextPresent(":: welcome ::"));
+        getBrowser().waitForTextPresent(":: welcome ::");
 
         // wait for the toolbar to be rendered before continuing with checking.
         PulseToolbar toolbar = new PulseToolbar(getBrowser());
         toolbar.waitFor();
 
-        assertTrue(getBrowser().isTextPresent("A. D. Ministrator"));
+        getBrowser().waitForTextPresent("A. D. Ministrator");
         assertTrue(getBrowser().isElementIdPresent("logout"));
     }
 
     private void checkSetPulseData()
     {
         SetPulseDataForm form = getBrowser().createForm(SetPulseDataForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         assertTrue(form.isBrowseDataLinkPresent());
         assertTrue(form.isFieldNotEmpty("zfid.data"));
 
         form.nextFormElements("");
         form.waitFor();
-        assertTrue(getBrowser().isTextPresent("pulse data directory requires a value"));
+        getBrowser().waitForTextPresent("pulse data directory requires a value");
 
         form.nextFormElements("data");
     }
@@ -110,25 +109,24 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
 
         // check that license is required.
         licenseForm.nextFormElements("");
-        assertTrue(licenseForm.isFormPresent());
+        licenseForm.waitFor();
         assertTrue(licenseForm.checkFormValues(""));
-        assertTrue(getBrowser().isTextPresent("license key requires a value"));
+        getBrowser().waitForTextPresent("license key requires a value");
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);
-        assertTrue(licenseForm.isFormPresent());
+        licenseForm.waitFor();
         assertTrue(licenseForm.checkFormValues(invalidLicenseKey));
-        assertTrue(getBrowser().isTextPresent("invalid"));
+        getBrowser().waitForTextPresent("invalid");
 
         // check that an expired license is not accepted.
         licenseForm.nextFormElements(expiredLicenseKey);
-        assertTrue(licenseForm.isFormPresent());
+        licenseForm.waitFor();
         assertTrue(licenseForm.checkFormValues(expiredLicenseKey));
-        assertTrue(getBrowser().isTextPresent("expired"));
+        getBrowser().waitForTextPresent("expired");
 
         // enter a valid license.
         licenseForm.nextFormElements(licenseKey);
-        assertFalse(licenseForm.isFormPresent());
     }
 
     private void checkCreateAdmin()

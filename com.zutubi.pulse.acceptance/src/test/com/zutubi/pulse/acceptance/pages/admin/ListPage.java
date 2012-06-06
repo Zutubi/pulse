@@ -64,7 +64,7 @@ public class ListPage extends ConfigPage
 
     public boolean isActionLinkPresent(String baseName, String action)
     {
-        return browser.isLinkPresent(getActionId(action, baseName));
+        return browser.isElementIdPresent(getActionId(action, baseName));
     }
 
     public String getCellContent(int itemIndex, int columnIndex)

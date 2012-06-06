@@ -1,29 +1,30 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectReportsPage;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldConfiguration;
 import com.zutubi.pulse.core.commands.core.CustomFieldsCommandConfiguration;
 import com.zutubi.pulse.core.engine.api.FieldScope;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 {
@@ -158,7 +159,7 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
 
         // Check no groups.
         ProjectReportsPage reportsPage = getBrowser().openAndWaitFor(ProjectReportsPage.class, random);
-        assertTrue(getBrowser().isTextPresent(MESSAGE_NO_GROUPS));
+        getBrowser().waitForTextPresent(MESSAGE_NO_GROUPS);
 
         rpcClient.RemoteApi.restoreConfig(buildTrendsPath);
         rpcClient.RemoteApi.restoreConfig(testTrendsPath);
@@ -171,7 +172,7 @@ public class ProjectReportsAcceptanceTest extends AcceptanceTestBase
         // no builds.
         getBrowser().open(urls.base());
         reportsPage.openAndWaitFor();
-        assertTrue(getBrowser().isTextPresent(MESSAGE_NO_BUILDS));
+        getBrowser().waitForTextPresent(MESSAGE_NO_BUILDS);
 
         // Check that a build gives some data to report.
         rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);

@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
+import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -323,8 +324,8 @@ public class SeleniumBrowser
         {
             throw new IllegalStateException("Can not logout when no logout link is available.");
         }
-        click(By.xpath("//span[@id='logout']/a"));
-        waitForPageToLoad();
+        click(By.id("logout-text"));
+        createForm(LoginForm.class).waitFor();
     }
 
     /**
@@ -342,7 +343,7 @@ public class SeleniumBrowser
      */
     public void open(String location)
     {
-        selenium.open(location);
+        webDriver.navigate().to(location);
     }
 
     /**
@@ -352,7 +353,7 @@ public class SeleniumBrowser
      */
     public void click(By by)
     {
-        webDriver.findElement(by).click();
+        new Actions(webDriver).click(webDriver.findElement(by)).build().perform();
     }
 
     /**
@@ -362,18 +363,15 @@ public class SeleniumBrowser
      */
     public void doubleClick(By by)
     {
-        Actions builder = new Actions(webDriver);
-        builder.doubleClick(webDriver.findElement(by));
-        builder.build().perform();
+        new Actions(webDriver).doubleClick(webDriver.findElement(by)).build().perform();
     }
 
     /**
-     * Refreshes the current web page.  This does not wait for the page to load
-     * after refreshing.
+     * Refreshes the current web page.
      */
     public void refresh()
     {
-        selenium.refresh();
+        webDriver.navigate().refresh();
     }
 
     /**
@@ -434,6 +432,18 @@ public class SeleniumBrowser
     public boolean isTextPresent(String text)
     {
         return selenium.isTextPresent(text);
+    }
+
+    public void waitForTextPresent(final String text)
+    {
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, WAITFOR_TIMEOUT/1000);
+        wait.until(new ExpectedCondition<Boolean>()
+        {
+            public Boolean apply(WebDriver webDriver)
+            {
+                return selenium.isTextPresent(text);
+            }
+        });
     }
 
     /**
@@ -552,16 +562,6 @@ public class SeleniumBrowser
         selenium.deleteAllVisibleCookies();
     }
 
-    public void waitForPageToLoad()
-    {
-        waitForPageToLoad(PAGELOAD_TIMEOUT);
-    }
-
-    public void waitForPageToLoad(long timeout)
-    {
-        selenium.waitForPageToLoad(Long.toString(timeout));
-    }
-
     public void waitForVariable(String variable)
     {
         waitForVariable(variable, false);
@@ -599,7 +599,7 @@ public class SeleniumBrowser
 
     public WebElement waitForElement(final By by, long timeout)
     {
-        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000, 5000).ignoring(RuntimeException.class);
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000, 250).ignoring(RuntimeException.class);
         return wait.until(new ExpectedCondition<WebElement>()
         {
             public WebElement apply(WebDriver webDriver)
@@ -738,47 +738,44 @@ public class SeleniumBrowser
         }
     }
 
-    public File captureFailure(String testName)
+    public void captureFailure(String testName)
     {
-        File failureFile = new File(getWorkingDirectory(), testName + "-failure.txt");
         try
         {
-            captureBodyText(failureFile);
-            captureScreenshot(failureFile);
+            captureBodyText(testName);
+            captureScreenshot(testName);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
-
-        return failureFile;
     }
 
-    private void captureBodyText(File failureFile) throws IOException
+    private void captureBodyText(String testName) throws IOException
     {
         String text;
         try
         {
-            text = selenium.getBodyText();
+            text = selenium.getHtmlSource();
         }
         catch (Exception e)
         {
-            text = stackTraceAsString(e, "Unable to get body text using selenium:");
+            text = stackTraceAsString(e, "Unable to get HTML source using selenium:");
         }
 
-        FileSystemUtils.createFile(failureFile, text);
+        FileSystemUtils.createFile(new File(getWorkingDirectory(), testName + "-failure.html"), text);
     }
 
-    private void captureScreenshot(File failureFile) throws IOException
+    private void captureScreenshot(String testName) throws IOException
     {
-        String screenshotFilename = failureFile.getAbsolutePath().replace(".txt", ".png");
+        String screenshotFilename = new File(getWorkingDirectory(), testName + "-failure.png").getAbsolutePath();
         try
         {
             selenium.captureScreenshot(screenshotFilename);
         }
         catch (Exception e)
         {
-            FileSystemUtils.createFile(new File(screenshotFilename + ".txt"), stackTraceAsString(e, "Unable to capture screenshot with selenium"));
+            FileSystemUtils.createFile(new File(getWorkingDirectory(), testName + "-failure.png.txt"), stackTraceAsString(e, "Unable to capture screenshot with selenium:"));
         }
     }
 

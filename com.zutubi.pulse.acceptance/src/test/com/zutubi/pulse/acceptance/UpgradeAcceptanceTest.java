@@ -139,19 +139,19 @@ public class UpgradeAcceptanceTest extends AcceptanceTestBase
         getBrowser().waitForElement("upgrade.preview", 120 * SECOND);
 
         // check that we have received the upgrade preview, and that the data is as expected.
-        assertTrue(getBrowser().isTextPresent("Upgrade Preview"));
+        getBrowser().waitForTextPresent("Upgrade Preview");
 
         getBrowser().click(By.id("continue"));
         getBrowser().waitForElement("upgrade.progress", 120 * SECOND);
 
         // waiting..
-        assertTrue(getBrowser().isTextPresent("Upgrade Progress"));
+        getBrowser().waitForTextPresent("Upgrade Progress");
 
         // how long should we be waiting for the upgrade to complete?
         getBrowser().waitForElement("upgrade.complete", 120 * SECOND);
 
-        assertTrue(getBrowser().isTextPresent("Upgrade Complete"));
-        assertTrue(getBrowser().isTextPresent("The upgrade has been successful"));
+        getBrowser().waitForTextPresent("Upgrade Complete");
+        getBrowser().waitForTextPresent("The upgrade has been successful");
 
         getBrowser().click(By.id("continue"));
 

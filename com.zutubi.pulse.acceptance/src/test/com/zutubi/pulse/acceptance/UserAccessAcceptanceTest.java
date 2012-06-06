@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.agents.AgentsPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
@@ -28,20 +27,17 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
 
         assertTrue(getBrowser().login(random, ""));
 
-        assertAccessible(DashboardPage.class);
-        assertAccessible(MyPreferencesPage.class);
-        assertAccessible(MyBuildsPage.class);
+        checkAccessible(DashboardPage.class);
+        checkAccessible(MyPreferencesPage.class);
+        checkAccessible(MyBuildsPage.class);
 
-        assertAccessible(BrowsePage.class);
-        assertAccessible(ServerActivityPage.class);
-        assertAccessible(AgentsPage.class);
-
-        assertAccessible(urls.admin());
+        checkAccessible(BrowsePage.class);
+        checkAccessible(ServerActivityPage.class);
+        checkAccessible(AgentsPage.class);
 
         getBrowser().open(urls.admin());
-        getBrowser().waitForPageToLoad();
-        assertTrue(getBrowser().isElementIdPresent("tab.administration.projects"));
-        assertTrue(getBrowser().isElementIdPresent("tab.administration.agents"));
+        getBrowser().waitForElement("tab.administration.projects");
+        getBrowser().waitForElement("tab.administration.agents");
         assertFalse(getBrowser().isElementIdPresent("tab.administration.groups"));
         assertFalse(getBrowser().isElementIdPresent("tab.administration.users"));
         assertFalse(getBrowser().isElementIdPresent("tab.administration.settings"));
@@ -70,20 +66,8 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
         }
     }
 
-    private void assertAccessible(String url)
+    private <T extends SeleniumPage> void checkAccessible(Class<T> page, Object... args)
     {
-        getBrowser().open(url);
-        getBrowser().waitForPageToLoad();
-
-        LoginPage loginPage = getBrowser().createPage(LoginPage.class);
-        assertFalse(loginPage.isPresent());
+        getBrowser().openAndWaitFor(page, args);
     }
-
-    private <T extends SeleniumPage> void  assertAccessible(Class<T> page, Object... args)
-    {
-        SeleniumPage p = getBrowser().openAndWaitFor(page, args);
-        assertTrue(p.isPresent());
-    }
-
-
 }

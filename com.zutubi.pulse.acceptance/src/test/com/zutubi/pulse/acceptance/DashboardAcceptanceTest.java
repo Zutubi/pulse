@@ -6,9 +6,6 @@ import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
@@ -17,6 +14,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -54,9 +54,8 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
     {
         // See CIB-1715.
         getBrowser().open(urls.base() + "dashboard");
-        getBrowser().waitForPageToLoad(3 * SECOND);
         DashboardPage page = getBrowser().createPage(DashboardPage.class);
-        assertTrue(page.isPresent());
+        page.waitFor();
         assertEquals(getBrowser().getTitle(), page.getTitle());
     }
 
@@ -175,7 +174,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             rpcClient.RemoteApi.waitForBuildInProgress(random, 1);
             
             getBrowser().refresh();
-            dashboard.waitForReload();
             buildIds = dashboard.getBuildIds(null, random);
             assertEquals(Arrays.asList(1L), buildIds);
             
@@ -183,7 +181,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
             getBrowser().refresh();
-            dashboard.waitForReload();
             buildIds = dashboard.getBuildIds(null, random);
             assertEquals(Arrays.asList(1L), buildIds);
 
@@ -191,7 +188,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             rpcClient.RemoteApi.waitForBuildInProgress(random, 2);
             
             getBrowser().refresh();
-            dashboard.waitForReload();
             buildIds = dashboard.getBuildIds(null, random);
             assertEquals(Arrays.asList(2L, 1L), buildIds);
 
@@ -199,7 +195,6 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
             getBrowser().refresh();
-            dashboard.waitForReload();
             buildIds = dashboard.getBuildIds(null, random);
             assertEquals(Arrays.asList(2L, 1L), buildIds);
         }

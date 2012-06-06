@@ -72,9 +72,8 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
         else
         {
             browser.createPage(LoginPage.class).open();
+            browser.createForm(LoginForm.class).waitFor();
         }
-
-        browser.createForm(LoginForm.class).waitFor();
     }
 
     public void stop()

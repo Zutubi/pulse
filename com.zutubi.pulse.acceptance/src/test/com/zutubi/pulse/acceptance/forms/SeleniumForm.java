@@ -213,10 +213,6 @@ public abstract class SeleniumForm
         {
             browser.waitForVariable("formSubmitting", true);
         }
-        else
-        {
-            browser.waitForPageToLoad();
-        }
     }
 
     /**

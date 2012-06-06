@@ -6,11 +6,12 @@ import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
 import com.zutubi.pulse.acceptance.pages.admin.HierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.model.UserManager.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.WebUtils;
+
+import static com.zutubi.pulse.master.model.UserManager.*;
 
 /**
  * Test for user groups.
@@ -42,7 +43,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         form.finishFormElements(random, null, null);
 
         getBrowser().waitForElement(getGroupId(random));
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         assertTrue(form.checkFormValues(random, "", ""));
     }
 
@@ -162,7 +163,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         // b) go to form, ensure name is not editable.
         // click view or groups/name
         BuiltinGroupForm form = groupsPage.clickViewBuiltinGroupAndWait(groupId);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
         assertFalse(form.isEditable("name"));
 
         getBrowser().logout();

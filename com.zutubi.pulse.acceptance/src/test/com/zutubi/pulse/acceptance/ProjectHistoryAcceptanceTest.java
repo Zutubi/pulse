@@ -1,15 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHistoryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
@@ -18,6 +11,14 @@ import com.zutubi.util.Predicate;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
 
 public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 {
@@ -35,7 +36,6 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         assertEmptyHistory(historyPage);
         
         historyPage.clearStateFilter();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
         assertEquals(HistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
@@ -109,7 +109,6 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         
         // Step forward
         historyPage.getPager().clickNext();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(BUILD_COUNT - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -118,7 +117,6 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 
         // Step backward
         historyPage.getPager().clickFirst();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -155,7 +153,6 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         
         // Step forward, ensure the filter is maintained.
         historyPage.getPager().clickLast();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(successfulBuilds.size() - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());

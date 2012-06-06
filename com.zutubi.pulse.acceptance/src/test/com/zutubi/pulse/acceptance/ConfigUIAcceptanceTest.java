@@ -185,7 +185,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         checkForm.checkFormElementsAndWait();
         assertFalse(checkForm.isResultOk());
         assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
-        assertTrue(getBrowser().isTextPresent("url requires a value"));
+        getBrowser().waitForTextPresent("url requires a value");
     }
 
     public void testCheckFormCheckFieldValidationFailure() throws Exception
@@ -198,7 +198,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         checkForm.checkFormElementsAndWait("");
         assertFalse(checkForm.isResultOk());
         assertEquals("unable to check configuration due to validation errors", checkForm.getResultMessage());
-        assertTrue(getBrowser().isTextPresent("recipient address requires a value"));
+        getBrowser().waitForTextPresent("recipient address requires a value");
     }
 
     public void testCheckFormInWizard() throws Exception
@@ -280,8 +280,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is already in use, please select another name"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("name is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInherited() throws Exception
@@ -298,8 +298,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is already in use, please select another name"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("name is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInDescendant() throws Exception
@@ -318,8 +318,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is already in use in descendant \"" + childName + "\", please select another name"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("name is already in use in descendant \"" + childName + "\", please select another name");
     }
 
     public void testNameValidationDuplicateInDescendants() throws Exception
@@ -341,8 +341,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is already in use in descendants [" + child1Name + ", " + child2Name + "], please select another name"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("name is already in use in descendants [" + child1Name + ", " + child2Name + "], please select another name");
     }
 
     public void testNameValidationDuplicateInAncestor() throws Exception
@@ -364,8 +364,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         ResourcePropertyForm form = getBrowser().createForm(ResourcePropertyForm.class);
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
     }
 
     public void testCannotConfigureOverriddenPath() throws Exception
@@ -570,7 +570,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         
         getBrowser().openAndWaitFor(CompositePage.class, getPath(childCommandsPath, NEW_COMMAND_NAME));
         AntCommandForm form = getBrowser().createForm(AntCommandForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
     }
 
     private void addInheritingProject(String parentName, String childName)
@@ -716,8 +716,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(getBrowser());
         subversionState.waitFor();
         subversionState.nextNamedFormElements(asPair("url", ""));
-        assertTrue(subversionState.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("url requires a value"));
+        subversionState.waitFor();
+        getBrowser().waitForTextPresent("url requires a value");
     }
 
     public void testDefaultProjectConfigCreated()
@@ -759,7 +759,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(getBrowser());
         projectState.waitFor();
-        assertTrue(getBrowser().isTextPresent("add new project"));
+        getBrowser().waitForTextPresent("add new project");
         assertFalse(getBrowser().isTextPresent("add new project template"));
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements(random, "", "");
@@ -773,8 +773,8 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         subversionState.waitFor();
         assertTrue(subversionState.isMarkedRequired("url"));
         subversionState.nextNamedFormElements(asPair("url", ""));
-        assertTrue(subversionState.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("url requires a value"));
+        subversionState.waitFor();
+        getBrowser().waitForTextPresent("url requires a value");
         subversionState.cancelNamedFormElements();
     }
 
@@ -788,11 +788,11 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         // name.
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(getBrowser());
         projectState.waitFor();
-        assertTrue(getBrowser().isTextPresent("add new project template"));
+        getBrowser().waitForTextPresent("add new project template");
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
-        assertTrue(projectState.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("name is a required field"));
+        projectState.waitFor();
+        getBrowser().waitForTextPresent("name is a required field");
         projectState.nextFormElements(random, "", "");
 
         SelectTypeState scmTypeState = new SelectTypeState(getBrowser());
@@ -833,7 +833,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(subversionForm.isMarkedRequired("url"));
         subversionForm.applyNamedFormElements(asPair("url", ""));
         subversionForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("url requires a value"));
+        getBrowser().waitForTextPresent("url requires a value");
     }
 
     public void testTemplateValidationOnSave() throws Exception
@@ -904,7 +904,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(CompositePage.class, projectPath);
-        assertTrue(getBrowser().isTextPresent("An SCM must be configured to complete this project."));
+        getBrowser().waitForTextPresent("An SCM must be configured to complete this project.");
     }
 
     public void testSaveNoParentPath() throws Exception
@@ -1035,7 +1035,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         form.okFormElements(random, "true");
         
         form.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
         form.cancelFormElements(random, "false");
         hierarchyPage.waitFor();
     }

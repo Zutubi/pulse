@@ -8,11 +8,12 @@ import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.CommentContainer;
 import com.zutubi.util.Condition;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Helper base class for tests of comment pages.
@@ -59,8 +60,8 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         dialog.clickOk();
 
         page.waitForComments(SeleniumBrowser.WAITFOR_TIMEOUT);
-        assertTrue(getBrowser().isTextPresent(TEST_COMMENT));
-        assertTrue(getBrowser().isTextPresent("by " + TEST_USER));
+        getBrowser().waitForTextPresent(TEST_COMMENT);
+        getBrowser().waitForTextPresent("by " + TEST_USER);
     }
 
     protected void cancelCommentOnPage(CommentPage page)

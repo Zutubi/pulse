@@ -397,7 +397,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     private String assertPromptForPulseDataDirectory(RuntimeContext expected, SeleniumBrowser browser)
     {
         SetPulseDataForm form = browser.createForm(SetPulseDataForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
 
         String dataDir = (String) form.getFieldValue(form.getFieldNames()[0]);
 
@@ -410,7 +410,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     private void assertPromptForDatabase(SeleniumBrowser browser)
     {
         SetupDatabaseTypeForm form = browser.createForm(SetupDatabaseTypeForm.class);
-        assertTrue(form.isFormPresent());
+        form.waitFor();
     }
 
     private void assertServerNotAvailable()

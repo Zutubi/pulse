@@ -273,7 +273,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
         assertTasks(confirmPage, projectPath, ACTION_DELETE_RECORD, projectPath, ACTION_DELETE_BUILDS);
-        assertTrue(getBrowser().isTextPresent("A further task is required that is not visible to you with your current permissions"));
+        getBrowser().waitForTextPresent("A further task is required that is not visible to you with your current permissions");
         confirmPage.clickDelete();
 
         ProjectHierarchyPage globalPage = getBrowser().createPage(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
@@ -375,7 +375,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTrue(getBrowser().isTextPresent("Are you sure you wish to hide this record?"));
+        getBrowser().waitForTextPresent("Are you sure you wish to hide this record?");
         assertTasks(confirmPage, cleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
@@ -434,7 +434,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTrue(getBrowser().isTextPresent("Are you sure you wish to hide this record?"));
+        getBrowser().waitForTextPresent("Are you sure you wish to hide this record?");
         assertTasks(confirmPage, parentCleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
@@ -467,7 +467,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
-        assertTrue(getBrowser().isTextPresent("Are you sure you wish to hide this record?"));
+        getBrowser().waitForTextPresent("Are you sure you wish to hide this record?");
         assertTasks(confirmPage, parentCleanupPath, ACTION_HIDE_RECORD, childCleanupPath, ACTION_DELETE_RECORD);
         confirmPage.clickDelete();
 

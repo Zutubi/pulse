@@ -3,14 +3,14 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Hashtable;
-
-import static com.zutubi.util.Constants.SECOND;
 
 /**
  * Tests for the shared projects summary parts of the dashboard and browse
@@ -47,9 +47,9 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
         descendantsBuildingHelper(getBrowser().createPage(DashboardPage.class));
     }
 
-    private void descendantsBuildingHelper(ProjectsSummaryPage summaryPage) throws Exception
+    private void descendantsBuildingHelper(final ProjectsSummaryPage summaryPage) throws Exception
     {
-        String templateProject = random + "-template";
+        final String templateProject = random + "-template";
         String childProject = random + "-child";
 
         File waitFile = new File(FileSystemUtils.getSystemTempDir(), childProject);
@@ -69,14 +69,20 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
 
             triggerAndWaitForBuildToCommence(childProject);
             getBrowser().refresh();
-            getBrowser().waitForPageToLoad(30 * SECOND);
-            assertEquals(STATUS_ONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
+            TestUtils.waitForCondition(new Condition() {
+                public boolean satisfied() {
+                    return STATUS_ONE_BUILDING.equals(summaryPage.getBuildingSummary(null, templateProject));
+                }
+            }, SeleniumBrowser.DEFAULT_TIMEOUT, "build to start");
 
             FileSystemUtils.createFile(waitFile, "test");
             rpcClient.RemoteApi.waitForBuildToComplete(childProject, 1);
             getBrowser().refresh();
-            getBrowser().waitForPageToLoad(30 * SECOND);
-            assertEquals(STATUS_NONE_BUILDING, summaryPage.getBuildingSummary(null, templateProject));
+            TestUtils.waitForCondition(new Condition() {
+                public boolean satisfied() {
+                    return STATUS_NONE_BUILDING.equals(summaryPage.getBuildingSummary(null, templateProject));
+                }
+            }, SeleniumBrowser.DEFAULT_TIMEOUT, "build to complete");
         }
         finally
         {

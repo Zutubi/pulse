@@ -94,7 +94,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().open(urls.base());
         getBrowser().waitForElement("license-expired");
-        assertTrue(getBrowser().isTextPresent("Your license has expired."));
+        getBrowser().waitForTextPresent("Your license has expired.");
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
         // Build triggers should be ignored
@@ -109,7 +109,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         getBrowser().openAndWaitFor(WelcomePage.class);
         getBrowser().refreshUntilElement("support-expired", BUILD_TIMEOUT);
 
-        assertTrue(getBrowser().isTextPresent("support/upgrades have expired"));
+        getBrowser().waitForTextPresent("support/upgrades have expired");
         assertFalse(getBrowser().isElementIdPresent("license-expired"));
 
         // Build triggers should behave normally
@@ -123,7 +123,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().open(urls.base());
         getBrowser().waitForElement("license-cannot-run");
-        assertTrue(getBrowser().isTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date."));
+        getBrowser().waitForTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
         assertFalse(getBrowser().isElementIdPresent("license-expired"));
         assertFalse(getBrowser().isElementIdPresent("support-expired"));
 
@@ -275,7 +275,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
+        getBrowser().waitForTextPresent("Unable to add project: license limit exceeded");
     }
 
     private Date tomorrow()
@@ -346,7 +346,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.finishNamedFormElements(asPair("name", name), asPair("host", "localhost"));
         form.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add agent: license limit exceeded"));
+        getBrowser().waitForTextPresent("Unable to add agent: license limit exceeded");
     }
 
     private void assertCanNotAddUserViaWeb(String name)
@@ -357,7 +357,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.finishNamedFormElements(asPair("login", name), asPair("name", name), asPair("emailAddress", name + "@example.com"));
         form.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add user: license limit exceeded"));
+        getBrowser().waitForTextPresent("Unable to add user: license limit exceeded");
     }
 
     private void assertCanAddUserViaApi(String name)
@@ -390,7 +390,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
         AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         AddProjectWizard.CommandState state = wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(ProjectManager.GLOBAL_PROJECT_NAME, name, false));
         state.waitFor();
-        assertTrue(getBrowser().isTextPresent("Unable to add project: license limit exceeded"));
+        getBrowser().waitForTextPresent("Unable to add project: license limit exceeded");
     }
 
     private void assertCanAddProjectViaApi(String name)
@@ -422,7 +422,7 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().open(urls.base());
         getBrowser().refreshUntilElement("license-exceeded");
-        assertTrue(getBrowser().isTextPresent("Your license limits have been exceeded."));
+        getBrowser().waitForTextPresent("Your license limits have been exceeded.");
 
         // No builds for you!
         assertTriggersIgnored();

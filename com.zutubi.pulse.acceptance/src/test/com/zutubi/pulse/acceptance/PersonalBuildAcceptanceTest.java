@@ -1,13 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -16,7 +14,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -28,10 +25,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
-import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 import org.tmatesoft.svn.core.SVNException;
 
@@ -41,6 +36,12 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -183,7 +184,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("Unknown child element 'notrecognised'"));
+        getBrowser().waitForTextPresent("Unknown child element 'notrecognised'");
     }
 
     public void testPersonalBuildOnAgent() throws Exception
@@ -258,7 +259,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         page.clickHook(HOOK_NAME);
 
         getBrowser().waitForVisible("status-message");
-        assertTrue(getBrowser().isTextPresent("triggered hook '" + HOOK_NAME + "'"));
+        getBrowser().waitForTextPresent("triggered hook '" + HOOK_NAME + "'");
     }
 
     public void testPersonalBuildFloatingRevision() throws Exception
@@ -293,7 +294,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         long buildNumber = runPersonalBuild(ResultState.ERROR);
 
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("Patch does not apply cleanly"));
+        getBrowser().waitForTextPresent("Patch does not apply cleanly");
     }
 
     public void testPersonalBuildWithOverrides() throws Exception
@@ -347,7 +348,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("Force build failure"));
+        getBrowser().waitForTextPresent("Force build failure");
         
         PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals("0f267c3c48939fd51dacbbddcf15f530f82f1523", changesPage.getCheckedOutRevision());
@@ -388,7 +389,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().loginAsAdmin();
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("Force build failure"));
+        getBrowser().waitForTextPresent("Force build failure");
         
         PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals("fe4571fd8bad5d556b26d1a05806074e67bbfa97", changesPage.getCheckedOutRevision());
@@ -487,7 +488,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         long buildNumber = runPersonalBuild(ResultState.FAILURE);
 
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("unified diffs will sink you"));
+        getBrowser().waitForTextPresent("unified diffs will sink you");
 
         PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals(DEFAULT_ANT_BUILD_FILE, changesPage.getChangedFile(0));
@@ -505,10 +506,10 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME, random);
         long buildNumber = runPersonalBuild(ResultState.ERROR);
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("nosuchrecipe"));
+        getBrowser().waitForTextPresent("nosuchrecipe");
         
         getBrowser().openAndWaitFor(PersonalBuildFilePage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("default-recipe=\"nosuchrecipe\""));
+        getBrowser().waitForTextPresent("default-recipe=\"nosuchrecipe\"");
     }
 
 /* TODO: Commented out until we can review why this is failing on pal-win
@@ -671,18 +672,18 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
     {
         // Verify each tab in turn
         getBrowser().openAndWaitFor(PersonalBuildSummaryPage.class, buildNumber);
-        assertTrue(getBrowser().isTextPresent("nosuchcommand"));
+        getBrowser().waitForTextPresent("nosuchcommand");
 
         getBrowser().click(IDs.buildLogsTab());
         BuildLogsPage logsPage = getBrowser().createPage(BuildLogsPage.class, projectName, buildNumber, "default");
         logsPage.waitFor();
-        assertTrue(getBrowser().isTextPresent("Recipe '[default]' completed with status failure"));
+        getBrowser().waitForTextPresent("Recipe '[default]' completed with status failure");
         
         getBrowser().click(IDs.buildDetailsTab());
         PersonalBuildDetailsPage detailsPage = getBrowser().createPage(PersonalBuildDetailsPage.class, buildNumber);
         detailsPage.waitFor();
         detailsPage.clickCommandAndWait("default", "build");
-        assertTrue(getBrowser().isTextPresent("nosuchcommand"));
+        getBrowser().waitForTextPresent("nosuchcommand");
 
         getBrowser().click(IDs.buildChangesTab());
         PersonalBuildChangesPage changesPage = getBrowser().createPage(PersonalBuildChangesPage.class, buildNumber);
@@ -701,7 +702,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         PersonalBuildFilePage filePage = getBrowser().createPage(PersonalBuildFilePage.class, buildNumber);
         filePage.waitFor();
         assertTrue(filePage.isHighlightedFilePresent());
-        assertTrue(getBrowser().isTextPresent("<ant"));
+        getBrowser().waitForTextPresent("<ant");
 
         PersonalBuildArtifactsPage artifactsPage = getBrowser().openAndWaitFor(PersonalBuildArtifactsPage.class, buildNumber);
         artifactsPage.setFilterAndWait("");

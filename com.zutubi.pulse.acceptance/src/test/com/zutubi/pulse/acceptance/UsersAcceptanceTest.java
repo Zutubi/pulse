@@ -15,11 +15,12 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationSta
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+
+import java.util.Hashtable;
+
 import static com.zutubi.util.CollectionUtils.asPair;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import java.util.Hashtable;
 
 public class UsersAcceptanceTest extends AcceptanceTestBase
 {
@@ -150,11 +151,11 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
 
         changePasswordForm.saveFormElements("nope", NEW_PASSWORD, NEW_PASSWORD);
         changePasswordForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("password is incorrect"));
+        getBrowser().waitForTextPresent("password is incorrect");
 
         changePasswordForm.saveFormElements("", NEW_PASSWORD, "wrong");
         changePasswordForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("new passwords do not match"));
+        getBrowser().waitForTextPresent("new passwords do not match");
 
         changePasswordForm.saveFormElements("", NEW_PASSWORD, NEW_PASSWORD);
         getBrowser().waitForStatus("password changed");

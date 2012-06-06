@@ -25,7 +25,7 @@ public class ServerMessagesAcceptanceTest extends AcceptanceTestBase
 
         getBrowser().loginAsAdmin();
         getBrowser().openAndWaitFor(ServerMessagesPage.class, 1);
-        assertTrue(getBrowser().isTextPresent("messages found"));
+        getBrowser().waitForTextPresent("messages found");
     }
 
     public void testServerMessagesPaging() throws Exception
@@ -41,10 +41,8 @@ public class ServerMessagesAcceptanceTest extends AcceptanceTestBase
         try
         {
             getBrowser().loginAsAdmin();
-            AgentMessagesPage page = getBrowser().createPage(AgentMessagesPage.class, random, 1);
-            page.open();
-            getBrowser().waitForPageToLoad();
-            assertTrue(getBrowser().isTextPresent("Agent is not online"));
+            getBrowser().openAndWaitFor(AgentMessagesPage.class, random, 1);
+            getBrowser().waitForTextPresent("Agent is not online");
         }
         finally
         {

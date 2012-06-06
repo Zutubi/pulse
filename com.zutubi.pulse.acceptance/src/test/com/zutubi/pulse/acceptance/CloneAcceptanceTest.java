@@ -14,14 +14,15 @@ import com.zutubi.pulse.master.tove.config.project.triggers.ScmBuildTriggerConfi
 import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getParentPath;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.WebUtils;
-import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for cloning both of top-level template collection items and of
@@ -135,11 +136,11 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is required"));
+        getBrowser().waitForTextPresent("name is required");
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
     }
 
     public void testCloneMapItemCancel() throws Exception
@@ -194,11 +195,11 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is required"));
+        getBrowser().waitForTextPresent("name is required");
 
         cloneForm.cloneFormElements(random);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
     }
 
     public void testCloneProjectHierarchyNoChild() throws Exception
@@ -257,15 +258,15 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is required"));
+        getBrowser().waitForTextPresent("name is required");
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
 
         cloneForm.cloneFormElements(random, "true", random);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("duplicate name, all names must be unique"));
+        getBrowser().waitForTextPresent("duplicate name, all names must be unique");
     }
 
     public void testSmartCloneProject() throws Exception
@@ -290,19 +291,19 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements("", random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is required"));
+        getBrowser().waitForTextPresent("name is required");
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, "");
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is required"));
+        getBrowser().waitForTextPresent("name is required");
 
         cloneForm.cloneFormElements(random, random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random);
         cloneForm.waitFor();
-        assertTrue(getBrowser().isTextPresent("name is already in use"));
+        getBrowser().waitForTextPresent("name is already in use");
     }
 
     public void testSmartCloneProjectHierarchyWithChild() throws Exception

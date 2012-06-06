@@ -64,8 +64,6 @@ public class HierarchyPage extends ConfigurationPanePage
     public void open()
     {
         browser.open(getUrl());
-        // Allow the initial page load.
-        browser.waitForPageToLoad();
     }
 
     public void waitFor()

@@ -72,7 +72,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.saveFormElements("one", "two");
         form.waitFor();
-        assertTrue(getBrowser().isTextPresent("passwords do not match"));
+        getBrowser().waitForTextPresent("passwords do not match");
     }
 
     public void testCustomActionWithArgumentCancel() throws Exception
@@ -149,7 +149,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         form.saveFormElements("<?xml version=\"1.0\"?><project><nosuchtag/></project>");
         form.waitFor();
 
-        assertTrue(getBrowser().isTextPresent("Unknown child element 'nosuchtag'"));
+        getBrowser().waitForTextPresent("Unknown child element 'nosuchtag'");
     }
 
     private ProjectConfigPage prepareActionPrelude() throws Exception
@@ -254,7 +254,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         assertDefaultAndComplexActionsNotShown(projectPage);
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_PAUSE);
-        assertTrue(getBrowser().isTextPresent("action 'pause' triggered on 2 descendants"));
+        getBrowser().waitForTextPresent("action 'pause' triggered on 2 descendants");
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
@@ -267,7 +267,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
 
         projectPage.clickDescendantActionAndWait(ProjectConfigurationActions.ACTION_RESUME);
-        assertTrue(getBrowser().isTextPresent("action 'resume' triggered on 1 descendant"));
+        getBrowser().waitForTextPresent("action 'resume' triggered on 1 descendant");
         assertTrue(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_PAUSE));
         assertFalse(projectPage.isDescendantActionPresent(ProjectConfigurationActions.ACTION_RESUME));
     }

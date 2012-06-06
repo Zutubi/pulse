@@ -4,13 +4,14 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.server.ServerHistoryPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
 import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
-import static java.util.Arrays.asList;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration.DEFAULT_HISTORY_BUILDS_PER_PAGE;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
@@ -37,7 +38,6 @@ public class ServerHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         assertEmptyHistory(historyPage);
 
         historyPage.clearStateFilter();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
         assertEquals(HistoryDataAction.STATE_ANY, historyPage.getStateFilter());
         assertEmptyHistory(historyPage);
@@ -93,7 +93,6 @@ public class ServerHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 
         // Step forward
         historyPage.getPager().clickNext();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(BUILD_COUNT - DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());
@@ -102,7 +101,6 @@ public class ServerHistoryAcceptanceTest extends HistoryAcceptanceTestBase
 
         // Step backward
         historyPage.getPager().clickFirst();
-        getBrowser().waitForPageToLoad();
         historyPage.waitFor();
 
         assertEquals(DEFAULT_HISTORY_BUILDS_PER_PAGE, historyPage.getBuildCount());

@@ -1,22 +1,23 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
+import com.zutubi.pulse.core.test.TestUtils;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.Condition;
+import com.zutubi.util.StringUtils;
+
+import java.util.Hashtable;
+
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import com.zutubi.pulse.acceptance.pages.browse.*;
-import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.acceptance.rpc.RpcClient;
-import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.Condition;
-import com.zutubi.util.StringUtils;
-
-import java.util.Hashtable;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -113,11 +114,16 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         takeResponsibility(TEST_PROJECT);
 
         // Clear on the dashboard
-        DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
+        final DashboardPage dashboardPage = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboardPage.hasResponsibilities());
         dashboardPage.clearResponsibility(TEST_PROJECT);
-        dashboardPage.waitForReload();
-        assertFalse(dashboardPage.hasResponsibilities());
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return !dashboardPage.hasResponsibilities();
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "responsbilities to clear");
     }
 
     public void testOtherUserResponsible() throws Exception

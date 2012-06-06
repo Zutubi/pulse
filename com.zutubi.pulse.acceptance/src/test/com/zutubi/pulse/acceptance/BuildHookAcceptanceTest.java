@@ -303,7 +303,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
         summaryPage.clickHook(random);
         getBrowser().waitForVisible("status-message");
-        assertTrue(getBrowser().isTextPresent("triggered hook '" + random + "'"));
+        getBrowser().waitForTextPresent("triggered hook '" + random + "'");
 
         waitForTask();
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");

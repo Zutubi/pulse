@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.i18n.Messages;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -15,17 +14,11 @@ import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
-import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -33,6 +26,14 @@ import com.zutubi.util.Mapping;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 {
@@ -80,8 +81,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         setAnonymousSignup(true);
 
         getBrowser().open(BrowsePage.class);
-        getBrowser().waitForPageToLoad();
-        
+
         LoginPage loginPage = getBrowser().createPage(LoginPage.class);
         loginPage.waitForSignup();
 
@@ -96,7 +96,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         WelcomePage welcomePage = getBrowser().createPage(WelcomePage.class);
         welcomePage.waitFor();
         assertTrue(welcomePage.isPresent());
-        assertTrue(getBrowser().isTextPresent(name));
+        getBrowser().waitForTextPresent(name);
         assertTrue(welcomePage.isLogoutLinkPresent());
         assertFalse(welcomePage.isLoginLinkPresent());
 
@@ -121,7 +121,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         SignupPage signupPage = getBrowser().openAndWaitFor(SignupPage.class);
         SignupForm form = signupPage.getForm();
         form.saveFormElements(random, random, "", "");
-        assertTrue(getBrowser().isTextPresent("Anonymous signup is not enabled"));
+        getBrowser().waitForTextPresent("Anonymous signup is not enabled");
     }
 
     public void testAnonymousSignupPasswordMismatch() throws Exception
@@ -133,8 +133,8 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         SignupForm form = login.clickSignup().getForm();
         form.waitFor();
         form.saveFormElements(random, random, "p1", "p2");
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent(SIGNUP_MESSAGES.format("passwords.differ")));
+        form.waitFor();
+        getBrowser().waitForTextPresent(SIGNUP_MESSAGES.format("passwords.differ"));
     }
 
     public void testAnonymousSignupExistingUser() throws Exception
@@ -148,8 +148,8 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         SignupForm form = login.clickSignup().getForm();
         form.waitFor();
         form.saveFormElements(adminUsername, "name", "p", "p");
-        assertTrue(form.isFormPresent());
-        assertTrue(getBrowser().isTextPresent("login '"+adminUsername+"' is already in use"));
+        form.waitFor();
+        getBrowser().waitForTextPresent("login '" + adminUsername + "' is already in use");
     }
 
     public void testAnonymousAccess() throws Exception
@@ -188,8 +188,7 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 
         setAnonymousServerPermissions();
 
-        ProjectHierarchyPage hierarchyPage = getBrowser().open(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
-        getBrowser().waitForPageToLoad();
+        ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, GLOBAL_PROJECT_NAME, true);
         assertFalse(hierarchyPage.isAddPresent());
 
         setAnonymousServerPermissions(CREATE_PROJECT);
@@ -280,18 +279,15 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
     private void assertRedirectionToLogin(String url)
     {
         getBrowser().open(url);
-        getBrowser().waitForPageToLoad();
 
         // We should be denied access and redirected to the login page.
         LoginPage loginPage = getBrowser().createPage(LoginPage.class);
         loginPage.waitFor();
-        assertTrue(loginPage.isPresent());
     }
 
     private void assertNoRedirectionToLogin(String url)
     {
         getBrowser().open(url);
-        getBrowser().waitForPageToLoad();
 
         LoginPage loginPage = getBrowser().createPage(LoginPage.class);
         assertFalse(loginPage.isPresent());
