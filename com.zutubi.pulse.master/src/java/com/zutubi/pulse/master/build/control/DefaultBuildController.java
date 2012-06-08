@@ -62,6 +62,7 @@ import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
@@ -994,14 +995,17 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void completeBuild(boolean hard)
     {
-        abortUnfinishedRecipes();
+        // Tries extra hard to ensure a completed build is saved.  If it can't, this controller
+        // must stay alive to handle later attempts.
+        if (!failsafeComplete())
+        {
+            return;
+        }
 
-        // If there is an SQL problem while saving the build result, the build becomes stuck and the server
-        // needs to be restarted to clear it up.  To prevent the need for server restarts, we catch and log the exception
-        // and continue.  This leaves the build result in an incorrect state, but will allow builds to continue. The
-        // builds will be cleaned up next time the server restarts.  THIS IS ONLY A TEMPORARY FIX UNTIL WE WORK OUT
-        // WHAT IS CAUSING THE SQL PROBLEMS (DEADLOCKS, STALE SESSIONS) IN THE FIRST PLACE.
-        // Unfortunately, if we can not write to the db, then we are a little stuffed.
+        // Now we are sure the build has been saved in a complete state.  We have more to do, and
+        // although it's not ideal if something here fails unexpectedly, we can allow this
+        // controller to complete.  We just must make sure the completed event goes out to allow
+        // scheduling of further builds.
         try
         {
             if (!hard && buildResult.getWorstStageState().isHealthy() && !buildResult.isPersonal())
@@ -1016,18 +1020,10 @@ public class DefaultBuildController implements EventListener, BuildController
                 {
                     buildResult.error(e);
                 }
-                catch (Exception e)
-                {
-                    buildResult.error(new BuildException(e));
-                }
             }
-
-            buildResult.complete();
-            buildLogger.completed(buildResult);
 
             // Make these DB updates before the post-build event goes out, in case they influence things that hang off
             // that event (such as hooks).
-            buildManager.save(buildResult);
             if (ivyModuleDescriptor != null)
             {
                 dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
@@ -1060,22 +1056,50 @@ public class DefaultBuildController implements EventListener, BuildController
 
             // Another save is required as hooks may change the build.
             buildManager.save(buildResult);
+
+            deactivateBuildAuthenticationToken();
         }
         catch (Exception e)
         {
-            LOG.severe("Failed to persist the completed build result. Reason: " + e.getMessage(), e);
+            LOG.severe(e);
         }
-
-        deactivateBuildAuthenticationToken();
 
         eventManager.unregister(asyncListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
         buildLogger.close();
 
-        // this must be last since we are in fact stopping the thread running this method.., we are
+        // this must be last since we are in fact stopping the thread running this method, we are
         // after all responding to an event on this listener.
         asyncListener.stop(true);
+    }
+
+    private boolean failsafeComplete()
+    {
+        RetryHandler retryHandler = new RetryHandler(5, TimeUnit.SECONDS, 5, TimeUnit.MINUTES);
+        try
+        {
+            while (true)
+            {
+                try
+                {
+                    abortUnfinishedRecipes();
+                    buildResult.complete();
+                    buildLogger.completed(buildResult);
+                    buildManager.save(buildResult);
+                    return true;
+                }
+                catch (Throwable t)
+                {
+                    retryHandler.handle(t);
+                }
+            }
+        }
+        catch (RetriesExhaustedException e)
+        {
+            LOG.severe("Unable to save completed build result, check your database connection then retry by cancelling the build: " + e.getMessage(), e);
+            return false;
+        }
     }
 
     private void addCommonScmProperties()
