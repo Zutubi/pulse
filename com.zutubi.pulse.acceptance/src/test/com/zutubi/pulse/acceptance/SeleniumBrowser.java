@@ -20,7 +20,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -65,10 +64,6 @@ public class SeleniumBrowser
         if (SystemUtils.IS_WINDOWS)
         {
             return new InternetExplorerDriver();
-        }
-        else if (SystemUtils.IS_MAC)
-        {
-            return new SafariDriver();
         }
         else
         {

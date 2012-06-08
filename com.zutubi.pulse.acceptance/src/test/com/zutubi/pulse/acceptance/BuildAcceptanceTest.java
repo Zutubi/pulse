@@ -845,7 +845,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(logPage.isLogAvailable());
         getBrowser().waitForTextPresent(MESSAGE_BUILD_COMPLETED);
 
-        StageLogPage stageLogPage = getBrowser().createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
+        final StageLogPage stageLogPage = getBrowser().createPage(StageLogPage.class, random, 1L, DEFAULT_STAGE);
         if (getBrowser().isFirefox())
         {
             // Unfortunately JS security prevents us using the combo in proxy
@@ -862,11 +862,17 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         getBrowser().waitForTextPresent(MESSAGE_RECIPE_COMPLETED);
 
         // Change the settings via the popup
-        int maxLines = stageLogPage.getMaxLines();
+        final int maxLines = stageLogPage.getMaxLines();
         TailSettingsDialog dialog = stageLogPage.clickConfigureAndWaitForDialog();
         dialog.setMaxLines(maxLines + 5);
         dialog.clickApply();
-        assertEquals(maxLines + 5, stageLogPage.getMaxLines());
+        TestUtils.waitForCondition(new Condition()
+        {
+            public boolean satisfied()
+            {
+                return stageLogPage.getMaxLines() == maxLines + 5;
+            }
+        }, SeleniumBrowser.DEFAULT_TIMEOUT, "max lines to be updated");
     }
 
     public void testArtifactTab() throws Exception
@@ -925,9 +931,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertTrue(permalink.contains("/downloads/"));
 
         getBrowser().loginAsAdmin();
-        getBrowser().open(permalink + "/output.txt");
-
-        assertTrue(getBrowser().getBodyText().contains("BUILD SUCCESSFUL"));
+        getBrowser().open(StringUtils.join("/", true, urls.base(), permalink + "output.txt"));
+        getBrowser().waitForTextPresent("BUILD SUCCESSFUL");
     }
 
     public void testSetArtifactContentType() throws Exception

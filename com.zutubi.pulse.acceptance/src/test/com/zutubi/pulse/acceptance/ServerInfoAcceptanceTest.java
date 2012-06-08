@@ -58,7 +58,7 @@ public class ServerInfoAcceptanceTest extends AcceptanceTestBase
         try
         {
             getBrowser().loginAsAdmin();
-            getBrowser().openAndWaitFor(AgentInfoPage.class, random);
+            getBrowser().open(AgentInfoPage.class, random);
             getBrowser().waitForTextPresent("Agent is not online");
         }
         finally

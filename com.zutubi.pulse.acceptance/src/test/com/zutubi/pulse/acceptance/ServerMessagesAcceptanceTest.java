@@ -41,7 +41,7 @@ public class ServerMessagesAcceptanceTest extends AcceptanceTestBase
         try
         {
             getBrowser().loginAsAdmin();
-            getBrowser().openAndWaitFor(AgentMessagesPage.class, random, 1);
+            getBrowser().open(AgentMessagesPage.class, random, 1);
             getBrowser().waitForTextPresent("Agent is not online");
         }
         finally
