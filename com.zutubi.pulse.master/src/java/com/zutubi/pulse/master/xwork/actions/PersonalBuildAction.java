@@ -226,7 +226,7 @@ public class PersonalBuildAction extends ActionSupport
         }
         else if (revision.equals(WorkingCopy.REVISION_LAST_KNOWN_GOOD.getRevisionString()))
         {
-            BuildResult lastKnownGood = buildManager.getLatestBuildResult(project, ResultState.getHealthyStates());
+            BuildResult lastKnownGood = buildManager.getLatestBuildResult(project, false, ResultState.getHealthyStates());
             if (lastKnownGood == null)
             {
                 // Let it float.

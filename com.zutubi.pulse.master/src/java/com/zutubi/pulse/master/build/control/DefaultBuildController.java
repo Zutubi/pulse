@@ -156,7 +156,7 @@ public class DefaultBuildController implements EventListener, BuildController
             String repositoryUrl = configurationManager.getUserPaths().getRepositoryRoot().toURI().toString();
             ivy = ivyManager.createIvyClient(repositoryUrl);
             moduleDescriptorFactory = new ModuleDescriptorFactory(new IvyConfiguration(), configurationManager);
-            previousHealthy = buildManager.getLatestBuildResult(project, ResultState.getHealthyStates());
+            previousHealthy = buildManager.getLatestBuildResult(project, true, ResultState.getHealthyStates());
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             File buildDir = paths.getBuildDir(buildResult);

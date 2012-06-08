@@ -125,8 +125,18 @@ public interface BuildManager
     @SecureResult
     List<BuildResult> getBuildsCompletedSince(Project[] projects, long sinceTime);
 
+    /**
+     * Retrieves the latest build result for a given project in any one of a given set of states.
+     *
+     * @param project    the project to get a build from
+     * @param initialise if true, the build is fully loaded from the database (i.e. no lazy
+     *                   collections)
+     * @param inStates   set of states to restrict the build to
+     * @return the latest build of the given project in one of the given states, or null if there
+     *         is no such build
+     */
     @SecureResult
-    BuildResult getLatestBuildResult(Project project, ResultState... inStates);
+    BuildResult getLatestBuildResult(Project project, boolean initialise, ResultState... inStates);
 
     @SecureResult
     BuildResult getLatestBuildResult(ResultState... inStates);

@@ -32,7 +32,7 @@ public abstract class LatestInStatesBuildFileObject extends AbstractBuildFileObj
             if (provider != null)
             {
                 Project project = provider.getProject();
-                return buildManager.getLatestBuildResult(project, inStates);
+                return buildManager.getLatestBuildResult(project, true, inStates);
             }
             else
             {

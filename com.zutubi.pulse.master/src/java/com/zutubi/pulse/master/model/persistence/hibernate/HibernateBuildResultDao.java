@@ -493,7 +493,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findLatest(final ResultState... inStates)
     {
-        return findLatestByProject(null, inStates);
+        return findLatestByProject(null, false, inStates);
     }
 
     public CommandResult findCommandResultByArtifact(final long artifactId)
@@ -514,18 +514,23 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public BuildResult findLatestByProject(final Project project, final ResultState... inStates)
+    public BuildResult findLatestByProject(final Project project, final boolean initialise, final ResultState... inStates)
     {
-        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
+        BuildResult buildResult = (BuildResult) getHibernateTemplate().execute(new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException {
                 Criteria criteria = getBuildResultCriteria(session, project, inStates, false);
                 criteria.setMaxResults(1);
                 criteria.addOrder(Order.desc("id"));
                 return criteria.uniqueResult();
             }
         });
+
+        if (initialise)
+        {
+            initialise(buildResult);
+        }
+
+        return buildResult;
     }
 
     public BuildResult findByRecipeId(long id)

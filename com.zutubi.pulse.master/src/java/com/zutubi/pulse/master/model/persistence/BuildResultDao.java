@@ -96,7 +96,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     CommandResult findCommandResultByArtifact(long artifactId);
 
-    BuildResult findLatestByProject(Project project, ResultState... inStates);
+    BuildResult findLatestByProject(Project project, boolean initialise, ResultState... inStates);
 
     int getBuildCount(String agent, ResultState[] states);
     List<BuildResult> findLatestByAgentName(String agent, ResultState[] states, int first, int max);

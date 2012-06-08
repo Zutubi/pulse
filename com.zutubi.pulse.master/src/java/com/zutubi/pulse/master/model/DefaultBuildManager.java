@@ -170,23 +170,23 @@ public class DefaultBuildManager implements BuildManager
     {
         if (isLatest(buildId))
         {
-            return getLatestBuildResult(project);
+            return getLatestBuildResult(project, false);
         }
         else if (isLatestCompleted(buildId))
         {
-            return getLatestBuildResult(project, ResultState.getCompletedStates());
+            return getLatestBuildResult(project, false, ResultState.getCompletedStates());
         }
         else if (isLatestHealthy(buildId))
         {
-            return getLatestBuildResult(project, ResultState.getHealthyStates());
+            return getLatestBuildResult(project, false, ResultState.getHealthyStates());
         }
         else if (isLatestSuccessful(buildId))
         {
-            return getLatestBuildResult(project, ResultState.SUCCESS);
+            return getLatestBuildResult(project, false, ResultState.SUCCESS);
         }
         else if (isLatestBroken(buildId))
         {
-            return getLatestBuildResult(project, ResultState.getBrokenStates());
+            return getLatestBuildResult(project, false, ResultState.getBrokenStates());
         }
         else
         {
@@ -476,9 +476,9 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatest();
     }
 
-    public BuildResult getLatestBuildResult(Project project, ResultState... inStates)
+    public BuildResult getLatestBuildResult(Project project, boolean initialise, ResultState... inStates)
     {
-        return buildResultDao.findLatestByProject(project, inStates);
+        return buildResultDao.findLatestByProject(project, initialise, inStates);
     }
 
     public BuildResult getLatestBuildResult(ResultState... inStates)

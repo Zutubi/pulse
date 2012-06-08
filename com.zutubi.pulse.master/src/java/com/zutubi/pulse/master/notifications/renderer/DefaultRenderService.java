@@ -48,7 +48,7 @@ public class DefaultRenderService implements RenderService
 
         if (!result.succeeded())
         {
-            BuildResult lastHealthy = buildManager.getLatestBuildResult(result.getProject(), ResultState.getHealthyStates());
+            BuildResult lastHealthy = buildManager.getLatestBuildResult(result.getProject(), true, ResultState.getHealthyStates());
             if (lastHealthy != null)
             {
                 dataMap.put("lastHealthy", lastHealthy);

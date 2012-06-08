@@ -803,10 +803,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         createFindLatestSuccessfulTestData();
 
-        BuildResult result = buildResultDao.findLatestByProject(projectA, ResultState.SUCCESS);
+        BuildResult result = buildResultDao.findLatestByProject(projectA, false, ResultState.SUCCESS);
         assertEquals(4, result.getNumber());
 
-        result = buildResultDao.findLatestByProject(projectB, ResultState.SUCCESS);
+        result = buildResultDao.findLatestByProject(projectB, false, ResultState.SUCCESS);
         assertEquals(4, result.getNumber());
     }
 

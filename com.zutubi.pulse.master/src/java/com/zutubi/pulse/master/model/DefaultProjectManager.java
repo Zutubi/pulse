@@ -1191,7 +1191,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             project = getProject(project.getId(), true);
             idLeader = getProject(idLeader.getId(), true);
 
-            BuildResult latest = buildManager.getLatestBuildResult(project);
+            BuildResult latest = buildManager.getLatestBuildResult(project, false);
             long minimum = latest == null ? 1 : latest.getNumber() + 1;
 
             long next = Math.max(minimum, idLeader.getNextBuildNumber());

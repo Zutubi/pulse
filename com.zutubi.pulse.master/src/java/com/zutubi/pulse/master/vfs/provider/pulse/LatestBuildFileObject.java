@@ -28,7 +28,7 @@ public class LatestBuildFileObject extends AbstractBuildFileObject
             if (provider != null)
             {
                 Project project = provider.getProject();
-                return buildManager.getLatestBuildResult(project);
+                return buildManager.getLatestBuildResult(project, true);
             }
             else
             {
