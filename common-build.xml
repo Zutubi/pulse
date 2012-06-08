@@ -2,6 +2,10 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
     <import file="macros.xml"/>
 
+    <presetdef name="javac">
+        <javac source="5" target="5" includeantruntime="false" />
+    </presetdef>
+
     <!-- initialise configuration -->
     <target name="init" depends="module-pre-init, common-init, module-post-init"/>
 
