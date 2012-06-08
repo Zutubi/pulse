@@ -1085,7 +1085,10 @@ public class DefaultBuildController implements EventListener, BuildController
                 {
                     abortUnfinishedRecipes();
                     buildResult.complete();
-                    buildLogger.completed(buildResult);
+                    if (buildLogger != null)
+                    {
+                        buildLogger.completed(buildResult);
+                    }
                     buildManager.save(buildResult);
                     return true;
                 }

@@ -677,17 +677,20 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public static void initialise(final BuildResult result)
     {
-        Hibernate.initialize(result.getFeatures());
-        for (RecipeResultNode node : result)
+        if (result != null)
         {
-            RecipeResult recipe = node.getResult();
-            Hibernate.initialize(recipe.getFeatures());
-            for (CommandResult command : recipe.getCommandResults())
+            Hibernate.initialize(result.getFeatures());
+            for (RecipeResultNode node : result)
             {
-                Hibernate.initialize(command.getFeatures());
-                for (StoredArtifact artifact : command.getArtifacts())
+                RecipeResult recipe = node.getResult();
+                Hibernate.initialize(recipe.getFeatures());
+                for (CommandResult command : recipe.getCommandResults())
                 {
-                    Hibernate.initialize(artifact.getChildren());
+                    Hibernate.initialize(command.getFeatures());
+                    for (StoredArtifact artifact : command.getArtifacts())
+                    {
+                        Hibernate.initialize(artifact.getChildren());
+                    }
                 }
             }
         }
