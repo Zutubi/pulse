@@ -119,6 +119,8 @@ public class DefaultBuildController implements EventListener, BuildController
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory;
     private ConfigurationVariableProvider configurationVariableProvider;
+
+    private boolean dependencyInfoRecorded = false;
     
     /**
      * A map of the recipe timeout callbacks.
@@ -995,6 +997,14 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void completeBuild(boolean hard)
     {
+        if (!hard && !dependencyInfoRecorded)
+        {
+            // These steps need to be taken before the build is marked as complete, so anything awaiting that moment can
+            // be sure the repository and dependency links are up to date.  We'll also only attempt this once.
+            dependencyInfoRecorded = true;
+            recordDependencyInformation();
+        }
+
         // Tries extra hard to ensure a completed build is saved.  If it can't, this controller
         // must stay alive to handle later attempts.
         if (!failsafeComplete())
@@ -1008,27 +1018,6 @@ public class DefaultBuildController implements EventListener, BuildController
         // scheduling of further builds.
         try
         {
-            if (!hard && buildResult.getWorstStageState().isHealthy() && !buildResult.isPersonal())
-            {
-                try
-                {
-                    // publish this builds ivy file to the repository, making its artifacts available
-                    // to subsequent builds.
-                    publishIvyToRepository();
-                }
-                catch (BuildException e)
-                {
-                    buildResult.error(e);
-                }
-            }
-
-            // Make these DB updates before the post-build event goes out, in case they influence things that hang off
-            // that event (such as hooks).
-            if (ivyModuleDescriptor != null)
-            {
-                dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
-            }
-
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.
             buildResult.calculateFeatureCounts();
@@ -1072,6 +1061,39 @@ public class DefaultBuildController implements EventListener, BuildController
         // this must be last since we are in fact stopping the thread running this method, we are
         // after all responding to an event on this listener.
         asyncListener.stop(true);
+    }
+
+    private void recordDependencyInformation()
+    {
+        try
+        {
+            if (buildResult.getWorstStageState().isHealthy() && !buildResult.isPersonal())
+            {
+                try
+                {
+                    // publish this builds ivy file to the repository, making its artifacts available
+                    // to subsequent builds.
+                    publishIvyToRepository();
+                }
+                catch (BuildException e)
+                {
+                    buildResult.error(e);
+                }
+            }
+
+            // Make these DB updates before the post-build event goes out, in case they influence things that hang off
+            // that event (such as hooks).
+            if (ivyModuleDescriptor != null)
+            {
+                dependencyManager.addDependencyLinks(buildResult, ivyModuleDescriptor);
+            }
+        }
+        catch (Exception e)
+        {
+            // We don't want to prevent build completion for this, as ugly as it may be.
+            buildResult.error(e.getMessage());
+            LOG.severe(e);
+        }
     }
 
     private boolean failsafeComplete()

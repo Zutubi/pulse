@@ -1342,10 +1342,14 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
             
             CONFIGURATION_HELPER.insertProject(project.getConfig(), false);
             
+            // Sadly inserting the stages does not always yield the correct order, so we need to ensure it's right.
+            final String defaultStageName = project.getDefaultStage().getName();
+            String stagesPath = PathUtils.getPath(project.getConfig().getConfigurationPath(), "stages");
+            rpcClient.RemoteApi.setConfigOrder(stagesPath, defaultStageName, SECOND_STAGE);
+
             rpcClient.RemoteApi.triggerBuild(project.getName());
             rpcClient.RemoteApi.waitForBuildInProgress(project.getName(), 1);
-            
-            final String defaultStageName = project.getDefaultStage().getName();
+
             TestUtils.waitForCondition(new Condition()
             {
                 public boolean satisfied()

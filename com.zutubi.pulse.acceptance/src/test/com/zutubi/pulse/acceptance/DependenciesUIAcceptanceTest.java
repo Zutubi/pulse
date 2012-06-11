@@ -10,6 +10,8 @@ import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.dependency.ProjectDependencyGraphBuilder;
 import com.zutubi.util.Condition;
+import com.zutubi.util.WebUtils;
+
 import static java.lang.String.valueOf;
 
 public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
@@ -104,7 +106,7 @@ public class DependenciesUIAcceptanceTest extends AcceptanceTestBase
         long buildNumber = buildRunner.triggerSuccessfulBuild(dependentProject.getConfig());
 
         getBrowser().openAndWaitFor(BuildDetailsPage.class, dependentProject.getName(), buildNumber);
-        assertTrue(getBrowser().isLinkPresent(projectA.getName() + "-default-artifactA.jar"));
+        getBrowser().waitForElement(WebUtils.toValidHtmlName(projectA.getName() + "-default-artifactA.jar"));
 
         // delete the artifact from the file system
         repository.clean();

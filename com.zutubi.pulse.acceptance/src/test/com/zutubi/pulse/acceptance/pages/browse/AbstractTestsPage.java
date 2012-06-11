@@ -33,22 +33,24 @@ public abstract class AbstractTestsPage extends SeleniumPage
 
     public void clickAllCrumb()
     {
-        browser.click(getCrumbLinkLocator(ID_ALL_CRUMB));
+        clickCrumb(ID_ALL_CRUMB);
     }
 
     public void clickStageCrumb()
     {
-        browser.click(getCrumbLinkLocator(ID_STAGE_CRUMB));
+        clickCrumb(ID_STAGE_CRUMB);
     }
 
     public void clickSuiteCrumb(String suitePath)
     {
-        browser.click(getCrumbLinkLocator(WebUtils.toValidHtmlName("suitecrumb-" + suitePath)));
+        clickCrumb(WebUtils.toValidHtmlName("suitecrumb-" + suitePath));
     }
 
-    private By getCrumbLinkLocator(String id)
+    private void clickCrumb(String id)
     {
-        return By.xpath("//span[@id='" + id + "']/a");
+        By crumbLocator = By.xpath("//span[@id='" + id + "']/a");
+        browser.waitForElement(crumbLocator);
+        browser.click(crumbLocator);
     }
 
     public void clickSuiteLink(String suite)
