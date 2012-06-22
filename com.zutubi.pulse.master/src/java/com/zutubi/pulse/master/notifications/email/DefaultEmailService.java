@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.notifications.email;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -19,6 +20,7 @@ public class DefaultEmailService implements EmailService
 {
     private static final Logger LOG = Logger.getLogger(DefaultEmailService.class);
 
+    private static final String PROPERTY_SEND_PARTIAL = "mail.smtp.sendpartial";
     private static final String PROPERTY_TRANSPORT_PROTOCOL = "mail.transport.protocol";
     private static final String PROTOCOL_SMTP = "smtp";
     private static final String PROTOCOL_SMTPS = "smtps";
@@ -69,17 +71,24 @@ public class DefaultEmailService implements EmailService
                 transport.sendMessage(msg, msg.getAllRecipients());
                 sent = true;
             }
+            catch (SendFailedException e)
+            {
+                if (e.getValidSentAddresses().length > 0)
+                {
+                    // We managed to send to some addresses, just report those that failed.
+                    sent = true;
+                    LOG.warning("Mail '" + subject + "' only partially sent.  Not sent to valid addresses " +
+                            asList(e.getValidUnsentAddresses()) + " nor invalid addresses " +
+                            asList(e.getInvalidAddresses()) + ".");
+                }
+                else
+                {
+                    handleError(reuseSession, attempts == retryLimit, e);
+                }
+            }
             catch (MessagingException e)
             {
-                if (reuseSession)
-                {
-                    cleanupSession();
-                }
-
-                if (attempts == retryLimit)
-                {
-                    throw new MessagingException(e.getMessage(), e);
-                }
+                handleError(reuseSession, attempts == retryLimit, e);
             }
             finally
             {
@@ -88,6 +97,19 @@ public class DefaultEmailService implements EmailService
                     safeClose(transport);
                 }
             }
+        }
+    }
+
+    private void handleError(boolean reuseSession, boolean retriesExhausted, MessagingException e) throws MessagingException
+    {
+        if (reuseSession)
+        {
+            cleanupSession();
+        }
+
+        if (retriesExhausted)
+        {
+            throw new MessagingException(e.getMessage(), e);
         }
     }
 
@@ -140,6 +162,7 @@ public class DefaultEmailService implements EmailService
     private Session getSession(final EmailConfiguration config)
     {
         Properties properties = (Properties) System.getProperties().clone();
+        properties.put(PROPERTY_SEND_PARTIAL, true);
         properties.put(PROPERTY_TRANSPORT_PROTOCOL, getProtocol(config));
         properties.put(getProperty(config, PROPERTY_HOST), config.getHost());
 
@@ -191,8 +214,15 @@ public class DefaultEmailService implements EmailService
 
         for (String recipient: recipients)
         {
-            InternetAddress toAddress = new InternetAddress(recipient);
-            msg.addRecipient(Message.RecipientType.TO, toAddress);
+            try
+            {
+                InternetAddress toAddress = new InternetAddress(recipient);
+                msg.addRecipient(Message.RecipientType.TO, toAddress);
+            }
+            catch (MessagingException e)
+            {
+                LOG.warning("Unable to add recipient '" + recipient + "' to email '" + subject + "', dropping this recipient.", e);
+            }
         }
 
         msg.setSubject(subject);
