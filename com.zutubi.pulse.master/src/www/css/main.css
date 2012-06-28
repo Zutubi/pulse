@@ -1194,6 +1194,12 @@ td.status-last
     background-image: none;
 }
 
+#artifacts-tree .x-treegrid-text img
+{
+    vertical-align: top;
+    padding-top: 2px;
+}
+
 #content-panel .x-panel-body
 {
     border: none;
