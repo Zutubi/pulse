@@ -342,7 +342,7 @@ public class SeleniumBrowser
      */
     public void click(By by)
     {
-        new Actions(webDriver).click(webDriver.findElement(by)).perform();
+        webDriver.findElement(by).click();
     }
 
     /**
