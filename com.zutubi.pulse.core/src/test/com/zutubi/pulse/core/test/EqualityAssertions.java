@@ -7,24 +7,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Assertions for higher-level tests of object equality.
  */
 public class EqualityAssertions
 {
-    /**
-     * Asserts two objects are equal, handling null and giving special
-     * consideration to common collection types (Maps, Lists, Collections and
-     * arrays).  Other objects are passed through to {@link Assert#assertEquals(String, Object, Object)}.
-     *
-     * @param a first object
-     * @param b second object
-     */
-    public static void assertObjectEquals(Object a, Object b)
-    {
-        assertObjectEquals(null, a, b);
-    }
-
     public static void assertObjectEquals(String msg, Object a, Object b)
     {
         if (a == null)
@@ -47,7 +36,7 @@ public class EqualityAssertions
         }
         else if (a.getClass().isArray())
         {
-            Arrays.equals((Object[]) a, (Object[]) b);
+            assertTrue(msg, Arrays.equals((Object[]) a, (Object[]) b));
         }
         else
         {
@@ -97,7 +86,7 @@ public class EqualityAssertions
         Assert.assertEquals(msg, a.size(), b.size());
         for (Object aA : a)
         {
-            Assert.assertTrue(msg, b.contains(aA));
+            assertTrue(msg, b.contains(aA));
         }
     }
 
