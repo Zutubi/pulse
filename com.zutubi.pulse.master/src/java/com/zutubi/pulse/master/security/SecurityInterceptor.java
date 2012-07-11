@@ -76,6 +76,15 @@ public class SecurityInterceptor implements MethodInterceptor
                         ensureAccess(arg, action);
                     }
                 }
+                else if (parameterType instanceof Class<?>)
+                {
+                    Class<?> clazz = (Class<?>) parameterType;
+                    if (clazz.isArray() && clazz.getComponentType() == type)
+                    {
+                        found = true;
+                        secureArray(action, arg);
+                    }
+                }
                 else if(parameterType instanceof ParameterizedType)
                 {
                     ParameterizedType parameterizedType = (ParameterizedType) parameterType;
@@ -102,14 +111,7 @@ public class SecurityInterceptor implements MethodInterceptor
                     if(genericArrayType.getGenericComponentType() == type)
                     {
                         found = true;
-                        if(arg != null)
-                        {
-                            Object[] array = (Object[]) arg;
-                            for (Object item : array)
-                            {
-                                ensureAccess(item, action);
-                            }
-                        }
+                        secureArray(action, arg);
                     }
                 }
             }
@@ -121,6 +123,18 @@ public class SecurityInterceptor implements MethodInterceptor
         }
     }
 
+    private void secureArray(String action, Object arg)
+    {
+        if (arg != null)
+        {
+            Object[] array = (Object[]) arg;
+            for (Object item : array)
+            {
+                ensureAccess(item, action);
+            }
+        }
+    }
+
     Object secureResult(String action, Object result)
     {
         if (result != null)
@@ -128,8 +142,8 @@ public class SecurityInterceptor implements MethodInterceptor
             if (result instanceof List)
             {
                 // Filter the list
-                List list = (List) result;
-                List toRemove = new LinkedList();
+                List<?> list = (List) result;
+                List<Object> toRemove = new LinkedList<Object>();
 
                 for (Object resource : list)
                 {
@@ -141,7 +155,7 @@ public class SecurityInterceptor implements MethodInterceptor
 
                 if (toRemove.size() > 0)
                 {
-                    List filtered = new LinkedList(list);
+                    List<Object> filtered = new LinkedList<Object>(list);
                     for (Object dead : toRemove)
                     {
                         filtered.remove(dead);
