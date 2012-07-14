@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.notifications.email;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -11,6 +10,8 @@ import javax.mail.internet.MimeMessage;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+
+import static java.util.Arrays.asList;
 
 /**
  * A default implementation of {@link EmailService} that sends mails
@@ -29,6 +30,8 @@ public class DefaultEmailService implements EmailService
     private static final String PROPERTY_AUTH = "auth";
     private static final String PROPERTY_PORT = "port";
     private static final String PROPERTY_LOCALHOST = "localhost";
+
+    private static final Address[] EMPTY_ADDRESSES = new Address[0];
 
     private EmailConfiguration sharedConfig;
     private Session sharedSession;
@@ -73,13 +76,13 @@ public class DefaultEmailService implements EmailService
             }
             catch (SendFailedException e)
             {
-                if (e.getValidSentAddresses().length > 0)
+                if (safeAddresses(e.getValidSentAddresses()).length > 0)
                 {
                     // We managed to send to some addresses, just report those that failed.
                     sent = true;
                     LOG.warning("Mail '" + subject + "' only partially sent.  Not sent to valid addresses " +
-                            asList(e.getValidUnsentAddresses()) + " nor invalid addresses " +
-                            asList(e.getInvalidAddresses()) + ".");
+                            asList(safeAddresses(e.getValidUnsentAddresses())) + " nor invalid addresses " +
+                            asList(safeAddresses(e.getInvalidAddresses())) + ".");
                 }
                 else
                 {
@@ -98,6 +101,11 @@ public class DefaultEmailService implements EmailService
                 }
             }
         }
+    }
+
+    private Address[] safeAddresses(Address[] addresses)
+    {
+        return addresses == null ? EMPTY_ADDRESSES : addresses;
     }
 
     private void handleError(boolean reuseSession, boolean retriesExhausted, MessagingException e) throws MessagingException
