@@ -40,7 +40,7 @@ public class SaveProjectsFilterAction extends ActionSupport
                         changed = true;
                     }
                 }
-                else if (!StringUtils.equals(user.getDashboardFilter(), filter))
+                else if (!StringUtils.equals(user.getBrowseViewFilter(), filter))
                 {
                     user.setBrowseViewFilter(filter);
                     changed = true;
