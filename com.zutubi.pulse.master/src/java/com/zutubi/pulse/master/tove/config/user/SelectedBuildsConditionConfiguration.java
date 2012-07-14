@@ -153,6 +153,11 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
             expressions.add(NotifyConditionFactory.WARNINGS);
         }
 
+        if (statusChange)
+        {
+            expressions.add(NotifyConditionFactory.STATE_CHANGE);
+        }
+
         if (includeChanges)
         {
             List<ChangedNotifyCondition.Modifier> modifiers = new LinkedList<ChangedNotifyCondition.Modifier>();
