@@ -1006,6 +1006,11 @@ public class DefaultBuildController implements EventListener, BuildController
             recordDependencyInformation();
         }
 
+        // Calculate the feature counts at the end of the build so that the result hierarchy does not need to be
+        // traversed when this information is required.  This info may be queried via the remote API, so set it before
+        // marking the build complete.
+        buildResult.calculateFeatureCounts();
+
         // Tries extra hard to ensure a completed build is saved.  If it can't, this controller
         // must stay alive to handle later attempts.
         if (!failsafeComplete())
@@ -1019,10 +1024,6 @@ public class DefaultBuildController implements EventListener, BuildController
         // scheduling of further builds.
         try
         {
-            // calculate the feature counts at the end of the build so that the result hierarchy does not need to
-            // be traversed when this information is required.
-            buildResult.calculateFeatureCounts();
-
             long start = System.currentTimeMillis();
             testManager.index(buildResult);
             long duration = System.currentTimeMillis() - start;
