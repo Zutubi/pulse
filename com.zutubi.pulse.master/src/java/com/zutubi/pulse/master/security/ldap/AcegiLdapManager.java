@@ -70,9 +70,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     private String statusMessage;
     /**
-     * Cache the users authentication details until the next time they log in.
+     * A cache of LDAP groups, set on each authenticate or when the user is needed and has not yet authenticated.
      */
-    private final Map<String, Authentication> authentications = new HashMap<String, Authentication>();
+    private final Map<String, Set<GrantedAuthority>> groupAuthorities = new HashMap<String, Set<GrantedAuthority>>();
 
     public synchronized void init(LDAPConfiguration configuration)
     {
@@ -81,6 +81,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         this.statusMessage = null;
 
         this.configuration = configuration;
+
+        // Clear the cache group roles, in case group integration settings have changed.
+        this.groupAuthorities.clear();
 
         if (configuration != null && configuration.isEnabled())
         {
@@ -130,7 +133,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 addEmailContactIfAvailable(user, context);
             }
 
-            authentications.put(username, authentication);
+            groupAuthorities.put(username, new HashSet<GrantedAuthority>(authentication.getAuthorities()));
 
             return user;
         }
@@ -206,15 +209,47 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     public synchronized void addLdapRoles(Principle user)
     {
         String username = user.getUsername();
-
-        if (authentications.containsKey(username))
+        if (!groupAuthorities.containsKey(username) && user.getLdapAuthentication())
         {
-            List<UserGroupConfiguration> groups = getLdapGroups(authentications.get(username));
-            for (UserGroupConfiguration group : groups)
+            // User is defined in LDAP, but has not authenticated since Pulse was started.  If group integration is
+            // enabled we have to do a manual bind and group lookup here.
+            LDAPConfiguration configuration = configurationProvider.get(LDAPConfiguration.class);
+            if (!configuration.getGroupBaseDns().isEmpty())
+            {
+                populateGroupAuthorities(user, username, configuration);
+            }
+        }
+
+        Set<GrantedAuthority> authorities = groupAuthorities.get(username);
+        if (authorities != null)
+        {
+            for (UserGroupConfiguration group : getLdapGroups(authorities))
             {
                 LOG.debug("Adding user '" + username + "' to group '" + group.getName() + "' via LDAP");
                 user.addGroup(group);
             }
+        }
+    }
+
+    private void populateGroupAuthorities(Principle user, String username, LDAPConfiguration configuration)
+    {
+        try
+        {
+            DefaultSpringSecurityContextSource context = createContextSource(configuration);
+            FilterBasedLdapUserSearch userSearch = createUserSearch(configuration, context);
+            DirContextOperations userContext = userSearch.searchForUser(user.getUsername());
+            List<DefaultLdapAuthoritiesPopulator> populators = createPopulators(configuration, context);
+            Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+            for (DefaultLdapAuthoritiesPopulator populator: populators)
+            {
+                authorities.addAll(populator.getGroupMembershipRoles(userContext.getNameInNamespace(), username));
+            }
+
+            groupAuthorities.put(username, authorities);
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Could not determine group membership for user '" + user.getUsername() + "': " + e.getMessage(), e);
         }
     }
 
@@ -234,7 +269,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         {
             LdapAuthenticationProvider authenticationProvider = getAuthenticationProvider(configuration);
             Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            return getLdapGroups(authentication);
+            return getLdapGroups(authentication.getAuthorities());
         }
         catch (Exception e)
         {
@@ -242,11 +277,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private List<UserGroupConfiguration> getLdapGroups(Authentication authentication)
+    private List<UserGroupConfiguration> getLdapGroups(Collection<GrantedAuthority> ldapAuthorities)
     {
         List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
-
-        Collection<GrantedAuthority> ldapAuthorities = authentication.getAuthorities();
         for (GrantedAuthority authority : ldapAuthorities)
         {
             UserGroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
@@ -263,7 +296,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     {
         DefaultSpringSecurityContextSource context = createContextSource(configuration);
 
-        return new FilterBasedLdapUserSearch(configuration.getUserBaseDn(), convertUserFilter(configuration.getUserFilter()), context);
+        return createUserSearch(configuration, context);
     }
 
     protected LdapAuthenticationProvider getAuthenticationProvider(LDAPConfiguration configuration) throws Exception
@@ -271,14 +304,12 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         DefaultSpringSecurityContextSource context = createContextSource(configuration);
 
         BindAuthenticator authenticator = new BindAuthenticator(context);
-        authenticator.setUserSearch(new FilterBasedLdapUserSearch(
-                configuration.getUserBaseDn(), convertUserFilter(configuration.getUserFilter()), context)
-        );
+        authenticator.setUserSearch(createUserSearch(configuration, context));
 
         LdapAuthoritiesPopulator populator = new NullAuthoritiesPopulator();
         if (configuration.getGroupBaseDns() != null && !configuration.getGroupBaseDns().isEmpty())
         {
-            populator = createPopulators(configuration, context);
+            populator = new LdapAuthoritiesPopulators(createPopulators(configuration, context));
         }
 
         LdapAuthenticationProvider provider = new LdapAuthenticationProvider(authenticator, populator);
@@ -291,6 +322,12 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
 
         return provider;
+    }
+
+    private FilterBasedLdapUserSearch createUserSearch(LDAPConfiguration configuration, DefaultSpringSecurityContextSource context)
+    {
+        String userFilter = configuration.getUserFilter().replace("${login}", "{0}");
+        return new FilterBasedLdapUserSearch(configuration.getUserBaseDn(), userFilter, context);
     }
 
     private DefaultSpringSecurityContextSource createContextSource(LDAPConfiguration configuration) throws Exception
@@ -334,9 +371,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return context;
     }
 
-    private LdapAuthoritiesPopulator createPopulators(LDAPConfiguration configuration, ContextSource context)
+    private List<DefaultLdapAuthoritiesPopulator> createPopulators(LDAPConfiguration configuration, ContextSource context)
     {
-        List<LdapAuthoritiesPopulator> populators = new LinkedList<LdapAuthoritiesPopulator>();
+        List<DefaultLdapAuthoritiesPopulator> populators = new LinkedList<DefaultLdapAuthoritiesPopulator>();
         for (String groupDn : configuration.getGroupBaseDns())
         {
             if (configuration.getEscapeSpaceCharacters())
@@ -360,18 +397,12 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             populator.setConvertToUpperCase(false);
             populators.add(populator);
         }
-
-        return new LdapAuthoritiesPopulators(populators);
+        return populators;
     }
 
     private String escapeSpaces(String dn)
     {
         return dn.replaceAll(" ", "\\\\20");
-    }
-
-    private String convertUserFilter(String userFilter)
-    {
-        return userFilter.replace("${login}", "{0}");
     }
 
     private String convertGroupFilter(String groupFilter)
@@ -447,9 +478,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     private class LdapAuthoritiesPopulators implements LdapAuthoritiesPopulator
     {
-        private List<LdapAuthoritiesPopulator> populators;
+        private List<? extends LdapAuthoritiesPopulator> populators;
 
-        private LdapAuthoritiesPopulators(List<LdapAuthoritiesPopulator> populators)
+        private LdapAuthoritiesPopulators(List<? extends LdapAuthoritiesPopulator> populators)
         {
             this.populators = populators;
         }
