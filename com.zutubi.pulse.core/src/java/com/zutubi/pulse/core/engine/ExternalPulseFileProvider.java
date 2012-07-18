@@ -35,7 +35,14 @@ public class ExternalPulseFileProvider implements PulseFileProvider
     public String getFileContent(FileResolver resolver) throws Exception
     {
         InputStream is = resolver.resolve(path);
-        return IOUtils.inputStreamToString(is);
+        try
+        {
+            return IOUtils.inputStreamToString(is);
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
     }
 
     public File getImportRoot()

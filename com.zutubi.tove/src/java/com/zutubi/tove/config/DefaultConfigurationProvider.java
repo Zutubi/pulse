@@ -39,7 +39,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         eventManager.register(syncMux);
 
         asyncMux = new DemultiplexingListener(ConfigurationEvent.class);
-        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, threadFactory);
+        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, getClass().getSimpleName() + " async demux", threadFactory);
         eventManager.register(asych);
 
         // The following initialisation steps, along with some of the

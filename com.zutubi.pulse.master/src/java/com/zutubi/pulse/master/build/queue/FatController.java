@@ -65,7 +65,7 @@ public class FatController implements EventListener, Stoppable
 
     public void init()
     {
-        asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
+        asyncListener = new AsynchronousDelegatingListener(this, getClass().getSimpleName(), threadFactory);
         eventManager.register(asyncListener);
 
         controllerStateListener = objectFactory.buildBean(ControllerStateListener.class);

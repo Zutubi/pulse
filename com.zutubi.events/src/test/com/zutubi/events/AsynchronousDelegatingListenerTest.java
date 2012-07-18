@@ -14,7 +14,7 @@ public class AsynchronousDelegatingListenerTest extends ZutubiTestCase
     public void testEventsExecutedOnSeparateThread() throws InterruptedException
     {
         WaitListener delegate = new WaitListener();
-        AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate, Executors.defaultThreadFactory());
+        AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate, "test", Executors.defaultThreadFactory());
 
         l.handleEvent(new Event(this));
         // the listener thread is now waiting for the semaphore to release.

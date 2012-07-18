@@ -54,7 +54,7 @@ public class ResultNotifier implements EventListener
 
     public void init()
     {
-        AsynchronousDelegatingListener listener = new AsynchronousDelegatingListener(this, Executors.newCachedThreadPool(threadFactory));
+        AsynchronousDelegatingListener listener = new AsynchronousDelegatingListener(this, getClass().getSimpleName(), Executors.newCachedThreadPool(threadFactory));
         eventManager.register(listener);
     }
 
