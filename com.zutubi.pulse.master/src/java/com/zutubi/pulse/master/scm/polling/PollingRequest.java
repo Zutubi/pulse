@@ -1,11 +1,8 @@
 package com.zutubi.pulse.master.scm.polling;
 
-import com.zutubi.util.Predicate;
 import com.zutubi.pulse.master.model.Project;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.LinkedList;
+import com.zutubi.util.ConjunctivePredicate;
+import com.zutubi.util.Predicate;
 
 /**
  * A request to poll a particular project.  This request has a list of
@@ -15,50 +12,49 @@ import java.util.LinkedList;
 public class PollingRequest
 {
     private Project project;
-    
-    protected List<Predicate<PollingRequest>> predicates;
+    private ProjectPollingState state;
+    private Predicate<PollingRequest> predicate;
 
-    public PollingRequest(Project project, Predicate<PollingRequest>... predicates)
-    {
-        this(project, Arrays.asList(predicates));
-    }
-
-    public PollingRequest(Project project, List<Predicate<PollingRequest>> predicates)
+    /**
+     * Creates a new request to poll the given project when the given
+     * predicates are satisfied.
+     *
+     * @param project the project to poll
+     * @param state state of the project at the last poll
+     * @param predicates predicates this request must satisfy before it can be
+     *                   activated
+     */
+    public PollingRequest(Project project, ProjectPollingState state, Predicate<PollingRequest>... predicates)
     {
         this.project = project;
-        this.predicates = new LinkedList<Predicate<PollingRequest>>(predicates);
+        this.state = state;
+        predicate = new ConjunctivePredicate<PollingRequest>(predicates);
     }
 
     /**
-     * Add the provided predicate to the list of predicates for this request.
-     *
-     * @param predicate a predicate
+     * @return the project that a poll is requested for
      */
-    public void add(Predicate<PollingRequest> predicate)
-    {
-        this.predicates.add(predicate);
-    }
-
     public Project getProject()
     {
         return project;
     }
 
     /**
-     * Returns true if and only if all of this requests predicates are
+     * @return the state of the project from the last poll
+     */
+    public ProjectPollingState getState()
+    {
+        return state;
+    }
+
+    /**
+     * Returns true if and only if all of this request's predicates are
      * satisfied.
      *
      * @return true if the predicates are satisfied, false otherwise.
      */
     public boolean satisfied()
     {
-        for (Predicate<PollingRequest> predicate : predicates)
-        {
-            if (!predicate.satisfied(this))
-            {
-                return false;
-            }
-        }
-        return true;
+        return predicate.satisfied(this);
     }
 }

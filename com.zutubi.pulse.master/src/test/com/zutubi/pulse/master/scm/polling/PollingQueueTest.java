@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.scm.polling;
 
-import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.Predicate;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 public class PollingQueueTest extends PulseTestCase
 {
@@ -123,12 +123,12 @@ public class PollingQueueTest extends PulseTestCase
 
     private PollingRequest activeRequest()
     {
-        return new PollingRequest(new Project(), new ActivateThisRequest());
+        return new PollingRequest(new Project(), new ProjectPollingState(0, null), new ActivateThisRequest());
     }
 
     private PollingRequest queueRequest()
     {
-        return new PollingRequest(new Project(), new QueueThisRequest());
+        return new PollingRequest(new Project(), new ProjectPollingState(0, null), new QueueThisRequest());
     }
 
     private void assertQueued(PollingRequest... requests)

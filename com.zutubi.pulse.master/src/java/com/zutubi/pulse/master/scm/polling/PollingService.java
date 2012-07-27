@@ -1,17 +1,13 @@
 package com.zutubi.pulse.master.scm.polling;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.config.api.Pollable;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
@@ -20,20 +16,13 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.util.*;
-import com.zutubi.util.adt.Pair;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.concurrent.ConcurrentUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
-import com.zutubi.util.time.TimeStamps;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 
 /**
  * Polls the scms for changes.
@@ -41,7 +30,6 @@ import java.util.concurrent.ThreadFactory;
 public class PollingService implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(PollingService.class);
-    private static final Messages I18N = Messages.getInstance(PollingService.class);
     private static final String CALLBACK_NAME = "Polling";
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
@@ -57,8 +45,8 @@ public class PollingService implements Stoppable
 
     private Clock clock = new SystemClock();
     private ExecutorService executorService;
-    private final Map<Long, Pair<Long, Revision>> waiting = Collections.synchronizedMap(new HashMap<Long, Pair<Long, Revision>>());
-    private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
+    private CompletionService<ProjectPollingState> completionService;
+    private final Map<Long, ProjectPollingState> states = Collections.synchronizedMap(new HashMap<Long, ProjectPollingState>());
     private final PollingQueue requestQueue;
     private final List<Long> clearCacheForProjects = new LinkedList<Long>();
     private final Map<Long, String> projectUidCache = new HashMap<Long, String>();
@@ -72,9 +60,12 @@ public class PollingService implements Stoppable
     {
         int pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT, DEFAULT_POLL_THREAD_COUNT);
         executorService = Executors.newFixedThreadPool(pollThreadCount, threadFactory);
+        completionService = new ExecutorCompletionService<ProjectPollingState>(executorService);
 
-        // initialise the latest built revision cache
-        latestRevisions.putAll(projectManager.getLatestBuiltRevisions());
+        for (Map.Entry<Long, Revision> entry : projectManager.getLatestBuiltRevisions().entrySet())
+        {
+            states.put(entry.getKey(), new ProjectPollingState(entry.getKey(), entry.getValue()));
+        }
 
         try
         {
@@ -145,8 +136,7 @@ public class PollingService implements Stoppable
         {
             for (long projectId : clearCacheForProjects)
             {
-                latestRevisions.remove(projectId);
-                waiting.remove(projectId);
+                states.remove(projectId);
                 projectUidCache.remove(projectId);
             }
             clearCacheForProjects.clear();
@@ -181,173 +171,38 @@ public class PollingService implements Stoppable
                 // the scm uids into a cache now.  This cache will be complete with the necessary uids before
                 // the enqueuing (and subsequent reading) occurs.
                 loadProjectScmUidIntoCache(project);
-                PollingRequest request = new PollingRequest(project);
-                request.add(objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache}));
-                request.add(objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue}));
+                ProjectPollingState state = states.get(project.getId());
+                if (state == null)
+                {
+                    state = new ProjectPollingState(project.getId(), null);
+                }
+
+                OneActivePollPerScmPredicate oneActive = objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache});
+                HasNoDependencyBeingPolledPredicate noDepsPolling = objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue});
+                PollingRequest request = new PollingRequest(project, state, oneActive, noDepsPolling);
                 requests.add(request);
             }
         }
         requestQueue.enqueue(requests.toArray(new PollingRequest[requests.size()]));
 
-        requestListener.waitForProcessingToComplete();
-
-        List<ScmChangeEvent> scmChanges = requestListener.getScmChanges();
-
-        // publish the new scm change events and record the latest encountered revisions.
-        for (ScmChangeEvent change : scmChanges)
+        List<ProjectPollingState> newStates = requestListener.waitForProcessingToComplete();
+        for (ProjectPollingState newState : newStates)
         {
-            eventManager.publish(change);
-            latestRevisions.put(change.getProjectConfiguration().getProjectId(), change.getNewRevision());
+            long projectId = newState.getProjectId();
+            ProjectPollingState previousState = states.get(projectId);
+            if (previousState != null && newState.changeDetectedSince(previousState))
+            {
+                ProjectConfiguration projectConfig = projectManager.getProjectConfig(projectId, true);
+                if (projectConfig != null)
+                {
+                    eventManager.publish(new ScmChangeEvent(projectConfig, newState.getLatestRevision(), previousState.getLatestRevision()));
+                }
+            }
+
+            states.put(projectId, newState);
         }
 
         clearCachesIfNecessary();
-    }
-
-    /**
-     * Poll the specified project for changes, creating the relevant scm change events
-     * and adding them to the changes list.
-     *
-     * @param project   the project being checked for scm changes.
-     * @param changes   the list to which all raised change events are added.
-     */
-    private void poll(Project project, List<ScmChangeEvent> changes)
-    {
-        ProjectConfiguration projectConfig = project.getConfig();
-        Pollable pollable = (Pollable) projectConfig.getScm();
-        long projectId = projectConfig.getProjectId();
-
-        ScmClient client = null;
-
-        try
-        {
-            long now = clock.getCurrentTimeMillis();
-
-            publishStatusMessage(projectConfig, I18N.format("polling.start"));
-            projectManager.updateLastPollTime(projectId, now);
-
-            client = createClient(projectConfig.getScm());
-            ScmContext context = createContext(project, client.getImplicitResource());
-
-            // When was the last time that we checked?  If never, get the latest revision.  We do
-            // this under the lock to protect from races with project destruction clearing the
-            // latestRevisions cache.
-            context.getPersistentContext().lock();
-            Revision previous;
-            try
-            {
-                previous = latestRevisions.get(projectId);
-                if (previous == null)
-                {
-                    previous = client.getLatestRevision(context);
-                    // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
-                    if (previous == null)
-                    {
-                        publishStatusMessage(projectConfig, I18N.format("polling.error", "Failed to return latest revision."));
-                        return;
-                    }
-                    latestRevisions.put(projectId, previous);
-                    publishStatusMessage(projectConfig, I18N.format("polling.initial", previous.getRevisionString()));
-                }
-            }
-            finally
-            {
-                context.getPersistentContext().unlock();
-            }
-
-            if (pollable.isQuietPeriodEnabled())
-            {
-                // are we waiting
-                if (waiting.containsKey(projectId))
-                {
-                    long quietTime = waiting.get(projectId).first;
-                    if (quietTime < clock.getCurrentTimeMillis())
-                    {
-                        Revision lastChange = waiting.get(projectId).second;
-                        Revision latest = getLatestRevisionSince(lastChange, client, context);
-                        if (latest != null)
-                        {
-                            // there has been a commit during the 'quiet period', lets reset the timer.
-                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.continue", latest.getRevisionString()));
-                            waiting.put(projectId, new Pair<Long, Revision>(clock.getCurrentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
-                        }
-                        else
-                        {
-                            // there have been no commits during the 'quiet period', trigger a change.
-                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.end"));
-                            changes.add(new ScmChangeEvent(projectConfig, lastChange, previous));
-                            waiting.remove(projectId);
-                        }
-                    }
-                }
-                else
-                {
-                    Revision latest = getLatestRevisionSince(previous, client, context);
-                    if (latest != null)
-                    {
-                        if (pollable.getQuietPeriod() != 0)
-                        {
-                            publishStatusMessage(projectConfig, I18N.format("polling.quiet.start", latest.getRevisionString()));
-                            waiting.put(projectId, new Pair<Long, Revision>(clock.getCurrentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
-                        }
-                        else
-                        {
-                            changes.add(new ScmChangeEvent(projectConfig, latest, previous));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Revision latest = getLatestRevisionSince(previous, client, context);
-                if (latest != null)
-                {
-                    changes.add(new ScmChangeEvent(projectConfig, latest, previous));
-                }
-            }
-
-            publishStatusMessage(projectConfig, I18N.format("polling.end", TimeStamps.getPrettyElapsed(clock.getCurrentTimeMillis() - now)));
-        }
-        catch (ScmException e)
-        {
-            publishStatusMessage(projectConfig, I18N.format("polling.error", e.getMessage()));
-            LOG.debug(e);
-
-            if (e.isReinitialiseRequired())
-            {
-                projectManager.makeStateTransition(projectConfig.getProjectId(), Project.Transition.INITIALISE);
-            }
-        }
-        finally
-        {
-            IOUtils.close(client);
-        }
-    }
-
-    private void publishStatusMessage(ProjectConfiguration project, String message)
-    {
-        eventManager.publish(new ProjectStatusEvent(this, project, message));
-    }
-
-    private ScmContext createContext(Project project, String implicitResource) throws ScmException
-    {
-        return scmManager.createContext(project.getConfig(), project.getState(), implicitResource);
-    }
-
-    private ScmClient createClient(ScmConfiguration config) throws ScmException
-    {
-        return scmManager.createClient(config);
-    }
-
-    private Revision getLatestRevisionSince(Revision revision, ScmClient client, ScmContext context) throws ScmException
-    {
-        // this assumes that getting the revision since revision x is more efficient than getting the latest revision.
-        List<Revision> revisions = client.getRevisions(context, revision, null);
-        if (revisions.size() > 0)
-        {
-            // get the latest revision.
-            return revisions.get(revisions.size() - 1);
-        }
-        return null;
     }
 
     private List<DependencyTree> generateDependencyTrees()
@@ -513,24 +368,16 @@ public class PollingService implements Stoppable
      */
     private class PollingRequestListener implements PollingActivationListener
     {
-        private final List<Future> futures;
-        private final List<ScmChangeEvent> scmChanges;
-
-        private PollingRequestListener()
-        {
-            futures = new LinkedList<Future>();
-            scmChanges = Collections.synchronizedList(new LinkedList<ScmChangeEvent>());
-        }
-
         public void onActivation(final PollingRequest request)
         {
-            Future<?> future = executorService.submit(new Runnable()
+            final ProjectPoll poll = objectFactory.buildBean(ProjectPoll.class, new Class[] {Project.class, ProjectPollingState.class, Clock.class}, new Object[] {request.getProject(), request.getState(), clock});
+            completionService.submit(new Callable<ProjectPollingState>()
             {
-                public void run()
+                public ProjectPollingState call() throws Exception
                 {
                     try
                     {
-                        poll(request.getProject(), scmChanges);
+                        return poll.call();
                     }
                     finally
                     {
@@ -538,48 +385,36 @@ public class PollingService implements Stoppable
                     }
                 }
             });
-            synchronized (futures)
-            {
-                futures.add(future);
-            }
-        }
-
-        public List<ScmChangeEvent> getScmChanges()
-        {
-            return scmChanges;
         }
 
         /**
          * This is a blocking call that waits until all of the requests in the queue have been
          * processed before returning.
+         *
+         * @return the new polling states for all processed projects
          */
-        public void waitForProcessingToComplete()
+        public List<ProjectPollingState> waitForProcessingToComplete()
         {
+            final List<ProjectPollingState> newStates = new LinkedList<ProjectPollingState>();
+
             while (requestQueue.hasRequests())
             {
                 try
                 {
-                    // Take a snapshot of the futures we have at the moment since this list
-                    // will be changing so long as we have queued requests.
-                    List<Future> copyOfFutures;
-                    synchronized (futures)
-                    {
-                        copyOfFutures = new LinkedList<Future>(futures);
-                    }
-
-                    ConcurrentUtils.waitForTasks(copyOfFutures, LOG);
-
-                    // Cleanup the futures list, removing those that we have finished waiting for.
-                    synchronized (futures)
-                    {
-                        futures.removeAll(copyOfFutures);
-                    }
+                    ProjectPollingState newState = completionService.take().get();
+                    newStates.add(newState);
                 }
                 catch (InterruptedException e)
                 {
                     LOG.warning(e);
                 }
+                catch (ExecutionException e)
+                {
+                    LOG.severe(e);
+                }
             }
+
+            return newStates;
         }
     }
 }

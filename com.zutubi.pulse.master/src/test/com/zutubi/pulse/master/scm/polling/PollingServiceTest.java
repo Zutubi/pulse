@@ -46,7 +46,7 @@ import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
-    private static final Messages I18N = Messages.getInstance(PollingService.class);
+    private static final Messages I18N = Messages.getInstance(ProjectPoll.class);
 
     private EventManager eventManager;
     private ThreadFactory threadFactory;
@@ -181,7 +181,6 @@ public class PollingServiceTest extends ZutubiTestCase
         serviceHandle.pollAndWait();
 
         assertScmChanges();
-        assertPolledForChanges(project);
 
         ScmClient client = scmClientsByProject.get(project);
         verify(client, times(1)).getLatestRevision((ScmContext) anyObject());

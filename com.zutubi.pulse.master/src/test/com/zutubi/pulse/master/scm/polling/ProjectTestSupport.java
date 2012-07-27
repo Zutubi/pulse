@@ -2,20 +2,21 @@ package com.zutubi.pulse.master.scm.polling;
 
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import static org.mockito.Matchers.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.stub;
 
 /**
  * A utility class with a set of methods that help simplify the
@@ -67,6 +68,15 @@ public class ProjectTestSupport
             }
         });
         stub(projectManager.getProjects(anyBoolean())).toReturn(allProjects);
+
+        stub(projectManager.getProjectConfig(anyLong(), anyBoolean())).toAnswer(new Answer<ProjectConfiguration>()
+        {
+            public ProjectConfiguration answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Long id = (Long) invocationOnMock.getArguments()[0];
+                return idToProject.get(id).getConfig();
+            }
+        });
 
         stub(projectManager.getDownstreamDependencies((ProjectConfiguration) anyObject())).toAnswer(new Answer<List<ProjectConfiguration>>()
         {
@@ -132,7 +142,6 @@ public class ProjectTestSupport
         nameToProject.put(project.getName(), project);
         allProjects.add(project);
         allConfigs.add(projectConfiguration);
-
         return project;
     }
 
