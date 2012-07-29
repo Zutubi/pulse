@@ -144,6 +144,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     nameToConfig.remove(instance.getName());
                     idToConfig.remove(instance.getProjectId());
                     validConfigs.remove(instance);
+                    reloadDownstreamProjects(instance);
                     removeFromLabelMap(instance);
                 }
                 finally
@@ -166,6 +167,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                     {
                         nameToConfig.remove(old.getName());
                         validConfigs.remove(old);
+                        reloadDownstreamProjects(old);
                         removeFromLabelMap(old);
                     }
 
@@ -200,6 +202,30 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
         };
         scmListener.register(configurationProvider, true);
+    }
+
+    private void reloadDownstreamProjects(ProjectConfiguration oldProjectConfiguration)
+    {
+        // Patch for CIB-2503: manually figure out projects that can "reach" a
+        // changed project via dependency configuration, and refresh them in
+        // the caches.  Note this is recursive to handle transitive
+        // dependencies.
+        for (ProjectConfiguration config: getDownstreamDependencies(oldProjectConfiguration))
+        {
+            if (config != null)
+            {
+                ProjectConfiguration cachedConfig = idToConfig.remove(config.getProjectId());
+                if (cachedConfig != null)
+                {
+                    validConfigs.remove(cachedConfig);
+                    nameToConfig.remove(cachedConfig.getName());
+                    removeFromLabelMap(cachedConfig);
+                    registerProjectConfig(config, false);
+                }
+
+                reloadDownstreamProjects(cachedConfig);
+            }
+        }
     }
 
     private void checkForScmAddOrRemove(ProjectConfiguration instance, ProjectConfiguration old)
