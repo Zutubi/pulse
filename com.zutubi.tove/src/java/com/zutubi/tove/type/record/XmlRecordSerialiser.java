@@ -28,7 +28,7 @@ public class XmlRecordSerialiser
 
     /**
      * Serialise a record to a file.
-     * @param file      the file to which the serialised record will be writen
+     * @param file      the file to which the serialised record will be written
      * @param record    the record being serialised.
      * @param deep      if true, the full record will be serialised. If false, will not serialise nested records.
      * @throws RecordSerialiseException if there is a problem serialising the record.

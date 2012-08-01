@@ -58,7 +58,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     private WireService wireService;
 
     private ValidationManager validationManager;
-    private int refreshCount = 0;
     private boolean validationEnabled = false;
 
     private SendEventsOnTransactionCompletionSynchronisation sendEventSync = new SendEventsOnTransactionCompletionSynchronisation();
@@ -789,7 +788,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 {
                     refreshInstances();
                 }
-                refreshCount++;
                 return null;
             }
         });
@@ -1291,12 +1289,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *                       completeness
      * @param checkEssential if true, validation will check for essential
      *                       complex fields
+     * @param deep           if true, recursively validate child records
+     * @param ignoredFields  a set of names of fields that should not be
+     *                       validated
      */
-    public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential)
-    {
-        validateInstance(type, instance, parentPath, baseName, concrete, checkEssential, false, null);
-    }
-
     private void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential, boolean deep, Set<String> ignoredFields)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
@@ -2527,11 +2523,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return deepClone(instance);
     }
 
-    public Set<String> getAllPaths(String path)
-    {
-        return CollectionUtils.map(getAllInstances(path, Configuration.class, true), new ConfigurationToPathMapping(), new HashSet<String>());
-    }
-
     public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
@@ -2918,11 +2909,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return configurationPersistenceManager.isPersistent(path);
     }
 
-    public int getRefreshCount()
-    {
-        return refreshCount;
-    }
-
     private void markDirty(String path)
     {
         if (instances.markDirty(path))
@@ -3048,21 +3034,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     InstanceCache getInstances()
     {
         return instances;
-    }
-
-    /**
-     * The state class encapsulates the state of the configuration template manager that is subject to
-     * transactional control / isolation etc.
-     */
-    class State
-    {
-        /**
-         * If true, the instance cache is enabled.  If not, it is ignored (not
-         * updated during refreshes).
-         */
-        boolean instancesEnabled = true;
-
-        Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
     }
 
     /**

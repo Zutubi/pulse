@@ -931,9 +931,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
         public String toString()
         {
-            StringBuffer buffer = new StringBuffer(action).append(", ");
-            buffer.append(id).append(", ").append(path).append(", ").append(record != null);
-            return buffer.toString();
+            return action + ", " + id + ", " + path + ", " + (record != null);
         }
     }
 }
