@@ -48,7 +48,7 @@ public class ServerInfoModel
         info.serverProperties.put(I18N.format("default.locale"), Locale.getDefault().toString());
         info.serverProperties.put(I18N.format("java.name"), properties.getProperty("java.vm.name"));
         info.serverProperties.put(I18N.format("java.vendor"), properties.getProperty("java.vm.vendor"));
-        info.serverProperties.put(I18N.format("java.version"), properties.getProperty("java.vm.version"));
+        info.serverProperties.put(I18N.format("java.version"), properties.getProperty("java.version"));
 
         Map<String, String> coreProperties = configurationManager.getCoreProperties();
         Version version = Version.getVersion();
