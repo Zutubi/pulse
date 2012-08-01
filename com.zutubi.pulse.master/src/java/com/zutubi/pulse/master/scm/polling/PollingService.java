@@ -101,89 +101,14 @@ public class PollingService implements Stoppable
         }
     }
 
-    public void loadProjectScmUidIntoCache(Project project)
-    {
-        final long key = project.getId();
-
-        if (!projectUidCache.containsKey(key))
-        {
-            try
-            {
-                ScmClientUtils.withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Object>()
-                {
-                    public Object process(ScmClient client, ScmContext context) throws ScmException
-                    {
-                        String projectUid = client.getUid(context);
-                        if (projectUid != null)
-                        {
-                            projectUidCache.put(key, projectUid);
-                        }
-
-                        return null;
-                    }
-                });
-            }
-            catch (ScmException e)
-            {
-                // noop.
-            }
-        }
-    }
-
-    private void clearCachesIfNecessary()
-    {
-        synchronized (clearCacheForProjects)
-        {
-            for (long projectId : clearCacheForProjects)
-            {
-                states.remove(projectId);
-                projectUidCache.remove(projectId);
-            }
-            clearCacheForProjects.clear();
-        }
-    }
-
     public void pollForChanges()
     {
         clearCachesIfNecessary();
 
-        List<DependencyTree> allDependencyTrees = generateDependencyTrees();
-
-        // filter those dependency trees that are not ready for polling.
-        List<DependencyTree> treesToPoll = CollectionUtils.filter(allDependencyTrees, new Predicate<DependencyTree>()
-        {
-            public boolean satisfied(DependencyTree dependencyTree)
-            {
-                return dependencyTree.isReadyToPoll();
-            }
-        });
-
         PollingRequestListener requestListener = new PollingRequestListener();
         requestQueue.setListener(requestListener);
 
-        // go through the dependency trees generating the poll requests.
-        List<PollingRequest> requests = new LinkedList<PollingRequest>();
-        for (DependencyTree tree : treesToPoll)
-        {
-            for (Project project : tree.getProjectsToPoll())
-            {
-                // so that we do not make potentially slow calls during the predicate processing, we load
-                // the scm uids into a cache now.  This cache will be complete with the necessary uids before
-                // the enqueuing (and subsequent reading) occurs.
-                loadProjectScmUidIntoCache(project);
-                ProjectPollingState state = states.get(project.getId());
-                if (state == null)
-                {
-                    state = new ProjectPollingState(project.getId(), null);
-                }
-
-                OneActivePollPerScmPredicate oneActive = objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache});
-                HasNoDependencyBeingPolledPredicate noDepsPolling = objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue});
-                PollingRequest request = new PollingRequest(project, state, oneActive, noDepsPolling);
-                requests.add(request);
-            }
-        }
-        requestQueue.enqueue(requests.toArray(new PollingRequest[requests.size()]));
+        queuePollRequests(generateReadyDependencyTrees());
 
         List<ProjectPollingState> newStates = requestListener.waitForProcessingToComplete();
         for (ProjectPollingState newState : newStates)
@@ -205,7 +130,20 @@ public class PollingService implements Stoppable
         clearCachesIfNecessary();
     }
 
-    private List<DependencyTree> generateDependencyTrees()
+    private void clearCachesIfNecessary()
+    {
+        synchronized (clearCacheForProjects)
+        {
+            for (long projectId : clearCacheForProjects)
+            {
+                states.remove(projectId);
+                projectUidCache.remove(projectId);
+            }
+            clearCacheForProjects.clear();
+        }
+    }
+
+    private List<DependencyTree> generateReadyDependencyTrees()
     {
         Set<Project> identified = new HashSet<Project>();
 
@@ -225,7 +163,13 @@ public class PollingService implements Stoppable
             identified.addAll(newTree.getProjects());
         }
 
-        return trees;
+        return CollectionUtils.filter(trees, new Predicate<DependencyTree>()
+        {
+            public boolean satisfied(DependencyTree dependencyTree)
+            {
+                return dependencyTree.isReadyToPoll();
+            }
+        });
     }
 
     private void addDependenciesToSet(Project project, DependencyTree tree)
@@ -251,6 +195,62 @@ public class PollingService implements Stoppable
             for (ProjectConfiguration downstreamProject : downstreamProjects)
             {
                 addDependenciesToSet(projectManager.getProject(downstreamProject.getProjectId(), false), tree);
+            }
+        }
+    }
+
+    private void queuePollRequests(List<DependencyTree> treesToPoll)
+    {
+        // go through the dependency trees generating the poll requests.
+        List<PollingRequest> requests = new LinkedList<PollingRequest>();
+        for (DependencyTree tree : treesToPoll)
+        {
+            for (Project project : tree.getProjectsToPoll())
+            {
+                // So that we do not make potentially slow calls during the predicate processing,
+                // we load the scm uids into a cache now.  This cache will be complete with the
+                // necessary uids before the queuing (and subsequent reading) occurs.
+                loadProjectScmUidIntoCache(project);
+                ProjectPollingState state = states.get(project.getId());
+                if (state == null)
+                {
+                    state = new ProjectPollingState(project.getId(), null);
+                }
+
+                OneActivePollPerScmPredicate oneActive = objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache});
+                HasNoDependencyBeingPolledPredicate noDepsPolling = objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue});
+                PollingRequest request = new PollingRequest(project, state, oneActive, noDepsPolling);
+                requests.add(request);
+            }
+        }
+        requestQueue.enqueue(requests.toArray(new PollingRequest[requests.size()]));
+    }
+
+    public void loadProjectScmUidIntoCache(Project project)
+    {
+        final long key = project.getId();
+
+        if (!projectUidCache.containsKey(key))
+        {
+            try
+            {
+                ScmClientUtils.withScmClient(project.getConfig(), project.getState(), scmManager, new ScmClientUtils.ScmContextualAction<Object>()
+                {
+                    public Object process(ScmClient client, ScmContext context) throws ScmException
+                    {
+                        String projectUid = client.getUid(context);
+                        if (projectUid != null)
+                        {
+                            projectUidCache.put(key, projectUid);
+                        }
+
+                        return null;
+                    }
+                });
+            }
+            catch (ScmException e)
+            {
+                // noop.
             }
         }
     }
@@ -370,7 +370,11 @@ public class PollingService implements Stoppable
     {
         public void onActivation(final PollingRequest request)
         {
-            final ProjectPoll poll = objectFactory.buildBean(ProjectPoll.class, new Class[] {Project.class, ProjectPollingState.class, Clock.class}, new Object[] {request.getProject(), request.getState(), clock});
+            final ProjectPoll poll = objectFactory.buildBean(
+                    ProjectPoll.class,
+                    new Class[] {Project.class, ProjectPollingState.class, Clock.class},
+                    new Object[] {request.getProject(), request.getState(), clock}
+            );
             completionService.submit(new Callable<ProjectPollingState>()
             {
                 public ProjectPollingState call() throws Exception
@@ -401,8 +405,7 @@ public class PollingService implements Stoppable
             {
                 try
                 {
-                    ProjectPollingState newState = completionService.take().get();
-                    newStates.add(newState);
+                    newStates.add(completionService.take().get());
                 }
                 catch (InterruptedException e)
                 {

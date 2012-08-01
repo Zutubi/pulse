@@ -6,35 +6,49 @@ import com.zutubi.pulse.core.scm.api.Revision;
  * Records state from previous polls of a project.  This class is immutable,
  * each poll of a project returns a new state.
  */
-public class ProjectPollingState
+public final class ProjectPollingState
 {
     /**
      * Id of the project this state corresponds to.
      */
-    private long projectId;
+    private final long projectId;
     /**
      * The latest seen revision.  Note that for projects with a quiet period
      * this will not be changed until the quiet period is observed
      * successfully.  May be null if no revision has or could be obtained.
      */
-    private Revision latestRevision;
+    private final Revision latestRevision;
     /**
      * Time, in ms since the epoch, that the quiet period will end.  If the
      * project is not in a quiet period this will be zero.
      */
-    private long quietPeriodEnd;
+    private final long quietPeriodEnd;
     /**
      * Revision that started the latest quiet period.  Null when the project is
      * not within a quiet period.
      */
-    private Revision quietPeriodRevision;
+    private final Revision quietPeriodRevision;
 
+    /**
+     * Creates a new polling state recording a revision for the project.
+     * 
+     * @param projectId      id of the project this state belongs to
+     * @param latestRevision the latest revision seen by a poll of the project
+     */
     public ProjectPollingState(long projectId, Revision latestRevision)
     {
-        this.projectId = projectId;
-        this.latestRevision = latestRevision;
+        this(projectId, latestRevision, 0, null);
     }
 
+    /**
+     * Creates a new polling state for a project within its quiet period.
+     *
+     * @param projectId           id of the project this state belongs to
+     * @param latestRevision      the latest revision seen by a poll of the project before the quiet
+     *                            period was started
+     * @param quietPeriodEnd      time, in milliseconds since the epoch, that the quiet period ends
+     * @param quietPeriodRevision latest revision to start (or restart) the quiet period
+     */
     public ProjectPollingState(long projectId, Revision latestRevision, long quietPeriodEnd, Revision quietPeriodRevision)
     {
         this.projectId = projectId;
