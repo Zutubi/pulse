@@ -6,6 +6,7 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -274,13 +275,13 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                         long id = Long.valueOf(line);
                         String action = reader.readLine();
                         String path = reader.readLine();
-                        long txnId = Long.valueOf(reader.readLine());
+                        // Reads the transaction id, unused.
+                        reader.readLine();
 
                         File recordDir = new File(persistenceDirectory, line);
 
                         JournalEntry journalEntry = new JournalEntry(action, path, recordDir);
                         journalEntry.setId(id);
-                        journalEntry.setTxnId(txnId);
                         journal.add(journalEntry);
                     }
                 }
@@ -511,40 +512,38 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void insert(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryFunction()
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            public Object process()
+            public void run()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++);
 
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 inMemoryDelegate.insert(path, record);
-                return null;
             }
         }, this);
     }
 
     public void update(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryFunction()
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            public Object process()
+            public void run()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 inMemoryDelegate.update(path, record);
-                return null;
             }
         }, this);
     }
 
     public Record delete(final String path)
     {
-        return (Record) transactionManager.runInTransaction(new NullaryFunction()
+        return transactionManager.runInTransaction(new NullaryFunction<Record>()
         {
-            public Object process()
+            public Record process()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
@@ -566,13 +565,12 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void importRecords(final Record record)
     {
-        transactionManager.runInTransaction(new NullaryFunction()
+        transactionManager.runInTransaction(new NullaryProcedure()
         {
-            public Object process()
+            public void run()
             {
                 activeJournal.add(new JournalEntry(ACTION_IMPORT, "", record, nextJournalEntryId++));
                 inMemoryDelegate.importRecords(record);
-                return null;
             }
         }, this);
     }
@@ -843,25 +841,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public class JournalEntry
     {
         private long id;
-        private long txnId = -1;
         private String action;
         private String path;
         private Record record;
         private File recordDir;
 
-        public JournalEntry(String action, String path)
-        {
-            this(action, path, (Record) null);
-        }
-
         public JournalEntry(String action, String path, long id)
         {
             this(action, path, (Record) null, id);
-        }
-
-        public JournalEntry(String action, String path, Record record)
-        {
-            this(action, path, record, 0);
         }
 
         public JournalEntry(String action, String path, Record record, long id)
@@ -904,11 +891,6 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             return record;
         }
 
-        public File getRecordDir()
-        {
-            return recordDir;
-        }
-
         long getId()
         {
             return id;
@@ -917,16 +899,6 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         void setId(long id)
         {
             this.id = id;
-        }
-
-        public long getTxnId()
-        {
-            return txnId;
-        }
-
-        void setTxnId(long txnId)
-        {
-            this.txnId = txnId;
         }
 
         public String toString()
