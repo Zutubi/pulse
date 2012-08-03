@@ -16,8 +16,6 @@
 
     <publications>
         <artifact name="com.zutubi.pulse.core.bundle" type="jar" conf="build,bundle"/>
-        <artifact name="com.zutubi.pulse.core.bundle-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.core.bundle-test" type="jar" conf="test"/>
     </publications>
 
     <dependencies>

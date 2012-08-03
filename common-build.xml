@@ -62,6 +62,11 @@
             <exclude name="**/*.java"/>
         </patternset>
 
+        <condition property="no.src">
+            <not>
+                <available file="src/java"/>
+            </not>
+        </condition>
         <condition property="no.tests">
             <not>
                 <available file="src/test"/>
@@ -199,14 +204,19 @@
         <echo message="----------------------------------------------"/>
 
         <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
-        <javac target="5" destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
-            <classpath refid="lib.path"/>
-            <src refid="src.paths"/>
-        </javac>
+        <if> <!-- if we have srcs to build, then do so. -->
+            <not><isset property="no.src"/></not>
+            <then>
+                <javac target="5" destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
+                    <classpath refid="lib.path"/>
+                    <src refid="src.paths"/>
+                </javac>
 
-        <copy todir="${classes.dir}" overwrite="true">
-            <path refid="src.resources"/>
-        </copy>
+                <copy todir="${classes.dir}" overwrite="true">
+                    <path refid="src.resources"/>
+                </copy>
+            </then>
+        </if>
 
         <if> <!-- if we have tests to build, then do so. -->
             <not><isset property="no.tests"/></not>
@@ -308,7 +318,12 @@
             </then>
         </if>
 
-        <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
+        <if>
+            <not><isset property="no.src"/></not>
+            <then>
+                <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
+            </then>
+        </if>
 
         <if>
             <not><isset property="no.tests"/></not>
