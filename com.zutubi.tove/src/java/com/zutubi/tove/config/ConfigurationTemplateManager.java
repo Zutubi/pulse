@@ -1931,7 +1931,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     /**
      * Validates that a new name is unique in a collection.  This takes into
      * account names in template ancestors and descendants: the name must be
-     * unique in the entire hierarchy.
+     * unique in the entire hierarchy.  Names are compared case-insensitively.
      *
      * @param parentPath   path of the collection to test
      * @param baseName     the name to check for uniqueness
@@ -1942,50 +1942,67 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public void validateNameIsUnique(String parentPath, String baseName, String fieldName, TextProvider textProvider) throws ValidationException
     {
-        String path = PathUtils.getPath(parentPath, baseName);
-        if(pathExists(path))
+        if (recordContainsKeyIgnoreCase(getRecord(parentPath), baseName))
         {
             throw new ValidationException(textProvider.getText(".inuse", fieldName));
         }
-        else if(PathUtils.getPathElements(path).length > 2)
+
+        if (PathUtils.getPathElements(parentPath).length > 2)
         {
             // We only need to do these checks when potentially
             // within a templated instance (hence the > 2 above).
-            String ancestorPath = findAncestorPath(path);
-            if(ancestorPath != null)
+            List<String> ancestorParentPaths = getAncestorPaths(parentPath, true);
+            for (String ancestorParentPath : ancestorParentPaths)
             {
-                throw new ValidationException(textProvider.getText(".inancestor", fieldName, PathUtils.getPathElements(ancestorPath)[1]));
-            }
-            else
-            {
-                List<String> descendantPaths = getDescendantPaths(path, true, false, false);
-                if(descendantPaths.size() > 0)
+                if (recordContainsKeyIgnoreCase(getRecord(ancestorParentPath), baseName))
                 {
-                    List<String> descendantNames = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
-                    {
-                        public String map(String descendantPath)
-                        {
-                            return PathUtils.getPathElements(descendantPath)[1];
-                        }
-                    });
-
-                    String message;
-                    if(descendantNames.size() == 1)
-                    {
-                        message = textProvider.getText(".indescendant", fieldName, descendantNames.get(0));
-                    }
-                    else
-                    {
-                        Collections.sort(descendantNames, new Sort.StringComparator());
-                        message = textProvider.getText(".indescendants", fieldName, descendantNames.toString());
-                    }
-
-                    throw new ValidationException(message);
+                    throw new ValidationException(textProvider.getText(".inancestor", fieldName, PathUtils.getPathElements(ancestorParentPath)[1]));
                 }
+            }
+
+            List<String> descendantParentPaths = getDescendantPaths(parentPath, true, false, false);
+            List<String> descendantNames = new LinkedList<String>();
+            for (String descendantParentPath : descendantParentPaths)
+            {
+                if (recordContainsKeyIgnoreCase(getRecord(descendantParentPath), baseName))
+                {
+                    descendantNames.add(PathUtils.getPathElements(descendantParentPath)[1]);
+                }
+            }
+
+            if (descendantNames.size() > 0)
+            {
+                String message;
+                if (descendantNames.size() == 1)
+                {
+                    message = textProvider.getText(".indescendant", fieldName, descendantNames.get(0));
+                }
+                else
+                {
+                    Collections.sort(descendantNames, new Sort.StringComparator());
+                    message = textProvider.getText(".indescendants", fieldName, descendantNames.toString());
+                }
+
+                throw new ValidationException(message);
             }
         }
     }
 
+    private boolean recordContainsKeyIgnoreCase(Record record, String key)
+    {
+        if (record != null)
+        {
+            for (String sibling: record.keySet())
+            {
+                if (sibling.equalsIgnoreCase(key))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -2022,29 +2039,23 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public boolean canDelete(final String path)
     {
-        return executeInsideTransaction(new NullaryFunction<Boolean>()
-        {
-            public Boolean process()
-            {
+        return executeInsideTransaction(new NullaryFunction<Boolean>() {
+            public Boolean process() {
                 Record record = recordManager.select(path);
-                if(record == null)
-                {
+                if (record == null) {
                     return false;
                 }
 
-                if(record.isPermanent())
-                {
+                if (record.isPermanent()) {
                     return false;
                 }
 
                 String[] pathElements = PathUtils.getPathElements(path);
-                if (pathElements.length == 1)
-                {
+                if (pathElements.length == 1) {
                     return false;
                 }
 
-                if (isTemplatedPath(path) && pathElements.length > 2)
-                {
+                if (isTemplatedPath(path) && pathElements.length > 2) {
                     // We are deleting something inside a template: make sure
                     // it is not an inherited composite.
                     String parentPath = PathUtils.getParentPath(path);
@@ -2052,8 +2063,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
                     TemplateRecord parentsTemplateParent = parentRecord.getParent();
 
-                    if(parentsTemplateParent != null && parentsTemplateParent.containsKey(baseName) && !parentRecord.isCollection())
-                    {
+                    if (parentsTemplateParent != null && parentsTemplateParent.containsKey(baseName) && !parentRecord.isCollection()) {
                         return false;
                     }
                 }
@@ -2069,39 +2079,30 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     RecordCleanupTask getCleanupTasks(final String path, final boolean checkTemplateParent)
     {
-        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>()
-        {
-            public RecordCleanupTask process()
-            {
+        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>() {
+            public RecordCleanupTask process() {
                 Record record = recordManager.select(path);
-                if(record == null)
-                {
+                if (record == null) {
                     throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
                 }
 
-                if(record.isPermanent())
-                {
+                if (record.isPermanent()) {
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
                 String[] pathElements = PathUtils.getPathElements(path);
-                if(pathElements.length == 1)
-                {
+                if (pathElements.length == 1) {
                     throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete a scope");
                 }
 
-                if(isTemplatedPath(path))
-                {
+                if (isTemplatedPath(path)) {
                     RecordCleanupTaskSupport result;
-                    if (pathElements.length == 2 || !checkTemplateParent)
-                    {
+                    if (pathElements.length == 2 || !checkTemplateParent) {
                         // Deleting an entire templated instance, or sure that
                         // we should delete the record regardless of
                         // inheritance.
                         result = new DeleteRecordCleanupTask(path, false);
-                    }
-                    else
-                    {
+                    } else {
                         // We are not deleting an entire templated instance.
                         // We need to determine if this is a hide or actual
                         // delete.
@@ -2110,40 +2111,31 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                         TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
                         TemplateRecord parentsTemplateParent = parentRecord.getParent();
 
-                        if(parentsTemplateParent == null || !parentsTemplateParent.containsKey(baseName))
-                        {
+                        if (parentsTemplateParent == null || !parentsTemplateParent.containsKey(baseName)) {
                             // This record does not exist in the parent: it
                             // has been added at this level.  It should be
                             // deleted.
                             result = new DeleteRecordCleanupTask(path, false);
-                        }
-                        else
-                        {
+                        } else {
                             // The record exists in the parent.  Check it is
                             // a collection item, and if so hide it.
-                            if(parentRecord.isCollection())
-                            {
+                            if (parentRecord.isCollection()) {
                                 result = new HideRecordCleanupTask(path, false);
-                            }
-                            else
-                            {
+                            } else {
                                 throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete an inherited composite property");
                             }
                         }
                     }
-                    
+
                     addAdditionalTasks(path, result);
 
                     // All descendants must be deleted.
                     List<String> descendantPaths = getDescendantPaths(path, true, false, true);
-                    for (String descendantPath : descendantPaths)
-                    {
+                    for (String descendantPath : descendantPaths) {
                         result.addCascaded(getDescendantCleanupTask(descendantPath));
                     }
                     return result;
-                }
-                else
-                {
+                } else {
                     // Much simpler, just delete the record and run custom and reference cleanup tasks.
                     DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false);
                     addAdditionalTasks(path, result);
@@ -2219,25 +2211,20 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        executeInsideTransaction(new NullaryFunction<Object>()
-        {
-            public Object process()
-            {
+        executeInsideTransaction(new NullaryFunction<Object>() {
+            public Object process() {
                 Record record = recordManager.select(path);
-                if(record == null)
-                {
+                if (record == null) {
                     throw new IllegalArgumentException("No such path '" + path + "'");
                 }
-                if(record.isPermanent())
-                {
+                if (record.isPermanent()) {
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
                 List<ConfigurationEvent> events = configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
                 refreshCaches();
 
-                for(ConfigurationEvent e: events)
-                {
+                for (ConfigurationEvent e : events) {
                     publishEvent(e);
                 }
 
@@ -2427,10 +2414,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(final T instance)
     {
-        return transactionManager.runInTransaction(new NullaryFunction<T>()
-        {
-            public T process()
-            {
+        return transactionManager.runInTransaction(new NullaryFunction<T>() {
+            public T process() {
                 final String path = instance.getConfigurationPath();
                 Record record = getRecord(path);
                 ComplexType type = getType(path);
@@ -2438,14 +2423,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 cloneSetCache.setTransactionManager(transactionManager);
                 cloneSetCache.init();
 
-                PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cloneSetCache, new ReferenceResolver()
-                {
-                    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException
-                    {
+                PersistentInstantiator instantiator = new PersistentInstantiator(getTemplateOwnerPath(path), path, cloneSetCache, new ReferenceResolver() {
+                    public Configuration resolveReference(String templateOwnerPath, long toHandle, Instantiator instantiator, String indexPath) throws TypeException {
                         InstanceCache cache = instances;
                         String targetPath = configurationReferenceManager.getReferencedPathForHandle(templateOwnerPath, toHandle);
-                        if(targetPath.startsWith(path))
-                        {
+                        if (targetPath.startsWith(path)) {
                             // This reference points within the object tree we are cloning.
                             // We must update it to point to a new clone.
                             cache = cloneSetCache;
@@ -2455,12 +2437,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     }
                 }, ConfigurationTemplateManager.this);
 
-                try
-                {
+                try {
                     return (T) instantiator.instantiate(path, false, type, record);
-                }
-                catch (TypeException e)
-                {
+                } catch (TypeException e) {
                     LOG.severe(e);
                     return null;
                 }
@@ -2621,10 +2600,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     public <T extends Configuration> List<T> getHighestInstancesSatisfying(final Predicate<T> predicate, final Class<T> clazz)
     {
         Collection<T> allConfigs = getAllInstances(clazz, true);
-        return CollectionUtils.filter(allConfigs, new Predicate<T>()
-        {
-            public boolean satisfied(T configuration)
-            {
+        return CollectionUtils.filter(allConfigs, new Predicate<T>() {
+            public boolean satisfied(T configuration) {
                 return isHighestSatisfying(configuration, clazz, predicate);
             }
         });

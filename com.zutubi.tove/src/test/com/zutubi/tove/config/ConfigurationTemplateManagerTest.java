@@ -18,6 +18,8 @@ import com.zutubi.util.FalsePredicate;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.TruePredicate;
 import com.zutubi.util.adt.Pair;
+import com.zutubi.validation.FakeValidationContext;
+import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
@@ -2106,6 +2108,84 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         BaseConfig ancestor = configurationTemplateManager.getAncestorOfType(loaded, BaseConfig.class);
         assertTrue(ancestor instanceof ExtensionConfig);
         assertEquals(configurationTemplateManager.getInstance("base/extended"), ancestor);
+    }
+
+    public void testValidateNameIsUnique_DuplicatedInCollection() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        ConfigA child = new ConfigA("child");
+        insertParentAndChildA(parent, child);
+
+        validateNameAndExpectOK(SCOPE_TEMPLATED, "unique");
+        validateNameAndExpectError(SCOPE_TEMPLATED, "parent", ".inuse");
+        validateNameAndExpectError(SCOPE_TEMPLATED, "Parent", ".inuse");
+        validateNameAndExpectError(SCOPE_TEMPLATED, "chILD", ".inuse");
+    }
+
+    public void testValidateNameIsUnique_DuplicatedInAncestor() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        parent.addC(new ConfigC("parentc"));
+        ConfigA child = new ConfigA("child");
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        String childCsPath = PathUtils.getPath(paths.second, "cs");
+
+        validateNameAndExpectOK(childCsPath, "unique");
+        validateNameAndExpectError(childCsPath, "parentc", ".inuse");
+        validateNameAndExpectError(childCsPath, "PArentc", ".inuse");
+
+        // Even if we hide the path, validation should fail with .inancestor
+        configurationTemplateManager.delete(PathUtils.getPath(childCsPath, "parentc"));
+        validateNameAndExpectError(childCsPath, "parentc", ".inancestor");
+        validateNameAndExpectError(childCsPath, "PArentc", ".inancestor");
+    }
+
+    public void testValidateNameIsUnique_DuplicatedInDescendant() throws TypeException
+    {
+        ConfigA parent = new ConfigA("parent");
+        ConfigA child = new ConfigA("child");
+        child.addC(new ConfigC("childc"));
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        String parentCsPath = PathUtils.getPath(paths.first, "cs");
+
+        validateNameAndExpectOK(parentCsPath, "unique");
+        validateNameAndExpectError(parentCsPath, "childc", ".indescendant");
+        validateNameAndExpectError(parentCsPath, "childC", ".indescendant");
+
+        // If it appears in multiple descendants we should get full details.
+        ConfigA otherChild = new ConfigA("otherchild");
+        otherChild.addC(new ConfigC("childc"));
+        MutableRecord record = unstantiate(otherChild);
+        configurationTemplateManager.setParentTemplate(record, configurationTemplateManager.getRecord(paths.first).getHandle());
+        configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
+
+        validateNameAndExpectError(parentCsPath, "childc", ".indescendants");
+        validateNameAndExpectError(parentCsPath, "chILdc", ".indescendants");
+    }
+
+    private void validateNameAndExpectOK(String parentPath, String name)
+    {
+        try
+        {
+            configurationTemplateManager.validateNameIsUnique(parentPath, name, "name", new FakeValidationContext());
+        }
+        catch (ValidationException e)
+        {
+            fail(e.getMessage());
+        }
+    }
+
+    private void validateNameAndExpectError(String parentPath, String name, String errorKey)
+    {
+        try
+        {
+            configurationTemplateManager.validateNameIsUnique(parentPath, name, "name", new FakeValidationContext());
+            fail("Validation should fail");
+        }
+        catch (ValidationException e)
+        {
+            assertThat(e.getMessage(), containsString(errorKey));
+        }
     }
 
     private Pair<String, String> insertParentAndChildA(ConfigA parent, ConfigA child) throws TypeException
