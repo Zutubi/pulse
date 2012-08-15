@@ -1,0 +1,9 @@
+*.iml
+/local.properties
+/plugins
+/classes
+build/
+pulse.ipr
+pulse.iws
+com.zutubi.pulse.master/etc/admin.token
+com.zutubi.pulse.master/etc/runtime.properties
