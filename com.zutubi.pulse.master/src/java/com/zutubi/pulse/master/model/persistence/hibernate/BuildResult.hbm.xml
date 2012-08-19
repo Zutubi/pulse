@@ -179,7 +179,8 @@
 
     <query name="findLatestSuccessfulByProject"><![CDATA[
         from BuildResult result
-        where result.project = :project
+        where result.user is null
+        and result.project = :project
         and result.stateName = 'SUCCESS'
         order by result.stamps.endTime desc
     ]]></query>

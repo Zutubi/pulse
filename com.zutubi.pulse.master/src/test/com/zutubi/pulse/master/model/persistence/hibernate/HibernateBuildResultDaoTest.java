@@ -809,6 +809,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         createFindLatestSuccessfulTestData();
 
+        User user = new User();
+        userDao.save(user);
+
+        buildResultDao.save(createPersonalBuild(user, projectA, 1));
+
         BuildResult result = buildResultDao.findLatestSuccessfulByProject(projectA);
         assertEquals(4, result.getNumber());
 
