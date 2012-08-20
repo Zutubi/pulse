@@ -18,17 +18,19 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements ScmLineHa
     private boolean throwOnStderr = false;
     private String commandLine;
     private boolean haveSignificantError = false;
-    private StringBuffer stderr;
+    private StringBuilder stderr;
 
     public PerforceErrorDetectingFeedbackHandler(boolean throwOnStderr)
     {
         this.throwOnStderr = throwOnStderr;
-        stderr = new StringBuffer();
+        stderr = new StringBuilder();
     }
 
     public void handleCommandLine(String line)
     {
         this.commandLine = line;
+        haveSignificantError = false;
+        stderr.delete(0, stderr.length());
     }
 
     public void handleStderr(String line)
@@ -67,7 +69,7 @@ public abstract class PerforceErrorDetectingFeedbackHandler implements ScmLineHa
     {
     }
 
-    public StringBuffer getStderr()
+    public StringBuilder getStderr()
     {
         return stderr;
     }

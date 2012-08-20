@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.ui.api.UserInterface;
 public class PerforceSyncFeedbackHandler implements ScmLineHandler
 {
     private UserInterface ui;
+    private String commandLine;
     private boolean resolveRequired = false;
     private boolean errorEncountered = false;
 
@@ -22,7 +23,7 @@ public class PerforceSyncFeedbackHandler implements ScmLineHandler
 
     public void handleCommandLine(String line)
     {
-        // no-op
+        commandLine = line;
     }
 
     public void handleStdout(String line)
@@ -56,13 +57,14 @@ public class PerforceSyncFeedbackHandler implements ScmLineHandler
 
     public void handleExitCode(int code) throws ScmException
     {
+        String command = commandLine == null ? "p4 process" : "'" + commandLine + "'";
         if(code != 0)
         {
-            throw new ScmException("p4 process returned non-zero exit code: " + code);
+            throw new ScmException(command + " returned non-zero exit code: " + code);
         }
         else if(errorEncountered)
         {
-            throw new ScmException("p4 process reported errors");
+            throw new ScmException(command + " reported errors");
         }
     }
 
