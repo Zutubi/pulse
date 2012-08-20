@@ -24,6 +24,8 @@ public class PerforceCheckoutFeedbackHandler extends PerforceErrorDetectingFeedb
         {
             handler.status(">> " + line);
         }
+
+        super.handleCommandLine(line);
     }
 
     public void handleStdout(String line)

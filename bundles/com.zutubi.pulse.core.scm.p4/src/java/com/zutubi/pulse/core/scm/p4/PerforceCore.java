@@ -38,14 +38,14 @@ public class PerforceCore
 
     public class P4Result
     {
-        public StringBuffer stdout;
-        public StringBuffer stderr;
+        public StringBuilder stdout;
+        public StringBuilder stderr;
         public int exitCode;
 
         public P4Result()
         {
-            stdout = new StringBuffer();
-            stderr = new StringBuffer();
+            stdout = new StringBuilder();
+            stderr = new StringBuilder();
         }
     }
 
