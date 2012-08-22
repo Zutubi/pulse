@@ -254,9 +254,18 @@ public class PatchArchive
             throw new PulseException("Entry for path '" + path + "' has no metadata");
         }
 
+        File f = new File(base, status.getTargetPath());
+        final FileStatus.State state = status.getState();
+        if ((state == FileStatus.State.MODIFIED || state == FileStatus.State.MERGED || state == FileStatus.State.METADATA_MODIFIED) &&
+                !f.exists())
+        {
+            // We want to do something to an existing target, but there's nothing there.
+            // It's up to preApply to warn about this.
+            return;
+        }
+
         scmFeedbackHandler.status(status.toString());
 
-        File f = new File(base, status.getTargetPath());
         if (entry.isDirectory())
         {
             if (!f.isDirectory() && !f.mkdirs())
