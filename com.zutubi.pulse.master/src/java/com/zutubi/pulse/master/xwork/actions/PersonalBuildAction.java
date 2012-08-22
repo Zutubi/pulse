@@ -159,7 +159,6 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        number = userManager.updateAndGetNextBuildNumber(user);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File patchDir = paths.getUserPatchDir(user.getId());
         if(!patchDir.isDirectory())
@@ -171,8 +170,9 @@ public class PersonalBuildAction extends ActionSupport
             }
         }
 
-        File patchFile = paths.getUserPatchFile(user.getId(), number);
-        if(patchFile.exists())
+        long buildNumber = userManager.updateAndGetNextBuildNumber(user);
+        File patchFile = paths.getUserPatchFile(user.getId(), buildNumber);
+        if (patchFile.exists())
         {
             responseErrors.add("Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.");
             return ERROR;
@@ -186,10 +186,10 @@ public class PersonalBuildAction extends ActionSupport
                 responseWarnings.add("Unable to clean up uploaded patch.");
             }
 
-            PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), number));
+            PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), buildNumber));
             properties.setPatchFormat(patchFormat);
 
-            long requestId = projectManager.triggerBuild(number, p, user, convertRevision(p), convertOverrides(), patchFile, patchFormat);
+            long requestId = projectManager.triggerBuild(buildNumber, p, user, convertRevision(p), convertOverrides(), patchFile, patchFormat);
             BuildRequestRegistry.RequestStatus requestStatus = buildRequestRegistry.waitForRequestToBeHandled(requestId, TIMEOUT);
             switch (requestStatus)
             {
@@ -198,6 +198,8 @@ public class PersonalBuildAction extends ActionSupport
                     return ERROR;
                 case ACTIVATED:
                 case QUEUED:
+                    // Now we know it was a success, record the number for the client (see CIB-2943).
+                    number = buildNumber;
                     return SUCCESS;
                 case REJECTED:
                     responseErrors.add("Request rejected: " + buildRequestRegistry.getRejectionReason(requestId));
