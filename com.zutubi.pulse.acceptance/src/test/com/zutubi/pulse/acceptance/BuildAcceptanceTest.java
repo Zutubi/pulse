@@ -1241,7 +1241,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testTestResultsNestedSuites() throws Exception
     {
         final String PROCESSOR_NAME = "nesty";
-        final String PROCESSOR_SUITE = "sweety has spaces & special % ch@r@cter$!";
+        final String PROCESSOR_SUITE = "sweety";
 
         Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");
