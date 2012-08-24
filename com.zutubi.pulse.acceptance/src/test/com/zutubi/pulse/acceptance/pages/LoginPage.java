@@ -26,12 +26,12 @@ public class LoginPage extends SeleniumPage
         return urls.login();
     }
 
-    public boolean login(String username, String password)
+    public void login(String username, String password)
     {
-        return login(username, password, false);
+        login(username, password, false);
     }
 
-    public boolean login(String username, String password, boolean rememberMe)
+    public void login(String username, String password, boolean rememberMe)
     {
         LoginForm form = browser.createForm(LoginForm.class);
         form.waitFor();
@@ -40,8 +40,6 @@ public class LoginPage extends SeleniumPage
                 asPair(FIELD_PASSWORD, password),
                 asPair(FIELD_REMEMBERME, Boolean.toString(rememberMe))
         );
-
-        return !form.isFormPresent();
     }
 
     public boolean isSignupLinkPresent()

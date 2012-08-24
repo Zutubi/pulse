@@ -68,14 +68,14 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         String propertyPath = rpcClient.RemoteApi.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
         String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
 
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
         assertCloneAvailability(propertyPath, false);
 
         String groupPath = rpcClient.RemoteApi.insertGroup(random + "-group", asList(userPath));
         rpcClient.RemoteApi.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
         assertCloneAvailability(propertyPath, true);
     }
 
@@ -93,14 +93,14 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.insertTrivialProject(project, false);
         String userPath = rpcClient.RemoteApi.insertTrivialUser(user);
 
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, project, false);
         assertFalse(hierarchyPage.isClonePresent());
 
         rpcClient.RemoteApi.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
         hierarchyPage.openAndWaitFor();
         assertTrue(hierarchyPage.isClonePresent());
     }

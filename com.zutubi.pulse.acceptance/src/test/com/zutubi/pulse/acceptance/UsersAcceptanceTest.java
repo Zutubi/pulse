@@ -54,7 +54,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
         assertEquals("1 of 2 users have been active in the last 10 minutes", usersPage.getActiveCount());
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
         getBrowser().logout();
 
         getBrowser().loginAsAdmin();
@@ -73,7 +73,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
         assertEquals(ACCESS_NEVER, userPage.getStateField(STATE_LAST_ACCESS));
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
         getBrowser().logout();
 
         getBrowser().loginAsAdmin();
@@ -141,7 +141,7 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.RemoteApi.insertTrivialUser(random);
         
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
         
         PreferencesPage preferencesPage = getBrowser().openAndWaitFor(PreferencesPage.class, random);
         preferencesPage.clickAction(UserPreferencesConfigurationActions.ACTION_CHANGE_PASSWORD);
@@ -167,7 +167,8 @@ public class UsersAcceptanceTest extends AcceptanceTestBase
         loginForm.waitFor();
         
         loginPage.openAndWaitFor();
-        assertTrue(loginPage.login(random, NEW_PASSWORD));
+        loginPage.login(random, NEW_PASSWORD);
+        assertTrue(getBrowser().isLoggedIn());
     }
 
     private String createUserWithContact(String name)

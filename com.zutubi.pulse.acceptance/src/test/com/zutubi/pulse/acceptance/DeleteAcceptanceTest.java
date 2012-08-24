@@ -258,7 +258,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         dashboard.put("shownProjects", new Vector<String>(Arrays.asList(projectPath)));
         rpcClient.RemoteApi.saveConfig(dashboardPath, dashboard, false);
 
-        assertTrue(getBrowser().login(authLogin, ""));
+        getBrowser().loginAndWait(authLogin, "");
         ProjectHierarchyPage hierarchyPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, random, false);
         DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();
@@ -268,7 +268,7 @@ public class DeleteAcceptanceTest extends AcceptanceTestBase
         hierarchyPage.waitFor();
         getBrowser().logout();
 
-        assertTrue(getBrowser().login(noAuthLogin, ""));
+        getBrowser().loginAndWait(noAuthLogin, "");
         hierarchyPage.openAndWaitFor();
         confirmPage = hierarchyPage.clickDelete();
         confirmPage.waitFor();

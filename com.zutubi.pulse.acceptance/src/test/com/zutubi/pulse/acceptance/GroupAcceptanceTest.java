@@ -63,7 +63,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
             rpcClient.logout();
         }
 
-        assertTrue(getBrowser().login(login, ""));
+        getBrowser().loginAndWait(login, "");
         ProjectHierarchyPage globalPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         getBrowser().logout();
@@ -79,7 +79,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         getBrowser().logout();
 
-        assertTrue(getBrowser().login(login, ""));
+        getBrowser().loginAndWait(login, "");
         globalPage.openAndWaitFor();
         getBrowser().waitForElement(HierarchyPage.LINK_ADD);
         getBrowser().logout();
@@ -109,7 +109,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         getBrowser().waitForElement(getGroupId(random));
         getBrowser().logout();
 
-        assertTrue(getBrowser().login(login, ""));
+        getBrowser().loginAndWait(login, "");
         ProjectHierarchyPage globalPage = getBrowser().openAndWaitFor(ProjectHierarchyPage.class, ProjectManager.GLOBAL_PROJECT_NAME, true);
         assertFalse(globalPage.isAddPresent());
         getBrowser().logout();
@@ -121,7 +121,7 @@ public class GroupAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         getBrowser().logout();
 
-        assertTrue(getBrowser().login(login, ""));
+        getBrowser().loginAndWait(login, "");
         globalPage.openAndWaitFor();
         assertTrue(globalPage.isAddPresent());
         getBrowser().logout();

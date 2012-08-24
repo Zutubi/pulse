@@ -1,7 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import static org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 public class RememberMeAcceptanceTest extends AcceptanceTestBase
@@ -20,7 +21,8 @@ public class RememberMeAcceptanceTest extends AcceptanceTestBase
     {
         assertFalse(isRememberMeCookieSet());
         LoginPage page = getBrowser().openAndWaitFor(LoginPage.class);
-        assertTrue(page.login(USERNAME, PASSWORD, true));
+        page.login(USERNAME, PASSWORD, true);
+        assertTrue(getBrowser().isLoggedIn());
         assertTrue(isRememberMeCookieSet());
     }
 
@@ -28,7 +30,8 @@ public class RememberMeAcceptanceTest extends AcceptanceTestBase
     {
         assertFalse(isRememberMeCookieSet());
         LoginPage page = getBrowser().openAndWaitFor(LoginPage.class);
-        assertTrue(page.login(USERNAME, PASSWORD, false));
+        page.login(USERNAME, PASSWORD, false);
+        assertTrue(getBrowser().isLoggedIn());
         assertFalse(isRememberMeCookieSet());
     }
 
@@ -37,7 +40,8 @@ public class RememberMeAcceptanceTest extends AcceptanceTestBase
         assertFalse(isRememberMeCookieSet());
 
         LoginPage page = getBrowser().openAndWaitFor(LoginPage.class);
-        assertTrue(page.login(USERNAME, PASSWORD, true));
+        page.login(USERNAME, PASSWORD, true);
+        assertTrue(getBrowser().isLoggedIn());
         assertTrue(isRememberMeCookieSet());
 
         getBrowser().logout();
