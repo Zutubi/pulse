@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Constants;
+import com.zutubi.util.StringUtils;
 import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
@@ -12,6 +13,7 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 /**
  * The configuration handler for the main Pulse web application.
@@ -39,7 +41,23 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
     public void configure(Server server) throws IOException
     {
         SystemConfiguration config = configurationManager.getSystemConfig();
+        String bindAddress = config.getBindAddress();
+        if (bindAddress.contains(","))
+        {
+            for (String host : StringUtils.split(bindAddress, ',', true))
+            {
+                host = host.trim();
+                addListener(server, config, host);
+            }
+        }
+        else
+        {
+            addListener(server, config, bindAddress);
+        }
+    }
 
+    private void addListener(Server server, SystemConfiguration config, String host) throws UnknownHostException
+    {
         SocketListener listener;
 
         if (config.isSslEnabled())
@@ -59,7 +77,7 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
             listener = new SocketListener();
         }
 
-        listener.setHost(config.getBindAddress());
+        listener.setHost(host);
         listener.setPort(config.getServerPort());
         listener.setMaxIdleTimeMs(getIdleTimeout());
         listener.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, listener.getMinThreads()));
