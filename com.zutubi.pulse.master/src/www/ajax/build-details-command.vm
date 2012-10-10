@@ -25,18 +25,24 @@
     #foreach($artifact in $implicitArtifacts)
         #foreach($fileArtifact in $artifact.children)
     <tr>
-        <td class="content leftmost #if(!$buildResult.completed()) rightmost #end">
+        <td class="content leftmost">
             <img src="$base/images/page.gif" alt='$action.getText("file")'/>
             #html($fileArtifact.path)
         </td>
-            #if($buildResult.completed())
         <td class="content rightmost fit-width">
+            #if($action.fileArtifactAvailable($fileArtifact))
             #artifactLink("download" "$urls.fileFileArtifact($artifact, $fileArtifact)")
                 #if($fileArtifact.canDecorate())
             <span class="understated">|</span> #artifactLink("decorate" "${urls.commandArtifacts($buildResult, $commandResult)}${fileArtifact.pathUrl}/")
                 #end
-        </td>
+            #else
+                #if($buildResult.completed())
+             file missing
+                #else
+             file not yet available
+                #end
             #end
+        </td>
     </tr>
         #end
     #end

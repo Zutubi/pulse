@@ -25,7 +25,7 @@ public class UserAccessAcceptanceTest extends AcceptanceTestBase
         // read access to the pulse ui
         assertFalse(getBrowser().isLoggedIn());
 
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
 
         checkAccessible(DashboardPage.class);
         checkAccessible(MyPreferencesPage.class);

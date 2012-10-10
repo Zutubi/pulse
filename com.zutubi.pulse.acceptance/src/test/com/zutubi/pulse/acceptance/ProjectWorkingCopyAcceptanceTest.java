@@ -7,18 +7,19 @@ import com.zutubi.pulse.acceptance.utils.AntProjectHelper;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.acceptance.windows.PulseFileSystemBrowserWindow;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.CheckoutType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_DISABLE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_ENABLE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
  * Tests for the working copy functionality.
@@ -77,7 +78,7 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
 
         // create user without view source permissions for the project and log in.
         UserConfiguration user = createUser(randomName());
-        assertTrue(getBrowser().login(user.getName(), ""));
+        getBrowser().loginAndWait(user.getName(), "");
 
         homePage.openAndWaitFor();
         assertFalse(homePage.isViewWorkingCopyPresent());

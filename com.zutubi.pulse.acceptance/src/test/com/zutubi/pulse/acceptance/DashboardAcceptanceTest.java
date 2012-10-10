@@ -39,7 +39,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
         String user = RandomUtils.randomString(10);
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
         
         buildRunner = new BuildRunner(rpcClient.RemoteApi);
     }

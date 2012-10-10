@@ -76,7 +76,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
 
     private void takeResponsibilityHelper(ResponsibilityPage page)
     {
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
         page.openAndWaitFor();
         awaitAndAssertNobodyResponsible(page);
 
@@ -94,7 +94,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
     {
         takeResponsibility(TEST_PROJECT);
 
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
 
         // Clear on the project home tab
         final ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
@@ -131,7 +131,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         takeResponsibility(TEST_PROJECT);
 
         rpcClient.RemoteApi.insertTrivialUser(random);
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
 
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, TEST_PROJECT);
         awaitAndAssertOtherResponsible(homePage);
@@ -174,7 +174,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(random, false);
         takeResponsibility(random);
 
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         awaitAndAssertSelfResponsible(homePage);
 
@@ -207,7 +207,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         optionsConfig.put(Constants.Project.Options.AUTO_CLEAR_RESPONSIBILITY, false);
         rpcClient.RemoteApi.saveConfig(optionsPath, optionsConfig, false);
 
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         awaitAndAssertSelfResponsible(homePage);
 

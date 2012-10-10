@@ -104,7 +104,8 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         getBrowser().logout();
 
         loginPage = getBrowser().openAndWaitFor(LoginPage.class);
-        assertTrue(loginPage.login(login, password));
+        loginPage.login(login, password);
+        assertTrue(getBrowser().isLoggedIn());
 
         welcomePage.waitFor();
         assertTrue(welcomePage.isPresent());

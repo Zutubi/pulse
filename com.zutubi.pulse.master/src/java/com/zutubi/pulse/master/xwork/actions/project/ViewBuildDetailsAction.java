@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.DependencyManager;
 import com.zutubi.pulse.master.model.StageRetrievedArtifacts;
@@ -9,6 +10,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -38,6 +40,13 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
     public List<StageRetrievedArtifacts> getDependencyDetails()
     {
         return dependencyDetails;
+    }
+
+    public boolean fileArtifactAvailable(StoredFileArtifact fileArtifact)
+    {
+        CommandResult commandResult = getCommandResult();
+        final File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        return new File(outputDir, fileArtifact.getPath()).exists();
     }
 
     public List<StoredArtifact> getImplicitArtifacts()

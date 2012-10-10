@@ -8,15 +8,16 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
+
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
-
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Acceptance tests for project ACLs
@@ -45,7 +46,7 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
         String permissionsPath = getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME, "permissions");
         Vector<String> permissions = rpcClient.RemoteApi.getConfigListing(permissionsPath);
 
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
         ListPage permissionsPage = getBrowser().openAndWaitFor(ListPage.class, permissionsPath);
         permissionsPage.clickAction(permissions.get(0), ListPage.ACTION_VIEW);
 
@@ -90,12 +91,12 @@ public class ProjectPermissionsAcceptanceTest extends AcceptanceTestBase
         addUserWithProjectPermissions(canCleanUser, project, ProjectConfigurationActions.ACTION_MARK_CLEAN);
         rpcClient.RemoteApi.insertTrivialUser(cannotCleanUser);
 
-        assertTrue(getBrowser().login(canCleanUser, ""));
+        getBrowser().loginAndWait(canCleanUser, "");
         ProjectHomePage homePage = getBrowser().openAndWaitFor(ProjectHomePage.class, project);
         assertTrue(homePage.isActionPresent(ProjectConfigurationActions.ACTION_MARK_CLEAN));
         getBrowser().logout();
 
-        assertTrue(getBrowser().login(cannotCleanUser, ""));
+        getBrowser().loginAndWait(cannotCleanUser, "");
         homePage.openAndWaitFor();
         assertFalse(homePage.isActionPresent(ProjectConfigurationActions.ACTION_MARK_CLEAN));
         getBrowser().logout();

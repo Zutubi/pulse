@@ -48,7 +48,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
 
     protected void addCommentOnPage(CommentPage page)
     {
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
         page.openAndWaitFor();
         assertFalse(page.isCommentsPresent());
 
@@ -66,7 +66,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
 
     protected void cancelCommentOnPage(CommentPage page)
     {
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
         page.openAndWaitFor();
         page.clickAction(CommentContainer.ACTION_ADD_COMMENT);
 
@@ -85,14 +85,14 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         final long commentId = getLatestCommentId();
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
 
         page.openAndWaitFor();
         assertTrue(page.isCommentPresent(commentId));
         assertFalse(page.isCommentDeleteLinkPresent(commentId));
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(TEST_USER, ""));
+        getBrowser().loginAndWait(TEST_USER, "");
 
         page.openAndWaitFor();
         assertTrue(page.isCommentPresent(commentId));

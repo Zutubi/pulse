@@ -468,7 +468,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String path = orderPrelude();
 
         rpcClient.RemoteApi.insertTrivialUser(random);
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
         ListPage listPage = getBrowser().openAndWaitFor(ListPage.class, getPropertiesPath(path));
         assertFalse(listPage.isOrderColumnPresent(2));
         listPage.waitForItem("p1", ANNOTATION_NONE);
@@ -988,7 +988,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(concretePage.isIntroduceParentPresent());
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
 
         templatePage.openAndWaitFor();
         assertFalse(templatePage.isIntroduceParentPresent());
@@ -1063,7 +1063,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertTrue(concretePage.isMovePresent());
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(user, ""));
+        getBrowser().loginAndWait(user, "");
 
         templatePage.openAndWaitFor();
         assertFalse(templatePage.isMovePresent());

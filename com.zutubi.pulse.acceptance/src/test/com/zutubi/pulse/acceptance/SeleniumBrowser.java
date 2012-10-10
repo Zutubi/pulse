@@ -284,15 +284,27 @@ public class SeleniumBrowser
 
     /**
      * Goes to the login page and logs in with the given credentials.
-     * 
+     *
      * @param username user to log in as
      * @param password the given user's password
-     * @return true if the login was successful, false if it failed
      */
-    public boolean login(String username, String password)
+    public void login(String username, String password)
     {
         LoginPage page = openAndWaitFor(LoginPage.class);
-        return page.login(username, password);
+        page.login(username, password);
+    }
+
+    /**
+     * Goes to the login page, logs in with the given credentials and waits for the login to succeed.
+     *
+     * @param username user to log in as
+     * @param password the given user's password
+     */
+    public void loginAndWait(String username, String password)
+    {
+        LoginPage page = openAndWaitFor(LoginPage.class);
+        page.login(username, password);
+        waitForElement(By.id(IDs.ID_LOGOUT));
     }
 
     /**

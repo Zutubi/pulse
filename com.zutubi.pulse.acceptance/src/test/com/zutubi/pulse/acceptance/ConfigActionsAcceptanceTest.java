@@ -62,7 +62,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         getBrowser().logout();
 
         // Login with the new password
-        assertTrue(getBrowser().login(random, "testpw"));
+        getBrowser().loginAndWait(random, "testpw");
     }
 
     public void testCustomActionWithArgumentValidation() throws Exception
@@ -88,7 +88,7 @@ public class ConfigActionsAcceptanceTest extends AcceptanceTestBase
         getBrowser().logout();
 
         // Check the password is unchanged
-        assertTrue(getBrowser().login(random, ""));
+        getBrowser().loginAndWait(random, "");
     }
 
     private ListPage customActionWithArgumentPrelude() throws Exception

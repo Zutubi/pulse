@@ -313,7 +313,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertEquals("2 builds", change.builds);
 
         getBrowser().logout();
-        assertTrue(getBrowser().login(regularUser, ""));
+        getBrowser().loginAndWait(regularUser, "");
         
         // Regular user should only see the visible project.
         changelistPage.openAndWaitFor();
@@ -890,7 +890,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         long buildNumber = rpcClient.RemoteApi.runBuild(projectName);
 
-        assertTrue(getBrowser().login(userLogin, ""));
+        getBrowser().loginAndWait(userLogin, "");
 
         BuildArtifactsPage page = getBrowser().openAndWaitFor(BuildArtifactsPage.class, projectName, buildNumber);
         assertEquals(User.DEFAULT_ARTIFACTS_FILTER, page.getCurrentFilter());
@@ -1241,7 +1241,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     public void testTestResultsNestedSuites() throws Exception
     {
         final String PROCESSOR_NAME = "nesty";
-        final String PROCESSOR_SUITE = "sweety has spaces & special % ch@r@cter$!";
+        final String PROCESSOR_SUITE = "sweety";
 
         Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "test");

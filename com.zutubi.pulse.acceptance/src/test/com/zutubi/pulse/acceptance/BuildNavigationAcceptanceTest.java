@@ -189,7 +189,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
         // user needs 'run personal build' permissions.
         rpcClient.RemoteApi.ensureUserCanRunPersonalBuild(userName);
 
-        assertTrue(getBrowser().login(userName, ""));
+        getBrowser().loginAndWait(userName, "");
         rpcClient.login(userName, "");
 
         File workingCopy = createTempDirectory();

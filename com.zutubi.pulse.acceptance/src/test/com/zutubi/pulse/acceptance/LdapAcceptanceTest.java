@@ -1,13 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.pages.admin.GroupsPage;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.util.Hashtable;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Acceptance test for the ldap integration.
@@ -27,9 +28,10 @@ public class LdapAcceptanceTest extends AcceptanceTestBase
 
     public void testAuthenticationViaLdap() throws Exception
     {
-        assertFalse(getBrowser().login("user1", "user1"));
+        getBrowser().login("user1", "user1");
+        assertFalse(getBrowser().isLoggedIn());
         addUser("user1", true);
-        assertTrue(getBrowser().login("user1", "user1"));
+        getBrowser().loginAndWait("user1", "user1");
     }
 
     public void testAuthenticateXmlRpcViaLdap() throws Exception
@@ -50,9 +52,10 @@ public class LdapAcceptanceTest extends AcceptanceTestBase
 
     public void testAddUserViaLdap() throws Exception
     {
-        assertFalse(getBrowser().login("user3", "user3"));
+        getBrowser().login("user3", "user3");
+        assertFalse(getBrowser().isLoggedIn());
         setAddUserViaLdap(true);
-        assertTrue(getBrowser().login("user3", "user3"));
+        getBrowser().loginAndWait("user3", "user3");
     }
 
     public void testEmailContactViaLdap() throws Exception
@@ -60,7 +63,7 @@ public class LdapAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
 
         setAddUserViaLdap(true);
-        assertTrue(getBrowser().login("user3", "user3"));
+        getBrowser().loginAndWait("user3", "user3");
         try
         {
             rpcClient.RemoteApi.getConfig(getPath(USERS_SCOPE, "user3", "preferences", "contacts", "LDAP email"));
@@ -71,7 +74,7 @@ public class LdapAcceptanceTest extends AcceptanceTestBase
         }
 
         setEmailAttribute("mail");
-        assertTrue(getBrowser().login("user4", "user4"));
+        getBrowser().loginAndWait("user4", "user4");
 
         Hashtable<String, Object> contact = rpcClient.RemoteApi.getConfig(getPath(USERS_SCOPE, "user4", "preferences", "contacts", "LDAP email"));
         assertEquals("mborn@example.com", contact.get("address"));
@@ -84,7 +87,7 @@ public class LdapAcceptanceTest extends AcceptanceTestBase
         setAddUserViaLdap(true);
         setGroupNameAttribute("cn");
         setGroupSearchFilter("(uniquemember=${user.dn})");
-        assertTrue(getBrowser().login("user2", "user2"));
+        getBrowser().loginAndWait("user2", "user2");
 
         // user 2 is an administrator in ldap, so should be able to view the admin pages.
         GroupsPage page = getBrowser().openAndWaitFor(GroupsPage.class);

@@ -64,7 +64,7 @@ public class ProjectLabelAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.addLabel(projectName, labelName);
 
         String userPath = rpcClient.RemoteApi.insertTrivialUser(userLogin);
-        assertTrue(getBrowser().login(userLogin, ""));
+        getBrowser().loginAndWait(userLogin, "");
 
         // Default is group by label
         BrowsePage browsePage = getBrowser().openAndWaitFor(BrowsePage.class);
