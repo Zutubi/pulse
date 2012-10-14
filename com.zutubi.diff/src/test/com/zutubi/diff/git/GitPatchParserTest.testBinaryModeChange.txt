@@ -1,3 +1,0 @@
-diff --git a/binfile b/binfile
-old mode 100644
-new mode 100755
