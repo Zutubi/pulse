@@ -991,10 +991,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private List<Project> filterCompleteAndValidProjects(List<Project> projects, final boolean allowInvalid)
     {
-        return filter(projects, new Predicate<Project>()
-        {
-            public boolean satisfied(Project project)
-            {
+        return filter(projects, new Predicate<Project>() {
+            public boolean satisfied(Project project) {
                 return isCompleteAndValid(project, allowInvalid);
             }
         });
@@ -1025,6 +1023,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         BootstrapConfiguration bootstrap = projectConfig.getBootstrap();
         if (bootstrap != null)
         {
+            final String deleteTaskType = SynchronisationTaskFactory.getTaskType(DeleteDirectoryTask.class);
             String workDirPattern = bootstrap.getPersistentDirPattern();
 
             AgentRecipeDetails details = new AgentRecipeDetails();
@@ -1032,7 +1031,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             details.setProjectHandle(projectConfig.getHandle());
             for (Agent agent: agentManager.getAllAgents())
             {
-                List<Pair<SynchronisationMessage, String>> messageDescriptionPairs = new LinkedList<Pair<SynchronisationMessage, String>>();
+                List<Pair<Properties, String>> propertiesDescriptionPairs = new LinkedList<Pair<Properties, String>>();
     
                 AgentConfiguration agentConfig = agent.getConfig();
                 details.setAgent(agent.getName());
@@ -1055,12 +1054,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     
                     DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
                     SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
-                    messageDescriptionPairs.add(asPair(message, I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
+                    propertiesDescriptionPairs.add(asPair(message.getArguments(), I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
                 }
                     
-                if (messageDescriptionPairs.size() > 0)
+                if (propertiesDescriptionPairs.size() > 0)
                 {
-                    agentManager.enqueueSynchronisationMessages(agent, messageDescriptionPairs);
+                    agentManager.enqueueSynchronisationMessages(agent, deleteTaskType, propertiesDescriptionPairs);
                 }
             }
         }

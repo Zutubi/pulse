@@ -311,20 +311,24 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    public void enqueueSynchronisationMessages(final Agent agent, final List<Pair<SynchronisationMessage, String>> messageDescriptionPairs)
+    public void enqueueSynchronisationMessages(final Agent agent, final String taskType, final List<Pair<Properties, String>> propertiesDescriptionPairs)
     {
+        System.out.println("Enqueuing " + propertiesDescriptionPairs.size() + " messages");
+        long startTime = System.currentTimeMillis();
         final AgentState agentState = agentStateDao.findById(agent.getId());
         if (agentState != null)
         {
+            final List<AgentSynchronisationMessage> messages = agentSynchronisationMessageDao.queryMessages(agentState, AgentSynchronisationMessage.Status.QUEUED, taskType);
             agentStatusManager.withAgentsLock(new NullaryFunction<Object>()
             {
                 public Object process()
                 {
-                    for (final Pair<SynchronisationMessage, String> pair: messageDescriptionPairs)
+                    for (final Pair<Properties, String> pair: propertiesDescriptionPairs)
                     {
-                        if (!matchingMessageExists(agentState, pair.first, pair.second))
+                        if (!matchingMessageExists(messages, pair.first, pair.second))
                         {
-                            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, pair.first, pair.second);
+                            final SynchronisationMessage message = new SynchronisationMessage(taskType, pair.first);
+                            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, pair.second);
                             agentSynchronisationMessageDao.save(agentMessage);
                         }
                     }
@@ -335,16 +339,17 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 }
             });
         }
+        System.out.println("It took " + (System.currentTimeMillis() - startTime) + " millis");
     }
 
-    private boolean matchingMessageExists(AgentState agentState, final SynchronisationMessage message, String description)
+    private boolean matchingMessageExists(final List<AgentSynchronisationMessage> existing, final Properties properties, final String description)
     {
-        List<AgentSynchronisationMessage> existing = agentSynchronisationMessageDao.queryMessages(agentState, AgentSynchronisationMessage.Status.QUEUED, message.getTypeName(), description);
         return CollectionUtils.contains(existing, new Predicate<AgentSynchronisationMessage>()
         {
             public boolean satisfied(AgentSynchronisationMessage existingMessage)
             {
-                return existingMessage.getMessage().equals(message);
+                return existingMessage.getDescription().equals(description) &&
+                        existingMessage.getMessage().getArguments().equals(properties);
             }
         });
     }

@@ -773,7 +773,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
             throw new RuntimeException("Not implemented");
         }
 
-        public void enqueueSynchronisationMessages(Agent agent, List<Pair<SynchronisationMessage, String>> messageDescriptionPairs)
+        public void enqueueSynchronisationMessages(Agent agent, String taskType, List<Pair<Properties, String>> propertiesDescriptionPairs)
         {
             throw new RuntimeException("Not implemented");
         }

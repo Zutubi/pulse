@@ -18,12 +18,15 @@ import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 /**
@@ -111,7 +114,9 @@ public class TestApi
         {
             SynchronisationTask task = synchronous ? new TestSynchronisationTask(succeed) : new TestAsyncSynchronisationTask(succeed);
             SynchronisationMessage message = synchronisationTaskFactory.toMessage(task);
-            agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), asList(asPair(message, description)));
+            final String taskType = SynchronisationTaskFactory.getTaskType(task.getClass());
+            final Pair<Properties,String> pair = asPair(message.getArguments(), description);
+            agentManager.enqueueSynchronisationMessages(internalGetAgent(agent), taskType, asList(pair));
             return true;
         }
         finally
