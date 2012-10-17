@@ -314,7 +314,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public void enqueueSynchronisationMessages(final Agent agent, final String taskType, final List<Pair<Properties, String>> propertiesDescriptionPairs)
     {
-        long startTime = System.currentTimeMillis();
         final AgentState agentState = agentStateDao.findById(agent.getId());
         if (agentState != null)
         {
