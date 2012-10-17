@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.tove.type.record.MutableRecordImpl;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.type.record.*;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryFunction;
 
 /**
@@ -12,6 +10,13 @@ import com.zutubi.util.UnaryFunction;
  */
 public class AddBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
 {
+    private static final String CHECKOUT_SCHEME_CLEAN_CHECKOUT = "CLEAN_CHECKOUT";
+    private static final String CHECKOUT_SCHEME_CLEAN_UPDATE = "CLEAN_UPDATE";
+    private static final String CHECKOUT_TYPE_CLEAN = "CLEAN_CHECKOUT";
+    private static final String CHECKOUT_TYPE_INCREMENTAL = "INCREMENTAL_CHECKOUT";
+    private static final String BUILD_TYPE_CLEAN = "CLEAN_BUILD";
+    private static final String BUILD_TYPE_INCREMENTAL = "INCREMENTAL_BUILD";
+
     private static final String SCOPE_PROJECTS = "projects";
 
     private static final String TYPE_BOOTSTRAP = "zutubi.bootstrapConfig";
@@ -40,8 +45,34 @@ public class AddBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
                 bootstrapRecord.setSymbolicName(TYPE_BOOTSTRAP);
                 if (node.getParent() == null)
                 {
-                    bootstrapRecord.put("checkoutType", "CLEAN_CHECKOUT");
-                    bootstrapRecord.put("buildType", "CLEAN_BUILD");
+                    String ownerId = node.getId();
+                    Record scmRecord = recordManager.select("projects/" + ownerId + "/scm");
+                    String checkoutScheme = scmRecord == null ? null : (String) scmRecord.get("checkoutScheme");
+                    if (!StringUtils.stringSet(checkoutScheme))
+                    {
+                        checkoutScheme = CHECKOUT_SCHEME_CLEAN_CHECKOUT;
+                    }
+
+                    String checkoutType;
+                    String buildType;
+                    if (checkoutScheme.equals(CHECKOUT_SCHEME_CLEAN_CHECKOUT))
+                    {
+                        checkoutType = CHECKOUT_TYPE_CLEAN;
+                        buildType = BUILD_TYPE_CLEAN;
+                    }
+                    else if (checkoutScheme.equals(CHECKOUT_SCHEME_CLEAN_UPDATE))
+                    {
+                        checkoutType = CHECKOUT_TYPE_INCREMENTAL;
+                        buildType = BUILD_TYPE_CLEAN;
+                    }
+                    else
+                    {
+                        checkoutType = CHECKOUT_TYPE_INCREMENTAL;
+                        buildType = BUILD_TYPE_INCREMENTAL;
+                    }
+
+                    bootstrapRecord.put("checkoutType", checkoutType);
+                    bootstrapRecord.put("buildType", buildType);
                     bootstrapRecord.put("persistentDirPattern", "$(agent.data.dir)/work/$(project.handle)/$(stage.handle)");
                     bootstrapRecord.put("tempDirPattern", "$(agent.data.dir)/recipes/$(recipe.id)/base");
                 }

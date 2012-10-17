@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryFunction;
 
 /**
@@ -52,38 +53,26 @@ public class PopulateBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
                 if (scm != null)
                 {
                     String checkoutScheme = (String) scm.get("checkoutScheme");
-                    if (checkoutScheme != null)
+                    if (StringUtils.stringSet(checkoutScheme))
                     {
-                        String parentCheckoutScheme = null;
-                        ScopeHierarchy.Node parentNode = node.getParent();
-                        if (parentNode != null)
-                        {
-                            String parent = parentNode.getId();
-                            Record parentScmRecord = recordManager.select("projects/" + parent + "/scm");
-                            parentCheckoutScheme = parentScmRecord == null ? null : (String) parentScmRecord.get("checkoutScheme");
-                        }
+                        String inheritedCheckoutScheme = findInheritedCheckoutScheme(node);
 
-                        if (parentCheckoutScheme == null)
+                        String inheritedCheckoutType;
+                        String inheritedBuildType;
+                        if (inheritedCheckoutScheme.equals(CHECKOUT_SCHEME_CLEAN_CHECKOUT))
                         {
-                            parentCheckoutScheme = CHECKOUT_SCHEME_CLEAN_CHECKOUT;
+                            inheritedCheckoutType = CHECKOUT_TYPE_CLEAN;
+                            inheritedBuildType = BUILD_TYPE_CLEAN;
                         }
-
-                        String parentCheckoutType;
-                        String parentBuildType;
-                        if (parentCheckoutScheme.equals(CHECKOUT_SCHEME_CLEAN_CHECKOUT))
+                        else if (inheritedCheckoutScheme.equals(CHECKOUT_SCHEME_CLEAN_UPDATE))
                         {
-                            parentCheckoutType = CHECKOUT_TYPE_CLEAN;
-                            parentBuildType = BUILD_TYPE_CLEAN;
-                        }
-                        else if (parentCheckoutScheme.equals(CHECKOUT_SCHEME_CLEAN_UPDATE))
-                        {
-                            parentCheckoutType = CHECKOUT_TYPE_INCREMENTAL;
-                            parentBuildType = BUILD_TYPE_CLEAN;
+                            inheritedCheckoutType = CHECKOUT_TYPE_INCREMENTAL;
+                            inheritedBuildType = BUILD_TYPE_CLEAN;
                         }
                         else
                         {
-                            parentCheckoutType = CHECKOUT_TYPE_INCREMENTAL;
-                            parentBuildType = BUILD_TYPE_INCREMENTAL;
+                            inheritedCheckoutType = CHECKOUT_TYPE_INCREMENTAL;
+                            inheritedBuildType = BUILD_TYPE_INCREMENTAL;
                         }
 
                         if (checkoutScheme.equals(CHECKOUT_SCHEME_CLEAN_CHECKOUT))
@@ -102,13 +91,13 @@ public class PopulateBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
                             buildType = BUILD_TYPE_INCREMENTAL;
                         }
 
-                        if (checkoutType.equals(parentCheckoutType))
+                        if (checkoutType.equals(inheritedCheckoutType))
                         {
                             // Scrub
                             checkoutType = null;
                         }
 
-                        if (buildType.equals(parentBuildType))
+                        if (buildType.equals(inheritedBuildType))
                         {
                             // Scrub
                             buildType = null;
@@ -138,6 +127,31 @@ public class PopulateBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
                 }
 
                 return true;
+            }
+
+            private String findInheritedCheckoutScheme(ScopeHierarchy.Node node)
+            {
+                String inheritedCheckoutScheme = null;
+                node = node.getParent();
+                while (node != null)
+                {
+                    String ownerId = node.getId();
+                    Record scmRecord = recordManager.select("projects/" + ownerId + "/scm");
+                    inheritedCheckoutScheme = scmRecord == null ? null : (String) scmRecord.get("checkoutScheme");
+                    if (StringUtils.stringSet(inheritedCheckoutScheme))
+                    {
+                        break;
+                    }
+
+                    node = node.getParent();
+                }
+
+                if (!StringUtils.stringSet(inheritedCheckoutScheme))
+                {
+                    // In this case we would have added clean checkout options to the global template.
+                    inheritedCheckoutScheme = CHECKOUT_SCHEME_CLEAN_CHECKOUT;
+                }
+                return inheritedCheckoutScheme;
             }
         });
     }
