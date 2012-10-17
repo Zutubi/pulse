@@ -11,12 +11,8 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -25,7 +21,6 @@ import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -41,6 +36,12 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  */
@@ -313,7 +314,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public void enqueueSynchronisationMessages(final Agent agent, final String taskType, final List<Pair<Properties, String>> propertiesDescriptionPairs)
     {
-        System.out.println("Enqueuing " + propertiesDescriptionPairs.size() + " messages");
         long startTime = System.currentTimeMillis();
         final AgentState agentState = agentStateDao.findById(agent.getId());
         if (agentState != null)
@@ -339,7 +339,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 }
             });
         }
-        System.out.println("It took " + (System.currentTimeMillis() - startTime) + " millis");
     }
 
     private boolean matchingMessageExists(final List<AgentSynchronisationMessage> existing, final Properties properties, final String description)
