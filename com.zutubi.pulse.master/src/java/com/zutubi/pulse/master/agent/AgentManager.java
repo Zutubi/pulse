@@ -13,6 +13,7 @@ import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  */
@@ -72,12 +73,13 @@ public interface AgentManager extends AgentPersistentStatusManager
      * will be sent on the next synchronisation cycle for the agent (and
      * retried until it succeeds or fails permanently).
      *
-     * @param agent                   agent to queue the message for
-     * @param messageDescriptionPairs a list of messages to queue, paired with
-     *                                human-readable description of their
-     *                                purpose
+     * @param agent                      agent to queue the message for
+     * @param taskType                   type of task for all messages to enqueue
+     * @param propertiesDescriptionPairs a list of arguments for the messages
+     *                                   to queue, paired with a human-readable
+     *                                   description of their purpose
      */
-    void enqueueSynchronisationMessages(Agent agent, List<Pair<SynchronisationMessage, String>> messageDescriptionPairs);
+    void enqueueSynchronisationMessages(Agent agent, String taskType, List<Pair<Properties, String>> propertiesDescriptionPairs);
 
     /**
      * Dequeues (deletes) the given agent synchronisation messages.

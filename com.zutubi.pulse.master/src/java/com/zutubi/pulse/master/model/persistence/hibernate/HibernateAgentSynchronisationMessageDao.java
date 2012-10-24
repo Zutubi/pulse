@@ -50,17 +50,16 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
         });
     }
 
-    public List<AgentSynchronisationMessage> queryMessages(final AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType, final String description)
+    public List<AgentSynchronisationMessage> queryMessages(final AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType)
     {
         return (List<AgentSynchronisationMessage>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState and statusName = :statusName and message.typeName = :typeName and description = :description order by id asc");
+                Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState and statusName = :statusName and message.typeName = :typeName order by id asc");
                 queryObject.setEntity("agentState", agentState);
                 queryObject.setString("statusName", status.name());
                 queryObject.setString("typeName", taskType);
-                queryObject.setString("description", description);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }

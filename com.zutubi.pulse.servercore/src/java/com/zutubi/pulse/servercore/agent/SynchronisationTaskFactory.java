@@ -45,6 +45,17 @@ public class SynchronisationTaskFactory
     }
 
     /**
+     * Returns the task type name for tasks of the given type, if known.
+     *
+     * @param taskClass task type to get the name for
+     * @return the type of the task, or null if the task class is not known
+     */
+    public static String getTaskType(Class<? extends SynchronisationTask> taskClass)
+    {
+        return classToName.get(taskClass);
+    }
+
+    /**
      * Creates a task from the given message.  The arguments in the message
      * are bound to corresponding fields in the task, where such fields exist.
      * Arguments with no corresponding field are ignored.
@@ -102,7 +113,7 @@ public class SynchronisationTaskFactory
                 }
             }
 
-            return new SynchronisationMessage(classToName.get(taskClass), properties);
+            return new SynchronisationMessage(getTaskType(taskClass), properties);
         }
         catch (Exception e)
         {

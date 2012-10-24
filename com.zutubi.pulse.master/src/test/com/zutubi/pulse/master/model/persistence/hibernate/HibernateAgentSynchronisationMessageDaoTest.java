@@ -94,10 +94,9 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
 
         commitAndRefreshTransaction();
 
-        assertEquals(asList(message1QueuedDeleteA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, deleteMessage.getTypeName(), "desc A"));
-        assertEquals(asList(message1ProcessingDeleteA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.PROCESSING, deleteMessage.getTypeName(), "desc A"));
-        assertEquals(asList(message1QueuedDeleteB), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, deleteMessage.getTypeName(), "desc B"));
-        assertEquals(asList(message1QueuedRenameA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, renameMessage.getTypeName(), "desc A"));
+        assertEquals(asList(message1QueuedDeleteA, message1QueuedDeleteB), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, deleteMessage.getTypeName()));
+        assertEquals(asList(message1ProcessingDeleteA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.PROCESSING, deleteMessage.getTypeName()));
+        assertEquals(asList(message1QueuedRenameA), agentSynchronisationMessageDao.queryMessages(agentState1, AgentSynchronisationMessage.Status.QUEUED, renameMessage.getTypeName()));
     }
 
     public void testFindByStatus()

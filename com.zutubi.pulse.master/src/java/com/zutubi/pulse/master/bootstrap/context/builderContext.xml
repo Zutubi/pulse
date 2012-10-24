@@ -118,7 +118,7 @@
         <property name="target">
             <bean class="com.zutubi.pulse.master.agent.DefaultAgentManager"/>
         </property>
-        <property name="interceptorNames" ref="securityInterceptors"/>
+        <property name="interceptorNames" ref="securityAndTransactionInterceptors"/>
     </bean>
 
     <bean id="agentSynchronisationService" class="com.zutubi.pulse.master.agent.AgentSynchronisationService"/>
