@@ -303,13 +303,20 @@ public class Logger
         // OK as we are only committed to making a "best effort" here.
     }
 
+    /**
+     * Sets the log level on the delegate.
+     *
+     * @param level the new log level
+     *
+     * @see java.util.logging.Logger#setLevel(java.util.logging.Level)
+     */
+    public void setLevel(Level level)
+    {
+        delegate.setLevel(level);
+    }
+
     public void setFilter(Filter filter)
     {
         delegate.setFilter(filter);
-    }
-
-    public java.util.logging.Logger getDelegate()
-    {
-        return delegate;
     }
 }

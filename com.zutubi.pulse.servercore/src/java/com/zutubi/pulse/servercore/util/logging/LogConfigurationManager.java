@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 
 /**
@@ -93,12 +92,7 @@ public class LogConfigurationManager
 
     protected void setLoggingEnabled(Logger logger, boolean enabled)
     {
-        Handler[] handlers = logger.getDelegate().getHandlers();
-        Level handlerLevel = enabled ? Level.ALL : Level.OFF;
-        for (Handler h : handlers)
-        {
-            h.setLevel(handlerLevel);
-        }
+        logger.setLevel(enabled ? Level.ALL : Level.OFF);
     }
 
     public List<String> getAvailableConfigurations()
