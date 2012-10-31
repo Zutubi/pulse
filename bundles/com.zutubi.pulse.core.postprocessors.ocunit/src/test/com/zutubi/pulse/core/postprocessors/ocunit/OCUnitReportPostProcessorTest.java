@@ -7,12 +7,16 @@ import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
@@ -171,9 +175,38 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
         assertEquals(2, suite.getSuites().size());
     }
 
+    public void testShortenSuiteNames()
+    {
+        PersistentTestSuiteResult tests = process(true);
+        tests = tests.getSuite("All tests");
+
+        List<String> names = CollectionUtils.map(tests.getSuites(), new Mapping<PersistentTestSuiteResult, String>()
+        {
+            public String map(PersistentTestSuiteResult persistentTestSuiteResult)
+            {
+                return persistentTestSuiteResult.getName();
+            }
+        });
+
+        assertEquals(Arrays.asList("build/Release/AmbUnitTests.octest(Tests)",
+                                   "Debug/AmbUnitTests.octest(Tests)",
+                                   "foo/Release/AmbUnitTests.octest(Tests)",
+                                   "MoreUnitTests.octest(Tests)",
+                                   "SenTestingKit.framework(Tests)",
+                                   "UnitTests.octest(Tests)"),
+                     names);
+    }
+
     private PersistentTestSuiteResult process()
     {
-        OCUnitReportPostProcessor pp = new OCUnitReportPostProcessor(new OCUnitReportPostProcessorConfiguration());
+        return process(false);
+    }
+
+    private PersistentTestSuiteResult process(boolean shortenSuiteNames)
+    {
+        OCUnitReportPostProcessorConfiguration config = new OCUnitReportPostProcessorConfiguration();
+        config.setShortenSuiteNames(shortenSuiteNames);
+        OCUnitReportPostProcessor pp = new OCUnitReportPostProcessor(config);
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
 
         ExecutionContext context = new PulseExecutionContext();
