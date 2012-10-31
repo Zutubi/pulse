@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -233,7 +234,12 @@ public class SchedulingController implements EventListener
         return accepted;
     }
 
-    protected void handleBuildCompleted(BuildCompletedEvent event)
+    private void handleBuildCommencing(BuildCommencingEvent event)
+    {
+        buildQueue.commencing(event.getBuildResult().getId());
+    }
+
+    private void handleBuildCompleted(BuildCompletedEvent event)
     {
         if (!handlers.containsKey(event.getMetaBuildId()))
         {
@@ -391,6 +397,10 @@ public class SchedulingController implements EventListener
         if (event instanceof BuildRequestEvent)
         {
             handleBuildRequest((BuildRequestEvent) event);
+        }
+        else if (event instanceof BuildCommencingEvent)
+        {
+            handleBuildCommencing((BuildCommencingEvent) event);
         }
         else if (event instanceof BuildCompletedEvent)
         {

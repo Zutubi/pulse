@@ -1,22 +1,25 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
+import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State;
-import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.pulse.master.model.Project.State;
+import static com.zutubi.pulse.master.model.Project.Transition;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Check that a set of use cases behave as expected.
@@ -244,8 +247,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         assertActivated(triggerA);
         setProjectState(State.BUILDING, client);
 
-        // fix the revision when it starts building to prevent further assimilation.
-        triggerA.getRevision().setRevision(new Revision("1"));
+        controller.handleEvent(new BuildCommencingEvent(this, createBuildResult(triggerA), new PulseExecutionContext()));
 
         // The triggerd requests queue up.
         BuildRequestEvent triggerB = createRequest(client, "cronTrigger", true, null);
@@ -397,8 +399,8 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
 
     /**
      * Two scm changes to the same component, ensure that the second request does not assimilate
-     * into the first because the first one has started and its revision is fixed.  Assimilation only
-     * occurs if all of a builds associated requests can be assimilated.
+     * into the first because the first one has commenced.  Assimilation only occurs if all of a
+     * builds associated requests can be assimilated.
      */
     public void testMultipleOverlappingCommitsRemainSeparateIfTheyCanNotAssimilateCompletely()
     {
@@ -406,10 +408,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         BuildRequestEvent changeB = createRequest(utility, "scm change", true, false);
 
         controller.handleEvent(changeA);
-
-        // fix the revision when it starts building to prevent further assimilation.
-        changeA.getRevision().setRevision(new Revision("1"));
-
+        controller.handleEvent(new BuildCommencingEvent(this, createBuildResult(changeA), new PulseExecutionContext()));
         controller.handleEvent(changeB);
 
         assertQueuedCount(7);

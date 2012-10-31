@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.build.control.BuildController;
+import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
 /**
  * Holds an activated build request.
@@ -16,6 +16,7 @@ import com.zutubi.pulse.master.build.control.BuildController;
 public class ActivatedRequest extends RequestHolder
 {
     private BuildController controller;
+    private boolean buildCommenced;
 
     protected ActivatedRequest(BuildRequestEvent request)
     {
@@ -30,5 +31,21 @@ public class ActivatedRequest extends RequestHolder
     public BuildController getController()
     {
         return controller;
+    }
+
+    /**
+     * @return true if the build associated with this request has commenced
+     */
+    public boolean isBuildCommenced()
+    {
+        return buildCommenced;
+    }
+
+    /**
+     * Marks this request as corresponding to a build that has commenced.
+     */
+    public void buildCommenced()
+    {
+        buildCommenced = true;
     }
 }

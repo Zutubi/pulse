@@ -18,11 +18,6 @@ public class PostBuildEvent extends BuildEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Post Build Event");
-        if (getBuildResult() != null)
-        {
-            buff.append(": ").append(getBuildResult().getId());
-        }
-        return buff.toString();
+        return "Post Build Event: " + getBuildResult();
     }
 }

@@ -19,11 +19,6 @@ public class BuildCompletedEvent extends BuildEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Build Completed Event");
-        if (getBuildResult() != null)
-        {
-            buff.append(": ").append(getBuildResult().getId());
-        }
-        return buff.toString();
+        return "Build Completed Event: " + getBuildResult();
     }    
 }

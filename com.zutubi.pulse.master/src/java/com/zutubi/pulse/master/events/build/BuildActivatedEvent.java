@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.master.model.User;
-
 /**
  * This event is raised when a build is activated: this is the point where
  * the build controller is about to start and enqueue the recipe requests.
@@ -43,15 +41,6 @@ public class BuildActivatedEvent extends BuildEvent
 
     public String toString()
     {
-        StringBuilder builder = new StringBuilder("Build Activated Event:");
-        if (event.isPersonal())
-        {
-            builder.append(" Personal Build: ");
-            builder.append(((User) event.getOwner()).getLogin());
-        }
-
-        builder.append(" Project: ");
-        builder.append(event.getProjectConfig().getName());
-        return builder.toString();
+        return "Build Activated Event: " + getBuildResult();
     }
 }
