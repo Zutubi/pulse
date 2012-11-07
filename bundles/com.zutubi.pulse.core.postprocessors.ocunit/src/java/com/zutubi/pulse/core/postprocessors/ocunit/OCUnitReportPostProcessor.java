@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.postprocessors.ocunit;
 
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.postprocessors.api.*;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -9,6 +10,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,13 +24,13 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
 {
     private static final Logger LOG = Logger.getLogger(OCUnitReportPostProcessor.class);
 
-    private BufferedReader reader;
-
-    private String currentLine;
     private static final Pattern START_SUITE_PATTERN = Pattern.compile("Test Suite '(.*?)' started at (.*$)");
     private static final Pattern END_SUITE_PATTERN = Pattern.compile("Test Suite '(.*?)' finished at (.*$)");
     private static final Pattern SUITE_SUMMARY_PATTERN = Pattern.compile("Executed (\\d*) test[s]?, with (\\d*) failure[s]? \\((\\d*) unexpected\\) in (\\d*\\.\\d*) \\((\\d*\\.\\d*)\\) second[s]?$");
     private static final Pattern CASE_SUMMARY_PATTERN = Pattern.compile("Test Case '-\\[(.*?) (.*?)\\]' (.*?) \\((\\d*\\.\\d*) second[s]?\\)\\.$");
+
+    private BufferedReader reader;
+    private String currentLine;
 
     public OCUnitReportPostProcessor(OCUnitReportPostProcessorConfiguration config)
     {
@@ -37,8 +42,6 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
         try
         {
             reader = new BufferedReader(new FileReader(file));
-
-            // read until you locate the start of a test suite.
             try
             {
                 processFile(suite, ppContext);
@@ -63,30 +66,27 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
 
     private void processFile(TestSuiteResult tests, PostProcessorContext ppContext) throws IOException
     {
-        // look for a TestSuite.
         currentLine = nextLine();
         while (currentLine != null)
         {
-            // does this line start with Test Suite
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
-                // we have a test suite.
                 tests.addSuite(processSuite(ppContext));
             }
             currentLine = nextLine();
         }
+
+        shortenChildSuiteNamesIfRequested(tests);
     }
 
     private TestSuiteResult processSuite(PostProcessorContext ppContext) throws IOException
     {
-        // varify that we have a start suite here.
         Matcher m = START_SUITE_PATTERN.matcher(currentLine);
         if (!m.matches())
         {
             throw new IllegalStateException("Should only get here by already checking we are at the start of suite marker");
         }
 
-        // start the suite.
         TestSuiteResult suite = new TestSuiteResult(m.group(1));
 
         currentLine = nextLine();
@@ -174,6 +174,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
             }
         }
 
+        shortenChildSuiteNamesIfRequested(suite);
         return suite;
     }
 
@@ -181,5 +182,55 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
     {
         currentLine = reader.readLine();
         return currentLine;
+    }
+
+    private void shortenChildSuiteNamesIfRequested(TestSuiteResult parentSuite)
+    {
+        if (!((OCUnitReportPostProcessorConfiguration) getConfig()).isShortenSuiteNames())
+        {
+            return;
+        }
+
+        // This implementation is naive, but we expect:
+        //   a) the number of suites to be small enough.
+        //   b) the last elements of suites to usually be unique
+        List<TestSuiteResult> suites = parentSuite.getSuites();
+        List<List<String>> splitNames = new LinkedList<List<String>>();
+        for (TestSuiteResult suite: suites)
+        {
+            String[] elements = StringUtils.split(suite.getName(), File.separatorChar);
+            splitNames.add(Arrays.asList(elements));
+        }
+
+        Iterator<TestSuiteResult> it = suites.iterator();
+        for (List<String> splitName : splitNames)
+        {
+            TestSuiteResult suite = it.next();
+            int elementCount = splitName.size();
+            for (int i = 1; i < elementCount; i++)
+            {
+                if (countMatchingSuffixes(splitNames, splitName, i) == 1)
+                {
+                    suite.setName(StringUtils.join(File.separator, splitName.subList(elementCount - i, elementCount)));
+                    break;
+                }
+            }
+        }
+    }
+
+    private int countMatchingSuffixes(List<List<String>> names, List<String> name, int suffixLength)
+    {
+        List<String> subname = name.subList(name.size() - suffixLength, name.size());
+        int count = 0;
+        for (List<String> candidate : names)
+        {
+            int size = candidate.size();
+            if (size >= suffixLength && candidate.subList(size - suffixLength, size).equals(subname))
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

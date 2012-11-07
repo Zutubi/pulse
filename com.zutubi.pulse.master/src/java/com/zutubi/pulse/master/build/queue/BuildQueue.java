@@ -87,6 +87,21 @@ public class BuildQueue
     }
 
     /**
+     * Notifies the queue that a build is commencing.  After this point the request cannot participate in assimilation.
+     *
+     * @param buildId id of the build that is commencing
+     */
+    public synchronized void commencing(long buildId)
+    {
+        for (ActivatedRequest request : activatedRequests)
+        {
+            if (request.getController().getBuildResultId() == buildId)
+            {
+                request.buildCommenced();
+            }
+        }
+    }
+    /**
      * Enqueue the requests.
      *
      * @param requests the requests to enqueue.
@@ -282,7 +297,7 @@ public class BuildQueue
                 return false;
             }
 
-            RequestHolder target = getAssimilationCandidate(source);
+            RequestHolder target = getLatestExistingRequestWithOwnerAndSource(source);
             if (isReplaceable(target))
             {
                 assimilationTargets.put(source, target);
@@ -293,8 +308,8 @@ public class BuildQueue
             }
         }
 
-        // if any revisions are fixed, then we can not assimilate it, so bail on the assimilation of the rest.
-        if (CollectionUtils.contains(assimilationTargets.values(), new HasFixedRevisionPredicate<RequestHolder>()))
+        // If any of the builds have commenced, then we can not assimilate it, so bail on the assimilation of the rest.
+        if (CollectionUtils.contains(assimilationTargets.values(), new BuildHasCommencedPredicate()))
         {
             return false;
         }
@@ -306,14 +321,14 @@ public class BuildQueue
 
             BuildRequestEvent targetRequest = target.getRequest();
             BuildRequestEvent sourceRequest = source.getRequest();
-
+            targetRequest.setRevision(sourceRequest.getRevision());
             buildRequestRegistry.requestAssimilated(sourceRequest, targetRequest.getId());
         }
 
         return true;
     }
 
-    private RequestHolder getAssimilationCandidate(RequestHolder source)
+    private RequestHolder getLatestExistingRequestWithOwnerAndSource(RequestHolder source)
     {
         // the back of the queue is the start of the list.
         QueuedRequest candidate = CollectionUtils.find(queuedRequests, new HasOwnerAndSourcePredicate<QueuedRequest>(source));

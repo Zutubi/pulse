@@ -5,9 +5,6 @@ import com.zutubi.pulse.core.scm.api.Revision;
 /**
  * Represents the revision to be built.  The revision of the build can be initialised
  * at any time before the build starts, but once initialised, it can not be changed.
- *
- * The build revision can be marked as fixed before it is initialised.  Once fixed, the
- * build revision should not take part in any scheduling assimilation processing.
  */
 public class BuildRevision
 {
@@ -16,10 +13,6 @@ public class BuildRevision
      * initialised.
      */
     private Revision revision;
-    /**
-     * True if the build revision has been fixed.
-     */
-    private boolean fixed = false;
     /**
      * True if this is a revision explicitly specified by the user, when
      * triggering the build.
@@ -62,26 +55,11 @@ public class BuildRevision
     }
 
     /**
-     * Check if this revision has been fixed.  The revision is fixed at the
+     * Check if this revision has been initialised.  The revision is initialised at the
      * latest when the build commences.
      *
-     * @return true if this revision has been fixed.
+     * @return true if this revision has been initialised.
      */
-    public synchronized boolean isFixed()
-    {
-        return isInitialised() || fixed;
-    }
-
-    private synchronized void setFixed(boolean fixed)
-    {
-        this.fixed = fixed;
-    }
-
-    public synchronized void fix()
-    {
-        setFixed(true);
-    }
-
     public synchronized boolean isInitialised()
     {
         return getRevision() != null;

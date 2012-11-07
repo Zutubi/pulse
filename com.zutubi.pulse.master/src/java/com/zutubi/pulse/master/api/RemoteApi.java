@@ -3902,7 +3902,7 @@ public class RemoteApi
 
     /**
      * Triggers a build of the given project at a floating revision.  The revision will be fixed as
-     * laate as possible.  This function returns as soon as the request has been made.
+     * late as possible.  This function returns as soon as the request has been made.
      *
      * @param token       authentication token, see {@link #login(String, String)}
      * @param projectName the name of the project to trigger

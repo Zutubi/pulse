@@ -195,6 +195,7 @@
                 <ref local="sendEmailUpstreamCommitters"/>
                 <ref local="changedCustomConditions"/>
                 <ref local="changedSelectedBuildsConditions"/>
+                <ref local="addOCUnitShortenSuiteNames"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1025,5 +1026,9 @@
 
     <bean id="changedSelectedBuildsConditions" class="com.zutubi.pulse.master.upgrade.tasks.ChangedSelectedBuildsConditionsUpgradeTask">
         <property name="buildNumber" value="205002003"/>
+    </bean>
+
+    <bean id="addOCUnitShortenSuiteNames" class="com.zutubi.pulse.master.upgrade.tasks.AddOCUnitShortenSuiteNamesUpgradeTask">
+        <property name="buildNumber" value="205011001"/>
     </bean>
 </beans>

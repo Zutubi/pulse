@@ -359,11 +359,15 @@ public abstract class BaseQueueTestCase extends PulseTestCase
 
     private BuildCompletedEvent createCompletedEvent(BuildRequestEvent request)
     {
-        BuildResult result = request.createResult(projectManager, buildManager);
+        return new BuildCompletedEvent(this, createBuildResult(request), new PulseExecutionContext());
+    }
 
+    protected BuildResult createBuildResult(BuildRequestEvent request)
+    {
+        BuildResult result = request.createResult(projectManager, buildManager);
+        result.setId(request.getId());
         result.setMetaBuildId(request.getMetaBuildId());
-        PulseExecutionContext ctx = new PulseExecutionContext();
-        return new BuildCompletedEvent(this, result, ctx);
+        return result;
     }
 
     protected DependencyConfiguration dependency(Project project)

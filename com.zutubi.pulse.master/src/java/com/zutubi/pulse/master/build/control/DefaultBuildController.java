@@ -746,8 +746,9 @@ public class DefaultBuildController implements EventListener, BuildController
      */
     private void handleBuildCommenced()
     {
-        BuildRevision buildRevision = request.getRevision();
+        publishEvent(new BuildCommencingEvent(this, buildResult, buildContext));
 
+        BuildRevision buildRevision = request.getRevision();
         if (!buildRevision.isInitialised())
         {
             buildLogger.status("Initialising build revision...");

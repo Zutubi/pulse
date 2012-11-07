@@ -46,6 +46,7 @@ public class ToveFileLoaderTest extends PulseTestCase
         definitions.register("string-list", registry.register(StringList.class));
 
         registry.register(FakePulseFile.class);
+        definitions.register("fpost-processor", registry.register(FakePostProcessor.class));
         definitions.register("frecipe", registry.register(FakeRecipe.class));
         definitions.register("fant", registry.register(FakeAntCommand.class));
         definitions.register("fmake", registry.register(FakeMakeCommand.class));
@@ -400,6 +401,26 @@ public class ToveFileLoaderTest extends PulseTestCase
         }
     }
 
+    public void testImportProcessorInRecipe() throws IOException, PulseException
+    {
+        File tempDir = createTempDirectory();
+        try
+        {
+            copyInputToDirectory(EXTENSION_XML, tempDir);
+            copyInputToDirectory(getName() + ".import", EXTENSION_XML, tempDir);
+
+            FakePulseFile pf = new FakePulseFile();
+            loader.load(getInput(EXTENSION_XML), pf, new LocalFileResolver(tempDir));
+            FakeCommand command = assertSingleCommandRecipe(pf, "processed");
+            assertEquals(1, command.getPostProcessors().size());
+            assertEquals("fake.pp", command.getPostProcessors().get(0).getName());
+        }
+        finally
+        {
+            removeDirectory(tempDir);
+        }
+    }
+
     public void testImportUnknownAttribute()
     {
         FakePulseFile pf = new FakePulseFile();
@@ -455,13 +476,14 @@ public class ToveFileLoaderTest extends PulseTestCase
         errorHelper("Duplicated Recipe name 'jim'");        
     }
 
-    private void assertSingleCommandRecipe(FakePulseFile pf, String name)
+    private FakeCommand assertSingleCommandRecipe(FakePulseFile pf, String name)
     {
         FakeRecipe recipe = pf.getRecipe(name);
         assertNotNull(recipe);
         Map<String, FakeCommand> commands = recipe.getCommands();
         assertEquals(1, commands.size());
         assertTrue(commands.containsKey(name));
+        return commands.values().iterator().next();
     }
 
     private void loadAndAssertImportedCommands(File tempDir) throws PulseException

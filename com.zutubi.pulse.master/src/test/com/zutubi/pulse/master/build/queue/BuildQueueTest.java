@@ -7,11 +7,12 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -328,7 +329,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         verify(buildRequestRegistry, never()).requestAssimilated(requestB, requestA.getId());
     }
 
-    public void testNoAssimilationIfRevisionIsFixed()
+    public void testNoAssimilationIfBuildCommenced()
     {
         Project project = createProject("A");
         BuildRequestEvent requestA = createRequest(project, "sourceA", true, new Revision("1"));
@@ -336,6 +337,7 @@ public class BuildQueueTest extends BaseQueueTestCase
         BuildRequestEvent requestB = createRequest(project, "sourceA", true, null);
 
         buildQueue.enqueue(active(requestA));
+        buildQueue.commencing(createBuildResult(requestA).getId());
         buildQueue.enqueue(queue(requestB));
 
         assertActivated(requestA);

@@ -46,6 +46,16 @@ public abstract class TestResult
     }
 
     /**
+     * Updates the name of this result.
+     *
+     * @param name the new name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
      * @return the time it took to execute the suite or case, in milliseconds,
      *         may be {@link #DURATION_UNKNOWN}
      */
