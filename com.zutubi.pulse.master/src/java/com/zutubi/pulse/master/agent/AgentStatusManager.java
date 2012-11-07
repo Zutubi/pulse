@@ -107,15 +107,33 @@ public class AgentStatusManager implements EventListener
      */
     <T> T withAgentsLock(NullaryFunction<T> fn)
     {
+        long startTime = System.currentTimeMillis();
+        T result;
         agentsLock.lock();
         try
         {
-            return fn.process();
+            result = fn.process();
         }
         finally
         {
             agentsLock.unlock();
         }
+
+        long elapsedMillis = System.currentTimeMillis() - startTime;
+        if (elapsedMillis > 10000)
+        {
+            try
+            {
+                // Raise an exception so we get a full stack trace.
+                throw new RuntimeException("Agent lock held for more than " + (elapsedMillis / 1000) + " seconds");
+            }
+            catch (RuntimeException e)
+            {
+                LOG.warning(e.getMessage(), e);
+            }
+        }
+
+        return result;
     }
 
     private void handlePing(AgentPingEvent agentPingEvent)
