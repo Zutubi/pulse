@@ -1,0 +1,8 @@
+<?xml version = "1.0"?>
+<root>
+    <fpost-processor name="fake.pp"/>
+
+    <fant name="processed">
+        <process processor="$(fake.pp)"/>
+    </fant>
+</root>

@@ -1,0 +1,6 @@
+<?xml version = "1.0"?>
+<project>
+    <frecipe name="processed">
+        <import path="testImportProcessorInRecipe.import.xml"/>
+    </frecipe>
+</project>

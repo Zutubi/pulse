@@ -758,76 +758,18 @@ public class ToveFileLoader
         return interceptor.allowUnresolved(type, e) ? RESOLVE_NON_STRICT : RESOLVE_STRICT;
     }
 
-    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth, ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws Exception
+    private boolean handleInternalElement(Element element, Configuration instance, CompositeType type, Scope scope, int depth,
+                                          ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws Exception
     {
         String localName = element.getLocalName();
         if (localName.equals("macro"))
         {
-            // Macro definition, get name and store child elements
-            boolean found = false;
-
-            for (int i = 0; i < element.getAttributeCount(); i++)
-            {
-                Attribute attribute = element.getAttribute(i);
-                if (attribute.getLocalName().equals("name"))
-                {
-                    scope.addUnique(new Macro(attribute.getValue(), element));
-                    found = true;
-                }
-                else
-                {
-                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
-                }
-            }
-
-            if (!found)
-            {
-                throw new FileLoadException("Required attribute 'name' not found");
-            }
-
+            handleMacro(element, scope);
             return true;
         }
         else if (localName.equals("macro-ref"))
         {
-            // Macro referece.  Lookup macro, and load all it's children now.
-            boolean found = false;
-
-            for (int i = 0; i < element.getAttributeCount(); i++)
-            {
-                Attribute attribute = element.getAttribute(i);
-                if (attribute.getLocalName().equals("macro"))
-                {
-                    String macroName = attribute.getValue();
-
-                    Object o = VariableResolver.resolveVariable(macroName, scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
-                    if (!LocationAwareElement.class.isAssignableFrom(o.getClass()))
-                    {
-                        throw new FileLoadException("Variable '" + macroName + "' does not resolve to a macro");
-                    }
-
-                    LocationAwareElement lae = (LocationAwareElement) o;
-
-                    try
-                    {
-                        loadSubElements(lae, instance, type, scope, depth, fileResolver, interceptor);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new FileLoadException("While expanding macro defined at " + lae.formatLocation() + ":\n" + indentMessage(e.getMessage()), e);
-                    }
-                    found = true;
-                }
-                else
-                {
-                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
-                }
-            }
-
-            if (!found)
-            {
-                throw new FileLoadException("Required attribute 'macro' not found");
-            }
-
+            handleMacroReference(element, instance, type, scope, depth, fileResolver, interceptor);
             return true;
         }
         else if (localName.equals("scope"))
@@ -838,66 +780,138 @@ public class ToveFileLoader
         }
         else if (localName.equals("import"))
         {
-            boolean optional = false;
-            String path = null;
-            for (int i = 0; i < element.getAttributeCount(); i++)
-            {
-                Attribute attribute = element.getAttribute(i);
-                if (attribute.getLocalName().equals("path"))
-                {
-                    path = attribute.getValue();
-                }
-                else if (attribute.getLocalName().equals("optional"))
-                {
-                    optional = Boolean.valueOf(attribute.getValue());
-                }
-                else
-                {
-                    throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
-                }
-            }
-
-            if (!StringUtils.stringSet(path))
-            {
-                throw new FileLoadException("Required attribute 'path' not set");
-            }
-
-
-            InputStream input;
-            if (optional)
-            {
-                try
-                {
-                    input = fileResolver.pushImport(path);
-                }
-                catch (Exception e)
-                {
-                    // Ignore for optional includes.
-                    return true;
-                }
-            }
-            else
-            {
-                input = fileResolver.pushImport(path);
-            }
-
-            try
-            {
-                Document doc = loadDocument(input, fileResolver.getCurrentPath());
-                loadSubElements(doc.getRootElement(), instance, type, scope, depth, fileResolver, interceptor);
-                return true;
-            }
-            catch (Exception e)
-            {
-                throw new FileLoadException("While importing file '" + path + "':\n" + indentMessage(e.getMessage()), e);
-            }
-            finally
-            {
-                fileResolver.popImport();
-            }
+            handleImport(element, instance, type, scope, depth, fileResolver, interceptor);
+            return true;
         }
 
         return false;
+    }
+
+    private void handleMacro(Element element, Scope scope) throws FileLoadException
+    {
+        // Macro definition, get name and store child elements
+        boolean found = false;
+        for (int i = 0; i < element.getAttributeCount(); i++)
+        {
+            Attribute attribute = element.getAttribute(i);
+            if (attribute.getLocalName().equals("name"))
+            {
+                scope.addUnique(new Macro(attribute.getValue(), element));
+                found = true;
+            }
+            else
+            {
+                throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+            }
+        }
+
+        if (!found)
+        {
+            throw new FileLoadException("Required attribute 'name' not found");
+        }
+    }
+
+    private void handleMacroReference(Element element, Configuration instance, CompositeType type, Scope scope, int depth,
+                                      ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws ResolutionException, FileLoadException
+    {
+        // Macro referece.  Lookup macro, and load all it's children now.
+        boolean found = false;
+
+        for (int i = 0; i < element.getAttributeCount(); i++)
+        {
+            Attribute attribute = element.getAttribute(i);
+            if (attribute.getLocalName().equals("macro"))
+            {
+                String macroName = attribute.getValue();
+
+                Object o = VariableResolver.resolveVariable(macroName, scope, VariableResolver.ResolutionStrategy.RESOLVE_STRICT);
+                if (!LocationAwareElement.class.isAssignableFrom(o.getClass()))
+                {
+                    throw new FileLoadException("Variable '" + macroName + "' does not resolve to a macro");
+                }
+
+                LocationAwareElement lae = (LocationAwareElement) o;
+
+                try
+                {
+                    loadSubElements(lae, instance, type, scope, depth, fileResolver, interceptor);
+                }
+                catch (Exception e)
+                {
+                    throw new FileLoadException("While expanding macro defined at " + lae.formatLocation() + ":\n" + indentMessage(e.getMessage()), e);
+                }
+                found = true;
+            }
+            else
+            {
+                throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+            }
+        }
+
+        if (!found)
+        {
+            throw new FileLoadException("Required attribute 'macro' not found");
+        }
+    }
+
+    private void handleImport(Element element, Configuration instance, CompositeType type, Scope scope, int depth,
+                              ToveFileResolver fileResolver, ToveFileLoadInterceptor interceptor) throws Exception
+    {
+        boolean optional = false;
+        String path = null;
+        for (int i = 0; i < element.getAttributeCount(); i++)
+        {
+            Attribute attribute = element.getAttribute(i);
+            if (attribute.getLocalName().equals("path"))
+            {
+                path = attribute.getValue();
+            }
+            else if (attribute.getLocalName().equals("optional"))
+            {
+                optional = Boolean.valueOf(attribute.getValue());
+            }
+            else
+            {
+                throw new FileLoadException("Unrecognised attribute '" + attribute.getLocalName() + "'");
+            }
+        }
+
+        if (!StringUtils.stringSet(path))
+        {
+            throw new FileLoadException("Required attribute 'path' not set");
+        }
+
+        InputStream input;
+        if (optional)
+        {
+            try
+            {
+                input = fileResolver.pushImport(path);
+            }
+            catch (Exception e)
+            {
+                // Ignore for optional includes.
+                return;
+            }
+        }
+        else
+        {
+            input = fileResolver.pushImport(path);
+        }
+
+        try
+        {
+            Document doc = loadDocument(input, fileResolver.getCurrentPath());
+            loadSubElements(doc.getRootElement(), instance, type, scope, depth, fileResolver, interceptor);
+        }
+        catch (Exception e)
+        {
+            throw new FileLoadException("While importing file '" + path + "':\n" + indentMessage(e.getMessage()), e);
+        }
+        finally
+        {
+            fileResolver.popImport();
+        }
     }
 
     private Document loadDocument(InputStream input, String file) throws ParsingException, IOException
