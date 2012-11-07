@@ -177,6 +177,12 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
 
     public void testShortenSuiteNames()
     {
+        if (File.separatorChar != '/')
+        {
+            // The test data uses forward slash paths.
+            return;
+        }
+
         PersistentTestSuiteResult tests = process(true);
         tests = tests.getSuite("All tests");
 
