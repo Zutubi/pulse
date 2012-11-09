@@ -18,7 +18,7 @@ public class RecipeCleanup
     static final String DELETING_DIRECTORY = "Found stale recipe directory '%s', deleting...";
     static final String DELETING_FILE = "Found unexpected file '%s', deleting...";
     static final String DELETED = "Deleted.";
-    static final String UNABLE_TO_DELETE_FILE = "Unable to delete file '%s'";
+    static final String UNABLE_TO_DELETE_FILE = "Unable to delete file '%s': %s.";
 
     private FileSystem fileSystem;
 
@@ -42,7 +42,7 @@ public class RecipeCleanup
             return;
         }
 
-        for (File node : directoryToClean.listFiles())
+        for (File node : files)
         {
             String statusMessage;
             if (node.isDirectory())
@@ -61,7 +61,9 @@ public class RecipeCleanup
             }
             catch (IOException e)
             {
-                eventManager.publish(new RecipeStatusEvent(this, recipeId, String.format(UNABLE_TO_DELETE_FILE, node.getName())));
+                String message = String.format(UNABLE_TO_DELETE_FILE, node.getName(), e.getMessage());
+                LOG.warning(message, e);
+                eventManager.publish(new RecipeStatusEvent(this, recipeId, message));
             }
         }
     }
