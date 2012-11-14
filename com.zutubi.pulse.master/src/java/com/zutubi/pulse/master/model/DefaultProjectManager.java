@@ -52,8 +52,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
@@ -65,6 +63,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -895,7 +896,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             ProjectConfiguration configuration = idToConfig.get(id);
-            configuration = configurationProvider.get(configuration.getHandle(), ProjectConfiguration.class);
+            if (configuration != null)
+            {
+                configuration = configurationProvider.get(configuration.getHandle(), ProjectConfiguration.class);
+            }
             return checkValidity(configuration, allowInvalid);
         }
         finally
