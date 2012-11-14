@@ -123,7 +123,7 @@ public class SlaveServiceImpl implements SlaveService
             LOG.severe(e);
             return new HostStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
-        
+
         if (pluginManager.getPlugins().isEmpty() || checkForPluginSync(master, masterPlugins))
         {
             return new HostStatus(PingStatus.PLUGIN_MISMATCH);
