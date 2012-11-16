@@ -40,8 +40,7 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public BackgroundServiceSupport(String serviceName)
     {
-        this.serviceName = serviceName;
-        this.executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        this(serviceName, (ThreadPoolExecutor) Executors.newCachedThreadPool(), false);
     }
 
     /**
@@ -54,9 +53,23 @@ public class BackgroundServiceSupport implements Stoppable
      */
     public BackgroundServiceSupport(String serviceName, int poolSize)
     {
+        this(serviceName, (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize), true);
+    }
+
+    /**
+     * Creates a new service with the given descriptive name.  The service will
+     * be backed by the given thread pool.
+     *
+     * @param serviceName name of the service, used to tag threads which are
+     *                    created by it for easy identification
+     * @param executorService thread pool executor used to run tasks
+     * @param fixed set to true if the size of the pool should be fixed
+     */
+    public BackgroundServiceSupport(String serviceName, ThreadPoolExecutor executorService, boolean fixed)
+    {
         this.serviceName = serviceName;
-        this.executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(poolSize);
-        fixed = true;
+        this.executorService = executorService;
+        this.fixed = fixed;
     }
 
     /**

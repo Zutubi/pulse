@@ -228,7 +228,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
                 message.addBodyPart(attachment.asBodyPart());
             }
 
-            emailService.sendMail(emails, subject, message, emailConfiguration, true);
+            emailService.queueMail(emails, subject, message, emailConfiguration);
         }
     }
 

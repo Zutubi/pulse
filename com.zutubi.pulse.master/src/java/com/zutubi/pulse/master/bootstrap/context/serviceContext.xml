@@ -8,6 +8,8 @@
         <property name="threadFactory" ref="threadFactory"/>
     </bean>
 
-    <bean id="emailService" class="com.zutubi.pulse.master.notifications.email.DefaultEmailService"/>
+    <bean id="emailService" class="com.zutubi.pulse.master.notifications.email.DefaultEmailService" init-method="init">
+        <property name="threadFactory" ref="threadFactory"/>
+    </bean>
     
 </beans>

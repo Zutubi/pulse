@@ -177,6 +177,7 @@
     <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
             <list>
+                <ref bean="emailService"/>
                 <ref bean="scheduler"/>
                 <ref bean="fatController"/>
                 <ref bean="recipeQueue"/>

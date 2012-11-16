@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.notifications.email;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
+import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -10,6 +12,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.*;
 
 import static java.util.Arrays.asList;
 
@@ -17,7 +20,7 @@ import static java.util.Arrays.asList;
  * A default implementation of {@link EmailService} that sends mails
  * synchronously using the JavaMail APIs.
  */
-public class DefaultEmailService implements EmailService
+public class DefaultEmailService extends BackgroundServiceSupport implements EmailService
 {
     private static final Logger LOG = Logger.getLogger(DefaultEmailService.class);
 
@@ -31,25 +34,100 @@ public class DefaultEmailService implements EmailService
     private static final String PROPERTY_PORT = "port";
     private static final String PROPERTY_LOCALHOST = "localhost";
 
+    private static final String PROPERTY_QUEUE_CAPACITY = "pulse.email.queue.capacity";
+
     private static final Address[] EMPTY_ADDRESSES = new Address[0];
 
     private EmailConfiguration sharedConfig;
     private Session sharedSession;
     private Transport sharedTransport;
 
-    public synchronized void sendMail(Collection<String> recipients, String subject, Multipart message, final EmailConfiguration config, boolean reuseSession) throws MessagingException
+    public DefaultEmailService()
     {
-        subject = addSubjectPrefix(config, subject);
+        super("Email", new ThreadPoolExecutor(
+                      1,
+                      1,
+                      0L,
+                      TimeUnit.MILLISECONDS,
+                      new LinkedBlockingQueue<Runnable>(Integer.getInteger(PROPERTY_QUEUE_CAPACITY, 4096)),
+                      new RejectedExecutionHandler()
+                      {
+                          public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor)
+                          {
+                              throw new PulseRuntimeException("Email queue is full, rejecting email.");
+                          }
+                      }
+              ), true);
+    }
 
-        int attempts = 0;
-        int retryLimit = reuseSession ? 3 : 1;
-        boolean sent = false;
-        while (!sent)
+    public void sendMail(final Collection<String> recipients, final String subject, final Multipart message, final EmailConfiguration config) throws MessagingException
+    {
+        MessagingException exception = new SendEmail(recipients, addSubjectPrefix(config, subject), message, config, false).call();
+        if (exception != null)
         {
-            attempts++;
+            throw new MessagingException(exception.getMessage(), exception);
+        }
+    }
 
+    public Future<MessagingException> queueMail(final Collection<String> recipients, final String subject, final Multipart message, final EmailConfiguration config)
+    {
+        return getExecutorService().submit(new SendEmail(recipients, addSubjectPrefix(config, subject), message, config, true));
+    }
+
+    private String addSubjectPrefix(EmailConfiguration config, String subject)
+    {
+        String prefix = config.getSubjectPrefix();
+        if (StringUtils.stringSet(prefix))
+        {
+            subject = prefix + " " + subject;
+        }
+        return subject;
+    }
+
+    private class SendEmail implements Callable<MessagingException>
+    {
+        private final Collection<String> recipients;
+        private final String             subject;
+        private final Multipart          message;
+        private final EmailConfiguration config;
+        private final boolean            reuseSession;
+
+        public SendEmail(Collection<String> recipients, String subject, Multipart message, EmailConfiguration config, boolean reuseSession)
+        {
+            this.recipients = recipients;
+            this.subject = subject;
+            this.message = message;
+            this.config = config;
+            this.reuseSession = reuseSession;
+        }
+
+        public MessagingException call()
+        {
+            int attempts = 0;
+            int retryLimit = reuseSession ? 3 : 1;
+            boolean sent = false;
+            try
+            {
+                while (!sent)
+                {
+                    attempts++;
+                    sent = attemptSend(subject, attempts == retryLimit);
+                }
+
+                return null;
+            }
+            catch (MessagingException e)
+            {
+                LOG.severe("Failed to send email '" + subject + "': " + e.getMessage(), e);
+                return e;
+            }
+        }
+
+        private boolean attemptSend(String subject, boolean retriesExhausted) throws MessagingException
+        {
             Session session;
             Transport transport;
+            boolean sent = false;
             if (reuseSession)
             {
                 ensureSharedSession(config);
@@ -63,7 +141,6 @@ public class DefaultEmailService implements EmailService
             }
 
             Message msg = createMessage(recipients, subject, message, config, session);
-
             try
             {
                 if (!transport.isConnected())
@@ -86,12 +163,12 @@ public class DefaultEmailService implements EmailService
                 }
                 else
                 {
-                    handleError(reuseSession, attempts == retryLimit, e);
+                    handleError(reuseSession, retriesExhausted, e);
                 }
             }
             catch (MessagingException e)
             {
-                handleError(reuseSession, attempts == retryLimit, e);
+                handleError(reuseSession, retriesExhausted, e);
             }
             finally
             {
@@ -100,143 +177,135 @@ public class DefaultEmailService implements EmailService
                     safeClose(transport);
                 }
             }
-        }
-    }
 
-    private Address[] safeAddresses(Address[] addresses)
-    {
-        return addresses == null ? EMPTY_ADDRESSES : addresses;
-    }
-
-    private void handleError(boolean reuseSession, boolean retriesExhausted, MessagingException e) throws MessagingException
-    {
-        if (reuseSession)
-        {
-            cleanupSession();
+            return sent;
         }
 
-        if (retriesExhausted)
+        private Address[] safeAddresses(Address[] addresses)
         {
-            throw new MessagingException(e.getMessage(), e);
-        }
-    }
-
-    private void ensureSharedSession(EmailConfiguration config) throws NoSuchProviderException
-    {
-        if (!config.isEquivalentTo(sharedConfig))
-        {
-            cleanupSession();
-
-            sharedConfig = config;
-            sharedSession = getSession(config);
-            sharedTransport = sharedSession.getTransport();
-        }
-    }
-
-    private void cleanupSession()
-    {
-        if (sharedTransport != null)
-        {
-            safeClose(sharedTransport);
-
-            sharedConfig = null;
-            sharedSession = null;
-            sharedTransport = null;
-        }
-    }
-
-    private void safeClose(Transport transport)
-    {
-        try
-        {
-            transport.close();
-        }
-        catch (MessagingException e)
-        {
-            LOG.info(e);
-        }
-    }
-
-    private String addSubjectPrefix(EmailConfiguration config, String subject)
-    {
-        String prefix = config.getSubjectPrefix();
-        if (StringUtils.stringSet(prefix))
-        {
-            subject = prefix + " " + subject;
-        }
-        return subject;
-    }
-
-    private Session getSession(final EmailConfiguration config)
-    {
-        Properties properties = (Properties) System.getProperties().clone();
-        properties.put(PROPERTY_SEND_PARTIAL, true);
-        properties.put(PROPERTY_TRANSPORT_PROTOCOL, getProtocol(config));
-        properties.put(getProperty(config, PROPERTY_HOST), config.getHost());
-
-        if (config.isCustomPort())
-        {
-            properties.put(getProperty(config, PROPERTY_PORT), Integer.toString(config.getPort()));
+            return addresses == null ? EMPTY_ADDRESSES : addresses;
         }
 
-        String localhost = config.getLocalhost();
-        if (StringUtils.stringSet(localhost))
+        private void handleError(boolean reuseSession, boolean retriesExhausted, MessagingException e) throws MessagingException
         {
-            properties.put(getProperty(config, PROPERTY_LOCALHOST), localhost);
-        }
-
-        Authenticator authenticator = null;
-        if (StringUtils.stringSet(config.getUsername()))
-        {
-            properties.put(getProperty(config, PROPERTY_AUTH), "true");
-
-            authenticator = new Authenticator()
+            if (reuseSession)
             {
-                protected PasswordAuthentication getPasswordAuthentication()
-                {
-                    return new PasswordAuthentication(config.getUsername(), config.getPassword());
-                }
-            };
+                cleanupSession();
+            }
+
+            if (retriesExhausted)
+            {
+                throw new MessagingException(e.getMessage(), e);
+            }
         }
 
-        return Session.getInstance(properties, authenticator);
-    }
-
-    private String getProtocol(EmailConfiguration config)
-    {
-        return config.getSsl() ? PROTOCOL_SMTPS : PROTOCOL_SMTP;
-    }
-
-    private String getProperty(EmailConfiguration config, String name)
-    {
-        return "mail." + getProtocol(config) + "." + name;
-    }
-
-    private Message createMessage(Collection<String> recipients, String subject, Multipart message, EmailConfiguration config, Session session) throws MessagingException
-    {
-        Message msg = new MimeMessage(session);
-        if (StringUtils.stringSet(config.getFrom()))
+        private void ensureSharedSession(EmailConfiguration config) throws NoSuchProviderException
         {
-            msg.setFrom(new InternetAddress(config.getFrom()));
+            if (!config.isEquivalentTo(sharedConfig))
+            {
+                cleanupSession();
+
+                sharedConfig = config;
+                sharedSession = getSession(config);
+                sharedTransport = sharedSession.getTransport();
+            }
         }
 
-        for (String recipient: recipients)
+        private void cleanupSession()
+        {
+            if (sharedTransport != null)
+            {
+                safeClose(sharedTransport);
+
+                sharedConfig = null;
+                sharedSession = null;
+                sharedTransport = null;
+            }
+        }
+
+        private void safeClose(Transport transport)
         {
             try
             {
-                InternetAddress toAddress = new InternetAddress(recipient);
-                msg.addRecipient(Message.RecipientType.TO, toAddress);
+                transport.close();
             }
             catch (MessagingException e)
             {
-                LOG.warning("Unable to add recipient '" + recipient + "' to email '" + subject + "', dropping this recipient.", e);
+                LOG.info(e);
             }
         }
 
-        msg.setSubject(subject);
-        msg.setContent(message);
-        msg.setHeader("X-Mailer", "Zutubi-Pulse");
-        msg.setSentDate(new Date());
-        return msg;
+        private Session getSession(final EmailConfiguration config)
+        {
+            Properties properties = (Properties) System.getProperties().clone();
+            properties.put(PROPERTY_SEND_PARTIAL, true);
+            properties.put(PROPERTY_TRANSPORT_PROTOCOL, getProtocol(config));
+            properties.put(getProperty(config, PROPERTY_HOST), config.getHost());
+
+            if (config.isCustomPort())
+            {
+                properties.put(getProperty(config, PROPERTY_PORT), Integer.toString(config.getPort()));
+            }
+
+            String localhost = config.getLocalhost();
+            if (StringUtils.stringSet(localhost))
+            {
+                properties.put(getProperty(config, PROPERTY_LOCALHOST), localhost);
+            }
+
+            Authenticator authenticator = null;
+            if (StringUtils.stringSet(config.getUsername()))
+            {
+                properties.put(getProperty(config, PROPERTY_AUTH), "true");
+
+                authenticator = new Authenticator()
+                {
+                    protected PasswordAuthentication getPasswordAuthentication()
+                    {
+                        return new PasswordAuthentication(config.getUsername(), config.getPassword());
+                    }
+                };
+            }
+
+            return Session.getInstance(properties, authenticator);
+        }
+
+        private String getProtocol(EmailConfiguration config)
+        {
+            return config.getSsl() ? PROTOCOL_SMTPS : PROTOCOL_SMTP;
+        }
+
+        private String getProperty(EmailConfiguration config, String name)
+        {
+            return "mail." + getProtocol(config) + "." + name;
+        }
+
+        private Message createMessage(Collection<String> recipients, String subject, Multipart message, EmailConfiguration config, Session session) throws MessagingException
+        {
+            Message msg = new MimeMessage(session);
+            if (StringUtils.stringSet(config.getFrom()))
+            {
+                msg.setFrom(new InternetAddress(config.getFrom()));
+            }
+
+            for (String recipient: recipients)
+            {
+                try
+                {
+                    InternetAddress toAddress = new InternetAddress(recipient);
+                    msg.addRecipient(Message.RecipientType.TO, toAddress);
+                }
+                catch (MessagingException e)
+                {
+                    LOG.warning("Unable to add recipient '" + recipient + "' to email '" + subject + "', dropping this recipient.", e);
+                }
+            }
+
+            msg.setSubject(subject);
+            msg.setContent(message);
+            msg.setHeader("X-Mailer", "Zutubi-Pulse");
+            msg.setSentDate(new Date());
+            return msg;
+        }
     }
 }

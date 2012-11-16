@@ -91,7 +91,7 @@ public class EmailContactConfiguration extends ContactConfiguration
                 message.addBodyPart(attachment.asBodyPart());
             }
             
-            emailService.sendMail(Arrays.asList(getAddress()), rendered.getSubject(), message, config, true);
+            emailService.queueMail(Arrays.asList(getAddress()), rendered.getSubject(), message, config);
         }
         catch (Exception e)
         {
