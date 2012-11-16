@@ -728,6 +728,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             cacheLock.writeLock().unlock();
         }
 
+        ProjectConfiguration rootProject = configurationTemplateManager.getRootInstance(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectConfiguration.class);
+        if (rootProject != null)
+        {
+            // Create dummy configuration for all projects that are missing theirs.
+            CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
+            long rootHandle = rootProject.getHandle();
+            for (Project missingConfig: filter(projectDao.findAll(), ProjectPredicates.noConfig()))
+            {
+                insertDummyConfiguration(missingConfig, projectType, rootHandle);
+            }
+        }
+
         // Restore project states that are out of sync due to unclean shutdown.
         for (Project project: filter(projectDao.findAll(), ProjectPredicates.exists()))
         {
@@ -759,6 +771,26 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
                 projects.add(projectConfig);
             }
+        }
+    }
+
+    private void insertDummyConfiguration(Project project, CompositeType projectType, long rootHandle)
+    {
+        LOG.warning("Inserting dummy configuration for orphaned project row '" + project.getId() + "'");
+        try
+        {
+            ProjectConfiguration dummy = new ProjectConfiguration("orphaned-database-entry-" + project.getId());
+            dummy.setDescription("Automatically-created dummy project for database entry missing corresponding configuration.  " +
+                "You should either delete this project, or re-create valid configuration for it.");
+            dummy.setProjectId(project.getId());
+
+            MutableRecord record = projectType.unstantiate(dummy, null);
+            configurationTemplateManager.setParentTemplate(record, rootHandle);
+            configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
         }
     }
 

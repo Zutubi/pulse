@@ -10,8 +10,8 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Manages the mapping from types to external state managers, and the creation of state.
  */
 public class ConfigurationStateManager
 {
@@ -54,53 +55,58 @@ public class ConfigurationStateManager
     public void createAndAssignState(final Configuration instance)
     {
         Class<? extends Configuration> clazz = instance.getClass();
-        final ExternalStateManager manager = getManager(clazz);
+        final ExternalStateManager<Configuration> manager = getManager(clazz);
         if (manager != null)
         {
-            final long[] hax = {-1};
-            transactionManager.runInTransaction(new NullaryFunction()
+            long existingId = getExternalStateId(instance);
+            if (existingId == 0)
             {
-                public Object process()
+                final long[] hax = {-1};
+                transactionManager.runInTransaction(new NullaryFunction<Object>()
                 {
-                    CompositeType type = typeRegistry.getType(instance.getClass());
+                    public Object process()
+                    {
+                        CompositeType type = typeRegistry.getType(instance.getClass());
 
-                    hax[0] = manager.createState(instance);
-                    updateProperty(type, instance, hax[0]);
+                        hax[0] = manager.createState(instance);
+                        updateProperty(type, instance, hax[0]);
 
-                    return null;
-                }
+                        return null;
+                    }
 
-            },
-            new TransactionResource()
-            {
-                public boolean prepare()
+                },
+                new TransactionResource()
                 {
-                    return true;
-                }
+                    public boolean prepare()
+                    {
+                        return true;
+                    }
 
-                public void commit()
-                {
+                    public void commit()
+                    {
 
-                }
+                    }
 
-                public void rollback()
-                {
-                    manager.rollbackState(hax[0]);
-                }
+                    public void rollback()
+                    {
+                        manager.rollbackState(hax[0]);
+                    }
 
-            });
+                });
+            }
         }
     }
 
-    private ExternalStateManager<?> getManager(Class<? extends Configuration> clazz)
+    @SuppressWarnings("unchecked")
+    private ExternalStateManager<Configuration> getManager(Class<? extends Configuration> clazz)
     {
-        ExternalStateManager<?> manager = managers.get(clazz);
+        ExternalStateManager<Configuration> manager = (ExternalStateManager<Configuration>) managers.get(clazz);
         if(manager == null)
         {
-            Class superClazz = clazz.getSuperclass();
-            if(superClazz != null)
+            Class<?> superClazz = clazz.getSuperclass();
+            if(superClazz != null  && Configuration.class.isAssignableFrom(superClazz))
             {
-                manager = getManager(superClazz);
+                manager = getManager((Class<? extends Configuration>) superClazz);
                 if(manager != null)
                 {
                     // Cache for next time
