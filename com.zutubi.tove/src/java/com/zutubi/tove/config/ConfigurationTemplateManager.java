@@ -2577,7 +2577,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
-        if (templateHierarchy == null)
+        if (templateHierarchy == null || templateHierarchy.getRoot() == null)
         {
             return null;
         }
