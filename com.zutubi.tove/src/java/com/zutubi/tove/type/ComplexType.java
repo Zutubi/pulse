@@ -15,12 +15,20 @@ public interface ComplexType extends Type
 
     Type getDeclaredPropertyType(String propertyName);
 
+    /**
+     * Gets the actual (as opposed to declared) type of the property with the given name and value.
+     * If there is no value the declared type is returned.
+     * 
+     * @param propertyName  name of the property to get the type of
+     * @param propertyValue value of the property, may be null
+     * @return the type of the named property's current value, or the declared type if it is unset
+     */
     Type getActualPropertyType(String propertyName, Object propertyValue);
 
     /**
      * Checks if the given instance is transitively valid.  Contrast this to
-     * {@link com.zutubi.tove.config.api.Configuration#isValid}, which only checks the instance itself,
-     * ignoring nested instances.
+     * {@link com.zutubi.tove.config.api.Configuration#isValid}, which only checks the instance
+     * itself, ignoring nested instances.
      *
      * @param instance the instance to check
      * @return true if the given instance is valid in the transitive sense
