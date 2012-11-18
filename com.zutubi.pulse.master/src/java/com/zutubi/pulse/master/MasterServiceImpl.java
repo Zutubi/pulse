@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -19,11 +20,15 @@ import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Implementation of the Master Hessian interface.  Used by agents to communicate with the master.
  */
 public class MasterServiceImpl implements MasterService
 {
+    private AtomicBoolean systemStarted = new AtomicBoolean(false);
+
     private ServiceTokenManager serviceTokenManager;
     private EventManager eventManager;
     private ResourceManager resourceManager;
@@ -32,7 +37,14 @@ public class MasterServiceImpl implements MasterService
 
     public List<PluginInfo> pong()
     {
-        return PluginList.toInfos(CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate()));
+        if (systemStarted.get())
+        {
+            return PluginList.toInfos(CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate()));
+        }
+        else
+        {
+            throw new PulseRuntimeException("Master service still starting.");
+        }
     }
 
     public void upgradeStatus(String token, UpgradeStatus upgradeStatus)
@@ -67,7 +79,7 @@ public class MasterServiceImpl implements MasterService
 
     private boolean validateToken(String token)
     {
-        if (serviceTokenManager != null)
+        if (systemStarted.get())
         {
             serviceTokenManager.validateToken(token);
             return true;
@@ -87,6 +99,7 @@ public class MasterServiceImpl implements MasterService
             public void systemStarted()
             {
                 SpringComponentContext.autowire(MasterServiceImpl.this);
+                systemStarted.set(true);
             }
         });
     }

@@ -52,8 +52,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
@@ -65,6 +63,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -727,6 +728,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             cacheLock.writeLock().unlock();
         }
 
+        ProjectConfiguration rootProject = configurationTemplateManager.getRootInstance(MasterConfigurationRegistry.PROJECTS_SCOPE, ProjectConfiguration.class);
+        if (rootProject != null)
+        {
+            // Create dummy configuration for all projects that are missing theirs.
+            CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
+            long rootHandle = rootProject.getHandle();
+            for (Project missingConfig: filter(projectDao.findAll(), ProjectPredicates.noConfig()))
+            {
+                insertDummyConfiguration(missingConfig, projectType, rootHandle);
+            }
+        }
+
         // Restore project states that are out of sync due to unclean shutdown.
         for (Project project: filter(projectDao.findAll(), ProjectPredicates.exists()))
         {
@@ -758,6 +771,26 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
                 projects.add(projectConfig);
             }
+        }
+    }
+
+    private void insertDummyConfiguration(Project project, CompositeType projectType, long rootHandle)
+    {
+        LOG.warning("Inserting dummy configuration for orphaned project row '" + project.getId() + "'");
+        try
+        {
+            ProjectConfiguration dummy = new ProjectConfiguration("orphaned-database-entry-" + project.getId());
+            dummy.setDescription("Automatically-created dummy project for database entry missing corresponding configuration.  " +
+                "You should either delete this project, or re-create valid configuration for it.");
+            dummy.setProjectId(project.getId());
+
+            MutableRecord record = projectType.unstantiate(dummy, null);
+            configurationTemplateManager.setParentTemplate(record, rootHandle);
+            configurationTemplateManager.insertRecord(MasterConfigurationRegistry.PROJECTS_SCOPE, record);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
         }
     }
 
@@ -895,7 +928,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             ProjectConfiguration configuration = idToConfig.get(id);
-            configuration = configurationProvider.get(configuration.getHandle(), ProjectConfiguration.class);
+            if (configuration != null)
+            {
+                configuration = configurationProvider.get(configuration.getHandle(), ProjectConfiguration.class);
+            }
             return checkValidity(configuration, allowInvalid);
         }
         finally

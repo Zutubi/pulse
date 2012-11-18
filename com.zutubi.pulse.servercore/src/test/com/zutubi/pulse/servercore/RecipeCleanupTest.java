@@ -77,7 +77,7 @@ public class RecipeCleanupTest extends PulseTestCase
 
         recipeCleanup.cleanup(eventManager, recipeDir, 42);
         verify(fileSystem).delete(file);
-        verifyEvents(String.format(RecipeCleanup.DELETING_FILE, "filename"), String.format(RecipeCleanup.UNABLE_TO_DELETE_FILE, "filename"));
+        verifyEvents(String.format(RecipeCleanup.DELETING_FILE, "filename"), String.format(RecipeCleanup.UNABLE_TO_DELETE_FILE, "filename", "disk error"));
     }
 
     public void testCleanupOneDirectory() throws IOException

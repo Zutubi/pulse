@@ -98,7 +98,7 @@ public class SlaveRecipeRunner implements RecipeRunner
             }
             catch (BuildException e)
             {
-                LOG.warning("A problem occured while processing a recipe build request. Reason: " + e.getMessage(), e);
+                LOG.warning("A problem occurred while processing a recipe build request. Reason: " + e.getMessage(), e);
                 RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage());
                 eventManager.publish(error);
             }

@@ -39,7 +39,7 @@ public class ServerSettingsConfigurationCheckHandler extends AbstractConfigurati
         MimeBodyPart bodyPart = new MimeBodyPart();
         bodyPart.setContent("Welcome to Zutubi Pulse!", "text/plain");
         message.addBodyPart(bodyPart);
-        emailService.sendMail(Arrays.asList(testAddress), "Test Email", message, configuration, false);
+        emailService.sendMail(Arrays.asList(testAddress), "Test Email", message, configuration);
     }
 
     public void setEmailService(EmailService emailService)

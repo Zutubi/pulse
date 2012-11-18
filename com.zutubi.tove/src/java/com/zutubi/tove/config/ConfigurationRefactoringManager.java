@@ -814,7 +814,10 @@ public class ConfigurationRefactoringManager
                     throw new IllegalArgumentException(e.getMessage(), e);
                 }
 
-                MutableRecord clone = copySimple(record);
+                // CIB-2307 - we need the specific instances target type, not the generic type
+                // represented by the mapType.getTargetType()
+                CompositeType cloneType = (CompositeType) mapType.getActualPropertyType(originalKey, record);
+                MutableRecord clone = copySimple(record, cloneType);
                 clone.put(keyPropertyName, cloneKey);
                 if (templatedCollection)
                 {
@@ -823,15 +826,12 @@ public class ConfigurationRefactoringManager
 
                 String clonePath = getPath(parentPath, cloneKey);
                 recordManager.insert(clonePath, clone);
-                // CIB-2307 - we need the specific instances target type, not the generic type
-                // represented by the mapType.getTargetType()
-                CompositeType targetType = (CompositeType) mapType.getActualPropertyType(originalKey, record);
-                cloneChildren(clonePath, record, targetType);
+                cloneChildren(clonePath, record, cloneType);
 
                 if (nestedWithinTemplatedOwner)
                 {
                     String remainderPath = getPath(2, getPathElements(clonePath));
-                    configurationTemplateManager.addInheritedSkeletons(scope, remainderPath, targetType, recordManager.select(clonePath), templateNode, true);
+                    configurationTemplateManager.addInheritedSkeletons(scope, remainderPath, cloneType, recordManager.select(clonePath), templateNode, true);
                     newConcretePaths.addAll(configurationTemplateManager.getDescendantPaths(clonePath, false, true, false));
                 }
                 else if (configurationTemplateManager.isConcrete(parentPath, clone))
@@ -935,14 +935,15 @@ public class ConfigurationRefactoringManager
             for (String key: configurationTemplateManager.getOrderedNestedKeys(record, type))
             {
                 Record child = (Record) record.get(key);
+                ComplexType childType = (ComplexType) type.getActualPropertyType(key, child);
+                MutableRecord copy = copySimple(child, childType);
                 String insertPath = getPath(path, key);
-                MutableRecord copy = copySimple(child);
                 recordManager.insert(insertPath, copy);
-                cloneChildren(insertPath, child, (ComplexType) type.getActualPropertyType(key, child));
+                cloneChildren(insertPath, child, childType);
             }
         }
 
-        private MutableRecord copySimple(Record record)
+        private MutableRecord copySimple(Record record, ComplexType type)
         {
             MutableRecord copy = new MutableRecordImpl();
             for (String meta: record.metaKeySet())
@@ -952,10 +953,27 @@ public class ConfigurationRefactoringManager
 
             for (String simple: record.simpleKeySet())
             {
-                copy.put(simple, record.get(simple));
+                if (!isExternalStateProperty(type, simple))
+                {
+                    copy.put(simple, record.get(simple));
+                }
             }
 
             return copy;
+        }
+
+        private boolean isExternalStateProperty(ComplexType type, String propertyName)
+        {
+            if (type instanceof CompositeType)
+            {
+                CompositeType compositeType = (CompositeType) type;
+                TypeProperty property = compositeType.getInternalProperty(propertyName);
+                return property != null && property.getAnnotation(ExternalState.class) != null;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void rewriteReferences(String parentPath, Map<String, String> oldKeyToNewKey)
