@@ -18,7 +18,7 @@ import java.util.List;
 public class HibernateBuildDependencyLinkDao extends HibernateEntityDao<BuildDependencyLink> implements BuildDependencyLinkDao
 {
     @Override
-    public Class persistentClass()
+    public Class<BuildDependencyLink> persistentClass()
     {
         return BuildDependencyLink.class;
     }

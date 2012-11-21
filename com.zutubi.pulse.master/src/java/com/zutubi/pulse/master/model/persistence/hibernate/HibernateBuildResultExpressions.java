@@ -9,19 +9,13 @@ import org.hibernate.criterion.Restrictions;
 import java.util.Collection;
 
 /**
- * The Build result restrictions provides a set of pre-defined expressions that can be applied to Search Queries
- * that target build results.
+ * Provides a set of pre-defined expressions that can be applied to queries that target build results.
  */
 public class HibernateBuildResultExpressions
 {
     public static Criterion projectEq(Project project)
     {
         return Restrictions.eq("project", project);
-    }
-
-    public static Criterion projectEq(long projectId)
-    {
-        return Restrictions.eq("project.id", projectId);
     }
 
     public static Criterion projectIn(Collection<Project> projects)
@@ -42,21 +36,6 @@ public class HibernateBuildResultExpressions
     public static Criterion buildResultCompleted()
     {
         return statesIn(ResultState.getCompletedStates());
-    }
-
-    public static Criterion startsAfter(long timestamp)
-    {
-        return Restrictions.ge("stamps.startTime", timestamp);
-    }
-
-    public static Criterion startsBefore(long timestamp)
-    {
-        return Restrictions.le("stamps.startTime", timestamp);
-    }
-
-    public static Criterion hasWorkDirectory(boolean b)
-    {
-        return Restrictions.eq("hasWorkDir", b);
     }
 
     public static Criterion isPersonalBuild(boolean b)

@@ -4,11 +4,11 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 
 /**
+ * Hibernate-based implementation of {@link UserDao}.
  */
-@SuppressWarnings({ "unchecked" })
 public class HibernateUserDao extends HibernateEntityDao<User> implements UserDao
 {
-    public Class persistentClass()
+    public Class<User> persistentClass()
     {
         return User.class;
     }

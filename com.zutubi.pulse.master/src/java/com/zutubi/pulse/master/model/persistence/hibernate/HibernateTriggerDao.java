@@ -6,11 +6,11 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * Hibernate implementation of {@link TriggerDao}.
  */
 public class HibernateTriggerDao extends HibernateEntityDao<Trigger> implements TriggerDao
 {
-    public Class persistentClass()
+    public Class<Trigger> persistentClass()
     {
         return Trigger.class;
     }
@@ -22,12 +22,12 @@ public class HibernateTriggerDao extends HibernateEntityDao<Trigger> implements 
 
     public List<Trigger> findByProject(long id)
     {
-        return findByNamedQuery("findByProject", "project", Long.valueOf(id));
+        return findByNamedQuery("findByProject", "project", id);
     }
 
     public Trigger findByProjectAndName(long id, String name)
     {
-        return (Trigger) findUniqueByNamedQuery("findByProjectAndName", "project", Long.valueOf(id), "name", name);
+        return (Trigger) findUniqueByNamedQuery("findByProjectAndName", "project", id, "name", name);
     }
 
     public Trigger findByNameAndGroup(String name, String group)

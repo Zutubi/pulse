@@ -12,10 +12,11 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import java.util.List;
 
 /**
+ * Hibernate implementation of {@link ProjectDao}.
  */
 public class HibernateProjectDao extends HibernateEntityDao<Project> implements ProjectDao
 {
-    public Class persistentClass()
+    public Class<Project> persistentClass()
     {
         return Project.class;
     }
@@ -23,9 +24,9 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     @SuppressWarnings({"unchecked"})
     public List<Project> findByResponsible(final User user)
     {
-        return (List<Project>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<Project>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<Project> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from Project project where responsibility.user = :user");
                 queryObject.setEntity("user", user);

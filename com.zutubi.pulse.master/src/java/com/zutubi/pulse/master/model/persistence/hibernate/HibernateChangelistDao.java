@@ -15,12 +15,12 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * Hibernate implementation of ChangelistDao.
+ * Hibernate implementation of {@link ChangelistDao}.
  */
 @SuppressWarnings({"unchecked"})
 public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangelist> implements ChangelistDao
 {
-    public Class persistentClass()
+    public Class<PersistentChangelist> persistentClass()
     {
         return PersistentChangelist.class;
     }
@@ -100,9 +100,9 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
     public List<PersistentChangelist> findAllEquivalent(final PersistentChangelist changelist)
     {
-        List<PersistentChangelist> result = (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
+        List<PersistentChangelist> result = getHibernateTemplate().execute(new HibernateCallback<List<PersistentChangelist>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<PersistentChangelist> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from PersistentChangelist model where model.hash = :hash");
                 queryObject.setParameter("hash", changelist.getHash());
@@ -128,23 +128,23 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
     public int getSize(final PersistentChangelist changelist)
     {
-        return toInt((Long)getHibernateTemplate().execute(new HibernateCallback()
+        return toInt(getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            public Long doInHibernate(Session session) throws HibernateException, SQLException
             {
                 Query queryObject = session.createQuery("select count(change) from PersistentChangelist model join model.changes as change where model = :changelist");
                 queryObject.setEntity("changelist", changelist);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.uniqueResult();
+                return (Long) queryObject.uniqueResult();
             }
         }));
     }
 
     public List<PersistentFileChange> getFiles(final PersistentChangelist changelist, final int offset, final int max)
     {
-        return (List<PersistentFileChange>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<PersistentFileChange>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            public List<PersistentFileChange> doInHibernate(Session session) throws HibernateException, SQLException
             {
                 Query queryObject = session.createFilter(changelist.getChanges(), "order by ordinal");
                 queryObject.setFirstResult(offset);
@@ -167,9 +167,9 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
             queryString = "from PersistentChangelist model where model.resultId = :resultId and size(model.changes) > 0 order by model.time desc, model.id desc";
         }
         
-        return  (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<PersistentChangelist>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<PersistentChangelist> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery(queryString);
                 queryObject.setParameter("resultId", id);
@@ -191,9 +191,9 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
 
         while(results.size() < max)
         {
-            List<PersistentChangelist> changelists = (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
+            List<PersistentChangelist> changelists = getHibernateTemplate().execute(new HibernateCallback<List<PersistentChangelist>>()
             {
-                public Object doInHibernate(Session session) throws HibernateException
+                public List<PersistentChangelist> doInHibernate(Session session) throws HibernateException
                 {
                     Query queryObject = changelistQuery.createQuery(session);
                     queryObject.setFirstResult(offset[0]);

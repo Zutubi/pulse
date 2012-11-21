@@ -11,36 +11,21 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import java.util.List;
 
 /**
+ * Hibernate implementation of {@link TestCaseIndexDao}.
  */
 public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex> implements TestCaseIndexDao
 {
-    public Class persistentClass()
+    public Class<TestCaseIndex> persistentClass()
     {
         return TestCaseIndex.class;
     }
 
-    public TestCaseIndex findByCase(final long stageNameId, final String name)
-    {
-        return (TestCaseIndex) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId and model.name = :name");
-                queryObject.setParameter("stageNameId", stageNameId);
-                queryObject.setParameter("name", name);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.uniqueResult();
-            }
-        });
-    }
-
     public List<TestCaseIndex> findBySuite(final long stageNameId, final String suite)
     {
-        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<TestCaseIndex>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            @SuppressWarnings("unchecked")
+            public List<TestCaseIndex> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId and model.name like :suite");
                 queryObject.setParameter("stageNameId", stageNameId);
@@ -55,9 +40,10 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
 
     public List<TestCaseIndex> findByStage(final long stageNameId)
     {
-        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<TestCaseIndex>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            @SuppressWarnings("unchecked")
+            public List<TestCaseIndex> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId");
                 queryObject.setParameter("stageNameId", stageNameId);
@@ -70,9 +56,9 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
 
     public int deleteByProject(final long projectId)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("delete from TestCaseIndex model where model.projectId = :projectId");
                 queryObject.setParameter("projectId", projectId);

@@ -13,31 +13,28 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import java.util.List;
 
 /**
- * 
- *
+ * Helper base class for implementing DAOs with Hibernate.  Provides basic CRUD support along with a
+ * collection of utility/convenience methods.
  */
 public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoSupport implements EntityDao<T>
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
 
-    @SuppressWarnings({"unchecked"})
     public T findById(long id)
     {
-        return (T) findByIdAndType(id, persistentClass());
+        return findByIdAndType(id, persistentClass());
     }
 
-    @SuppressWarnings({"unchecked"})
     protected <U extends T> U findByIdAndType(long id, Class<U> type)
     {
-        return (U)findAnyType(id, type);
+        return findAnyType(id, type);
     }
 
-    @SuppressWarnings({"unchecked"})
-    protected <T> T findAnyType(long id, Class type)
+    protected <T> T findAnyType(long id, Class<T> type)
     {
         try
         {
-            return (T)getHibernateTemplate().load(type, Long.valueOf(id));
+            return getHibernateTemplate().load(type, Long.valueOf(id));
         }
         catch (ObjectNotFoundException e)
         {
@@ -49,10 +46,9 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         }
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<T> findAll()
     {
-        return (List<T>) getHibernateTemplate().loadAll(persistentClass());
+        return getHibernateTemplate().loadAll(persistentClass());
     }
 
     public void save(T entity)
@@ -77,72 +73,16 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public int count()
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = session.createCriteria(persistentClass());
                 criteria.setProjection(Projections.rowCount());
                 SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
-                return criteria.uniqueResult();
+                return (Integer) criteria.uniqueResult();
             }
         });
-    }
-
-    public Object findFirstByNamedQuery(final String queryName)
-    {
-        return findFirstByNamedQuery(queryName, false);
-    }
-
-    public Object findFirstByNamedQuery(final String queryName, final boolean cachable)
-    {
-        return findFirstByNamedQuery(queryName, null, null, cachable);
-    }
-
-    public Object findFirstByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
-    {
-        return findFirstByNamedQuery(queryName, propertyName, propertyValue, false);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public Object findFirstByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final boolean cacheable)
-    {
-        List<Object> results = (List<Object>) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.getNamedQuery(queryName);
-                if (propertyName != null)
-                {
-                    queryObject.setParameter(propertyName, propertyValue);
-                }
-                queryObject.setMaxResults(1);
-                queryObject.setCacheable(cacheable);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
-            }
-        });
-        if (results != null && results.size() > 0)
-        {
-            return results.get(0);
-        }
-        return null;
-    }
-
-    public <U> List<U> findByNamedQuery(final String queryName)
-    {
-        return findByNamedQuery(queryName, 0);
-    }
-
-    public <U> List<U> findByNamedQuery(final String queryName, final int maxResults)
-    {
-        return findByNamedQuery(queryName, maxResults, false);
-    }
-
-    public <U> List<U> findByNamedQuery(final String queryName, final int maxResults, final boolean cachable)
-    {
-        return findByNamedQuery(queryName, null, null, maxResults, cachable);
     }
 
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
@@ -158,9 +98,9 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     @SuppressWarnings({"unchecked"})
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final int maxResults, final boolean cachable)
     {
-        return (List<U>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<U>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<U> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.getNamedQuery(queryName);
                 if (propertyName != null)
@@ -176,16 +116,6 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                 return queryObject.list();
             }
         });
-    }
-
-    public final Object findUniqueByNamedQuery(final String queryName)
-    {
-        return findUniqueByNamedQuery(queryName, false);
-    }
-
-    public final Object findUniqueByNamedQuery(final String queryName, final boolean cachable)
-    {
-        return findUniqueByNamedQuery(queryName, null, null, cachable);
     }
 
     public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
@@ -206,9 +136,9 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     @SuppressWarnings({"unchecked"})
     public final <U> U findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
     {
-        return (U) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<U>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public U doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.getNamedQuery(queryName);
                 if (propertyName != null)
@@ -221,7 +151,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                 }
                 queryObject.setCacheable(cachable);
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.uniqueResult();
+                return (U) queryObject.uniqueResult();
             }
         });
     }
@@ -243,5 +173,5 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         return (int)l;
     }
 
-    public abstract Class persistentClass();
+    public abstract Class<T> persistentClass();
 }

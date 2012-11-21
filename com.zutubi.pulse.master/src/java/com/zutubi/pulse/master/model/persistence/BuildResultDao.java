@@ -12,6 +12,9 @@ import com.zutubi.pulse.master.model.User;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Provides access to build results and the sub results contained within them.
+ */
 public interface BuildResultDao extends EntityDao<BuildResult>
 {
     void save(RecipeResultNode node);

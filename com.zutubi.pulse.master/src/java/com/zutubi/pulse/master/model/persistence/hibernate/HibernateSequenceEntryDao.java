@@ -4,11 +4,11 @@ import com.zutubi.pulse.master.model.SequenceEntry;
 import com.zutubi.pulse.master.model.persistence.SequenceEntryDao;
 
 /**
- * The hibernate implementation of the SequenceEntryDao interface.
+ * The hibernate implementation of the {@link SequenceEntryDao} interface.
  */
 public class HibernateSequenceEntryDao extends HibernateEntityDao<SequenceEntry> implements SequenceEntryDao 
 {
-    public Class persistentClass()
+    public Class<SequenceEntry> persistentClass()
     {
         return SequenceEntry.class;
     }

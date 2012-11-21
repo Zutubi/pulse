@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.scheduling.Trigger;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * Provides access to trigger entities.
  */
 public interface TriggerDao extends EntityDao<Trigger>
 {

@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.model.User;
 import java.util.List;
 
 /**
+ * Provides access to project entities.
  */
 public interface ProjectDao extends EntityDao<Project>
 {

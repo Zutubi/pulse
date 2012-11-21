@@ -12,21 +12,21 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import java.util.List;
 
 /**
- * Hibernate-specific implementation of {@link com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao}.
+ * Hibernate-specific implementation of {@link AgentSynchronisationMessageDao}.
  */
 @SuppressWarnings("unchecked")
 public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<AgentSynchronisationMessage> implements AgentSynchronisationMessageDao
 {
-    public Class persistentClass()
+    public Class<AgentSynchronisationMessage> persistentClass()
     {
         return AgentSynchronisationMessage.class;
     }
 
     public List<AgentSynchronisationMessage> findByAgentState(final AgentState agentState)
     {
-        return (List<AgentSynchronisationMessage>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<AgentSynchronisationMessage>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<AgentSynchronisationMessage> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState order by id asc");
                 queryObject.setEntity("agentState", agentState);
@@ -38,9 +38,9 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
 
     public List<AgentSynchronisationMessage> findByStatus(final AgentSynchronisationMessage.Status status)
     {
-        return (List<AgentSynchronisationMessage>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<AgentSynchronisationMessage>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<AgentSynchronisationMessage> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from AgentSynchronisationMessage where statusName = :statusName");
                 queryObject.setString("statusName", status.name());
@@ -52,9 +52,9 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
 
     public List<AgentSynchronisationMessage> queryMessages(final AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType)
     {
-        return (List<AgentSynchronisationMessage>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<AgentSynchronisationMessage>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<AgentSynchronisationMessage> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState and statusName = :statusName and message.typeName = :typeName order by id asc");
                 queryObject.setEntity("agentState", agentState);
@@ -68,9 +68,9 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
 
     public int deleteByAgentState(final AgentState agentState)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("delete from AgentSynchronisationMessage where agentState = :agentState");
                 queryObject.setEntity("agentState", agentState);

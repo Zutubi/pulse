@@ -14,23 +14,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Hibernate-specific implementation of {@link com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao}.
+ * Hibernate-specific implementation of {@link AgentDailyStatisticsDao}.
  */
+@SuppressWarnings({"unchecked"})
 public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDailyStatistics> implements AgentDailyStatisticsDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateAgentDailyStatisticsDao.class);
     
-    public Class persistentClass()
+    public Class<AgentDailyStatistics> persistentClass()
     {
         return AgentDailyStatistics.class;
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<AgentDailyStatistics> findByAgent(final long agentId)
     {
-        return (List<AgentDailyStatistics>) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<List<AgentDailyStatistics>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<AgentDailyStatistics> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from AgentDailyStatistics where agentId = :agentId");
                 queryObject.setLong("agentId", agentId);
@@ -42,10 +42,9 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
 
     public AgentDailyStatistics safeFindByAgentAndDay(final long agentId, final long dayStamp)
     {
-        @SuppressWarnings({"unchecked"})
-        List<AgentDailyStatistics> results = (List<AgentDailyStatistics>) getHibernateTemplate().execute(new HibernateCallback()
+        List<AgentDailyStatistics> results = getHibernateTemplate().execute(new HibernateCallback<List<AgentDailyStatistics>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public List<AgentDailyStatistics> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from AgentDailyStatistics where agentId = :agentId and dayStamp = :dayStamp");
                 queryObject.setLong("agentId", agentId);
@@ -77,7 +76,7 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
 
     public int deleteByDayStampBefore(final long dayStamp)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
             public Integer doInHibernate(Session session) throws HibernateException, SQLException
             {
@@ -91,7 +90,7 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
 
     public int deleteByAgentNotIn(final Set<Long> agentIds)
     {
-        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
             public Integer doInHibernate(Session session) throws HibernateException, SQLException
             {
