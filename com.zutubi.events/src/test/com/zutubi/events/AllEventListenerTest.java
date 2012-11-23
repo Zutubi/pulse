@@ -13,15 +13,27 @@ public class AllEventListenerTest extends TestCase
         eventManager = new DefaultEventManager();
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testReceiveBaseEvent()
     {
-        final boolean[] handled = {false};
+        eventReceivedTest(new Event(this));
+    }
 
+    public void testReceiveSubEvent()
+    {
+        eventReceivedTest(new SubEvent(this));
+    }
+
+    public void testReceiveAnonymousEvent()
+    {
+        eventReceivedTest(new Event(this)
+        {
+            // noop extension
+        });
+    }
+
+    private void eventReceivedTest(Event e)
+    {
+        final boolean[] handled = {false};
         eventManager.register(new AllEventListener()
         {
             public void handleEvent(Event event)
@@ -31,29 +43,15 @@ public class AllEventListenerTest extends TestCase
         });
 
         assertFalse(handled[0]);
-        
-        eventManager.publish(new Event(this));
+        eventManager.publish(e);
         assertTrue(handled[0]);
     }
 
-    public void testReceieveAnnonymousEvent()
+    private static class SubEvent extends Event
     {
-        final boolean[] handled = {false};
-
-        eventManager.register(new AllEventListener()
+        public SubEvent(Object source)
         {
-            public void handleEvent(Event event)
-            {
-                handled[0] = true;
-            }
-        });
-
-        assertFalse(handled[0]);
-
-        eventManager.publish(new Event(this)
-        {
-            // noop extension to make this an annonymous inner.
-        });
-        assertTrue(handled[0]);
+            super(source);
+        }
     }
 }

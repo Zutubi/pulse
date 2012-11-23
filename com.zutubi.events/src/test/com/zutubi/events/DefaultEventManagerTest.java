@@ -17,11 +17,6 @@ public class DefaultEventManagerTest extends TestCase
         listener = new RecordingEventListener(Event.class);
     }
 
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testRegisterListener()
     {
         eventManager.register(listener);

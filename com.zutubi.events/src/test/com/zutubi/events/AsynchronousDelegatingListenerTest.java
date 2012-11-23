@@ -25,7 +25,7 @@ public class AsynchronousDelegatingListenerTest extends TestCase
         assertTrue(delegate.acquired);
     }
 
-    private class WaitListener implements EventListener
+    private class WaitListener extends AllEventListener
     {
         private boolean acquired;
 
@@ -41,11 +41,6 @@ public class AsynchronousDelegatingListenerTest extends TestCase
             }
 
             doneSemaphore.release();
-        }
-
-        public Class[] getHandledEvents()
-        {
-            return new Class[]{Event.class};
         }
     }
 }
