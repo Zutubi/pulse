@@ -12,11 +12,19 @@ public class DefaultEventManager implements EventManager
 
     private EventDispatcher dispatcher;
 
+    /**
+     * Creates a manager that will use synchronous event dispatch.
+     */
     public DefaultEventManager()
     {
         this(new SynchronousDispatcher());
     }
 
+    /**
+     * Creates a manager that will use the given dispatcher.
+     *
+     * @param dispatcher dispatcher used to pass events to listeners
+     */
     public DefaultEventManager(EventDispatcher dispatcher)
     {
         this.dispatcher = dispatcher;

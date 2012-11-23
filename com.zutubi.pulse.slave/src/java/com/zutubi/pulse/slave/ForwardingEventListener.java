@@ -40,7 +40,6 @@ public class ForwardingEventListener implements EventListener
         {
             try
             {
-                event.setSource(null);
                 masterService.handleEvent(serviceTokenManager.getToken(), event);
             }
             catch (Exception e)

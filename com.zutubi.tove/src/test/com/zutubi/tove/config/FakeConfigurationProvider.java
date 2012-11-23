@@ -2,9 +2,9 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.DemultiplexingListener;
 import com.zutubi.events.Event;
-import com.zutubi.events.FilteringListener;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.events.ConfigurationEvent;
+import com.zutubi.tove.events.FilteringListener;
 import com.zutubi.util.NullaryFunction;
 
 import java.util.*;

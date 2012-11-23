@@ -1,8 +1,8 @@
 package com.zutubi.events;
 
-import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.TestCase;
 
-public class AllEventListenerTest extends ZutubiTestCase
+public class AllEventListenerTest extends TestCase
 {
     private EventManager eventManager = null;
 

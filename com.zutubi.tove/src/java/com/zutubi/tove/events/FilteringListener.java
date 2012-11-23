@@ -1,5 +1,7 @@
-package com.zutubi.events;
+package com.zutubi.tove.events;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
 import com.zutubi.util.Predicate;
 
 /**

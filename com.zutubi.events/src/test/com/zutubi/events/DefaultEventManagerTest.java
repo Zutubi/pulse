@@ -1,10 +1,10 @@
 package com.zutubi.events;
 
-import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.TestCase;
 
 import java.util.List;
 
-public class DefaultEventManagerTest extends ZutubiTestCase
+public class DefaultEventManagerTest extends TestCase
 {
     private DefaultEventManager eventManager;
     private RecordingEventListener listener;

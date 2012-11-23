@@ -5,9 +5,11 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.events.FilteringListener;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
@@ -226,13 +228,13 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     private void unregister(final ConfigurationEventListener listener, DemultiplexingListener mux)
     {
-        mux.removeDelegate(new Predicate<EventListener>()
+        mux.removeDelegate(CollectionUtils.find(mux.getDelegates(), new Predicate<EventListener>()
         {
             public boolean satisfied(EventListener eventListener)
             {
-                return listener == ((Listener)eventListener).getDelegate();
+                return listener == ((Listener) eventListener).getDelegate();
             }
-        });
+        }));
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
