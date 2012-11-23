@@ -3,15 +3,16 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Hashtable;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 public class LoggingAcceptanceTest extends AcceptanceTestBase
 {
@@ -139,6 +140,11 @@ public class LoggingAcceptanceTest extends AcceptanceTestBase
     // seems to not suffer from this same behaviour.
     private long fileLength(File f) throws IOException
     {
+        if (!f.exists())
+        {
+            return 0;
+        }
+
         return new RandomAccessFile(f, "r").length();
     }
 }
