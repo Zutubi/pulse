@@ -282,6 +282,7 @@ public class SchedulingController
             if (!result.healthy())
             {
                 // Identify the queued requests that depend on this failed build so they can be cancelled.
+                @SuppressWarnings("unchecked")
                 Predicate<QueuedRequest> toCancelPredicate = new ConjunctivePredicate<QueuedRequest>(
                         new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()),
                         new HasDependencyOnPredicate(buildQueue, requestToComplete.getOwner())

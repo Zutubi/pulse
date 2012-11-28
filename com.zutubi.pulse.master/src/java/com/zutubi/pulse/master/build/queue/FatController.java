@@ -44,6 +44,7 @@ public class FatController implements EventListener, Stoppable
 
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
+    private EventListener commencingListener;
     private ControllerStateListener controllerStateListener;
 
     private final Lock lock = new ReentrantLock();
@@ -69,6 +70,30 @@ public class FatController implements EventListener, Stoppable
         asyncListener = new AsynchronousDelegatingListener(this, getClass().getSimpleName(), threadFactory);
         eventManager.register(asyncListener);
 
+        // Build commencing events must be handle synchronously, as we need to guarantee the build
+        // request cannot participate in assimilation after the event is published.
+        commencingListener = new EventListener()
+        {
+            public void handleEvent(Event event)
+            {
+                lock.lock();
+                try
+                {
+                    schedulingController.handleBuildCommencing((BuildCommencingEvent) event);
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+            }
+
+            public Class[] getHandledEvents()
+            {
+                return new Class[] { BuildCommencingEvent.class };
+            }
+        };
+        eventManager.register(commencingListener);
+        
         controllerStateListener = objectFactory.buildBean(ControllerStateListener.class);
         controllerStateListener.setController(this);
         eventManager.register(controllerStateListener);
@@ -154,13 +179,14 @@ public class FatController implements EventListener, Stoppable
 
         // Now stop handling events
         eventManager.unregister(asyncListener);
+        eventManager.unregister(commencingListener);
         eventManager.unregister(controllerStateListener);
         asyncListener.stop(force);
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, BuildCommencingEvent.class, BuildCompletedEvent.class};
+        return new Class[]{ BuildRequestEvent.class, BuildCompletedEvent.class };
     }
 
     public void handleEvent(Event event)
@@ -169,17 +195,13 @@ public class FatController implements EventListener, Stoppable
         {
             requestBuild((BuildRequestEvent) event);
         }
-        else if (event instanceof BuildCommencingEvent)
-        {
-            handleBuildCommencing((BuildCommencingEvent) event);
-        }
         else if (event instanceof BuildCompletedEvent)
         {
             handleBuildCompleted((BuildCompletedEvent) event);
         }
     }
 
-    public void requestBuild(BuildRequestEvent request)
+    private void requestBuild(BuildRequestEvent request)
     {
         if (isDisabled())
         {
@@ -192,19 +214,6 @@ public class FatController implements EventListener, Stoppable
         try
         {
             schedulingController.handleBuildRequest(request);
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    private void handleBuildCommencing(BuildCommencingEvent event)
-    {
-        lock.lock();
-        try
-        {
-            schedulingController.handleBuildCommencing(event);
         }
         finally
         {
