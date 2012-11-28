@@ -36,7 +36,6 @@ public class FileDeletionService extends BackgroundServiceSupport
     private static final Logger LOG = Logger.getLogger(FileDeletionService.class);
 
     private static final String PROPERTY_DELETE_OUTSIDE_DATA = "pulse.delete.outside.data";
-    private static final boolean DELETE_OUTSIDE_DATA = Boolean.getBoolean(PROPERTY_DELETE_OUTSIDE_DATA);
 
     public static final String INDEX_FILE_NAME = "dead-index.txt";
     public static final String SUFFIX = ".dead";
@@ -114,7 +113,7 @@ public class FileDeletionService extends BackgroundServiceSupport
     {
         try
         {
-            return DELETE_OUTSIDE_DATA || FileSystemUtils.isParentOf(dataDir, file);
+            return Boolean.getBoolean(PROPERTY_DELETE_OUTSIDE_DATA) || FileSystemUtils.isParentOf(dataDir, file);
         }
         catch (IOException e)
         {
