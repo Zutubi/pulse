@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
@@ -33,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * It is responsible for coordinating the scheduling process, delegating much of the
  * work to the build request handlers and the internal queue.
  */
-public class SchedulingController implements EventListener
+public class SchedulingController
 {
     protected static final String SEQUENCE_BUILD_ID = "BUILD_ID";
 
@@ -93,8 +91,14 @@ public class SchedulingController implements EventListener
             lock.unlock();
         }        
     }
-    
-    protected void handleBuildRequest(final BuildRequestEvent request)
+
+    /**
+     * Handles a request for a build.  Events are forwarded directly here by the
+     * {@link FatController}.
+     * 
+     * @param request the request event to handle
+     */
+    void handleBuildRequest(final BuildRequestEvent request)
     {
         BuildRequestHandler requestHandler = getRequestHandler(request);
         lock.lock();
@@ -234,12 +238,23 @@ public class SchedulingController implements EventListener
         return accepted;
     }
 
-    private void handleBuildCommencing(BuildCommencingEvent event)
+    /**
+     * Handles a build commencing.    Events are forwarded directly here by the
+     * {@link FatController}.
+     * 
+     * @param event the commencing event to handle
+     */
+    void handleBuildCommencing(BuildCommencingEvent event)
     {
         buildQueue.commencing(event.getBuildResult().getId());
     }
 
-    private void handleBuildCompleted(BuildCompletedEvent event)
+    /**
+     * Handles a build completing.  Events are forwarded directly here by the {@link FatController}.
+     * 
+     * @param event the completed event to handle
+     */
+    void handleBuildCompleted(BuildCompletedEvent event)
     {
         if (!handlers.containsKey(event.getMetaBuildId()))
         {
@@ -385,27 +400,6 @@ public class SchedulingController implements EventListener
         handlers.put(metaBuildId, handler);
 
         return handler;
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class};
-    }
-
-    public void handleEvent(Event event)
-    {
-        if (event instanceof BuildRequestEvent)
-        {
-            handleBuildRequest((BuildRequestEvent) event);
-        }
-        else if (event instanceof BuildCommencingEvent)
-        {
-            handleBuildCommencing((BuildCommencingEvent) event);
-        }
-        else if (event instanceof BuildCompletedEvent)
-        {
-            handleBuildCompleted((BuildCompletedEvent) event);
-        }
     }
 
     /**

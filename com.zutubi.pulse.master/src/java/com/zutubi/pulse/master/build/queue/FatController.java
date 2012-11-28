@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildTerminationRequestEvent;
@@ -159,7 +160,7 @@ public class FatController implements EventListener, Stoppable
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildRequestEvent.class, BuildCompletedEvent.class};
+        return new Class[]{BuildRequestEvent.class, BuildCommencingEvent.class, BuildCompletedEvent.class};
     }
 
     public void handleEvent(Event event)
@@ -167,6 +168,10 @@ public class FatController implements EventListener, Stoppable
         if (event instanceof BuildRequestEvent)
         {
             requestBuild((BuildRequestEvent) event);
+        }
+        else if (event instanceof BuildCommencingEvent)
+        {
+            handleBuildCommencing((BuildCommencingEvent) event);
         }
         else if (event instanceof BuildCompletedEvent)
         {
@@ -186,7 +191,20 @@ public class FatController implements EventListener, Stoppable
         lock.lock();
         try
         {
-            schedulingController.handleEvent(request);
+            schedulingController.handleBuildRequest(request);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    private void handleBuildCommencing(BuildCommencingEvent event)
+    {
+        lock.lock();
+        try
+        {
+            schedulingController.handleBuildCommencing(event);
         }
         finally
         {
@@ -199,7 +217,7 @@ public class FatController implements EventListener, Stoppable
         lock.lock();
         try
         {
-            schedulingController.handleEvent(event);
+            schedulingController.handleBuildCompleted(event);
             if (schedulingController.getActivedRequestCount() == 0)
             {
                 stoppedCondition.signalAll();

@@ -46,7 +46,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     public void testProjectMarkedAsBuildingOnRequest()
     {
         BuildRequestEvent request = createRequest("a");
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         verify(projectManager, times(1)).makeStateTransition(request.getOwner().getId(), Transition.BUILDING);
     }
@@ -55,12 +55,12 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project project = createProject("a");
         BuildRequestEvent request = createRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
         verify(projectManager, times(1)).makeStateTransition(request.getOwner().getId(), Transition.BUILDING);
         setProjectState(State.BUILDING, project);
 
         BuildCompletedEvent completed = createSuccessful(request);
-        controller.handleEvent(completed);
+        controller.handleBuildCompleted(completed);
         verify(projectManager, times(1)).makeStateTransition(request.getOwner().getId(), Transition.IDLE);
     }
 
@@ -68,15 +68,15 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project project = createProject("a");
         BuildRequestEvent requestA = createRequest("a");
-        controller.handleEvent(requestA);
+        controller.handleBuildRequest(requestA);
         verify(projectManager, times(1)).makeStateTransition(project.getId(), Transition.BUILDING);
         setProjectState(State.BUILDING, project);
 
-        controller.handleEvent(createRequest("a"));
-        controller.handleEvent(createRequest("a"));
+        controller.handleBuildRequest(createRequest("a"));
+        controller.handleBuildRequest(createRequest("a"));
 
         BuildCompletedEvent completed = createSuccessful(requestA);
-        controller.handleEvent(completed);
+        controller.handleBuildCompleted(completed);
 
         verify(projectManager, times(1)).makeStateTransition(anyLong(), (Project.Transition) anyObject());
     }
@@ -85,7 +85,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project project = createProject("a", State.BUILDING);
         BuildRequestEvent request = createPersonalRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
@@ -95,7 +95,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project project = createProject("a", State.IDLE);
         BuildRequestEvent request = createPersonalRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
@@ -105,13 +105,13 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project project = createProject("a", State.IDLE);
         BuildRequestEvent request = createPersonalRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
 
         BuildCompletedEvent completed = createSuccessful(request);
-        controller.handleEvent(completed);
+        controller.handleBuildCompleted(completed);
         verify(projectManager, times(0)).makeStateTransition(anyLong(), (Transition)anyObject());
     }
 
@@ -122,7 +122,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         Project project = createProject("a", State.PAUSED);
 
         BuildRequestEvent request = createRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated();
         assertQueued();
@@ -135,7 +135,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         Project project = createProject("a", State.PAUSED);
 
         BuildRequestEvent request = createPersonalRequest(project);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         assertQueued();
@@ -144,9 +144,9 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     public void testDownstreamProjectPausedDoesNotImpactRequest()
     {
         Project projectA = createProject("a");
-        Project projectB = createProject("b", State.PAUSED, dependency(projectA));
+        createProject("b", State.PAUSED, dependency(projectA));
         BuildRequestEvent request = createRequest(projectA);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         assertQueued();
@@ -157,7 +157,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         Project projectA = createProject("a", State.PAUSED);
         Project projectB = createProject("b", dependency(projectA));
         BuildRequestEvent request = createRebuildRequest(projectB);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated();
         assertQueued();
@@ -169,11 +169,11 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         Project util = createProject("util");
         Project lib = createProject("lib", State.PAUSED, dependency(util));
-        Project clientA = createProject("clientA", dependency(lib));
-        Project clientB = createProject("clientB", dependency(lib));
+        createProject("clientA", dependency(lib));
+        createProject("clientB", dependency(lib));
 
         BuildRequestEvent request = createRequest(util);
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         assertQueued();
@@ -187,7 +187,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     public void testActivatedRequestRegistryTransitions()
     {
         BuildRequestEvent request = createRequest("a");
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         verify(buildRequestRegistry, times(1)).requestQueued(request);
         verify(buildRequestRegistry, times(1)).requestActivated(request, request.getId());
@@ -201,7 +201,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     public void testActivatedRequestInSnapshot()
     {
         BuildRequestEvent request = createRequest("a");
-        controller.handleEvent(request);
+        controller.handleBuildRequest(request);
 
         assertActivated(request);
         assertQueued();
@@ -211,8 +211,8 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         BuildRequestEvent requestA = createRequest("a");
         BuildRequestEvent requestB = createRequest("a");
-        controller.handleEvent(requestA);
-        controller.handleEvent(requestB);
+        controller.handleBuildRequest(requestA);
+        controller.handleBuildRequest(requestB);
 
         assertActivated(requestA);
         assertQueued(requestB);
@@ -222,8 +222,8 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         BuildRequestEvent requestA = createRequest("a");
         BuildRequestEvent requestB = createPersonalRequest("a");
-        controller.handleEvent(requestA);
-        controller.handleEvent(requestB);
+        controller.handleBuildRequest(requestA);
+        controller.handleBuildRequest(requestB);
 
         assertActivated(requestA, requestB);
     }
@@ -232,7 +232,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     public void testCancelActivatedRequestDoesNothing()
     {
         BuildRequestEvent requestA = createRequest("a");
-        controller.handleEvent(requestA);
+        controller.handleBuildRequest(requestA);
 
         assertActivated(requestA);
 
@@ -245,8 +245,8 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         BuildRequestEvent requestA = createRequest("a");
         BuildRequestEvent requestB = createRequest("a");
-        controller.handleEvent(requestA);
-        controller.handleEvent(requestB);
+        controller.handleBuildRequest(requestA);
+        controller.handleBuildRequest(requestB);
 
         assertActivated(requestA);
         assertQueued(requestB);
@@ -261,8 +261,8 @@ public class SchedulingControllerTest extends BaseQueueTestCase
     {
         BuildRequestEvent requestA = createRequest("a");
         BuildRequestEvent requestB = createRequest("a");
-        controller.handleEvent(requestA);
-        controller.handleEvent(requestB);
+        controller.handleBuildRequest(requestA);
+        controller.handleBuildRequest(requestB);
 
         assertActivated(requestA);
         assertQueued(requestB);
