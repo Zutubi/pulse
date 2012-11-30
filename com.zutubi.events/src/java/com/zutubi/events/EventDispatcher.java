@@ -8,11 +8,11 @@ import java.util.List;
 public interface EventDispatcher
 {
     /**
-     * Dispatches the given event to the given listeners.  The list is already filtered to only include listeners that
-     * are interested in the event.
+     * Dispatches the given event to the given listeners.  The list is already filtered to only
+     * include listeners that are interested in the event.
      *
-     * @param evt the event to dispatch
+     * @param event the event to dispatch
      * @param listeners listeners to dispatch the event to
      */
-    void dispatch(Event evt, List<EventListener> listeners);
+    void dispatch(Event event, List<EventListener> listeners);
 }

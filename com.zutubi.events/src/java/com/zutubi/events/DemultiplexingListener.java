@@ -8,9 +8,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A listener that dispatches events to multiple delegates.  Each delegate must handle the same types of events.  The
- * implementation is thread safe - new delegates may be added or removed from any thread at any time.  Changes to the
- * wrapped delegates will be reflected in later event handling (events already being handled will be unaffected).
+ * A listener that dispatches events to multiple delegates.  Each delegate must handle the same
+ * types of events.  The implementation is thread safe - new delegates may be added or removed from
+ * any thread at any time.  Changes to the wrapped delegates will be reflected in later event
+ * handling (events already being handled will be unaffected).
  */
 public class DemultiplexingListener implements EventListener
 {
@@ -47,7 +48,8 @@ public class DemultiplexingListener implements EventListener
     }
 
     /**
-     * Adds a new delegate listener.  The listener must handle exactly the same types of events as this.
+     * Adds a new delegate listener.  The listener must handle exactly the same types of events as
+     * this.
      *
      * @param listener the listener to add
      * @throws IllegalArgumentException if the given listener does not handle the same event types

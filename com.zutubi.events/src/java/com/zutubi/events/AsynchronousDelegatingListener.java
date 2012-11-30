@@ -8,11 +8,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An event listener that wraps another listener, passing events to that listener on via an {@link ExecutorService}.
- * This effectively makes {@link #handleEvent(Event)} asynchronous.
+ * An event listener that wraps another listener, passing events to that listener on via an
+ * {@link ExecutorService}.  This effectively makes {@link #handleEvent(Event)} asynchronous.
  * <p/>
- * The use of this delegating listener ensures that events do not block the event dispatch thread.  If this listener
- * uses a single-threaded executor service, events are also guaranteed to be handled in the order they were sent.
+ * The use of this delegating listener ensures that events do not block the event dispatch thread.
+ * If this listener uses a single-threaded executor service, events are also guaranteed to be
+ * handled in the order they were sent.
  */
 public class AsynchronousDelegatingListener implements EventListener
 {
@@ -40,7 +41,8 @@ public class AsynchronousDelegatingListener implements EventListener
      * Wraps the given listener with event dispatch via a single-threaded executor.
      *
      * @param delegate the listener to wrap, events are forwarded asycnhronously
-     * @param name a descriptive name for this listener, used to name the listener thread and in logging
+     * @param name a descriptive name for this listener, used to name the listener thread and in
+     *             logging
      * @param threadFactory factory used to create the executor services' thread
      */
     public AsynchronousDelegatingListener(EventListener delegate, final String name, final ThreadFactory threadFactory)
@@ -85,11 +87,11 @@ public class AsynchronousDelegatingListener implements EventListener
     }
 
     /**
-     * Stops the underlying executor service, so that events will no longer be processed.  Waits for shutdown to
-     * complete, though eventually the wait will time out.
+     * Stops the underlying executor service, so that events will no longer be processed.  Waits for
+     * shutdown to complete, though eventually the wait will time out.
      *
-     * @param force true to force stop as soon as possible (discarding submitted events where possible), false to allow
-     *              already-queued events to be processed
+     * @param force true to force stop as soon as possible (discarding submitted events where
+     *              possible), false to allow already-queued events to be processed
      */
     public void stop(boolean force)
     {

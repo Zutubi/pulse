@@ -1,8 +1,8 @@
 package com.zutubi.events;
 
 /**
- * The base interface implemented by event managers.  Event managers support registering listeners and publishing events
- * to those listeners.
+ * The base interface implemented by event managers.  Event managers support registering listeners
+ * and publishing events to those listeners.
  */
 public interface EventManager
 {
@@ -21,7 +21,8 @@ public interface EventManager
     void unregister(EventListener eventListener);
 
     /**
-     * Publish an event, notifying the appropriate event listeners.  Equivalent to publish(evt, PublishFlag.IMMEDIATE).
+     * Publish an event, notifying the appropriate event listeners.  Equivalent to publish(event,
+     * PublishFlag.IMMEDIATE).
      *
      * @see PublishFlag
      * @see #publish(Event,PublishFlag)

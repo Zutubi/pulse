@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A listener that stores up all the events it has received.  Quite useful for testing, if nothing else.
+ * A listener that stores up all the events it has received.  Quite useful for testing, if nothing
+ * else.
  */
 public class RecordingEventListener implements EventListener
 {
@@ -42,8 +43,8 @@ public class RecordingEventListener implements EventListener
     }
 
     /**
-     * Returns all recorded events of the given type, including subtypes, in the order they were handled.  Any event
-     * that is an instanceof the given class is included.
+     * Returns all recorded events of the given type, including subtypes, in the order they were
+     * handled.  Any event that is an instanceof the given class is included.
      *
      * @return a list of all events of the given type recorded thus far
      */

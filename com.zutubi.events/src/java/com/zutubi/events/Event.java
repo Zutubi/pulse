@@ -48,8 +48,8 @@ public class Event
     }
 
     /**
-     * Records an exception against this event.  This is primarily used to record an exception while the event is
-     * handled, which may be of interest to the event publisher.
+     * Records an exception against this event.  This is primarily used to record an exception while
+     * the event is handled, which may be of interest to the event publisher.
      *
      * @param e the exception to record
      */
