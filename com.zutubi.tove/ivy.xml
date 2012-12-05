@@ -21,9 +21,11 @@
         <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
+
+        <!-- Library dependencies -->
+        <dependency org="zutubi" name="events" rev="3.0.+" conf="build,release->default;src->src"/>
 
         <!-- external libraries -->
         <dependency org="nu.xom" name="nu.xom" rev="20111125" conf="build,release->default;src->src"/>

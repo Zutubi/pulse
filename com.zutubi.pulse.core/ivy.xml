@@ -25,14 +25,13 @@
     <dependencies>
         <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.tove" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
 
         <!-- Library dependencies -->
         <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default;src->src"/>
-        <dependency org="zutubi" name="diff" rev="3.0.3" conf="external,build,release->default;src->src"/>
-        <dependency org="zutubi" name="events" rev="3.0.2" conf="external,build,release->default;src->src"/>
+        <dependency org="zutubi" name="diff" rev="3.0.+" conf="external,build,release->default;src->src"/>
+        <dependency org="zutubi" name="events" rev="3.0.+" conf="external,build,release->default;src->src"/>
 
         <!-- External dependencies -->
         <dependency org="org.apache.ant" name="org.apache.ant" rev="1.6.5" conf="external,build,release->directoryscanner;src->src"/>
