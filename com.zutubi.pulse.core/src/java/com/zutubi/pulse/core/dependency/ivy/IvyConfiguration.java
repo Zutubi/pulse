@@ -160,15 +160,28 @@ public class IvyConfiguration
      * Define the base cache directory to be used for all of ivy's caching.
      * This includes the resolution cache and the artifact cache.
      *
-     * @param cacheBase     the directory to use as the cache root.
-     * @throws IOException on error.
+     * @param cacheBase the directory to use as the cache root.
      */
-    public void setCacheBase(File cacheBase) throws IOException
+    public void setCacheBase(File cacheBase)
     {
         this.cacheBase = cacheBase;
         setVariable(IVY_CACHE_DIR, cacheBase.toURI().toString());
-        setVariable(IVY_CACHE_RESOLUTION, cacheBase.getCanonicalPath());
-        setVariable(IVY_CACHE_REPOSITORY, cacheBase.getCanonicalPath());
+        String canonicalPath = safeCanonicalPath(cacheBase);
+        setVariable(IVY_CACHE_RESOLUTION, canonicalPath);
+        setVariable(IVY_CACHE_REPOSITORY, canonicalPath);
+    }
+
+    private String safeCanonicalPath(File cacheBase)
+    {
+        try
+        {
+            return cacheBase.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            // We did our best, just use the non-canonical path
+            return cacheBase.getAbsolutePath();
+        }
     }
 
     public File getCacheBase()

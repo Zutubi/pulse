@@ -137,7 +137,7 @@ public class RecipeProcessor
         {
             if (descriptor.getDependencies().length > 0)
             {
-                IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository");
+                IvyClient ivy = ivyManager.createIvyClient(context.getString(PROPERTY_MASTER_URL) + "/repository", request.getId());
                 ivy.pushMessageLogger(new IvyMessageOutputStreamAdapter(context.getOutputStream()));
 
                 RetrieveDependenciesCommandConfiguration retrieveCommandConfig = new RetrieveDependenciesCommandConfiguration();
