@@ -3,14 +3,14 @@ package com.zutubi.util.adt;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-
+@SuppressWarnings("unchecked")
 public class DAGraphTest extends ZutubiTestCase
 {
     // The graph looks like:

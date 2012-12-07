@@ -34,7 +34,8 @@ public class DefaultBundleManager implements BundleManager
     {
         synchronized(resolvers)
         {
-            Class clazz = resolver.getContextType();
+            @SuppressWarnings("unchecked")
+            Class<? extends Context> clazz = (Class<? extends Context>)resolver.getContextType();
             if (!resolvers.containsKey(clazz))
             {
                 resolvers.put(clazz, new LinkedList<ContextResolver>());
@@ -44,6 +45,7 @@ public class DefaultBundleManager implements BundleManager
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<ResourceBundle> getBundles(Context context, Locale locale)
     {
         if (cache.isCached(context, locale))
@@ -75,7 +77,7 @@ public class DefaultBundleManager implements BundleManager
                 InputStream input = null;
                 try
                 {
-                    input = getContextLoader(context).loadResource(context, candidateName);
+                    input = getContextLoader().loadResource(context, candidateName);
                     if (input != null)
                     {
                         bundles.add(factory.loadBundle(input, locale));
@@ -98,7 +100,7 @@ public class DefaultBundleManager implements BundleManager
 
     }
 
-    private ContextLoader getContextLoader(Context context)
+    private ContextLoader getContextLoader()
     {
         return defaultLoader;
     }
