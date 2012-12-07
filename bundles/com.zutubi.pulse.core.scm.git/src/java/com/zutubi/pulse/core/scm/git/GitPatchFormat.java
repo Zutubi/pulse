@@ -8,22 +8,21 @@ import com.zutubi.diff.git.GitPatchParser;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ForwardingCharHandler;
+import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import static java.util.Arrays.asList;
 
 /**
  * A {@link com.zutubi.pulse.core.scm.patch.api.PatchFormat} implementation for
@@ -89,7 +88,7 @@ public class GitPatchFormat implements PatchFormat
 
         // Run the process directly so we can capture raw output.  Going
         // through a line handler munges newlines.
-        AsyncProcess async = null;
+        ProcessWrapper processWrapper = null;
         Writer output = null;
         StringWriter error = new StringWriter();
         try
@@ -100,8 +99,8 @@ public class GitPatchFormat implements PatchFormat
             builder.directory(context.getBase());
             Process p = builder.start();
 
-            async = new AsyncProcess(p, new ForwardingCharHandler(output, error), true);
-            int exitCode = async.waitFor();
+            processWrapper = new ProcessWrapper(p, new ForwardingCharHandler(output, error), true);
+            int exitCode = processWrapper.waitFor();
             if (exitCode != 0)
             {
                 context.getUI().error(error.toString());
@@ -117,9 +116,9 @@ public class GitPatchFormat implements PatchFormat
         finally
         {
             IOUtils.close(output);
-            if (async != null)
+            if (processWrapper != null)
             {
-                async.destroy();
+                processWrapper.destroy();
             }
         }
 

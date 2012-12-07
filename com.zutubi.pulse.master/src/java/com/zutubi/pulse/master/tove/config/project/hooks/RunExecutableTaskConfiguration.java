@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ByteHandler;
 import com.zutubi.pulse.core.util.process.ForwardingByteHandler;
 import com.zutubi.pulse.core.util.process.NullByteHandler;
+import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.tove.annotations.ControllingCheckbox;
@@ -88,7 +88,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
 
     public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode) throws Exception
     {
-        AsyncProcess asyncProcess = null;
+        ProcessWrapper processWrapper = null;
         try
         {
             List<String> resolvedArguments = context.splitAndResolveVariables(arguments);
@@ -113,21 +113,21 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
                 byteHandler = new ForwardingByteHandler(context.getOutputStream());
             }
 
-            asyncProcess = new AsyncProcess(builder.start(), byteHandler, false);
+            processWrapper = new ProcessWrapper(builder.start(), byteHandler, false);
             if (timeoutApplied)
             {
-                asyncProcess.waitForSuccessOrThrow(timeout, TimeUnit.SECONDS);
+                processWrapper.waitForSuccessOrThrow(timeout, TimeUnit.SECONDS);
             }
             else
             {
-                asyncProcess.waitForSuccess();
+                processWrapper.waitForSuccess();
             }
         }
         finally
         {
-            if (asyncProcess != null)
+            if (processWrapper != null)
             {
-                asyncProcess.destroy();
+                processWrapper.destroy();
             }
         }
     }

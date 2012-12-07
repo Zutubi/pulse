@@ -30,7 +30,7 @@ public class PasswordReader
         {
             Method getConsoleMethod = System.class.getMethod("console");
             console = getConsoleMethod.invoke(null);
-            Class consoleClass = Class.forName("java.io.Console");
+            Class<?> consoleClass = Class.forName("java.io.Console");
             readPasswordMethod = consoleClass.getMethod("readPassword", String.class, Object[].class);
         }
         catch (Exception e)

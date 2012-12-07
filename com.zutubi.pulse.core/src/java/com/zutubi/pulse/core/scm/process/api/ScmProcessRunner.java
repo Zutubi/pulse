@@ -2,9 +2,9 @@ package com.zutubi.pulse.core.scm.process.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.ByteHandler;
 import com.zutubi.pulse.core.util.process.LineHandler;
+import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 
@@ -304,13 +304,13 @@ public class ScmProcessRunner
         }
     }
 
-    private AsyncProcess wrapProcess(Process child, final ScmOutputHandler handler, final StringBuilder stderr, final AtomicBoolean activity)
+    private ProcessWrapper wrapProcess(Process child, final ScmOutputHandler handler, final StringBuilder stderr, final AtomicBoolean activity)
     {
-        AsyncProcess async;
+        ProcessWrapper async;
         if (handler instanceof ScmLineHandler)
         {
             final ScmLineHandler lineHandler = (ScmLineHandler) handler;
-            async = new AsyncProcess(child, new LineHandler()
+            async = new ProcessWrapper(child, new LineHandler()
             {
                 public Charset getCharset()
                 {
@@ -335,7 +335,7 @@ public class ScmProcessRunner
         }
         else if (handler instanceof ScmByteHandler)
         {
-            async = new AsyncProcess(child, new ByteHandler()
+            async = new ProcessWrapper(child, new ByteHandler()
             {
                 final ScmByteHandler byteHandler = (ScmByteHandler) handler;
                 public void handle(byte[] buffer, int n, boolean error) throws Exception
@@ -355,7 +355,7 @@ public class ScmProcessRunner
         }
         else
         {
-            async = new AsyncProcess(child, new ByteHandler()
+            async = new ProcessWrapper(child, new ByteHandler()
             {
                 public void handle(byte[] buffer, int n, boolean error) throws Exception
                 {
@@ -366,7 +366,7 @@ public class ScmProcessRunner
         return async;
     }
 
-    private int completeProcess(AsyncProcess async, ScmOutputHandler safeHandler, AtomicBoolean activity) throws ScmException
+    private int completeProcess(ProcessWrapper async, ScmOutputHandler safeHandler, AtomicBoolean activity) throws ScmException
     {
         try
         {

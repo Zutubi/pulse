@@ -7,7 +7,7 @@ import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.pulse.core.util.config.EnvConfig;
-import com.zutubi.pulse.core.util.process.BufferingCharHandler;
+import com.zutubi.pulse.core.util.process.CollectingCharHandler;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.dev.bootstrap.DefaultDevPaths;
 import com.zutubi.pulse.dev.bootstrap.DevPaths;
@@ -111,7 +111,7 @@ public class DevToolsTestBase extends PulseTestCase
         ProcessWrapper process = null;
         try
         {
-            BufferingCharHandler handler = new BufferingCharHandler();
+            CollectingCharHandler handler = new CollectingCharHandler();
             
             Process child = builder.start();
             process = new ProcessWrapper(child, handler, true);
