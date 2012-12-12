@@ -669,7 +669,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
                     publishEvent(new InsertEvent(this, configuration, cascaded));
                     publishEvent(new PostInsertEvent(this, configuration, cascaded));
-                    configurationStateManager.createAndAssignState(configuration);
+                    configurationStateManager.createAndAssignState(configuration, false);
                 }
             }
         }

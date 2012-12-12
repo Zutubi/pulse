@@ -52,14 +52,21 @@ public class ConfigurationStateManager
         return new LinkedList<Class<? extends Configuration>>(managers.keySet());
     }
 
-    public void createAndAssignState(final Configuration instance)
+    /**
+     * Creates state matching the given instance and assigns the new id to that instance's external
+     * state property.
+     * 
+     * @param instance the instance to create state for
+     * @param force true to create the state even if the instance already has a non-zero id in its
+     *              external state property
+     */
+    public void createAndAssignState(final Configuration instance, final boolean force)
     {
         Class<? extends Configuration> clazz = instance.getClass();
         final ExternalStateManager<Configuration> manager = getManager(clazz);
         if (manager != null)
         {
-            long existingId = getExternalStateId(instance);
-            if (existingId == 0)
+            if (force || getExternalStateId(instance) == 0)
             {
                 final long[] hax = {-1};
                 transactionManager.runInTransaction(new NullaryFunction<Object>()

@@ -75,7 +75,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
                 Object externalState = configurationStateManager.getExternalState(config);
                 if (externalState == null && config.isConcrete())
                 {
-                    configurationStateManager.createAndAssignState(config);
+                    configurationStateManager.createAndAssignState(config, true);
                 }
             }
         }
