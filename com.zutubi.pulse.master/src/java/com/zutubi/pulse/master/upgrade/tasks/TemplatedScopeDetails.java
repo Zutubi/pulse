@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.tove.type.record.TemplateRecord;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -138,7 +139,7 @@ public class TemplatedScopeDetails extends ScopeDetails
     private ScopeHierarchy.Node createNode(String id, Map<String, Record> recordById, Map<Long, List<String>> idByParentHandle)
     {
         Record record = recordById.get(id);
-        ScopeHierarchy.Node result = new ScopeHierarchy.Node(id);
+        ScopeHierarchy.Node result = new ScopeHierarchy.Node(id, Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY)));
 
         long handle = record.getHandle();
         List<String> children = idByParentHandle.get(handle);
