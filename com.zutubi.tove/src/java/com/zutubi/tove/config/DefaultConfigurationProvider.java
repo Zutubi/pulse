@@ -10,6 +10,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.logging.Logger;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,8 @@ import java.util.concurrent.ThreadFactory;
  */
 public class DefaultConfigurationProvider implements ConfigurationProvider
 {
+    private static final Logger LOG = Logger.getLogger(DefaultConfigurationProvider.class);
+    
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -75,6 +78,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
                 Object externalState = configurationStateManager.getExternalState(config);
                 if (externalState == null && config.isConcrete())
                 {
+                    LOG.warning("No state found for '" + config.getConfigurationPath() + "', creating blank state");
                     configurationStateManager.createAndAssignState(config, true);
                 }
             }

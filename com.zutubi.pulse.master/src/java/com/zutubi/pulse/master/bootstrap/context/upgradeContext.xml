@@ -196,6 +196,7 @@
                 <ref local="changedCustomConditions"/>
                 <ref local="changedSelectedBuildsConditions"/>
                 <ref local="addOCUnitShortenSuiteNames"/>
+                <ref local="pushDownExternalStateIds"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1030,5 +1031,9 @@
 
     <bean id="addOCUnitShortenSuiteNames" class="com.zutubi.pulse.master.upgrade.tasks.AddOCUnitShortenSuiteNamesUpgradeTask">
         <property name="buildNumber" value="205011001"/>
+    </bean>
+
+    <bean id="pushDownExternalStateIds" class="com.zutubi.pulse.master.upgrade.tasks.PushDownExternalStateIdsUpgradeTask">
+        <property name="buildNumber" value="205014001"/>
     </bean>
 </beans>

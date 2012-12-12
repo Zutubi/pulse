@@ -2,8 +2,6 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
-import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.UnaryProcedure;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -81,17 +79,22 @@ public class ScopeHierarchy
     public static class Node
     {
         private String id;
+        private boolean template;
         private Node parent;
         private List<Node> children = new LinkedList<Node>();
 
         /**
+         * Creates a new node for the given id.
+         * 
          * @param id the identifier of the node, which is the key of the
          *           associated record in the templated collection (the second
          *           element of the record's path).
+         * @param template true iff this represents a template
          */
-        public Node(String id)
+        public Node(String id, boolean template)
         {
             this.id = id;
+            this.template = template;
         }
 
         /**
@@ -108,6 +111,14 @@ public class ScopeHierarchy
         public String getId()
         {
             return id;
+        }
+
+        /**
+         * @return true iff this represents a template
+         */
+        public boolean isTemplate()
+        {
+            return template;
         }
 
         /**

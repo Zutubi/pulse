@@ -45,9 +45,9 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
         final List<RecordUpgrader> recordUpgraders = getRecordUpgraders();
         wireExternalDependencies(recordLocator, recordUpgraders);
 
-        transactionManager.runInTransaction(new NullaryFunction()
+        transactionManager.runInTransaction(new NullaryFunction<Void>()
         {
-            public Object process()
+            public Void process()
             {
                 Map<String, Record> recordsToUpgrade = recordLocator.locate(recordManager);
                 for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
