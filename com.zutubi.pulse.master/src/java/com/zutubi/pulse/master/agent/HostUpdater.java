@@ -8,6 +8,7 @@ import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
 import com.zutubi.pulse.master.servlet.PluginRepositoryServlet;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -22,6 +23,10 @@ public class HostUpdater implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(HostUpdater.class);
 
+    private static final String PROPERTY_STATUS_TIMEOUT = "pulse.agent.upgrade.status.timeout";
+    private static final String PROPERTY_REBOOT_TIMEOUT = "pulse.agent.upgrade.reboot.timeout";
+    private static final String PROPERTY_REBOOT_PING_INTERVAL = "pulse.agent.upgrade.reboot.ping.interval";
+
     private DefaultHost host;
     private HostService hostService;
     private ExecutorService executor;
@@ -31,18 +36,18 @@ public class HostUpdater implements Runnable
      * Maximum number of seconds to wait between status events before timing
      * out the upgrade.
      */
-    private long statusTimeout = 600;
+    private long statusTimeout = Long.getLong(PROPERTY_STATUS_TIMEOUT, 600);
 
     /**
      * Maximum number of seconds to wait between receiving the reboot status and
      * a successful ping.
      */
-    private long rebootTimeout = 300;
+    private long rebootTimeout = Long.getLong(PROPERTY_REBOOT_TIMEOUT, 600);
 
     /**
-     * Number of milliseconds between pings while waiting for reboot.
+     * Number of seconds between pings while waiting for reboot.
      */
-    private long pingInterval = 5000;
+    private long pingInterval = Long.getLong(PROPERTY_REBOOT_PING_INTERVAL, 5);
 
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
@@ -169,7 +174,7 @@ public class HostUpdater implements Runnable
             catch (Exception e)
             {
                 // We expect some pings to fail, so can't read too much into it
-                Thread.sleep(pingInterval);
+                Thread.sleep(pingInterval * Constants.SECOND);
             }
         }
 
@@ -242,13 +247,13 @@ public class HostUpdater implements Runnable
     }
 
     /**
-     * The approximate interval in milliseconds between successive pings.
+     * The approximate interval in seconds between successive pings.
      *
-     * @param milliseconds time in milliseconds
+     * @param seconds time in seconds
      */
-    public void setPingInterval(long milliseconds)
+    public void setPingInterval(long seconds)
     {
-        this.pingInterval = milliseconds;
+        this.pingInterval = seconds;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
