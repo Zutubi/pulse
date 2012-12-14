@@ -63,7 +63,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         updater = new HostUpdater(host, hostService);
         updater.setStatusTimeout(5);
         updater.setRebootTimeout(5);
-        updater.setPingInterval(10);
+        updater.setPingInterval(1);
 
         SimpleMasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
         configurationManager.setDevelopmentSystemPaths(systemPaths);
@@ -173,8 +173,8 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
     public void testRebootTimeout() throws Exception
     {
         configureService(true, 10);
-        updater.setRebootTimeout(1);
-        updater.setPingInterval(250);
+        updater.setRebootTimeout(3);
+        updater.setPingInterval(1);
         updater.start();
         start();
         download();
@@ -187,8 +187,8 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
     public void testRebootWrongBuild() throws Exception
     {
         configureService(true, 2, 6);
-        updater.setPingInterval(250);
-        updater.setRebootTimeout(1);
+        updater.setPingInterval(1);
+        updater.setRebootTimeout(5);
         updater.start();
         start();
         download();
