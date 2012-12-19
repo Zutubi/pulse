@@ -4,20 +4,19 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
 import com.zutubi.util.time.TestClock;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class AgentStatisticsManagerTest extends PulseTestCase
 {
@@ -134,6 +133,7 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         stateChange(KNOWN_AGENT_1, SYNCHRONISING, IDLE);
         clock.add(DURATION_IDLE);
         stateChange(KNOWN_AGENT_1, IDLE, RECIPE_ASSIGNED);
+        stateChange(KNOWN_AGENT_1, RECIPE_ASSIGNED, RECIPE_DISPATCHED);
         stateChange(KNOWN_AGENT_1, IDLE, BUILDING);
         clock.add(DURATION_BUILDING);
         stateChange(KNOWN_AGENT_1, BUILDING, POST_RECIPE);
@@ -189,29 +189,32 @@ public class AgentStatisticsManagerTest extends PulseTestCase
         final int DURATION_4 = 45;
         final int DURATION_5 = 577;
         final int DURATION_6 = 76;
+        final int DURATION_7 = 123;
 
         stateChange(KNOWN_AGENT_1, INITIAL, IDLE);
         clock.add(DURATION_1);
         stateChange(KNOWN_AGENT_1, IDLE, RECIPE_ASSIGNED);
         clock.add(DURATION_2);
-        stateChange(KNOWN_AGENT_1, RECIPE_ASSIGNED, BUILDING);
+        stateChange(KNOWN_AGENT_1, RECIPE_ASSIGNED, RECIPE_DISPATCHED);
         clock.add(DURATION_3);
-        stateChange(KNOWN_AGENT_1, BUILDING, POST_RECIPE);
+        stateChange(KNOWN_AGENT_1, RECIPE_DISPATCHED, BUILDING);
         clock.add(DURATION_4);
-        stateChange(KNOWN_AGENT_1, POST_RECIPE, AWAITING_PING);
+        stateChange(KNOWN_AGENT_1, BUILDING, POST_RECIPE);
         clock.add(DURATION_5);
+        stateChange(KNOWN_AGENT_1, POST_RECIPE, AWAITING_PING);
+        clock.add(DURATION_6);
         stateChange(KNOWN_AGENT_1, AWAITING_PING, IDLE);
 
         AgentDailyStatistics expected = new AgentDailyStatistics(KNOWN_AGENT_1.getId(), midnights[0]);
         expected.setIdleTime(DURATION_1);
-        expected.setBusyTime(DURATION_2 + DURATION_3 + DURATION_4 + DURATION_5);
+        expected.setBusyTime(DURATION_2 + DURATION_3 + DURATION_4 + DURATION_5 + DURATION_6);
         expected.setRecipeCount(1);
         assertEquals(asList(expected), agentStatisticsManager.getStatisticsForAgent(KNOWN_AGENT_1.getId()));
 
-        clock.add(DURATION_6);
+        clock.add(DURATION_7);
         stateChange(KNOWN_AGENT_1, IDLE, RECIPE_ASSIGNED);
 
-        expected.setIdleTime(DURATION_1 + DURATION_6);
+        expected.setIdleTime(DURATION_1 + DURATION_7);
         expected.setRecipeCount(2);
         assertEquals(asList(expected), agentStatisticsManager.getStatisticsForAgent(KNOWN_AGENT_1.getId()));
     }

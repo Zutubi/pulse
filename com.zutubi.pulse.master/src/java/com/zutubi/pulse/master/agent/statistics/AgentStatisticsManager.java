@@ -186,6 +186,7 @@ public class AgentStatisticsManager implements EventListener
             case BUILDING_INVALID:
             case POST_RECIPE:
             case RECIPE_ASSIGNED:
+            case RECIPE_DISPATCHED:
                 currentStats.setBusyTime(currentStats.getBusyTime() + duration);
                 break;
         }

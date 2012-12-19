@@ -57,12 +57,12 @@ public class RecipeDispatchedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Dispatched Event");
-        buff.append(": ").append(getRecipeId());
+        StringBuilder builder = new StringBuilder("Recipe Dispatched Event");
+        builder.append(": ").append(getRecipeId());
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getConfig().getName());
+            builder.append(": ").append(getAgent().getConfig().getName());
         }
-        return buff.toString();
+        return builder.toString();
     }
 }

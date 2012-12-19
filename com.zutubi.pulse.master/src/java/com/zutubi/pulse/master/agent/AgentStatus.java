@@ -49,9 +49,13 @@ public enum AgentStatus
      */
     SYNCHRONISED(true, false, false, false),
     /**
-     * A recipe has been assigned to the agent, but it has not yet commenced.
+     * A recipe has been assigned to the agent, but it has not yet been dispatched.
      */
     RECIPE_ASSIGNED(true, false, true, false),
+    /**
+     * A recipe has been dispatched to the agent, but it has not yet commenced.
+     */
+    RECIPE_DISPATCHED(true, false, true, false),
     /**
      * The agent is currently executing a recipe.
      */

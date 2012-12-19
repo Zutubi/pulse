@@ -14,6 +14,7 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -21,8 +22,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
-
-import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * Manages the transient status of agents.  Uses ping and recipe events to
@@ -170,6 +169,7 @@ public class AgentStatusManager implements EventListener
                 {
                     case BUILDING:
                     case RECIPE_ASSIGNED:
+                    case RECIPE_DISPATCHED:
                         publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent status changed to '" + agentPingEvent.getPingStatus().getPrettyString() + "' while recipe in progress"));
 
                         // So severe that we will not do the usual post
@@ -240,6 +240,7 @@ public class AgentStatusManager implements EventListener
         switch (agent.getStatus())
         {
             case RECIPE_ASSIGNED:
+            case RECIPE_DISPATCHED:
             case BUILDING:
                 if (pingRecipe == agent.getRecipeId())
                 {
@@ -296,6 +297,10 @@ public class AgentStatusManager implements EventListener
                 break;
 
             case RECIPE_ASSIGNED:
+                // Master is still yet to dispatch, idle is expected.
+                break;
+            
+            case RECIPE_DISPATCHED:
                 checkForStatusTimeout(agent, "Agent idle after recipe expected to have commenced");
                 break;
 
@@ -316,6 +321,7 @@ public class AgentStatusManager implements EventListener
         {
             case BUILDING:
             case RECIPE_ASSIGNED:
+            case RECIPE_DISPATCHED:
                 // Don't immediately give up - wait for the timeout.
                 if (checkForStatusTimeout(agent, "Connection to agent lost during recipe execution"))
                 {
@@ -391,6 +397,23 @@ public class AgentStatusManager implements EventListener
                 agentsByRecipeId.put(recipeId, agent);
                 publishEvent(new AgentUnavailableEvent(this, agent));
                 updateAgentRecipeStatus(agent, AgentStatus.RECIPE_ASSIGNED, recipeId);
+            }
+        }
+    }
+
+    private void handleRecipeDispatched(RecipeDispatchedEvent event)
+    {
+        Agent agent = agentsById.get(event.getAgent().getId());
+        if(agent != null)
+        {
+            long recipeId = event.getRecipeId();
+            if (agent.getStatus() == AgentStatus.RECIPE_ASSIGNED && agent.getRecipeId() == recipeId)
+            {
+                updateAgentRecipeStatus(agent, AgentStatus.RECIPE_DISPATCHED, recipeId);
+            }
+            else
+            {
+                LOG.warning("Mismatched recipe dispatched event '" + event + "' for agent '" + agent + "', agent recipe " + agent.getRecipeId());
             }
         }
     }
@@ -481,6 +504,7 @@ public class AgentStatusManager implements EventListener
                     {
                         case BUILDING:
                         case RECIPE_ASSIGNED:
+                        case RECIPE_DISPATCHED:
                             publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), agent.getRecipeId()));
                             publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent disabled while recipe in progress"));
                             break;
@@ -542,6 +566,7 @@ public class AgentStatusManager implements EventListener
             switch(runningAgent.getStatus())
             {
                 case RECIPE_ASSIGNED:
+                case RECIPE_DISPATCHED:
                 case BUILDING:
                     publishEvent(new RecipeErrorEvent(this, recipeId, "Agent deleted while recipe in progress"));
                     break;
@@ -638,6 +663,10 @@ public class AgentStatusManager implements EventListener
             {
                 handleRecipeAssigned((RecipeAssignedEvent) event);
             }
+            else if(event instanceof RecipeDispatchedEvent)
+            {
+                handleRecipeDispatched((RecipeDispatchedEvent) event);
+            }
             else if(event instanceof RecipeCollectingEvent)
             {
                 handleRecipeCollecting((RecipeEvent) event);
@@ -709,6 +738,7 @@ public class AgentStatusManager implements EventListener
                 RecipeCollectingEvent.class,
                 RecipeCompletedEvent.class,
                 RecipeAssignedEvent.class,
+                RecipeDispatchedEvent.class,
         };
     }
 }

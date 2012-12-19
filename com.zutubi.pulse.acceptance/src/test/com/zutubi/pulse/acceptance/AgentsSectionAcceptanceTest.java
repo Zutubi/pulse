@@ -110,7 +110,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         agentsPage.openAndWaitFor();
         summaryTable.clickAction(agentId, ACTION_PING);
 
-        agentsPage.refreshUntilStatus(LOCAL_AGENT, BUILDING.getPrettyString(),RECIPE_ASSIGNED.getPrettyString());
+        agentsPage.refreshUntilStatus(LOCAL_AGENT, BUILDING.getPrettyString(), RECIPE_ASSIGNED.getPrettyString(), RECIPE_DISPATCHED.getPrettyString());
 
         assertTrue(rpcClient.RemoteApi.getAgentEnableState(LOCAL_AGENT).isEnabled());
 
@@ -229,6 +229,7 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
 
     private void assertBuildingStatus(String status)
     {
-        assertTrue("Status '" + status + "' is not a building status", status.equals(BUILDING.getPrettyString()) || status.equals(RECIPE_ASSIGNED.getPrettyString()));
+        assertTrue("Status '" + status + "' is not a building status",
+                status.equals(BUILDING.getPrettyString()) || status.equals(RECIPE_ASSIGNED.getPrettyString()) || status.equals(RECIPE_DISPATCHED.getPrettyString()));
     }
 }
