@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.scheduling.CallbackService;
@@ -30,13 +31,16 @@ import java.util.concurrent.*;
 public class PollingService implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(PollingService.class);
+    
     private static final String CALLBACK_NAME = "Polling";
+    
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
     private static final int DEFAULT_ACTIVE_POLLS_PER_SCM = 5;
     private static final String PROPERTY_ACTIVE_POLLS_PER_SCM = "scm.polling.active.polls.per.scm";
 
     private ProjectManager projectManager;
+    private BuildManager buildManager;
     private CallbackService callbackService;
     private EventManager eventManager;
     private ThreadFactory threadFactory;
@@ -231,7 +235,11 @@ public class PollingService implements Stoppable
                 ProjectPollingState state = states.get(project.getId());
                 if (state == null)
                 {
-                    state = new ProjectPollingState(project.getId(), null);
+                    // In the reinitialise case we may have a previous build revision to base off
+                    // (CIB-2970).  We need to add this to the states map so it is there when the
+                    // poll completes (to be compared against what the poll discovered).
+                    state = new ProjectPollingState(project.getId(), buildManager.getPreviousRevision(project));
+                    states.put(project.getId(), state);
                 }
 
                 PollingRequest request = new PollingRequest(project, state, limitActivePollsPerScmPredicate, noDependencyBeingPolledPredicate);
@@ -278,6 +286,11 @@ public class PollingService implements Stoppable
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 
     public void setEventManager(EventManager eventManager)

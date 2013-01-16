@@ -14,6 +14,7 @@ import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
 import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -52,6 +53,7 @@ public class PollingServiceTest extends ZutubiTestCase
     private ShutdownManager shutdownManager;
     private CallbackService callbackService;
     private ProjectManager projectManager;
+    private BuildManager buildManager;
     private WiringObjectFactory objectFactory;
     private RecordingEventListener eventListener;
     private ConfigurationProvider configurationProvider;
@@ -101,10 +103,18 @@ public class PollingServiceTest extends ZutubiTestCase
         callbackService = mock(CallbackService.class);
         shutdownManager = mock(ShutdownManager.class);
         projectManager = mock(ProjectManager.class);
-
+        buildManager = mock(BuildManager.class);
+        
         testSupport = ProjectTestSupport.createSupport(projectManager);
         stub(projectManager.getLatestBuiltRevisions()).toReturn(latestBuildRevisions);
-
+        stub(buildManager.getPreviousRevision(Matchers.<Project>anyObject())).toAnswer(new Answer<Revision>()
+        {
+            public Revision answer(InvocationOnMock invocationOnMock) throws Throwable
+            {
+                Project project = (Project) invocationOnMock.getArguments()[0];
+                return latestBuildRevisions.get(project.getId());
+            }
+        });
         scmManager = mock(ScmManager.class);
 
         clock = new TestClock();
@@ -169,13 +179,13 @@ public class PollingServiceTest extends ZutubiTestCase
         assertPolledForChanges(project);
     }
 
-    public void testSingleProjectWithChange() throws Exception
+    public void testSingleProjectWithNoBuildsAndChange() throws Exception
     {
         Project project = createProject("project");
 
         serviceHandle.init();
 
-        setLatestRevision(project, new Revision(3));
+        scmServerByProject.get(project).setLatestRevision(project, new Revision(3));
 
         serviceHandle.pollAndWait();
 

@@ -212,8 +212,8 @@ public interface BuildManager
      * specified project.
      *
      * @param project   the project of interest.
-     * @return  the latest non user defined revision used to build the
-     * project.  
+     * @return  the latest non-user-defined revision used to build the project, or null if there is
+     *          no such revision
      */
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     Revision getPreviousRevision(Project project);
