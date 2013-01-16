@@ -33,6 +33,8 @@ public class PollingService implements Stoppable
     private static final String CALLBACK_NAME = "Polling";
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
+    private static final int DEFAULT_ACTIVE_POLLS_PER_SCM = 5;
+    private static final String PROPERTY_ACTIVE_POLLS_PER_SCM = "scm.polling.active.polls.per.scm";
 
     private ProjectManager projectManager;
     private CallbackService callbackService;
@@ -44,12 +46,16 @@ public class PollingService implements Stoppable
     private ScmManager scmManager;
 
     private Clock clock = new SystemClock();
+    private int activePollsPerScmLimit = Integer.getInteger(PROPERTY_ACTIVE_POLLS_PER_SCM, DEFAULT_ACTIVE_POLLS_PER_SCM);
     private ExecutorService executorService;
     private CompletionService<ProjectPollingState> completionService;
     private final Map<Long, ProjectPollingState> states = Collections.synchronizedMap(new HashMap<Long, ProjectPollingState>());
     private final PollingQueue requestQueue;
     private final List<Long> clearCacheForProjects = new LinkedList<Long>();
     private final Map<Long, String> projectUidCache = new HashMap<Long, String>();
+    
+    private LimitActivePollsPerScmPredicate limitActivePollsPerScmPredicate;
+    private HasNoDependencyBeingPolledPredicate noDependencyBeingPolledPredicate;
 
     public PollingService()
     {
@@ -58,6 +64,17 @@ public class PollingService implements Stoppable
 
     public void init()
     {
+        limitActivePollsPerScmPredicate = objectFactory.buildBean(
+                LimitActivePollsPerScmPredicate.class,
+                new Class[]{int.class, PollingQueue.class, Map.class},
+                new Object[]{activePollsPerScmLimit, requestQueue, projectUidCache}
+        );
+        noDependencyBeingPolledPredicate = objectFactory.buildBean(
+                HasNoDependencyBeingPolledPredicate.class,
+                new Class[]{PollingQueue.class},
+                new Object[]{requestQueue}
+        );
+
         int pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT, DEFAULT_POLL_THREAD_COUNT);
         executorService = Executors.newFixedThreadPool(pollThreadCount, threadFactory);
         completionService = new ExecutorCompletionService<ProjectPollingState>(executorService);
@@ -217,9 +234,7 @@ public class PollingService implements Stoppable
                     state = new ProjectPollingState(project.getId(), null);
                 }
 
-                OneActivePollPerScmPredicate oneActive = objectFactory.buildBean(OneActivePollPerScmPredicate.class, new Class[]{PollingQueue.class, Map.class}, new Object[]{requestQueue, projectUidCache});
-                HasNoDependencyBeingPolledPredicate noDepsPolling = objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, new Class[]{PollingQueue.class}, new Object[]{requestQueue});
-                PollingRequest request = new PollingRequest(project, state, oneActive, noDepsPolling);
+                PollingRequest request = new PollingRequest(project, state, limitActivePollsPerScmPredicate, noDependencyBeingPolledPredicate);
                 requests.add(request);
             }
         }
@@ -295,6 +310,11 @@ public class PollingService implements Stoppable
         this.clock = clock;
     }
 
+    public void setActivePollsPerScmLimit(int activePollsPerScmLimit)
+    {
+        this.activePollsPerScmLimit = activePollsPerScmLimit;
+    }
+
     /**
      * A value object that holds a set of projects that are related via
      * dependencies.  This object is also able to answer simple questions
@@ -325,12 +345,12 @@ public class PollingService implements Stoppable
 
         public void add(Project project)
         {
-            this.projects.add(project);
+            projects.add(project);
         }
 
         public boolean contains(Project project)
         {
-            return this.projects.contains(project);
+            return projects.contains(project);
         }
 
         public Collection<? extends Project> getProjects()

@@ -11,7 +11,7 @@ import com.zutubi.util.Predicate;
  */
 public class HasNoDependencyBeingPolledPredicate implements Predicate<PollingRequest>
 {
-    private PollingQueue requestQueue;
+    private final PollingQueue requestQueue;
 
     public HasNoDependencyBeingPolledPredicate(PollingQueue requestQueue)
     {

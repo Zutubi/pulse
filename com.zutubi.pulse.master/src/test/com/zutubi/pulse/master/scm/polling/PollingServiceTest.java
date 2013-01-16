@@ -13,7 +13,9 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.Project;
+import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
@@ -31,18 +33,15 @@ import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.time.TestClock;
+import static java.util.Arrays.asList;
 import org.mockito.Matchers;
+import static org.mockito.Matchers.refEq;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.*;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import static com.zutubi.pulse.master.model.Project.State.INITIAL;
-import static java.util.Arrays.asList;
-import static org.mockito.Matchers.refEq;
-import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
@@ -309,11 +308,10 @@ public class PollingServiceTest extends ZutubiTestCase
         assertPolledForChanges(projectA, projectB);
     }
 
-    public void testPollingIsSequentialForSingleScmServer() throws Exception
+    public void testPollingLimitForSingleScmServer() throws Exception
     {
-        // Project A and B communicate with the same scm server and therefore whilst
-        // unrelated, there requests must be serialised.
-
+        service.setActivePollsPerScmLimit(1);
+        
         ScmServer scmServer = new ScmServer("a", true);
         latestProjectRevision = new Revision(2);
 
