@@ -13,6 +13,9 @@ public class IsInitialisedPredicate implements Predicate<Project>
 {
     public boolean satisfied(Project project)
     {
-        return project.isInitialised();
+        // CIB-2987: there's usually no point polling a project that is due to reinitialise (and
+        // indeed it may be counter-productive).  Reinitialisation is commonly due to non-contiguous
+        // change history.
+        return project.isInitialised() && project.getState() != Project.State.INITIALISE_ON_IDLE;
     }
 }
