@@ -10,6 +10,7 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ import java.util.Map;
  */
 public class CheckAction extends ToveActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(CheckAction.class); 
+ 
     private Record checkRecord;
     private ConfigurationErrors configurationErrors = new ConfigurationErrors(this);
     private CheckResponse checkResponse;
@@ -112,6 +115,7 @@ public class CheckAction extends ToveActionSupport
         }
         catch (Exception e)
         {
+            LOG.debug(e);
             exception = e;
         }
         

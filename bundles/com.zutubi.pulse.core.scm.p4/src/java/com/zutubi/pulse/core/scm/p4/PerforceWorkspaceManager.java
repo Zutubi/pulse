@@ -158,7 +158,9 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         File root;
         String description;
         boolean temporary;
-        if (getProjectName(scmContext) == null)
+        // CIB-2988: A project that is not initialised has a null persistent context.  Use a
+        // throwaway client in this case.
+        if (scmContext.getPersistentContext() == null || getProjectName(scmContext) == null)
         {
             workspaceName = getWorkspacePrefix() + TEMP_WORKSPACE_TAG + RandomUtils.randomString(10);
             root = new File(".");
