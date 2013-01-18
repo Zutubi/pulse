@@ -4,12 +4,17 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 public class GitClientTest extends GitClientTestBase
 {
@@ -233,6 +232,20 @@ public class GitClientTest extends GitClientTestBase
         {
             assertEquals("Fetch is not fast-forward, likely due to history changes upstream.  Project reinitialisation required.", e.getMessage());
         }
+    }
+
+    public void testGetRevisionsOnNewBranch() throws ScmException, IOException
+    {
+        final String BRANCH_NEW = "newbranch";
+        
+        client.init(scmContext, new ScmFeedbackAdapter());
+        assertEquals(REVISION_MASTER_LATEST, client.getLatestRevision(scmContext).getRevisionString());
+
+        NativeGit git = getNativeGitOnMaster();
+        git.run(git.getGitCommand(), "branch", BRANCH_NEW);
+        client.setBranch(BRANCH_NEW);
+
+        assertEquals(1, client.getRevisions(scmContext, new Revision(REVISION_MASTER_PREVIOUS), null).size());
     }
 
     private void makeUpstreamCommit() throws IOException, ScmException
