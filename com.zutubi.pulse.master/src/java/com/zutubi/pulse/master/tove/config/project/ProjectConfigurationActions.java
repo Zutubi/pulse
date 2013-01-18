@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
 import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
@@ -24,6 +25,8 @@ import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -222,12 +225,26 @@ public class ProjectConfigurationActions
         CustomTypeConfiguration result = new CustomTypeConfiguration();
         try
         {
+            FileResolver fileResolver;
             Project project = projectManager.getProject(projectConfiguration.getProjectId(), false);
-            if (project != null)
+            if (project == null)
             {
-                ScmFileResolver resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
-                result.setPulseFileString(projectConfiguration.getType().getPulseFile().getFileContent(resolver));
+                // Project invalid, or a template (CIB-2979).  In this case just make a best effort
+                // by resolving files to empty.
+                fileResolver = new FileResolver()
+                {
+                    public InputStream resolve(String path) throws Exception
+                    {
+                        return new ByteArrayInputStream(new byte[0]);
+                    }
+                };
             }
+            else
+            {
+                fileResolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
+            }
+
+            result.setPulseFileString(projectConfiguration.getType().getPulseFile().getFileContent(fileResolver));
         }
         catch (Exception e)
         {
