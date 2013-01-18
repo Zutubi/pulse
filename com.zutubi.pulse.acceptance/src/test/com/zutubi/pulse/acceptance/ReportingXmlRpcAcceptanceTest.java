@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -615,6 +616,15 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> status = rpcClient.RemoteApi.getBuildRequestStatus(id);
         assertEquals("REJECTED", status.get("status"));
         assertEquals("project state (paused) does not allow building", status.get("rejectionReason"));
+    }
+
+    public void testGetAgentDetails() throws Exception
+    {
+        Hashtable<String, Object> details = rpcClient.RemoteApi.getAgentDetails(AgentManager.MASTER_AGENT_NAME);
+        assertEquals(AgentStatus.IDLE.getPrettyString(), details.get("status"));
+        assertEquals("[master]", details.get("location"));
+        assertTrue(details.containsKey("lastPingTime"));
+        assertTrue(details.containsKey("lastOnlineTime"));
     }
 
     public void testGetAgentStatistics() throws Exception

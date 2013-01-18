@@ -4708,6 +4708,52 @@ public class RemoteApi
     }
 
     /**
+     * Returns various details about the given agent as a struct of key-value pairs.  Details
+     * include:
+     * <ul>
+     * <li>status: the current agent state as a string</li>
+     * <li>location: agent location (host:port or "[master]"), </li>
+     * <li>lastPingTime: time the agent was last pinged, in milliseconds since the epoch converted
+     *     to a string (zero if the agent has not been pinged).</li>
+     * <li>pingError: an error message indicating why the last ping failed (not present if the last
+     *     ping succeeded)</li>
+     * <li>lastOnlineTime: time the agent was last online, in milliseconds since the epoch
+     *     converted to a string (zero if the agent has not been online).</li>
+     * </ul>
+     *
+     *
+     * @param token authentication token (see {@link #login})
+     * @param name  the name of the agent to retrieve the details for
+     * @return details for the given agent
+     * @throws IllegalArgumentException if the given agent does not exist
+     * @access available to users with view permission for the given agent
+     * @see #getAgentStatus(String, String)
+     */
+    public Hashtable<String, Object> getAgentDetails(String token, String name)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Agent agent = internalGetAgent(name);
+            Hashtable<String, Object> result = new Hashtable<String, Object>();
+            result.put("status", agent.getStatus().getPrettyString());
+            result.put("location", agent.getHost().getLocation());
+            result.put("lastPingTime", Long.toString(agent.getLastPingTime()));
+            if (agent.getPingError() != null)
+            {
+                result.put("pingError", agent.getPingError());
+            }
+
+            result.put("lastOnlineTime", Long.toString(agent.getLastOnlineTime()));
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Returns gathered statistics for the given agent.  Statistics are gathered over a 30 day
      * window and record the time the agent spends in various states.
      *

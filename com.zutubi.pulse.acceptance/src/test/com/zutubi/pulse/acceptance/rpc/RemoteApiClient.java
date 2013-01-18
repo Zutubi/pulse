@@ -331,6 +331,11 @@ public class RemoteApiClient extends ApiClient
         return state;
     }
 
+    public Hashtable<String, Object> getAgentDetails(String name) throws Exception
+    {
+        return call("getAgentDetails", name);
+    }
+
     public Hashtable<String, Object> getAgentStatistics(String name) throws Exception
     {
         return call("getAgentStatistics", name);
