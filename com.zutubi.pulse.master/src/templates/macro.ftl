@@ -231,7 +231,7 @@ flat plain text list.
   - ${renderer.wrapString(context, "    ")}
     Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}, skipped: ${summary.skipped}
     [/#if]
-    [#if result.hasBrokenTests()]
+    [#if result.hasBrokenTests() && result.failedTestResults?exists]
         [#local excess = result.excessFailureCount/]
         [#if excess &gt; 0]
     NOTE: This recipe has ${excess} more failures, see the full test report
@@ -517,7 +517,7 @@ Shows a table with the given changelists.
     [#else]
         <tr>
             [@contentCell cc="no changes in this build" span=5/]
-        <tr>
+        </tr>
     [/#if]
     </table>
 [/#macro]

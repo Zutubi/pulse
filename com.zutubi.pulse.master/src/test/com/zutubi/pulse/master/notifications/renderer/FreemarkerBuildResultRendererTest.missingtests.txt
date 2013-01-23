@@ -1,0 +1,23 @@
+=====================================================================
+:: test project ::
+=====================================================================
+Build 101 has completed with status 'success'.
+
+You can view the full build result at:
+
+/browse/projects/test%20project/builds/101/
+
+Build reason: trigger 'scm trigger'.
+
+Build stages:
+  * first stage :: first recipe@[pending] :: success
+  * second stage :: second recipe@[pending] :: success
+  * third stage :: third recipe@[pending] :: success
+
+There were no new changes in this build.
+
+
+
+Test summary: total: 5, errors: 1, failures: 1, skipped: 0
+  - first stage :: first recipe@[pending]
+    Test summary: total: 5, errors: 1, failures: 1, skipped: 0
