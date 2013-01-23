@@ -35,6 +35,7 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -63,8 +64,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
-
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -1989,15 +1988,15 @@ public class RemoteApi
     }
 
     /**
-     * Deletes the build result for the given project and id, if such a build exists
-     * and is not pinned.  All details of the build, including artifacts, are
-     * permanently removed and may not be recovered.
+     * Deletes the build result for the given project and id, if such a build exists,
+     * is complete, and is not pinned.  All details of the build, including artifacts,
+     * are permanently removed and may not be recovered.
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project that owns the build to delete
      * @param id          ID of the build to delete
-     * @return true if the build was found and deleted, false if the build does not exist
-     *         or is pinned
+     * @return true if the build was found and deleted, false if the build does not exist,
+     *         is not yet complete or is pinned
      * @throws IllegalArgumentException if the given project name is invalid
      * @access requires write permission for the given project
      */
@@ -2009,7 +2008,7 @@ public class RemoteApi
             Project project = internalGetProject(projectName, true);
             accessManager.ensurePermission(AccessManager.ACTION_WRITE, project);
             BuildResult build = buildManager.getByProjectAndNumber(project, id);
-            if (build == null || build.isPinned())
+            if (build == null || build.isPinned() || !build.getState().isCompleted())
             {
                 return false;
             }
