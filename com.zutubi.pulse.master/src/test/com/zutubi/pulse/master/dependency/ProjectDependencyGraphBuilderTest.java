@@ -9,6 +9,10 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.TreeNode;
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -16,11 +20,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 public class ProjectDependencyGraphBuilderTest extends PulseTestCase
 {
@@ -278,6 +277,16 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
 
         assertEquals(node(masterProject), graph.getDownstreamRoot());
     }
+
+    public void testCycle()
+    {
+        DependencyConfiguration dependencyOnMaster = new DependencyConfiguration();
+        dependencyOnMaster.setProject(masterProject.getConfig());
+        utilProject.getConfig().getDependencies().getDependencies().add(dependencyOnMaster);
+        // Non-explosion is sufficient.
+        builder.build(masterProject, ProjectDependencyGraphBuilder.TransitiveMode.FULL);
+    }
+
 
     private void assertEquals(TreeNode<DependencyGraphData> expected, TreeNode<DependencyGraphData> got)
     {

@@ -10,9 +10,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.TreeNode;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service to yield dependency graphs for projects.  Contains the building
@@ -57,31 +55,38 @@ public class ProjectDependencyGraphBuilder
      */
     public ProjectDependencyGraph build(Project project, TransitiveMode mode)
     {
-        return new ProjectDependencyGraph(buildUpstream(project, mode), buildDownstream(project, mode));
+        // Although validation should prevent cycles, we add checks to the build methods just in
+        return new ProjectDependencyGraph(buildUpstream(project, mode, new HashSet<Long>()),
+                buildDownstream(project, mode, new HashSet<Long>()));
     }
 
-    private TreeNode<DependencyGraphData> buildUpstream(Project project, TransitiveMode mode)
+    private TreeNode<DependencyGraphData> buildUpstream(Project project, TransitiveMode mode, Set<Long> seenProjects)
     {
+        seenProjects.add(project.getId());
         TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
 
         List<ProjectConfiguration> upstreamProjectConfigs = getDependentProjectConfigs(project.getConfig());
         List<Project> upstreamProjects = projectManager.mapConfigsToProjects(upstreamProjectConfigs);
         for (Project upstream: upstreamProjects)
         {
-            TreeNode<DependencyGraphData> child;
-            if (mode == TransitiveMode.NONE)
-            {
-                child = new TreeNode<DependencyGraphData>(new DependencyGraphData(upstream));
+            if (!seenProjects.contains(upstream.getId()))
+            {            
+                TreeNode<DependencyGraphData> child;
+                if (mode == TransitiveMode.NONE)
+                {
+                    child = new TreeNode<DependencyGraphData>(new DependencyGraphData(upstream));
+                }
+                else
+                {
+                    child = buildUpstream(upstream, mode, seenProjects);
+                }
+    
+                node.add(child);
             }
-            else
-            {
-                child = buildUpstream(upstream, mode);
-            }
-
-            node.add(child);
         }
 
         processDuplicateSubtrees(node, mode);
+        seenProjects.remove(project.getId());
         return node;
     }
 
@@ -97,28 +102,33 @@ public class ProjectDependencyGraphBuilder
         });
     }
 
-    private TreeNode<DependencyGraphData> buildDownstream(Project project, TransitiveMode mode)
+    private TreeNode<DependencyGraphData> buildDownstream(Project project, TransitiveMode mode, Set<Long> seenProjects)
     {
+        seenProjects.add(project.getId());
         TreeNode<DependencyGraphData> node = new TreeNode<DependencyGraphData>(new DependencyGraphData(project));
 
         List<ProjectConfiguration> downstreamProjectConfigs = projectManager.getDownstreamDependencies(project.getConfig());
         List<Project> downstreamProjects = projectManager.mapConfigsToProjects(downstreamProjectConfigs);
         for (Project downstream: downstreamProjects)
         {
-            TreeNode<DependencyGraphData> child;
-            if (mode == TransitiveMode.NONE)
+            if (!seenProjects.contains(downstream.getId()))
             {
-                child = new TreeNode<DependencyGraphData>(new DependencyGraphData(downstream));
+                TreeNode<DependencyGraphData> child;
+                if (mode == TransitiveMode.NONE)
+                {
+                    child = new TreeNode<DependencyGraphData>(new DependencyGraphData(downstream));
+                }
+                else
+                {
+                    child = buildDownstream(downstream, mode, seenProjects);
+                }
+    
+                node.add(child);
             }
-            else
-            {
-                child = buildDownstream(downstream, mode);
-            }
-
-            node.add(child);
         }
 
         processDuplicateSubtrees(node, mode);
+        seenProjects.remove(project.getId());
         return node;
     }
 

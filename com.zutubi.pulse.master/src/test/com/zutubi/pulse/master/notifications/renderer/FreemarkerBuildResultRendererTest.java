@@ -2,6 +2,8 @@ package com.zutubi.pulse.master.notifications.renderer;
 
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -16,19 +18,18 @@ import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
+    private static final List<PersistentChangelist> NO_CHANGES = Collections.emptyList();
+    
     private boolean generate = false;
 
     private FreemarkerBuildResultRenderer renderer;
@@ -93,7 +94,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
+        createAndVerify("basic", "http://test.url:8080", result, NO_CHANGES);
     }
 
     public void testWithChanges() throws Exception
@@ -120,7 +121,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testSimpleInstantBasic() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "simple-instant-message", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
+        createAndVerify("basic", "simple-instant-message", "http://test.url:8080", result, NO_CHANGES);
     }
 
     public void testSimpleInstantError() throws Exception
@@ -131,7 +132,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testDetailedInstantBasic() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "detailed-instant-message", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
+        createAndVerify("basic", "detailed-instant-message", "http://test.url:8080", result, NO_CHANGES);
     }
 
     public void testDetailedInstantError() throws Exception
@@ -224,14 +225,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testProjectOverviewSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
+        createAndVerify("basic", "html-project-overview", "http://test.url:8080", result, NO_CHANGES);
     }
 
     public void testProjectOverviewFailureNoPreviousSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
         result.failure("i failed");
-        createAndVerify("failednosuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>(), null, 0, 0);
+        createAndVerify("failednosuccess", "html-project-overview", "http://test.url:8080", result, NO_CHANGES, null, 0, 0);
     }
 
     public void testProjectOverviewFailurePreviousSuccess() throws Exception
@@ -243,7 +244,16 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
         BuildResult result = createSuccessfulBuild();
         result.failure("i failed");
-        createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>(), previous, 33, 10);
+        createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, NO_CHANGES, previous, 33, 10);
+    }
+
+    public void testRecipeWithFailedBuildsMissingDetails() throws Exception
+    {
+        // CIB-2991
+        BuildResult result = createSuccessfulBuild();
+        final RecipeResult node = result.getStages().get(0).getResult();
+        node.setTestSummary(new TestResultSummary(0, 1, 1, 0, 5));
+        createAndVerify("missingtests", "plain-text-email", "http://test.url:8080", result, NO_CHANGES);
     }
 
     private void errorsHelper(String type) throws Exception
