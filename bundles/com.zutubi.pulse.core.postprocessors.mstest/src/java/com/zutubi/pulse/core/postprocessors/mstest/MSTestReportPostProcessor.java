@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.postprocessors.api.StAXTestReportPostProcessorSuppo
 import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
+import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -12,8 +13,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
 
 /**
  * Post-processor for MSTest TRX reports.
@@ -170,13 +169,19 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
         Map<String, String> attributes = getAttributes(reader);
         String id = attributes.get(ATTRIBUTE_TEST_ID);
         String name = attributes.get(ATTRIBUTE_TEST_NAME);
-        Outcome outcome = getOutcome(attributes);
-        if (!StringUtils.stringSet(id) || !StringUtils.stringSet(name) || !idToSuite.containsKey(id) || outcome == null)
+        if (!StringUtils.stringSet(id) || !StringUtils.stringSet(name) || !idToSuite.containsKey(id))
         {
             nextElement(reader);
             return;
         }
 
+        Outcome outcome = getOutcome(name, attributes);
+        if (outcome == null)
+        {
+            nextElement(reader);
+            return;
+        }
+        
         nextTagOrEnd(reader);
         
         TestSuiteResult suite = addSuite(parentSuite, idToSuite.get(id));
@@ -281,16 +286,22 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
         return -1;
     }
 
-    private Outcome getOutcome(Map<String, String> attributes)
+    private Outcome getOutcome(String name, Map<String, String> attributes)
     {
         String outcomeValue = attributes.get(ATTRIBUTE_OUTCOME);
+        if (outcomeValue == null)
+        {
+            LOG.warning("No outcome for test '" + name + "', assuming error");
+            return Outcome.Error;
+        }
+        
         try
         {
             return Outcome.valueOf(outcomeValue);
         }
         catch (IllegalArgumentException e)
         {
-            LOG.warning("Unrecognised test outcome '" + outcomeValue + "', ignoring test");
+            LOG.warning("Unrecognised test outcome '" + outcomeValue + "', ignoring test '" + name + "'");
             return null;
         }
     }

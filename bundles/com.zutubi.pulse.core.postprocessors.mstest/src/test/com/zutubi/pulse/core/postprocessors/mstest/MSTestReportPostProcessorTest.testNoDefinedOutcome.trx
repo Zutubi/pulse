@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="fe1a9c86-a6bd-4bd4-95f6-b3f7be5ef2bd" name="pulse@pulse 2013-01-18 10:40:51" runUser="pulse\pulse" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local Test Run" id="7161eb18-63b9-4d3e-b12c-bae6642ee3a3">
+    <Description>This is a default test run configuration for a local test run.</Description>
+    <Deployment userDeploymentRoot="D:\pulse" useDefaultDeploymentRoot="false" enabled="false" runDeploymentRoot="pulse_pulse 2013-01-18 10_40_51" />
+    <Execution>
+      <Timeouts runTimeout="7200000" testTimeout="300000" />
+      <TestTypeSpecific>
+        <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
+          <AssemblyResolution applicationBaseDirectory="D:\pulse">
+            <TestDirectory useLoadContext="true" />
+          </AssemblyResolution>
+        </UnitTestRunConfig>
+      </TestTypeSpecific>
+      <AgentRule name="LocalMachineDefaultRole">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2013-01-18T10:40:51.0442891-05:00" queuing="2013-01-18T10:40:51.3874891-05:00" start="2013-01-18T10:40:51.4966891-05:00" finish="2013-01-18T10:41:08.2042891-05:00" />
+  <ResultSummary outcome="Error">
+    <Counters total="68" executed="68" passed="67" error="1" failed="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <RunInfos>
+      <RunInfo computerName="pulse" outcome="Error" timestamp="2013-01-18T10:41:07.2058891-05:00">
+        <Text>One of the background threads threw exception: 
+System.AggregateException: blah blah
+</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="no_outcome" storage="pulse.unittests.dll" id="69ee83ac-2499-ccd5-2d22-47a9c00317ec">
+      <Execution id="ee342606-4fa2-4a67-b295-c93c68db331c" />
+      <TestMethod codeBase="D:/pulse/UnitTests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Pulse.UnitTestsClass, Pulse.UnitTests, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" name="no_outcome" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="69ee83ac-2499-ccd5-2d22-47a9c00317ec" executionId="ee342606-4fa2-4a67-b295-c93c68db331c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="ee342606-4fa2-4a67-b295-c93c68db331c" testId="69ee83ac-2499-ccd5-2d22-47a9c00317ec" testName="no_outcome" computerName="pulse" endTime="2013-01-18T10:41:07.5490891-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee342606-4fa2-4a67-b295-c93c68db331c">
+      <Output>
+        <ErrorInfo>
+          <Message>The agent process was stopped while the test was running.</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

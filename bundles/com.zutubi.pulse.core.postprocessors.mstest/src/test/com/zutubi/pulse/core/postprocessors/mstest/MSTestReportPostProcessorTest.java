@@ -1,12 +1,11 @@
 package com.zutubi.pulse.core.postprocessors.mstest;
 
 import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.api.XMLTestPostProcessorTestCase;
 
 import java.io.IOException;
-
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 public class MSTestReportPostProcessorTest extends XMLTestPostProcessorTestCase
 {
@@ -115,5 +114,16 @@ public class MSTestReportPostProcessorTest extends XMLTestPostProcessorTestCase
             );
 
         assertEquals(expected, runProcessorAndGetTests(pp, EXTENSION));
+    }
+    
+    public void testNoDefinedOutcome() throws IOException
+    {
+        final TestSuiteResult result = runProcessorAndGetTests(pp, EXTENSION);
+        final TestSuiteResult suiteResult = result.findSuite("Pulse.UnitTestsClass");
+        assertNotNull(suiteResult);
+        final TestCaseResult caseResult = suiteResult.findCase("no_outcome");
+        assertNotNull(caseResult);
+        assertEquals(ERROR, caseResult.getStatus());
+        assertEquals("The agent process was stopped while the test was running.", caseResult.getMessage());
     }
 }
