@@ -250,4 +250,6 @@
     <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener"/>
 
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
+
+    <bean id="workDirectoryCleanupService" class="com.zutubi.pulse.master.agent.WorkDirectoryCleanupService" init-method="init"/>
 </beans>
