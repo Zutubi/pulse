@@ -11,8 +11,7 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
-import com.zutubi.pulse.master.agent.Agent;
-import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.agent.WorkDirectoryCleanupService;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
@@ -31,14 +30,9 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
-import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.agent.DeleteDirectoryTask;
-import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
-import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -49,10 +43,8 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.variables.api.Variable;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import com.zutubi.util.adt.Pair;
+import static com.zutubi.util.CollectionUtils.filter;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -63,9 +55,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.filter;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -81,8 +70,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private ChangelistIsolator changelistIsolator;
     private ScmManager scmManager;
     private LicenseManager licenseManager;
-    private AgentManager agentManager;
-    private SynchronisationTaskFactory synchronisationTaskFactory;
+    private WorkDirectoryCleanupService workDirectoryCleanupService;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
@@ -275,7 +263,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if (oldBootstrap == null || newBootstrap == null ||
             !StringUtils.equals(newBootstrap.getPersistentDirPattern(), oldBootstrap.getPersistentDirPattern()))
         {
-            cleanupWorkDirs(old, null);
+            workDirectoryCleanupService.cleanupWorkDirs(old, null);
         }
     }
 
@@ -291,7 +279,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 }
             }))
             {
-                cleanupWorkDirs(old, oldStage);
+                workDirectoryCleanupService.cleanupWorkDirs(old, oldStage);
             }
         }
     }
@@ -1051,73 +1039,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void cleanupWorkDirs(ProjectConfiguration projectConfig)
     {
-        cleanupWorkDirs(projectConfig, null);
-    }
-
-    private void cleanupWorkDirs(ProjectConfiguration projectConfig, BuildStageConfiguration specificStage)
-    {
-        BootstrapConfiguration bootstrap = projectConfig.getBootstrap();
-        if (bootstrap != null)
-        {
-            final String deleteTaskType = SynchronisationTaskFactory.getTaskType(DeleteDirectoryTask.class);
-            String workDirPattern = bootstrap.getPersistentDirPattern();
-
-            AgentRecipeDetails details = new AgentRecipeDetails();
-            details.setProject(projectConfig.getName());
-            details.setProjectHandle(projectConfig.getHandle());
-            for (Agent agent: agentManager.getAllAgents())
-            {
-                List<Pair<Properties, String>> propertiesDescriptionPairs = new LinkedList<Pair<Properties, String>>();
-    
-                AgentConfiguration agentConfig = agent.getConfig();
-                details.setAgent(agent.getName());
-                details.setAgentHandle(agentConfig.getHandle());
-                
-                Collection<BuildStageConfiguration> stageConfigs;
-                if (specificStage == null)
-                {
-                    stageConfigs = projectConfig.getStages().values();
-                }
-                else
-                {
-                    stageConfigs = Arrays.asList(specificStage);
-                }
-                
-                for (BuildStageConfiguration stageConfig: stageConfigs)
-                {
-                    details.setStage(stageConfig.getName());
-                    details.setStageHandle(stageConfig.getHandle());
-    
-                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
-                    SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
-                    propertiesDescriptionPairs.add(asPair(message.getArguments(), I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
-                }
-                    
-                if (propertiesDescriptionPairs.size() > 0)
-                {
-                    agentManager.enqueueSynchronisationMessages(agent, deleteTaskType, propertiesDescriptionPairs);
-                }
-            }
-        }
-    }
-
-    private Map<String, String> getVariables(AgentRecipeDetails details)
-    {
-        VariableMap variables = details.createPathVariableMap();
-        Map<String, String> result = new HashMap<String, String>();
-        for (Variable variable: variables.getVariables())
-        {
-            result.put(variable.getName(), variable.getValue().toString());
-        }
-        
-        return result;
+        workDirectoryCleanupService.cleanupWorkDirs(projectConfig, null);
     }
     
     private void deleteProject(Project project)
     {
         projectInitialisationService.requestDestruction(project.getConfig(), true);
         buildManager.deleteAllBuilds(project);
-        cleanupWorkDirs(project.getConfig(), null);
+        workDirectoryCleanupService.cleanupWorkDirs(project.getConfig(), null);
         
         testCaseIndexDao.deleteByProject(project.getId());
         
@@ -1666,13 +1595,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         this.buildManager = buildManager;
     }
 
-    public void setAgentManager(AgentManager agentManager)
+    public void setWorkDirectoryCleanupService(WorkDirectoryCleanupService workDirectoryCleanupService)
     {
-        this.agentManager = agentManager;
-    }
-
-    public void setSynchronisationTaskFactory(SynchronisationTaskFactory synchronisationTaskFactory)
-    {
-        this.synchronisationTaskFactory = synchronisationTaskFactory;
+        this.workDirectoryCleanupService = workDirectoryCleanupService;
     }
 }

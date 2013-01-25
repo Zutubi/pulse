@@ -102,7 +102,7 @@
 
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <bean class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultAgentStateManager"/>
         </property>
         <property name="interceptorNames" ref="transactionInterceptors"/>
     </bean>
@@ -217,11 +217,11 @@
 
     <bean id="buildHookManager" class="com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager"/>
 
-    <bean id="buildRequestRegistry" class="com.zutubi.pulse.master.build.queue.BuildRequestRegistry" autowire="byName"/>
+    <bean id="buildRequestRegistry" class="com.zutubi.pulse.master.build.queue.BuildRequestRegistry"/>
 
-    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
+    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider"/>
     
-    <bean id="configurationVariableProvider" class="com.zutubi.pulse.master.tove.config.MasterConfigurationVariableProvider" autowire="byName"/>
+    <bean id="configurationVariableProvider" class="com.zutubi.pulse.master.tove.config.MasterConfigurationVariableProvider"/>
 
     <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
         <property name="projectsDir" value="#{userPaths.projectRoot}"/>
@@ -245,9 +245,11 @@
 
     <bean id="triggerConditionFactory" class="com.zutubi.pulse.master.trigger.DefaultTriggerConditionFactory"/>
 
-    <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init" autowire="byName"/>
+    <bean id="lastAccessManager" class="com.zutubi.pulse.master.security.LastAccessManager" init-method="init"/>
 
-    <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener" autowire="byName"/>
+    <bean id="recipeRenameListener" class="com.zutubi.pulse.master.model.RecipeRenameListener"/>
 
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
+
+    <bean id="workDirectoryCleanupService" class="com.zutubi.pulse.master.agent.WorkDirectoryCleanupService" init-method="init"/>
 </beans>
