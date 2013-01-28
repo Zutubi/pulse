@@ -1,5 +1,8 @@
 package com.zutubi.util;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.adt.Pair;
 
 import java.io.UnsupportedEncodingException;
@@ -8,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Miscellaneous utility methods useful for web-related things like URLs, HTML,
@@ -67,16 +68,16 @@ public class WebUtils
         return sb.toString();
     }
 
-    public static String encodeAndJoin(char separator, Collection<String> pieces)
+    public static String encodeAndJoin(char separator, Iterable<String> pieces)
     {
-        return encodeAndJoin(separator, pieces.toArray(new String[pieces.size()]));
+        return encodeAndJoin(separator, Iterables.toArray(pieces, String.class));
     }
 
     public static String encodeAndJoin(final char separator, String... pieces)
     {
         return encodeAndJoin(new Predicate<Character>()
         {
-            public boolean satisfied(Character character)
+            public boolean apply(Character character)
             {
                 return !character.equals(separator) && !character.equals('%');
             }
@@ -84,7 +85,7 @@ public class WebUtils
     }
 
     /**
-     * @see #encodeAndJoin(com.zutubi.util.Predicate, char, String[])
+     * @see #encodeAndJoin(Predicate, char, String[])
      *
      * @param allowedCharacters a condition that is true for characters that
      *                          are allowed in the result verbatim (i.e. not
@@ -137,7 +138,7 @@ public class WebUtils
     }
 
     /**
-     * The inverse of {@link #encodeAndJoin(com.zutubi.util.Predicate, char, String[])}
+     * The inverse of {@link #encodeAndJoin(Predicate, char, String[])}
      * Splits the given string at occurences of the given separator then
      * decodes the resulting pieces.
      *
@@ -195,7 +196,7 @@ public class WebUtils
         for(int i = 0; i < in.length(); i++)
         {
             char c = in.charAt(i);
-            if(allowedCharacters.satisfied(c))
+            if(allowedCharacters.apply(c))
             {
                 if(sb != null)
                 {
@@ -241,7 +242,7 @@ public class WebUtils
      * searches for %-encoded bytes, sequences of such bytes are decoded
      * using UTF-8 to give a Java string.
      *
-     * @see #percentEncode(String, com.zutubi.util.Predicate)
+     * @see #percentEncode(String, Predicate)
      *
      * @param in the string to decode
      * @return decoded version of the input string
@@ -393,7 +394,7 @@ public class WebUtils
      * this method.  Non-ASCII characters are encoded to UTF-8 and then
      * represented in the result as %-encoded bytes.
      *
-     * @see #percentEncode(String, com.zutubi.util.Predicate)
+     * @see #percentEncode(String, Predicate)
      * @see #uriComponentDecode(String)
      *
      * @param in the string to encode
@@ -403,7 +404,7 @@ public class WebUtils
     {
         return percentEncode(in, new Predicate<Character>()
         {
-            public boolean satisfied(Character character)
+            public boolean apply(Character character)
             {
                 return allowedInURIComponent(character);
             }

@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.build.queue;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 
@@ -31,12 +32,12 @@ public class ActiveBuildsPerOwnerPredicate implements QueuedRequestPredicate
      *
      * @return true if the requests owner has no active requests, false otherwise.
      */
-    public boolean satisfied(final QueuedRequest request)
+    public boolean apply(final QueuedRequest request)
     {
         List<ActivatedRequest> activatedRequests = buildQueue.getActivatedRequests();
         NamedEntity owner = request.getRequest().getOwner();
 
-        int ownerRequests = CollectionUtils.count(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner));
+        int ownerRequests = size(filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)));
         
         int allowedActiveBuilds = 1;
         if (owner instanceof Project)

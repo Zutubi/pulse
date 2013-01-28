@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core.plugins.repository.http;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.plugins.repository.*;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -9,7 +10,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A plugin repository that is stored on an HTTP server.  The repository is
@@ -44,7 +45,7 @@ public class HttpPluginRepository implements PluginRepository
         this.baseUrl = baseUrl;
     }
 
-    public List<PluginInfo> getAvailablePlugins(Scope scope)
+    public Collection<PluginInfo> getAvailablePlugins(Scope scope)
     {
         HttpClient client = new HttpClient();
         GetMethod get = new GetMethod(baseUrl + PATH_AVAILABLE);
@@ -56,7 +57,7 @@ public class HttpPluginRepository implements PluginRepository
                 throw new PluginRepositoryException("Unable to list plugins: Server returned response code " + code + " (" + HttpStatus.getStatusText(code) + ")");
             }
 
-            return CollectionUtils.filter(PluginList.read(get.getResponseBodyAsStream()), new PluginScopePredicate(scope));
+            return Lists.newArrayList(Collections2.filter(PluginList.read(get.getResponseBodyAsStream()), new PluginScopePredicate(scope)));
         }
         catch (IOException e)
         {

@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandConfigurationSupport;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.tove.config.annotations.BrowseScmDirAction;
 import com.zutubi.tove.annotations.*;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
@@ -114,13 +115,13 @@ public class ExecutableCommandConfiguration extends OutputProducingCommandConfig
         }
         
         combined.addAll(extraArguments);
-        return CollectionUtils.filter(combined, new Predicate<String>()
+        return Lists.newArrayList(Iterables.filter(combined, new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return StringUtils.stringSet(s);
             }
-        });
+        }));
     }
 
     public String getWorkingDir()

@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
 
 /**
  * Represents a change to a single file as part of a larger Changelist.  For
@@ -106,13 +107,13 @@ public class FileChange
          */
         public static Action fromString(final String s)
         {
-            Action found = CollectionUtils.find(Action.values(), new Predicate<Action>()
+            Action found = find(asList(Action.values()), new Predicate<Action>()
             {
-                public boolean satisfied(Action action)
+                public boolean apply(Action action)
                 {
                     return action.toString().equals(s);
                 }
-            });
+            }, null);
 
             if (found == null)
             {

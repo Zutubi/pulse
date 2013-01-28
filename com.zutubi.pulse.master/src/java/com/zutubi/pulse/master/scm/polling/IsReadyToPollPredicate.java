@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.scm.config.api.Pollable;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
 
@@ -21,7 +21,7 @@ public class IsReadyToPollPredicate implements Predicate<Project>
     private ConfigurationProvider configurationProvider;
     private Clock clock = new SystemClock();
 
-    public boolean satisfied(Project project)
+    public boolean apply(Project project)
     {
         Pollable scm = (Pollable) project.getConfig().getScm();
 

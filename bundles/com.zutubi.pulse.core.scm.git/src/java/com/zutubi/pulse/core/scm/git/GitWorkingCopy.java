@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 
 import java.util.EnumSet;
@@ -68,13 +68,13 @@ public class GitWorkingCopy implements WorkingCopy
     private String getLocalBranch(NativeGit git) throws ScmException
     {
         List<GitBranchEntry> branches = git.branch();
-        GitBranchEntry activeBranch = CollectionUtils.find(branches, new Predicate<GitBranchEntry>()
+        GitBranchEntry activeBranch = find(branches, new Predicate<GitBranchEntry>()
         {
-            public boolean satisfied(GitBranchEntry gitBranchEntry)
+            public boolean apply(GitBranchEntry gitBranchEntry)
             {
                 return gitBranchEntry.isActive();
             }
-        });
+        }, null);
 
         if (activeBranch == null)
         {

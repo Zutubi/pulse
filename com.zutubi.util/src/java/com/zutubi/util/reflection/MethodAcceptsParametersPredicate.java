@@ -1,6 +1,6 @@
 package com.zutubi.util.reflection;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.lang.reflect.Method;
 
@@ -23,7 +23,7 @@ public class MethodAcceptsParametersPredicate implements Predicate<Method>
         this.parameterTypes = parameterTypes;
     }
 
-    public boolean satisfied(Method method)
+    public boolean apply(Method method)
     {
         return ReflectionUtils.acceptsParameters(method, parameterTypes);
     }

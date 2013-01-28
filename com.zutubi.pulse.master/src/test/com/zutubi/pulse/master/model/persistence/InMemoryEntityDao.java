@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model.persistence;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.util.Predicate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -95,7 +95,7 @@ public class InMemoryEntityDao<T extends Entity> implements EntityDao<T>
         LinkedList<T> findResults = new LinkedList<T>();
         for (T t : entities)
         {
-            if (f.satisfied(t))
+            if (f.apply(t))
             {
                 findResults.add(t);
             }

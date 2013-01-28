@@ -1,9 +1,10 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * An input stream implementation that reads a seamless stream from
@@ -37,13 +38,7 @@ public class MultipleFileInputStream extends InputStream
     public MultipleFileInputStream(File... files) throws IOException
     {
         // filter nulls.
-        this.files = CollectionUtils.filterToArray(files, new Predicate<File>()
-        {
-            public boolean satisfied(File file)
-            {
-                return file != null;
-            }
-        });
+        this.files = Iterables.toArray(Iterables.filter(Arrays.asList(files), Predicates.notNull()), File.class);
 
         this.sizes = new long[this.files.length];
         for (int i = 0; i < this.files.length; i++)

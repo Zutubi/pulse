@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.or;
 import com.zutubi.pulse.master.model.persistence.BuildDependencyLinkDao;
 import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 
@@ -12,7 +14,7 @@ public class InMemoryBuildDependencyLinkDao extends InMemoryEntityDao<BuildDepen
 {
     public List<BuildDependencyLink> findAllDependencies(long buildId)
     {
-        return findByPredicate(new BuildDependencyLink.HasId(buildId));
+        return findByPredicate(hasId(buildId));
     }
 
     public List<BuildDependencyLink> findAllUpstreamDependencies(long buildId)
@@ -27,6 +29,11 @@ public class InMemoryBuildDependencyLinkDao extends InMemoryEntityDao<BuildDepen
 
     public int deleteDependenciesByBuild(long buildId)
     {
-        return deleteByPredicate(new BuildDependencyLink.HasId(buildId));
+        return deleteByPredicate(hasId(buildId));
+    }
+
+    private Predicate<BuildDependencyLink> hasId(long buildId)
+    {
+        return or(new BuildDependencyLink.HasDownstreamId(buildId), new BuildDependencyLink.HasUpstreamId(buildId));
     }
 }

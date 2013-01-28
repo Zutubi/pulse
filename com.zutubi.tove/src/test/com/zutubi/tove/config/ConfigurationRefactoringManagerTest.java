@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.collect.Sets;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
@@ -14,7 +15,6 @@ import static com.zutubi.tove.type.record.PathUtils.getBaseName;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
@@ -1535,7 +1535,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     {
         try
         {
-            configurationRefactoringManager.pushDown("invalid/path", asSet("dummy"));
+            configurationRefactoringManager.pushDown("invalid/path", Sets.newHashSet("dummy"));
             fail("Should not be able to push down invalid path");
         }
         catch (IllegalArgumentException e)
@@ -1563,7 +1563,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, createAInstance("a"), rootPath, true);
         try
         {
-            configurationRefactoringManager.pushDown(getPath(path, "b"), asSet("invalid"));
+            configurationRefactoringManager.pushDown(getPath(path, "b"), Sets.newHashSet("invalid"));
             fail("Should not be able to push down to an invalid child");
         }
         catch (IllegalArgumentException e)
@@ -1587,7 +1587,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.delete(getPath(childPath, "bmap", "colby"));
         try
         {
-            configurationRefactoringManager.pushDown(getPath(parentPath, "bmap", "colby"), asSet(NAME_CHILD));
+            configurationRefactoringManager.pushDown(getPath(parentPath, "bmap", "colby"), Sets.newHashSet(NAME_CHILD));
             fail("Should not be able to push down to child that hides path");
         }
         catch (IllegalArgumentException e)
@@ -1615,7 +1615,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String childHiddenPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD_HIDDEN), parentPath, false);
         configurationTemplateManager.delete(getPath(childHiddenPath, "bmap", "colby"));
         String pushPath = getPath(parentPath, "bmap", "colby");
-        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         String toPath = getPath(childPath, "bmap", "colby");
         String toHiddenPath = getPath(childHiddenPath, "bmap", "colby");
@@ -1636,10 +1636,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
-        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         String toPath = getPath(childPath, "b");
-        assertEquals(asSet(toPath), pushedToPaths);
+        assertEquals(Sets.newHashSet(toPath), pushedToPaths);
         assertFalse(configurationTemplateManager.pathExists(pushPath));
         assertTrue(configurationTemplateManager.pathExists(toPath));
         Record record = configurationTemplateManager.getRecord(toPath);
@@ -1660,10 +1660,10 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "bmap", "colby");
-        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         String toPath = getPath(childPath, "bmap", "colby");
-        assertEquals(asSet(toPath), pushedToPaths);
+        assertEquals(Sets.newHashSet(toPath), pushedToPaths);
         assertFalse(configurationTemplateManager.pathExists(pushPath));
         assertTrue(configurationTemplateManager.pathExists(toPath));
         Record record = configurationTemplateManager.getRecord(toPath);
@@ -1684,7 +1684,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, child, parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
-        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         Record record = configurationTemplateManager.getRecord(getPath(childPath, "b"));
         assertEquals("88", record.get("y"));
@@ -1706,11 +1706,11 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String child2Path = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD2), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
-        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD1, NAME_CHILD2));
+        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD1, NAME_CHILD2));
 
         String toPath1 = getPath(child1Path, "b");
         String toPath2 = getPath(child2Path, "b");
-        assertEquals(asSet(toPath1, toPath2), pushedToPaths);
+        assertEquals(Sets.newHashSet(toPath1, toPath2), pushedToPaths);
         assertFalse(configurationTemplateManager.pathExists(pushPath));
         assertTrue(configurationTemplateManager.pathExists(toPath1));
         assertTrue(configurationTemplateManager.pathExists(toPath2));
@@ -1737,11 +1737,11 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         Listener listener = registerListener();
 
         String pushPath = getPath(parentPath, "b");
-        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD1));
+        Set<String> pushedToPaths = configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD1));
 
         String toPath = getPath(child1Path, "b");
         String deletedPath = getPath(child2Path, "b");
-        assertEquals(asSet(toPath), pushedToPaths);
+        assertEquals(Sets.newHashSet(toPath), pushedToPaths);
         assertFalse(configurationTemplateManager.pathExists(pushPath));
         assertTrue(configurationTemplateManager.pathExists(toPath));
         assertFalse(configurationTemplateManager.pathExists(deletedPath));
@@ -1770,7 +1770,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String childPath = configurationTemplateManager.insertTemplated(TEMPLATE_SCOPE, new ConfigA(NAME_CHILD), parentPath, false);
 
         String pushPath = getPath(parentPath, "b");
-        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         Record record = configurationTemplateManager.getRecord(getPath(childPath, "b", "cmap", "colc"));
         assertEquals(ConfigC.DEFAULT_VALUE, record.get("value"));
@@ -1797,7 +1797,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.delete(hiddenPath);
 
         String pushPath = getPath(parentPath, "b");
-        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         Record record = configurationTemplateManager.getRecord(getPath(childPath, "b"));
         assertEquals("44", record.get("y"));
@@ -1823,7 +1823,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.save(parentA);
 
         String pushPath = getPath(parentPath, "b");
-        configurationRefactoringManager.pushDown(pushPath, asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(pushPath, Sets.newHashSet(NAME_CHILD));
 
         ConfigA childA = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         assertNotNull(childA.getB().getRef());
@@ -1850,7 +1850,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
         try
         {
-            configurationRefactoringManager.pushDown(getPath(parentPath, "b"), asSet(NAME_CHILD));
+            configurationRefactoringManager.pushDown(getPath(parentPath, "b"), Sets.newHashSet(NAME_CHILD));
             fail("Should not be able to push down when there are internal references to the item to push down");
         }
         catch (IllegalArgumentException e)
@@ -1877,7 +1877,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         parentA.getB().setRefToRef(parentA.getRef());
         configurationTemplateManager.save(parentA);
 
-        configurationRefactoringManager.pushDown(getPath(parentPath, "b"), asSet(NAME_CHILD));
+        configurationRefactoringManager.pushDown(getPath(parentPath, "b"), Sets.newHashSet(NAME_CHILD));
 
         ConfigA childA = configurationTemplateManager.getInstance(childPath, ConfigA.class);
         assertNotNull(childA.getRef());
@@ -2055,7 +2055,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("new b", blist.get(1).getName());
         Map<String, ConfigB> bmap = child.getBmap();
         assertEquals(3, bmap.size());
-        assertEquals(CollectionUtils.asSet("map new b", "map both b", "map child b"), bmap.keySet());
+        assertEquals(Sets.newHashSet("map new b", "map both b", "map child b"), bmap.keySet());
 
         String newBPath = blist.get(1).getConfigurationPath();
         String newMapBPath = getPath(childPath, "bmap", "map new b");
@@ -2098,15 +2098,15 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         
         child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
         assertEquals(2, child.getX());
-        assertEquals(asSet("child recipe", "originalp recipe", "newp recipe"), child.getRecipes().keySet());
+        assertEquals(Sets.newHashSet("child recipe", "originalp recipe", "newp recipe"), child.getRecipes().keySet());
 
         grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
         assertEquals(3, grandchild1.getX());
-        assertEquals(asSet("grandchild1 recipe", "child recipe", "originalp recipe", "newp recipe"), grandchild1.getRecipes().keySet());
+        assertEquals(Sets.newHashSet("grandchild1 recipe", "child recipe", "originalp recipe", "newp recipe"), grandchild1.getRecipes().keySet());
 
         ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
         assertEquals(2, grandchild2.getX());
-        assertEquals(asSet("child recipe", "originalp recipe", "newp recipe"), grandchild2.getRecipes().keySet());
+        assertEquals(Sets.newHashSet("child recipe", "originalp recipe", "newp recipe"), grandchild2.getRecipes().keySet());
         
         String newRecipeRemainderPath = getPath("recipes", "newp recipe");
         listener.assertEvents(
@@ -2149,9 +2149,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
 
         child = configurationTemplateManager.getInstance(moveHierarchy.childPath, ConfigA.class);
-        assertEquals(asSet(RECIPE_NAME), child.getRecipes().keySet());
+        assertEquals(Sets.newHashSet(RECIPE_NAME), child.getRecipes().keySet());
         ConfigRecipe recipe = child.getRecipes().get(RECIPE_NAME);
-        assertEquals(asSet(COMMAND_NAME), recipe.getCommands().keySet());
+        assertEquals(Sets.newHashSet(COMMAND_NAME), recipe.getCommands().keySet());
         assertTrue(recipe.getCommands().get(COMMAND_NAME) instanceof ConfigMavenCommand);
 
         listener.assertEvents(
@@ -2195,9 +2195,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(asList(deletedCommandPath), result.getDeletedPaths());
 
         grandchild1 = configurationTemplateManager.getInstance(moveHierarchy.grandchild1Path, ConfigA.class);
-        assertEquals(asSet(RECIPE_NAME), grandchild1.getRecipes().keySet());
+        assertEquals(Sets.newHashSet(RECIPE_NAME), grandchild1.getRecipes().keySet());
         ConfigRecipe recipe = grandchild1.getRecipes().get(RECIPE_NAME);
-        assertEquals(asSet(COMMAND_NAME), recipe.getCommands().keySet());
+        assertEquals(Sets.newHashSet(COMMAND_NAME), recipe.getCommands().keySet());
         assertTrue(recipe.getCommands().get(COMMAND_NAME) instanceof ConfigMavenCommand);
 
         ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
@@ -2378,7 +2378,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(Collections.<String>emptySet(), grandchild1.getRecipes().keySet());
 
         ConfigA grandchild2 = configurationTemplateManager.getInstance(moveHierarchy.grandchild2Path, ConfigA.class);
-        assertEquals(asSet("recipe"), grandchild2.getRecipes().keySet());
+        assertEquals(Sets.newHashSet("recipe"), grandchild2.getRecipes().keySet());
     }
 
     public void testMoveWithHiddenListItem()

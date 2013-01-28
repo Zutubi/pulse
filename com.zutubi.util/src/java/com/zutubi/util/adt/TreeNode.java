@@ -1,14 +1,15 @@
 package com.zutubi.util.adt;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.math.AggregationFunction;
+import static java.util.Arrays.asList;
 
 import java.util.*;
-
-import static java.util.Arrays.asList;
 
 /**
  * Represents a node in a hierarchical structure.  Nodes can hold an arbitrary
@@ -239,7 +240,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
      */
     public void filteringWalk(Predicate<TreeNode<T>> predicate)
     {
-        children = CollectionUtils.filter(children, predicate);
+        Iterables.removeIf(children, Predicates.not(predicate));
         for (TreeNode<T> child: children)
         {
             child.filteringWalk(predicate);

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.dependency;
 
+import com.google.common.base.Predicate;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.DirectoryFileFilter;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,7 +170,7 @@ public class RepositoryAttributes
             if (PathUtils.prefixPatternMatchesPath(path, key))
             {
                 Map<String, String> attributes = cache.get(key);
-                if (predicate.satisfied(attributes))
+                if (predicate.apply(attributes))
                 {
                     result.add(key);
                 }

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.build.control;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
@@ -352,9 +355,9 @@ public class DefaultBuildController implements EventListener, BuildController
 
             if (StringUtils.stringSet(implicitResource))
             {
-                if (!CollectionUtils.contains(requirements, new Predicate<ResourceRequirement>()
+                if (!Iterables.any(requirements, new Predicate<ResourceRequirement>()
                 {
-                    public boolean satisfied(ResourceRequirement resourceRequirement)
+                    public boolean apply(ResourceRequirement resourceRequirement)
                     {
                         return resourceRequirement.getResource().equals(implicitResource);
                     }
@@ -1136,9 +1139,9 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void addCommonScmProperties()
     {
-        Collection<RecipeController> filteredControllers = CollectionUtils.filter(controllers, new Predicate<RecipeController>()
+        Iterable<RecipeController> filteredControllers = Iterables.filter(controllers, new Predicate<RecipeController>()
         {
-            public boolean satisfied(RecipeController recipeController)
+            public boolean apply(RecipeController recipeController)
             {
                 return recipeController.getScmProperties() != null;
             }
@@ -1154,7 +1157,7 @@ public class DefaultBuildController implements EventListener, BuildController
         while (recipeIt.hasNext())
         {
             final List<ResourceProperty> properties = recipeIt.next().getScmProperties();
-            CollectionUtils.filterInPlace(commonProperties, new ContainsMatchingPropertyPredicate(properties));
+            Iterables.removeIf(commonProperties, Predicates.not(new ContainsMatchingPropertyPredicate(properties)));
         }
 
         for (ResourceProperty property: commonProperties)
@@ -1352,7 +1355,7 @@ public class DefaultBuildController implements EventListener, BuildController
             this.properties = properties;
         }
 
-        public boolean satisfied(final ResourceProperty commonProperty)
+        public boolean apply(final ResourceProperty commonProperty)
         {
             return properties.contains(commonProperty);
         }

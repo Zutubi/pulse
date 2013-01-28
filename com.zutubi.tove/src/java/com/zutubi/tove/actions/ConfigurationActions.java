@@ -1,24 +1,26 @@
 package com.zutubi.tove.actions;
 
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.util.reflection.ReflectionUtils;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.util.reflection.MethodPredicates.*;
 
 /**
  * Describes a bunch of available actions for a configuration type.
@@ -50,15 +52,9 @@ public class ConfigurationActions
     {
         if (actionHandlerClass != null)
         {
-            enabledMethod = CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
-            {
-                public boolean satisfied(Method method)
-                {
-                    return method.getName().equals("actionsEnabled") &&
-                            (ReflectionUtils.acceptsParameters(method, configurationClass, boolean.class)) &&
-                            method.getReturnType().equals(boolean.class);
-                }
-            });
+            enabledMethod = find(asList(actionHandlerClass.getMethods()),
+                    and(hasName("actionsEnabled"), acceptsParameters(configurationClass, boolean.class), returnsType(boolean.class)),
+                    null);
         }
     }
 
@@ -66,8 +62,9 @@ public class ConfigurationActions
     {
         if (actionHandlerClass != null)
         {
-            actionListingMethod = CollectionUtils.find(actionHandlerClass.getMethods(),
-                    and(hasName("getActions"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)));
+            actionListingMethod = find(asList(actionHandlerClass.getMethods()),
+                    and(hasName("getActions"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)),
+                    null);
         }
     }
 
@@ -158,24 +155,24 @@ public class ConfigurationActions
     private Method getMethodWithOptionalReturn(String action, final Class optionalReturnType, String prefix)
     {
         final String expectedName = prefix + action.substring(0, 1).toUpperCase() + action.substring(1);
-        return CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
+        return find(asList(actionHandlerClass.getMethods()), new Predicate<Method>()
         {
-            public boolean satisfied(Method method)
+            public boolean apply(Method method)
             {
-                if(!method.getName().equals(expectedName))
+                if (!method.getName().equals(expectedName))
                 {
                     return false;
                 }
 
-                if(!ReflectionUtils.acceptsParameters(method) && !ReflectionUtils.acceptsParameters(method, configurationClass))
+                if (!ReflectionUtils.acceptsParameters(method) && !ReflectionUtils.acceptsParameters(method, configurationClass))
                 {
                     return false;
                 }
 
                 Class<?> returnType = method.getReturnType();
-                return  returnType == Void.TYPE || optionalReturnType != null && optionalReturnType.isAssignableFrom(returnType);
+                return returnType == Void.TYPE || optionalReturnType != null && optionalReturnType.isAssignableFrom(returnType);
             }
-        });
+        }, null);
     }
 
     public Class getConfigurationClass()

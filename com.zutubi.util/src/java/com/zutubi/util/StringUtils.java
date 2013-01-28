@@ -1,6 +1,7 @@
 package com.zutubi.util;
 
-import java.util.Collection;
+import com.google.common.collect.Iterables;
+
 import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
@@ -641,9 +642,9 @@ public class StringUtils
      *
      * @see #join(String, String...)
      */
-    public static String join(String glue, Collection<String> parts)
+    public static String join(String glue, Iterable<String> parts)
     {
-        return join(glue, parts.toArray(new String[parts.size()]));
+        return join(glue, Iterables.toArray(parts, String.class));
     }
 
     public static String join(char glue, boolean glueCheck, boolean skipEmpty, String... pieces)

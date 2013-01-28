@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-
-import java.util.List;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
 
 /**
  * A predicate to select only those queued requests that are dependent on
@@ -20,14 +19,14 @@ public class HasDependencyOnPredicate implements QueuedRequestPredicate
         this.owner = owner;
     }
 
-    public boolean satisfied(QueuedRequest queuedRequest)
+    public boolean apply(QueuedRequest queuedRequest)
     {
         return dependsOn(queuedRequest, owner);
     }
 
     private boolean dependsOn(QueuedRequest request, Object owner)
     {
-        List<QueuedRequestPredicate> dependencies = extractDependencies(request);
+        Iterable<QueuedRequestPredicate> dependencies = extractDependencies(request);
 
         for (QueuedRequestPredicate predicate : dependencies)
         {
@@ -40,8 +39,9 @@ public class HasDependencyOnPredicate implements QueuedRequestPredicate
             {
                 // Resolve the predicate into the associated queued request.  It is the queued
                 // request that contains the transitive dependency details via its predicates.
-                QueuedRequest queuedRequest = CollectionUtils.find(buildQueue.getQueuedRequests(),
-                        new HasMetaIdAndOwnerPredicate(request.getMetaBuildId(), dependency.getOwner())
+                QueuedRequest queuedRequest = find(buildQueue.getQueuedRequests(),
+                        new HasMetaIdAndOwnerPredicate<QueuedRequest>(request.getMetaBuildId(), dependency.getOwner()),
+                        null
                 );
                 if (queuedRequest != null && dependsOn(queuedRequest, owner))
                 {
@@ -53,11 +53,11 @@ public class HasDependencyOnPredicate implements QueuedRequestPredicate
         return false;
     }
 
-    private List<QueuedRequestPredicate> extractDependencies(QueuedRequest request)
+    private Iterable<QueuedRequestPredicate> extractDependencies(QueuedRequest request)
     {
-        return CollectionUtils.filter(request.getPredicates(), new Predicate<QueuedRequestPredicate>()
+        return Iterables.filter(request.getPredicates(), new Predicate<QueuedRequestPredicate>()
         {
-            public boolean satisfied(QueuedRequestPredicate predicate)
+            public boolean apply(QueuedRequestPredicate predicate)
             {
                 return DependencyPredicate.class.isAssignableFrom(predicate.getClass());
             }

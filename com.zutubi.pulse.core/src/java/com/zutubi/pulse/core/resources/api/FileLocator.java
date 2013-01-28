@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.resources.api;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Interface for classes that can locate paths of interest on the file system.
@@ -13,5 +13,5 @@ public interface FileLocator
      * 
      * @return all located files
      */
-    List<File> locate();
+    Collection<File> locate();
 }

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 
 import java.io.File;
@@ -227,14 +227,14 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
      */
     public BuildResult getDependsOn(final String projectName)
     {
-        return CollectionUtils.find(this.dependsOn, new Predicate<BuildResult>()
+        return find(this.dependsOn, new Predicate<BuildResult>()
         {
-            public boolean satisfied(BuildResult buildResult)
+            public boolean apply(BuildResult buildResult)
             {
                 ProjectConfiguration dependsOnProject = buildResult.getProject().getConfig();
                 return (dependsOnProject.getName().equals(projectName));
             }
-        });
+        }, null);
     }
 
     public void abortUnfinishedRecipes()
@@ -316,29 +316,29 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
     
     public RecipeResultNode findResultNode(final long id)
     {
-        return CollectionUtils.find(stages, new EntityWithIdPredicate<RecipeResultNode>(id));
+        return find(stages, new EntityWithIdPredicate<RecipeResultNode>(id), null);
     }
 
     public RecipeResultNode findResultNodeByHandle(final long handle)
     {
-        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
+        return find(stages, new Predicate<RecipeResultNode>()
         {
-            public boolean satisfied(RecipeResultNode recipeResultNode)
+            public boolean apply(RecipeResultNode recipeResultNode)
             {
                 return recipeResultNode.getStageHandle() == handle;
             }
-        });
+        }, null);
     }
 
     public RecipeResultNode findResultNode(final String stageName)
     {
-        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
+        return find(stages, new Predicate<RecipeResultNode>()
         {
-            public boolean satisfied(RecipeResultNode recipeResultNode)
+            public boolean apply(RecipeResultNode recipeResultNode)
             {
                 return stageName.equals(recipeResultNode.getStageName());
             }
-        });
+        }, null);
     }
 
     /**
@@ -350,20 +350,20 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
      */
     public RecipeResultNode findResultNodeByRecipeId(final long recipeId)
     {
-        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
+        return find(stages, new Predicate<RecipeResultNode>()
         {
-            public boolean satisfied(RecipeResultNode recipeResultNode)
+            public boolean apply(RecipeResultNode recipeResultNode)
             {
                 return recipeResultNode.getResult().getId() == recipeId;
             }
-        });
+        }, null);
     }
 
     public RecipeResultNode findResultNode(final CommandResult commandResult)
     {
-        return CollectionUtils.find(stages, new Predicate<RecipeResultNode>()
+        return find(stages, new Predicate<RecipeResultNode>()
         {
-            public boolean satisfied(RecipeResultNode recipeResultNode)
+            public boolean apply(RecipeResultNode recipeResultNode)
             {
                 RecipeResult result = recipeResultNode.getResult();
                 for (CommandResult command : result.getCommandResults())
@@ -376,7 +376,7 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
 
                 return false;
             }
-        });
+        }, null);
     }
 
     public StoredArtifact findArtifact(String artifactName)

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -123,13 +123,13 @@ public class BuildStageEnableDisableAcceptanceTest extends AcceptanceTestBase
     private void assertStageState(Hashtable<String, Object> build, final String stageName, ResultState state)
     {
         Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-        Hashtable<String, Object> stage = CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> stage = find(stages, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> stage)
+            public boolean apply(Hashtable<String, Object> stage)
             {
                 return stage.get("name").equals(stageName);
             }
-        });
+        }, null);
         assertNotNull(stage);
         assertEquals(state, ResultState.fromPrettyString((String) stage.get("status")));
     }

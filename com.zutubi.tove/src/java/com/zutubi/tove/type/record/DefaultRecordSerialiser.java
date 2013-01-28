@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -95,7 +95,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
     {
         path = WebUtils.encodeAndJoin(new Predicate<Character>()
         {
-            public boolean satisfied(Character character)
+            public boolean apply(Character character)
             {
                 if(StringUtils.isAsciiAlphaNumeric(character))
                 {

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins.osgi;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import org.osgi.framework.Bundle;
 
 /**
@@ -15,7 +15,7 @@ class BundleSymbolicNamePredicate implements Predicate<Bundle>
         this.symbolicName = symbolicName;
     }
 
-    public boolean satisfied(Bundle bundle)
+    public boolean apply(Bundle bundle)
     {
         return bundle.getSymbolicName().equals(symbolicName);
     }

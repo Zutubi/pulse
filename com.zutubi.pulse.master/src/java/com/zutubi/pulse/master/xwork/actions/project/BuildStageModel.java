@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
@@ -12,7 +14,6 @@ import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
@@ -60,9 +61,9 @@ public class BuildStageModel extends ResultModel
             List<ActionLink> collectedArtifacts = new LinkedList<ActionLink>();
             for (final CommandResult commandResult: recipeResult.getCommandResults())
             {
-                List<StoredArtifact> commandFeaturedArtifacts = CollectionUtils.filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
+                Iterable<StoredArtifact> commandFeaturedArtifacts = Iterables.filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
                 {
-                    public boolean satisfied(StoredArtifact storedArtifact)
+                    public boolean apply(StoredArtifact storedArtifact)
                     {
                         return storedArtifact.isFeatured();
                     }

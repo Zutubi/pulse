@@ -1,12 +1,17 @@
 package com.zutubi.tove.type;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.*;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.GraphFunction;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
@@ -279,13 +284,13 @@ public class CompositeType extends AbstractType implements ComplexType
             }
         }
 
-        CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        addAll(result, filter(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation.annotationType().equals(annotationType);
             }
-        }, result);
+        }));
 
         return result;
     }
@@ -297,13 +302,13 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public <T extends Annotation> T getAnnotation(final Class<T> annotationType, boolean includeInherited)
     {
-        T result = annotationType.cast(CollectionUtils.find(annotations, new Predicate<Annotation>()
+        T result = annotationType.cast(find(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation.annotationType().equals(annotationType);
             }
-        }));
+        }, null));
 
         if(result == null && includeInherited)
         {

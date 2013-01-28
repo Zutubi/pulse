@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.notifications;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.build.log.LogFile;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
@@ -82,7 +82,7 @@ public class NotificationAttachment
 
         String safeFileName = WebUtils.encode('_', filename, new Predicate<Character>()
         {
-            public boolean satisfied(Character c)
+            public boolean apply(Character c)
             {
                 switch (c)
                 {

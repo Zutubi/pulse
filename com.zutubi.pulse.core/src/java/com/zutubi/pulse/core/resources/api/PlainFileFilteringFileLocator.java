@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.io.File;
 
@@ -20,7 +20,7 @@ public class PlainFileFilteringFileLocator extends FilteringFileLocator
     {
         super(delegate, new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return file.isFile();
             }

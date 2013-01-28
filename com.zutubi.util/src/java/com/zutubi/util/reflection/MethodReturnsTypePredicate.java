@@ -1,6 +1,6 @@
 package com.zutubi.util.reflection;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -28,7 +28,7 @@ public class MethodReturnsTypePredicate implements Predicate<Method>
         this.typeArguments = typeArguments;
     }
 
-    public boolean satisfied(Method method)
+    public boolean apply(Method method)
     {
         return ReflectionUtils.returnsType(method, rawClass, typeArguments);
     }

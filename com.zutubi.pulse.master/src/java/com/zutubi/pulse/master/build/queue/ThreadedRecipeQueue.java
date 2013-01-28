@@ -1,5 +1,10 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.removeIf;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -24,7 +29,9 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
-import com.zutubi.util.*;
+import com.zutubi.util.Constants;
+import com.zutubi.util.RetryHandler;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -217,13 +224,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             lock.lock();
-            RecipeAssignmentRequest removeRequest = CollectionUtils.find(requestQueue, new Predicate<RecipeAssignmentRequest>()
+            RecipeAssignmentRequest removeRequest = find(requestQueue, new Predicate<RecipeAssignmentRequest>()
             {
-                public boolean satisfied(RecipeAssignmentRequest request)
+                public boolean apply(RecipeAssignmentRequest request)
                 {
                     return request.getRequest().getId() == recipeId;
                 }
-            });
+            }, null);
 
             if (removeRequest != null)
             {
@@ -418,16 +425,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                         // Note that this method must be fast - we are locking agents.
                         // The lock is require to prevent the agent state changing
                         // before we assign the recipe to it.
-                        public void run(final List<Agent> agents)
+                        public void run(final List<Agent> availableAgents)
                         {
                             // The agent pool can only contain agents that are currently available.
-                            CollectionUtils.filterInPlace(agentPool, new Predicate<Agent>()
-                            {
-                                public boolean satisfied(Agent agent)
-                                {
-                                    return agents.contains(agent);
-                                }
-                            });
+                            removeIf(agentPool, not(in(availableAgents)));
 
                             Iterable<Agent> agentList = agentSorter.sort(agentPool, request);
                             for (Agent agent : agentList)
@@ -652,13 +653,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         public synchronized void add(final RecipeAssignmentRequest item)
         {
-            RecipeAssignmentRequest request = CollectionUtils.find(list, new Predicate<RecipeAssignmentRequest>()
+            RecipeAssignmentRequest request = find(list, new Predicate<RecipeAssignmentRequest>()
             {
-                public boolean satisfied(RecipeAssignmentRequest r)
+                public boolean apply(RecipeAssignmentRequest r)
                 {
                     return r.getPriority() < item.getPriority();
                 }
-            });
+            }, null);
             if (request != null)
             {
                 list.add(list.indexOf(request), item);

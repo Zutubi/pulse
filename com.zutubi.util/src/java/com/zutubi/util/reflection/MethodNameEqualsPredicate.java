@@ -1,6 +1,6 @@
 package com.zutubi.util.reflection;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.lang.reflect.Method;
 
@@ -21,7 +21,7 @@ public class MethodNameEqualsPredicate implements Predicate<Method>
         this.name = name;
     }
 
-    public boolean satisfied(Method method)
+    public boolean apply(Method method)
     {
         return method.getName().equals(name);
     }

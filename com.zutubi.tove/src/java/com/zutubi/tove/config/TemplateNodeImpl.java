@@ -1,8 +1,8 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
@@ -47,13 +47,13 @@ public class TemplateNodeImpl implements TemplateNode
 
     public TemplateNode getChild(final String id)
     {
-        return CollectionUtils.find(children, new Predicate<TemplateNode>()
+        return find(children, new Predicate<TemplateNode>()
         {
-            public boolean satisfied(TemplateNode templateNode)
+            public boolean apply(TemplateNode templateNode)
             {
                 return templateNode.getId().equals(id);
             }
-        });
+        }, null);
     }
 
     public void addChild(TemplateNodeImpl child)

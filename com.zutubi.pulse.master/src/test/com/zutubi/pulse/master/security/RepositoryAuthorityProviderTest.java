@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.google.common.collect.Sets;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
+import com.zutubi.pulse.core.test.api.PulseTestCase;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
@@ -10,14 +11,13 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;
 import static org.mortbay.http.HttpRequest.__GET;
 import static org.mortbay.http.HttpRequest.__PUT;
 
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class RepositoryAuthorityProviderTest extends PulseTestCase
 {
@@ -71,7 +71,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     public void testDelegation_WriteRequest()
     {
         ProjectConfiguration project = newProject("org", "project");
-        stub(delegateProvider.getAllowedAuthorities(ACTION_WRITE, project)).toReturn(asSet("write"));
+        stub(delegateProvider.getAllowedAuthorities(ACTION_WRITE, project)).toReturn(Sets.newHashSet("write"));
 
         Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
@@ -83,7 +83,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     public void testDelegation_ReadRequest()
     {
         ProjectConfiguration project = newProject("org", "project");
-        stub(delegateProvider.getAllowedAuthorities(ACTION_VIEW, project)).toReturn(asSet("read"));
+        stub(delegateProvider.getAllowedAuthorities(ACTION_VIEW, project)).toReturn(Sets.newHashSet("read"));
 
         Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());

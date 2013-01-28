@@ -1,9 +1,9 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Predicate;
 
 /**
  * An event predicate that is satisfied by {@link com.zutubi.tove.config.events.ConfigurationEvent}s
@@ -20,7 +20,7 @@ public class PathPredicate implements Predicate<Event>
         this.patterns = patterns;
     }
 
-    public boolean satisfied(Event event)
+    public boolean apply(Event event)
     {
         if(event instanceof ConfigurationEvent)
         {

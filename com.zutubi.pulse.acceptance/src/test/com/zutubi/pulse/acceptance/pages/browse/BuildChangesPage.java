@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -8,9 +10,9 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
+import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 
 import java.util.LinkedList;
@@ -146,9 +148,9 @@ public class BuildChangesPage extends SeleniumPage
 
     public List<Long> getChangeIds()
     {
-        List<String> viewIdStrings = CollectionUtils.filter(browser.getAllLinks(), new Predicate<String>()
+        Iterable<String> viewIdStrings = Iterables.filter(asList(browser.getAllLinks()), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return s.startsWith(PREFIX_VIEW_LINK);
             }

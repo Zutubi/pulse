@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.hook.email;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -35,18 +37,16 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
+import static java.util.Arrays.asList;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 /**
  * A build hook task that sends email notifications to project contacts and/or
@@ -251,13 +251,13 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
     private void addContactEmail(UserConfiguration user, Set<String> emails)
     {
-        ContactConfiguration primaryContact = CollectionUtils.find(user.getPreferences().getContacts().values(), new Predicate<ContactConfiguration>()
+        ContactConfiguration primaryContact = find(user.getPreferences().getContacts().values(), new Predicate<ContactConfiguration>()
         {
-            public boolean satisfied(ContactConfiguration contactConfiguration)
+            public boolean apply(ContactConfiguration contactConfiguration)
             {
                 return contactConfiguration.isPrimary();
             }
-        });
+        }, null);
 
         if (primaryContact != null && primaryContact instanceof EmailContactConfiguration)
         {
@@ -311,13 +311,13 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 
     private String getEmail(ProjectConfiguration projectConfig, Project.State projectState, final String scmLogin)
     {
-        CommitterMappingConfiguration mapping = CollectionUtils.find(projectConfig.getScm().getCommitterMappings(), new Predicate<CommitterMappingConfiguration>()
+        CommitterMappingConfiguration mapping = find(projectConfig.getScm().getCommitterMappings(), new Predicate<CommitterMappingConfiguration>()
         {
-            public boolean satisfied(CommitterMappingConfiguration committerMappingConfiguration)
+            public boolean apply(CommitterMappingConfiguration committerMappingConfiguration)
             {
                 return committerMappingConfiguration.getScmLogin().equals(scmLogin);
             }
-        });
+        }, null);
 
         String email = null;
         if (mapping == null)

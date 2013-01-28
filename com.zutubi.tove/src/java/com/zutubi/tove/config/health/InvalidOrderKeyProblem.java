@@ -1,11 +1,11 @@
 package com.zutubi.tove.config.health;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.NotEqualsPredicate;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class InvalidOrderKeyProblem extends HealthProblemSupport
             if (orderKeys.contains(key))
             {
                 MutableRecord mutable = record.copy(false, true);
-                CollectionType.setOrder(mutable, CollectionUtils.filter(orderKeys, new NotEqualsPredicate<String>(key)));
+                CollectionType.setOrder(mutable, Iterables.filter(orderKeys, Predicates.not(Predicates.equalTo(key))));
                 recordManager.update(getPath(), mutable);
             }
         }

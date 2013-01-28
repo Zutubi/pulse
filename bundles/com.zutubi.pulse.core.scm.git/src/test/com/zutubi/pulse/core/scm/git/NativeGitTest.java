@@ -1,13 +1,17 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,10 +20,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 public class NativeGitTest extends PulseTestCase
 {
@@ -199,9 +199,9 @@ public class NativeGitTest extends PulseTestCase
         List<GitLogEntry> logEntries = parseLog();
 
         assertEquals(7, logEntries.size());
-        assertFalse(CollectionUtils.contains(logEntries, new Predicate<GitLogEntry>()
+        assertFalse(Iterables.any(logEntries, new Predicate<GitLogEntry>()
         {
-            public boolean satisfied(GitLogEntry gitLogEntry)
+            public boolean apply(GitLogEntry gitLogEntry)
             {
                 return gitLogEntry.getDate() == null;
             }

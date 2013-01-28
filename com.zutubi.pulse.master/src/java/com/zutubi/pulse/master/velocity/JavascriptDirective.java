@@ -160,7 +160,7 @@ public class JavascriptDirective extends AbstractDirective
 
     private String generateContent(String base, File jsRoot, List<String> jsPaths) throws IOException
     {
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
 
         List<String> sortedPaths;
         try

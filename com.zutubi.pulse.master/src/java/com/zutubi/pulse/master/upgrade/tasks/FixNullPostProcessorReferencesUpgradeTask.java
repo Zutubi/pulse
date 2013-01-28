@@ -1,15 +1,17 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryFunction;
-
-import java.util.List;
-
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.UnaryFunction;
 import static java.util.Arrays.asList;
+
+import java.util.List;
 
 /**
  * Fixes null post-processor references that may have been created by a bug in
@@ -38,7 +40,7 @@ public class FixNullPostProcessorReferencesUpgradeTask extends AbstractRecordPro
         
         return new PredicateFilterRecordLocator(locator, new Predicate<Record>()
         {
-            public boolean satisfied(Record record)
+            public boolean apply(Record record)
             {
                 return record.containsKey(PROPERTY_POST_PROCESSORS);
             }
@@ -54,13 +56,7 @@ public class FixNullPostProcessorReferencesUpgradeTask extends AbstractRecordPro
                 if (o != null && o instanceof String[])
                 {
                     String[] array = (String[]) o;
-                    return CollectionUtils.filterToArray(array, new Predicate<String>()
-                    {
-                        public boolean satisfied(String s)
-                        {
-                            return !s.equals("0");
-                        }
-                    });
+                    return toArray(filter(asList(array), not(equalTo("0"))), String.class);
                 }
                 
                 return o;

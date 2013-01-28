@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Comment;
@@ -7,8 +9,6 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.CommentModel;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -126,13 +126,13 @@ public class BuildSummaryModel
 
     public BuildStageModel getStage(final String stageName)
     {
-        return CollectionUtils.find(build.getStages(), new Predicate<BuildStageModel>()
+        return find(build.getStages(), new Predicate<BuildStageModel>()
         {
-            public boolean satisfied(BuildStageModel buildStageModel)
+            public boolean apply(BuildStageModel buildStageModel)
             {
                 return buildStageModel.getName().equals(stageName);
             }
-        });
+        }, null);
     }
 
 }

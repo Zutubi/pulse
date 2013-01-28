@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.notifications.condition;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TruePredicate;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -104,7 +104,7 @@ public class ChangedNotifyCondition implements NotifyCondition
             }
         }
 
-        Predicate<PersistentChangelist> predicate = modifiers.contains(Modifier.BY_ME) ? new ByMePredicate(user) : new TruePredicate<PersistentChangelist>();
-        return CollectionUtils.contains(changelists, predicate);
+        Predicate<PersistentChangelist> predicate = modifiers.contains(Modifier.BY_ME) ? new ByMePredicate(user) : Predicates.<PersistentChangelist>alwaysTrue();
+        return any(changelists, predicate);
     }
 }

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.hg;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.FilterPathsPredicate;
-import com.zutubi.util.Predicate;
 
 import java.util.List;
 
@@ -19,11 +19,11 @@ public class ChangelistPathsPredicate implements Predicate<Changelist>
         pathPredicate = new FilterPathsPredicate(includedPaths, excludedPaths);
     }
 
-    public boolean satisfied(Changelist changelist)
+    public boolean apply(Changelist changelist)
     {
         for (FileChange change: changelist.getChanges())
         {
-            if (pathPredicate.satisfied(change.getPath()))
+            if (pathPredicate.apply(change.getPath()))
             {
                 return true;
             }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.resources.api.*;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -11,6 +11,7 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -108,7 +109,7 @@ public class MsBuildResourceLocator implements ResourceLocator
 
         // Try on any file system root.
         FileLocator locater = new PathPatternFileLocator("Windows", "WINNT");
-        List<File> list = locater.locate();
+        List<File> list = new LinkedList<File>(locater.locate());
         if (list.size() > 0)
         {
             // Prefer earlier roots (drive letter earlier in the alphabet)
@@ -129,7 +130,7 @@ public class MsBuildResourceLocator implements ResourceLocator
 
     private class DotNetInstallPredicate implements Predicate<File>
     {
-        public boolean satisfied(File file)
+        public boolean apply(File file)
         {
             return file.getName().startsWith("v") && getMsBuildBinary(file).isFile();
         }

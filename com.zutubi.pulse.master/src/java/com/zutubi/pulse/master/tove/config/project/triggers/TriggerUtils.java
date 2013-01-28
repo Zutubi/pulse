@@ -1,13 +1,15 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.google.common.base.Predicates.instanceOf;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.InstanceOfPredicate;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
-import java.util.Map;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class TriggerUtils
 {
@@ -25,7 +27,7 @@ public class TriggerUtils
         Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) projectConfig.getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
         if (triggers != null)
         {
-            return (T) CollectionUtils.find(triggers.values(), new InstanceOfPredicate<TriggerConfiguration>(type));
+            return (T) find(triggers.values(), instanceOf(type), null);
         }
         return null;
     }
@@ -44,7 +46,7 @@ public class TriggerUtils
         Map<String, TriggerConfiguration> triggers = (Map<String, TriggerConfiguration>) projectConfig.getExtensions().get(EXTENSION_PROJECT_TRIGGERS);
         if (triggers != null)
         {
-            return (List<T>) CollectionUtils.filter(triggers.values(), new InstanceOfPredicate<TriggerConfiguration>(type));
+            return Lists.newArrayList((Iterable<? extends T>) Iterables.filter(triggers.values(), instanceOf(type)));
         }
         return new LinkedList<T>();
     }

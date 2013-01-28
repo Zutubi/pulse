@@ -1,5 +1,8 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.tove.annotations.Wire;
@@ -2594,22 +2597,24 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *
      * @param predicate predicate to be satisfied by instances
      * @param clazz     class of the instances to be found
-     * @return the highest configuration instances in the heirarchy that
+     * @return the highest configuration instances in the hierarchy that
      *         satisfy the given predicate
      */
-    public <T extends Configuration> List<T> getHighestInstancesSatisfying(final Predicate<T> predicate, final Class<T> clazz)
+    public <T extends Configuration> Collection<T> getHighestInstancesSatisfying(final Predicate<T> predicate, final Class<T> clazz)
     {
         Collection<T> allConfigs = getAllInstances(clazz, true);
-        return CollectionUtils.filter(allConfigs, new Predicate<T>() {
-            public boolean satisfied(T configuration) {
+        return Lists.newArrayList(Collections2.filter(allConfigs, new Predicate<T>()
+        {
+            public boolean apply(T configuration)
+            {
                 return isHighestSatisfying(configuration, clazz, predicate);
             }
-        });
+        }));
     }
 
     private <T extends Configuration> boolean isHighestSatisfying(T config, Class<T> clazz, final Predicate<T> predicate)
     {
-        if (predicate.satisfied(config))
+        if (predicate.apply(config))
         {
             TemplateRecord templateParentRecord = getTemplateParentRecord(config.getConfigurationPath());
             if (templateParentRecord == null)
@@ -2619,7 +2624,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             else
             {
                 T templateParentConfig = getInstance(templateParentRecord.getHandle(), clazz);
-                return !predicate.satisfied(templateParentConfig);
+                return !predicate.apply(templateParentConfig);
             }
         }
 

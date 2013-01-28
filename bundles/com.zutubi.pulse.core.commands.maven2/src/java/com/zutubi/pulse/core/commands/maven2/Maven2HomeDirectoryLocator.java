@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.commands.maven2;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.resources.api.*;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +20,7 @@ public class Maven2HomeDirectoryLocator implements FileLocator
 
     private String capturedVersion = null;
     
-    public List<File> locate()
+    public Collection<File> locate()
     {
         // Our search strategy needs to disambiguate maven 2 and 3.  To do so,
         // we find candidate scripts and run them with -version.  If they
@@ -33,7 +33,7 @@ public class Maven2HomeDirectoryLocator implements FileLocator
         //   - mvn on the path
         Predicate<File> scriptFilePredicate = new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return isScriptRightVersion(file);
             }

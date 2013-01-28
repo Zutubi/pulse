@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 import com.zutubi.pulse.core.engine.api.Feature;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
 
@@ -114,13 +115,13 @@ public class StoredFileArtifact extends Entity
 
     public int getFeatureCount(final Feature.Level level)
     {
-        return CollectionUtils.count(features, new Predicate<PersistentFeature>()
+        return size(filter(features, new Predicate<PersistentFeature>()
         {
-            public boolean satisfied(PersistentFeature persistentFeature)
+            public boolean apply(PersistentFeature persistentFeature)
             {
                 return persistentFeature.getLevel() == level;
             }
-        });
+        }));
     }
     
     public String getType()

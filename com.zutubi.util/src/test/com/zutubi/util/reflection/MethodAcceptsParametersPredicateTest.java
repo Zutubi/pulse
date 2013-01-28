@@ -8,7 +8,7 @@ public class MethodAcceptsParametersPredicateTest extends ZutubiTestCase
     public void testSanity() throws NoSuchMethodException
     {
         MethodAcceptsParametersPredicate predicate = new MethodAcceptsParametersPredicate(Object.class);
-        assertTrue(predicate.satisfied(Object.class.getMethod("equals", Object.class)));
-        assertFalse(predicate.satisfied(Object.class.getMethod("hashCode")));
+        assertTrue(predicate.apply(Object.class.getMethod("equals", Object.class)));
+        assertFalse(predicate.apply(Object.class.getMethod("hashCode")));
     }
 }

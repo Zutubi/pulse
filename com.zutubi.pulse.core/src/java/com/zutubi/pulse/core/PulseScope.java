@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.tove.variables.GenericVariable;
@@ -8,7 +10,6 @@ import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
@@ -133,9 +134,9 @@ public class PulseScope implements Scope
         });
     }
 
-    private List<Variable> getVariablesSatisfyingPredicate(Predicate<VariableInfo> p)
+    private Collection<Variable> getVariablesSatisfyingPredicate(Predicate<VariableInfo> p)
     {
-        return CollectionUtils.map(CollectionUtils.filter(merge().values(), p), new Mapping<VariableInfo, Variable>()
+        return CollectionUtils.map(Collections2.filter(merge().values(), p), new Mapping<VariableInfo, Variable>()
         {
             public Variable map(VariableInfo variableInfo)
             {
@@ -144,11 +145,11 @@ public class PulseScope implements Scope
         });
     }
 
-    public List<Variable> getVariables(final Class type)
+    public Collection<Variable> getVariables(final Class type)
     {
         return getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(VariableInfo variableInfo)
+            public boolean apply(VariableInfo variableInfo)
             {
                 return type.isInstance(variableInfo.variable.getValue());
             }
@@ -286,7 +287,7 @@ public class PulseScope implements Scope
     {
         Collection<Variable> variables = getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(VariableInfo variableInfo)
+            public boolean apply(VariableInfo variableInfo)
             {
                 return variableInfo.addToEnvironment && (variableInfo.variable.getValue() instanceof String);
             }
@@ -340,7 +341,7 @@ public class PulseScope implements Scope
     {
         Collection<Variable> variables = getVariablesSatisfyingPredicate(new Predicate<VariableInfo>()
         {
-            public boolean satisfied(VariableInfo variableInfo)
+            public boolean apply(VariableInfo variableInfo)
             {
                 return variableInfo.addToPath && variableInfo.variable.getValue() instanceof String;
             }

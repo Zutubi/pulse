@@ -1,9 +1,9 @@
 package com.zutubi.tove.squeezer.squeezers;
 
+import com.google.common.base.Predicate;
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
@@ -171,7 +171,7 @@ public class MapSqueezer implements TypeSqueezer
 
     private static class AllowedCharactersPredicate implements Predicate<Character>
     {
-        public boolean satisfied(Character character)
+        public boolean apply(Character character)
         {
             return character != KEY_VALUE_SEPARATOR && character != ENTRY_SEPARATOR && character != '%';
         }

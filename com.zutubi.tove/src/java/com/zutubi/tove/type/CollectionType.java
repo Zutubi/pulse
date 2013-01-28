@@ -87,7 +87,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return order;
     }
 
-    public static void setOrder(MutableRecord record, Collection<String> order)
+    public static void setOrder(MutableRecord record, Iterable<String> order)
     {
         record.putMeta(ORDER_KEY, WebUtils.encodeAndJoin(SEPARATOR, order));
     }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave.api;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginManager;
@@ -8,10 +9,8 @@ import com.zutubi.pulse.core.plugins.repository.PluginList;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -51,7 +50,7 @@ public class RemoteApi
     public Vector<Hashtable<String, Object>> getRunningPlugins(String token)
     {
         checkToken(token);
-        List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+        Iterable<Plugin> plugins = Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
         return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
     

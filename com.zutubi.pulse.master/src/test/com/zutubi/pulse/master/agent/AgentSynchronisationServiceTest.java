@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -19,14 +22,16 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.time.TestClock;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -37,11 +42,6 @@ import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.*;
 
 public class AgentSynchronisationServiceTest extends PulseTestCase
 {
@@ -512,13 +512,13 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         
         public AgentSynchronisationMessage findById(final long id)
         {
-            return copy(CollectionUtils.find(messages, new Predicate<AgentSynchronisationMessage>()
+            return copy(find(messages, new Predicate<AgentSynchronisationMessage>()
             {
-                public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                public boolean apply(AgentSynchronisationMessage agentSynchronisationMessage)
                 {
                     return agentSynchronisationMessage.getId() == id;
                 }
-            }));
+            }, null));
         }
 
         public void flush()
@@ -572,9 +572,9 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public List<AgentSynchronisationMessage> findByStatus(final AgentSynchronisationMessage.Status status)
         {
-            return copy(CollectionUtils.filter(messages, new Predicate<AgentSynchronisationMessage>()
+            return copy(Iterables.filter(messages, new Predicate<AgentSynchronisationMessage>()
             {
-                public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                public boolean apply(AgentSynchronisationMessage agentSynchronisationMessage)
                 {
                     return agentSynchronisationMessage.getStatus() == status;
                 }
@@ -583,9 +583,9 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
         public List<AgentSynchronisationMessage> queryMessages(AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType)
         {
-            return copy(CollectionUtils.filter(messages, new Predicate<AgentSynchronisationMessage>()
+            return copy(Iterables.filter(messages, new Predicate<AgentSynchronisationMessage>()
             {
-                public boolean satisfied(AgentSynchronisationMessage message)
+                public boolean apply(AgentSynchronisationMessage message)
                 {
                     return message.getStatus() == status && message.getMessage().getTypeName().equals(taskType);
                 }
@@ -600,7 +600,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             return count;
         }
 
-        private List<AgentSynchronisationMessage> copy(List<AgentSynchronisationMessage> messages)
+        private List<AgentSynchronisationMessage> copy(Iterable<AgentSynchronisationMessage> messages)
         {
             List<AgentSynchronisationMessage> copy = new LinkedList<AgentSynchronisationMessage>();
             for (AgentSynchronisationMessage message: messages)

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
@@ -17,7 +18,6 @@ import com.zutubi.pulse.servercore.services.InvalidTokenException;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,7 +39,7 @@ public class MasterServiceImpl implements MasterService
     {
         if (systemStarted.get())
         {
-            return PluginList.toInfos(CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate()));
+            return PluginList.toInfos(Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate()));
         }
         else
         {

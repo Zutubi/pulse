@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.util.Predicate;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -78,7 +78,7 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
     {
         return isAnyChild(new Predicate<ArtifactFileObject>()
         {
-            public boolean satisfied(ArtifactFileObject file)
+            public boolean apply(ArtifactFileObject file)
             {
                 return file.isExplicit();
             }
@@ -89,7 +89,7 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
     {
         return isAnyChild(new Predicate<ArtifactFileObject>()
         {
-            public boolean satisfied(ArtifactFileObject file)
+            public boolean apply(ArtifactFileObject file)
             {
                 return file.isFeatured();
             }
@@ -101,7 +101,7 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
         FileObject[] children = getChildren();
         for (FileObject child: children)
         {
-            if (p.satisfied((ArtifactFileObject) child))
+            if (p.apply((ArtifactFileObject) child))
             {
                 return true;
             }

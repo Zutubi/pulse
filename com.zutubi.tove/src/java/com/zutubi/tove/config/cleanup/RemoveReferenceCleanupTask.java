@@ -1,8 +1,12 @@
 package com.zutubi.tove.config.cleanup;
 
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static java.util.Arrays.asList;
 
 /**
  * A record cleanup task that removes a reference from a collection.
@@ -35,8 +39,8 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
             if (references != null && CollectionUtils.contains(references, deletedHandle))
             {
                 MutableRecord newValues = parentRecord.copy(false, true);
-                String[] newReferences = filter(references);
-                String[] newInheritedReferences = filter(inheritedReferences);
+                String[] newReferences = filterReferences(references);
+                String[] newInheritedReferences = filterReferences(inheritedReferences);
 
                 if (RecordUtils.valuesEqual(newReferences, newInheritedReferences))
                 {
@@ -55,7 +59,7 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
         return false;
     }
 
-    private String[] filter(String[] references)
+    private String[] filterReferences(String[] references)
     {
         if (references == null)
         {
@@ -63,13 +67,7 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
         }
         else
         {
-            return CollectionUtils.filterToArray(references, new Predicate<String>()
-            {
-                public boolean satisfied(String handle)
-                {
-                    return !handle.equals(deletedHandle);
-                }
-            });
+            return toArray(filter(asList(references), not(equalTo(deletedHandle))), String.class);
         }
     }
 

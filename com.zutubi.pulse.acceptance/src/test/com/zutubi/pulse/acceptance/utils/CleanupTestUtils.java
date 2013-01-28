@@ -1,5 +1,8 @@
 package com.zutubi.pulse.acceptance.utils;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.filter;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
@@ -20,13 +23,11 @@ import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.io.IsDirectoryPredicate;
+import static java.util.Arrays.asList;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -119,17 +120,11 @@ public class CleanupTestUtils
     {
         File buildDir = getBuildDirectory(projectName, buildNumber);
 
-        List<File> stageDirectories = CollectionUtils.filter(buildDir.listFiles(), new Predicate<File>()
-        {
-            public boolean satisfied(File file)
-            {
-                return file.isDirectory();
-            }
-        });
+        Iterable<File> stageDirectories = filter(asList(buildDir.listFiles()), new IsDirectoryPredicate());
 
-        return CollectionUtils.contains(stageDirectories, new Predicate<File>()
+        return any(stageDirectories, new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return new File(file, directoryName).isDirectory();
             }
@@ -141,7 +136,7 @@ public class CleanupTestUtils
         Hashtable<String, Object> dirArtifactConfig = remoteApi.createDefaultConfig(DirectoryArtifactConfiguration.class);
         dirArtifactConfig.put(NAME, "xml reports");
         dirArtifactConfig.put(BASE, "build/reports/xml");
-        dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(Arrays.asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
+        dirArtifactConfig.put(POSTPROCESSORS, new Vector<String>(asList(PathUtils.getPath(projectPath, POSTPROCESSORS, processorName))));
         remoteApi.insertConfig(PathUtils.getPath(projectPath, TYPE, RECIPES, DEFAULT_RECIPE_NAME, COMMANDS, DEFAULT_COMMAND, ARTIFACTS), dirArtifactConfig);
     }
 

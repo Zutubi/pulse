@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -143,7 +143,7 @@ public class PollingQueueTest extends PulseTestCase
 
     private class QueueThisRequest implements Predicate<PollingRequest>
     {
-        public boolean satisfied(PollingRequest request)
+        public boolean apply(PollingRequest request)
         {
             return false;
         }
@@ -151,7 +151,7 @@ public class PollingQueueTest extends PulseTestCase
 
     private class ActivateThisRequest implements Predicate<PollingRequest>
     {
-        public boolean satisfied(PollingRequest request)
+        public boolean apply(PollingRequest request)
         {
             return true;
         }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.CollectionUtils;
+import com.google.common.collect.Iterables;
 
 import java.util.List;
 
@@ -33,12 +33,12 @@ public class DependencyCompleteQueuePredicate implements QueuedRequestPredicate,
         return owner;
     }
 
-    public boolean satisfied(QueuedRequest request)
+    public boolean apply(QueuedRequest request)
     {
         long metaBuildId = request.getRequest().getMetaBuildId();
 
         List<RequestHolder> existingRequests = buildQueue.getMetaBuildRequests(metaBuildId);
-        return !CollectionUtils.contains(existingRequests, new HasOwnerPredicate<RequestHolder>(owner));
+        return !Iterables.any(existingRequests, new HasOwnerPredicate<RequestHolder>(owner));
     }
 
     @Override

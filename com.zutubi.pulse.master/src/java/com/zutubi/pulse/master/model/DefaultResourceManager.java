@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
@@ -19,7 +20,6 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -258,7 +258,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                     }
                 }
 
-                List<AgentConfiguration> agentConfigs = configurationTemplateManager.getHighestInstancesSatisfying(new DefinesLocation(hostLocation), AgentConfiguration.class);
+                Collection<AgentConfiguration> agentConfigs = configurationTemplateManager.getHighestInstancesSatisfying(new DefinesLocation(hostLocation), AgentConfiguration.class);
                 List<AgentConfiguration> affectedAgents = new LinkedList<AgentConfiguration>();
                 for (AgentConfiguration config: agentConfigs)
                 {
@@ -391,7 +391,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
         }
 
 
-        public boolean satisfied(AgentConfiguration configuration)
+        public boolean apply(AgentConfiguration configuration)
         {
             return HostLocationFormatter.format(configuration).equals(location);
         }

@@ -1,5 +1,7 @@
 package com.zutubi.util;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.Arrays;
@@ -760,13 +762,13 @@ public class StringUtilsTest extends ZutubiTestCase
         String[] javaApi = s.split("/");
         assertEquals(javaApi, StringUtils.split(s, '/'));
 
-        javaApi = CollectionUtils.filterToArray(javaApi, new Predicate<String>()
+        javaApi = Iterables.toArray(Iterables.filter(Arrays.asList(javaApi), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return s.length() > 0;
             }
-        });
+        }), String.class);
 
         assertEquals(javaApi, StringUtils.split(s, '/', true));
     }

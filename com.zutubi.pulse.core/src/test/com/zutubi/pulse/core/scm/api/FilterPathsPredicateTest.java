@@ -99,19 +99,19 @@ public class FilterPathsPredicateTest extends PulseTestCase
     public void testInclusionExclusion()
     {
         FilterPathsPredicate predicate = new FilterPathsPredicate(Arrays.asList("*/bar/baz"), Arrays.asList("foo/*/baz"));
-        assertEquals(false, predicate.satisfied("foo/bar/baz"));
-        assertEquals(true, predicate.satisfied("quux/bar/baz"));
+        assertEquals(false, predicate.apply("foo/bar/baz"));
+        assertEquals(true, predicate.apply("quux/bar/baz"));
     }
     
     private void assertExclusionAccepts(String exclude, String path, boolean accept)
     {
         FilterPathsPredicate predicate = new FilterPathsPredicate(Collections.<String>emptyList(), Arrays.asList(exclude));
-        assertEquals(accept, predicate.satisfied(path));
+        assertEquals(accept, predicate.apply(path));
     }
 
     private void assertInclusionAccepts(String include, String path, boolean accept)
     {
         FilterPathsPredicate predicate = new FilterPathsPredicate(Arrays.asList(include), Collections.<String>emptyList());
-        assertEquals(accept, predicate.satisfied(path));
+        assertEquals(accept, predicate.apply(path));
     }
 }

@@ -1,5 +1,10 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
+import com.google.common.collect.Lists;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -43,8 +48,10 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
-import static com.zutubi.util.CollectionUtils.filter;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -271,9 +278,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         for (final BuildStageConfiguration oldStage: old.getStages().values())
         {
-            if (!CollectionUtils.contains(instance.getStages().values(), new Predicate<BuildStageConfiguration>()
+            if (!Iterables.any(instance.getStages().values(), new Predicate<BuildStageConfiguration>()
             {
-                public boolean satisfied(BuildStageConfiguration stage)
+                public boolean apply(BuildStageConfiguration stage)
                 {
                     return stage.getHandle() == oldStage.getHandle();
                 }
@@ -1015,16 +1022,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private List<Project> filterCompleteAndValidProjects(List<Project> projects, final boolean allowInvalid)
     {
-        return filter(projects, new Predicate<Project>() {
-            public boolean satisfied(Project project) {
+        return Lists.newArrayList(filter(projects, new Predicate<Project>()
+        {
+            public boolean apply(Project project)
+            {
                 return isCompleteAndValid(project, allowInvalid);
             }
-        });
+        }));
     }
 
     public int getProjectCount()
     {
-        return filter(getAllProjectConfigs(true), ProjectPredicates.concrete()).size();
+        return size(filter(getAllProjectConfigs(true), ProjectPredicates.concrete()));
     }
 
     public void abortUnfinishedBuilds(Project project, String message)

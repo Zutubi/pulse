@@ -1,11 +1,13 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
 
-import java.util.List;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The build snapshot is an immutable snapshot of the contents of the build queue
@@ -74,7 +76,7 @@ public class BuildQueueSnapshot
      */
     public List<QueuedRequest> getQueuedRequestsByOwner(Object owner)
     {
-        return Collections.unmodifiableList(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
+        return Lists.newArrayList(Iterables.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
     }
 
     /**

@@ -1,13 +1,12 @@
 package com.zutubi.util.adt;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class TreeNodeTest extends ZutubiTestCase
 {
@@ -63,7 +62,7 @@ public class TreeNodeTest extends ZutubiTestCase
     {
         root.filteringWalk(new Predicate<TreeNode<String>>()
         {
-            public boolean satisfied(TreeNode<String> node)
+            public boolean apply(TreeNode<String> node)
             {
                 return !node.getData().contains("2");
             }

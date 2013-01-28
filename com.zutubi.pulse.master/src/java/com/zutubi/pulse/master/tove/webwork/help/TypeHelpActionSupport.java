@@ -1,17 +1,18 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
-import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public abstract class TypeHelpActionSupport extends HelpActionSupport
 
         // Calculate the form field properties in order so the UI can display
         // them nicely alongside the form.
-        List<String> fields = CollectionUtils.map(CollectionUtils.filter(composite.getProperties(),
+        Collection<String> fields = CollectionUtils.map(Collections2.filter(composite.getProperties(),
                 getPropertyPredicate()),
                 new Mapping<TypeProperty, String>()
                 {

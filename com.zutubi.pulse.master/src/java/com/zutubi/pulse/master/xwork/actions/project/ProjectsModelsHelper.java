@@ -1,5 +1,10 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.*;
@@ -14,9 +19,6 @@ import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TruePredicate;
 
 import java.util.*;
 
@@ -41,7 +43,7 @@ public class ProjectsModelsHelper
 
     public List<ProjectsModel> createProjectsModels(User loggedInUser, ProjectsSummaryConfiguration configuration, Urls urls, boolean showUngrouped)
     {
-        return createProjectsModels(loggedInUser, configuration, Collections.<LabelProjectTuple>emptySet(), urls, new TruePredicate<Project>(), new TruePredicate<ProjectGroup>(), showUngrouped);
+        return createProjectsModels(loggedInUser, configuration, Collections.<LabelProjectTuple>emptySet(), urls, Predicates.<Project>alwaysTrue(), Predicates.<ProjectGroup>alwaysTrue(), showUngrouped);
     }
 
     /**
@@ -66,8 +68,8 @@ public class ProjectsModelsHelper
     public List<ProjectsModel> createProjectsModels(User loggedInUser, ProjectsSummaryConfiguration configuration, Set<LabelProjectTuple> tuples, Urls urls, Predicate<Project> projectPredicate, Predicate<ProjectGroup> groupPredicate, boolean showUngrouped)
     {
         Set<String> collapsed = translateCollapsed(tuples);
-        List<Project> projects = CollectionUtils.filter(projectManager.getProjects(false), projectPredicate);
-        List<ProjectGroup> groups = CollectionUtils.filter(projectManager.getAllProjectGroups(), groupPredicate);
+        List<Project> projects = Lists.newLinkedList(Iterables.filter(projectManager.getProjects(false), projectPredicate));
+        List<ProjectGroup> groups = Lists.newLinkedList(Iterables.filter(projectManager.getAllProjectGroups(), groupPredicate));
         TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(MasterConfigurationRegistry.PROJECTS_SCOPE);
 
         List<ProjectsModel> result = new LinkedList<ProjectsModel>();
@@ -75,7 +77,7 @@ public class ProjectsModelsHelper
 
         for (ProjectGroup group : groups)
         {
-            List<Project> groupProjects = CollectionUtils.filter(group.getProjects(), projectPredicate);
+            List<Project> groupProjects = Lists.newLinkedList(Iterables.filter(group.getProjects(), projectPredicate));
             if (!groupProjects.isEmpty())
             {
                 ProjectsModel projectsModel = createModel(group.getName(), true, groupProjects, hierarchy, loggedInUser, configuration, collapsed, buildCache, urls);
@@ -210,7 +212,7 @@ public class ProjectsModelsHelper
 
     private ProjectHealth getHealth(Project project, List<BuildResult> builds)
     {
-        BuildResult latestCompleted = CollectionUtils.find(builds, new CompletedBuildPredicate());
+        BuildResult latestCompleted = find(builds, new CompletedBuildPredicate(), null);
         if (latestCompleted == null)
         {
             return ProjectHealth.getHealth(buildManager, project);

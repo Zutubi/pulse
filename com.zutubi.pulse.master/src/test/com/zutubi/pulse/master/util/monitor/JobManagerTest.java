@@ -98,7 +98,7 @@ public class JobManagerTest extends PulseTestCase
 
     private class NoopJob implements Job<Task>
     {
-        public Iterator<Task> getTasks()
+        public Iterator<Task> iterator()
         {
             return new LinkedList<Task>().iterator();
         }
@@ -113,7 +113,7 @@ public class JobManagerTest extends PulseTestCase
             task.endNow();
         }
 
-        public Iterator<Task> getTasks()
+        public Iterator<Task> iterator()
         {
             return Arrays.asList((Task)task).iterator();
         }

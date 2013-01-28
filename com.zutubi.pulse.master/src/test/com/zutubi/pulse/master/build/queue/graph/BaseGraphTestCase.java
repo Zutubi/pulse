@@ -1,18 +1,17 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.util.*;
-
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 
 public abstract class BaseGraphTestCase extends ZutubiTestCase
 {
@@ -33,13 +32,13 @@ public abstract class BaseGraphTestCase extends ZutubiTestCase
         for (TreeNode<BuildGraphData> expectedChild : expectedChildren)
         {
             final BuildGraphData childData = expectedChild.getData();
-            TreeNode<BuildGraphData> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<BuildGraphData>>()
+            TreeNode<BuildGraphData> gotChild = find(gotChildren, new Predicate<TreeNode<BuildGraphData>>()
             {
-                public boolean satisfied(TreeNode<BuildGraphData> node)
+                public boolean apply(TreeNode<BuildGraphData> node)
                 {
                     return node.getData().getProjectConfig().equals(childData.getProjectConfig());
                 }
-            });
+            }, null);
 
             assertNotNull(gotChild);
             assertEquals(expectedChild, gotChild);

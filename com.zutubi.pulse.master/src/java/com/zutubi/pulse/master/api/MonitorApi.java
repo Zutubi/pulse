@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.api;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.NamedEntity;
@@ -7,9 +9,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.*;
 
@@ -173,25 +173,25 @@ public class MonitorApi
 
     private Hashtable<String, Object> getProjectStatus(final Project project, List<BuildResult> inProgress, List<BuildResult> completedSince)
     {
-        List<BuildResult> projectInProgress = CollectionUtils.filter(inProgress, new Predicate<BuildResult>()
+        Iterable<BuildResult> projectInProgress = Iterables.filter(inProgress, new Predicate<BuildResult>()
         {
-            public boolean satisfied(BuildResult buildResult)
+            public boolean apply(BuildResult buildResult)
             {
                 return buildResult.getProject().equals(project);
             }
         });
 
         final BuildResult latestComplete = buildManager.getLatestCompletedBuildResult(project);
-        List<BuildResult> projectCompletedSince;
+        Iterable<BuildResult> projectCompletedSince;
         if (latestComplete == null)
         {
             projectCompletedSince = Collections.emptyList();
         }
         else
         {
-            projectCompletedSince = CollectionUtils.filter(completedSince, new Predicate<BuildResult>()
+            projectCompletedSince = Iterables.filter(completedSince, new Predicate<BuildResult>()
             {
-                public boolean satisfied(BuildResult buildResult)
+                public boolean apply(BuildResult buildResult)
                 {
                     return buildResult.getProject().equals(project) && !buildResult.equals(latestComplete);
                 }
@@ -233,7 +233,7 @@ public class MonitorApi
         return createStatus(user, inProgress, latestCompleted, completedSince);
     }
 
-    private Hashtable<String, Object> createStatus(NamedEntity owner, List<BuildResult> inProgress, BuildResult latestComplete, List<BuildResult> completedSince)
+    private Hashtable<String, Object> createStatus(NamedEntity owner, Iterable<BuildResult> inProgress, BuildResult latestComplete, Iterable<BuildResult> completedSince)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         result.put("owner", owner.getName());

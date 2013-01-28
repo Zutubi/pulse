@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.util.CollectionUtils;
+import com.google.common.collect.Sets;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -146,13 +146,13 @@ public class IvyModuleDescriptorTest extends ZutubiTestCase
         assertEquals(0, descriptor.getOptionalDependencies().size());
 
         descriptor.addOptionalDependency(MODULE_1);
-        assertEquals(CollectionUtils.asSet(MODULE_1), descriptor.getOptionalDependencies());
+        assertEquals(Sets.newHashSet(MODULE_1), descriptor.getOptionalDependencies());
 
         descriptor.addOptionalDependency(MODULE_2);
-        assertEquals(CollectionUtils.asSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
+        assertEquals(Sets.newHashSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
 
         descriptor.addOptionalDependency(MODULE_1);
-        assertEquals(CollectionUtils.asSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
+        assertEquals(Sets.newHashSet(MODULE_1, MODULE_2), descriptor.getOptionalDependencies());
     }
 
     private File writeToFile(IvyModuleDescriptor descriptor) throws IOException

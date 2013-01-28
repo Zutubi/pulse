@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.pulse.master.xwork.actions.project.BuildActionBase;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 /**
  * An action for manually triggering a build hook on a build.
@@ -34,13 +34,13 @@ public class TriggerBuildHookAction extends BuildActionBase
         {
             BuildResult buildResult = getRequiredBuildResult();
             Project project = buildResult.getProject();
-            BuildHookConfiguration hookConfig = CollectionUtils.find(project.getConfig().getBuildHooks().values(), new Predicate<BuildHookConfiguration>()
+            BuildHookConfiguration hookConfig = find(project.getConfig().getBuildHooks().values(), new Predicate<BuildHookConfiguration>()
             {
-                public boolean satisfied(BuildHookConfiguration buildHookConfiguration)
+                public boolean apply(BuildHookConfiguration buildHookConfiguration)
                 {
                     return buildHookConfiguration.getHandle() == hook;
                 }
-            });
+            }, null);
 
             if (hookConfig == null)
             {

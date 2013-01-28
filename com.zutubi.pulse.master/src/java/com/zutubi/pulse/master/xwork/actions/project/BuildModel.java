@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
@@ -7,8 +9,6 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import flexjson.JSON;
 
 import java.util.LinkedList;
@@ -167,13 +167,13 @@ public class BuildModel extends ResultModel
 
     public BuildStageModel getStage(final String stageName)
     {
-        return CollectionUtils.find(stages, new Predicate<BuildStageModel>()
+        return find(stages, new Predicate<BuildStageModel>()
         {
-            public boolean satisfied(BuildStageModel buildStageModel)
+            public boolean apply(BuildStageModel buildStageModel)
             {
                 return buildStageModel.getName().equals(stageName);
             }
-        });
+        }, null);
     }
 
 }

@@ -1,18 +1,19 @@
 package com.zutubi.pulse.master.scheduling;
 
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
-import com.zutubi.util.CollectionUtils;
+import static com.zutubi.pulse.master.scheduling.TriggerState.PAUSED;
+import static com.zutubi.pulse.master.scheduling.TriggerState.SCHEDULED;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
-
-import static com.zutubi.pulse.master.scheduling.TriggerState.SCHEDULED;
-import static com.zutubi.pulse.master.scheduling.TriggerState.PAUSED;
-import static org.mockito.Mockito.*;
 
 public class DefaultSchedulerTest extends ZutubiTestCase
 {
@@ -39,7 +40,7 @@ public class DefaultSchedulerTest extends ZutubiTestCase
             {
                 String name = (String)invocationOnMock.getArguments()[0];
                 String group = (String)invocationOnMock.getArguments()[1];
-                return CollectionUtils.find(persistedTriggers, new HasNameAndGroupPredicate(name, group));
+                return find(persistedTriggers, new HasNameAndGroupPredicate(name, group), null);
             }
         });
         stub(triggerDao.findByGroup(anyString())).toAnswer(new Answer()
@@ -47,7 +48,7 @@ public class DefaultSchedulerTest extends ZutubiTestCase
             public Object answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 String group = (String)invocationOnMock.getArguments()[0];
-                return CollectionUtils.filter(persistedTriggers, new HasGroupPredicate(group));
+                return Lists.newArrayList(Iterables.filter(persistedTriggers, new HasGroupPredicate(group)));
             }
         });
         stub(triggerDao.findAll()).toReturn(persistedTriggers);

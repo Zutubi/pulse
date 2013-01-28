@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.validation.FakeValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -10,7 +10,7 @@ import com.zutubi.validation.ValidationException;
 import java.util.List;
 
 /**
- * A base for validation test cases, allowing conventient testing of the
+ * A base for validation test cases, allowing convenient testing of the
  * validation rules for configuration types.
  */
 public abstract class AbstractValidationTestCase extends AbstractConfigurationSystemTestCase
@@ -44,6 +44,6 @@ public abstract class AbstractValidationTestCase extends AbstractConfigurationSy
         ValidationContext context = new FakeValidationContext();
         validationManager.validate(instance, context);
         assertTrue(context.hasErrors());
-        assertErrors(CollectionUtils.asList(context.getActionErrors()), expectedErrors);
+        assertErrors(newArrayList(context.getActionErrors()), expectedErrors);
     }
 }

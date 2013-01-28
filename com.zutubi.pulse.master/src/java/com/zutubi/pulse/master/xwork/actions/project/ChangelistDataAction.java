@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.api.*;
@@ -19,7 +20,6 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.io.IOUtils;
@@ -163,7 +163,7 @@ public class ChangelistDataAction extends ActionSupport
         {
             DAGraph.Node<BuildResult> nodeWithChangeViewer = buildGraph.findNodeByPredicate(new Predicate<DAGraph.Node<BuildResult>>()
             {
-                public boolean satisfied(DAGraph.Node<BuildResult> buildResultNode)
+                public boolean apply(DAGraph.Node<BuildResult> buildResultNode)
                 {
                     return buildResultNode.getData().getProject().getConfig().getChangeViewer() != null;
                 }

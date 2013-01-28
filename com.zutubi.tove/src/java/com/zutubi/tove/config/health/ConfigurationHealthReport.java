@@ -1,7 +1,8 @@
 package com.zutubi.tove.config.health;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,9 +59,9 @@ public class ConfigurationHealthReport
      */
     public boolean isSolvable()
     {
-        return !CollectionUtils.contains(problems, new Predicate<HealthProblem>()
+        return !Iterables.any(problems, new Predicate<HealthProblem>()
         {
-            public boolean satisfied(HealthProblem healthProblem)
+            public boolean apply(HealthProblem healthProblem)
             {
                 return !healthProblem.isSolvable();
             }
@@ -88,13 +89,13 @@ public class ConfigurationHealthReport
      */
     public Iterable<HealthProblem> getProblems(final String path, final boolean includeNested)
     {
-        return CollectionUtils.filter(problems, new Predicate<HealthProblem>()
+        return Lists.newArrayList(Iterables.filter(problems, new Predicate<HealthProblem>()
         {
-            public boolean satisfied(HealthProblem problem)
+            public boolean apply(HealthProblem problem)
             {
                 return problem.getPath().startsWith(path) && (includeNested || problem.getPath().length() == path.length());
             }
-        });
+        }));
     }
 
     /**

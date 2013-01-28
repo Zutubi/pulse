@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.pulse.master.tove.model.AbstractParameterised;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -62,13 +61,13 @@ public class Row extends AbstractParameterised
 
     public ActionLink getAction(final String actionName)
     {
-        return CollectionUtils.find(actions, new Predicate<ActionLink>()
+        return find(actions, new Predicate<ActionLink>()
         {
-            public boolean satisfied(ActionLink actionLink)
+            public boolean apply(ActionLink actionLink)
             {
                 return actionLink.getAction().equals(actionName);
             }
-        });
+        }, null);
     }
 
     public void addAction(ActionLink action)

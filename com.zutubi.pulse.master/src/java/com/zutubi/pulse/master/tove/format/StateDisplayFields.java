@@ -1,12 +1,15 @@
 package com.zutubi.pulse.master.tove.format;
 
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.*;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import static com.zutubi.util.reflection.MethodPredicates.*;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,10 +58,11 @@ public class StateDisplayFields
 
     private void findFieldListingMethod()
     {
-        Method[] methods = stateDisplayClass.getMethods();
-        fieldListingMethod = CollectionUtils.find(methods,
-                and(hasName(METHOD_LIST_FIELDS), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)));
-        collectionFieldListingMethod = CollectionUtils.find(methods,
+        List<Method> methods = asList(stateDisplayClass.getMethods());
+        fieldListingMethod = find(methods,
+                and(hasName(METHOD_LIST_FIELDS), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, String.class)),
+                null);
+        collectionFieldListingMethod = find(methods,
                 and(
                         hasName(METHOD_LIST_COLLECTION_FIELDS),
                         or(
@@ -67,13 +71,14 @@ public class StateDisplayFields
                                 acceptsParameters(Collection.class, Configuration.class)
                         ),
                         returnsType(List.class, String.class)
-                )
+                ),
+                null
         );
     }
 
     private void findAvailableFields()
     {
-        Method[] methods = stateDisplayClass.getMethods();
+        List<Method> methods = asList(stateDisplayClass.getMethods());
         findFieldMethods(methods,
                 METHOD_PREFIX_FORMAT,
                 availableFields,
@@ -89,9 +94,9 @@ public class StateDisplayFields
                 acceptsParameters(Collection.class, configurationClass));
     }
 
-    private void findFieldMethods(Method[] allMethods, String prefix, Map<String, Method> availableMap, Predicate<Method>... parameterPredicates)
+    private void findFieldMethods(Iterable<Method> allMethods, String prefix, Map<String, Method> availableMap, Predicate<Method>... parameterPredicates)
     {
-        List<Method> fieldMethods = CollectionUtils.filter(allMethods,
+        Iterable<Method> fieldMethods = Iterables.filter(allMethods,
                 and(hasPrefix(prefix, false),
                         not(returnsType(Void.TYPE)),
                         or(parameterPredicates)

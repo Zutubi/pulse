@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.api;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.model.Result;
@@ -9,7 +10,10 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.time.TimeStamps;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Utility methods shared by XML-RPC API classes.
@@ -24,9 +28,9 @@ public class ApiUtils
      *                      returned structs, if false omit these details
      * @return the builds ready for automatic conversion to an array of structs
      */
-    public static Vector<Hashtable<String, Object>> mapBuilds(List<BuildResult> builds, boolean includeStages)
+    public static Vector<Hashtable<String, Object>> mapBuilds(Iterable<BuildResult> builds, boolean includeStages)
     {
-        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(Iterables.size(builds));
         for (BuildResult build : builds)
         {
             result.add(convertBuild(build, includeStages));

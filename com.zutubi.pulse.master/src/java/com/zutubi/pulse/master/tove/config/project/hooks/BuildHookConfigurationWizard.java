@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.tove.type.CompositeType;
@@ -7,7 +10,6 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,14 +47,14 @@ public class BuildHookConfigurationWizard extends AbstractTypeWizard
 
     private List<CompositeType> filterTaskTypes(List<CompositeType> taskExtensions, final Class hookClass)
     {
-        return CollectionUtils.filter(taskExtensions, new Predicate<CompositeType>()
+        return Lists.newArrayList(Iterables.filter(taskExtensions, new Predicate<CompositeType>()
         {
-            public boolean satisfied(CompositeType compositeType)
+            public boolean apply(CompositeType compositeType)
             {
                 CompatibleHooks compatible = compositeType.getAnnotation(CompatibleHooks.class, true);
-                 return compatible == null || CollectionUtils.contains(compatible.value(), hookClass);
+                return compatible == null || CollectionUtils.contains(compatible.value(), hookClass);
             }
-        });
+        }));
     }
 
     public void doFinish()

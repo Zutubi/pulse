@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * A predicate that matches a request holder containing a
@@ -17,7 +17,7 @@ public class HasMetaIdPredicate<T extends RequestHolder> implements Predicate<T>
         this.metaBuildId = metaBuildId;
     }
 
-    public boolean satisfied(T holder)
+    public boolean apply(T holder)
     {
         return holder.getMetaBuildId() == metaBuildId;
     }

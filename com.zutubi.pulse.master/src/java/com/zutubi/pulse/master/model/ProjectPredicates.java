@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.util.Predicate;
-import com.zutubi.util.InvertedPredicate;
-import com.zutubi.util.ConjunctivePredicate;
-import com.zutubi.util.NotNullPredicate;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
@@ -20,7 +18,7 @@ public class ProjectPredicates
     {
         return new Predicate<ProjectConfiguration>()
         {
-            public boolean satisfied(ProjectConfiguration projectConfiguration)
+            public boolean apply(ProjectConfiguration projectConfiguration)
             {
                 return projectConfiguration.isConcrete();
             }
@@ -38,7 +36,7 @@ public class ProjectPredicates
      */
     public static boolean concrete(ProjectConfiguration project)
     {
-        return concrete().satisfied(project);
+        return concrete().apply(project);
     }
 
     /**
@@ -48,7 +46,7 @@ public class ProjectPredicates
      */
     public static Predicate<Project> hasConfig()
     {
-        return new InvertedPredicate<Project>(noConfig());
+        return Predicates.not(noConfig());
     }
 
     /**
@@ -61,7 +59,7 @@ public class ProjectPredicates
     {
         return new Predicate<Project>()
         {
-            public boolean satisfied(Project project)
+            public boolean apply(Project project)
             {
                 return project.getConfig() == null;
             }
@@ -81,7 +79,7 @@ public class ProjectPredicates
      */
     public static Predicate<Project> exists()
     {
-        return new ConjunctivePredicate<Project>(new NotNullPredicate<Project>(), hasConfig());
+        return Predicates.and(Predicates.notNull(), hasConfig());
     }
 
     /**
@@ -95,7 +93,7 @@ public class ProjectPredicates
      */
     public static boolean notExists(Project project)
     {
-        return notExists().satisfied(project);
+        return notExists().apply(project);
     }
 
     /**
@@ -108,7 +106,7 @@ public class ProjectPredicates
      */
     public static Predicate<Project> notExists()
     {
-        return new InvertedPredicate<Project>(exists());
+        return Predicates.not(exists());
     }
 
     /**
@@ -122,7 +120,7 @@ public class ProjectPredicates
      */
     public static boolean exists(Project project)
     {
-        return exists().satisfied(project);
+        return exists().apply(project);
     }
 
     /**
@@ -134,7 +132,7 @@ public class ProjectPredicates
     {
         return new Predicate<Project>()
         {
-            public boolean satisfied(Project project)
+            public boolean apply(Project project)
             {
                 return project.isInitialised();
             }

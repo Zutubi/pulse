@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.api;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.Predicate;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ScmUtilsTest extends PulseTestCase
 {
@@ -28,7 +28,7 @@ public class ScmUtilsTest extends PulseTestCase
     {
         return new Predicate<String>()
         {
-            public boolean satisfied(String path)
+            public boolean apply(String path)
             {
                 return path.endsWith(endsWith);
             }

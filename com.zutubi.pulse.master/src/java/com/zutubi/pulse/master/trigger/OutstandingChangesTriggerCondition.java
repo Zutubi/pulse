@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.trigger;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.build.queue.FatController;
@@ -9,8 +11,6 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.triggers.OutstandingChangesTriggerConditionConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -75,13 +75,13 @@ public class OutstandingChangesTriggerCondition extends TriggerConditionSupport
     private BuildRevision getLatestQueuedRevision(Project project)
     {
         List<BuildRequestEvent> queued = fatController.getRequestsForEntity(project);
-        BuildRequestEvent event = CollectionUtils.find(queued, new Predicate<BuildRequestEvent>()
+        BuildRequestEvent event = find(queued, new Predicate<BuildRequestEvent>()
         {
-            public boolean satisfied(BuildRequestEvent event)
+            public boolean apply(BuildRequestEvent event)
             {
                 return !event.getRevision().isUser();
             }
-        });
+        }, null);
 
         return event == null ? null : event.getRevision();
     }

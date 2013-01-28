@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.google.common.base.Predicate;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.util.Predicate;
 
 /**
  * Looks up the documentation for a type found by configuration path.
@@ -24,7 +24,7 @@ public class TypeHelpAction extends TypeHelpActionSupport
     {
         return new Predicate<TypeProperty>()
         {
-            public boolean satisfied(TypeProperty typeProperty)
+            public boolean apply(TypeProperty typeProperty)
             {
                 return ToveUtils.isFormField(typeProperty);
             }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.test.api;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -78,13 +78,13 @@ public abstract class PulseTestCase extends ZutubiTestCase
 
         for (final T expectedItem : expected)
         {
-            assertNotNull(CollectionUtils.find(actual, new Predicate<T>()
+            assertNotNull(find(actual, new Predicate<T>()
             {
-                public boolean satisfied(T actualItem)
+                public boolean apply(T actualItem)
                 {
                     return expectedItem == actualItem;
                 }
-            }));
+            }, null));
         }
     }
 }

@@ -1,5 +1,9 @@
 package com.zutubi.tove.type;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -7,8 +11,6 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.lang.annotation.*;
 import java.util.Hashtable;
@@ -472,9 +474,9 @@ public class CompositeTypeTest extends TypeTestCase
 
     private void assertAnnotation(List<Annotation> annotations, final Class clazz)
     {
-        assertTrue(CollectionUtils.contains(annotations, new Predicate<Annotation>()
+        assertTrue(Iterables.any(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation.annotationType() == clazz;
             }
@@ -483,13 +485,13 @@ public class CompositeTypeTest extends TypeTestCase
 
     private void assertAnnotationCount(int count, List<Annotation> annotations, final Class clazz)
     {
-        assertEquals(count, CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        assertEquals(count, size(filter(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation.annotationType() == clazz;
             }
-        }).size());
+        })));
     }
 
     public void testSupertypesRegistered()

@@ -1,12 +1,13 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static java.util.Arrays.asList;
+import org.mortbay.http.HttpContext;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
-import org.mortbay.http.HttpContext;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -93,15 +94,14 @@ public class JettyServerManager implements Stoppable
             throw new IllegalArgumentException("Unknown jetty server '" + serverName + "'");
         }
 
-        HttpContext context = CollectionUtils.find(server.getContexts(), new Predicate<HttpContext>()
+        // A context is available if it is not yet taken
+        return !any(asList(server.getContexts()), new Predicate<HttpContext>()
         {
-            public boolean satisfied(HttpContext httpContext)
+            public boolean apply(HttpContext httpContext)
             {
                 return httpContext.getContextPath().compareTo(contextPath) == 0;
             }
         });
-
-        return context == null;
     }
 
     /**

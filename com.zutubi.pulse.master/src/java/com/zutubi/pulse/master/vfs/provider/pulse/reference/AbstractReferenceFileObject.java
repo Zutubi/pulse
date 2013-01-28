@@ -1,11 +1,14 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
+import static java.util.Arrays.asList;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -15,9 +18,6 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.concatenate;
-import static java.util.Arrays.asList;
 
 /**
  * Abstract base for all reference doc files.  Handles common behaviour such as
@@ -53,7 +53,7 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
         }
         else
         {
-            List<String> allChildren = concatenate(asList(staticChildren), asList(dynamicChildren));
+            List<String> allChildren = newArrayList(concat(asList(staticChildren), asList(dynamicChildren)));
             Collections.sort(allChildren, new Sort.StringComparator());
             return allChildren.toArray(new String[allChildren.size()]);
         }

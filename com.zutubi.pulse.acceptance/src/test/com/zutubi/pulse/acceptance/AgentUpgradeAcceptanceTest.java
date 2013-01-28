@@ -1,6 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
@@ -10,9 +14,9 @@ import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.Constants.MINUTE;
+import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.NullUnaryProcedure;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -21,10 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
-import static com.zutubi.util.Constants.MINUTE;
-import static com.zutubi.util.Constants.SECOND;
 
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
@@ -127,9 +127,9 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     private void checkPluginsMatch(RpcClient masterRpcClient, RpcClient agentRpcClient) throws Exception
     {
         Vector<Hashtable<String, Object>> masterPlugins = masterRpcClient.TestApi.getRunningPlugins();
-        masterPlugins = new Vector<Hashtable<String, Object>>(CollectionUtils.filter(masterPlugins, new Predicate<Hashtable<String, Object>>()
+        masterPlugins = new Vector<Hashtable<String, Object>>(Collections2.filter(masterPlugins, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> plugin)
+            public boolean apply(Hashtable<String, Object> plugin)
             {
                 return PluginRepository.Scope.CORE.toString().equals(plugin.get("scope")) ||
                         PluginRepository.Scope.SERVER.toString().equals(plugin.get("scope"));
@@ -142,9 +142,9 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         for (final Hashtable<String, Object> masterPlugin: masterPlugins)
         {
             assertTrue("Cannot find plugin '" + getId(masterPlugin) + ":" + getVersion(masterPlugin) + "' on agent",
-                    CollectionUtils.contains(agentPlugins, new Predicate<Hashtable<String, Object>>()
+                    Iterables.any(agentPlugins, new Predicate<Hashtable<String, Object>>()
                     {
-                        public boolean satisfied(Hashtable<String, Object> agentPlugin)
+                        public boolean apply(Hashtable<String, Object> agentPlugin)
                         {
                             return getId(masterPlugin).equals(getId(agentPlugin)) && getVersion(masterPlugin).equals(getVersion(agentPlugin));
                         }

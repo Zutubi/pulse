@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins.sync;
 
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
@@ -7,16 +8,15 @@ import com.zutubi.pulse.core.plugins.repository.PluginRepositoryException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import static java.util.Arrays.asList;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.*;
 
 public class PluginSynchroniserTest extends PulseTestCase
 {
@@ -54,7 +54,7 @@ public class PluginSynchroniserTest extends PulseTestCase
         {
             public Plugin answer(InvocationOnMock invocationOnMock) throws Throwable
             {
-                return CollectionUtils.find(plugins, new PluginIdPredicate((String) invocationOnMock.getArguments()[0]));
+                return find(plugins, new PluginIdPredicate((String) invocationOnMock.getArguments()[0]), null);
             }
         }).when(pluginManager).getPlugin(Mockito.anyString());
         

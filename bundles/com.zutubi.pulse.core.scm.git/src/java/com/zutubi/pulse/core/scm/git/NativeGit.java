@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.process.api.*;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -19,8 +20,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
@@ -566,7 +565,7 @@ public class NativeGit
                             if (parts.length == 2)
                             {
                                 logEntryHasFiles = true;
-                                if (changesFilter.satisfied(parts[1]))
+                                if (changesFilter.apply(parts[1]))
                                 {
                                     logEntry.addFileChange(parts[1], parts[0]);
                                 }

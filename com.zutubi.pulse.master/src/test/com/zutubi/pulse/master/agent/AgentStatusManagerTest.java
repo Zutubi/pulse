@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -20,7 +21,6 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.variables.GenericVariable;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -1179,7 +1179,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         return agentStatusManager.getAgentsByStatusPredicate(new Predicate<AgentStatus>()
         {
-            public boolean satisfied(AgentStatus status)
+            public boolean apply(AgentStatus status)
             {
                 return status.isOnline();
             }

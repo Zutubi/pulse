@@ -1,9 +1,11 @@
 package com.zutubi.util.reflection;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.BeanUtils;
+import static java.util.Arrays.asList;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -45,14 +47,14 @@ public class AnnotationUtils
         Method readMethod = property.getReadMethod();
         if (readMethod != null)
         {
-            annotations.addAll(Arrays.asList(readMethod.getAnnotations()));
+            annotations.addAll(asList(readMethod.getAnnotations()));
             declaringClass = readMethod.getDeclaringClass();
         }
 
         Method writeMethod = property.getWriteMethod();
         if (writeMethod != null)
         {
-            annotations.addAll(Arrays.asList(writeMethod.getAnnotations()));
+            annotations.addAll(asList(writeMethod.getAnnotations()));
             declaringClass = writeMethod.getDeclaringClass();
         }
 
@@ -61,7 +63,7 @@ public class AnnotationUtils
             try
             {
                 Field field = declaringClass.getDeclaredField(property.getName());
-                annotations.addAll(Arrays.asList(field.getAnnotations()));
+                annotations.addAll(asList(field.getAnnotations()));
             }
             catch (NoSuchFieldException e)
             {
@@ -131,13 +133,13 @@ public class AnnotationUtils
     private static void processSuper(Class superClass, final PropertyDescriptor property, List<Annotation> annotations, boolean includeMeta) throws IntrospectionException
     {
         BeanInfo superInfo = Introspector.getBeanInfo(superClass);
-        PropertyDescriptor superDescriptor = CollectionUtils.find(superInfo.getPropertyDescriptors(), new Predicate<PropertyDescriptor>()
+        PropertyDescriptor superDescriptor = find(asList(superInfo.getPropertyDescriptors()), new Predicate<PropertyDescriptor>()
         {
-            public boolean satisfied(PropertyDescriptor superProperty)
+            public boolean apply(PropertyDescriptor superProperty)
             {
                 return superProperty.getName().equals(property.getName());
             }
-        });
+        }, null);
 
         if (superDescriptor != null)
         {

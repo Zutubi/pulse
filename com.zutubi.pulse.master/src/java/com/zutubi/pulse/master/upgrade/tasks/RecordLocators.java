@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Predicate;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.Predicate;
 
 /**
  * Static factory methods for creating {@link RecordLocator} instances.

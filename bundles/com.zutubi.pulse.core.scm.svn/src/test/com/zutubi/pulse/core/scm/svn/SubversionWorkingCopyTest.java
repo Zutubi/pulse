@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.google.common.collect.Sets;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.unified.UnifiedHunk;
@@ -32,8 +33,6 @@ import org.tmatesoft.svn.core.wc.SVNWCClient;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
-
-import static com.zutubi.util.CollectionUtils.asSet;
 
 public class SubversionWorkingCopyTest extends PulseTestCase
 {
@@ -510,7 +509,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
                 return fileStatus.getPath();
             }
         }, new HashSet<String>(2));
-        assertEquals(asSet("dir1/file1", "dir1/file2"), paths);
+        assertEquals(Sets.newHashSet("dir1/file1", "dir1/file2"), paths);
     }
 
     public void testUpdateAlreadyUpToDate() throws Exception

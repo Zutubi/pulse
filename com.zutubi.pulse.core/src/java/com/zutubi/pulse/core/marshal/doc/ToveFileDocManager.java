@@ -1,11 +1,14 @@
 package com.zutubi.pulse.core.marshal.doc;
 
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Iterables.filter;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Internal;
@@ -14,24 +17,21 @@ import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
-import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.validation.annotations.Required;
+import static java.util.Arrays.asList;
 import nu.xom.Element;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
-
-import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
-import static com.zutubi.util.CollectionUtils.map;
-import static com.zutubi.util.reflection.MethodPredicates.*;
-import static java.util.Arrays.asList;
 
 /**
  * Analyses types and creates data structures representing tove file
@@ -237,7 +237,7 @@ public class ToveFileDocManager
         Class<?> examplesClass = ConventionSupport.getExamples(type.getClazz());
         if (examplesClass != null)
         {
-            List<Method> exampleMethods = CollectionUtils.filter(examplesClass.getMethods(),
+            Iterable<Method> exampleMethods = filter(asList(examplesClass.getMethods()),
                     and(hasPrefix(EXAMPLE_METHOD_PREFIX, false), acceptsParameters(), returnsType(ConfigurationExample.class)));
 
             try

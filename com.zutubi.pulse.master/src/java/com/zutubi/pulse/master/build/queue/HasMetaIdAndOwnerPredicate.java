@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.Predicate;
-import com.zutubi.util.ConjunctivePredicate;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 /**
  * A predicate that matches a request holder containing a
@@ -15,14 +15,14 @@ public class HasMetaIdAndOwnerPredicate<T extends RequestHolder> implements Pred
 
     public HasMetaIdAndOwnerPredicate(long metaBuildId, Object owner)
     {
-        this.delegate = new ConjunctivePredicate<T>(
-                new HasMetaIdPredicate(metaBuildId),
-                new HasOwnerPredicate(owner)
+        this.delegate = Predicates.and(
+                new HasMetaIdPredicate<T>(metaBuildId),
+                new HasOwnerPredicate<T>(owner)
         );
     }
 
-    public boolean satisfied(T holder)
+    public boolean apply(T holder)
     {
-        return delegate.satisfied(holder);
+        return delegate.apply(holder);
     }
 }

@@ -1,19 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.RandomUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * A set of acceptance tests for the build version functionality.  This includes
@@ -139,13 +138,13 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     private String getEnvironmentText(String projectName, int buildNumber) throws Exception
     {
         Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(projectName, buildNumber);
-        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> artifact = find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> artifact)
+            public boolean apply(Hashtable<String, Object> artifact)
             {
                 return artifact.get("name").equals("environment");
             }
-        });
+        }, null);
         assertNotNull(artifact);
 
         String permalink = (String) artifact.get("permalink");

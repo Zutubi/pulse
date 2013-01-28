@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.plugins.PluginManager;
@@ -141,7 +142,7 @@ public class SlaveServiceImpl implements SlaveService
 
     private boolean checkForPluginSync(String masterUrl, List<PluginInfo> masterPlugins)
     {
-        List<PluginInfo> serverPlugins = CollectionUtils.filter(masterPlugins, new PluginScopePredicate(PluginRepository.Scope.SERVER));
+        Iterable<PluginInfo> serverPlugins = Iterables.filter(masterPlugins, new PluginScopePredicate(PluginRepository.Scope.SERVER));
         SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(serverPlugins);
         if (requiredActions.isRebootRequired())
         {

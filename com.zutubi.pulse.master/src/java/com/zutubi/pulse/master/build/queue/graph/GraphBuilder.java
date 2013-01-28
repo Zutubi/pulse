@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.build.queue.graph;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.TreeNode;
 
 import java.util.List;
@@ -71,13 +71,13 @@ public class GraphBuilder
 
     private DependencyConfiguration findDependency(ProjectConfiguration fromProject, final ProjectConfiguration toProject)
     {
-        return CollectionUtils.find(fromProject.getDependencies().getDependencies(), new Predicate<DependencyConfiguration>()
+        return find(fromProject.getDependencies().getDependencies(), new Predicate<DependencyConfiguration>()
         {
-            public boolean satisfied(DependencyConfiguration dependency)
+            public boolean apply(DependencyConfiguration dependency)
             {
-                return toProject.equals(dependency.getProject()) ;
+                return toProject.equals(dependency.getProject());
             }
-        });
+        }, null);
     }
 
     private void applyFilters(TreeNode<BuildGraphData> root, GraphFilter... filters)
@@ -87,7 +87,7 @@ public class GraphBuilder
             root.breadthFirstWalk(filter);
             root.filteringWalk(new Predicate<TreeNode<BuildGraphData>>()
             {
-                public boolean satisfied(TreeNode<BuildGraphData> node)
+                public boolean apply(TreeNode<BuildGraphData> node)
                 {
                     return !filter.contains(node);
                 }

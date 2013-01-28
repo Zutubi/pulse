@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -16,7 +19,8 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
-import com.zutubi.util.*;
+import com.zutubi.util.Constants;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
@@ -164,7 +168,7 @@ public class PollingService implements Stoppable
         }
     }
 
-    private List<DependencyTree> generateReadyDependencyTrees()
+    private Iterable<DependencyTree> generateReadyDependencyTrees()
     {
         Set<Project> identified = new HashSet<Project>();
 
@@ -184,9 +188,9 @@ public class PollingService implements Stoppable
             identified.addAll(newTree.getProjects());
         }
 
-        return CollectionUtils.filter(trees, new Predicate<DependencyTree>()
+        return Iterables.filter(trees, new Predicate<DependencyTree>()
         {
-            public boolean satisfied(DependencyTree dependencyTree)
+            public boolean apply(DependencyTree dependencyTree)
             {
                 return dependencyTree.isReadyToPoll();
             }
@@ -220,7 +224,7 @@ public class PollingService implements Stoppable
         }
     }
 
-    private void queuePollRequests(List<DependencyTree> treesToPoll)
+    private void queuePollRequests(Iterable<DependencyTree> treesToPoll)
     {
         // go through the dependency trees generating the poll requests.
         List<PollingRequest> requests = new LinkedList<PollingRequest>();
@@ -371,10 +375,10 @@ public class PollingService implements Stoppable
             return projects;
         }
 
-        public Collection<? extends Project> getProjectsToPoll()
+        public Iterable<? extends Project> getProjectsToPoll()
         {
-            return CollectionUtils.filter(projects,
-                    new ConjunctivePredicate<Project>(
+            return Iterables.filter(projects,
+                    Predicates.and(
                             objectFactory.buildBean(IsInitialisedPredicate.class),
                             objectFactory.buildBean(IsMonitorablePredicate.class)
                     )
@@ -383,13 +387,13 @@ public class PollingService implements Stoppable
 
         public boolean isReadyToPoll()
         {
-            return CollectionUtils.find(projects,
-                    new ConjunctivePredicate<Project>(
+            return Iterables.any(projects,
+                    Predicates.and(
                             objectFactory.buildBean(IsInitialisedPredicate.class),
                             objectFactory.buildBean(IsMonitorablePredicate.class),
                             objectFactory.buildBean(IsReadyToPollPredicate.class)
                     )
-            ) != null;
+            );
         }
     }
 

@@ -1,11 +1,13 @@
 package com.zutubi.pulse.servercore.agent;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.reflection.ReflectionUtils;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -123,14 +125,14 @@ public class SynchronisationTaskFactory
 
     private Field[] getArgumentFields(Class taskClass)
     {
-        return CollectionUtils.filterToArray(taskClass.getDeclaredFields(), new Predicate<Field>()
+        return toArray(filter(asList(taskClass.getDeclaredFields()), new Predicate<Field>()
         {
-            public boolean satisfied(Field field)
+            public boolean apply(Field field)
             {
                 int modifiers = field.getModifiers();
                 return !Modifier.isFinal(modifiers) && !Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers);
             }
-        });
+        }), Field.class);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

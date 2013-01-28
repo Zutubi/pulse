@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.ui;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.ui.api.MenuChoice;
 import com.zutubi.pulse.core.ui.api.MenuOption;
 import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -102,13 +102,13 @@ public class TestUI implements UserInterface
 
     public <T> MenuChoice<T> menuPrompt(String question, List<MenuOption<T>> choices)
     {
-        MenuOption<T> defaultOption = CollectionUtils.find(choices, new Predicate<MenuOption<T>>()
+        MenuOption<T> defaultOption = find(choices, new Predicate<MenuOption<T>>()
         {
-            public boolean satisfied(MenuOption<T> option)
+            public boolean apply(MenuOption<T> option)
             {
                 return option.isDefaultOption();
             }
-        });
+        }, null);
 
         if (defaultOption != null)
         {

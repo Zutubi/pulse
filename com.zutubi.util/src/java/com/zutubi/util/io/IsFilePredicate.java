@@ -1,6 +1,6 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.io.File;
 
@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class IsFilePredicate implements Predicate<File>
 {
-    public boolean satisfied(File file)
+    public boolean apply(File file)
     {
         return file.isFile();
     }

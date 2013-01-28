@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
@@ -14,6 +17,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
@@ -24,16 +28,17 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.EnumUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
-import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -76,11 +81,11 @@ public class ProjectHomeDataAction extends ProjectActionBase
         final Set<Long> activatedBuilds = new HashSet<Long>();
         CollectionUtils.map(inProgress, new BuildResultToNumberMapping(), activatedBuilds);
         CollectionUtils.map(latestCompleted, new BuildResultToNumberMapping(), activatedBuilds);
-        queued = CollectionUtils.filter(queued, new Predicate<QueuedRequest>()
+        Iterables.removeIf(queued, new Predicate<QueuedRequest>()
         {
-            public boolean satisfied(QueuedRequest queuedRequest)
+            public boolean apply(QueuedRequest queuedRequest)
             {
-                return !activatedBuilds.contains(buildRequestRegistry.getBuildNumber(queuedRequest.getRequest().getId()));
+                return activatedBuilds.contains(buildRequestRegistry.getBuildNumber(queuedRequest.getRequest().getId()));
             }
         });
 
@@ -125,9 +130,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
         List<BuildStageModel> brokenStages = null;
         if (latestCompleted != null)
         {
-            List<RecipeResultNode> brokenNodes = CollectionUtils.filter(latestCompleted.getStages(), new Predicate<RecipeResultNode>()
+            Collection<RecipeResultNode> brokenNodes = Collections2.filter(latestCompleted.getStages(), new Predicate<RecipeResultNode>()
             {
-                public boolean satisfied(RecipeResultNode recipeResultNode)
+                public boolean apply(RecipeResultNode recipeResultNode)
                 {
                     return !recipeResultNode.getResult().healthy();
                 }

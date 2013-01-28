@@ -1,18 +1,18 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.ConfigurationEvent;
-import com.zutubi.util.Predicate;
 
 /**
- *
- *
+ * A predicate to test for configuration events against instances of a give class (including
+ * subclasses).
  */
 public class ClassPredicate implements Predicate<Event>
 {
-    private Class clazz;
+    private Class<?> clazz;
 
-    public ClassPredicate(Class clazz)
+    public ClassPredicate(Class<?> clazz)
     {
         if (clazz == null)
         {
@@ -21,7 +21,7 @@ public class ClassPredicate implements Predicate<Event>
         this.clazz = clazz;
     }
 
-    public boolean satisfied(Event event)
+    public boolean apply(Event event)
     {
         if (!(event instanceof ConfigurationEvent))
         {

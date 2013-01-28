@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.xwork.actions.setup;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesActionSupport;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,13 +28,13 @@ public class SystemStartingAction extends ServerMessagesActionSupport
     @Override
     public String execute() throws Exception
     {
-        errorRecords = CollectionUtils.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
+        errorRecords = Lists.newLinkedList(Iterables.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
         {
-            public boolean satisfied(CustomLogRecord customLogRecord)
+            public boolean apply(CustomLogRecord customLogRecord)
             {
                 return isError(customLogRecord);
             }
-        });
+        }));
 
         Collections.reverse(errorRecords);
         if (errorRecords.size() > MAX_ERRORS)

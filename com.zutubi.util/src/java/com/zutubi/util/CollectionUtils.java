@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Predicate;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
@@ -11,93 +12,6 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    /**
-     * Similar to {@link #filter(Object[], Predicate)}  items not matching the predicate
-     * are removed from the original collection and returned.
-     *
-     * @param l     the list that will be filtered inplace
-     * @param p     the predicate identifying the items to be accepted.
-     * @param <T>   the type of the item contained by the collection
-     * @return  a list of the items that were filtered.
-     */
-    public static <T> List<T> filterInPlace(Collection<T> l, Predicate<T> p)
-    {
-        List<T> removedItems = new LinkedList<T>();
-        Iterator<T> it = l.iterator();
-        while (it.hasNext())
-        {
-            T value = it.next();
-            if (!p.satisfied(value))
-            {
-                it.remove();
-                removedItems.add(value);
-            }
-        }
-        
-        return removedItems;
-    }
-
-    public static <T> List<T> filter(Iterable<T> l, Predicate<T> p)
-    {
-        return filter(l, p, (List<T>) new LinkedList<T>());
-    }
-
-    public static <T, U extends Collection<? super T>> U filter(Iterable<T> in, Predicate<T> p, U out)
-    {
-        for(T t: in)
-        {
-            if(p.satisfied(t))
-            {
-                out.add(t);
-            }
-        }
-
-        return out;
-    }
-
-    public static <T> List<T> filter(T[] l, Predicate<T> p)
-    {
-        List<T> result = new LinkedList<T>();
-        filter(l, p, result);
-        return result;
-    }
-
-    public static <T> void filter(T[] in, Predicate<T> p, Collection<T> out)
-    {
-        for(T t: in)
-        {
-            if(p.satisfied(t))
-            {
-                out.add(t);
-            }
-        }
-    }
-
-    public static <T> T[] filterToArray(T[] in, Predicate<T> predicate)
-    {
-        List<T> result = filter(in, predicate);
-        return result.toArray((T[])Array.newInstance(in.getClass().getComponentType(), result.size()));
-    }
-
-    /**
-     * Create a single list that contains the contents of each of the specified
-     * lists.  If items are in the input lists multiple times, then they will appear
-     * in the concatenated list multiple times.
-     *
-     * @param lists     the lists being concatenated.
-     * @param <T>       the type of the objects contained by the lists
-     * @return a list that contains all of the data from the input lists.
-     */
-    public static <T> List<T> concatenate(List<T>... lists)
-    {
-        List<T> result = new LinkedList<T>();
-        for (Collection<T> collection : lists)
-        {
-            result.addAll(collection);
-        }
-        return result;
-    }
-
     public static <T, U> List<U> map(Iterable<T> l, Mapping<? super T, U> m)
     {
         List<U> result = new LinkedList<U>();
@@ -179,35 +93,6 @@ public class CollectionUtils
         }
     }
 
-    public static <T> T find(Iterable<T> c, Predicate<T> p)
-    {
-        return find(c.iterator(), p);
-    }
-
-    public static <T> T find(Iterator<T> c, Predicate<T> p)
-    {
-        while (c.hasNext())
-        {
-            T t = c.next();
-            if (p.satisfied(t))
-            {
-                return t;
-            }
-        }
-
-        return null;
-    }
-
-    public static <T> T find(T[] c, Predicate<T> p)
-    {
-        return find(Arrays.asList(c), p);
-    }
-
-    public static <T> boolean contains(Iterable<T> in, Predicate<T> p)
-    {
-        return find(in, p) != null;
-    }
-
     public static <T> boolean containsIdentity(T[] a, T x)
     {
         for(T t: a)
@@ -232,17 +117,6 @@ public class CollectionUtils
         }
 
         return false;
-    }
-
-    public static <T> Mapping<? extends T, T> identityMapping()
-    {
-        return new Mapping<T, T>()
-        {
-            public T map(T t)
-            {
-                return t;
-            }
-        };
     }
 
     public static <T> boolean equals(T[] a1, T[] a2)
@@ -441,30 +315,6 @@ public class CollectionUtils
     }
 
     /**
-     * Caclulates the number of items in the given collection that satisfy the
-     * given predicate.
-     *
-     * @param c         collection to count items from
-     * @param predicate predicate that must be satisfied to include an item in
-     *                  the count
-     * @param <T> type of item in the collection
-     * @return the number of items in the collection that satisfy the predicate
-     */
-    public static <T> int count(Collection<T> c, Predicate<T> predicate)
-    {
-        int count = 0;
-        for (T t: c)
-        {
-            if (predicate.satisfied(t))
-            {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    /**
      * Create a sorted version of the list using the provided comparator without changing the
      * original list.
      *
@@ -478,48 +328,6 @@ public class CollectionUtils
         List<T> copy = new LinkedList<T>(list);
         Collections.sort(copy, comparator);
         return copy;
-    }
-
-    /**
-     * Creates a new set containing the given items.
-     *
-     * @param ts  items to add to the set
-     * @param <T> type of item
-     * @return a new set populated with the given items
-     */
-    public static <T> Set<T> asSet(T... ts)
-    {
-        return new HashSet<T>(Arrays.asList(ts));
-    }
-
-    /**
-     * Return a list of the items contained by the specified iterator.
-     * The ordering of the iterator is preserved by the list.
-     *
-     * @param iterator  containing the items to turn into a list.
-     * @return a list that is equivalent to the contents of the iterator.
-     */
-    public static <T> List<T> asList(Iterator<T> iterator)
-    {
-        List<T> result = new LinkedList<T>();
-        while (iterator.hasNext())
-        {
-            result.add(iterator.next());
-        }
-        return result;
-    }
-
-    /**
-     * Return a list of the items contained by the specified collection.
-     * The ordering of the list is determines by the ordering presented by
-     * an iterator over the collection
-     *
-     * @param collection    containing the items to turn into a list.
-     * @return a list that is equivalent to the contents of the collection.
-     */
-    public static <T> List<T> asList(Collection<T> collection)
-    {
-        return asList(collection.iterator());
     }
 
     /**
@@ -582,7 +390,7 @@ public class CollectionUtils
             }
         }
 
-        if (predicate.satisfied(root.getData()))
+        if (predicate.apply(root.getData()))
         {
             return root.getData();
         }
@@ -629,7 +437,7 @@ public class CollectionUtils
         while (!toProcess.isEmpty())
         {
             TreeNode<T> next = toProcess.remove();
-            if (predicate.satisfied(next.getData()))
+            if (predicate.apply(next.getData()))
             {
                 return next.getData();
             }
@@ -640,38 +448,6 @@ public class CollectionUtils
             }
         }
         return null;
-    }
-
-    /**
-     * Divides the input list into sublists of the given size that do not
-     * overlap.  Note that the last sublist returned may be shorter than the
-     * specified size.  The sublists are views into the original list -- not
-     * copies.
-     *
-     * @param size the size of each sublist
-     * @param in   the input collection to partition
-     * @param <T>  the collection element type
-     * @return the sublist views of the input
-     * @see List#subList(int, int)
-     */
-    public static <T> List<List<T>> partition(int size, List<T> in)
-    {
-        if (size < 0)
-        {
-            throw new IllegalArgumentException("Size must be strictly positive (got " + size + ")");
-        }
-
-        int offset = 0;
-        List<List<T>> result = new LinkedList<List<T>>();
-        int length = in.size();
-        while (offset < length)
-        {
-            int end = Math.min(length, offset + size);
-            result.add(in.subList(offset, end));
-            offset = end;
-        }
-
-        return result;
     }
 
     /**

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.scm.config.api.Pollable;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.Predicate;
 
 /**
  * This predicate is satisfied by any project that should be monitored.
@@ -14,7 +14,7 @@ import com.zutubi.util.Predicate;
  */
 public class IsMonitorablePredicate implements Predicate<Project>
 {
-    public boolean satisfied(Project project)
+    public boolean apply(Project project)
     {
         ScmConfiguration scm = project.getConfig().getScm();
         if (scm == null || !(scm instanceof Pollable))

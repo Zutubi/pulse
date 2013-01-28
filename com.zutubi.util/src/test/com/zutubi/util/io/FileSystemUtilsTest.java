@@ -1,6 +1,12 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.*;
+import com.google.common.base.Predicates;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
+import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
+import static com.zutubi.util.io.FileSystemUtils.relativePath;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -9,9 +15,6 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
-import static com.zutubi.util.io.FileSystemUtils.relativePath;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
@@ -1284,7 +1287,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertTrue(new File(tmpDir, "a").mkdirs());
         assertTrue(new File(tmpDir, "b").mkdirs());
 
-        List<File> files = FileSystemUtils.filter(tmpDir, new TruePredicate<File>());
+        List<File> files = FileSystemUtils.filter(tmpDir, Predicates.<File>alwaysTrue());
         List<String> filenames = mapToFilenames(files);
         assertEquals(2, filenames.size());
         assertTrue(filenames.contains("a"));
@@ -1293,7 +1296,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testFilterNonExistentDirectory() throws IOException
     {
-        List<File> files = FileSystemUtils.filter(new File("nosuchfile"), new TruePredicate<File>());
+        List<File> files = FileSystemUtils.filter(new File("nosuchfile"), Predicates.<File>alwaysTrue());
         assertEquals(0, files.size());
     }
 
@@ -1301,7 +1304,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File f = new File(tmpDir, "f");
         assertTrue(f.createNewFile());
-        List<File> files = FileSystemUtils.filter(f, new TruePredicate<File>());
+        List<File> files = FileSystemUtils.filter(f, Predicates.<File>alwaysTrue());
         assertEquals(0, files.size());
     }
 

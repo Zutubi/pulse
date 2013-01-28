@@ -1,17 +1,17 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.util.InCollectionPredicate;
-import com.zutubi.util.InvertedPredicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCase
 {
@@ -235,7 +235,7 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     private String makeTestPath(String... pieces)
     {
         StringBuilder builder = new StringBuilder();
-        InvertedPredicate<Character> predicate = new InvertedPredicate<Character>(new InCollectionPredicate<Character>('/', '%'));
+        Predicate<Character> predicate = Predicates.not(Predicates.in(Arrays.asList('/', '%')));
         for (String piece : pieces)
         {
             if (builder.length() > 0)

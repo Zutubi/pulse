@@ -1,23 +1,22 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.DefaultObjectFactory;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 public class DefaultHostManagerTest extends PulseTestCase
 {
@@ -211,8 +210,8 @@ public class DefaultHostManagerTest extends PulseTestCase
 
         Collection<Agent> agents = hostManager.getAgentsForHost(host);
         assertEquals(2, agents.size());
-        assertTrue(CollectionUtils.contains(agents, new HasConfig(config1)));
-        assertTrue(CollectionUtils.contains(agents, new HasConfig(config2)));
+        assertTrue(any(agents, new HasConfig(config1)));
+        assertTrue(any(agents, new HasConfig(config2)));
     }
 
     private String getExpectedLocation(String hostname, int port)
@@ -244,7 +243,7 @@ public class DefaultHostManagerTest extends PulseTestCase
             this.config = config;
         }
 
-        public boolean satisfied(Agent agent)
+        public boolean apply(Agent agent)
         {
             return agent.getConfig() == config;
         }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The queued request holds the details of a build request that is
@@ -55,7 +55,7 @@ public class QueuedRequest extends RequestHolder
     {
         for (Predicate<QueuedRequest> predicate : predicates)
         {
-            if (!predicate.satisfied(this))
+            if (!predicate.apply(this))
             {
                 return false;
             }
@@ -80,7 +80,7 @@ public class QueuedRequest extends RequestHolder
         {
             if (predicate instanceof DependencyPredicate)
             {
-                if (!predicate.satisfied(this))
+                if (!predicate.apply(this))
                 {
                     return true;
                 }

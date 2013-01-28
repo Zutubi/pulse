@@ -1,10 +1,13 @@
 package com.zutubi.tove.config.health;
 
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.NotEqualsPredicate;
+import static java.util.Arrays.asList;
 
 import java.util.Arrays;
 
@@ -52,7 +55,7 @@ public class InvalidReferenceProblem extends HealthProblemSupport
                 else if (value instanceof String[])
                 {
                     String[] references = (String[]) value;
-                    String[] filteredReferences = CollectionUtils.filterToArray(references, new NotEqualsPredicate<String>(referencedHandle));
+                    String[] filteredReferences = toArray(filter(asList(references), not(equalTo((referencedHandle)))), String.class);
                     if (!Arrays.equals(references, filteredReferences))
                     {
                         MutableRecord mutableRecord = record.copy(false, true);

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.util.DisjunctivePredicate;
-import com.zutubi.util.Predicate;
 
 /**
  * Links builds with a dependency relationship.
@@ -51,7 +50,7 @@ public class BuildDependencyLink extends Entity
             this.buildId = buildId;
         }
 
-        public boolean satisfied(BuildDependencyLink buildDependencyLink)
+        public boolean apply(BuildDependencyLink buildDependencyLink)
         {
             return buildDependencyLink.getDownstreamBuildId() == buildId;
         }
@@ -66,17 +65,9 @@ public class BuildDependencyLink extends Entity
             this.buildId = buildId;
         }
 
-        public boolean satisfied(BuildDependencyLink buildDependencyLink)
+        public boolean apply(BuildDependencyLink buildDependencyLink)
         {
             return buildDependencyLink.getUpstreamBuildId() == buildId;
-        }
-    }
-
-    public static class HasId extends DisjunctivePredicate<BuildDependencyLink>
-    {
-        public HasId(long buildId)
-        {
-            super(new HasDownstreamId(buildId), new HasUpstreamId(buildId));
         }
     }
 }

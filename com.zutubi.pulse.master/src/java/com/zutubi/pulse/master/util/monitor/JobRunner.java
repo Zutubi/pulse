@@ -32,7 +32,7 @@ public class JobRunner<T extends Task>
         JobMonitor<T> monitor = (JobMonitor<T>) getMonitor();
 
         // register the tasks with the monitor.
-        Iterator<T> i = job.getTasks();
+        Iterator<T> i = job.iterator();
         while (i.hasNext())
         {
             monitor.add(i.next());

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.api;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
@@ -1669,7 +1672,7 @@ public class RemoteApi
         try
         {
             List<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-            List<ProjectConfiguration> concreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
+            Collection<ProjectConfiguration> concreteProjects = Collections2.filter(allProjects, ProjectPredicates.concrete());
             return getConfigNames(concreteProjects);
         }
         finally
@@ -3401,7 +3404,7 @@ public class RemoteApi
             }
 
             BuildResult buildResult = internalGetBuild(internalGetProject(projectName, true), buildId);
-            Comment comment = CollectionUtils.find(buildResult.getComments(), new EntityWithIdPredicate<Comment>(id));
+            Comment comment = find(buildResult.getComments(), new EntityWithIdPredicate<Comment>(id), null);
             if (comment == null)
             {
                 return false;
@@ -3513,7 +3516,7 @@ public class RemoteApi
             }
 
             Agent agent = internalGetAgent(agentName);
-            final Comment comment = CollectionUtils.find(agent.getComments(), new EntityWithIdPredicate<Comment>(id));
+            final Comment comment = find(agent.getComments(), new EntityWithIdPredicate<Comment>(id), null);
             if (comment == null)
             {
                 return false;
@@ -4481,8 +4484,8 @@ public class RemoteApi
                 }
             });
 
-            List<Plugin> runningPlugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
-            List<PluginInfo> coreInfos = CollectionUtils.filter(PluginList.toInfos(runningPlugins), new PluginScopePredicate(PluginRepository.Scope.CORE));
+            Iterable<Plugin> runningPlugins = Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+            Iterable<PluginInfo> coreInfos = Iterables.filter(PluginList.toInfos(runningPlugins), new PluginScopePredicate(PluginRepository.Scope.CORE));
             result.put(PersonalBuildInfo.PLUGINS, new Vector<Hashtable<String, Object>>(PluginList.infosToHashes(coreInfos)));
             return result;
         }

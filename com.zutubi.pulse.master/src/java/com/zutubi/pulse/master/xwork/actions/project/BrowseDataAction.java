@@ -1,12 +1,16 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.util.*;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.Sort;
 
 import java.util.*;
 
@@ -38,11 +42,10 @@ public class BrowseDataAction extends ProjectActionSupport
                 Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
                 Collection<ProjectConfiguration> allProjects = projectManager.getAllProjectConfigs(true);
-                List<ProjectConfiguration> allConcreteProjects = CollectionUtils.filter(allProjects, ProjectPredicates.concrete());
 
                 // Filter invalid projects into a separate list.
                 List<String> invalidProjects = new LinkedList<String>();
-                for (ProjectConfiguration project: allConcreteProjects)
+                for (ProjectConfiguration project: Iterables.filter(allProjects, ProjectPredicates.concrete()))
                 {
                     if (!projectManager.isProjectValid(project))
                     {
@@ -55,9 +58,9 @@ public class BrowseDataAction extends ProjectActionSupport
 
                 Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
                 ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);
-                model.setProjectGroups(helper.createProjectsModels(user, browseConfig, collapsed, urls, new TruePredicate<Project>(), new Predicate<ProjectGroup>()
+                model.setProjectGroups(helper.createProjectsModels(user, browseConfig, collapsed, urls, Predicates.<Project>alwaysTrue(), new Predicate<ProjectGroup>()
                 {
-                    public boolean satisfied(ProjectGroup projectGroup)
+                    public boolean apply(ProjectGroup projectGroup)
                     {
                         return browseConfig.isGroupsShown();
                     }

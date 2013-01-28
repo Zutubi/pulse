@@ -1,17 +1,15 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.concurrent.ConcurrentUtils;
 import com.zutubi.util.io.FileSystem;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -68,16 +66,16 @@ public class PathPatternFileLocator implements FileLocator
         return result;
     }
 
-    private List<File> findPathsMatchingPattern(String pattern)
+    private Collection<File> findPathsMatchingPattern(String pattern)
     {
         String[] elements = pattern.split(SEPARATOR);
 
-        List<File> matching = null;
+        Collection<File> matching = null;
         for (String element : elements)
         {
             final FilenameFilter filter = getFilterForElement(element);
 
-            List<File> matchesElement = new LinkedList<File>();
+            Collection<File> matchesElement = new LinkedList<File>();
             if (matching == null)
             {
                 List<File> roots = ConcurrentUtils.runWithTimeout(new Callable<List<File>>()
@@ -88,9 +86,9 @@ public class PathPatternFileLocator implements FileLocator
                     }
                 }, ROOT_LISTING_TIMEOUT_SECONDS, TimeUnit.SECONDS, Collections.<File>emptyList());
 
-                matchesElement = CollectionUtils.filter(roots, new Predicate<File>()
+                matchesElement = Collections2.filter(roots, new Predicate<File>()
                 {
-                    public boolean satisfied(File file)
+                    public boolean apply(File file)
                     {
                         String name = file.getAbsolutePath();
                         if (name.endsWith(File.separator))
@@ -110,7 +108,7 @@ public class PathPatternFileLocator implements FileLocator
                 }
             }
 
-            matching = matchesElement;
+            matching = Lists.newArrayList(matchesElement);
         }
         return matching;
     }

@@ -53,7 +53,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.visualstudio" rev="latest.integration" conf="*->@"/>
 
         <!-- Test dependencies -->
-        <dependency org="com.thoughtworks.selenium" name="com.thoughtworks.selenium" rev="2.24.1" conf="external,build->default;src->src"/>
+        <dependency org="com.thoughtworks.selenium" name="com.thoughtworks.selenium" rev="2.28.0" conf="external,build->default;src->src"/>
         <dependency org="com.dumbster" name="com.dumbster.smtp" rev="20090217" conf="external,build->default;src->src"/>
         <dependency org="com.svnkit" name="com.svnkit" rev="1.7.5" conf="external,build->default;src->src"/>
 

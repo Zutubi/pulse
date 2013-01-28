@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.dependency;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.Sort;
 
-import java.util.Map;
 import java.util.Comparator;
+import java.util.Map;
 
 /**
  * A set of predicates that simplify interaction with the repository attributes.
@@ -22,7 +22,7 @@ public class RepositoryAttributePredicates
         return new Predicate<Map<String, String>>()
         {
             private Comparator<String> comparator = new Sort.StringComparator();
-            public boolean satisfied(Map<String, String> attributes)
+            public boolean apply(Map<String, String> attributes)
             {
                 if (attributes.containsKey(attributeName))
                 {

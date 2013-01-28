@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.Predicate;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class LimitActivePollsPerScmPredicate implements Predicate<PollingRequest
         this.projectUidCache = projectUidCache;
     }
 
-    public boolean satisfied(PollingRequest request)
+    public boolean apply(PollingRequest request)
     {
         String uid = getProjectsScmServerUid(request.getProject());
         if (uid == null)

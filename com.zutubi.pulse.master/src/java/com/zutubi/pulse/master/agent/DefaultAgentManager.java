@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
@@ -11,8 +14,12 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -21,13 +28,16 @@ import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.*;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.Sort;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -36,12 +46,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  */
@@ -287,7 +291,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             {
                 List<Agent> availableAgents = agentStatusManager.getAgentsByStatusPredicate(new Predicate<AgentStatus>()
                 {
-                    public boolean satisfied(AgentStatus status)
+                    public boolean apply(AgentStatus status)
                     {
                         return status.isAvailable();
                     }
@@ -342,9 +346,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     private boolean matchingMessageExists(final List<AgentSynchronisationMessage> existing, final Properties properties, final String description)
     {
-        return CollectionUtils.contains(existing, new Predicate<AgentSynchronisationMessage>()
+        return any(existing, new Predicate<AgentSynchronisationMessage>()
         {
-            public boolean satisfied(AgentSynchronisationMessage existingMessage)
+            public boolean apply(AgentSynchronisationMessage existingMessage)
             {
                 return existingMessage.getDescription().equals(description) &&
                         existingMessage.getMessage().getArguments().equals(properties);
@@ -410,14 +414,14 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                         // agent), we declare it complete and let the status manager
                         // move the agent offline.  When we get a successful ping, a
                         // new cycle will start.
-                        if (!successful || !CollectionUtils.contains(messages, AgentSynchronisationService.INCOMPLETE_MESSAGES_PREDICATE))
+                        if (!successful || !any(messages, AgentSynchronisationService.INCOMPLETE_MESSAGES_PREDICATE))
                         {
                             eventManager.publish(new AgentSynchronisationCompleteEvent(this, getAgentById(agentId), successful));
                             return true;
                         }
                     }
                     
-                    return !CollectionUtils.contains(messages, AgentSynchronisationService.PENDING_MESSAGES_PREDICATE);
+                    return !any(messages, AgentSynchronisationService.PENDING_MESSAGES_PREDICATE);
                 }
                 else
                 {
@@ -496,7 +500,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         return agentStatusManager.getAgentsByStatusPredicate(new Predicate<AgentStatus>()
         {
-            public boolean satisfied(AgentStatus status)
+            public boolean apply(AgentStatus status)
             {
                 return status.isOnline();
             }
@@ -518,13 +522,13 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public Agent getAgentById(final long agentId)
     {
-        return CollectionUtils.find(agents.values(), new Predicate<Agent>()
+        return find(agents.values(), new Predicate<Agent>()
         {
-            public boolean satisfied(Agent agent)
+            public boolean apply(Agent agent)
             {
                 return agent.getId() == agentId;
             }
-        });
+        }, null);
     }
 
     public Agent getAgent(AgentConfiguration agent)

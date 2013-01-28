@@ -1,9 +1,13 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.UnaryFunction;
+import static java.util.Arrays.asList;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,11 +37,11 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
     protected List<RecordUpgrader> getRecordUpgraders()
     {
         FixColumnsFn editFn = new FixColumnsFn();
-        return Arrays.asList(RecordUpgraders.newDeleteProperty("myProjectsColumns"),
-                             RecordUpgraders.newDeleteProperty("projectSummaryColumns"),
-                             RecordUpgraders.newEditProperty("myBuildsColumns", editFn),
-                             RecordUpgraders.newEditProperty("projectRecentColumns", editFn),
-                             RecordUpgraders.newEditProperty("projectHistoryColumns", editFn));
+        return asList(RecordUpgraders.newDeleteProperty("myProjectsColumns"),
+                RecordUpgraders.newDeleteProperty("projectSummaryColumns"),
+                RecordUpgraders.newEditProperty("myBuildsColumns", editFn),
+                RecordUpgraders.newEditProperty("projectRecentColumns", editFn),
+                RecordUpgraders.newEditProperty("projectHistoryColumns", editFn));
     }
 
     private static class FixColumnsFn implements UnaryFunction<Object, Object>
@@ -47,18 +51,12 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
             if (o != null && o instanceof String)
             {
                 String columnsString = (String) o;
-                String[] columns = StringUtils.split(columnsString, ',', true);
-                columns = CollectionUtils.filterToArray(columns, new Predicate<String>()
-                {
-                    public boolean satisfied(String s)
-                    {
-                        return !s.equals(COLUMN_ACTIONS);
-                    }
-                });
+                Iterable<String> columns = asList(StringUtils.split(columnsString, ',', true));
+                Iterables.removeIf(columns, Predicates.equalTo(COLUMN_ACTIONS));
                 
-                columns = CollectionUtils.mapToArray(columns, new Mapping<String, String>()
+                columns = Iterables.transform(columns, new Function<String, String>()
                 {
-                    public String map(String s)
+                    public String apply(String s)
                     {
                         if (COLUMN_NUMBER_ORIGINAL.equals(s))
                         {

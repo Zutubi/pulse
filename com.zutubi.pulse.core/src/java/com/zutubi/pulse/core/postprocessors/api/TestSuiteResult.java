@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -98,13 +98,13 @@ public class TestSuiteResult extends TestResult
      */
     public int getTotalWithStatus(final TestStatus status)
     {
-        int total = CollectionUtils.count(cases, new Predicate<TestCaseResult>()
+        int total = size(filter(cases, new Predicate<TestCaseResult>()
         {
-            public boolean satisfied(TestCaseResult caseResult)
+            public boolean apply(TestCaseResult caseResult)
             {
                 return caseResult.getStatus() == status;
             }
-        });
+        }));
 
         for (TestSuiteResult nestedSuite: suites)
         {
@@ -122,13 +122,13 @@ public class TestSuiteResult extends TestResult
      */
     public TestSuiteResult findSuite(final String name)
     {
-        return CollectionUtils.find(suites, new Predicate<TestSuiteResult>()
+        return find(suites, new Predicate<TestSuiteResult>()
         {
-            public boolean satisfied(TestSuiteResult suiteResult)
+            public boolean apply(TestSuiteResult suiteResult)
             {
                 return suiteResult.getName().equals(name);
             }
-        });
+        }, null);
     }
 
     /**
@@ -147,13 +147,13 @@ public class TestSuiteResult extends TestResult
      */
     public TestCaseResult findCase(final String name)
     {
-        return CollectionUtils.find(cases, new Predicate<TestCaseResult>()
+        return find(cases, new Predicate<TestCaseResult>()
         {
-            public boolean satisfied(TestCaseResult caseResult)
+            public boolean apply(TestCaseResult caseResult)
             {
                 return caseResult.getName().equals(name);
             }
-        });
+        }, null);
     }
 
     /**

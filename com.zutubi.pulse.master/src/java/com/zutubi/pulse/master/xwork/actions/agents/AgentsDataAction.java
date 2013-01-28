@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.agents;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -19,8 +21,6 @@ import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 
 import java.io.File;
@@ -56,9 +56,9 @@ public class AgentsDataAction extends ActionSupport
         List<String> invalidAgents = new LinkedList<String>();
         for (final AgentConfiguration config: allConfigs)
         {
-            if (config.isConcrete() && !CollectionUtils.contains(agents, new Predicate<Agent>()
+            if (config.isConcrete() && !any(agents, new Predicate<Agent>()
             {
-                public boolean satisfied(Agent agent)
+                public boolean apply(Agent agent)
                 {
                     return agent.getConfig().equals(config);
                 }

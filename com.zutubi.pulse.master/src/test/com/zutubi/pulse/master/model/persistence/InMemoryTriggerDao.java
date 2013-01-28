@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model.persistence;
 
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.util.Predicate;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class InMemoryTriggerDao extends InMemoryEntityDao<Trigger> implements Tr
     {
         return findByPredicate(new Predicate<Trigger>()
         {
-            public boolean satisfied(Trigger trigger)
+            public boolean apply(Trigger trigger)
             {
                 return group.compareTo(trigger.getGroup()) == 0;
             }
@@ -23,7 +23,7 @@ public class InMemoryTriggerDao extends InMemoryEntityDao<Trigger> implements Tr
     {
         return findUniqueByPredicate(new Predicate<Trigger>()
         {
-            public boolean satisfied(Trigger trigger)
+            public boolean apply(Trigger trigger)
             {
                 return group.compareTo(trigger.getGroup()) == 0 &&
                         name.compareTo(trigger.getName()) == 0;
@@ -35,7 +35,7 @@ public class InMemoryTriggerDao extends InMemoryEntityDao<Trigger> implements Tr
     {
         return findByPredicate(new Predicate<Trigger>()
         {
-            public boolean satisfied(Trigger trigger)
+            public boolean apply(Trigger trigger)
             {
                 return trigger.getProject() == id;
             }
@@ -46,7 +46,7 @@ public class InMemoryTriggerDao extends InMemoryEntityDao<Trigger> implements Tr
     {
         return findUniqueByPredicate(new Predicate<Trigger>()
         {
-            public boolean satisfied(Trigger trigger)
+            public boolean apply(Trigger trigger)
             {
                 return name.compareTo(trigger.getName()) == 0 &&
                         id == trigger.getProject();

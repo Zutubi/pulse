@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * A predicate satisfied by plugins that are running.
@@ -9,7 +9,7 @@ import com.zutubi.util.Predicate;
  */
 public class PluginRunningPredicate implements Predicate<Plugin>
 {
-    public boolean satisfied(Plugin plugin)
+    public boolean apply(Plugin plugin)
     {
         return plugin.isRunning();
     }

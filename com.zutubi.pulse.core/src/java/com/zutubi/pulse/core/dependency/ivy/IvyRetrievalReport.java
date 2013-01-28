@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import static com.zutubi.pulse.core.util.api.XMLStreamUtils.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.cache.ArtifactOrigin;
@@ -452,9 +452,9 @@ public class IvyRetrievalReport
         List<ArtifactDownloadReport> failures = new LinkedList<ArtifactDownloadReport>();
         for (ModuleRevisionId mrid : moduleArtifacts.keySet())
         {
-            failures.addAll(CollectionUtils.filter(moduleArtifacts.get(mrid), new Predicate<ArtifactDownloadReport>()
+            failures.addAll(Collections2.filter(moduleArtifacts.get(mrid), new Predicate<ArtifactDownloadReport>()
             {
-                public boolean satisfied(ArtifactDownloadReport downloadReport)
+                public boolean apply(ArtifactDownloadReport downloadReport)
                 {
                     return downloadReport.getDownloadStatus() == DownloadStatus.FAILED;
                 }

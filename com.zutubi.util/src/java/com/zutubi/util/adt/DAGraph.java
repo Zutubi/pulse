@@ -1,7 +1,7 @@
 package com.zutubi.util.adt;
 
+import com.google.common.base.Predicate;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.*;
@@ -160,7 +160,7 @@ public class DAGraph<T>
 
         Node<T> findByPredicate(Predicate<Node<T>> predicate)
         {
-            if (predicate.satisfied(this))
+            if (predicate.apply(this))
             {
                 return this;
             }
@@ -292,7 +292,7 @@ public class DAGraph<T>
                 this.data = data;
             }
 
-            public boolean satisfied(Node<T> node)
+            public boolean apply(Node<T> node)
             {
                 return data.equals(node.getData());
             }

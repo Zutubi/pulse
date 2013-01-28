@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.StringUtils;
 
 /**
@@ -14,7 +14,7 @@ public class AllowedCharacters
      */
     public static final Predicate<Character> NAMES = new Predicate<Character>()
     {
-        public boolean satisfied(Character character)
+        public boolean apply(Character character)
         {
             if (StringUtils.isAsciiAlphaNumeric(character))
             {

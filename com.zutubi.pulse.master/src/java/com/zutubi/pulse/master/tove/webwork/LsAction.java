@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -14,9 +16,13 @@ import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
+import static java.util.Arrays.asList;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 
@@ -404,9 +410,9 @@ public class LsAction extends VFSActionSupport
             try
             {
                 BeanInfo beanInfo = Introspector.getBeanInfo(fileClass);
-                PropertyDescriptor descriptor = CollectionUtils.find(beanInfo.getPropertyDescriptors(), new Predicate<PropertyDescriptor>()
+                PropertyDescriptor descriptor = find(asList(beanInfo.getPropertyDescriptors()), new Predicate<PropertyDescriptor>()
                 {
-                    public boolean satisfied(PropertyDescriptor propertyDescriptor)
+                    public boolean apply(PropertyDescriptor propertyDescriptor)
                     {
                         if (propertyDescriptor.getName().equals(flag))
                         {
@@ -416,7 +422,7 @@ public class LsAction extends VFSActionSupport
 
                         return false;
                     }
-                });
+                }, null);
 
                 if (descriptor != null)
                 {

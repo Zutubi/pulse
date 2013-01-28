@@ -1,12 +1,18 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
 import com.zutubi.pulse.core.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -854,13 +860,13 @@ public class PluginManager
 
     private LocalPlugin findPlugin(final String id, List<LocalPlugin> plugins)
     {
-        return CollectionUtils.find(plugins, new Predicate<LocalPlugin>()
+        return find(plugins, new Predicate<LocalPlugin>()
         {
-            public boolean satisfied(LocalPlugin plugin)
+            public boolean apply(LocalPlugin plugin)
             {
                 return plugin.getId().equals(id);
             }
-        });
+        }, null);
     }
 
     /**
@@ -918,9 +924,9 @@ public class PluginManager
      */
     private List<LocalPlugin> sortPlugins(final List<LocalPlugin> plugins)
     {
-        boolean unsortablePlugin = CollectionUtils.contains(plugins, new Predicate<LocalPlugin>()
+        boolean unsortablePlugin = any(plugins, new Predicate<LocalPlugin>()
         {
-            public boolean satisfied(LocalPlugin plugin)
+            public boolean apply(LocalPlugin plugin)
             {
                 return plugin.getBundleDescription() == null;
             }

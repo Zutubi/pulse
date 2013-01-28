@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.api;
 
+import com.google.common.base.Predicate;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 
@@ -42,7 +42,7 @@ public class FilterPathsPredicate implements Predicate<String>
         this.excludedPaths = CollectionUtils.map(excludedPaths, normaliseMapping);
     }
 
-    public boolean satisfied(String path)
+    public boolean apply(String path)
     {
         path = normalisePath(path);
         return isIncluded(path) && !isExcluded(path);

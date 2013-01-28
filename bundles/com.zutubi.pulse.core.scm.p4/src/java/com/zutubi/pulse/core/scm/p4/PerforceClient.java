@@ -1,11 +1,16 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.partition;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
@@ -18,8 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
@@ -179,7 +182,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
             FileChange change = getChangelistChange(lines[i]);
-            if (predicate.satisfied(change.getPath()))
+            if (predicate.apply(change.getPath()))
             {
                 changes.add(change);
             }
@@ -205,7 +208,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     private boolean noFilesInView(String clientName, List<FileChange> changes) throws ScmException
     {
-        List<List<FileChange>> partitioned = CollectionUtils.partition(FILE_LIMIT, changes);
+        Iterable<List<FileChange>> partitioned = partition(changes, FILE_LIMIT);
         for (List<FileChange> sublist: partitioned)
         {
             if (hasFilesInView(clientName, sublist))
@@ -855,7 +858,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
         Predicate<FileStatus> addedPredicate = new Predicate<FileStatus>()
         {
-            public boolean satisfied(FileStatus fileStatus)
+            public boolean apply(FileStatus fileStatus)
             {
                 FileStatus.State state = fileStatus.getState();
                 return state == FileStatus.State.ADDED ||
@@ -864,19 +867,19 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
             }
         };
         
-        List<FileStatus> addedFiles = CollectionUtils.filter(statuses, addedPredicate);
-        List<FileStatus> existingFiles = CollectionUtils.filter(statuses, new InvertedPredicate<FileStatus>(addedPredicate));
+        Iterable<FileStatus> addedFiles = Iterables.filter(statuses, addedPredicate);
+        Iterable<FileStatus> existingFiles = Iterables.filter(statuses, Predicates.not(addedPredicate));
         
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            List<List<FileStatus>> partitioned = CollectionUtils.partition(FILE_LIMIT, addedFiles);
+            Iterable<List<FileStatus>> partitioned = partition(addedFiles, FILE_LIMIT);
             for (List<FileStatus> sublist: partitioned)
             {
                 convertTargetPathsForAddedFiles(workspace, sublist);
             }
 
-            partitioned = CollectionUtils.partition(FILE_LIMIT, existingFiles);
+            partitioned = partition(existingFiles, FILE_LIMIT);
             for (List<FileStatus> sublist: partitioned)
             {
                 convertTargetPathsForExistingFiles(workspace, sublist);

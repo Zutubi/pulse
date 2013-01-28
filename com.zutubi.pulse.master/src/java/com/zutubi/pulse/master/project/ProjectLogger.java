@@ -1,17 +1,19 @@
 package com.zutubi.pulse.master.project;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.toArray;
 import com.zutubi.pulse.master.project.events.ProjectEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.MultipleFileInputStream;
 import com.zutubi.util.io.Tail;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -116,13 +118,13 @@ public class ProjectLogger
      */
     public synchronized InputStream getRawInputStream() throws IOException
     {
-        File[] files = CollectionUtils.filterToArray(new File[]{lastFile, currentFile}, new Predicate<File>()
+        File[] files = toArray(filter(asList(lastFile, currentFile), new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return file.isFile();
             }
-        });
+        }), File.class);
 
         return new MultipleFileInputStream(files);
     }

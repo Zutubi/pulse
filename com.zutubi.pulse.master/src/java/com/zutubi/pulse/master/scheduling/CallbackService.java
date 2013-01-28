@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.scheduling;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryProcedure;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Date;
@@ -137,7 +138,7 @@ public class CallbackService
      */
     public synchronized boolean unregisterCallback(NullaryProcedure callback)
     {
-        Map.Entry<String, NullaryProcedure> entry = CollectionUtils.find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
+        Map.Entry<String, NullaryProcedure> entry = find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback), null);
         if (entry != null)
         {
             String triggerName = entry.getKey();
@@ -180,7 +181,7 @@ public class CallbackService
 
     private boolean isRegistered(NullaryProcedure callback)
     {
-        return CollectionUtils.contains(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
+        return any(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
     }
 
     public void setScheduler(Scheduler scheduler)
@@ -224,7 +225,7 @@ public class CallbackService
             this.callback = callback;
         }
 
-        public boolean satisfied(Map.Entry<String, NullaryProcedure> entry)
+        public boolean apply(Map.Entry<String, NullaryProcedure> entry)
         {
             return entry.getValue() == callback;
         }

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -16,7 +18,9 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelSorter;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -90,13 +94,13 @@ public class DashboardDataAction extends ActionSupport
     
                 if (dashboardConfig.isShowAllProjects())
                 {
-                    projectPredicate = new TruePredicate<Project>();
+                    projectPredicate = Predicates.alwaysTrue();
                 }
                 else
                 {
                     projectPredicate = new Predicate<Project>()
                     {
-                        public boolean satisfied(Project project)
+                        public boolean apply(Project project)
                         {
                             return dashboardConfig.getShownProjects().contains(project.getConfig());
                         }
@@ -116,13 +120,13 @@ public class DashboardDataAction extends ActionSupport
                     showUngrouped = dashboardConfig.isShowUngrouped();
                     if (dashboardConfig.isShowAllGroups())
                     {
-                        groupPredicate = new TruePredicate<ProjectGroup>();
+                        groupPredicate = Predicates.alwaysTrue();
                     }
                     else
                     {
                         groupPredicate = new Predicate<ProjectGroup>()
                         {
-                            public boolean satisfied(ProjectGroup projectGroup)
+                            public boolean apply(ProjectGroup projectGroup)
                             {
                                 return dashboardConfig.getShownGroups().contains(projectGroup.getName());
                             }
@@ -136,7 +140,7 @@ public class DashboardDataAction extends ActionSupport
                 else
                 {
                     showUngrouped = true;
-                    groupPredicate = new FalsePredicate<ProjectGroup>();
+                    groupPredicate = Predicates.<ProjectGroup>alwaysFalse();
                 }
     
                 ProjectsModelsHelper helper = objectFactory.buildBean(ProjectsModelsHelper.class);

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.NewLabelConfiguration;
@@ -12,8 +15,6 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -182,13 +183,13 @@ public class SaveLabelAction extends SaveAction
         
         final String labelsPath = PathUtils.getPath(PROJECTS_SCOPE, WILDCARD_ANY_ELEMENT, "labels", WILDCARD_ANY_ELEMENT);
         Collection<LabelConfiguration> labels = configurationTemplateManager.getAllInstances(labelsPath, LabelConfiguration.class, false);
-        otherLabelCount = CollectionUtils.count(labels, new Predicate<LabelConfiguration>()
+        otherLabelCount = size(filter(labels, new Predicate<LabelConfiguration>()
         {
-            public boolean satisfied(LabelConfiguration l)
+            public boolean apply(LabelConfiguration l)
             {
                 return l.getLabel().equals(originalLabel.getLabel());
             }
-        }) - 1;
+        })) - 1;
         
         return otherLabelCount > 0;
     }

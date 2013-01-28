@@ -1,6 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.Constants.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.*;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
@@ -23,6 +36,8 @@ import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.core.*;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
+import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -37,10 +52,16 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
+import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
+import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.project.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
@@ -49,11 +70,18 @@ import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfigur
 import com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.*;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Condition;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.SecurityUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.httpclient.Header;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -62,30 +90,6 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.Constants.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.*;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.PUBLISH;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
-import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_RELEASE;
-import static com.zutubi.pulse.master.agent.AgentManager.GLOBAL_AGENT_NAME;
-import static com.zutubi.pulse.master.agent.AgentManager.MASTER_AGENT_NAME;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_STAGE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.asPair;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -989,13 +993,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     private Hashtable<String, Object> getArtifact(String project, long buildNumber, final String name) throws Exception
     {
         Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(project, buildNumber);
-        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> artifact = find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> artifact)
+            public boolean apply(Hashtable<String, Object> artifact)
             {
                 return name.equals(artifact.get("name"));
             }
-        });
+        }, null);
 
         assertNotNull(artifact);
         return artifact;
@@ -1577,13 +1581,13 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         @SuppressWarnings({"unchecked"})
         Vector<Hashtable<String, Object>> stagesVector = (Vector<Hashtable<String, Object>>) stages;
-        Hashtable<String, Object> stage = CollectionUtils.find(stagesVector, new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> stage = find(stagesVector, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> detail)
+            public boolean apply(Hashtable<String, Object> detail)
             {
                 return detail.get("name").equals(stageName);
             }
-        });
+        }, null);
         assertNotNull(stage);
         assertEquals(expectedState, ResultState.fromPrettyString((String) stage.get("status")));
     }

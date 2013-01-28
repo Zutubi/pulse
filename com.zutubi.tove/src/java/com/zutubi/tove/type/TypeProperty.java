@@ -1,7 +1,7 @@
 package com.zutubi.tove.type;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
@@ -62,13 +62,13 @@ public abstract class TypeProperty
 
     public <T extends Annotation> T getAnnotation(final Class<T> type)
     {
-        return type.cast(CollectionUtils.find(annotations, new Predicate<Annotation>()
+        return type.cast(find(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation.annotationType() == type;
             }
-        }));
+        }, null));
     }
 
     public String getName()

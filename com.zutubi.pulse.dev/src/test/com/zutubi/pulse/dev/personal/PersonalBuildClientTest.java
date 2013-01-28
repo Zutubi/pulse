@@ -1,5 +1,8 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.ui.api.MenuChoice;
@@ -8,19 +11,16 @@ import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.util.AbstractDevTestCase;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
-
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 public class PersonalBuildClientTest extends AbstractDevTestCase
 {
@@ -142,10 +142,10 @@ public class PersonalBuildClientTest extends AbstractDevTestCase
         assertEquals(WorkingCopy.REVISION_FLOATING, revision.getRevision());
 
         assertEquals(3, revisionOptions.size());
-        assertFalse(CollectionUtils.contains(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LOCAL)));
-        assertFalse(CollectionUtils.contains(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LATEST)));
+        assertFalse(any(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LOCAL)));
+        assertFalse(any(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_LATEST)));
 
-        MenuOption<String> floatingOption = CollectionUtils.find(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_FLOATING));
+        MenuOption<String> floatingOption = find(revisionOptions, new OptionValuePredicate(PersonalBuildClient.REVISION_OPTION_FLOATING));
         assertTrue(floatingOption.isDefaultOption());
     }
     
@@ -235,7 +235,7 @@ public class PersonalBuildClientTest extends AbstractDevTestCase
             this.value = value;
         }
 
-        public boolean satisfied(MenuOption<String> option)
+        public boolean apply(MenuOption<String> option)
         {
             return option.getValue().equals(value);
         }

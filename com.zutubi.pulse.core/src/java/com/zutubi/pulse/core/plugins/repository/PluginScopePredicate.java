@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins.repository;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * A predicate to test if plugins are in a given scope.  Note that a plugin is
@@ -15,7 +15,7 @@ public class PluginScopePredicate implements Predicate<PluginInfo>
         this.scope = scope;
     }
 
-    public boolean satisfied(PluginInfo pluginInfo)
+    public boolean apply(PluginInfo pluginInfo)
     {
         return pluginInfo.getScope().ordinal() <= scope.ordinal();
     }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class ScopeHierarchy
     {
         return findNodeByPredicate(new Predicate<Node>()
         {
-            public boolean satisfied(Node node)
+            public boolean apply(Node node)
             {
                 return node.getId().equals(id);
             }
@@ -156,7 +156,7 @@ public class ScopeHierarchy
          */
         Node findByPredicate(Predicate<Node> predicate)
         {
-            if (predicate.satisfied(this))
+            if (predicate.apply(this))
             {
                 return this;
             }

@@ -18,6 +18,7 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -26,14 +27,12 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
-import static org.mockito.Mockito.*;
 
 
 /**
@@ -395,7 +394,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
 
     private class QueueThisRequest implements QueuedRequestPredicate
     {
-        public boolean satisfied(QueuedRequest queuedRequest)
+        public boolean apply(QueuedRequest queuedRequest)
         {
             return false;
         }
@@ -403,7 +402,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
 
     private class ActivateThisRequest implements QueuedRequestPredicate
     {
-        public boolean satisfied(QueuedRequest queuedRequest)
+        public boolean apply(QueuedRequest queuedRequest)
         {
             return true;
         }

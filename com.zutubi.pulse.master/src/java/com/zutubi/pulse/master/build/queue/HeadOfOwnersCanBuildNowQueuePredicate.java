@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.ConjunctivePredicate;
-import com.zutubi.util.InvertedPredicate;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.reverse;
 
 import java.util.LinkedList;
 
@@ -28,16 +29,17 @@ public class HeadOfOwnersCanBuildNowQueuePredicate implements QueuedRequestPredi
         this.buildQueue = buildQueue;
     }
 
-    public boolean satisfied(QueuedRequest request)
+    public boolean apply(QueuedRequest request)
     {
         LinkedList<QueuedRequest> queuedRequests = new LinkedList<QueuedRequest>(buildQueue.getQueuedRequests());
 
         // search for the first item in the queue that is not waiting on another build.
-        QueuedRequest headOfQueue = CollectionUtils.find(new com.zutubi.util.adt.ReverseListIterator<QueuedRequest>(queuedRequests),
-                new ConjunctivePredicate<QueuedRequest>(
+        QueuedRequest headOfQueue = find(reverse(queuedRequests),
+                and(
                         new HasOwnerPredicate<QueuedRequest>(request.getOwner()),
-                        new InvertedPredicate<QueuedRequest>(new HasPendingDependencyPredicate())
-        ));
+                        not(new HasPendingDependencyPredicate())
+                ),
+                null);
 
         return headOfQueue != null && headOfQueue.equals(request);
     }

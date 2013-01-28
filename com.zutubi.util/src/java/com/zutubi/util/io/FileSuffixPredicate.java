@@ -1,6 +1,6 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ public class FileSuffixPredicate implements Predicate<File>
         this.suffixes = suffixes;
     }
 
-    public boolean satisfied(File file)
+    public boolean apply(File file)
     {
         for (String suffix : suffixes)
         {

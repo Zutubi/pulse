@@ -322,7 +322,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             throw new UnsupportedOperationException("Remove not supported.");
         }
 
-        public Iterator<UpgradeTask> getTasks()
+        public Iterator<UpgradeTask> iterator()
         {
             return this;
         }

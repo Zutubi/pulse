@@ -1,15 +1,14 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * An upgrade task that allows the artifact repository format to be adjusted.
@@ -29,9 +28,9 @@ public abstract class RefactorArtifactRepositoryUpgradeTask extends AbstractUpgr
 
     public void execute(String existingArtifactPattern, String newArtifactPattern) throws TaskException
     {
-        List<File> ivyFiles = FileSystemUtils.filter(repositoryBase, new Predicate<File>()
+        Iterable<File> ivyFiles = FileSystemUtils.filter(repositoryBase, new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 String filename = file.getName();
                 return filename.startsWith("ivy") && filename.endsWith(".xml");

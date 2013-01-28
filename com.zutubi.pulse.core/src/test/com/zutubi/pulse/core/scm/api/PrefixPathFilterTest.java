@@ -26,6 +26,6 @@ public class PrefixPathFilterTest extends PulseTestCase
 
     private boolean isSatisfied(String prefix, String path)
     {
-        return new PrefixPathFilter(prefix).satisfied(path);
+        return new PrefixPathFilter(prefix).apply(path);
     }
 }

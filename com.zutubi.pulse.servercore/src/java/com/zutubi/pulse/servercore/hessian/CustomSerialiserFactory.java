@@ -4,8 +4,8 @@ import com.caucho.hessian.io.AbstractSerializerFactory;
 import com.caucho.hessian.io.Deserializer;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.hessian.io.Serializer;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.reflection.ReflectionUtils;
 
@@ -44,20 +44,20 @@ public class CustomSerialiserFactory extends AbstractSerializerFactory
         return lookup(cl, deserialisers);
     }
 
-    private <T> T lookup(final Class cl, final Map<Class, T> map)
+    private <T> T lookup(final Class<?> cl, final Map<Class, T> map)
     {
         if (map.containsKey(cl))
         {
             return map.get(cl);
         }
 
-        Map.Entry<Class, T> e = CollectionUtils.find(map.entrySet(), new Predicate<Map.Entry<Class, T>>()
+        Map.Entry<Class, T> e = find(map.entrySet(), new Predicate<Map.Entry<Class, T>>()
         {
-            public boolean satisfied(Map.Entry<Class, T> entry)
+            public boolean apply(Map.Entry<Class, T> entry)
             {
                 return entry.getKey().isAssignableFrom(cl);
             }
-        });
+        }, null);
         if (e != null)
         {
             return e.getValue();

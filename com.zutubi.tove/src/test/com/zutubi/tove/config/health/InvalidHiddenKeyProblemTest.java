@@ -1,10 +1,9 @@
 package com.zutubi.tove.config.health;
 
+import com.google.common.collect.Sets;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.TemplateRecord;
-
-import static com.zutubi.util.CollectionUtils.asSet;
 
 public class InvalidHiddenKeyProblemTest extends AbstractHealthProblemTestCase
 {
@@ -39,8 +38,8 @@ public class InvalidHiddenKeyProblemTest extends AbstractHealthProblemTestCase
         TemplateRecord.hideItem(record, "other");
         recordManager.insert(PATH, record);
         problem.solve(recordManager);
-        
-        assertEquals(asSet("other"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
+
+        assertEquals(Sets.newHashSet("other"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
     }
 
     public void testKeyRemoved()
@@ -50,8 +49,8 @@ public class InvalidHiddenKeyProblemTest extends AbstractHealthProblemTestCase
         TemplateRecord.hideItem(record, "other");
         recordManager.insert(PATH, record);
         problem.solve(recordManager);
-        
-        assertEquals(asSet("other"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
+
+        assertEquals(Sets.newHashSet("other"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
     }
 
     public void testMultipleKeysRemoved()
@@ -60,7 +59,7 @@ public class InvalidHiddenKeyProblemTest extends AbstractHealthProblemTestCase
         record.putMeta(TemplateRecord.HIDDEN_KEY, "other," + KEY + ",another," + KEY);
         recordManager.insert(PATH, record);
         problem.solve(recordManager);
-        
-        assertEquals(asSet("other", "another"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
+
+        assertEquals(Sets.newHashSet("other", "another"), TemplateRecord.getHiddenKeys(recordManager.select(PATH)));
     }
 }

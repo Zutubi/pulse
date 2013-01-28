@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 
 /**
@@ -22,7 +22,7 @@ public class PrefixPathFilter implements Predicate<String>
         this.prefix = normalisePath(prefix);
     }
 
-    public boolean satisfied(String path)
+    public boolean apply(String path)
     {
         String normalisedPath = normalisePath(path);
         return normalisedPath.startsWith(prefix);

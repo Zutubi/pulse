@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.model.EntityWithIdPredicate;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.model.CommentContainer;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 
 /**
  * Action allowing a user to delete a comment on a build result.
@@ -25,7 +25,7 @@ public class DeleteCommentAction extends CommentActionBase
     @Override
     protected void updateContainer(CommentContainer container, User user)
     {
-        Comment comment = CollectionUtils.find(container.getComments(), new EntityWithIdPredicate<Comment>(commentId));
+        Comment comment = find(container.getComments(), new EntityWithIdPredicate<Comment>(commentId), null);
         if (comment == null)
         {
             throw new IllegalArgumentException(I18N.format("unknown.comment", commentId));

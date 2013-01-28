@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.charting.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -43,9 +44,9 @@ public class ReportData
      */
     public boolean isEmpty()
     {
-        return !CollectionUtils.contains(seriesList, new Predicate<SeriesData>()
+        return !any(seriesList, new Predicate<SeriesData>()
         {
-            public boolean satisfied(SeriesData seriesData)
+            public boolean apply(SeriesData seriesData)
             {
                 return seriesData.getPoints().size() > 0;
             }

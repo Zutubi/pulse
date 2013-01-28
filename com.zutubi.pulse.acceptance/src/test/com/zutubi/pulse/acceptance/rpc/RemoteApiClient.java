@@ -1,10 +1,13 @@
 package com.zutubi.pulse.acceptance.rpc;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.commands.ant.AntCommandConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.core.test.TimeoutException;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentStatus;
@@ -12,8 +15,11 @@ import com.zutubi.pulse.master.build.queue.BuildRequestRegistry;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
@@ -28,22 +34,15 @@ import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.Pair;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
-import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * An XML-RPC client for {@link com.zutubi.pulse.master.api.RemoteApi}.
@@ -1283,13 +1282,13 @@ public class RemoteApiClient extends ApiClient
         {
             @SuppressWarnings("unchecked")
             Vector<Hashtable<String, Object>> stages = (Vector<Hashtable<String, Object>>) build.get("stages");
-            return CollectionUtils.find(stages, new Predicate<Hashtable<String, Object>>()
+            return find(stages, new Predicate<Hashtable<String, Object>>()
             {
-                public boolean satisfied(Hashtable<String, Object> stage)
+                public boolean apply(Hashtable<String, Object> stage)
                 {
                     return stage.get("name").equals(stageName);
                 }
-            });
+            }, null);
         }
         return null;
     }

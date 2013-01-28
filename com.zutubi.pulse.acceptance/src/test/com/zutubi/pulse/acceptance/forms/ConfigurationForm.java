@@ -1,5 +1,9 @@
 package com.zutubi.pulse.acceptance.forms;
 
+import com.google.common.base.Predicate;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.tove.annotations.Field;
 import com.zutubi.tove.annotations.FieldType;
@@ -7,12 +11,11 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.InstanceOfPredicate;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
+import static java.util.Arrays.asList;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -106,19 +109,19 @@ public class ConfigurationForm extends SeleniumForm
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (final String fieldName : fieldNames)
             {
-                PropertyDescriptor property = CollectionUtils.find(propertyDescriptors, new Predicate<PropertyDescriptor>()
+                PropertyDescriptor property = find(asList(propertyDescriptors), new Predicate<PropertyDescriptor>()
                 {
-                    public boolean satisfied(PropertyDescriptor propertyDescriptor)
+                    public boolean apply(PropertyDescriptor propertyDescriptor)
                     {
                         return propertyDescriptor.getName().equals(fieldName);
                     }
-                });
+                }, null);
 
                 int fieldType = TEXTFIELD;
                 if (property != null)
                 {
                     List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(property, true);
-                    if (ignoreWizard && CollectionUtils.contains(annotations, new InstanceOfPredicate<Annotation>(Wizard.Ignore.class)))
+                    if (ignoreWizard && any(annotations, instanceOf(Wizard.Ignore.class)))
                     {
                         continue;
                     }
@@ -140,13 +143,13 @@ public class ConfigurationForm extends SeleniumForm
     {
         int fieldType = TEXTFIELD;
 
-        Field field = (Field) CollectionUtils.find(annotations, new Predicate<Annotation>()
+        Field field = (Field) find(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 return annotation instanceof Field;
             }
-        });
+        }, null);
 
         Class<?> returnType = property.getReadMethod().getReturnType();
         boolean collection = List.class.isAssignableFrom(returnType) || Map.class.isAssignableFrom(returnType);

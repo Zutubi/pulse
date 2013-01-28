@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.plugins.repository;
 
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Represents a location from which plugins can be obtained.
@@ -62,7 +62,7 @@ public interface PluginRepository
      *        the given scope
      * @throws PluginRepositoryException on any error
      */
-    List<PluginInfo> getAvailablePlugins(Scope scope) throws PluginRepositoryException;
+    Collection<PluginInfo> getAvailablePlugins(Scope scope) throws PluginRepositoryException;
 
     /**
      * Returns the location from which the given plugin's file can be obtained.

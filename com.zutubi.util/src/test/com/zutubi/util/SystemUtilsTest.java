@@ -1,9 +1,12 @@
 package com.zutubi.util;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 
-import java.io.File;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 
 /**
@@ -71,13 +74,13 @@ public class SystemUtilsTest extends ZutubiTestCase
         SystemUtils.threadDump(new PrintStream(baos));
 
         String[] dump = new String(baos.toByteArray()).split("\n");
-        assertTrue(CollectionUtils.find(dump, new Predicate<String>()
+        assertTrue(any(asList(dump), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return s.contains("at com.zutubi.util.SystemUtils.threadDump");
             }
-        }) != null);
+        }));
     }
 
 /*

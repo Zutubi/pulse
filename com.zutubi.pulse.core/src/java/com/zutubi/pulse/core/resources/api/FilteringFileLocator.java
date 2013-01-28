@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A file locator that takes files located by a child locator and filters out
@@ -30,8 +31,8 @@ public class FilteringFileLocator implements FileLocator
         this.predicate = predicate;
     }
 
-    public List<File> locate()
+    public Collection<File> locate()
     {
-        return CollectionUtils.filter(delegate.locate(), predicate);
+        return Lists.newArrayList(Collections2.filter(delegate.locate(), predicate));
     }
 }

@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Predicates;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.WebUtils.buildQueryString;
 import static com.zutubi.util.WebUtils.formUrlEncode;
@@ -364,9 +365,9 @@ public class WebUtilsTest extends ZutubiTestCase
 
     public void testEncodeWithTag()
     {
-        assertEquals("%21", WebUtils.encode('%', "!", new FalsePredicate<Character>()));
-        assertEquals("%25", WebUtils.encode('%', "%", new FalsePredicate<Character>()));
-        assertEquals("^", WebUtils.encode('%', "^", new TruePredicate<Character>()));
+        assertEquals("%21", WebUtils.encode('%', "!", Predicates.<Character>alwaysFalse()));
+        assertEquals("%25", WebUtils.encode('%', "%", Predicates.<Character>alwaysFalse()));
+        assertEquals("^", WebUtils.encode('%', "^", Predicates.<Character>alwaysTrue()));
     }
 
     public void testDecodeWithTag()

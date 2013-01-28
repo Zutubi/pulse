@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * Tests builds and passes those that have completed.
  */
 public class CompletedBuildPredicate implements Predicate<BuildResult>
 {
-    public boolean satisfied(BuildResult buildResult)
+    public boolean apply(BuildResult buildResult)
     {
         return buildResult.completed();
     }

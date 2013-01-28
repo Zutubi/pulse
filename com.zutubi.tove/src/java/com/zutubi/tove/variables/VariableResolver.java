@@ -1,9 +1,9 @@
 package com.zutubi.tove.variables;
 
+import com.google.common.collect.Sets;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
-import static com.zutubi.util.CollectionUtils.asSet;
 import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
@@ -19,7 +19,7 @@ public class VariableResolver
      * Set of all characters that are reserved for special meanings in the
      * extended reference syntax $(...).
      */
-    public static Set<Character> EXTENDED_SPECIAL_CHARS = asSet(')', '?', '|', '!', '%', '#', '&', '/', ':', ';');
+    public static Set<Character> EXTENDED_SPECIAL_CHARS = Sets.newHashSet(')', '?', '|', '!', '%', '#', '&', '/', ':', ';');
 
     private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
 

@@ -1,6 +1,6 @@
 package com.zutubi.util.reflection;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.lang.reflect.Method;
 
@@ -28,7 +28,7 @@ public class MethodNamePrefixPredicate implements Predicate<Method>
         this.allowExactMatch = allowExactMatch;
     }
 
-    public boolean satisfied(Method method)
+    public boolean apply(Method method)
     {
         String name = method.getName();
         return name.startsWith(prefix) && (allowExactMatch || name.length() > prefix.length());

@@ -1,8 +1,8 @@
 package com.zutubi.tove.events;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
-import com.zutubi.util.Predicate;
 
 /**
  * A listener that filters events before passing them on to a delegate,
@@ -21,7 +21,7 @@ public class FilteringListener implements EventListener
 
     public void handleEvent(Event evt)
     {
-        if(predicate.satisfied(evt))
+        if(predicate.apply(evt))
         {
             delegate.handleEvent(evt);
         }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.Predicate;
 import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
@@ -79,7 +79,7 @@ public class AgentStatusManager implements EventListener
         {
             for(Agent a: agentsById.values())
             {
-                if(predicate.satisfied(a.getStatus()))
+                if(predicate.apply(a.getStatus()))
                 {
                     result.add(a);
                 }

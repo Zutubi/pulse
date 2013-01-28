@@ -23,13 +23,13 @@ public class MethodNameEqualsPredicateTest extends ZutubiTestCase
     public void testNameMatches()
     {
         MethodNameEqualsPredicate predicate = new MethodNameEqualsPredicate(NAME);
-        assertTrue(predicate.satisfied(theName));
+        assertTrue(predicate.apply(theName));
     }
 
     public void testNameDoesntMatch()
     {
         MethodNameEqualsPredicate predicate = new MethodNameEqualsPredicate(NAME);
-        assertFalse(predicate.satisfied(theNameSucks));
+        assertFalse(predicate.apply(theNameSucks));
     }
 
     private static class MethodHolder

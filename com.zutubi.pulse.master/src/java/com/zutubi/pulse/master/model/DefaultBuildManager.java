@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
@@ -33,7 +36,6 @@ import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.IsDirectoryPredicate;
 import com.zutubi.util.logging.Logger;
 
@@ -582,11 +584,11 @@ public class DefaultBuildManager implements BuildManager
         eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason, kill));
     }
 
-    private List<File> getRepositoryDirectoriesFor(final Project project) throws Exception
+    private Iterable<File> getRepositoryDirectoriesFor(final Project project) throws Exception
     {
         final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
         List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(project.getConfig().getHandle())));
-        return CollectionUtils.filter(CollectionUtils.map(paths, new Mapping<String, File>()
+        return Iterables.filter(CollectionUtils.map(paths, new Mapping<String, File>()
         {
             public File map(String s)
             {
@@ -614,13 +616,13 @@ public class DefaultBuildManager implements BuildManager
             List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(build.getProject().getConfig().getHandle())));
 
             // find the ivy file.
-            candidateIvyPath = CollectionUtils.find(paths, new Predicate<String>()
+            candidateIvyPath = find(paths, new Predicate<String>()
             {
-                public boolean satisfied(String path)
+                public boolean apply(String path)
                 {
                     return new File(repositoryRoot, path + "/ivy-" + build.getVersion() + ".xml").isFile();
                 }
-            });
+            }, null);
             candidateIvyFile = new File(repositoryRoot, candidateIvyPath + "/ivy-" + build.getVersion() + ".xml");
         }
 

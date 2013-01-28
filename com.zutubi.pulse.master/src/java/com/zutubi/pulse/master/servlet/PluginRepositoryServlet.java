@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.servlet;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginList;
+import static com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository.*;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -18,9 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-
-import static com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository.*;
 
 /**
  * A servlet that implements a plugin repository around the plugin manager.
@@ -65,7 +63,7 @@ public class PluginRepositoryServlet extends HttpServlet
 
     private void listAvailable(HttpServletResponse response) throws IOException
     {
-        List<Plugin> runningPlugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+        Iterable<Plugin> runningPlugins = Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
 
         ServletOutputStream os = response.getOutputStream();
         PluginList.write(PluginList.toInfos(runningPlugins), os);

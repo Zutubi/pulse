@@ -25,27 +25,27 @@ public class MethodNamePrefixPredicateTest extends ZutubiTestCase
     public void testPrefixMatches()
     {
         MethodNamePrefixPredicate predicate = new MethodNamePrefixPredicate(PREFIX, false);
-        assertTrue(predicate.satisfied(getSomething));
+        assertTrue(predicate.apply(getSomething));
     }
 
     public void testPrefixDoesntMatch()
     {
         MethodNamePrefixPredicate predicate = new MethodNamePrefixPredicate(PREFIX, false);
-        assertFalse(predicate.satisfied(together));
+        assertFalse(predicate.apply(together));
     }
 
     public void testExactMatchAllowed()
     {
         MethodNamePrefixPredicate predicate = new MethodNamePrefixPredicate(PREFIX, true);
-        assertTrue(predicate.satisfied(get));
-        assertTrue(predicate.satisfied(getSomething));
+        assertTrue(predicate.apply(get));
+        assertTrue(predicate.apply(getSomething));
     }
 
     public void testExactMatchNotAllowed()
     {
         MethodNamePrefixPredicate predicate = new MethodNamePrefixPredicate(PREFIX, false);
-        assertFalse(predicate.satisfied(get));
-        assertTrue(predicate.satisfied(getSomething));
+        assertFalse(predicate.apply(get));
+        assertTrue(predicate.apply(getSomething));
     }
 
     private static class MethodHolder

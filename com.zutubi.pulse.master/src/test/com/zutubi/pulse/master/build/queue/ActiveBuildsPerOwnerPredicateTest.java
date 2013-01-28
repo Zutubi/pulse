@@ -2,12 +2,11 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 public class ActiveBuildsPerOwnerPredicateTest extends BaseQueueTestCase
 {
@@ -48,7 +47,7 @@ public class ActiveBuildsPerOwnerPredicateTest extends BaseQueueTestCase
         project.getConfig().getOptions().setConcurrentBuilds(concurrentBuilds);
         
         QueuedRequestPredicate predicate = new ActiveBuildsPerOwnerPredicate(buildQueue);
-        return predicate.satisfied(new QueuedRequest(request));
+        return predicate.apply(new QueuedRequest(request));
     }
 
     private void activateRequest(BuildRequestEvent request)

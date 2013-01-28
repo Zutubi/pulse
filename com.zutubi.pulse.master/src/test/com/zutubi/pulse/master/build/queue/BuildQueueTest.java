@@ -7,12 +7,11 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.mockito.Mockito.*;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -446,7 +445,7 @@ public class BuildQueueTest extends BaseQueueTestCase
             this.queue = queue;
         }
 
-        public boolean satisfied(QueuedRequest queuedRequest)
+        public boolean apply(QueuedRequest queuedRequest)
         {
             return queue.getActivatedRequestCount() == 0;
         }

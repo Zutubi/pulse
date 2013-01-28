@@ -1,14 +1,18 @@
 package com.zutubi.tove.links;
 
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.MethodPredicates;
-import static com.zutubi.util.reflection.MethodPredicates.*;
+import static com.zutubi.util.reflection.MethodPredicates.hasName;
+import static com.zutubi.util.reflection.MethodPredicates.returnsType;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -52,8 +56,9 @@ public class ConfigurationLinks
                 return;
             }
 
-            linksMethod = CollectionUtils.find(linksClass.getMethods(),
-                    and(hasName(METHOD_NAME), or(MethodPredicates.acceptsParameters(), MethodPredicates.acceptsParameters(configurationClass)), returnsType(List.class, ConfigurationLink.class)));
+            linksMethod = find(asList(linksClass.getMethods()),
+                    and(hasName(METHOD_NAME), or(MethodPredicates.acceptsParameters(), MethodPredicates.acceptsParameters(configurationClass)), returnsType(List.class, ConfigurationLink.class)),
+                    null);
         }
     }
 

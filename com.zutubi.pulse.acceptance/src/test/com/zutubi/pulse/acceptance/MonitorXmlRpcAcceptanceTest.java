@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -10,7 +12,6 @@ import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.Constants.MINUTE;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
@@ -275,13 +276,13 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> projects = (Vector<Hashtable<String, Object>>) statuses.get(KEY_PROJECTS);
-        return CollectionUtils.find(projects, new Predicate<Hashtable<String, Object>>()
+        return find(projects, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> project)
+            public boolean apply(Hashtable<String, Object> project)
             {
                 return projectName.equals(project.get(KEY_OWNER));
             }
-        });
+        }, null);
     }
 
     @SuppressWarnings("unchecked")

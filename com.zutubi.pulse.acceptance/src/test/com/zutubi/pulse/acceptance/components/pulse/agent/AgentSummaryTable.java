@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.components.pulse.agent;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.SummaryTable;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import org.openqa.selenium.By;
 
 import java.util.*;
@@ -46,13 +46,13 @@ public class AgentSummaryTable extends SummaryTable
      */
     public AgentInfo getAgent(final String name)
     {
-        return CollectionUtils.find(getAgents(), new Predicate<AgentInfo>()
+        return find(getAgents(), new Predicate<AgentInfo>()
         {
-            public boolean satisfied(AgentInfo agentInfo)
+            public boolean apply(AgentInfo agentInfo)
             {
                 return name.equals(agentInfo.name);
             }
-        });
+        }, null);
     }
     
     public String getStatus(String agent)

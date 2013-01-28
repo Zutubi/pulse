@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.resources.api;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 
 import java.io.File;
 import java.util.List;
@@ -44,14 +45,7 @@ public class FileSystemResourceLocator implements ResourceLocator
             }
         });
 
-        resources = CollectionUtils.filter(resources, new Predicate<ResourceConfiguration>()
-        {
-            public boolean satisfied(ResourceConfiguration resource)
-            {
-                return resource != null;
-            }
-        });
-        
+        Iterables.removeIf(resources, Predicates.isNull());
         return resources;
     }
 }

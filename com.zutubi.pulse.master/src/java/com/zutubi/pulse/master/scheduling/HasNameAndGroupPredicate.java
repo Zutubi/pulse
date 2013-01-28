@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.util.Predicate;
-import com.zutubi.util.ConjunctivePredicate;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 /**
  * A predicate that is satisfied by any trigger with a specified name and group.
@@ -15,14 +15,14 @@ public class HasNameAndGroupPredicate implements Predicate<Trigger>
 
     public HasNameAndGroupPredicate(String name, String group)
     {
-        this.delegate = new ConjunctivePredicate<Trigger>(
+        this.delegate = Predicates.and(
                 new HasNamePredicate(name),
                 new HasGroupPredicate(group)
         );
     }
 
-    public boolean satisfied(Trigger trigger)
+    public boolean apply(Trigger trigger)
     {
-        return delegate.satisfied(trigger);
+        return delegate.apply(trigger);
     }
 }

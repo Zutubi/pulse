@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.agent.statistics;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
 import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
-import com.zutubi.util.Predicate;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +14,7 @@ public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatisti
     {
         return findByPredicate(new Predicate<AgentDailyStatistics>()
         {
-            public boolean satisfied(AgentDailyStatistics agentDailyStatistics)
+            public boolean apply(AgentDailyStatistics agentDailyStatistics)
             {
                 return agentDailyStatistics.getAgentId() == agentId;
             }
@@ -25,7 +25,7 @@ public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatisti
     {
         return findUniqueByPredicate(new Predicate<AgentDailyStatistics>()
         {
-            public boolean satisfied(AgentDailyStatistics agentDailyStatistics)
+            public boolean apply(AgentDailyStatistics agentDailyStatistics)
             {
                 return agentDailyStatistics.getAgentId() == agentId && agentDailyStatistics.getDayStamp() == dayStamp;
             }
@@ -36,7 +36,7 @@ public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatisti
     {
         return deleteByPredicate(new Predicate<AgentDailyStatistics>()
         {
-            public boolean satisfied(AgentDailyStatistics agentDailyStatistics)
+            public boolean apply(AgentDailyStatistics agentDailyStatistics)
             {
                 return agentDailyStatistics.getDayStamp() < dayStamp;
             }
@@ -47,7 +47,7 @@ public class TestAgentStatisticsDao extends InMemoryEntityDao<AgentDailyStatisti
     {
         return deleteByPredicate(new Predicate<AgentDailyStatistics>()
         {
-            public boolean satisfied(AgentDailyStatistics agentDailyStatistics)
+            public boolean apply(AgentDailyStatistics agentDailyStatistics)
             {
                 return !agentIds.contains(agentDailyStatistics.getAgentId());
             }

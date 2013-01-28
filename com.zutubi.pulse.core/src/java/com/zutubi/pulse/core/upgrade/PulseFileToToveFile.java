@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.upgrade;
 
-import com.zutubi.util.CollectionUtils;
+import com.google.common.collect.Sets;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import nu.xom.*;
@@ -28,18 +28,7 @@ public class PulseFileToToveFile
     private static final String ATTRIBUTE_SCOPE = "scope";
     private static final String ATTRIBUTE_VALUE = "value";
 
-    private static final Set<String> COMMAND_ELEMENTS = CollectionUtils.asSet(
-            "ant",
-            "bjam",
-            "executable",
-            "print",
-            "sleep",
-            "make",
-            "maven",
-            "maven2",
-            "msbuild",
-            "xcodebuild"
-    );
+    private static final Set<String> COMMAND_ELEMENTS = Sets.newHashSet("ant", "bjam", "executable", "print", "sleep", "make", "maven", "maven2", "msbuild", "xcodebuild");
 
     public static String convert(String pulseFile) throws IOException, ParsingException
     {

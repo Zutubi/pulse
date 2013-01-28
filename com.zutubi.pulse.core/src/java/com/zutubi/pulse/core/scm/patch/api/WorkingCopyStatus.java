@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.patch.api;
 
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 
 import java.io.File;
 import java.util.Collections;
@@ -94,13 +94,13 @@ public class WorkingCopyStatus
      */
     public FileStatus getFileStatus(final String path)
     {
-        return CollectionUtils.find(fileStatuses, new Predicate<FileStatus>()
+        return find(fileStatuses, new Predicate<FileStatus>()
         {
-            public boolean satisfied(FileStatus fileStatus)
+            public boolean apply(FileStatus fileStatus)
             {
                 return fileStatus.getPath().equals(path);
             }
-        });
+        }, null);
     }
 
     /**

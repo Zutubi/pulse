@@ -1,13 +1,15 @@
 package com.zutubi.util;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -231,7 +233,7 @@ public class SystemUtils
         if (path != null)
         {
             String[] paths = path.split(File.pathSeparator);
-            allPaths.addAll(Arrays.asList(paths));
+            allPaths.addAll(asList(paths));
         }
 
         if (IS_WINDOWS)
@@ -369,12 +371,12 @@ public class SystemUtils
      *
      * @return a list of threads.
      */
-    public static List<Thread> getAllThreads()
+    private static Iterable<Thread> getAllThreads()
     {
         final ThreadGroup root = getRootThreadGroup();
         final ThreadMXBean thbean = ManagementFactory.getThreadMXBean();
         int nAlloc = thbean.getThreadCount();
-        int n = 0;
+        int n;
         Thread[] threads;
         do {
             nAlloc *= 2;
@@ -382,15 +384,7 @@ public class SystemUtils
             n = root.enumerate(threads, true);
         } while (n == nAlloc);
 
-        List<Thread> result = new LinkedList<Thread>();
-        CollectionUtils.filter(threads, new Predicate<Thread>()
-        {
-            public boolean satisfied(Thread thread)
-            {
-                return thread != null;
-            }
-        }, result);
-        return result;
+        return filter(asList(threads), notNull());
     }
 
     private static ThreadGroup getRootThreadGroup() {

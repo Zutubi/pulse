@@ -32,17 +32,17 @@ public class HeadOfOwnerQueuePredicateTest extends BaseQueueTestCase
 
     public void testRequestAtHeadOfQueue()
     {
-        assertTrue(predicate.satisfied(r1));
+        assertTrue(predicate.apply(r1));
     }
 
     public void testRequestNotAtHeadOfQueue()
     {
-        assertFalse(predicate.satisfied(r2));
-        assertFalse(predicate.satisfied(r3));
+        assertFalse(predicate.apply(r2));
+        assertFalse(predicate.apply(r3));
     }
 
     public void testRequestNotInQueue()
     {
-        assertFalse(predicate.satisfied(r4));
+        assertFalse(predicate.apply(r4));
     }
 }

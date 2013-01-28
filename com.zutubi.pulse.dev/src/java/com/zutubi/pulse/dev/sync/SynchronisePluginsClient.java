@@ -17,6 +17,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import org.eclipse.core.runtime.jobs.IJobManager;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public class SynchronisePluginsClient extends AbstractClient<DevConfig>
         try
         {
             ui.status(I18N.format("retrieving"));
-            List<PluginInfo> available = repository.getAvailablePlugins(PluginRepository.Scope.CORE);
+            Collection<PluginInfo> available = repository.getAvailablePlugins(PluginRepository.Scope.CORE);
             ui.status(I18N.format("retrieving.complete"));
             ui.status(I18N.format("determining.actions"));
             SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(available);

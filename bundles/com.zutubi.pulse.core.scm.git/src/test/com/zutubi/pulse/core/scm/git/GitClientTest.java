@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -7,8 +9,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -63,13 +63,13 @@ public class GitClientTest extends GitClientTestBase
     {
         List<ResourceProperty> properties = client.getProperties(new PulseExecutionContext());
         assertEquals(2, properties.size());
-        ResourceProperty repositoryProperty = CollectionUtils.find(properties, new Predicate<ResourceProperty>()
+        ResourceProperty repositoryProperty = find(properties, new Predicate<ResourceProperty>()
         {
-            public boolean satisfied(ResourceProperty resourceProperty)
+            public boolean apply(ResourceProperty resourceProperty)
             {
                 return resourceProperty.getName().equals("git.repository");
             }
-        });
+        }, null);
         assertNotNull(repositoryProperty);
         assertEquals(repository, repositoryProperty.getValue());
     }
@@ -555,13 +555,13 @@ public class GitClientTest extends GitClientTestBase
 
     private Changelist findChangelist(List<Changelist> changes, final String revision)
     {
-        return CollectionUtils.find(changes, new Predicate<Changelist>()
+        return find(changes, new Predicate<Changelist>()
         {
-            public boolean satisfied(Changelist changelist)
+            public boolean apply(Changelist changelist)
             {
                 return changelist.getRevision().getRevisionString().equals(revision);
             }
-        });
+        }, null);
     }
 
     public void testBrowse() throws ScmException

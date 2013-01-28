@@ -1,19 +1,20 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
 import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.httpclient.*;
@@ -26,8 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import static java.util.Arrays.asList;
 
 public class AcceptanceTestUtils
 {
@@ -341,13 +340,13 @@ public class AcceptanceTestUtils
             get = AcceptanceTestUtils.httpGet(uri, credentials);
             Header[] headers = get.getResponseHeaders();
 
-            return CollectionUtils.find(headers, new Predicate<Header>()
+            return find(asList(headers), new Predicate<Header>()
             {
-                public boolean satisfied(Header header)
+                public boolean apply(Header header)
                 {
                     return header.getName().equals(headerName);
                 }
-            });
+            }, null);
         }
         finally
         {

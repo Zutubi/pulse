@@ -1,8 +1,9 @@
 package com.zutubi.pulse.servercore.services;
 
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.NotEqualsPredicate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class HostStatus
 
     public HostStatus(Map<Long, Long> agentHandleToRecipeId, boolean first)
     {
-        this.status = CollectionUtils.contains(agentHandleToRecipeId.values(), new NotEqualsPredicate<Long>(NO_RECIPE)) ? PingStatus.BUILDING : PingStatus.IDLE;
+        this.status = any(agentHandleToRecipeId.values(), not(equalTo(NO_RECIPE))) ? PingStatus.BUILDING : PingStatus.IDLE;
         this.agentHandleToRecipeId = agentHandleToRecipeId;
         this.first = first;
     }

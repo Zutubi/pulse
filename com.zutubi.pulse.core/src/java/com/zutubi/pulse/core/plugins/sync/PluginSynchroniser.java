@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core.plugins.sync;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginException;
 import com.zutubi.pulse.core.plugins.PluginManager;
@@ -8,10 +11,9 @@ import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A service to synchronise plugins with a repository.
@@ -32,7 +34,7 @@ public class PluginSynchroniser
      */
     public boolean synchroniseWithRepository(final PluginRepository repository, PluginRepository.Scope scope) throws PluginException
     {
-        List<PluginInfo> repositoryPlugins = repository.getAvailablePlugins(scope);
+        Collection<PluginInfo> repositoryPlugins = repository.getAvailablePlugins(scope);
         synchronized (pluginManager)
         {
             SynchronisationActions syncActions = determineRequiredActions(repositoryPlugins);
@@ -47,7 +49,7 @@ public class PluginSynchroniser
      * @param repositoryPlugins the plugins to synchronise with
      * @return the collection of actions required to synchronise
      */
-    public SynchronisationActions determineRequiredActions(List<PluginInfo> repositoryPlugins)
+    public SynchronisationActions determineRequiredActions(Iterable<PluginInfo> repositoryPlugins)
     {
         SynchronisationActions actions = new SynchronisationActions();
         for (PluginInfo pluginInfo : repositoryPlugins)
@@ -55,7 +57,7 @@ public class PluginSynchroniser
             categoriseRepositoryPlugin(pluginInfo, actions);
         }
 
-        for (final Plugin runningPlugin : CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate()))
+        for (final Plugin runningPlugin : Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate()))
         {
             if (!pluginInList(repositoryPlugins, runningPlugin))
             {
@@ -111,11 +113,11 @@ public class PluginSynchroniser
         }
     }
 
-    private boolean pluginInList(List<PluginInfo> repositoryPlugins, final Plugin plugin)
+    private boolean pluginInList(Iterable<PluginInfo> repositoryPlugins, final Plugin plugin)
     {
-        return CollectionUtils.contains(repositoryPlugins, new Predicate<PluginInfo>()
+        return any(repositoryPlugins, new Predicate<PluginInfo>()
         {
-            public boolean satisfied(PluginInfo pluginInfo)
+            public boolean apply(PluginInfo pluginInfo)
             {
                 return pluginInfo.getId().equals(plugin.getId());
             }

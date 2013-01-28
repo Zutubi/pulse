@@ -1,10 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.junit.IOAssertions;
@@ -13,7 +13,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
 {
@@ -39,7 +39,7 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
 
     public void testListAvailable() throws IOException
     {
-        List<PluginInfo> infoList = repository.getAvailablePlugins(PluginRepository.Scope.MASTER);
+        Collection<PluginInfo> infoList = repository.getAvailablePlugins(PluginRepository.Scope.MASTER);
         assertTrue(isPluginListed(infoList, ID_CORE_COMMANDS));
         assertTrue(isPluginListed(infoList, ID_EMAIL_HOOK_TASK));
 
@@ -48,11 +48,11 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
         assertFalse(isPluginListed(infoList, ID_EMAIL_HOOK_TASK));
     }
 
-    private boolean isPluginListed(List<PluginInfo> infoList, final String id)
+    private boolean isPluginListed(Collection<PluginInfo> infoList, final String id)
     {
-        return CollectionUtils.contains(infoList, new Predicate<PluginInfo>()
+        return Iterables.any(infoList, new Predicate<PluginInfo>()
         {
-            public boolean satisfied(PluginInfo pluginInfo)
+            public boolean apply(PluginInfo pluginInfo)
             {
                 return pluginInfo.getId().equals(id);
             }

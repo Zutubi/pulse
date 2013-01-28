@@ -1,13 +1,16 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.master.model.persistence.EntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.NotNullPredicate;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.*;
@@ -176,7 +179,7 @@ public class DefaultHostManager implements HostManager
             }
         });
 
-        return CollectionUtils.filter(agents, new NotNullPredicate<Agent>());
+        return Lists.newArrayList(Iterables.filter(agents, Predicates.notNull()));
     }
 
     public HostService getServiceForHost(Host host)
@@ -213,9 +216,9 @@ public class DefaultHostManager implements HostManager
     {
         if (!host.isUpgrading())
         {
-            boolean hasEnabledAgent = CollectionUtils.contains(getAgentsForHost(host), new Predicate<Agent>()
+            boolean hasEnabledAgent = any(getAgentsForHost(host), new Predicate<Agent>()
             {
-                public boolean satisfied(Agent agent)
+                public boolean apply(Agent agent)
                 {
                     return agent.isEnabled();
                 }

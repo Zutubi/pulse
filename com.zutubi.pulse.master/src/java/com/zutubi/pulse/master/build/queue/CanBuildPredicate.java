@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.Predicate;
-import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.model.Project;
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 
 /**
  * Predicate that is satisfied if the project state accepts a
@@ -17,7 +17,7 @@ public class CanBuildPredicate<T extends RequestHolder> implements Predicate<T>
 {
     private ProjectManager projectManager;
 
-    public boolean satisfied(RequestHolder holder)
+    public boolean apply(RequestHolder holder)
     {
         BuildRequestEvent request = holder.getRequest();
         Project project = projectManager.getProject(request.getProjectConfig().getProjectId(), false);

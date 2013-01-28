@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.restore;
 
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.util.monitor.Job;
 import com.zutubi.pulse.master.util.monitor.JobManager;
 import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.util.monitor.Task;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -95,7 +95,7 @@ public class DefaultRestoreManager implements RestoreManager
         Job<Task> job = jobManager.getJob(ARCHIVE_JOB_KEY);
         if (job != null)
         {
-            return CollectionUtils.asList(job.getTasks());
+            return Lists.newLinkedList(job);
         }
         return null;
     }

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.Predicate;
 
 /**
  * Looks up the documentation for a type being rendered in a wizard.  Uses
@@ -36,7 +36,7 @@ public class WizardTypeHelpAction extends TypeHelpActionSupport
         ensureState();
         return new Predicate<TypeProperty>()
         {
-            public boolean satisfied(TypeProperty typeProperty)
+            public boolean apply(TypeProperty typeProperty)
             {
                 return ToveUtils.isFormField(typeProperty) && state.includesField(getType(), typeProperty.getName());
             }

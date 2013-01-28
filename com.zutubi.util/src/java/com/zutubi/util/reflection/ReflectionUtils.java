@@ -1,8 +1,11 @@
 package com.zutubi.util.reflection;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Sets.newHashSet;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 
@@ -128,13 +131,13 @@ public class ReflectionUtils
      */
     public static Set<Class> getImplementedInterfaces(Class clazz, Class stopClazz, boolean strict)
     {
-        return CollectionUtils.filter(getSupertypes(clazz, stopClazz, strict), new Predicate<Class>()
+        return newHashSet(filter(getSupertypes(clazz, stopClazz, strict), new Predicate<Class>()
         {
-            public boolean satisfied(Class aClass)
+            public boolean apply(Class aClass)
             {
                 return Modifier.isInterface(aClass.getModifiers());
             }
-        }, new HashSet<Class>());
+        }));
     }
 
     /**
@@ -180,14 +183,13 @@ public class ReflectionUtils
      */
     public static Field getDeclaredField(Class clazz, Class stopClazz, final String fieldName)
     {
-        Set<Field> fieldSet = getDeclaredFields(clazz, stopClazz);
-        return CollectionUtils.find(fieldSet, new Predicate<Field>()
+        return find(getDeclaredFields(clazz, stopClazz), new Predicate<Field>()
         {
-            public boolean satisfied(Field field)
+            public boolean apply(Field field)
             {
                 return field.getName().equals(fieldName);
             }
-        });
+        }, null);
     }
 
     /**

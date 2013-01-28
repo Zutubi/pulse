@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,13 +71,13 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
 
     public FieldDescriptor getFieldDescriptor(final String name)
     {
-        return CollectionUtils.find(fieldDescriptors, new Predicate<FieldDescriptor>()
+        return find(fieldDescriptors, new Predicate<FieldDescriptor>()
         {
-            public boolean satisfied(FieldDescriptor fieldDescriptor)
+            public boolean apply(FieldDescriptor fieldDescriptor)
             {
                 return fieldDescriptor.getName().equals(name);
             }
-        });
+        }, null);
     }
 
     public List<FieldDescriptor> getFieldDescriptors()

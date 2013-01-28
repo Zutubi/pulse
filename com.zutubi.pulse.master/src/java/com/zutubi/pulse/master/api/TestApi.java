@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.api;
 
+import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.plugins.Plugin;
@@ -16,9 +17,7 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
-import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
-
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import static java.util.Arrays.asList;
@@ -147,7 +146,7 @@ public class TestApi
     public Vector<Hashtable<String, Object>> getRunningPlugins(String token)
     {
         tokenManager.verifyAdmin(token);
-        List<Plugin> plugins = CollectionUtils.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
+        Iterable<Plugin> plugins = Iterables.filter(pluginManager.getPlugins(), new PluginRunningPredicate());
         return new Vector<Hashtable<String, Object>>(PluginList.pluginsToHashes(plugins));
     }
 

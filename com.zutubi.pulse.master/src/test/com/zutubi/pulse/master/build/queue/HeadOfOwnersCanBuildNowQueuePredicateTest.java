@@ -32,18 +32,18 @@ public class HeadOfOwnersCanBuildNowQueuePredicateTest extends BaseQueueTestCase
 
     public void testRequestAtHeadOfQueue()
     {
-        assertTrue(predicate.satisfied(r2));
+        assertTrue(predicate.apply(r2));
     }
 
     public void testRequestNotAtHeadOfQueue()
     {
-        assertFalse(predicate.satisfied(r1));
-        assertFalse(predicate.satisfied(r3));
+        assertFalse(predicate.apply(r1));
+        assertFalse(predicate.apply(r3));
     }
 
     public void testRequestNotInQueue()
     {
-        assertFalse(predicate.satisfied(r4));
+        assertFalse(predicate.apply(r4));
     }
 
     private QueuedRequestPredicate pendingDependency()
@@ -70,7 +70,7 @@ public class HeadOfOwnersCanBuildNowQueuePredicateTest extends BaseQueueTestCase
             return null;
         }
 
-        public boolean satisfied(QueuedRequest queuedRequest)
+        public boolean apply(QueuedRequest queuedRequest)
         {
             return satisfied;
         }

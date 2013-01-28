@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.ConjunctivePredicate;
-import com.zutubi.util.Predicate;
 
 /**
  * A request to poll a particular project.  This request has a list of
@@ -28,7 +28,7 @@ public class PollingRequest
     {
         this.project = project;
         this.state = state;
-        predicate = new ConjunctivePredicate<PollingRequest>(predicates);
+        predicate = Predicates.and(predicates);
     }
 
     /**
@@ -55,6 +55,6 @@ public class PollingRequest
      */
     public boolean satisfied()
     {
-        return predicate.satisfied(this);
+        return predicate.apply(this);
     }
 }

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.charting.build;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.charting.model.DataPoint;
 import com.zutubi.pulse.master.charting.model.ReportData;
@@ -7,13 +10,14 @@ import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
-import com.zutubi.util.*;
+import com.zutubi.util.BinaryFunction;
+import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.*;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Builds reports by combining configuration with a set of build results.
@@ -46,9 +50,9 @@ public class ReportBuilder
         ReportData reportData = new ReportData();
         for (final ReportSeriesConfiguration seriesConfig: configuration.getSeriesMap().values())
         {
-            List<BuildResult> filteredDataSet = CollectionUtils.filter(dataSet, new Predicate<BuildResult>()
+            Iterable<BuildResult> filteredDataSet = Iterables.filter(dataSet, new Predicate<BuildResult>()
             {
-                public boolean satisfied(BuildResult buildResult)
+                public boolean apply(BuildResult buildResult)
                 {
                     return !seriesConfig.isSuccessfulOnly() || buildResult.healthy();
                 }
@@ -67,7 +71,7 @@ public class ReportBuilder
         return reportData;
     }
 
-    private void addBuildSeries(ReportData reportData, BuildReportSeriesConfiguration seriesConfig, List<BuildResult> dataSet)
+    private void addBuildSeries(ReportData reportData, BuildReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
         SeriesData seriesData = new SeriesData(seriesConfig.getName());
         BinaryFunction<BuildResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
@@ -84,7 +88,7 @@ public class ReportBuilder
         reportData.addSeries(seriesData);
     }
 
-    private void addStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, List<BuildResult> dataSet)
+    private void addStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
         if (seriesConfig.isCombineStages())
         {
@@ -96,14 +100,14 @@ public class ReportBuilder
         }
     }
 
-    private void addCombinedStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, List<BuildResult> dataSet)
+    private void addCombinedStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
         SeriesData seriesData = new SeriesData(seriesConfig.getName());
         final BinaryFunction<RecipeResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
 
         for (BuildResult build: dataSet)
         {
-            List<Number> values = CollectionUtils.map(build.getStages(), new Mapping<RecipeResultNode, Number>()
+            Collection<Number> values = CollectionUtils.map(build.getStages(), new Mapping<RecipeResultNode, Number>()
             {
                 public Number map(RecipeResultNode node)
                 {
@@ -111,7 +115,7 @@ public class ReportBuilder
                 }
             });
 
-            values = CollectionUtils.filter(values, new NotNullPredicate<Number>());
+            Iterables.removeIf(values, Predicates.isNull());
             if (values.size()  > 0)
             {
                 seriesData.addPoint(new DataPoint(build.getNumber(), seriesConfig.getAggregationFunction().aggregate(values)));
@@ -121,7 +125,7 @@ public class ReportBuilder
         reportData.addSeries(seriesData);
     }
 
-    private void addSeparateStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, List<BuildResult> dataSet)
+    private void addSeparateStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
         BinaryFunction<RecipeResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
         Map<String, SeriesData> seriesByStage = new LinkedHashMap<String, SeriesData>();

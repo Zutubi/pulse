@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.plugins.osgi;
 
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryFunction;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -221,7 +221,7 @@ public class Equinox implements OSGiFramework
             {
                 for (final BundleDescription r : required)
                 {
-                    Bundle dependent = CollectionUtils.find(bundles, new BundleSymbolicNamePredicate(r.getSymbolicName()));
+                    Bundle dependent = find(bundles, new BundleSymbolicNamePredicate(r.getSymbolicName()), null);
                     if (dependent != null)
                     {
                         result.add(dependent);

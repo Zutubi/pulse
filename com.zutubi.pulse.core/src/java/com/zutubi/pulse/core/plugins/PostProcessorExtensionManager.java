@@ -1,17 +1,20 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -112,13 +115,13 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         lock.readLock().lock();
         try
         {
-            descriptor = CollectionUtils.find(descriptors.values(), new Predicate<PostProcessorDescriptor>()
+            descriptor = find(descriptors.values(), new Predicate<PostProcessorDescriptor>()
             {
-                public boolean satisfied(PostProcessorDescriptor postProcessorDescriptor)
+                public boolean apply(PostProcessorDescriptor postProcessorDescriptor)
                 {
                     return postProcessorDescriptor.getClazz() == type;
                 }
-            });
+            }, null);
         }
         finally
         {

@@ -35,10 +35,10 @@ public class HasDependencyOnPredicateTest extends BaseQueueTestCase
 
         stub(buildQueue.getQueuedRequests()).toReturn(Arrays.asList(r4, r3, r2, r1));
 
-        assertTrue(predicate.satisfied(r1));
-        assertTrue(predicate.satisfied(r2));
-        assertTrue(predicate.satisfied(r3));
-        assertFalse(predicate.satisfied(r4));
+        assertTrue(predicate.apply(r1));
+        assertTrue(predicate.apply(r2));
+        assertTrue(predicate.apply(r3));
+        assertFalse(predicate.apply(r4));
     }
 
     private void addDependency(QueuedRequest request, Object dependentOwner)

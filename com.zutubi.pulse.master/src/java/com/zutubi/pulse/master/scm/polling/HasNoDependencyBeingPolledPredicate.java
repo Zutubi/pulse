@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 /**
  * This predicate is satisfied if the project in question has
@@ -18,7 +18,7 @@ public class HasNoDependencyBeingPolledPredicate implements Predicate<PollingReq
         this.requestQueue = requestQueue;
     }
 
-    public boolean satisfied(PollingRequest request)
+    public boolean apply(PollingRequest request)
     {
         PollingQueueSnapshot snapshot = requestQueue.getSnapshot();
 
@@ -28,14 +28,14 @@ public class HasNoDependencyBeingPolledPredicate implements Predicate<PollingReq
         // dependent upon.
         Predicate<PollingRequest> hasDependencyPredicate = new Predicate<PollingRequest>()
         {
-            public boolean satisfied(PollingRequest t)
+            public boolean apply(PollingRequest t)
             {
                 ProjectConfiguration otherProject = t.getProject().getConfig();
                 return projectBeingTested.isDependentOn(otherProject);
             }
         };
 
-        return !CollectionUtils.contains(snapshot.getActivatedRequests(), hasDependencyPredicate) &&
-                !CollectionUtils.contains(snapshot.getQueuedRequests(), hasDependencyPredicate);
+        return !Iterables.any(snapshot.getActivatedRequests(), hasDependencyPredicate) &&
+                !Iterables.any(snapshot.getQueuedRequests(), hasDependencyPredicate);
     }
 }

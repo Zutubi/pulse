@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.DAGraph;
 
 import java.util.HashSet;
@@ -33,9 +33,9 @@ public class BuildGraph extends DAGraph<BuildResult>
      */
     public Node<BuildResult> findNodeByBuildId(final long buildId)
     {
-        return findNodeByPredicate(new Predicate<DAGraph.Node<BuildResult>>()
+        return findNodeByPredicate(new Predicate<Node<BuildResult>>()
         {
-            public boolean satisfied(DAGraph.Node<BuildResult> node)
+            public boolean apply(DAGraph.Node<BuildResult> node)
             {
                 return node.getData().getId() == buildId;
             }

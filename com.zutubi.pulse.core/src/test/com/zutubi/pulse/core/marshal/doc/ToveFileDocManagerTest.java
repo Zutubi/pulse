@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.marshal.doc;
 
+import com.google.common.collect.Sets;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.pulse.core.marshal.types.*;
 import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.type.TypeException;
-import com.zutubi.util.CollectionUtils;
 
 public class ToveFileDocManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -177,7 +177,7 @@ public class ToveFileDocManagerTest extends AbstractConfigurationSystemTestCase
 
     public void testGetRoots()
     {
-        assertEquals(CollectionUtils.asSet(ELEMENT_ROOT), toveFileDocManager.getRoots());
+        assertEquals(Sets.newHashSet(ELEMENT_ROOT), toveFileDocManager.getRoots());
     }
 
     public void testBuiltins()

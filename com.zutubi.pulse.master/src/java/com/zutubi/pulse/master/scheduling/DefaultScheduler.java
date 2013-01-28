@@ -1,10 +1,12 @@
 package com.zutubi.pulse.master.scheduling;
 
+import static com.google.common.base.Predicates.and;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.ConjunctivePredicate;
 import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -116,7 +118,7 @@ public class DefaultScheduler implements Scheduler
 
     public Trigger getTrigger(String name, String group)
     {
-        Trigger trigger = CollectionUtils.find(transientTriggers, new HasNameAndGroupPredicate(name, group));
+        Trigger trigger = find(transientTriggers, new HasNameAndGroupPredicate(name, group), null);
         if (trigger != null)
         {
             return trigger;
@@ -131,30 +133,30 @@ public class DefaultScheduler implements Scheduler
 
     public List<Trigger> getTriggers()
     {
-        return CollectionUtils.concatenate(
+        return Lists.newArrayList(Iterables.concat(
                 triggerDao.findAll(),
-                transientTriggers);
+                transientTriggers));
     }
 
     public List<Trigger> getTriggers(long project)
     {
-        return CollectionUtils.concatenate(
+        return Lists.newArrayList(Iterables.concat(
                 triggerDao.findByProject(project),
-                CollectionUtils.filter(transientTriggers, new HasProjectPredicate(project)));
+                Iterables.filter(transientTriggers, new HasProjectPredicate(project))));
     }
 
     public List<Trigger> getTriggers(String group)
     {
-        return CollectionUtils.concatenate(
+        return Lists.newArrayList(Iterables.concat(
                 triggerDao.findByGroup(group),
-                CollectionUtils.filter(transientTriggers, new HasGroupPredicate(group)));
+                Iterables.filter(transientTriggers, new HasGroupPredicate(group))));
     }
 
     public Trigger getTrigger(long project, String triggerName)
     {
-        Trigger trigger = CollectionUtils.find(transientTriggers, new ConjunctivePredicate<Trigger>(
+        Trigger trigger = find(transientTriggers, and(
                 new HasProjectPredicate(project), new HasNamePredicate(triggerName)
-        ));
+        ), null);
         if (trigger != null)
         {
             return trigger;

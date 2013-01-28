@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Predicate;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ScmInclusionPathsUpgradeTask extends AbstractRecordPropertiesUpgrad
     {
         return RecordLocators.newPredicateFilter(RecordLocators.newPathPattern("projects/*/scm"), new Predicate<Record>()
         {
-            public boolean satisfied(Record record)
+            public boolean apply(Record record)
             {
                 return record.containsKey(PROPERTY_FILTER_PATHS);
             }

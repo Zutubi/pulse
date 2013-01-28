@@ -18,6 +18,8 @@
     </publications>
 
     <dependencies>
+        <dependency org="com.google" name="com.google.guava" rev="14.0rc2"  conf="build,release->default;src->src"/>
+
         <!-- Test dependencies -->
         <dependency org="org.junit" name="org.junit" rev="4.8.2"  conf="test->default;src->src"/>
         <dependency org="org.mockito" name="org.mockito" rev="1.5.0" conf="test->default;src->src"/>

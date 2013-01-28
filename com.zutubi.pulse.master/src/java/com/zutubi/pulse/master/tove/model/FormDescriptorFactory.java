@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.tove.annotations.FieldType;
@@ -10,8 +12,6 @@ import com.zutubi.tove.config.ConfigurationValidatorProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -88,14 +88,14 @@ public class FormDescriptorFactory
         descriptor.setId(type.getClazz().getName());
 
         // Process the annotations at apply to the type / form.
-        List<Annotation> annotations = type.getAnnotations(true);
+        Iterable<Annotation> annotations = type.getAnnotations(true);
 
         // We accept inherited annotations, but only process the most locally-
         // declared of each type.
         final Set<Class> seenTypes = new HashSet<Class>();
-        annotations = CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        annotations = Iterables.filter(annotations, new Predicate<Annotation>()
         {
-            public boolean satisfied(Annotation annotation)
+            public boolean apply(Annotation annotation)
             {
                 boolean satisfied = !seenTypes.contains(annotation.getClass());
                 seenTypes.add(annotation.getClass());
@@ -298,7 +298,7 @@ public class FormDescriptorFactory
      * @param descriptor  the target that will be modified by these annotations.
      * @param annotations the annotations that need to be processed (includes meta already).
      */
-    private void handleAnnotations(CompositeType type, Descriptor descriptor, List<Annotation> annotations)
+    private void handleAnnotations(CompositeType type, Descriptor descriptor, Iterable<Annotation> annotations)
     {
         for (Annotation annotation : annotations)
         {

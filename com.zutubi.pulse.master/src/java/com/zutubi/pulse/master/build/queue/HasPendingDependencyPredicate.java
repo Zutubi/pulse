@@ -7,7 +7,7 @@ package com.zutubi.pulse.master.build.queue;
  */
 public class HasPendingDependencyPredicate implements QueuedRequestPredicate
 {
-    public boolean satisfied(QueuedRequest queuedRequest)
+    public boolean apply(QueuedRequest queuedRequest)
     {
         return queuedRequest.isDependencyPending();
     }

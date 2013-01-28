@@ -12,7 +12,7 @@ public class ArrayJobWrapper<T extends Task> implements Job<T>
         this.tasks = tasks;
     }
 
-    public Iterator<T> getTasks()
+    public Iterator<T> iterator()
     {
         return Arrays.asList(tasks).iterator();
     }

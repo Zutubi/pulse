@@ -9,8 +9,6 @@ import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
-
 /**
  * A command used to install new plugins that have been found on the master.
  * This is simpler than a full plugin sync as no restart is required.
@@ -33,7 +31,7 @@ public class InstallPluginsCommand implements Runnable
         try
         {
             HttpPluginRepository repository = new HttpPluginRepository(StringUtils.join("/", true, masterUrl, "pluginrepository/"));
-            List<PluginInfo> availablePlugins = repository.getAvailablePlugins(PluginRepository.Scope.SERVER);
+            Iterable<PluginInfo> availablePlugins = repository.getAvailablePlugins(PluginRepository.Scope.SERVER);
             synchronized (pluginManager)
             {
                 SynchronisationActions requiredActions = pluginSynchroniser.determineRequiredActions(availablePlugins);

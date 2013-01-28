@@ -1,14 +1,14 @@
 package com.zutubi.pulse.acceptance.support;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.p4.PerforceConstants;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
+import java.util.Collection;
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Utilities for creating and working with Perforce projects.
@@ -97,11 +97,11 @@ public class PerforceUtils
      * @return the names of all perforce clients created by Pulse
      * @throws ScmException on a perforce error
      */
-    public static List<String> getAllPulseWorkspaces(PerforceCore core) throws ScmException
+    public static Collection<String> getAllPulseWorkspaces(PerforceCore core) throws ScmException
     {
-        return CollectionUtils.filter(core.getAllWorkspaceNames(), new Predicate<String>()
+        return Collections2.filter(core.getAllWorkspaceNames(), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return s.startsWith(WORKSPACE_PREFIX);
             }

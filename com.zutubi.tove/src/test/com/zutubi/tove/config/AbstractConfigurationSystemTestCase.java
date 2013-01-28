@@ -1,5 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.tove.config.api.Configuration;
@@ -19,8 +21,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.tove.type.record.store.InMemoryRecordStore;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
@@ -267,13 +267,13 @@ public abstract class AbstractConfigurationSystemTestCase extends AbstractTransa
                     events.size());
             for(final EventSpec spec: expectedEvents)
             {
-                ConfigurationEvent matchingEvent = CollectionUtils.find(events, new Predicate<ConfigurationEvent>()
+                ConfigurationEvent matchingEvent = find(events, new Predicate<ConfigurationEvent>()
                 {
-                    public boolean satisfied(ConfigurationEvent event)
+                    public boolean apply(ConfigurationEvent event)
                     {
                         return spec.matches(event);
                     }
-                });
+                }, null);
 
                 assertNotNull("Expected event '" + spec.toString() + "' missing", matchingEvent);
             }

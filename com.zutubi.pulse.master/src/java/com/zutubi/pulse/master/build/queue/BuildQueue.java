@@ -1,5 +1,10 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.PublishFlag;
 import com.zutubi.i18n.Messages;
@@ -122,7 +127,7 @@ public class BuildQueue
      */
     public synchronized boolean cancel(long requestId)
     {
-        QueuedRequest requestToCancel = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
+        QueuedRequest requestToCancel = find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId), null);
 
         if (requestToCancel != null)
         {
@@ -145,7 +150,7 @@ public class BuildQueue
      */
     public synchronized boolean complete(long requestId)
     {
-        ActivatedRequest completedRequest = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
+        ActivatedRequest completedRequest = find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId), null);
 
         if (completedRequest != null)
         {
@@ -309,7 +314,7 @@ public class BuildQueue
         }
 
         // If any of the builds have commenced, then we can not assimilate it, so bail on the assimilation of the rest.
-        if (CollectionUtils.contains(assimilationTargets.values(), new BuildHasCommencedPredicate()))
+        if (any(assimilationTargets.values(), new BuildHasCommencedPredicate()))
         {
             return false;
         }
@@ -331,12 +336,12 @@ public class BuildQueue
     private RequestHolder getLatestExistingRequestWithOwnerAndSource(RequestHolder source)
     {
         // the back of the queue is the start of the list.
-        QueuedRequest candidate = CollectionUtils.find(queuedRequests, new HasOwnerAndSourcePredicate<QueuedRequest>(source));
+        QueuedRequest candidate = find(queuedRequests, new HasOwnerAndSourcePredicate<QueuedRequest>(source), null);
         if (candidate != null)
         {
             return candidate;
         }
-        return CollectionUtils.find(activatedRequests, new HasOwnerAndSourcePredicate<ActivatedRequest>(source));
+        return find(activatedRequests, new HasOwnerAndSourcePredicate<ActivatedRequest>(source), null);
     }
 
     private boolean isReplaceable(RequestHolder target)
@@ -360,9 +365,9 @@ public class BuildQueue
      * @param owner the owner of the queued requests.
      * @return a list of queued requests belonging to the specified owner.
      */
-    public synchronized List<QueuedRequest> getQueuedRequestsByOwner(Object owner)
+    public synchronized Collection<QueuedRequest> getQueuedRequestsByOwner(Object owner)
     {
-        return CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner));
+        return Lists.newArrayList(Collections2.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
     }
 
     /**
@@ -381,9 +386,9 @@ public class BuildQueue
      * @param owner the owner of the activated requests.
      * @return a list of activated requests belonging to the specified owner.
      */
-    public synchronized List<ActivatedRequest> getActivatedRequestsByOwner(Object owner)
+    public synchronized Collection<ActivatedRequest> getActivatedRequestsByOwner(Object owner)
     {
-        return CollectionUtils.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner));
+        return Lists.newArrayList(Collections2.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)));
     }
 
     /**
@@ -406,8 +411,8 @@ public class BuildQueue
     public synchronized List<RequestHolder> getMetaBuildRequests(long metaBuildId)
     {
         LinkedList<RequestHolder> requests = new LinkedList<RequestHolder>();
-        requests.addAll(CollectionUtils.filter(queuedRequests, new HasMetaIdPredicate<QueuedRequest>(metaBuildId)));
-        requests.addAll(CollectionUtils.filter(activatedRequests, new HasMetaIdPredicate<ActivatedRequest>(metaBuildId)));
+        requests.addAll(Collections2.filter(queuedRequests, new HasMetaIdPredicate<QueuedRequest>(metaBuildId)));
+        requests.addAll(Collections2.filter(activatedRequests, new HasMetaIdPredicate<ActivatedRequest>(metaBuildId)));
         return requests;
     }
 
@@ -419,10 +424,10 @@ public class BuildQueue
      */
     public synchronized BuildRequestEvent getRequest(long requestId)
     {
-        RequestHolder request = CollectionUtils.find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId));
+        RequestHolder request = find(queuedRequests, new HasIdPredicate<QueuedRequest>(requestId), null);
         if (request == null)
         {
-            request = CollectionUtils.find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId));
+            request = find(activatedRequests, new HasIdPredicate<ActivatedRequest>(requestId), null);
         }
         if (request != null)
         {
@@ -451,8 +456,8 @@ public class BuildQueue
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
     {
         List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestMapping<QueuedRequest>()));
-        byOwner.addAll(CollectionUtils.map(CollectionUtils.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestMapping<ActivatedRequest>()));
+        byOwner.addAll(CollectionUtils.map(Iterables.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestMapping<QueuedRequest>()));
+        byOwner.addAll(CollectionUtils.map(Iterables.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestMapping<ActivatedRequest>()));
         return byOwner;
     }
 

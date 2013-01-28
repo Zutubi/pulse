@@ -1,7 +1,8 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.addAll;
+import static com.google.common.collect.Iterables.filter;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.ValidatorProvider;
@@ -24,13 +25,13 @@ public class ConfigurationValidatorProvider implements ValidatorProvider
         final boolean includeRequired = !(context instanceof ConfigurationValidationContext) || !((ConfigurationValidationContext)context).isTemplate();
         for(ValidatorProvider delegate: delegates)
         {
-            CollectionUtils.filter(delegate.getValidators(obj, context), new Predicate<Validator>()
+            addAll(validators, filter(delegate.getValidators(obj, context), new Predicate<Validator>()
             {
-                public boolean satisfied(Validator validator)
+                public boolean apply(Validator validator)
                 {
                     return !(!includeRequired && validator instanceof RequiredValidator) || !((RequiredValidator) validator).isIgnorable();
                 }
-            }, validators);
+            }));
         }
 
         return validators;

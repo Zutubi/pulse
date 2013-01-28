@@ -1,10 +1,13 @@
 package com.zutubi.tove.config.cleanup;
 
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import static com.zutubi.util.reflection.MethodPredicates.*;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -31,8 +34,8 @@ public class ConfigurationCleanupTaskFinder
 
         if (cleanupTasksClass != null)
         {
-            taskListingMethod = CollectionUtils.find(cleanupTasksClass.getMethods(),
-                    and(hasName("getTasks"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, RecordCleanupTask.class)));
+            taskListingMethod = find(asList(cleanupTasksClass.getMethods()),
+                    and(hasName("getTasks"), or(acceptsParameters(), acceptsParameters(configurationClass)), returnsType(List.class, RecordCleanupTask.class)), null);
 
             if(taskListingMethod == null)
             {

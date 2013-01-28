@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * A predicate satisfied by plugins with a given id
@@ -14,7 +14,7 @@ public class PluginIdPredicate implements Predicate<Plugin>
         this.id = id;
     }
 
-    public boolean satisfied(Plugin plugin)
+    public boolean apply(Plugin plugin)
     {
         return plugin.getId().equals(id);
     }

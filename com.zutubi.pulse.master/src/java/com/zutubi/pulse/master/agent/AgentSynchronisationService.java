@@ -1,5 +1,9 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -10,7 +14,10 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
-import com.zutubi.util.*;
+import static com.zutubi.util.CollectionUtils.map;
+import com.zutubi.util.Constants;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -20,9 +27,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static com.zutubi.util.CollectionUtils.filter;
-import static com.zutubi.util.CollectionUtils.map;
 
 /**
  * Responsible for handling the {@link AgentStatus#SYNCHRONISING} state of
@@ -103,13 +107,13 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             final long timeoutMillis = MESSAGE_TIMEOUT_SECONDS * Constants.SECOND;
 
             List<AgentSynchronisationMessage> processingMessages = agentManager.getProcessingSynchronisationMessages();
-            List<AgentSynchronisationMessage> timedOutMessages = CollectionUtils.filter(processingMessages, new Predicate<AgentSynchronisationMessage>()
+            List<AgentSynchronisationMessage> timedOutMessages = Lists.newArrayList(Iterables.filter(processingMessages, new Predicate<AgentSynchronisationMessage>()
             {
-                public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                public boolean apply(AgentSynchronisationMessage agentSynchronisationMessage)
                 {
                     return (now - agentSynchronisationMessage.getProcessingTimestamp()) > timeoutMillis;
                 }
-            });
+            }));
 
             Set<Long> affectedAgentIds = new HashSet<Long>();
             for (AgentSynchronisationMessage message: timedOutMessages)
@@ -150,7 +154,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     try
                     {
                         List<AgentSynchronisationMessage> messages = agentManager.getSynchronisationMessages(agentId);
-                        List<AgentSynchronisationMessage> pendingMessages = filter(messages, PENDING_MESSAGES_PREDICATE);
+                        List<AgentSynchronisationMessage> pendingMessages = Lists.newArrayList(Iterables.filter(messages, PENDING_MESSAGES_PREDICATE));
                         if (pendingMessages.size() > 0)
                         {
                             setMessagesToProcessing(pendingMessages);
@@ -216,13 +220,13 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             {
                 for (final SynchronisationMessageResult result: results)
                 {
-                    AgentSynchronisationMessage correspondingMessage = CollectionUtils.find(pendingMessages, new Predicate<AgentSynchronisationMessage>()
+                    AgentSynchronisationMessage correspondingMessage = find(pendingMessages, new Predicate<AgentSynchronisationMessage>()
                     {
-                        public boolean satisfied(AgentSynchronisationMessage agentSynchronisationMessage)
+                        public boolean apply(AgentSynchronisationMessage agentSynchronisationMessage)
                         {
                             return agentSynchronisationMessage.getId() == result.getMessageId();
                         }
-                    });
+                    }, null);
 
                     if (correspondingMessage != null)
                     {
@@ -235,7 +239,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
             private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
             {
-                List<AgentSynchronisationMessage> completed = filter(messages, COMPLETED_MESSAGES_PREDICATE);
+                List<AgentSynchronisationMessage> completed = Lists.newArrayList(Iterables.filter(messages, COMPLETED_MESSAGES_PREDICATE));
                 if (completed.size() > COMPLETED_MESSAGE_LIMIT)
                 {
                     agentManager.dequeueSynchronisationMessages(completed.subList(0, completed.size() - COMPLETED_MESSAGE_LIMIT));
@@ -350,7 +354,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             this.acceptableStatuses = acceptableStatuses;
         }
 
-        public boolean satisfied(AgentSynchronisationMessage message)
+        public boolean apply(AgentSynchronisationMessage message)
         {
             return acceptableStatuses.contains(message.getStatus());
         }

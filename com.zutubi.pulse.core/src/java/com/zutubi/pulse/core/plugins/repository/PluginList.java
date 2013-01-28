@@ -36,7 +36,7 @@ public class PluginList
      * @param plugins the plugins to convert
      * @return a list of infos corresponding to the input
      */
-    public static List<PluginInfo> toInfos(List<Plugin> plugins)
+    public static List<PluginInfo> toInfos(Iterable<Plugin> plugins)
     {
         return CollectionUtils.map(plugins, new Mapping<Plugin, PluginInfo>()
         {
@@ -53,10 +53,10 @@ public class PluginList
      * @param plugins the plugins to convert
      * @return a list of hashstables corresponding to the input
      * 
-     * @see #infosToHashes(List) 
-     * @see #infosFromHashes(List)
+     * @see #infosToHashes(Iterable) 
+     * @see #infosFromHashes(Iterable)
      */
-    public static List<Hashtable<String, Object>> pluginsToHashes(List<Plugin> plugins)
+    public static List<Hashtable<String, Object>> pluginsToHashes(Iterable<Plugin> plugins)
     {
         return CollectionUtils.map(plugins, new Mapping<Plugin, Hashtable<String, Object>>()
         {
@@ -77,10 +77,10 @@ public class PluginList
      * @param pluginInfos the infos to convert
      * @return a list of hashstables corresponding to the input
      * 
-     * @see #pluginsToHashes(List) 
-     * @see #infosFromHashes(List)
+     * @see #pluginsToHashes(Iterable) 
+     * @see #infosFromHashes(Iterable)
      */
-    public static List<Hashtable<String, Object>> infosToHashes(List<PluginInfo> pluginInfos)
+    public static List<Hashtable<String, Object>> infosToHashes(Iterable<PluginInfo> pluginInfos)
     {
         return CollectionUtils.map(pluginInfos, new Mapping<PluginInfo, Hashtable<String, Object>>()
         {
@@ -101,10 +101,10 @@ public class PluginList
      * @param hashes the hashes to convert
      * @return a list of plugin infors corresponding to the input
      * 
-     * @see #infosToHashes(List) 
-     * @see #pluginsToHashes(List) 
+     * @see #infosToHashes(Iterable) 
+     * @see #pluginsToHashes(Iterable) 
      */
-    public static List<PluginInfo> infosFromHashes(List<Hashtable<String, Object>> hashes)
+    public static List<PluginInfo> infosFromHashes(Iterable<Hashtable<String, Object>> hashes)
     {
         List<PluginInfo> result = new LinkedList<PluginInfo>();
         for (Hashtable<String, Object> hash: hashes)

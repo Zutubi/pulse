@@ -1,12 +1,12 @@
 package com.zutubi.tove.type.record;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Sets.newHashSet;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -116,24 +116,24 @@ public abstract class AbstractRecord implements Record
 
     public Set<String> simpleKeySet()
     {
-        return CollectionUtils.filter(keySet(), new Predicate<String>()
+        return newHashSet(filter(keySet(), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return !(get(s) instanceof Record);
             }
-        }, new HashSet<String>(size()));
+        }));
     }
 
     public Set<String> nestedKeySet()
     {
-        return CollectionUtils.filter(keySet(), new Predicate<String>()
+        return newHashSet(filter(keySet(), new Predicate<String>()
         {
-            public boolean satisfied(String s)
+            public boolean apply(String s)
             {
                 return get(s) instanceof Record;
             }
-        }, new HashSet<String>(size()));
+        }));
     }
 
     public boolean equals(Object obj)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.resources.api;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A file locator that locates a directory based on the value of an environment
@@ -23,7 +23,7 @@ public class EnvironmentVariableDirectoryLocator implements FileLocator
         delegate = new DirectoryFilteringFileLocator(new EnvironmentVariableFileLocator(environmentVariable));
     }
 
-    public List<File> locate()
+    public Collection<File> locate()
     {
         return delegate.locate();
     }

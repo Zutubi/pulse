@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class ScmUtils
             List<FileChange> changes = new LinkedList<FileChange>();
             for (FileChange c : ch.getChanges())
             {
-                if (predicate == null || predicate.satisfied(c.getPath()))
+                if (predicate == null || predicate.apply(c.getPath()))
                 {
                     changes.add(c);
                 }

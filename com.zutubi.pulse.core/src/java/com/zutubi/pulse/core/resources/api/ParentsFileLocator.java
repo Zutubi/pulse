@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.resources.api;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.NotNullPredicate;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A file locator takes the output of one locator and returns all non-null
@@ -25,14 +27,14 @@ public class ParentsFileLocator implements FileLocator
         this.delegate = delegate;
     }
 
-    public List<File> locate()
+    public Collection<File> locate()
     {
-        return CollectionUtils.filter(CollectionUtils.map(delegate.locate(), new Mapping<File, File>()
+        return Lists.newArrayList(Collections2.filter(CollectionUtils.map(delegate.locate(), new Mapping<File, File>()
         {
             public File map(File file)
             {
                 return file.getParentFile();
             }
-        }), new NotNullPredicate<File>());
+        }), Predicates.notNull()));
     }
 }

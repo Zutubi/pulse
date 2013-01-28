@@ -1,5 +1,8 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -7,8 +10,6 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -165,28 +166,29 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final Project project)
     {
-        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
-            public boolean satisfied(BuildResult t)
+        return Lists.newArrayList(Iterables.filter(allResults, new Predicate<BuildResult>()
+        {
+            public boolean apply(BuildResult t)
             {
                 return t.getProject().equals(project);
             }
-        });
+        }));
     }
 
     private List<BuildResult> getFiltered(final ResultState state)
     {
-        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
-            public boolean satisfied(BuildResult t)
+        return Lists.newArrayList(Iterables.filter(allResults, new Predicate<BuildResult>() {
+            public boolean apply(BuildResult t)
             {
                 return t.getState().equals(state);
             }
-        });
+        }));
     }
 
     private List<BuildResult> getFiltered(final ResultState... states)
     {
-        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
-            public boolean satisfied(BuildResult t)
+        return Lists.newArrayList(Iterables.filter(allResults, new Predicate<BuildResult>() {
+            public boolean apply(BuildResult t)
             {
                 for(ResultState s: states)
                 {
@@ -198,13 +200,13 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
                 return false;
             }
-        });
+        }));
     }
 
     private List<BuildResult> getFiltered(final int earliestStart, final int latestStart)
     {
-        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
-            public boolean satisfied(BuildResult t)
+        return Lists.newArrayList(Iterables.filter(allResults, new Predicate<BuildResult>() {
+            public boolean apply(BuildResult t)
             {
                 if(earliestStart > 0 && t.getStamps().getStartTime() < earliestStart)
                 {
@@ -218,7 +220,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
                 return true;
             }
-        });
+        }));
     }
 
     private List<BuildResult> getPaged(int first, int max)

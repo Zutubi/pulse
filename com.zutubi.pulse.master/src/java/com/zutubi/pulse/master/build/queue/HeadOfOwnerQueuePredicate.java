@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.adt.ReverseListIterator;
+import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.Lists;
 
 import java.util.LinkedList;
 
@@ -31,13 +31,13 @@ public class HeadOfOwnerQueuePredicate implements QueuedRequestPredicate
      * @return true if the request is at the head of the queued requests queue,
      * false otherwise.
      */
-    public boolean satisfied(final QueuedRequest request)
+    public boolean apply(final QueuedRequest request)
     {
         LinkedList<QueuedRequest> queuedRequests = new LinkedList<QueuedRequest>(buildQueue.getQueuedRequests());
 
         // are we at the head of the queue for our owner?
-        QueuedRequest headOfQueue = CollectionUtils.find(
-                new ReverseListIterator<QueuedRequest>(queuedRequests),
+        QueuedRequest headOfQueue = find(
+                Lists.reverse(queuedRequests),
                 new HasOwnerPredicate<QueuedRequest>(request.getOwner())
         );
         return headOfQueue.equals(request);

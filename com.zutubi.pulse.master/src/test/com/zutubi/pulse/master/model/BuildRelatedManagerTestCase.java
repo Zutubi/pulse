@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.collect.Sets;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
 import static java.util.Arrays.asList;
 import org.mockito.Matchers;
 import static org.mockito.Matchers.anyBoolean;
@@ -65,7 +65,7 @@ public abstract class BuildRelatedManagerTestCase extends PulseTestCase
             public Set<Long> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 PersistentChangelist changelist = (PersistentChangelist) invocationOnMock.getArguments()[0];
-                return CollectionUtils.asSet(changelist.getResultId());
+                return Sets.newHashSet(changelist.getResultId());
             }
         });
 

@@ -1,13 +1,14 @@
 package com.zutubi.pulse.master.tove.config.user;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.tove.wizard.AbstractChainableState;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.List;
 
@@ -27,13 +28,13 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
         conditionType = typeRegistry.getType(SubscriptionConditionConfiguration.class);
 
         List<AbstractChainableState> states = addWizardStates(null, parentPath, subscriptionType, null);
-        addWizardStates(CollectionUtils.filter(states, new Predicate<AbstractChainableState>()
+        addWizardStates(Lists.newArrayList(Iterables.filter(states, new Predicate<AbstractChainableState>()
         {
-            public boolean satisfied(AbstractChainableState state)
+            public boolean apply(AbstractChainableState state)
             {
                 return state.getType().equals(projectSubscriptionType);
             }
-        }), null, conditionType, null);
+        })), null, conditionType, null);
     }
 
     public void doFinish()

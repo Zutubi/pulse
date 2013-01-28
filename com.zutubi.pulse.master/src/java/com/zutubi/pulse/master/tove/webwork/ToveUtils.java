@@ -393,7 +393,7 @@ public class ToveUtils
      * @return the order that the forms should appear on a form - some
      *         permutation of allFields.
      */
-    public static List<String> evaluateFieldOrder(List<String> declaredOrder, List<String> allFields)
+    public static List<String> evaluateFieldOrder(Iterable<String> declaredOrder, Collection<String> allFields)
     {
         LinkedList<String> ordered = new LinkedList<String>();
         if (declaredOrder != null)

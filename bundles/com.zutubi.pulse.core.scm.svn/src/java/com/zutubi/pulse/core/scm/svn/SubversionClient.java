@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.zutubi.i18n.Messages;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.util.ConjunctivePredicate;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -547,7 +547,7 @@ public class SubversionClient implements ScmClient
                 for (Object value : files.values())
                 {
                     SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                    if (changelistFilter.satisfied(entryPath.getPath()))
+                    if (changelistFilter.apply(entryPath.getPath()))
                     {
                         if (handler.handleChange(new FileChange(entryPath.getPath(), revision, decodeAction(entryPath.getType()))))
                         {
@@ -578,7 +578,7 @@ public class SubversionClient implements ScmClient
      */
     private boolean containsUnfilteredChanges(List<SVNLogEntry> logs, Predicate<String> changeFilter, SVNRepository repository) throws SVNException
     {
-        Predicate<String> hasChangedFilter = new ConjunctivePredicate<String>(
+        Predicate<String> hasChangedFilter = Predicates.and(
                 changeFilter,
                 new PrefixPathFilter(repository.getRepositoryPath(""))
         );
@@ -589,7 +589,7 @@ public class SubversionClient implements ScmClient
             for (Object value : files.values())
             {
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                if (hasChangedFilter.satisfied(entryPath.getPath()))
+                if (hasChangedFilter.apply(entryPath.getPath()))
                 {
                     return true;
                 }

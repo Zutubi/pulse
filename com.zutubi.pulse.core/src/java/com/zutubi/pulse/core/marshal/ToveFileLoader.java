@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.api.PulseException;
@@ -13,9 +15,9 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
@@ -31,9 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 
 /**
  * Loads configuration objects from XML files, using the type properties and
@@ -744,13 +743,13 @@ public class ToveFileLoader
 
     private TypeProperty findContentProperty(CompositeType type)
     {
-        return CollectionUtils.find(type.getProperties(), new Predicate<TypeProperty>()
+        return find(type.getProperties(), new Predicate<TypeProperty>()
         {
-            public boolean satisfied(TypeProperty property)
+            public boolean apply(TypeProperty property)
             {
                 return property.getAnnotation(Content.class) != null;
             }
-        });
+        }, null);
     }
 
     private VariableResolver.ResolutionStrategy getResolutionStrategy(ToveFileLoadInterceptor interceptor, Configuration type, Element e)

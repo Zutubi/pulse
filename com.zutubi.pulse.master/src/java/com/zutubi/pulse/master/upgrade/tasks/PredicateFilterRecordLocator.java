@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Predicate;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.Predicate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ class PredicateFilterRecordLocator implements RecordLocator
         Map<String, Record> result = new HashMap<String, Record>();
         for (Map.Entry<String, Record> entry: allRecords.entrySet())
         {
-            if (predicate.satisfied(entry.getValue()))
+            if (predicate.apply(entry.getValue()))
             {
                 result.put(entry.getKey(), entry.getValue());
             }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.security;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -110,14 +110,14 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     private User findUserCaseInsensitive(final String login)
     {
-        return CollectionUtils.find(userManager.getAllUsers(), new Predicate<User>()
+        return find(userManager.getAllUsers(), new Predicate<User>()
         {
-            public boolean satisfied(User user)
+            public boolean apply(User user)
             {
                 UserConfiguration userConfig = user.getConfig();
                 return userConfig.isAuthenticatedViaLdap() && userConfig.getLogin().equalsIgnoreCase(login);
             }
-        });
+        }, null);
     }
 
     private void tryAutoAdd(String username, String password)

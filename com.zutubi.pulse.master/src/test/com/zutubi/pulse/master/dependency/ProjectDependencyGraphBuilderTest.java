@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.dependency;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -7,7 +9,6 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.adt.TreeNode;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.*;
@@ -300,13 +301,13 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         for (TreeNode<DependencyGraphData> expectedChild: expectedChildren)
         {
             final DependencyGraphData childData = expectedChild.getData();
-            TreeNode<DependencyGraphData> gotChild = CollectionUtils.find(gotChildren, new Predicate<TreeNode<DependencyGraphData>>()
+            TreeNode<DependencyGraphData> gotChild = find(gotChildren, new Predicate<TreeNode<DependencyGraphData>>()
             {
-                public boolean satisfied(TreeNode<DependencyGraphData> node)
+                public boolean apply(TreeNode<DependencyGraphData> node)
                 {
                     return node.getData().equals(childData);
                 }
-            });
+            }, null);
 
             assertNotNull(gotChild);
             assertEquals(expectedChild, gotChild);

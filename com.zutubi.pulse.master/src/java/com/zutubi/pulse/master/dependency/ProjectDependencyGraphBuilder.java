@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.dependency;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.TreeNode;
 
@@ -162,7 +162,7 @@ public class ProjectDependencyGraphBuilder
                 // Remove the marked nodes themselves too.
                 root.filteringWalk(new Predicate<TreeNode<DependencyGraphData>>()
                 {
-                    public boolean satisfied(TreeNode<DependencyGraphData> node)
+                    public boolean apply(TreeNode<DependencyGraphData> node)
                     {
                         return !node.getData().isSubtreeFiltered();
                     }

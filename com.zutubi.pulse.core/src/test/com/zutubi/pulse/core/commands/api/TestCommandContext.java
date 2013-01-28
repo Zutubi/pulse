@@ -1,18 +1,14 @@
 package com.zutubi.pulse.core.commands.api;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.zutubi.pulse.core.engine.api.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static com.zutubi.util.CollectionUtils.asPair;
+import java.util.*;
 
 /**
  * An implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}
@@ -72,11 +68,11 @@ public class TestCommandContext implements CommandContext
      * @param level the level of feature to retrieve
      * @return all features of the given level added to this context
      */
-    public List<Feature> getFeatures(final Feature.Level level)
+    public Collection<Feature> getFeatures(final Feature.Level level)
     {
-        return CollectionUtils.filter(features, new Predicate<Feature>()
+        return Collections2.filter(features, new Predicate<Feature>()
         {
-            public boolean satisfied(Feature feature)
+            public boolean apply(Feature feature)
             {
                 return feature.getLevel() == level;
             }

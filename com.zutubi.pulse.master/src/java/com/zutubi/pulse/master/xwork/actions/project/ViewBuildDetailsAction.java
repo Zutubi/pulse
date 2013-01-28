@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.DependencyManager;
 import com.zutubi.pulse.master.model.StageRetrievedArtifacts;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 
 import java.io.File;
@@ -28,9 +28,9 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
 
     public boolean isDependencyDetailsPresent()
     {
-        return dependencyDetails != null && CollectionUtils.contains(dependencyDetails, new Predicate<StageRetrievedArtifacts>()
+        return dependencyDetails != null && any(dependencyDetails, new Predicate<StageRetrievedArtifacts>()
         {
-            public boolean satisfied(StageRetrievedArtifacts stageDependencyDetails)
+            public boolean apply(StageRetrievedArtifacts stageDependencyDetails)
             {
                 return stageDependencyDetails.isArtifactInformationAvailable() && stageDependencyDetails.getRetrievedArtifacts().size() > 0;
             }
@@ -68,13 +68,13 @@ public class ViewBuildDetailsAction extends BuildStatusActionBase
         if (commandResult != null)
         {
             List<StoredArtifact> artifacts = commandResult.getArtifacts();
-            CollectionUtils.filter(artifacts, new Predicate<StoredArtifact>()
+            addAll(implicitArtifacts, filter(artifacts, new Predicate<StoredArtifact>()
             {
-                public boolean satisfied(StoredArtifact storedArtifact)
+                public boolean apply(StoredArtifact storedArtifact)
                 {
                     return !storedArtifact.isExplicit();
                 }
-            }, implicitArtifacts);
+            }));
             final Sort.StringComparator stringComparator = new Sort.StringComparator();
             Collections.sort(implicitArtifacts, new Comparator<StoredArtifact>()
             {

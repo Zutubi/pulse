@@ -1,24 +1,24 @@
 package com.zutubi.tove.config.docs;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
+import static com.zutubi.util.CollectionUtils.asOrderedMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.zutubi.util.CollectionUtils.asOrderedMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * A repository for documentation of configuration types.  The information is
@@ -95,13 +95,13 @@ public class ConfigurationDocsManager
         Class<? extends Configuration> clazz = type.getClazz();
         if (ConfigurationCreator.class.isAssignableFrom(clazz))
         {
-            ParameterizedType creatorType = (ParameterizedType) CollectionUtils.find(clazz.getGenericInterfaces(), new Predicate<Type>()
+            ParameterizedType creatorType = (ParameterizedType) find(asList(clazz.getGenericInterfaces()), new Predicate<Type>()
             {
-                public boolean satisfied(Type type)
+                public boolean apply(Type type)
                 {
                     return type instanceof ParameterizedType && ((ParameterizedType)type).getRawType() == ConfigurationCreator.class;
                 }
-            });
+            }, null);
 
             clazz = (Class<? extends Configuration>) creatorType.getActualTypeArguments()[0];
         }

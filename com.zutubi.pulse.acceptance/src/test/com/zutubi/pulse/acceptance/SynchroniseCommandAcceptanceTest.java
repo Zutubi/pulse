@@ -4,16 +4,15 @@ import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
 import com.zutubi.pulse.master.servlet.PluginRepositoryServlet;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import static java.util.Arrays.asList;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SynchroniseCommandAcceptanceTest extends DevToolsTestBase
 {
@@ -26,7 +25,7 @@ public class SynchroniseCommandAcceptanceTest extends DevToolsTestBase
         assertTrue(pluginDir.exists());
 
         HttpPluginRepository repository = new HttpPluginRepository(AcceptanceTestUtils.getPulseUrl() + "/" + PluginRepositoryServlet.PATH_REPOSITORY);
-        List<PluginInfo> corePlugins = repository.getAvailablePlugins(PluginRepository.Scope.CORE);
+        Collection<PluginInfo> corePlugins = repository.getAvailablePlugins(PluginRepository.Scope.CORE);
         assertEquals(corePlugins.size(), pluginDir.list(new SuffixFileFilter(".jar")).length);
     }
 

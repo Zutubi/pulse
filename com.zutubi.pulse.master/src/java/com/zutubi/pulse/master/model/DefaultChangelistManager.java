@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.DAGraph;
 import org.springframework.security.access.AccessDeniedException;
@@ -170,13 +170,13 @@ public class DefaultChangelistManager implements ChangelistManager
         List<PersistentChangelist> changelists = getChangesForBuild(node.getData(), sinceNode.getData().getNumber(), true);
         for (final PersistentChangelist changelist: changelists)
         {
-            UpstreamChangelist upstreamChangelist = CollectionUtils.find(upstreamChangelists, new Predicate<UpstreamChangelist>()
+            UpstreamChangelist upstreamChangelist = find(upstreamChangelists, new Predicate<UpstreamChangelist>()
             {
-                public boolean satisfied(UpstreamChangelist upstreamChange)
+                public boolean apply(UpstreamChangelist upstreamChange)
                 {
                     return upstreamChange.getChangelist().isEquivalent(changelist);
                 }
-            });
+            }, null);
 
             if (upstreamChangelist == null)
             {

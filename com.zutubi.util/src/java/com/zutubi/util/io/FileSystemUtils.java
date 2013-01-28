@@ -1,5 +1,6 @@
 package com.zutubi.util.io;
 
+import com.google.common.base.Predicate;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -131,7 +132,7 @@ public class FileSystemUtils
         boolean success = false;
         for (int i = 0; i < ROBUST_RETRIES; i++)
         {
-            success = fn.satisfied(f);
+            success = fn.apply(f);
             if (success)
             {
                 break;
@@ -168,7 +169,7 @@ public class FileSystemUtils
     {
         return robustFn(f, new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return file.delete();
             }
@@ -188,7 +189,7 @@ public class FileSystemUtils
     {
         boolean success = robustFn(src, new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 return file.renameTo(dest);
             }
@@ -1407,7 +1408,7 @@ public class FileSystemUtils
     {
         return WebUtils.percentEncode(component, new Predicate<Character>()
         {
-            public boolean satisfied(Character ch)
+            public boolean apply(Character ch)
             {
                 if (Character.isLetterOrDigit(ch))
                 {
@@ -1449,7 +1450,7 @@ public class FileSystemUtils
 
     private static void filter(File base, Predicate<File> predicate, List<File> satisfiedFiles)
     {
-        if (predicate.satisfied(base))
+        if (predicate.apply(base))
         {
             satisfiedFiles.add(base);
         }

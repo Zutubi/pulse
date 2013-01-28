@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.scheduling;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
 
 /**
  * A predicate that is satisfied by any trigger with a specified project id
@@ -14,7 +14,7 @@ public class HasProjectPredicate implements Predicate<Trigger>
         this.projectId = projectId;
     }
 
-    public boolean satisfied(Trigger trigger)
+    public boolean apply(Trigger trigger)
     {
         return trigger.getProjectId() == projectId;
     }

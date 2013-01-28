@@ -10,9 +10,9 @@ public class MethodReturnsTypePredicateTest extends ZutubiTestCase
     public void testSanity() throws NoSuchMethodException
     {
         MethodReturnsTypePredicate predicate = new MethodReturnsTypePredicate(List.class, String.class);
-        assertTrue(predicate.satisfied(MethodHolder.class.getMethod("getStrings")));
-        assertFalse(predicate.satisfied(MethodHolder.class.getMethod("getInts")));
-        assertFalse(predicate.satisfied(MethodHolder.class.getMethod("getNothing")));
+        assertTrue(predicate.apply(MethodHolder.class.getMethod("getStrings")));
+        assertFalse(predicate.apply(MethodHolder.class.getMethod("getInts")));
+        assertFalse(predicate.apply(MethodHolder.class.getMethod("getNothing")));
     }
     
     private static class MethodHolder

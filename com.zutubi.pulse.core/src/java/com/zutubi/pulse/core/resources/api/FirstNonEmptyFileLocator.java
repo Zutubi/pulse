@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.resources.api;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * A file locator that tries child locators in order and returns the results of
@@ -24,11 +24,11 @@ public class FirstNonEmptyFileLocator implements FileLocator
         this.delegates = delegates;
     }
 
-    public List<File> locate()
+    public Collection<File> locate()
     {
         for (FileLocator delegate: delegates)
         {
-            List<File> results = delegate.locate();
+            Collection<File> results = delegate.locate();
             if (results.size() > 0)
             {
                 return results;

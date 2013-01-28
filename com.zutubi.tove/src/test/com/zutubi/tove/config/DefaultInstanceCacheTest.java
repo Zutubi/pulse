@@ -1,10 +1,10 @@
 package com.zutubi.tove.config;
 
+import com.google.common.collect.Sets;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.transaction.TransactionManager;
-import static com.zutubi.util.CollectionUtils.asSet;
 import com.zutubi.util.Sort;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -350,8 +350,8 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
 
         assertTrue(cache.getInstancePathsReferencing("foo").isEmpty());
         assertTrue(cache.getPropertyPathsReferencing("foo").isEmpty());
-        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
-        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
     }
 
     public void testIndexReferenceClearedOnSourceDirty()
@@ -360,8 +360,8 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         addInstance("bar");
         cache.indexReference("foo/ref", "bar");
 
-        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
-        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
 
         cache.markDirty("foo");
         cache.clearDirty();
@@ -376,14 +376,14 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         addInstance("bar");
         cache.indexReference("foo/ref", "bar");
 
-        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
-        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
 
         cache.markDirty("bar");
         cache.clearDirty();
 
-        assertEquals(asSet("foo"), cache.getInstancePathsReferencing("bar"));
-        assertEquals(asSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo"), cache.getInstancePathsReferencing("bar"));
+        assertEquals(Sets.newHashSet("foo/ref"), cache.getPropertyPathsReferencing("bar"));
     }
 
     private void addInstance(String path)

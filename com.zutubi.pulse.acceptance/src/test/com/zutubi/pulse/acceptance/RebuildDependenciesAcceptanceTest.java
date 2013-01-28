@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
@@ -8,10 +10,8 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.model.Project.State.IDLE;
 import static com.zutubi.pulse.master.tove.config.project.DependencyConfiguration.*;
-import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
@@ -349,12 +349,12 @@ public class RebuildDependenciesAcceptanceTest extends AcceptanceTestBase
             throws Exception
     {
         Vector<Hashtable<String, Object>> snapshot = rpcClient.RemoteApi.getBuildQueueSnapshot();
-        return CollectionUtils.find(snapshot, new Predicate<Hashtable<String, Object>>()
+        return find(snapshot, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> build)
+            public boolean apply(Hashtable<String, Object> build)
             {
                 return build.get("project").equals(project.getName());
             }
-        });
+        }, null);
     }
 }

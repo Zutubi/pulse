@@ -1,5 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
@@ -21,7 +23,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.ToStringMapping;
 import com.zutubi.util.io.IOUtils;
@@ -397,13 +398,13 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.waitForBuildToComplete(projectName, number);
 
         Vector<Hashtable<String, Object>> artifacts = rpcClient.RemoteApi.getArtifactsInBuild(projectName, number);
-        Hashtable<String, Object> artifact = CollectionUtils.find(artifacts, new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> artifact = find(artifacts, new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> artifact)
+            public boolean apply(Hashtable<String, Object> artifact)
             {
                 return artifact.get("name").equals("environment");
             }
-        });
+        }, null);
 
         assertNotNull(artifact);
         String permalink = (String) artifact.get("permalink");
@@ -540,13 +541,13 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         Collections.sort(files, new Sort.StringComparator());
         assertEquals(EXPECTED_FILES, files);
 
-        Hashtable<String, Object> artifact = CollectionUtils.find(rpcClient.RemoteApi.getArtifactsInBuild(project, buildId), new Predicate<Hashtable<String, Object>>()
+        Hashtable<String, Object> artifact = find(rpcClient.RemoteApi.getArtifactsInBuild(project, buildId), new Predicate<Hashtable<String, Object>>()
         {
-            public boolean satisfied(Hashtable<String, Object> artifactStruct)
+            public boolean apply(Hashtable<String, Object> artifactStruct)
             {
                 return ARTIFACT_NAME.equals(artifactStruct.get("name"));
             }
-        });
+        }, null);
         assertNotNull(artifact);
 
         File artifactDir = new File(AcceptanceTestUtils.getDataDirectory(), (String) artifact.get("dataPath"));

@@ -1,12 +1,9 @@
 package com.zutubi.pulse.master.security;
 
-import static com.zutubi.util.CollectionUtils.contains;
-import com.zutubi.util.Predicate;
 
-import java.util.List;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A simple holder for the path, role, methods tuple.  The represented data is defined as follows:

@@ -1,21 +1,20 @@
 package com.zutubi.pulse.master.tove.wizard;
 
+import com.google.common.base.Predicate;
+import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import static com.zutubi.pulse.master.tove.wizard.WizardTransition.*;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-
-import static com.zutubi.pulse.master.tove.wizard.WizardTransition.*;
 
 /**
  *
@@ -138,13 +137,13 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public TypeWizardState getCompletedStateForType(final CompositeType type)
     {
-        return CollectionUtils.find(completedStates, new Predicate<TypeWizardState>()
+        return find(completedStates, new Predicate<TypeWizardState>()
         {
-            public boolean satisfied(TypeWizardState state)
+            public boolean apply(TypeWizardState state)
             {
                 return type.equals(state.getConfiguredBaseType());
             }
-        });
+        }, null);
     }
 
     public String getSuccessPath()

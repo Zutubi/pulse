@@ -1,11 +1,10 @@
 package com.zutubi.pulse.core.resources.api;
 
-import com.zutubi.util.Predicate;
+import com.google.common.base.Predicate;
+import static com.zutubi.pulse.core.resources.api.StandardHomeDirectoryConstants.getBinaryFile;
 
 import java.io.File;
-import java.util.List;
-
-import static com.zutubi.pulse.core.resources.api.StandardHomeDirectoryConstants.getBinaryFile;
+import java.util.Collection;
 
 /**
  * A locator that looks for home directories matching the expectations of
@@ -55,7 +54,7 @@ public class StandardHomeDirectoryFileLocator implements FileLocator
     {
         delegate = new FilteringFileLocator(new EnvironmentVariableDirectoryLocator(environmentVariable), new Predicate<File>()
         {
-            public boolean satisfied(File file)
+            public boolean apply(File file)
             {
                 File binaryFile = getBinaryFile(file, binaryName, script);
                 if (!binaryFile.isFile())
@@ -63,7 +62,7 @@ public class StandardHomeDirectoryFileLocator implements FileLocator
                     return false;
                 }
                 
-                if (extraBinaryPredicate != null && !extraBinaryPredicate.satisfied(binaryFile))
+                if (extraBinaryPredicate != null && !extraBinaryPredicate.apply(binaryFile))
                 {
                     return false;
                 }
@@ -73,7 +72,7 @@ public class StandardHomeDirectoryFileLocator implements FileLocator
         });
     }
     
-    public List<File> locate()
+    public Collection<File> locate()
     {
         return delegate.locate();
     }
