@@ -327,7 +327,7 @@
         </exec>
     </target>
 
-    <target name="package.master" depends="init">
+    <target name="package.master" depends="init, check.js">
         <!-- Check that all plugins will be included in some package -->
         <exec executable="python" failonerror="true">
             <arg line="scripts/check-plugins.py"/>

@@ -1154,7 +1154,7 @@ Zutubi.BuildNavToolbarMenu = Ext.extend(Ext.Toolbar.Item, {
         {
             return 'health/ok.gif';    
         }
-        else if (build.status == 'warnings')
+        else if (build.status === 'warnings')
         {
             return 'health/warnings.gif';
         }
