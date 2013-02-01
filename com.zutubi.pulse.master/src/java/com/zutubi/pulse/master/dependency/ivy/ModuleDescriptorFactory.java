@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.dependency.ivy;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
@@ -14,8 +15,8 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
@@ -32,7 +33,9 @@ import java.util.regex.Pattern;
 public class ModuleDescriptorFactory
 {
     private static final Messages I18N = Messages.getInstance(ModuleDescriptorFactory.class);
-    private static final Mapping<BuildStageConfiguration, String> STAGE_NAME_MAPPING = new StageNameMapping();
+    
+    private static final Function<BuildStageConfiguration, String> STAGE_NAME_FUNCTION = Configurations.toConfigurationName();
+    
     private final IvyConfiguration configuration;
     private final MasterConfigurationManager configurationManager;
 
@@ -99,7 +102,7 @@ public class ModuleDescriptorFactory
                         stageNames.add(stage.getName());
                         break;
                     case SELECTED_STAGES:
-                        CollectionUtils.map(dependency.getStages(), STAGE_NAME_MAPPING, stageNames);
+                        CollectionUtils.map(dependency.getStages(), STAGE_NAME_FUNCTION, stageNames);
                         break;
                 }
 
@@ -277,14 +280,6 @@ public class ModuleDescriptorFactory
         public RecipeResult getRecipeResult()
         {
             return recipeResult;
-        }
-    }
-
-    private static class StageNameMapping implements Mapping<BuildStageConfiguration, String>
-    {
-        public String map(BuildStageConfiguration t)
-        {
-            return t.getName();
         }
     }
 }

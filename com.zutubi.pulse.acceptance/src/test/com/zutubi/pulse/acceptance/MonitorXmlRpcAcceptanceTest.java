@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -11,7 +12,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.Constants.MINUTE;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.FileSystemUtils;
 import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
@@ -305,9 +305,9 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(statuses.containsKey(KEY_PROJECTS));
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> projects = (Vector<Hashtable<String, Object>>) statuses.get(KEY_PROJECTS);
-        Set<String> gotProjects = CollectionUtils.map(projects, new Mapping<Hashtable<String, Object>, String>()
+        Set<String> gotProjects = CollectionUtils.map(projects, new Function<Hashtable<String, Object>, String>()
         {
-            public String map(Hashtable<String, Object> status)
+            public String apply(Hashtable<String, Object> status)
             {
                 return (String) status.get(KEY_OWNER);
             }
@@ -351,9 +351,9 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(status.containsKey(key));
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> builds = (Vector<Hashtable<String, Object>>) status.get(key);
-        List<Integer> gotBuilds = CollectionUtils.map(builds, new Mapping<Hashtable<String, Object>, Integer>()
+        List<Integer> gotBuilds = CollectionUtils.map(builds, new Function<Hashtable<String, Object>, Integer>()
         {
-            public Integer map(Hashtable<String, Object> build)
+            public Integer apply(Hashtable<String, Object> build)
             {
                 return (Integer) build.get(KEY_ID);
             }

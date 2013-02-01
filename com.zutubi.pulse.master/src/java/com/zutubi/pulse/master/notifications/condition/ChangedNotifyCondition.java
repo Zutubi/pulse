@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.notifications.condition;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.notifications.NotifyConditionContext;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.Mapping;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -45,9 +45,9 @@ public class ChangedNotifyCondition implements NotifyCondition
             return name().toLowerCase().replace('_', '.');
         }
 
-        public static class ToTextMapping implements Mapping<Modifier, String>
+        public static class ToTextFunction implements Function<Modifier, String>
         {
-            public String map(Modifier modifier)
+            public String apply(Modifier modifier)
             {
                 return modifier.asText();
             }

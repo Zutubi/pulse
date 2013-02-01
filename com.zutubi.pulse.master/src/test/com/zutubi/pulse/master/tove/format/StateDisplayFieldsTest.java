@@ -1,15 +1,15 @@
 package com.zutubi.pulse.master.tove.format;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
-
 import static java.util.Arrays.asList;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -167,9 +167,9 @@ public class StateDisplayFieldsTest extends ZutubiTestCase
     {
         public List<String> formatCollectionA(Collection<T> ts)
         {
-            return CollectionUtils.map(ts, new Mapping<T, String>()
+            return CollectionUtils.map(ts, new Function<T, String>()
             {
-                public String map(T t)
+                public String apply(T t)
                 {
                     return t.getName();
                 }

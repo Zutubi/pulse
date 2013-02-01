@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.patchformats.unified;
 
+import com.google.common.base.Function;
 import com.zutubi.diff.*;
 import com.zutubi.diff.unified.UnifiedPatch;
 import com.zutubi.diff.unified.UnifiedPatchParser;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.io.*;
 import java.util.Collections;
@@ -45,9 +45,9 @@ public class UnifiedPatchFormat implements PatchFormat
     public List<FileStatus> readFileStatuses(File patchFile) throws ScmException
     {
         PatchFile patch = parse(patchFile);
-        return CollectionUtils.map(patch.getPatches(), new Mapping<Patch, FileStatus>()
+        return CollectionUtils.map(patch.getPatches(), new Function<Patch, FileStatus>()
         {
-            public FileStatus map(Patch patch)
+            public FileStatus apply(Patch patch)
             {
                 return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
             }

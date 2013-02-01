@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core.engine;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,9 +55,9 @@ public class ResourcesConfiguration extends AbstractConfiguration
 
     public List<ResourceRequirement> createRequirements()
     {
-        return CollectionUtils.map(requirements, new Mapping<SimpleResourceRequirementConfiguration, ResourceRequirement>()
+        return CollectionUtils.map(requirements, new Function<SimpleResourceRequirementConfiguration, ResourceRequirement>()
         {
-            public ResourceRequirement map(SimpleResourceRequirementConfiguration requirementConfiguration)
+            public ResourceRequirement apply(SimpleResourceRequirementConfiguration requirementConfiguration)
             {
                 return requirementConfiguration.asResourceRequirement();
             }

@@ -1,9 +1,9 @@
 package com.zutubi.tove.actions;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -250,9 +250,9 @@ public class ConfigurationActionsTest extends ZutubiTestCase
     private void assertActions(List<ConfigurationAction> got, String... expected)
     {
         assertEquals(expected.length, got.size());
-        List<String> gotNames = CollectionUtils.map(got, new Mapping<ConfigurationAction, String>()
+        List<String> gotNames = CollectionUtils.map(got, new Function<ConfigurationAction, String>()
         {
-            public String map(ConfigurationAction configurationAction)
+            public String apply(ConfigurationAction configurationAction)
             {
                 return configurationAction.getName();
             }

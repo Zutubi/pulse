@@ -1,13 +1,12 @@
 package com.zutubi.pulse.master.agent.statistics;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
-import com.zutubi.util.Mapping;
+import static com.zutubi.util.CollectionUtils.map;
+import static com.zutubi.util.CollectionUtils.reduce;
 import com.zutubi.util.math.LongAddition;
 
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.map;
-import static com.zutubi.util.CollectionUtils.reduce;
 
 /**
  * Wrapper around statistics for a single agent over multiple days which
@@ -44,9 +43,9 @@ public class AgentStatistics
         totalRecordedTime = totalDisabledTime + totalOfflineTime + totalSynchronisingTime + totalIdleTime + totalBusyTime;
     }
 
-    private long total(Mapping<AgentDailyStatistics, Long> mapping)
+    private long total(Function<AgentDailyStatistics, Long> function)
     {
-        return reduce(map(dailyStatistics, mapping), 0L, new LongAddition());
+        return reduce(map(dailyStatistics, function), 0L, new LongAddition());
     }
 
     private double percentage(long time)
@@ -244,49 +243,49 @@ public class AgentStatistics
         return percentage(totalBusyTime);
     }
 
-    private static class ToRecipeCount implements Mapping<AgentDailyStatistics, Long>
+    private static class ToRecipeCount implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getRecipeCount();
         }
     }
 
-    private static class ToDisabledTime implements Mapping<AgentDailyStatistics, Long>
+    private static class ToDisabledTime implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getDisabledTime();
         }
     }
 
-    private static class ToOfflineTime implements Mapping<AgentDailyStatistics, Long>
+    private static class ToOfflineTime implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getOfflineTime();
         }
     }
 
-    private static class ToSynchronisingTime implements Mapping<AgentDailyStatistics, Long>
+    private static class ToSynchronisingTime implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getSynchronisingTime();
         }
     }
 
-    private static class ToIdleTime implements Mapping<AgentDailyStatistics, Long>
+    private static class ToIdleTime implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getIdleTime();
         }
     }
 
-    private static class ToBusyTime implements Mapping<AgentDailyStatistics, Long>
+    private static class ToBusyTime implements Function<AgentDailyStatistics, Long>
     {
-        public Long map(AgentDailyStatistics statistics)
+        public Long apply(AgentDailyStatistics statistics)
         {
             return (long) statistics.getBusyTime();
         }

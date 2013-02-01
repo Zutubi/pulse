@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -46,9 +46,9 @@ public class BuildWorkingCopiesFileObject extends AbstractPulseFileObject
         }
 
         List<RecipeResultNode> stages = result.getStages();
-        return CollectionUtils.mapToArray(stages, new Mapping<RecipeResultNode, String>()
+        return CollectionUtils.mapToArray(stages, new Function<RecipeResultNode, String>()
         {
-            public String map(RecipeResultNode node)
+            public String apply(RecipeResultNode node)
             {
                 return Long.toString(node.getResult().getId());
             }

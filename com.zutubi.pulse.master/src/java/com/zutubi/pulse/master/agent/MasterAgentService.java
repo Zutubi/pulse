@@ -14,7 +14,7 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
-import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
+import com.zutubi.pulse.servercore.filesystem.ToFileInfoFunction;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
@@ -121,7 +121,7 @@ public class MasterAgentService implements AgentService
         File[] listing = path.listFiles();
         if (listing != null)
         {
-            return CollectionUtils.map(listing,  new ToFileInfoMapping());
+            return CollectionUtils.map(listing,  new ToFileInfoFunction());
         }
 
         return new LinkedList<FileInfo>();

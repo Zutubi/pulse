@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -158,9 +158,9 @@ public abstract class ProjectsModelTestBase extends PulseTestCase
     {
         ProjectConfiguration configuration = new ProjectConfiguration();
         configuration.setName(name);
-        configuration.setLabels(CollectionUtils.map(labels, new Mapping<String, LabelConfiguration>()
+        configuration.setLabels(CollectionUtils.map(labels, new Function<String, LabelConfiguration>()
         {
-            public LabelConfiguration map(String s)
+            public LabelConfiguration apply(String s)
             {
                 LabelConfiguration label = new LabelConfiguration();
                 label.setLabel(s);

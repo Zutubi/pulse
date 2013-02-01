@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.tove.wizard.AbstractTypeWizard;
 import com.zutubi.pulse.master.tove.wizard.TypeWizardState;
 import com.zutubi.pulse.master.tove.wizard.WizardState;
@@ -9,7 +10,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.List;
 
@@ -69,9 +69,9 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
 
     private void decorate(FormDescriptor descriptor)
     {
-        List<String> actions = CollectionUtils.map(wizardInstance.getAvailableActions(), new Mapping<WizardTransition, String>()
+        List<String> actions = CollectionUtils.map(wizardInstance.getAvailableActions(), new Function<WizardTransition, String>()
         {
-            public String map(WizardTransition o)
+            public String apply(WizardTransition o)
             {
                 return o.name().toLowerCase();
             }

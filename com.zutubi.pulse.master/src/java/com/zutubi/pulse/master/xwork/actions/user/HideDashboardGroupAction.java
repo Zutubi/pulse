@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 /**
  * Action allowing a user to hide a chosen project group from their dashboard.
@@ -42,9 +42,9 @@ public class HideDashboardGroupAction extends UserActionSupport
         if(configuration.isShowAllGroups())
         {
             configuration.setShowAllGroups(false);
-            configuration.getShownGroups().addAll(CollectionUtils.map(projectManager.getAllProjectGroups(), new Mapping<ProjectGroup, String>()
+            configuration.getShownGroups().addAll(CollectionUtils.map(projectManager.getAllProjectGroups(), new Function<ProjectGroup, String>()
             {
-                public String map(ProjectGroup projectGroup)
+                public String apply(ProjectGroup projectGroup)
                 {
                     return projectGroup.getName();
                 }

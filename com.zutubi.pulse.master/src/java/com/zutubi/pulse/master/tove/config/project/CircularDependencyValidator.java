@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationValidationContext;
-import com.zutubi.tove.config.api.ToConfigurationNameMapping;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
@@ -40,7 +40,7 @@ public class CircularDependencyValidator extends FieldValidatorSupport
         LinkedList<ProjectConfiguration> circularPath = new LinkedList<ProjectConfiguration>();
         if (findCircularDependency(instance, candidate, circularPath))
         {
-            String path = StringUtils.join("->", CollectionUtils.map(circularPath, new ToConfigurationNameMapping<ProjectConfiguration>()));
+            String path = StringUtils.join("->", CollectionUtils.map(circularPath, Configurations.toConfigurationName()));
             addError("circular.error", path);
         }
     }

@@ -1,11 +1,10 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.core.model.EntityToIdMapping;
+import com.google.common.base.Functions;
+import com.zutubi.pulse.core.model.EntityToIdFunction;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.CompositeMapping;
-import com.zutubi.util.ToStringMapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -79,7 +78,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
             List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project, MAX_BUILDS);
             List<String> buildIds = CollectionUtils.map(builds, 
-                    new CompositeMapping<BuildResult, Long, String>(new EntityToIdMapping<BuildResult>(), new ToStringMapping<Long>())
+                    Functions.compose(Functions.toStringFunction(), new EntityToIdFunction<BuildResult>())
             );
             return buildIds.toArray(new String[buildIds.size()]);
         }

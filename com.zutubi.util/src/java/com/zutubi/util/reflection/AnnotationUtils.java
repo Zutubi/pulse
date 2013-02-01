@@ -1,9 +1,9 @@
 package com.zutubi.util.reflection;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.BeanUtils;
 import static java.util.Arrays.asList;
 
@@ -96,9 +96,9 @@ public class AnnotationUtils
     private static List<Annotation> addMetaAnnotations(List<Annotation> annotations)
     {
         Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
-        CollectionUtils.map(annotations, new Mapping<Annotation, Class<? extends Annotation>>()
+        CollectionUtils.map(annotations, new Function<Annotation, Class<? extends Annotation>>()
         {
-            public Class<? extends Annotation> map(Annotation annotation)
+            public Class<? extends Annotation> apply(Annotation annotation)
             {
                 return annotation.annotationType();
             }
@@ -235,9 +235,9 @@ public class AnnotationUtils
     public static <T extends Annotation> T findAnnotation(List<Annotation> from, Class<T> clazz)
     {
         Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
-        CollectionUtils.map(from, new Mapping<Annotation, Class<? extends Annotation>>()
+        CollectionUtils.map(from, new Function<Annotation, Class<? extends Annotation>>()
         {
-            public Class<? extends Annotation> map(Annotation annotation)
+            public Class<? extends Annotation> apply(Annotation annotation)
             {
                 return annotation.annotationType();
             }

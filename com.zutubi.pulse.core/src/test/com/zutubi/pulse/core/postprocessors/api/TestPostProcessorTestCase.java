@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import com.google.common.base.Function;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import junit.framework.AssertionFailedError;
 
 import java.io.IOException;
 import java.util.List;
-
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 /**
  * Support base class for test report post-processor test cases.  This case
@@ -268,9 +267,9 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
         assertEquals(skips, suite.getTotalWithStatus(SKIPPED));
     }
 
-    private static class TestResultToName<T extends TestResult> implements Mapping<T, String>
+    private static class TestResultToName<T extends TestResult> implements Function<T, String>
     {
-        public String map(T t)
+        public String apply(T t)
         {
             return t.getName();
         }

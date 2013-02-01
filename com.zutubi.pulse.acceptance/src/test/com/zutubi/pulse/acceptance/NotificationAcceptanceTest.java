@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -20,10 +21,9 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
-
 import static java.util.Arrays.asList;
+
 import java.util.*;
 
 /**
@@ -194,9 +194,9 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private void assertIndividualEmailsTo(String... suffixes)
     {
-        assertEmailsTo(suffixes.length, CollectionUtils.mapToArray(suffixes, new Mapping<String, String>()
+        assertEmailsTo(suffixes.length, CollectionUtils.mapToArray(suffixes, new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 return random + "user" + s;
             }
@@ -317,9 +317,9 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private String createGroup(String group, String... users) throws Exception
     {
-        return rpcClient.RemoteApi.insertGroup(group, CollectionUtils.map(users, new Mapping<String, String>()
+        return rpcClient.RemoteApi.insertGroup(group, CollectionUtils.map(users, new Function<String, String>()
         {
-            public String map(String name)
+            public String apply(String name)
             {
                 return "users/" + name;
             }

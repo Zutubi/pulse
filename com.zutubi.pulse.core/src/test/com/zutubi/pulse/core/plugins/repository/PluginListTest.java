@@ -1,20 +1,19 @@
 package com.zutubi.pulse.core.plugins.repository;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginDependency;
 import com.zutubi.pulse.core.plugins.PluginVersion;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import static java.util.Arrays.asList;
 import nu.xom.Document;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class PluginListTest extends PulseTestCase
 {
@@ -110,9 +109,9 @@ public class PluginListTest extends PulseTestCase
 
     private Plugin makePluginWithDependencies(String... dependencyIds)
     {
-        List<PluginDependency> dependencies = CollectionUtils.map(dependencyIds, new Mapping<String, PluginDependency>()
+        List<PluginDependency> dependencies = CollectionUtils.map(dependencyIds, new Function<String, PluginDependency>()
         {
-            public PluginDependency map(String id)
+            public PluginDependency apply(String id)
             {
                 return new PluginDependency(id, null, null);
             }

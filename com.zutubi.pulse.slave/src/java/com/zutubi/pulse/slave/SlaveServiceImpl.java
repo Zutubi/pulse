@@ -23,7 +23,7 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
-import com.zutubi.pulse.servercore.filesystem.ToFileInfoMapping;
+import com.zutubi.pulse.servercore.filesystem.ToFileInfoFunction;
 import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
@@ -242,7 +242,7 @@ public class SlaveServiceImpl implements SlaveService
         File[] listing = path.listFiles();
         if (listing != null)
         {
-            return CollectionUtils.map(listing,  new ToFileInfoMapping());
+            return CollectionUtils.map(listing,  new ToFileInfoFunction());
         }
 
         return new LinkedList<FileInfo>();

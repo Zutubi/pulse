@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
 import java.io.IOException;
@@ -120,9 +120,9 @@ public class TailBuildLogAction extends StageActionBase
             }
         }
 
-        List<String> stageNames = CollectionUtils.map(buildResult.getStages(), new Mapping<RecipeResultNode, String>()
+        List<String> stageNames = CollectionUtils.map(buildResult.getStages(), new Function<RecipeResultNode, String>()
         {
-            public String map(RecipeResultNode recipeResultNode)
+            public String apply(RecipeResultNode recipeResultNode)
             {
                 return recipeResultNode.getStageName();
             }

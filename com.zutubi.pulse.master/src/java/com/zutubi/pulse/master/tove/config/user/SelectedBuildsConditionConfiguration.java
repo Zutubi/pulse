@@ -184,7 +184,7 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
             String modifierExpression = "";
             if (modifiers.size() > 0)
             {
-                modifierExpression = "(" + StringUtils.join(",", CollectionUtils.map(modifiers, new ChangedNotifyCondition.Modifier.ToTextMapping())) + ")";
+                modifierExpression = "(" + StringUtils.join(",", CollectionUtils.map(modifiers, new ChangedNotifyCondition.Modifier.ToTextFunction())) + ")";
             }
 
             expressions.add("changed" + modifierExpression);

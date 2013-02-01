@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.control;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -27,7 +28,7 @@ import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
-import com.zutubi.pulse.core.resources.api.AsResourcePropertyMapping;
+import com.zutubi.pulse.core.resources.api.AsResourcePropertyFunction;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -316,7 +317,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
     {
-        return CollectionUtils.map(resourcePropertyConfigurations, new AsResourcePropertyMapping());
+        return CollectionUtils.map(resourcePropertyConfigurations, new AsResourcePropertyFunction());
     }
 
     private AgentRequirements getAgentRequirements(BuildStageConfiguration stage)
@@ -377,9 +378,9 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Collection<? extends ResourceRequirement> asResourceRequirements(List<ResourceRequirementConfiguration> requirements, final VariableMap variables)
     {
-        return CollectionUtils.map(requirements, new Mapping<ResourceRequirementConfiguration, ResourceRequirement>()
+        return CollectionUtils.map(requirements, new Function<ResourceRequirementConfiguration, ResourceRequirement>()
         {
-            public ResourceRequirement map(ResourceRequirementConfiguration config)
+            public ResourceRequirement apply(ResourceRequirementConfiguration config)
             {
                 return config.asResourceRequirement(variables);
             }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.model.PersistentTestCaseResult;
 import com.zutubi.pulse.core.model.PersistentTestResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
 
 import java.util.Collection;
@@ -130,9 +130,9 @@ public class BuildStageTestFailuresModel
             List<PersistentTestSuiteResult> childSuites = suiteResult.getSuites();
             if (childSuites.size() > 0)
             {
-                suites = CollectionUtils.map(childSuites, new Mapping<PersistentTestSuiteResult, TestSuiteModel>()
+                suites = CollectionUtils.map(childSuites, new Function<PersistentTestSuiteResult, TestSuiteModel>()
                 {
-                    public TestSuiteModel map(PersistentTestSuiteResult childSuite)
+                    public TestSuiteModel apply(PersistentTestSuiteResult childSuite)
                     {
                         return new TestSuiteModel(childSuite);
                     }
@@ -142,9 +142,9 @@ public class BuildStageTestFailuresModel
             Collection<PersistentTestCaseResult> childCases = suiteResult.getCases();
             if (childCases.size() > 0)
             {
-                cases = CollectionUtils.map(childCases, new Mapping<PersistentTestCaseResult, TestCaseModel>()
+                cases = CollectionUtils.map(childCases, new Function<PersistentTestCaseResult, TestCaseModel>()
                 {
-                    public TestCaseModel map(PersistentTestCaseResult childCase)
+                    public TestCaseModel apply(PersistentTestCaseResult childCase)
                     {
                         return new TestCaseModel(childCase);
                     }

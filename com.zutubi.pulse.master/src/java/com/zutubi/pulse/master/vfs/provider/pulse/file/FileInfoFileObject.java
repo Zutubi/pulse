@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.file;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -47,9 +47,9 @@ public class FileInfoFileObject extends AbstractPulseFileObject
             String relativePath = root.getName().getRelativeName(getName());
 
             List<FileInfo> children = provider.getFileInfos(relativePath);
-            return UriParser.encode(CollectionUtils.mapToArray(children, new Mapping<FileInfo, String>()
+            return UriParser.encode(CollectionUtils.mapToArray(children, new Function<FileInfo, String>()
             {
-                public String map(FileInfo fileInfo)
+                public String apply(FileInfo fileInfo)
                 {
                     return fileInfo.getName();
                 }

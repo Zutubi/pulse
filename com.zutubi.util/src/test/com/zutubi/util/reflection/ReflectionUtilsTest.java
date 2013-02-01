@@ -1,12 +1,13 @@
 package com.zutubi.util.reflection;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.map;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -15,7 +16,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-import static java.util.Arrays.asList;
 
 public class ReflectionUtilsTest extends ZutubiTestCase
 {
@@ -603,7 +603,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void declaredFieldsHelper(Class clazz, Class stopClazz, String... expected)
     {
-        List<String> names = map(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameMapping());
+        List<String> names = map(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameFunction());
         Collections.sort(names);
         assertEquals(asList(expected), names);
     }
@@ -896,9 +896,9 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     private void beanPropertiesHelper(final Class<?> clazz, String... expectedNames) throws IntrospectionException
     {
         PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(clazz);
-        String[] names = CollectionUtils.mapToArray(properties, new Mapping<PropertyDescriptor, String>()
+        String[] names = CollectionUtils.mapToArray(properties, new Function<PropertyDescriptor, String>()
         {
-            public String map(PropertyDescriptor propertyDescriptor)
+            public String apply(PropertyDescriptor propertyDescriptor)
             {
                 return propertyDescriptor.getName();
             }
@@ -1127,9 +1127,9 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     }
 
-    private static class FieldNameMapping implements Mapping<Field, String>
+    private static class FieldNameFunction implements Function<Field, String>
     {
-        public String map(Field field)
+        public String apply(Field field)
         {
             return field.getName();
         }

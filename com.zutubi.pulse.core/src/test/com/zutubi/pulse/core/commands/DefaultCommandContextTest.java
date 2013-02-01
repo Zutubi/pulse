@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.NoopPostProcessorConfiguration;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
@@ -143,9 +143,9 @@ public class DefaultCommandContextTest extends PulseTestCase
     
     private DefaultCommandContext createContextWithErrorFeatures(CommandResult commandResult, int perFileFeatureLimit, final String... errors)
     {
-        Feature[] features = CollectionUtils.mapToArray(errors, new Mapping<String, Feature>()
+        Feature[] features = CollectionUtils.mapToArray(errors, new Function<String, Feature>()
         {
-            public Feature map(String s)
+            public Feature apply(String s)
             {
                 return error(s);
             }

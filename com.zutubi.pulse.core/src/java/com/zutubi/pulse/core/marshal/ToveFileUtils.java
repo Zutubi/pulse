@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Referenceable;
@@ -10,7 +11,6 @@ import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
 import java.util.List;
@@ -236,9 +236,9 @@ public class ToveFileUtils
         }
         else
         {
-            List<String> list = CollectionUtils.map(propertyValue, new Mapping<Object, String>()
+            List<String> list = CollectionUtils.map(propertyValue, new Function<Object, String>()
             {
-                public String map(Object o)
+                public String apply(Object o)
                 {
                     try
                     {

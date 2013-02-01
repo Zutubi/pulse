@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
@@ -7,7 +8,6 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -209,9 +209,9 @@ public class NativeGitTest extends PulseTestCase
 
         assertEquals("Dev3 (Name Lastname, lastname includes norwegian characters. Special norwegian characters are æ.ø,å)", logEntries.get(1).getAuthor());
 
-        List<String> revisions = CollectionUtils.map(logEntries, new Mapping<GitLogEntry, String>()
+        List<String> revisions = CollectionUtils.map(logEntries, new Function<GitLogEntry, String>()
         {
-            public String map(GitLogEntry gitLogEntry)
+            public String apply(GitLogEntry gitLogEntry)
             {
                 return gitLogEntry.getId();
             }

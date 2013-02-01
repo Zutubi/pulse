@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 import com.zutubi.tove.type.CompositeType;
@@ -7,7 +8,6 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Collection;
@@ -161,9 +161,9 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
 
         public WorkerGroup(Worker... workers)
         {
-            workerThreads = CollectionUtils.mapToArray(workers, new Mapping<Worker, WorkerThread>()
+            workerThreads = CollectionUtils.mapToArray(workers, new Function<Worker, WorkerThread>()
             {
-                public WorkerThread map(Worker worker)
+                public WorkerThread apply(Worker worker)
                 {
                     return new WorkerThread(new WorkerRunner(worker, running));
                 }

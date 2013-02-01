@@ -1,7 +1,7 @@
 package com.zutubi.util.adt;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.*;
@@ -71,13 +71,13 @@ public class DAGraph<T>
      * Transforms this graph to a new graph of the same shape by mapping the data in all nodes
      * according to the given function.
      *
-     * @param mapping mapping used to transform data
+     * @param function mapping used to transform data
      * @param <U> new data type
      * @return a new graph shaped like this one with all data transformed
      */
-    public <U> DAGraph<U> transform(Mapping<T, U> mapping)
+    public <U> DAGraph<U> transform(Function<T, U> function)
     {
-        return new DAGraph<U>(root.transform(mapping, new HashMap<Node<T>, Node<U>>()));
+        return new DAGraph<U>(root.transform(function, new HashMap<Node<T>, Node<U>>()));
     }
 
     @Override
@@ -221,17 +221,17 @@ public class DAGraph<T>
             return result;
         }
 
-        <U> Node<U> transform(Mapping<T, U> mapping, HashMap<Node<T>, Node<U>> mapped)
+        <U> Node<U> transform(Function<T, U> function, HashMap<Node<T>, Node<U>> mapped)
         {
             Node<U> transformed = mapped.get(this);
             if (transformed == null)
             {
-                transformed = new Node<U>(mapping.map(data));
+                transformed = new Node<U>(function.apply(data));
                 mapped.put(this, transformed);
 
                 for (Node<T> child: connected)
                 {
-                    transformed.connectNode(child.transform(mapping, mapped));
+                    transformed.connectNode(child.transform(function, mapped));
                 }
             }
 
@@ -303,9 +303,9 @@ public class DAGraph<T>
          *
          * @param <T> type of the node data
          */
-        public static class ToDataMapping<T> implements Mapping<Node<T>, T>
+        public static class ToDataFunction<T> implements Function<Node<T>, T>
         {
-            public T map(Node<T> node)
+            public T apply(Node<T> node)
             {
                 return node.getData();
             }
@@ -316,9 +316,9 @@ public class DAGraph<T>
          *
          * @param <T> type of the node data
          */
-        public static class FromDataMapping<T> implements Mapping<T, Node<T>>
+        public static class FromDataFunction<T> implements Function<T, Node<T>>
         {
-            public Node<T> map(T data)
+            public Node<T> apply(T data)
             {
                 return new Node<T>(data);
             }
@@ -350,9 +350,9 @@ public class DAGraph<T>
      * 
      * @param <T> type of the graph data
      */
-    public static class ToRootMapping<T> implements Mapping<DAGraph<T>, Node<T>>
+    public static class ToRootFunction<T> implements Function<DAGraph<T>, Node<T>>
     {
-        public Node<T> map(DAGraph<T> graph)
+        public Node<T> apply(DAGraph<T> graph)
         {
             return graph.getRoot();
         }

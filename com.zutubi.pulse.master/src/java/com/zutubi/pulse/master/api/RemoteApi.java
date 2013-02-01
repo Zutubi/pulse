@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.api;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import static com.google.common.collect.Iterables.find;
@@ -56,7 +57,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.api.ToConfigurationNameMapping;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
@@ -345,9 +346,9 @@ public class RemoteApi
         {
             TemplateNode node = getTemplateNode(path);
 
-            List<String> names = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()
+            List<String> names = CollectionUtils.map(node.getChildren(), new Function<TemplateNode, String>()
             {
-                public String map(TemplateNode templateNode)
+                public String apply(TemplateNode templateNode)
                 {
                     return templateNode.getId();
                 }
@@ -1814,7 +1815,7 @@ public class RemoteApi
     private Vector<String> getConfigNames(Collection<ProjectConfiguration> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
-        CollectionUtils.map(projects, new ToConfigurationNameMapping<ProjectConfiguration>(), result);
+        CollectionUtils.map(projects, Configurations.toConfigurationName(), result);
 
         return result;
     }
@@ -1822,9 +1823,9 @@ public class RemoteApi
     private Vector<String> getNames(Collection<Project> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
-        CollectionUtils.map(projects, new Mapping<Project, String>()
+        CollectionUtils.map(projects, new Function<Project, String>()
         {
-            public String map(Project project)
+            public String apply(Project project)
             {
                 return project.getName();
             }
@@ -1874,9 +1875,9 @@ public class RemoteApi
         {
             List<Agent> agents = agentManager.getAllAgents();
             Vector<String> result = new Vector<String>(agents.size());
-            CollectionUtils.map(agents, new Mapping<Agent, String>()
+            CollectionUtils.map(agents, new Function<Agent, String>()
             {
-                public String map(Agent agent)
+                public String apply(Agent agent)
                 {
                     return agent.getConfig().getName();
                 }
@@ -3694,9 +3695,9 @@ public class RemoteApi
                 }
             }
 
-            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildRequestEvent, Hashtable<String, Object>>()
+            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Function<BuildRequestEvent, Hashtable<String, Object>>()
             {
-                public Hashtable<String, Object> map(BuildRequestEvent e)
+                public Hashtable<String, Object> apply(BuildRequestEvent e)
                 {
                     return convertBuildRequestEvent(e);
                 }
@@ -3772,9 +3773,9 @@ public class RemoteApi
                         }
                     }
         
-                    return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Mapping<BuildResult, Hashtable<String, Object>>()
+                    return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Function<BuildResult, Hashtable<String, Object>>()
                     {
-                        public Hashtable<String, Object> map(BuildResult build)
+                        public Hashtable<String, Object> apply(BuildResult build)
                         {
                             return ApiUtils.convertBuild(build, true);
                         }

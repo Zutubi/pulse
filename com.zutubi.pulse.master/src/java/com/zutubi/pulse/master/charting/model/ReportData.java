@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.charting.model;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.any;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -74,9 +74,9 @@ public class ReportData
         List<Number> allValues = new LinkedList<Number>();
         for (SeriesData series: seriesList)
         {
-            CollectionUtils.map(series.getPoints(), new Mapping<DataPoint, Number>()
+            CollectionUtils.map(series.getPoints(), new Function<DataPoint, Number>()
             {
-                public Number map(DataPoint dataPoint)
+                public Number apply(DataPoint dataPoint)
                 {
                     return dataPoint.getY();
                 }

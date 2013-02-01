@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
@@ -14,26 +16,23 @@ import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.MyPreferencesPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
+import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
+import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.master.model.ProjectManager.GLOBAL_PROJECT_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.ADMINISTER;
-import static com.zutubi.pulse.master.tove.config.group.ServerPermission.CREATE_PROJECT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
 {
@@ -233,9 +232,9 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
     private void setAnonymousServerPermissions(ServerPermission... permissions) throws Exception
     {
         Hashtable<String, Object> group = rpcClient.RemoteApi.getConfig(ANONYMOUS_GROUP_PATH);
-        List<String> permissionStrings = CollectionUtils.map(permissions, new Mapping<ServerPermission, String>()
+        List<String> permissionStrings = CollectionUtils.map(permissions, new Function<ServerPermission, String>()
         {
-            public String map(ServerPermission permission)
+            public String apply(ServerPermission permission)
             {
                 return permission.toString();
             }

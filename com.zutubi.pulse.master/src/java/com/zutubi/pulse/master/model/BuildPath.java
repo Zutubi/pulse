@@ -32,7 +32,7 @@ public class BuildPath implements Iterable<BuildResult>
      */
     public BuildPath(List<DAGraph.Node<BuildResult>> path)
     {
-        this.builds = CollectionUtils.map(path, new DAGraph.Node.ToDataMapping<BuildResult>());
+        this.builds = CollectionUtils.map(path, new DAGraph.Node.ToDataFunction<BuildResult>());
     }
 
     /**

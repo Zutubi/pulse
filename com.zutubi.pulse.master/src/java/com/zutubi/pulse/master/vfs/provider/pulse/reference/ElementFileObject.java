@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.marshal.doc.*;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -26,9 +26,9 @@ public class ElementFileObject extends AbstractReferenceFileObject
     protected String[] getDynamicChildren()
     {
         Collection<ChildNodeDocs> children = elementDocs.getChildren();
-        return CollectionUtils.mapToArray(children, new Mapping<ChildNodeDocs, String>()
+        return CollectionUtils.mapToArray(children, new Function<ChildNodeDocs, String>()
         {
-            public String map(ChildNodeDocs childNodeDocs)
+            public String apply(ChildNodeDocs childNodeDocs)
             {
                 return childNodeDocs.getName();
             }

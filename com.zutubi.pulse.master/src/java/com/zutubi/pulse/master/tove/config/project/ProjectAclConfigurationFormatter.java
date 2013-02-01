@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
@@ -24,9 +24,9 @@ public class ProjectAclConfigurationFormatter
     {
         List<String> allowedActions = configuration.getAllowedActions();
         final Messages messages = Messages.getInstance(ProjectAuthorityProvider.class);
-        allowedActions = CollectionUtils.map(allowedActions, new Mapping<String, String>()
+        allowedActions = CollectionUtils.map(allowedActions, new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 return messages.format(s + ".label");
             }

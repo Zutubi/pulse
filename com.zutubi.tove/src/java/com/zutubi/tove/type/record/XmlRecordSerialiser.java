@@ -1,7 +1,7 @@
 package com.zutubi.tove.type.record;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
@@ -125,9 +125,9 @@ public class XmlRecordSerialiser
 
     private Element createElement(String elementName, String key, String[] values)
     {
-        return createElement(elementName, key, CollectionUtils.mapToArray(values, new Mapping<String, Element>()
+        return createElement(elementName, key, CollectionUtils.mapToArray(values, new Function<String, Element>()
         {
-            public Element map(String s)
+            public Element apply(String s)
             {
                 Element e = new Element(ELEMENT_ITEM);
                 e.appendChild(new Text(s));

@@ -1,8 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.EnumUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -105,9 +109,9 @@ public class ProjectDependencyData
      */
     public void flipHorizontal()
     {
-        classes = CollectionUtils.map(classes, new Mapping<String, String>()
+        classes = CollectionUtils.map(classes, new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 if (s.equals(CLASS_LEFT_BORDER))
                 {

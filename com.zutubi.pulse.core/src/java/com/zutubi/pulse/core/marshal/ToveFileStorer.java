@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.Addable;
 import static com.zutubi.pulse.core.marshal.ToveFileUtils.*;
@@ -9,7 +10,6 @@ import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
@@ -197,9 +197,9 @@ public class ToveFileStorer
 
         @SuppressWarnings({"unchecked"})
         List<Object> items = (List<Object>) getPropertyValue(configuration, property);
-        return CollectionUtils.map(items, new Mapping<Object, String>()
+        return CollectionUtils.map(items, new Function<Object, String>()
         {
-            public String map(Object o)
+            public String apply(Object o)
             {
                 try
                 {

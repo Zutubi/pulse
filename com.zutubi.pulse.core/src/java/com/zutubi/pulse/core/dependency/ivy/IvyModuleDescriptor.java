@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
+import static java.util.Arrays.asList;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.*;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -11,7 +12,6 @@ import org.apache.ivy.core.settings.IvySettings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import static java.util.Arrays.asList;
 import java.util.*;
 
 /**
@@ -416,9 +416,9 @@ public class IvyModuleDescriptor
      */
     public List<String> getArtifactPaths()
     {
-        return CollectionUtils.map(descriptor.getAllArtifacts(), new Mapping<Artifact, String>()
+        return CollectionUtils.map(descriptor.getAllArtifacts(), new Function<Artifact, String>()
         {
-            public String map(Artifact artifact)
+            public String apply(Artifact artifact)
             {
                 return IvyPatternHelper.substitute(configuration.getArtifactPattern(), artifact);
             }

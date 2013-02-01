@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -499,9 +499,9 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
     private void assertActivatedEvents(BuildRequestEvent... requests)
     {
         // activated event was generated.
-        List<BuildRequestEvent> activatedEvents = CollectionUtils.map(listener.getEventsReceived(BuildActivatedEvent.class), new Mapping<BuildActivatedEvent, BuildRequestEvent>()
+        List<BuildRequestEvent> activatedEvents = CollectionUtils.map(listener.getEventsReceived(BuildActivatedEvent.class), new Function<BuildActivatedEvent, BuildRequestEvent>()
         {
-            public BuildRequestEvent map(BuildActivatedEvent buildActivatedEvent)
+            public BuildRequestEvent apply(BuildActivatedEvent buildActivatedEvent)
             {
                 return buildActivatedEvent.getEvent();
             }

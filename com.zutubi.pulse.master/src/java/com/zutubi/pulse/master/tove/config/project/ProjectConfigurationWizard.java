@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.plugins.CommandExtensionManager;
@@ -21,7 +22,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -248,9 +248,9 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         {
             @SuppressWarnings("unchecked")
             List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
-            List<ResourceRequirementConfiguration> configurations = CollectionUtils.map(defaultRequirements, new Mapping<ResourceRequirement, ResourceRequirementConfiguration>()
+            List<ResourceRequirementConfiguration> configurations = CollectionUtils.map(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
             {
-                public ResourceRequirementConfiguration map(ResourceRequirement resourceRequirement)
+                public ResourceRequirementConfiguration apply(ResourceRequirement resourceRequirement)
                 {
                     return new ResourceRequirementConfiguration(resourceRequirement);
                 }

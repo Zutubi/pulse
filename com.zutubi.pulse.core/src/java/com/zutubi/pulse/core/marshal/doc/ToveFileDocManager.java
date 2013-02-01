@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.marshal.doc;
 
+import com.google.common.base.Function;
 import static com.google.common.base.Predicates.and;
 import static com.google.common.collect.Iterables.filter;
 import com.zutubi.i18n.Messages;
@@ -18,7 +19,6 @@ import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
 import static com.zutubi.util.CollectionUtils.map;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
@@ -56,9 +56,9 @@ public class ToveFileDocManager
 
     private static final String EXAMPLE_METHOD_PREFIX = "get";
 
-    private static final List<ChildNodeDocs> BUILTINS = map(asList("import", "macro", "macro-ref", "scope"), new Mapping<String, ChildNodeDocs>()
+    private static final List<ChildNodeDocs> BUILTINS = map(asList("import", "macro", "macro-ref", "scope"), new Function<String, ChildNodeDocs>()
     {
-        public ChildNodeDocs map(String name)
+        public ChildNodeDocs apply(String name)
         {
             String doc = I18N.format(name + "." + KEY_SUFFIX_BUILTIN);
             return new ChildNodeDocs(name, new BuiltinElementDocs(doc, doc), Arity.ZERO_OR_MORE);

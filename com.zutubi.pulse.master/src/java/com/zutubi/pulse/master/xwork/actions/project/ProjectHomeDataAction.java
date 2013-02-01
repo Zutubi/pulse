@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -30,7 +31,6 @@ import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import static java.util.Arrays.asList;
 
@@ -79,8 +79,8 @@ public class ProjectHomeDataAction extends ProjectActionBase
         // that request must have been activate between snapshotting and
         // querying the builds.
         final Set<Long> activatedBuilds = new HashSet<Long>();
-        CollectionUtils.map(inProgress, new BuildResultToNumberMapping(), activatedBuilds);
-        CollectionUtils.map(latestCompleted, new BuildResultToNumberMapping(), activatedBuilds);
+        CollectionUtils.map(inProgress, BuildResults.toNumber(), activatedBuilds);
+        CollectionUtils.map(latestCompleted, BuildResults.toNumber(), activatedBuilds);
         Iterables.removeIf(queued, new Predicate<QueuedRequest>()
         {
             public boolean apply(QueuedRequest queuedRequest)
@@ -92,7 +92,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectConfiguration projectConfig = project.getConfig();
         BuildResult latestCompletedResult = latestCompleted.isEmpty() ? null : latestCompleted.get(0);
-        BuildResultToModelMapping buildMapping = new BuildResultToModelMapping(urls, projectConfig.getChangeViewer());
+        BuildResultToModelFunction buildMapping = new BuildResultToModelFunction(urls, projectConfig.getChangeViewer());
         if (latestCompletedResult != null)
         {
             buildMapping.collectArtifactsForBuildId(latestCompletedResult.getId());
@@ -140,9 +140,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
             if (!brokenNodes.isEmpty())
             {
-                brokenStages = CollectionUtils.map(brokenNodes, new Mapping<RecipeResultNode, BuildStageModel>()
+                brokenStages = CollectionUtils.map(brokenNodes, new Function<RecipeResultNode, BuildStageModel>()
                 {
-                    public BuildStageModel map(RecipeResultNode recipeResultNode)
+                    public BuildStageModel apply(RecipeResultNode recipeResultNode)
                     {
                         return new BuildStageModel(latestCompleted, recipeResultNode, urls, false);
                     }
@@ -176,14 +176,14 @@ public class ProjectHomeDataAction extends ProjectActionBase
         return transition;
     }
 
-    private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelMapping buildMapping)
+    private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelFunction buildMapping)
     {
         ProjectConfiguration projectConfig = getProject().getConfig();
-        CollectionUtils.map(queued, new QueuedToBuildModelMapping(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
+        CollectionUtils.map(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
         CollectionUtils.map(inProgress, buildMapping, model.getActivity());
     }
 
-    private void addRecent(List<BuildResult> completed, BuildResultToModelMapping buildMapping)
+    private void addRecent(List<BuildResult> completed, BuildResultToModelFunction buildMapping)
     {
         CollectionUtils.map(completed, buildMapping, model.getRecent());
     }
@@ -277,9 +277,9 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfiguration = getProject().getConfig();
         final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
         final Collection<CommitMessageTransformerConfiguration> transformers = projectConfiguration.getCommitMessageTransformers().values();
-        CollectionUtils.map(latestChanges, new Mapping<PersistentChangelist, ChangelistModel>()
+        CollectionUtils.map(latestChanges, new Function<PersistentChangelist, ChangelistModel>()
         {
-            public ChangelistModel map(PersistentChangelist persistentChangelist)
+            public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, changeViewer, transformers);
             }
@@ -291,18 +291,18 @@ public class ProjectHomeDataAction extends ProjectActionBase
         this.configurationManager = configurationManager;
     }
 
-    private static class QueuedToBuildModelMapping implements Mapping<QueuedRequest, BuildModel>
+    private static class QueuedToBuildModelFunction implements Function<QueuedRequest, BuildModel>
     {
         private String projectName;
         private ChangeViewerConfiguration changeViewerConfig;
 
-        private QueuedToBuildModelMapping(String projectName, ChangeViewerConfiguration changeViewerConfig)
+        private QueuedToBuildModelFunction(String projectName, ChangeViewerConfiguration changeViewerConfig)
         {
             this.projectName = projectName;
             this.changeViewerConfig = changeViewerConfig;
         }
 
-        public BuildModel map(QueuedRequest queuedRequest)
+        public BuildModel apply(QueuedRequest queuedRequest)
         {
             BuildRequestEvent requestEvent = queuedRequest.getRequest();
             Revision revision = requestEvent.getRevision().getRevision();

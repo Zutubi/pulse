@@ -1,5 +1,6 @@
 package com.zutubi.tove.type;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.*;
 import com.zutubi.tove.annotations.ExternalState;
@@ -10,7 +11,6 @@ import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -161,9 +161,9 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public List<String> getPropertyNames(Class<? extends Type> type)
     {
-        return CollectionUtils.map(getProperties(type), new Mapping<TypeProperty, String>()
+        return CollectionUtils.map(getProperties(type), new Function<TypeProperty, String>()
         {
-            public String map(TypeProperty property)
+            public String apply(TypeProperty property)
             {
                 return property.getName();
             }

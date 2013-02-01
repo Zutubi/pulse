@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -742,9 +741,9 @@ public class PluginManager
         }
 
         BundleSpecification[] requiredBundles = description.getRequiredBundles();
-        return CollectionUtils.map(requiredBundles, new Mapping<BundleSpecification, PluginDependency>()
+        return CollectionUtils.map(requiredBundles, new Function<BundleSpecification, PluginDependency>()
         {
-            public PluginDependency map(BundleSpecification bundleSpecification)
+            public PluginDependency apply(BundleSpecification bundleSpecification)
             {
                 return new PluginDependency(bundleSpecification.getName(),
                         convertVersionRange(bundleSpecification.getVersionRange()),

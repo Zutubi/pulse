@@ -1,12 +1,16 @@
 package com.zutubi.pulse.core.scm.hg;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IOUtils;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +19,6 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 
 public class MercurialClientTest extends MercurialTestBase
 {
@@ -315,9 +314,9 @@ public class MercurialClientTest extends MercurialTestBase
         assertEquals(5, changes.size());
         Changelist changelist = changes.get(0);
         List<FileChange> fileChanges = changelist.getChanges();
-        assertEquals(asList("empty.txt", CONTENT_FILE_PATH, "file1.txt", "file2.txt"), CollectionUtils.map(fileChanges, new Mapping<FileChange, String>()
+        assertEquals(asList("empty.txt", CONTENT_FILE_PATH, "file1.txt", "file2.txt"), CollectionUtils.map(fileChanges, new Function<FileChange, String>()
         {
-            public String map(FileChange fileChange)
+            public String apply(FileChange fileChange)
             {
                 return fileChange.getPath();
             }

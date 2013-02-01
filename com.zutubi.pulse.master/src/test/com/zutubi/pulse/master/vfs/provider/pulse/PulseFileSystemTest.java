@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFile;
@@ -12,7 +13,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileDepthFilterSelector;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
@@ -114,9 +114,9 @@ public class PulseFileSystemTest extends PulseTestCase
 
     private List<ScmFile> asFiles(String... filenames)
     {
-        return CollectionUtils.map(Arrays.asList(filenames), new Mapping<String, ScmFile>()
+        return CollectionUtils.map(Arrays.asList(filenames), new Function<String, ScmFile>()
         {
-            public ScmFile map(String s)
+            public ScmFile apply(String s)
             {
                 return new ScmFile(s);
             }

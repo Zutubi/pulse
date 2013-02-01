@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -14,7 +15,10 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.SecurityUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.*;
@@ -233,9 +237,9 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         command.add(clientName);
         command.add(COMMAND_WHERE);
 
-        CollectionUtils.map(changes, new Mapping<FileChange, String>()
+        CollectionUtils.map(changes, new Function<FileChange, String>()
         {
-            public String map(FileChange fileChange)
+            public String apply(FileChange fileChange)
             {
                 return fileChange.getPath();
             }

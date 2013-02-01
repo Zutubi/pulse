@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.io.File;
 import java.util.List;
@@ -37,9 +37,9 @@ public class PostProcessorGroup implements PostProcessor
 
     public void process(File artifactFile, PostProcessorContext ppContext)
     {
-        List<PostProcessor> processors = CollectionUtils.map(config.getProcessors().values(), new Mapping<PostProcessorConfiguration, PostProcessor>()
+        List<PostProcessor> processors = CollectionUtils.map(config.getProcessors().values(), new Function<PostProcessorConfiguration, PostProcessor>()
         {
-            public PostProcessor map(PostProcessorConfiguration childConfig)
+            public PostProcessor apply(PostProcessorConfiguration childConfig)
             {
                 return createChildProcessor(childConfig);
             }

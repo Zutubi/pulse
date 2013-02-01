@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class BuildFeaturesModel
     {
         if (buildResult.hasDirectMessages(level))
         {
-            features = CollectionUtils.map(buildResult.getFeatures(level), new SimpleFeatureMapping());
+            features = CollectionUtils.map(buildResult.getFeatures(level), new SimpleFeatureFunction());
         }
         
         for (RecipeResultNode stageResult: buildResult.getStages())
@@ -72,7 +72,7 @@ public class BuildFeaturesModel
             
             if (recipeResult.hasDirectMessages(level))
             {
-                features = CollectionUtils.map(recipeResult.getFeatures(level), new SimpleFeatureMapping());
+                features = CollectionUtils.map(recipeResult.getFeatures(level), new SimpleFeatureFunction());
             }
             
             for (CommandResult command: recipeResult.getCommandResults())
@@ -132,7 +132,7 @@ public class BuildFeaturesModel
             name = commandResult.getCommandName();
             if (commandResult.hasDirectMessages(level))
             {
-                features = CollectionUtils.map(commandResult.getFeatures(level), new SimpleFeatureMapping());
+                features = CollectionUtils.map(commandResult.getFeatures(level), new SimpleFeatureFunction());
             }
             
             artifactsUrl = urls.commandArtifacts(buildResult, commandResult);
@@ -294,9 +294,9 @@ public class BuildFeaturesModel
         }
     }
 
-    private static class SimpleFeatureMapping implements Mapping<PersistentFeature, FeatureModel>
+    private static class SimpleFeatureFunction implements Function<PersistentFeature, FeatureModel>
     {
-        public FeatureModel map(PersistentFeature persistentFeature)
+        public FeatureModel apply(PersistentFeature persistentFeature)
         {
             return new SimpleFeatureModel(persistentFeature);
         }

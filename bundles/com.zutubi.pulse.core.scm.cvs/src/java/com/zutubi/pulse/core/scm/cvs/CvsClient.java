@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
@@ -7,10 +8,10 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.FileSystemUtils;
+import static com.zutubi.util.io.FileSystemUtils.createFile;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -18,8 +19,6 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.*;
 import java.util.*;
-
-import static com.zutubi.util.io.FileSystemUtils.createFile;
 
 /**
  * The CvsClient provides all interactions with a cvs repository.
@@ -512,9 +511,9 @@ public class CvsClient implements ScmClient
                     changelist.getTime(),
                     changelist.getAuthor(),
                     changelist.getComment(),
-                    CollectionUtils.map(changelist.getChanges(), new Mapping<FileChange, FileChange>()
+                    CollectionUtils.map(changelist.getChanges(), new Function<FileChange, FileChange>()
                     {
-                        public FileChange map(FileChange change)
+                        public FileChange apply(FileChange change)
                         {
                             // a) strip off the leading /.
                             String filename = change.getPath();

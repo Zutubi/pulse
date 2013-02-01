@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import static com.zutubi.util.Constants.UTF8;
@@ -335,9 +336,9 @@ public class WebUtils
      */
     public static String uriPathEncode(String rawPath)
     {
-        List<String> components = CollectionUtils.map(splitPath(rawPath), new Mapping<String, String>()
+        List<String> components = CollectionUtils.map(splitPath(rawPath), new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 return uriComponentEncode(s);
             }
@@ -357,9 +358,9 @@ public class WebUtils
      */
     public static String uriPathDecode(String encodedPath)
     {
-        List<String> components = CollectionUtils.map(splitPath(encodedPath), new Mapping<String, String>()
+        List<String> components = CollectionUtils.map(splitPath(encodedPath), new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 return uriComponentDecode(s);
             }

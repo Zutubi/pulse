@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins.sync;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import static com.google.common.collect.Iterables.any;
@@ -10,7 +11,6 @@ import com.zutubi.pulse.core.plugins.PluginRunningPredicate;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.net.URI;
 import java.util.Collection;
@@ -100,9 +100,9 @@ public class PluginSynchroniser
             }
             else
             {
-                pluginManager.installAll(CollectionUtils.map(syncActions.getToInstall(), new Mapping<PluginInfo, URI>()
+                pluginManager.installAll(CollectionUtils.map(syncActions.getToInstall(), new Function<PluginInfo, URI>()
                 {
-                    public URI map(PluginInfo pluginInfo)
+                    public URI apply(PluginInfo pluginInfo)
                     {
                         return repository.getPluginLocation(pluginInfo);
                     }

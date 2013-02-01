@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.forms;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Iterables.any;
@@ -11,7 +12,6 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -69,9 +69,9 @@ public class ConfigurationForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return CollectionUtils.mapToArray(fields, new Mapping<FieldInfo, String>()
+        return CollectionUtils.mapToArray(fields, new Function<FieldInfo, String>()
         {
-            public String map(FieldInfo fieldInfo)
+            public String apply(FieldInfo fieldInfo)
             {
                 return fieldInfo.name;
             }

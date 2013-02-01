@@ -1,10 +1,10 @@
 package com.zutubi.util.adt;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.math.AggregationFunction;
 import static java.util.Arrays.asList;
@@ -158,9 +158,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
         }
         else
         {
-            Number maxChildDepth = AggregationFunction.MAX.aggregate(CollectionUtils.map(children, new Mapping<TreeNode<T>, Number>()
+            Number maxChildDepth = AggregationFunction.MAX.aggregate(CollectionUtils.map(children, new Function<TreeNode<T>, Number>()
             {
-                public Number map(TreeNode<T> child)
+                public Number apply(TreeNode<T> child)
                 {
                     return child.depth();
                 }

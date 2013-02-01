@@ -1,10 +1,10 @@
 package com.zutubi.tove.config.health;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Arrays;
 
@@ -56,9 +56,9 @@ public class NonCanonicalReferenceProblem extends HealthProblemSupport
                 else if (value instanceof String[])
                 {
                     String[] references = (String[]) value;
-                    String[] canonicalised = CollectionUtils.mapToArray(references, new Mapping<String, String>()
+                    String[] canonicalised = CollectionUtils.mapToArray(references, new Function<String, String>()
                     {
-                        public String map(String s)
+                        public String apply(String s)
                         {
                             if (s.equals(referencedHandle))
                             {

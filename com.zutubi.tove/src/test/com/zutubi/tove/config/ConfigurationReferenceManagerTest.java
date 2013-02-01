@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
@@ -10,7 +11,6 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.validation.annotations.Required;
 
@@ -315,9 +315,9 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
     {
         Sort.StringComparator comparator = new Sort.StringComparator();
         String[] got = new String[collection.size()];
-        CollectionUtils.mapToArray(collection, new Mapping<Configuration, String>()
+        CollectionUtils.mapToArray(collection, new Function<Configuration, String>()
         {
-            public String map(Configuration configuration)
+            public String apply(Configuration configuration)
             {
                 return ((NamedConfiguration)configuration).getName();
             }

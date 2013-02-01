@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
 import static java.util.Arrays.asList;
@@ -156,9 +156,9 @@ public class BuildChangesPage extends SeleniumPage
             }
         });
         
-        return CollectionUtils.map(viewIdStrings, new Mapping<String, Long>()
+        return CollectionUtils.map(viewIdStrings, new Function<String, Long>()
         {
-            public Long map(String s)
+            public Long apply(String s)
             {
                 return Long.parseLong(s.substring(PREFIX_VIEW_LINK.length()));
             }

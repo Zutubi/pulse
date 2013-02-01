@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.opensymphony.util.TextUtils;
+import static com.opensymphony.util.TextUtils.htmlEncode;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.TestResultSummary;
@@ -9,6 +11,7 @@ import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
+import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration.*;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.variables.GenericVariable;
@@ -17,17 +20,13 @@ import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.time.TimeStamps;
 import flexjson.JSON;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.opensymphony.util.TextUtils.htmlEncode;
-import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * JSON-encodable object representing a single build result.  The configurable
@@ -62,9 +61,9 @@ public class ProjectBuildModel
         status = formatStatus(buildResult, urls);
         statusIcon = ToveUtils.getStatusIcon(buildResult);
         comments = new CommentSummaryModel(buildResult.getComments());
-        columns = CollectionUtils.map(configuration.getColumns(), new Mapping<String, String>()
+        columns = CollectionUtils.map(configuration.getColumns(), new Function<String, String>()
         {
-            public String map(String column)
+            public String apply(String column)
             {
                 return renderColumn(buildResult, column, urls);
             }

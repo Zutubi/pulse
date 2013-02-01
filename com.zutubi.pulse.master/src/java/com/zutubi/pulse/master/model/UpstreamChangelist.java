@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.model.PersistentChangelist;
-import com.zutubi.util.Mapping;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,9 +93,9 @@ public class UpstreamChangelist
     /**
      * Maps from an upstream changelist to the actual changelist.
      */
-    public static class ToChangelistMapping implements Mapping<UpstreamChangelist, PersistentChangelist>
+    public static class ToChangelistFunction implements Function<UpstreamChangelist, PersistentChangelist>
     {
-        public PersistentChangelist map(UpstreamChangelist upstreamChangelist)
+        public PersistentChangelist apply(UpstreamChangelist upstreamChangelist)
         {
             return upstreamChangelist.changelist;
         }

@@ -110,7 +110,7 @@ public class ChangelistDataAction extends ActionSupport
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         List<TreeBuildModel> treeBuilds = new LinkedList<TreeBuildModel>();
-        List<DAGraph.Node<BuildResult>> roots = CollectionUtils.map(buildGraphs, new DAGraph.ToRootMapping<BuildResult>());
+        List<DAGraph.Node<BuildResult>> roots = CollectionUtils.map(buildGraphs, new DAGraph.ToRootFunction<BuildResult>());
         Comparator<DAGraph.Node<BuildResult>> nodeComparator = new DAGraph.Node.CompareByData<BuildResult>(new BuildResult.CompareByOwnerThenNumber());
         Collections.sort(roots, nodeComparator);
         for (DAGraph.Node<BuildResult> root: roots)

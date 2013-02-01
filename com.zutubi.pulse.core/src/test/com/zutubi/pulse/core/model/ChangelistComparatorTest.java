@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-
 import static java.util.Arrays.asList;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -27,9 +27,9 @@ public class ChangelistComparatorTest extends PulseTestCase
 
     private void assertIds(List<PersistentChangelist> changelists, Long... expected)
     {
-        List<Long> got = CollectionUtils.map(changelists, new Mapping<PersistentChangelist, Long>()
+        List<Long> got = CollectionUtils.map(changelists, new Function<PersistentChangelist, Long>()
         {
-            public Long map(PersistentChangelist persistentChangelist)
+            public Long apply(PersistentChangelist persistentChangelist)
             {
                 return persistentChangelist.getId();
             }

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -212,9 +212,9 @@ public class BuildQueueTest extends BaseQueueTestCase
             requests.add(createRequest(p, "sourceA", true, null));
         }
 
-        buildQueue.enqueue(CollectionUtils.map(requests, new Mapping<BuildRequestEvent, QueuedRequest>()
+        buildQueue.enqueue(CollectionUtils.map(requests, new Function<BuildRequestEvent, QueuedRequest>()
         {
-            public QueuedRequest map(BuildRequestEvent request)
+            public QueuedRequest apply(BuildRequestEvent request)
             {
                 return queue(request);
             }
@@ -229,9 +229,9 @@ public class BuildQueueTest extends BaseQueueTestCase
             requestsToBeAssimilated.add(createRequest(p, "sourceA", true, null));
         }
 
-        buildQueue.enqueue(CollectionUtils.map(requestsToBeAssimilated, new Mapping<BuildRequestEvent, QueuedRequest>()
+        buildQueue.enqueue(CollectionUtils.map(requestsToBeAssimilated, new Function<BuildRequestEvent, QueuedRequest>()
         {
-            public QueuedRequest map(BuildRequestEvent request)
+            public QueuedRequest apply(BuildRequestEvent request)
             {
                 return queue(request);
             }

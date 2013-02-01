@@ -5,10 +5,9 @@ import com.zutubi.pulse.core.RecipeListingInterceptor;
 import com.zutubi.pulse.core.RecipeLoadInterceptor;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
-import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.ToveFileLoader;
-import com.zutubi.tove.config.api.ToConfigurationNameMapping;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.util.CollectionUtils;
 
 import java.io.ByteArrayInputStream;
@@ -49,6 +48,6 @@ public class PulseFileLoader extends ToveFileLoader
         RecipeListingInterceptor predicate = new RecipeListingInterceptor();
         load(new ByteArrayInputStream(pulseFile.getBytes()), recipes, new PulseScope(), fileResolver, predicate);
 
-        return CollectionUtils.map(recipes.getRecipes().values(), new ToConfigurationNameMapping<RecipeConfiguration>());
+        return CollectionUtils.map(recipes.getRecipes().values(), Configurations.toConfigurationName());
     }
 }

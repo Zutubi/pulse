@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent.statistics;
 
+import com.google.common.base.Function;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.pulse.master.agent.Agent;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -96,9 +96,9 @@ public class AgentStatisticsManager implements EventListener
 
         // And those that are for agents that no longer exist.
         Set<Long> allIds = new HashSet<Long>();
-        CollectionUtils.map(agentManager.getAllAgents(), new Mapping<Agent, Long>()
+        CollectionUtils.map(agentManager.getAllAgents(), new Function<Agent, Long>()
         {
-            public Long map(Agent agent)
+            public Long apply(Agent agent)
             {
                 return agent.getId();
             }

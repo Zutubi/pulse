@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.base.Function;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import flexjson.JSON;
 
 import java.util.List;
@@ -38,9 +38,9 @@ public class ChangelistModel
     {
         this.changelist = changelist;
         this.url = url;
-        this.builds = CollectionUtils.map(buildResults, new Mapping<BuildResult, ChangelistBuildModel>()
+        this.builds = CollectionUtils.map(buildResults, new Function<BuildResult, ChangelistBuildModel>()
         {
-            public ChangelistBuildModel map(BuildResult buildResult)
+            public ChangelistBuildModel apply(BuildResult buildResult)
             {
                 return new ChangelistBuildModel(buildResult);
             }

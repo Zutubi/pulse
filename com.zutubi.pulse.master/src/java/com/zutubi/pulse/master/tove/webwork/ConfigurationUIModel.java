@@ -18,7 +18,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
@@ -163,9 +162,9 @@ public class ConfigurationUIModel
             formHeading = ToveUtils.getFormHeading(ctype);
             simpleProperties = ctype.getSimplePropertyNames();
 
-            extensions.addAll(CollectionUtils.map(((CompositeType) targetType).getExtensions(), new Mapping<CompositeType, String>()
+            extensions.addAll(CollectionUtils.map(((CompositeType) targetType).getExtensions(), new Function<CompositeType, String>()
             {
-                public String map(CompositeType compositeType)
+                public String apply(CompositeType compositeType)
                 {
                     return compositeType.getSymbolicName();
                 }
@@ -291,9 +290,9 @@ public class ConfigurationUIModel
                 key[0] = PathUtils.getBaseName(path);
             }
 
-            actions = CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
+            actions = CollectionUtils.map(actionNames, new Function<String, ActionLink>()
             {
-                public ActionLink map(String actionName)
+                public ActionLink apply(String actionName)
                 {
                     return ToveUtils.getActionLink(actionName, parentRecord[0], key[0], messages, systemPaths);
                 }

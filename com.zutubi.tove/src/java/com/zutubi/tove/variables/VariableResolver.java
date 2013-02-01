@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -25,13 +26,7 @@ public class VariableResolver
 
     static
     {
-        FILTER_FUNCTIONS.put("trim", new Function<String, String>()
-        {
-            public String apply(String s)
-            {
-                return s.trim();
-            }
-        });
+        FILTER_FUNCTIONS.put("trim", StringUtils.trim());
 
         FILTER_FUNCTIONS.put("lower", new Function<String, String>()
         {

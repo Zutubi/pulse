@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.annotations.NoInherit;
 import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -8,14 +9,12 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.*;
-
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests that the records returned by the CTM are template records with
@@ -1538,9 +1537,9 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         else if(type instanceof ListType)
         {
             ConfigurationList instance = configurationTemplateManager.getInstance(path, ConfigurationList.class);
-            return CollectionUtils.<Configuration, String>map(instance, new Mapping<Configuration, String>()
+            return CollectionUtils.<Configuration, String>map(instance, new Function<Configuration, String>()
             {
-                public String map(Configuration o)
+                public String apply(Configuration o)
                 {
                     return PathUtils.getBaseName(o.getConfigurationPath());
                 }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Function;
 import com.zutubi.diff.Patch;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.util.process.ForwardingCharHandler;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import static java.util.Arrays.asList;
@@ -151,9 +151,9 @@ public class GitPatchFormat implements PatchFormat
         {
             PatchFileParser parser = new PatchFileParser(new GitPatchParser());
             PatchFile gitPatch = parser.parse(new FileReader(patchFile));
-            return CollectionUtils.map(gitPatch.getPatches(), new Mapping<Patch, FileStatus>()
+            return CollectionUtils.map(gitPatch.getPatches(), new Function<Patch, FileStatus>()
             {
-                public FileStatus map(Patch patch)
+                public FileStatus apply(Patch patch)
                 {
                     return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
                 }

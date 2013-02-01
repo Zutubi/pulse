@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import static com.google.common.collect.Iterables.find;
@@ -35,7 +36,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.IsDirectoryPredicate;
 import com.zutubi.util.logging.Logger;
 
@@ -588,9 +588,9 @@ public class DefaultBuildManager implements BuildManager
     {
         final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
         List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(project.getConfig().getHandle())));
-        return Iterables.filter(CollectionUtils.map(paths, new Mapping<String, File>()
+        return Iterables.filter(CollectionUtils.map(paths, new Function<String, File>()
         {
-            public File map(String s)
+            public File apply(String s)
             {
                 return new File(repositoryRoot, s);
             }

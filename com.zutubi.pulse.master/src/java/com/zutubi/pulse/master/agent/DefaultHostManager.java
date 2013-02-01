@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -10,7 +11,6 @@ import com.zutubi.pulse.master.model.persistence.EntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.*;
@@ -171,9 +171,9 @@ public class DefaultHostManager implements HostManager
             return Collections.emptyList();
         }
 
-        List<Agent> agents = CollectionUtils.map(agentIds, new Mapping<Long, Agent>()
+        List<Agent> agents = CollectionUtils.map(agentIds, new Function<Long, Agent>()
         {
-            public Agent map(Long agentHandle)
+            public Agent apply(Long agentHandle)
             {
                 return agentManager.getAgentByHandle(agentHandle);
             }

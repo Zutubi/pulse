@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 import java.util.Formatter;
@@ -997,6 +998,33 @@ public class StringUtils
         catch (Exception e)
         {
             return "<error calling toString>";
+        }
+    }
+
+    /**
+     * @return a function that takes a string and returns the trimmed equivalent
+     * 
+     * @see String#trim()
+     */
+    public static Function<String, String> trim()
+    {
+        return Trim.INSTANCE;
+    }
+
+    private enum Trim implements Function<String, String>
+    {
+        INSTANCE;
+
+        public String apply(String input)
+        {
+            return input.trim();
+        }
+
+
+        @Override
+        public String toString()
+        {
+            return "trim";
         }
     }
 }

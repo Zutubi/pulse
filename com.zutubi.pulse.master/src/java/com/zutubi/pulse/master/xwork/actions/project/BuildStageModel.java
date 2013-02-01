@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
@@ -69,9 +69,9 @@ public class BuildStageModel extends ResultModel
                     }
                 });
 
-                CollectionUtils.map(commandFeaturedArtifacts, new Mapping<StoredArtifact, ActionLink>()
+                CollectionUtils.map(commandFeaturedArtifacts, new Function<StoredArtifact, ActionLink>()
                 {
-                    public ActionLink map(StoredArtifact artifact)
+                    public ActionLink apply(StoredArtifact artifact)
                     {
                         String icon;
                         String url;

@@ -541,9 +541,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         List<String> descendantPaths = getDescendantPaths(newPath, true, false, false);
         if(descendantPaths.size() > 0)
         {
-            List<String> descendantNames = CollectionUtils.map(descendantPaths, new Mapping<String, String>()
+            List<String> descendantNames = CollectionUtils.map(descendantPaths, new Function<String, String>()
             {
-                public String map(String descendantPath)
+                public String apply(String descendantPath)
                 {
                     return PathUtils.getPathElements(descendantPath)[1];
                 }

@@ -456,8 +456,8 @@ public class BuildQueue
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
     {
         List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
-        byOwner.addAll(CollectionUtils.map(Iterables.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestMapping<QueuedRequest>()));
-        byOwner.addAll(CollectionUtils.map(Iterables.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestMapping<ActivatedRequest>()));
+        byOwner.addAll(CollectionUtils.map(Iterables.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestFunction<QueuedRequest>()));
+        byOwner.addAll(CollectionUtils.map(Iterables.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestFunction<ActivatedRequest>()));
         return byOwner;
     }
 

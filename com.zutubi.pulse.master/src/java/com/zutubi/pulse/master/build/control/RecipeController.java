@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultCustomFields;
-import com.zutubi.pulse.core.resources.api.AsResourcePropertyMapping;
+import com.zutubi.pulse.core.resources.api.AsResourcePropertyFunction;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -232,7 +232,7 @@ public class RecipeController
         recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
         Collection<ResourcePropertyConfiguration> agentProperties = agent.getConfig().getProperties().values();
-        recipeRequest.addAllProperties(CollectionUtils.map(agentProperties, new AsResourcePropertyMapping()));
+        recipeRequest.addAllProperties(CollectionUtils.map(agentProperties, new AsResourcePropertyFunction()));
         for (ResourcePropertyConfiguration propertyConfig: agentProperties)
         {
             ResourceProperty property = propertyConfig.asResourceProperty();

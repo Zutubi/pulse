@@ -126,7 +126,7 @@ public class NotifyConditionContext
     {
         if (upstreamChanges == null)
         {
-            upstreamChanges = buildResult == null ? Collections.<PersistentChangelist>emptyList() : CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getPrevious().getBuildResult()), new UpstreamChangelist.ToChangelistMapping());
+            upstreamChanges = buildResult == null ? Collections.<PersistentChangelist>emptyList() : CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getPrevious().getBuildResult()), new UpstreamChangelist.ToChangelistFunction());
         }
 
         return upstreamChanges;
@@ -176,7 +176,7 @@ public class NotifyConditionContext
             }
             else
             {
-                upstreamChangesSinceLastSuccess = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastSuccess()), new UpstreamChangelist.ToChangelistMapping());
+                upstreamChangesSinceLastSuccess = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastSuccess()), new UpstreamChangelist.ToChangelistFunction());
             }
         }
 
@@ -227,7 +227,7 @@ public class NotifyConditionContext
             }
             else
             {
-                upstreamChangesSinceLastHealthy = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastHealthy()), new UpstreamChangelist.ToChangelistMapping());
+                upstreamChangesSinceLastHealthy = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastHealthy()), new UpstreamChangelist.ToChangelistFunction());
             }
         }
         return upstreamChangesSinceLastHealthy;

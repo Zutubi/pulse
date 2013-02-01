@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.hook.email;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -20,18 +21,16 @@ import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfigurati
 import com.zutubi.pulse.master.tove.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.mockito.Matchers;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 public class SendEmailTaskConfigurationTest extends PulseTestCase
 {
@@ -158,9 +157,9 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         assertEquals(1, emailService.getEmailCount());
         List<String> recipients = new LinkedList<String>(emailService.getRecipientsForEmail(0));
         Collections.sort(recipients);
-        assertEquals(CollectionUtils.map(logins, new Mapping<String, String>()
+        assertEquals(CollectionUtils.map(logins, new Function<String, String>()
         {
-            public String map(String s)
+            public String apply(String s)
             {
                 return s + EMAIL_DOMAIN;
             }

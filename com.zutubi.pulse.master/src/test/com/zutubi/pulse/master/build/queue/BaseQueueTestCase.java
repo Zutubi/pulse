@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Function;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -23,7 +24,6 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.mockito.Matchers;
@@ -94,9 +94,9 @@ public abstract class BaseQueueTestCase extends PulseTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 Collection<ProjectConfiguration> configs = (Collection<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Mapping<ProjectConfiguration, Project>()
+                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
                 {
-                    public Project map(ProjectConfiguration projectConfiguration)
+                    public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }

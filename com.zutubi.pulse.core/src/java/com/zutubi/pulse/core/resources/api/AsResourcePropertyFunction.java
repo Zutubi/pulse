@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core.resources.api;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
-import com.zutubi.util.Mapping;
 
 /**
  * Maps from ResourcePropertyConfiguration to ResourceProperty.
  */
-public class AsResourcePropertyMapping implements Mapping<ResourcePropertyConfiguration, ResourceProperty>
+public class AsResourcePropertyFunction implements Function<ResourcePropertyConfiguration, ResourceProperty>
 {
-    public ResourceProperty map(ResourcePropertyConfiguration config)
+    public ResourceProperty apply(ResourcePropertyConfiguration config)
     {
         return config.asResourceProperty();
     }

@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.config.api.ToConfigurationNameMapping;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 
@@ -85,7 +85,7 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
         }
         else
         {
-            List<String> agentNames = CollectionUtils.map(compatibleAgents, new ToConfigurationNameMapping<AgentConfiguration>());
+            List<String> agentNames = CollectionUtils.map(compatibleAgents, Configurations.toConfigurationName());
 
             Collections.sort(agentNames, new Sort.StringComparator());
             return agentNames;

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
@@ -46,9 +46,9 @@ public class ProjectLabelOptionProvider extends ListOptionProvider
             }
         }
 
-        CollectionUtils.map(projectManager.getAllProjectGroups(), new Mapping<ProjectGroup, String>()
+        CollectionUtils.map(projectManager.getAllProjectGroups(), new Function<ProjectGroup, String>()
         {
-            public String map(ProjectGroup projectGroup)
+            public String apply(ProjectGroup projectGroup)
             {
                 return projectGroup.getName();
             }

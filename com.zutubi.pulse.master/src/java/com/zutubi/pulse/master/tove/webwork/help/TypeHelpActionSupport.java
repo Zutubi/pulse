@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork.help;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -9,7 +10,6 @@ import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,9 +42,9 @@ public abstract class TypeHelpActionSupport extends HelpActionSupport
         // them nicely alongside the form.
         Collection<String> fields = CollectionUtils.map(Collections2.filter(composite.getProperties(),
                 getPropertyPredicate()),
-                new Mapping<TypeProperty, String>()
+                new Function<TypeProperty, String>()
                 {
-                    public String map(TypeProperty typeProperty)
+                    public String apply(TypeProperty typeProperty)
                     {
                         return typeProperty.getName();
                     }

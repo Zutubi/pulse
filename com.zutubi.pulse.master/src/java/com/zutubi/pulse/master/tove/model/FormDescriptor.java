@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.tove.model;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -168,9 +168,9 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
             ordered.addAll(Arrays.asList((String[])getParameter(PARAMETER_FIELD_ORDER)));
         }
 
-        return ToveUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Mapping<FieldDescriptor, String>()
+        return ToveUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Function<FieldDescriptor, String>()
         {
-            public String map(FieldDescriptor fieldDescriptor)
+            public String apply(FieldDescriptor fieldDescriptor)
             {
                 return fieldDescriptor.getName();
             }

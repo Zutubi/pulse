@@ -1,22 +1,21 @@
 package com.zutubi.pulse.master.scm.polling;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.stub;
 
 /**
  * A utility class with a set of methods that help simplify the
@@ -104,9 +103,9 @@ public class ProjectTestSupport
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 Collection<ProjectConfiguration> configs = (Collection<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Mapping<ProjectConfiguration, Project>()
+                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
                 {
-                    public Project map(ProjectConfiguration projectConfiguration)
+                    public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }

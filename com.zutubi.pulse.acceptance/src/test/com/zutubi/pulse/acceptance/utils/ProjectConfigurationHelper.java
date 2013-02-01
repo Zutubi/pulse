@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.core.commands.api.FileArtifactConfiguration;
@@ -14,7 +15,6 @@ import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWi
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -169,9 +169,9 @@ public abstract class ProjectConfigurationHelper
         if (stageNames.length > 0)
         {
             dependency.setStageType(DependencyConfiguration.StageType.SELECTED_STAGES);
-            dependency.setStages(CollectionUtils.map(stageNames, new Mapping<String, BuildStageConfiguration>()
+            dependency.setStages(CollectionUtils.map(stageNames, new Function<String, BuildStageConfiguration>()
             {
-                public BuildStageConfiguration map(String stageName)
+                public BuildStageConfiguration apply(String stageName)
                 {
                     return target.getStage(stageName);
                 }

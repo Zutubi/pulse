@@ -108,7 +108,7 @@ public class SchedulingController
             {
                 final List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
     
-                List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestMapping<QueuedRequest>());
+                List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestFunction<QueuedRequest>());
                 projectManager.runUnderProjectLocks(new Runnable()
                 {
                     public void run()
@@ -204,7 +204,7 @@ public class SchedulingController
 
         while (true)
         {
-            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerMapping<QueuedRequest>());
+            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerFunction<QueuedRequest>());
             Collection<QueuedRequest> acceptedThatDependOnRejected = Collections2.filter(accepted, new Predicate<QueuedRequest>()
             {
                 public boolean apply(QueuedRequest queuedRequest)
@@ -300,7 +300,7 @@ public class SchedulingController
 
     private void internalCompleteRequests(final BuildRequestHandler requestHandler, final Collection<RequestHolder> completedRequests)
     {
-        final List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestMapping<RequestHolder>());
+        final List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestFunction<RequestHolder>());
 
         lock.lock();
         try

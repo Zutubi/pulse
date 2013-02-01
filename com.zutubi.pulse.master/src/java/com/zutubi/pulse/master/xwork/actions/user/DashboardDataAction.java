@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.zutubi.pulse.core.model.ChangelistComparator;
@@ -19,7 +20,6 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
@@ -79,9 +79,9 @@ public class DashboardDataAction extends ActionSupport
                 }
     
                 List<Project> responsibleFor = projectManager.findByResponsible(user);
-                List<UserResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Mapping<Project, UserResponsibilityModel>()
+                List<UserResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Function<Project, UserResponsibilityModel>()
                 {
-                    public UserResponsibilityModel map(Project project)
+                    public UserResponsibilityModel apply(Project project)
                     {
                         return new UserResponsibilityModel(project.getName(), project.getId());
                     }
@@ -167,9 +167,9 @@ public class DashboardDataAction extends ActionSupport
 
     private List<ChangelistModel> mapChangelists(List<PersistentChangelist> changelists)
     {
-        return CollectionUtils.map(changelists, new Mapping<PersistentChangelist, ChangelistModel>()
+        return CollectionUtils.map(changelists, new Function<PersistentChangelist, ChangelistModel>()
         {
-            public ChangelistModel map(PersistentChangelist persistentChangelist)
+            public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, getChangeUrl(persistentChangelist), getChangelistResults(persistentChangelist), getCommitMessageSupport(persistentChangelist));
             }

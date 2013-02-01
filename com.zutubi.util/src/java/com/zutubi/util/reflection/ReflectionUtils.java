@@ -1,11 +1,11 @@
 package com.zutubi.util.reflection;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Sets.newHashSet;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 
@@ -517,9 +517,9 @@ public class ReflectionUtils
             addBeanPropertiesFromClass(iface, null, descriptors);
         }
 
-        return CollectionUtils.mapToArray(descriptors.values(), new Mapping<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
+        return CollectionUtils.mapToArray(descriptors.values(), new Function<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
         {
-            public PropertyDescriptor map(Pair<Class, PropertyDescriptor> pair)
+            public PropertyDescriptor apply(Pair<Class, PropertyDescriptor> pair)
             {
                 return pair.second;
             }
@@ -558,9 +558,9 @@ public class ReflectionUtils
         try
         {
             Class[] types = new Class[args.length];
-            CollectionUtils.mapToArray(args, new Mapping<Object, Class>()
+            CollectionUtils.mapToArray(args, new Function<Object, Class>()
             {
-                public Class map(Object o)
+                public Class apply(Object o)
                 {
                     return o.getClass();
                 }

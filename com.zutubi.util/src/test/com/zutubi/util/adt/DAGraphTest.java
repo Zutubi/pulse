@@ -1,6 +1,6 @@
 package com.zutubi.util.adt;
 
-import com.zutubi.util.Mapping;
+import com.google.common.base.Function;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.junit.ZutubiTestCase;
 import static java.util.Arrays.asList;
@@ -130,9 +130,9 @@ public class DAGraphTest extends ZutubiTestCase
         m4.connectNode(m5);
         DAGraph<Integer> expected = new DAGraph<Integer>(m1);
 
-        DAGraph<Integer> got = graph.transform(new Mapping<Integer, Integer>()
+        DAGraph<Integer> got = graph.transform(new Function<Integer, Integer>()
         {
-            public Integer map(Integer integer)
+            public Integer apply(Integer integer)
             {
                 return integer * 2;
             }

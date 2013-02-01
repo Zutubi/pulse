@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.DAGraph;
 
 import java.util.HashSet;
@@ -54,9 +54,9 @@ public class BuildGraph extends DAGraph<BuildResult>
     {
         Set<List<Node<BuildResult>>> paths = getAllPathsTo(node);
         Set<BuildPath> buildPaths = new HashSet<BuildPath>();
-        return CollectionUtils.map(paths, new Mapping<List<Node<BuildResult>>, BuildPath>()
+        return CollectionUtils.map(paths, new Function<List<Node<BuildResult>>, BuildPath>()
         {
-            public BuildPath map(List<Node<BuildResult>> path)
+            public BuildPath apply(List<Node<BuildResult>> path)
             {
                 return new BuildPath(path);
             }

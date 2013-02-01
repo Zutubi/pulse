@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.PersistentChangelist;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UpstreamChangelist;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -133,9 +133,9 @@ public class ViewChangesAction extends BuildActionBase
         List<PersistentChangelist> rawChangelists = changelistManager.getChangesForBuild(result, sinceBuild, true);
         final ChangelistComparator changelistComparator = new ChangelistComparator();
         Collections.sort(rawChangelists, changelistComparator);
-        changelists = CollectionUtils.map(rawChangelists, new Mapping<PersistentChangelist, ChangelistModel>()
+        changelists = CollectionUtils.map(rawChangelists, new Function<PersistentChangelist, ChangelistModel>()
         {
-            public ChangelistModel map(PersistentChangelist persistentChangelist)
+            public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT));
             }
@@ -150,9 +150,9 @@ public class ViewChangesAction extends BuildActionBase
             }
         });
         
-        upstreamChangelists = CollectionUtils.map(rawUpstreamChangelists, new Mapping<UpstreamChangelist, ChangelistModel>()
+        upstreamChangelists = CollectionUtils.map(rawUpstreamChangelists, new Function<UpstreamChangelist, ChangelistModel>()
         {
-            public ChangelistModel map(UpstreamChangelist upstreamChangelist)
+            public ChangelistModel apply(UpstreamChangelist upstreamChangelist)
             {
                 PersistentChangelist persistentChangelist = upstreamChangelist.getChangelist();
                 return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT), upstreamChangelist.getUpstreamContexts());

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.table;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.model.*;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -14,7 +15,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -200,9 +200,9 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         try
         {
             List<String> actionNames = actionManager.getActions((Configuration) instance, true, true);
-            return CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
+            return CollectionUtils.map(actionNames, new Function<String, ActionLink>()
             {
-                public ActionLink map(String actionName)
+                public ActionLink apply(String actionName)
                 {
                     return ToveUtils.getActionLink(actionName, data, key, messages, systemPaths);
                 }

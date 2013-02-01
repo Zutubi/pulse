@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.*;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.WebUtils;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.adt.DAGraph;
@@ -273,9 +273,9 @@ public class DefaultDependencyManager implements DependencyManager
     {
         public List<Long> getLinkedBuilds(long id)
         {
-            return CollectionUtils.map(buildDependencyLinkDao.findAllUpstreamDependencies(id), new Mapping<BuildDependencyLink, Long>()
+            return CollectionUtils.map(buildDependencyLinkDao.findAllUpstreamDependencies(id), new Function<BuildDependencyLink, Long>()
             {
-                public Long map(BuildDependencyLink link)
+                public Long apply(BuildDependencyLink link)
                 {
                     return link.getUpstreamBuildId();
                 }
@@ -290,9 +290,9 @@ public class DefaultDependencyManager implements DependencyManager
     {
         public List<Long> getLinkedBuilds(long id)
         {
-            return CollectionUtils.map(buildDependencyLinkDao.findAllDownstreamDependencies(id), new Mapping<BuildDependencyLink, Long>()
+            return CollectionUtils.map(buildDependencyLinkDao.findAllDownstreamDependencies(id), new Function<BuildDependencyLink, Long>()
             {
-                public Long map(BuildDependencyLink link)
+                public Long apply(BuildDependencyLink link)
                 {
                     return link.getDownstreamBuildId();
                 }

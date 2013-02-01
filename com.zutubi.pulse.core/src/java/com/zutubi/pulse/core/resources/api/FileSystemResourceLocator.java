@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.resources.api;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.io.File;
 import java.util.List;
@@ -37,9 +37,9 @@ public class FileSystemResourceLocator implements ResourceLocator
 
     public List<ResourceConfiguration> locate()
     {
-        List<ResourceConfiguration> resources = CollectionUtils.map(fileLocator.locate(), new Mapping<File, ResourceConfiguration>()
+        List<ResourceConfiguration> resources = CollectionUtils.map(fileLocator.locate(), new Function<File, ResourceConfiguration>()
         {
-            public ResourceConfiguration map(File file)
+            public ResourceConfiguration apply(File file)
             {
                 return resourceBuilder.buildResource(file);
             }

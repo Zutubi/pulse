@@ -1,23 +1,22 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.model.User;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 import flexjson.JSON;
 
 import java.util.List;
 import java.util.Set;
-
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 
 /**
  * JSON-encodable object representing the current state of a concrete project.
@@ -61,9 +60,9 @@ public class ConcreteProjectModel extends ProjectModel
         }
 
         final boolean absoluteTimestamps = loggedInUser != null && loggedInUser.getPreferences().getDefaultTimestampDisplay() == UserPreferencesConfiguration.TimestampDisplay.ABSOLUTE;
-        buildRows = CollectionUtils.map(latestBuilds, new Mapping<BuildResult, ProjectBuildModel>()
+        buildRows = CollectionUtils.map(latestBuilds, new Function<BuildResult, ProjectBuildModel>()
         {
-            public ProjectBuildModel map(BuildResult buildResult)
+            public ProjectBuildModel apply(BuildResult buildResult)
             {
                 return new ProjectBuildModel(buildResult, configuration, urls, absoluteTimestamps);
             }

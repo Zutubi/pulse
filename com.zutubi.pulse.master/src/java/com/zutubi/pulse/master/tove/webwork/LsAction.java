@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
@@ -19,7 +20,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 import static java.util.Arrays.asList;
@@ -221,9 +221,9 @@ public class LsAction extends VFSActionSupport
             sortChildren(fileObject, children);
             extFiles = new ExtFile[children.length];
             final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
-            CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
+            CollectionUtils.mapToArray(children, new Function<FileObject, ExtFile>()
             {
-                public ExtFile map(FileObject child)
+                public ExtFile apply(FileObject child)
                 {
                     ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
                     if (!extFile.isLeaf() && currentDepth < depth)

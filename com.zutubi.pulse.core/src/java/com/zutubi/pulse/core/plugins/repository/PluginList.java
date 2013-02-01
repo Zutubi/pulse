@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.plugins.repository;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginDependency;
 import com.zutubi.pulse.core.util.api.XMLUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
@@ -38,9 +38,9 @@ public class PluginList
      */
     public static List<PluginInfo> toInfos(Iterable<Plugin> plugins)
     {
-        return CollectionUtils.map(plugins, new Mapping<Plugin, PluginInfo>()
+        return CollectionUtils.map(plugins, new Function<Plugin, PluginInfo>()
         {
-            public PluginInfo map(Plugin plugin)
+            public PluginInfo apply(Plugin plugin)
             {
                 return new PluginInfo(plugin.getId(), plugin.getVersion().toString(), getScope(plugin));
             }
@@ -58,9 +58,9 @@ public class PluginList
      */
     public static List<Hashtable<String, Object>> pluginsToHashes(Iterable<Plugin> plugins)
     {
-        return CollectionUtils.map(plugins, new Mapping<Plugin, Hashtable<String, Object>>()
+        return CollectionUtils.map(plugins, new Function<Plugin, Hashtable<String, Object>>()
         {
-            public Hashtable<String, Object> map(Plugin plugin)
+            public Hashtable<String, Object> apply(Plugin plugin)
             {
                 Hashtable<String, Object> hash = new Hashtable<String, Object>();
                 hash.put(KEY_ID, plugin.getId());
@@ -82,9 +82,9 @@ public class PluginList
      */
     public static List<Hashtable<String, Object>> infosToHashes(Iterable<PluginInfo> pluginInfos)
     {
-        return CollectionUtils.map(pluginInfos, new Mapping<PluginInfo, Hashtable<String, Object>>()
+        return CollectionUtils.map(pluginInfos, new Function<PluginInfo, Hashtable<String, Object>>()
         {
-            public Hashtable<String, Object> map(PluginInfo info)
+            public Hashtable<String, Object> apply(PluginInfo info)
             {
                 Hashtable<String, Object> hash = new Hashtable<String, Object>();
                 hash.put(KEY_ID, info.getId());

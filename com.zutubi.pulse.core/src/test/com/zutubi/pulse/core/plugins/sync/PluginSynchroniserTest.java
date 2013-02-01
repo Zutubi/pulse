@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins.sync;
 
+import com.google.common.base.Function;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -7,7 +8,6 @@ import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.PluginRepositoryException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import static java.util.Arrays.asList;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
@@ -224,13 +224,13 @@ public class PluginSynchroniserTest extends PulseTestCase
         if (actions.isRebootRequired())
         {
             assertEquals(0, installs.size());
-            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdMapping()), installRequests);
-            assertEquals(CollectionUtils.map(actions.getToUpgrade(), new PluginInfoToIdMapping()), upgrades);
+            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdFunction()), installRequests);
+            assertEquals(CollectionUtils.map(actions.getToUpgrade(), new PluginInfoToIdFunction()), upgrades);
             assertEquals(actions.getToUninstall(), uninstalls);
         }
         else
         {
-            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdMapping()), installs);
+            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdFunction()), installs);
             assertEquals(0, installRequests.size());
             assertEquals(0, upgrades.size());
             assertEquals(0, uninstalls.size());
@@ -291,9 +291,9 @@ public class PluginSynchroniserTest extends PulseTestCase
         }
     }
 
-    private static class PluginInfoToIdMapping implements Mapping<PluginInfo, String>
+    private static class PluginInfoToIdFunction implements Function<PluginInfo, String>
     {
-        public String map(PluginInfo pluginInfo)
+        public String apply(PluginInfo pluginInfo)
         {
             return pluginInfo.getId();
         }

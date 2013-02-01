@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.annotations.Reference;
@@ -9,7 +10,6 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import flexjson.JSON;
 
 import java.util.Arrays;
@@ -89,9 +89,9 @@ public class DependentOptionsAction extends ActionSupport
         List mapOptions = optionProvider.getOptions(instance, path, property);
 
         // convert the map options to a list of lists for easy consumption by the javascript.
-        options = CollectionUtils.map(mapOptions, new Mapping<Object, Object>()
+        options = CollectionUtils.map(mapOptions, new Function<Object, Object>()
         {
-            public Object map(Object o)
+            public Object apply(Object o)
             {
                 Map.Entry<String, String> entry = (Map.Entry<String, String>) o;
                 return Arrays.asList(entry.getKey(), entry.getValue());

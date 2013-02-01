@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.util.List;
 
@@ -42,9 +42,9 @@ public class MyBuildsDataAction extends ActionSupport
             return ERROR;
         }
 
-        builds = CollectionUtils.map(buildManager.getPersonalBuilds(user), new Mapping<BuildResult, BuildModel>()
+        builds = CollectionUtils.map(buildManager.getPersonalBuilds(user), new Function<BuildResult, BuildModel>()
         {
-            public BuildModel map(BuildResult buildResult)
+            public BuildModel apply(BuildResult buildResult)
             {
                 return new BuildModel(buildResult, new Urls(configurationManager.getSystemConfig().getContextPathNormalised()), false);
             }

@@ -1,8 +1,8 @@
 package com.zutubi.util.io;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
@@ -1273,9 +1273,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     private List<String> mapToFilenames(List<File> files)
     {
-        return CollectionUtils.map(files, new Mapping<File, String>()
+        return CollectionUtils.map(files, new Function<File, String>()
         {
-            public String map(File file)
+            public String apply(File file)
             {
                 return file.getName();
             }

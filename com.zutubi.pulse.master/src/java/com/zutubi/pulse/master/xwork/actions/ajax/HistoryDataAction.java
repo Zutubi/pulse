@@ -10,7 +10,7 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
-import com.zutubi.pulse.master.xwork.actions.project.BuildResultToModelMapping;
+import com.zutubi.pulse.master.xwork.actions.project.BuildResultToModelFunction;
 import com.zutubi.pulse.master.xwork.actions.project.PagerModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.util.CollectionUtils;
@@ -138,14 +138,14 @@ public class HistoryDataAction extends ActionSupport
         buildManager.fillHistoryPage(page, states);
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
-        BuildResultToModelMapping toModelMapping;
+        BuildResultToModelFunction toModelMapping;
         if (project == null)
         {
-            toModelMapping = new BuildResultToModelMapping(urls);
+            toModelMapping = new BuildResultToModelFunction(urls);
         }
         else
         {
-            toModelMapping = new BuildResultToModelMapping(urls, project.getConfig().getChangeViewer());
+            toModelMapping = new BuildResultToModelFunction(urls, project.getConfig().getChangeViewer());
         }
 
         List<BuildModel> builds = CollectionUtils.map(page.getResults(), toModelMapping);

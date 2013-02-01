@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import static com.google.common.collect.Iterables.filter;
@@ -49,7 +50,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -218,9 +218,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         List<Long> downstreamHandles = configToDownstreamConfigHandles.get(oldProjectConfiguration);
         if (downstreamHandles != null)
         {
-            List<ProjectConfiguration> downstreamConfigs = CollectionUtils.map(downstreamHandles, new Mapping<Long, ProjectConfiguration>()
+            List<ProjectConfiguration> downstreamConfigs = CollectionUtils.map(downstreamHandles, new Function<Long, ProjectConfiguration>()
             {
-                public ProjectConfiguration map(Long handle)
+                public ProjectConfiguration apply(Long handle)
                 {
                     return configurationProvider.get(handle, ProjectConfiguration.class);
                 }
@@ -805,9 +805,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
     {
         List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
-        return CollectionUtils.map(dependencies, new Mapping<DependencyConfiguration, ProjectConfiguration>()
+        return CollectionUtils.map(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
         {
-            public ProjectConfiguration map(DependencyConfiguration dependencyConfiguration)
+            public ProjectConfiguration apply(DependencyConfiguration dependencyConfiguration)
             {
                 return dependencyConfiguration.getProject();
             }
@@ -988,9 +988,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public List<Project> getDescendantProjects(String project, boolean strict, boolean allowInvalid)
     {
         Set<ProjectConfiguration> projectConfigs = configurationProvider.getAllDescendants(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project), ProjectConfiguration.class, strict, true);
-        List<Long> ids = CollectionUtils.map(projectConfigs, new Mapping<ProjectConfiguration, Long>()
+        List<Long> ids = CollectionUtils.map(projectConfigs, new Function<ProjectConfiguration, Long>()
         {
-            public Long map(ProjectConfiguration projectConfiguration)
+            public Long apply(ProjectConfiguration projectConfiguration)
             {
                 return projectConfiguration.getProjectId();
             }
@@ -1409,9 +1409,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 result = Collections.emptyList();
             }
 
-            return CollectionUtils.map(result, new Mapping<Long, ProjectConfiguration>()
+            return CollectionUtils.map(result, new Function<Long, ProjectConfiguration>()
             {
-                public ProjectConfiguration map(Long handle)
+                public ProjectConfiguration apply(Long handle)
                 {
                     return configurationProvider.get(handle, ProjectConfiguration.class);
                 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import antlr.collections.AST;
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.notifications.NotifyConditionContext;
@@ -16,7 +17,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
 import java.io.StringReader;
@@ -120,9 +120,9 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
                 }
             }
 
-            List<String> projectLabels = CollectionUtils.map(project.getConfig().getLabels(), new Mapping<LabelConfiguration, String>()
+            List<String> projectLabels = CollectionUtils.map(project.getConfig().getLabels(), new Function<LabelConfiguration, String>()
             {
-                public String map(LabelConfiguration labelConfiguration)
+                public String apply(LabelConfiguration labelConfiguration)
                 {
                     return labelConfiguration.getLabel();
                 }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.test.api;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.hamcrest.Matcher;
 
 import java.util.Arrays;
@@ -23,9 +23,9 @@ public class Matchers
      */
     public static <T> Iterable<Matcher<? super T>> getEqualToMatchers(T... items)
     {
-        return CollectionUtils.map(items, new Mapping<T, Matcher<? super T>>()
+        return CollectionUtils.map(items, new Function<T, Matcher<? super T>>()
         {
-            public Matcher<? super T> map(T t)
+            public Matcher<? super T> apply(T t)
             {
                 return org.hamcrest.Matchers.equalTo(t);
             }

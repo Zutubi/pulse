@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.test.EqualityAssertions;
@@ -8,7 +9,6 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.store.InMemoryRecordStore;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;
@@ -269,9 +269,9 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
             assertEquals(expectedParentId, node.getParent().getId());
         }
 
-        List<String> gotChildIds = CollectionUtils.map(node.getChildren(), new Mapping<ScopeHierarchy.Node, String>()
+        List<String> gotChildIds = CollectionUtils.map(node.getChildren(), new Function<ScopeHierarchy.Node, String>()
         {
-            public String map(ScopeHierarchy.Node node)
+            public String apply(ScopeHierarchy.Node node)
             {
                 return node.getId();
             }

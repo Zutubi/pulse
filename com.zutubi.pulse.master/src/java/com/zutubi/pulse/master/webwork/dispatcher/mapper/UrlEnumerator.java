@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 
@@ -67,9 +67,9 @@ public class UrlEnumerator
 
     private static String collapse(List<Pair<String, Class>> currentPath)
     {
-        return StringUtils.join("/", CollectionUtils.map(currentPath, new Mapping<Pair<String, Class>, String>()
+        return StringUtils.join("/", CollectionUtils.map(currentPath, new Function<Pair<String, Class>, String>()
         {
-            public String map(Pair<String, Class> pair)
+            public String apply(Pair<String, Class> pair)
             {
                 return pair.first;
             }

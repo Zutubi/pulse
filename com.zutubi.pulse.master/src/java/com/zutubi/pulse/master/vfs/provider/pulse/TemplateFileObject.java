@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -8,7 +9,6 @@ import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
@@ -76,9 +76,9 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
                 }
             });
 
-            List<String> childNodes = CollectionUtils.map(visibleChildren, new Mapping<TemplateNode, String>()
+            List<String> childNodes = CollectionUtils.map(visibleChildren, new Function<TemplateNode, String>()
             {
-                public String map(TemplateNode templateNode)
+                public String apply(TemplateNode templateNode)
                 {
                     return templateNode.getId();
                 }

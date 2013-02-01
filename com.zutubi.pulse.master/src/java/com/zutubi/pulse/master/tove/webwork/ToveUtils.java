@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
@@ -112,13 +113,7 @@ public class ToveUtils
                 }
             }
 
-            parameterValue = CollectionUtils.mapToArray(parameterValue, new Mapping<String, String>()
-            {
-                public String map(String s)
-                {
-                    return s.trim();
-                }
-            }, new String[parameterValue.length]);            
+            parameterValue = CollectionUtils.mapToArray(parameterValue, StringUtils.trim(), new String[parameterValue.length]);            
 
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {
@@ -212,9 +207,9 @@ public class ToveUtils
             final Record value = configurationTemplateManager.getRecord(path);
 
             // Get property/display name pairs
-            List<Pair<String, String>> propertyDisplayPairs = CollectionUtils.map(nestedProperties, new Mapping<String, Pair<String, String>>()
+            List<Pair<String, String>> propertyDisplayPairs = CollectionUtils.map(nestedProperties, new Function<String, Pair<String, String>>()
             {
-                public Pair<String, String> map(String s)
+                public Pair<String, String> apply(String s)
                 {
                     String propertyPath = PathUtils.getPath(path, s);
                     ComplexType propertyType = configurationTemplateManager.getType(propertyPath);
@@ -232,9 +227,9 @@ public class ToveUtils
             });
 
             // Pull out property names and add to result
-            CollectionUtils.map(propertyDisplayPairs, new Mapping<Pair<String, String>, String>()
+            CollectionUtils.map(propertyDisplayPairs, new Function<Pair<String, String>, String>()
             {
-                public String map(Pair<String, String> pair)
+                public String apply(Pair<String, String> pair)
                 {
                     return pair.first;
                 }

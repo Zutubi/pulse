@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.charting.render;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.ReportData;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.Pair;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -157,9 +157,9 @@ public abstract class CustomChart implements Chart
             final StageReportSeriesConfiguration stageConfig = (StageReportSeriesConfiguration) seriesConfig;
             if (!stageConfig.isCombineStages())
             {
-                return CollectionUtils.map(getAllStageNames(builds), new Mapping<String, String>()
+                return CollectionUtils.map(getAllStageNames(builds), new Function<String, String>()
                 {
-                    public String map(String s)
+                    public String apply(String s)
                     {
                         return ReportBuilder.getStageSeriesName(stageConfig.getName(), s);
                     }

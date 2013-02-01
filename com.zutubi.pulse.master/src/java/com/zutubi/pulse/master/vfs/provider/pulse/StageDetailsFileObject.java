@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -44,9 +44,9 @@ public class StageDetailsFileObject extends AbstractResultDetailsFileObject impl
     protected String[] doListChildren() throws Exception
     {
         List<CommandResult> commandResults = getRecipeResult().getCommandResults();
-        return CollectionUtils.mapToArray(commandResults, new Mapping<CommandResult, String>()
+        return CollectionUtils.mapToArray(commandResults, new Function<CommandResult, String>()
         {
-            public String map(CommandResult commandResult)
+            public String apply(CommandResult commandResult)
             {
                 return commandResult.getCommandName();
             }

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -97,9 +97,9 @@ public class ViewTestSuiteAction extends StageActionBase
         }
         else
         {
-            String uriPath = StringUtils.join("/", CollectionUtils.map(paths, new Mapping<String, String>()
+            String uriPath = StringUtils.join("/", CollectionUtils.map(paths, new Function<String, String>()
             {
-                public String map(String s)
+                public String apply(String s)
                 {
                     return WebUtils.uriComponentEncode(s);
                 }
@@ -129,17 +129,17 @@ public class ViewTestSuiteAction extends StageActionBase
         if(StringUtils.stringSet(path))
         {
             String[] elements = path.split("/");
-            paths = CollectionUtils.map(elements, new Mapping<String, String>()
+            paths = CollectionUtils.map(elements, new Function<String, String>()
             {
-                public String map(String s)
+                public String apply(String s)
                 {
                     return WebUtils.uriComponentDecode(s);
                 }
             });
 
-            String[] encodedElements = CollectionUtils.mapToArray(paths, new Mapping<String, String>()
+            String[] encodedElements = CollectionUtils.mapToArray(paths, new Function<String, String>()
             {
-                public String map(String s)
+                public String apply(String s)
                 {
                     return urlEncode(s);
                 }

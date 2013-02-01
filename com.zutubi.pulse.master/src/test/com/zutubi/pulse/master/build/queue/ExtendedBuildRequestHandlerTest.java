@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
@@ -286,9 +286,9 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 
     private List<Project> getDependencyOwners(Project project)
     {
-        return CollectionUtils.map(project.getConfig().getDependencies().getDependencies(), new Mapping<DependencyConfiguration, Project>()
+        return CollectionUtils.map(project.getConfig().getDependencies().getDependencies(), new Function<DependencyConfiguration, Project>()
         {
-            public Project map(DependencyConfiguration dependency)
+            public Project apply(DependencyConfiguration dependency)
             {
                 return projectManager.getProject(dependency.getProject().getProjectId(), false);
             }

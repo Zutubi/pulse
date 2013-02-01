@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Ordered;
@@ -7,8 +8,8 @@ import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.tove.config.api.NamedConfiguration;
-import com.zutubi.tove.config.api.ToConfigurationNameMapping;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import static com.zutubi.tove.type.record.PathUtils.getBaseName;
@@ -16,7 +17,6 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
 import static com.zutubi.util.CollectionUtils.*;
-import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -454,9 +454,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String clonePath = configurationRefactoringManager.clone(sourcePath, "clone");
 
         instance = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
-        Mapping<ConfigB, String> configToNameFn = new Mapping<ConfigB, String>()
+        Function<ConfigB, String> configToNameFn = new Function<ConfigB, String>()
         {
-            public String map(ConfigB configB)
+            public String apply(ConfigB configB)
             {
                 return configB.getName();
             }
@@ -626,9 +626,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/extracted", node.getTemplatePath());
 
         assertEquals(2, node.getChildren().size());
-        List<String> children = map(node.getChildren(), new Mapping<TemplateNode, String>()
+        List<String> children = map(node.getChildren(), new Function<TemplateNode, String>()
         {
-            public String map(TemplateNode templateNode)
+            public String apply(TemplateNode templateNode)
             {
                 return templateNode.getId();
             }
@@ -839,9 +839,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/added", node.getTemplatePath());
 
         assertEquals(2, node.getChildren().size());
-        List<String> children = map(node.getChildren(), new Mapping<TemplateNode, String>()
+        List<String> children = map(node.getChildren(), new Function<TemplateNode, String>()
         {
-            public String map(TemplateNode templateNode)
+            public String apply(TemplateNode templateNode)
             {
                 return templateNode.getId();
             }
@@ -934,7 +934,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String clonePath = configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, instance.getName(), "extracted", asMap(asPair(instance.getName(), "clone")));
 
 
-        Mapping<ConfigB, String> configToNameFn = new ToConfigurationNameMapping<ConfigB>();
+        Function<ConfigB, String> configToNameFn = Configurations.toConfigurationName();
         
         instance = configurationTemplateManager.getInstance(sourcePath, ConfigA.class);
         assertEquals(LIST_NAMES, map(instance.getOrderedBlist(), configToNameFn));

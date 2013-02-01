@@ -1,7 +1,12 @@
 package com.zutubi.pulse.acceptance.forms;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.ObjectUtils;
+import com.zutubi.util.StringUtils;
+import static com.zutubi.util.StringUtils.stripLineBreaks;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
 import junit.framework.Assert;
 import org.openqa.selenium.By;
@@ -9,8 +14,6 @@ import org.openqa.selenium.By;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.util.StringUtils.stripLineBreaks;
 
 /**
  * Base for form classes: supports methods for reading and writing fields and
@@ -279,9 +282,9 @@ public abstract class SeleniumForm
                 case ITEM_PICKER:
                 case MULTI_SELECT:
                     List<String> values = convertMultiValue(value);
-                    List<String> quotedValues = CollectionUtils.map(values, new Mapping<String, String>()
+                    List<String> quotedValues = CollectionUtils.map(values, new Function<String, String>()
                     {
-                        public String map(String s)
+                        public String apply(String s)
                         {
                             return "'" + s + "'";
                         }

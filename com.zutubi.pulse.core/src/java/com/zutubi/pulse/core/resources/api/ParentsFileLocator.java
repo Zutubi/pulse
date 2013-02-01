@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.resources.api;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 
 import java.io.File;
 import java.util.Collection;
@@ -29,9 +29,9 @@ public class ParentsFileLocator implements FileLocator
 
     public Collection<File> locate()
     {
-        return Lists.newArrayList(Collections2.filter(CollectionUtils.map(delegate.locate(), new Mapping<File, File>()
+        return Lists.newArrayList(Collections2.filter(CollectionUtils.map(delegate.locate(), new Function<File, File>()
         {
-            public File map(File file)
+            public File apply(File file)
             {
                 return file.getParentFile();
             }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.external.jira;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
@@ -78,9 +78,9 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
     public List<Substitution> substitutions()
     {
         final String linkUrl = StringUtils.join("/", true, this.url, "browse/$0");
-        return CollectionUtils.map(getKeyPatterns(), new Mapping<String, Substitution>()
+        return CollectionUtils.map(getKeyPatterns(), new Function<String, Substitution>()
         {
-            public Substitution map(String keyPattern)
+            public Substitution apply(String keyPattern)
             {
                 return new LinkSubstitution(keyPattern + "-[0-9]+", linkUrl, "$0");
             }

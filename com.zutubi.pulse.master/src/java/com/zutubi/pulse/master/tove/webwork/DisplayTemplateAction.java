@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
@@ -11,7 +12,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -125,9 +125,9 @@ public class DisplayTemplateAction extends ActionSupport implements MessagesProv
             }
 
             List<TemplateNode> children = node.getChildren();
-            childRecords = CollectionUtils.map(children, new Mapping<TemplateNode, Record>()
+            childRecords = CollectionUtils.map(children, new Function<TemplateNode, Record>()
             {
-                public Record map(TemplateNode templateNode)
+                public Record apply(TemplateNode templateNode)
                 {
                     return configurationTemplateManager.getRecord(templateNode.getPath());
                 }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
+import com.google.common.base.Function;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
 import static java.util.Arrays.asList;
@@ -74,9 +74,9 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
             if (candidateDir.isDirectory())
             {
                 String[] templates = candidateDir.list(new SuffixFileFilter(SUFFIX_VELOCITY));
-                staticChildren = CollectionUtils.mapToArray(templates, new Mapping<String, String>()
+                staticChildren = CollectionUtils.mapToArray(templates, new Function<String, String>()
                 {
-                    public String map(String s)
+                    public String apply(String s)
                     {
                         return s.substring(0, s.length() - SUFFIX_VELOCITY.length());
                     }

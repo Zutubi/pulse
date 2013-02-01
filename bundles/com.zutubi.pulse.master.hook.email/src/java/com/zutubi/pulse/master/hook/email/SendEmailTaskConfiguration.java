@@ -291,7 +291,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
             {
                 BuildResult sinceBuild = buildManager.getPreviousBuildResult(build);
                 List<UpstreamChangelist> upstreamChangelists = changelistManager.getUpstreamChangelists(build, sinceBuild);
-                CollectionUtils.map(upstreamChangelists, new UpstreamChangelist.ToChangelistMapping(), changelists);
+                CollectionUtils.map(upstreamChangelists, new UpstreamChangelist.ToChangelistFunction(), changelists);
             }
 
             for (PersistentChangelist change : changelists)

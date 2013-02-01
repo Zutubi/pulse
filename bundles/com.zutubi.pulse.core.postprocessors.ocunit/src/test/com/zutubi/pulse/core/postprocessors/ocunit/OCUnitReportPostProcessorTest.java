@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.postprocessors.ocunit;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
@@ -8,7 +10,6 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -17,8 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 public class OCUnitReportPostProcessorTest extends PulseTestCase
 {
@@ -186,9 +185,9 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
         PersistentTestSuiteResult tests = process(true);
         tests = tests.getSuite("All tests");
 
-        List<String> names = CollectionUtils.map(tests.getSuites(), new Mapping<PersistentTestSuiteResult, String>()
+        List<String> names = CollectionUtils.map(tests.getSuites(), new Function<PersistentTestSuiteResult, String>()
         {
-            public String map(PersistentTestSuiteResult persistentTestSuiteResult)
+            public String apply(PersistentTestSuiteResult persistentTestSuiteResult)
             {
                 return persistentTestSuiteResult.getName();
             }

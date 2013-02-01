@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -9,7 +10,6 @@ import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
@@ -125,9 +125,9 @@ public class PulseScope implements Scope
     
     public Collection<Variable> getVariables()
     {
-        return CollectionUtils.map(merge().values(), new Mapping<VariableInfo, Variable>()
+        return CollectionUtils.map(merge().values(), new Function<VariableInfo, Variable>()
         {
-            public Variable map(VariableInfo variableInfo)
+            public Variable apply(VariableInfo variableInfo)
             {
                 return variableInfo.variable;
             }
@@ -136,9 +136,9 @@ public class PulseScope implements Scope
 
     private Collection<Variable> getVariablesSatisfyingPredicate(Predicate<VariableInfo> p)
     {
-        return CollectionUtils.map(Collections2.filter(merge().values(), p), new Mapping<VariableInfo, Variable>()
+        return CollectionUtils.map(Collections2.filter(merge().values(), p), new Function<VariableInfo, Variable>()
         {
-            public Variable map(VariableInfo variableInfo)
+            public Variable apply(VariableInfo variableInfo)
             {
                 return variableInfo.variable;
             }
@@ -347,9 +347,9 @@ public class PulseScope implements Scope
             }
         });
         
-        List<String> result = CollectionUtils.map(variables, new Mapping<Variable, String>()
+        List<String> result = CollectionUtils.map(variables, new Function<Variable, String>()
         {
-            public String map(Variable variable)
+            public String apply(Variable variable)
             {
                 return (String) variable.getValue();
             }

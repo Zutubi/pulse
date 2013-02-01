@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.charting.build;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.BinaryFunction;
 import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -107,9 +107,9 @@ public class ReportBuilder
 
         for (BuildResult build: dataSet)
         {
-            Collection<Number> values = CollectionUtils.map(build.getStages(), new Mapping<RecipeResultNode, Number>()
+            Collection<Number> values = CollectionUtils.map(build.getStages(), new Function<RecipeResultNode, Number>()
             {
-                public Number map(RecipeResultNode node)
+                public Number apply(RecipeResultNode node)
                 {
                     return extractFn.process(node.getResult(), customFieldSource);
                 }

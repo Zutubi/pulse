@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import com.zutubi.util.Mapping;
+import com.google.common.base.Function;
+import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.*;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
@@ -10,8 +11,6 @@ import org.apache.ivy.core.report.ArtifactDownloadReport;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor.*;
 
 /**
  * A utility class that handles the encoding and decoding needed within
@@ -29,8 +28,8 @@ public class IvyEncoder
 {
     private static final char ENCODING_MARKER = '$';
 
-    private static final Mapping<String, String> ENCODE_MAPPING = new EncodeMapping();
-    private static final Mapping<String, String> DECODE_MAPPING = new DecodeMapping();
+    private static final Function<String, String> ENCODE_FUNCTION = new EncodeFunction();
+    private static final Function<String, String> DECODE_FUNCTION = new DecodeFunction();
 
     /**
      * Encode the string.
@@ -66,7 +65,7 @@ public class IvyEncoder
      */
     public static String[] encodeNames(String... names)
     {
-        return map(ENCODE_MAPPING, names);
+        return map(ENCODE_FUNCTION, names);
     }
 
     /**
@@ -78,15 +77,15 @@ public class IvyEncoder
      */
     public static String[] decodeNames(String... names)
     {
-        return map(DECODE_MAPPING, names);
+        return map(DECODE_FUNCTION, names);
     }
 
-    private static String[] map(Mapping<String, String> mapping, String... names)
+    private static String[] map(Function<String, String> function, String... names)
     {
         String[] mapped = new String[names.length];
         for (int i = 0; i < names.length; i++)
         {
-            mapped[i] = mapping.map(names[i]);
+            mapped[i] = function.apply(names[i]);
         }
         return mapped;
     }
@@ -102,7 +101,7 @@ public class IvyEncoder
      */
     public static Map<String, String> encode(Map<String, String> extraAttributes)
     {
-        return map(extraAttributes, ENCODE_MAPPING);
+        return map(extraAttributes, ENCODE_FUNCTION);
     }
 
     /**
@@ -115,17 +114,17 @@ public class IvyEncoder
      */
     public static Map<String, String> decode(Map<String, String> extraAttributes)
     {
-        return map(extraAttributes, DECODE_MAPPING);
+        return map(extraAttributes, DECODE_FUNCTION);
     }
 
-    private static Map<String, String> map(Map<String, String> extraAttributes, Mapping<String, String> mapping)
+    private static Map<String, String> map(Map<String, String> extraAttributes, Function<String, String> function)
     {
         Map<String, String> mapped = new HashMap<String, String>();
         for (String key : extraAttributes.keySet())
         {
             if (isStageName(key))
             {
-                mapped.put(key, mapping.map(extraAttributes.get(key)));
+                mapped.put(key, function.apply(extraAttributes.get(key)));
             }
             else
             {
@@ -154,7 +153,7 @@ public class IvyEncoder
      */
     public static Artifact encode(Artifact artifact)
     {
-        return map(artifact, ENCODE_MAPPING);
+        return map(artifact, ENCODE_FUNCTION);
     }
 
     /**
@@ -169,10 +168,10 @@ public class IvyEncoder
      */
     public static Artifact decode(Artifact artifact)
     {
-        return map(artifact, DECODE_MAPPING);
+        return map(artifact, DECODE_FUNCTION);
     }
 
-    private static Artifact map(Artifact artifact, Mapping<String, String> mapping)
+    private static Artifact map(Artifact artifact, Function<String, String> function)
     {
         // there are two types of artifacts that we encounter. MDArtifacts and DefaultArtifacts.
         // The MDArtifact is a special case that has a reference to the underlying descriptor.
@@ -184,15 +183,15 @@ public class IvyEncoder
                 ModuleDescriptor descriptor = (ModuleDescriptor) ReflectionUtils.getFieldValue(artifact, "md");
                 MDArtifact mappedArtifact = new MDArtifact(
                         descriptor,
-                        mapping.map(artifact.getName()),
-                        mapping.map(artifact.getType()),
-                        mapping.map(artifact.getExt()),
+                        function.apply(artifact.getName()),
+                        function.apply(artifact.getType()),
+                        function.apply(artifact.getExt()),
                         artifact.getUrl(),
-                        map((Map<String, String>)artifact.getExtraAttributes(), mapping)
+                        map((Map<String, String>)artifact.getExtraAttributes(), function)
                 );
                 for (String conf : artifact.getConfigurations())
                 {
-                    mappedArtifact.addConfiguration(mapping.map(conf));
+                    mappedArtifact.addConfiguration(function.apply(conf));
                 }
                 return mappedArtifact;
             }
@@ -206,12 +205,12 @@ public class IvyEncoder
         else
         {
             return new DefaultArtifact(
-                    map(artifact.getModuleRevisionId(), mapping),
+                    map(artifact.getModuleRevisionId(), function),
                     artifact.getPublicationDate(),
-                    mapping.map(artifact.getName()),
-                    mapping.map(artifact.getType()),
-                    mapping.map(artifact.getExt()),
-                    map((Map<String, String>)artifact.getExtraAttributes(), mapping)
+                    function.apply(artifact.getName()),
+                    function.apply(artifact.getType()),
+                    function.apply(artifact.getExt()),
+                    map((Map<String, String>)artifact.getExtraAttributes(), function)
             );
         }
     }
@@ -224,7 +223,7 @@ public class IvyEncoder
      */
     public static DependencyDescriptor encode(DependencyDescriptor dependency)
     {
-        return map(dependency, ENCODE_MAPPING);
+        return map(dependency, ENCODE_FUNCTION);
     }
 
     /**
@@ -235,13 +234,13 @@ public class IvyEncoder
      */
     public static DependencyDescriptor decode(DependencyDescriptor dependency)
     {
-        return map(dependency, DECODE_MAPPING);
+        return map(dependency, DECODE_FUNCTION);
     }
 
-    private static DependencyDescriptor map(DependencyDescriptor dependency, Mapping<String, String> mapping)
+    private static DependencyDescriptor map(DependencyDescriptor dependency, Function<String, String> function)
     {
         DefaultDependencyDescriptor mapped = new DefaultDependencyDescriptor(null,
-                map(dependency.getDependencyRevisionId(), mapping),
+                map(dependency.getDependencyRevisionId(), function),
                 dependency.isForce(),
                 dependency.isChanging(),
                 dependency.isTransitive());
@@ -251,7 +250,7 @@ public class IvyEncoder
             String[] confs = dependency.getDependencyConfigurations(moduleConfiguration);
             for (String conf : confs)
             {
-                String encodedConf = isBuiltinConf(conf) ? conf : mapNames(NAME_GLUE, conf, mapping);
+                String encodedConf = isBuiltinConf(conf) ? conf : mapNames(NAME_GLUE, conf, function);
                 mapped.addDependencyConfiguration(moduleConfiguration, encodedConf);
             }
         }
@@ -271,7 +270,7 @@ public class IvyEncoder
      */
     public static ArtifactDownloadReport decode(ArtifactDownloadReport report)
     {
-        return map(report, DECODE_MAPPING);
+        return map(report, DECODE_FUNCTION);
     }
 
     /**
@@ -282,12 +281,12 @@ public class IvyEncoder
      */
     public static ArtifactDownloadReport encode(ArtifactDownloadReport report)
     {
-        return map(report, ENCODE_MAPPING);
+        return map(report, ENCODE_FUNCTION);
     }
 
-    private static ArtifactDownloadReport map(ArtifactDownloadReport report, Mapping<String, String> mapping)
+    private static ArtifactDownloadReport map(ArtifactDownloadReport report, Function<String, String> function)
     {
-        ArtifactDownloadReport mapped = new ArtifactDownloadReport(map(report.getArtifact(), mapping));
+        ArtifactDownloadReport mapped = new ArtifactDownloadReport(map(report.getArtifact(), function));
         mapped.setDownloadDetails(report.getDownloadDetails());
         mapped.setDownloadStatus(report.getDownloadStatus());
         mapped.setArtifactOrigin(report.getArtifactOrigin());
@@ -305,7 +304,7 @@ public class IvyEncoder
      */
     public static ModuleRevisionId encode(ModuleRevisionId mrid)
     {
-        return map(mrid, new EncodeMapping());
+        return map(mrid, new EncodeFunction());
     }
 
     /**
@@ -316,44 +315,44 @@ public class IvyEncoder
      */
     public static ModuleRevisionId decode(ModuleRevisionId mrid)
     {
-        return map(mrid, new DecodeMapping());
+        return map(mrid, new DecodeFunction());
     }
 
-    private static ModuleRevisionId map(ModuleRevisionId mrid, Mapping<String, String> mapping)
+    private static ModuleRevisionId map(ModuleRevisionId mrid, Function<String, String> function)
     {
         return ModuleRevisionId.newInstance(
-                mapping.map(mrid.getOrganisation()),
-                mapping.map(mrid.getName()),
+                function.apply(mrid.getOrganisation()),
+                function.apply(mrid.getName()),
                 mrid.getBranch(),
                 mrid.getRevision(),
-                map(mrid.getExtraAttributes(), mapping));
+                map(mrid.getExtraAttributes(), function));
     }
 
-    private static String mapNames(String glue, String in, Mapping<String, String> mapping)
+    private static String mapNames(String glue, String in, Function<String, String> function)
     {
         String[] mapped;
         if (in.contains(glue))
         {
-            mapped = map(mapping, StringUtils.split(in, glue.charAt(0), true));
+            mapped = map(function, StringUtils.split(in, glue.charAt(0), true));
         }
         else
         {
-            mapped = new String[]{mapping.map(in)};
+            mapped = new String[]{function.apply(in)};
         }
         return StringUtils.join(glue, mapped);
     }
 
-    private static class EncodeMapping implements Mapping<String, String>
+    private static class EncodeFunction implements Function<String, String>
     {
-        public String map(String decodedString)
+        public String apply(String decodedString)
         {
             return encode(decodedString);
         }
     }
 
-    private static class DecodeMapping implements Mapping<String, String>
+    private static class DecodeFunction implements Function<String, String>
     {
-        public String map(String encodedString)
+        public String apply(String encodedString)
         {
             return decode(encodedString);
         }

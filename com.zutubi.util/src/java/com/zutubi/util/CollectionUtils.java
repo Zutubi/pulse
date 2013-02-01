@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
@@ -12,84 +13,84 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T, U> List<U> map(Iterable<T> l, Mapping<? super T, U> m)
+    public static <T, U> List<U> map(Iterable<T> l, Function<? super T, U> m)
     {
         List<U> result = new LinkedList<U>();
         map(l, m, result);
         return result;
     }
 
-    public static <T, U, V extends Collection<U>> V map(Iterable<T> in, Mapping<? super T, U> m, V out)
+    public static <T, U, V extends Collection<U>> V map(Iterable<T> in, Function<? super T, U> m, V out)
     {
         for(T t: in)
         {
-            out.add(m.map(t));
+            out.add(m.apply(t));
         }
 
         return out;
     }
 
-    public static <T, U> List<U> map(T[] in, Mapping<T, U> m)
+    public static <T, U> List<U> map(T[] in, Function<T, U> m)
     {
         List<U> result = new LinkedList<U>();
         map(in, m, result);
         return result;
     }
 
-    public static <T, U, V extends Collection<U>> V map(T[] in, Mapping<T, U> m, V out)
+    public static <T, U, V extends Collection<U>> V map(T[] in, Function<T, U> m, V out)
     {
         for(T t: in)
         {
-            out.add(m.map(t));
+            out.add(m.apply(t));
         }
 
         return out;
     }
 
-    public static <T, U> U[] mapToArray(Iterable<T> iterable, Mapping<T, U> m, U[] out)
+    public static <T, U> U[] mapToArray(Iterable<T> iterable, Function<T, U> m, U[] out)
     {
         int i = 0;
         for(T t: iterable)
         {
-            out[i++] = m.map(t);
+            out[i++] = m.apply(t);
         }
 
         return out;
     }
 
-    public static <T> T[] mapToArray(T[] in, Mapping<T, T> m)
+    public static <T> T[] mapToArray(T[] in, Function<T, T> m)
     {
         return mapToArray(in, m, (T[])Array.newInstance(in.getClass().getComponentType(), in.length), 0);
     }
 
-    public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out)
+    public static <T, U> U[] mapToArray(T[] in, Function<T, U> m, U[] out)
     {
         return mapToArray(in, m, out, 0);
     }
 
-    public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out, int offset)
+    public static <T, U> U[] mapToArray(T[] in, Function<T, U> m, U[] out, int offset)
     {
         int i = 0;
         for(T t: in)
         {
-            out[i++ + offset] = m.map(t);
+            out[i++ + offset] = m.apply(t);
         }
 
         return out;
     }
 
-    public static <K, T, U> Map<K, U> map(Map<K, T> in, Mapping<T, U> m)
+    public static <K, T, U> Map<K, U> map(Map<K, T> in, Function<T, U> m)
     {
         Map<K, U> result = new HashMap<K,U>(in.size());
         map(in, m, result);
         return result;
     }
 
-    public static <K, T, U> void map(Map<K, T> in, Mapping<T, U> m, Map<K, U> out)
+    public static <K, T, U> void map(Map<K, T> in, Function<T, U> m, Map<K, U> out)
     {
         for(Map.Entry<K, T> e: in.entrySet())
         {
-            out.put(e.getKey(), m.map(in.get(e.getKey())));
+            out.put(e.getKey(), m.apply(in.get(e.getKey())));
         }
     }
 
@@ -147,12 +148,12 @@ public class CollectionUtils
         return false;
     }
 
-    public static <T> void print(Collection<T> c, Mapping<T, String> m)
+    public static <T> void print(Collection<T> c, Function<T, String> m)
     {
         print(c, m, System.out);
     }
 
-    public static <T> void print(Collection<T> c, Mapping<T, String> m, PrintStream stream)
+    public static <T> void print(Collection<T> c, Function<T, String> m, PrintStream stream)
     {
         boolean comma = false;
         stream.print("[");
@@ -167,7 +168,7 @@ public class CollectionUtils
                 comma = true;
             }
 
-            stream.print(m.map(t));
+            stream.print(m.apply(t));
         }
         stream.println("]");
     }

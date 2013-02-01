@@ -1,15 +1,14 @@
 package com.zutubi.pulse.master.dependency;
 
+import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Point;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
 import java.util.List;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 
 /**
@@ -86,9 +85,9 @@ public class SimpleTreeLayoutAlgorithm<T>
         }
         else
         {
-            List<TreeNode<Pair<T,Point>>> children = CollectionUtils.map(node, new Mapping<TreeNode<T>, TreeNode<Pair<T, Point>>>()
+            List<TreeNode<Pair<T,Point>>> children = CollectionUtils.map(node, new Function<TreeNode<T>, TreeNode<Pair<T, Point>>>()
             {
-                public TreeNode<Pair<T, Point>> map(TreeNode<T> child)
+                public TreeNode<Pair<T, Point>> apply(TreeNode<T> child)
                 {
                     return layout(child, depth + 1, state);
                 }

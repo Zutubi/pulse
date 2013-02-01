@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -10,15 +11,13 @@ import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import static java.util.Arrays.asList;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
-
-import static java.util.Arrays.asList;
 
 public class DefaultConfigurationProviderTest extends AbstractConfigurationSystemTestCase
 {
@@ -207,9 +206,9 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     private Set<String> getAllDescendantPaths(String path, boolean strict, boolean concreteOnly)
     {
         Set<A> instances = configurationProvider.getAllDescendants(path, A.class, strict, concreteOnly);
-        return CollectionUtils.map(instances, new Mapping<A, String>()
+        return CollectionUtils.map(instances, new Function<A, String>()
         {
-            public String map(A a)
+            public String apply(A a)
             {
                 return a.getConfigurationPath();
             }

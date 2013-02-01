@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.dependency;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.adt.TreeNode;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.*;
@@ -79,9 +79,9 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 List<ProjectConfiguration> configs = (List<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Mapping<ProjectConfiguration, Project>()
+                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
                 {
-                    public Project map(ProjectConfiguration projectConfiguration)
+                    public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }
@@ -336,9 +336,9 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         config.setHandle(nextId++);
         config.setProjectId(nextId++);
 
-        config.getDependencies().getDependencies().addAll(CollectionUtils.map(dependencies, new Mapping<Project, DependencyConfiguration>()
+        config.getDependencies().getDependencies().addAll(CollectionUtils.map(dependencies, new Function<Project, DependencyConfiguration>()
         {
-            public DependencyConfiguration map(Project project)
+            public DependencyConfiguration apply(Project project)
             {
                 DependencyConfiguration dependencyConfiguration = new DependencyConfiguration();
                 dependencyConfiguration.setProject(project.getConfig());

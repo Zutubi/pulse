@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import static com.google.common.collect.Iterables.find;
@@ -16,7 +17,6 @@ import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Constants;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -190,7 +190,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
             private boolean sendPendingMessages(Agent agent, List<AgentSynchronisationMessage> pendingMessages)
             {
-                List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageMapping());
+                List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageFunction());
 
                 AgentService service = agent.getService();
                 List<SynchronisationMessageResult> results;
@@ -359,9 +359,9 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         }
     }
 
-    private static class ExtractMessageMapping implements Mapping<AgentSynchronisationMessage, SynchronisationMessage>
+    private static class ExtractMessageFunction implements Function<AgentSynchronisationMessage, SynchronisationMessage>
     {
-        public SynchronisationMessage map(AgentSynchronisationMessage message)
+        public SynchronisationMessage apply(AgentSynchronisationMessage message)
         {
             SynchronisationMessage m = message.getMessage();
             m.setId(message.getId());

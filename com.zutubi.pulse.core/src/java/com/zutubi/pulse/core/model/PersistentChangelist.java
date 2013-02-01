@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.time.TimeStamps;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -59,9 +59,9 @@ public class PersistentChangelist extends Entity
         time = data.getTime();
         author = data.getAuthor();
         comment = data.getComment();
-        changes = CollectionUtils.map(data.getChanges(), new Mapping<FileChange, PersistentFileChange>()
+        changes = CollectionUtils.map(data.getChanges(), new Function<FileChange, PersistentFileChange>()
         {
-            public PersistentFileChange map(FileChange change)
+            public PersistentFileChange apply(FileChange change)
             {
                 return new PersistentFileChange(change);
             }
