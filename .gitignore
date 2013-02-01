@@ -2,8 +2,16 @@
 /local.properties
 /plugins
 /classes
-build/
+/build/
+*/build/
+*/*/build/
+/data/
+/working/
+/velocity.log
 pulse.ipr
 pulse.iws
 com.zutubi.pulse.master/etc/admin.token
 com.zutubi.pulse.master/etc/runtime.properties
+com.zutubi.pulse.slave/etc/admin.token
+com.zutubi.pulse.slave/etc/runtime.properties
+com.zutubi.pulse.master/system/
