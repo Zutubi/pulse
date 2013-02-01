@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -625,9 +626,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         final Record skeleton = createSkeletonRecord(actualType, record);
 
-        node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+        node.forEachDescendant(new Function<TemplateNode, Boolean>()
         {
-            public Boolean process(TemplateNode templateNode)
+            public Boolean apply(TemplateNode templateNode)
             {
                 String descendantPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
                 if (recordManager.select(descendantPath) == null && recordManager.select(PathUtils.getParentPath(descendantPath)) != null)
@@ -1719,9 +1720,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
             TemplateNode node = hierarchy.getNodeById(elements[1]);
 
-            node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            node.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode templateNode)
+                public Boolean apply(TemplateNode templateNode)
                 {
                     String oldDescendantPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
                     String newDescendantPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
@@ -1800,9 +1801,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
 
-                node.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
+                node.forEachAncestor(new Function<TemplateNode, Boolean>()
                 {
-                    public Boolean process(TemplateNode node)
+                    public Boolean apply(TemplateNode node)
                     {
                         String ancestorPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
                         if (pathExists(ancestorPath))
@@ -1840,9 +1841,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             final List<String> result = new LinkedList<String>();
             final String remainderPath = nodeAndRemainder.second;
-            nodeAndRemainder.first.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
+            nodeAndRemainder.first.forEachAncestor(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode node)
+                public Boolean apply(TemplateNode node)
                 {
                     String ancestorPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
                     if (pathExists(ancestorPath))
@@ -1874,9 +1875,9 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             final List<String> result = new LinkedList<String>();
             final String remainderPath = nodeAndRemainder.second;
-            nodeAndRemainder.first.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            nodeAndRemainder.first.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode node)
+                public Boolean apply(TemplateNode node)
                 {
                     if (!concreteOnly || node.isConcrete())
                     {

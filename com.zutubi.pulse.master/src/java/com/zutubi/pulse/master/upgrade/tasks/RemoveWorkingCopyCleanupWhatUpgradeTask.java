@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeException;
 import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgradeUtils.hideItem;
@@ -7,7 +8,6 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -66,9 +66,9 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
 
         // Delete any cleanup configuration trees that are now completely invalid.
         TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        details.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        details.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 Map<String, Record> records = recordManager.selectAll("projects/" + node.getId() + "/cleanup/*");
 
@@ -85,9 +85,9 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
                         // Do any children override this base configuration?
                         for (ScopeHierarchy.Node child : node.getChildren())
                         {
-                            child.forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+                            child.forEach(new Function<ScopeHierarchy.Node, Boolean>()
                             {
-                                public Boolean process(ScopeHierarchy.Node node)
+                                public Boolean apply(ScopeHierarchy.Node node)
                                 {
                                     // abort any further processing once we have identified an override.
                                     if (overridingDescendants.size() > 0)
@@ -127,9 +127,9 @@ public class RemoveWorkingCopyCleanupWhatUpgradeTask extends AbstractUpgradeTask
 
         // Hide any remaining cleanup configurations that are invalid.
         final List<String> pathsToHide = new LinkedList<String>();
-        details.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        details.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 if (!node.hasChildren()) // we are at a leaf
                 {

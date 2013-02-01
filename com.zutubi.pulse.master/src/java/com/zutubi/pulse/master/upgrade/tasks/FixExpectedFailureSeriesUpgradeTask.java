@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.UnaryFunction;
 
 public class FixExpectedFailureSeriesUpgradeTask extends AbstractUpgradeTask
 {
@@ -46,9 +46,9 @@ public class FixExpectedFailureSeriesUpgradeTask extends AbstractUpgradeTask
             final MutableRecord skeleton = new MutableRecordImpl();
             skeleton.setSymbolicName(symbolicName);
             
-            scopeDetails.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+            scopeDetails.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
             {
-                public Boolean process(ScopeHierarchy.Node node)
+                public Boolean apply(ScopeHierarchy.Node node)
                 {
                     if (node.getParent() == null)
                     {

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
@@ -8,7 +9,6 @@ import static com.google.common.collect.Iterables.toArray;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.UnaryFunction;
 import static java.util.Arrays.asList;
 
 import java.util.List;
@@ -49,9 +49,9 @@ public class FixNullPostProcessorReferencesUpgradeTask extends AbstractRecordPro
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return asList(RecordUpgraders.newEditProperty(PROPERTY_POST_PROCESSORS, new UnaryFunction<Object, Object>()
+        return asList(RecordUpgraders.newEditProperty(PROPERTY_POST_PROCESSORS, new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 if (o != null && o instanceof String[])
                 {

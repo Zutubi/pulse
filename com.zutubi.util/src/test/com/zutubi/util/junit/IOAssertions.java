@@ -1,7 +1,7 @@
 package com.zutubi.util.junit;
 
-import com.zutubi.util.IdentityFunction;
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.zutubi.util.io.IOUtils;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -88,7 +88,7 @@ public class IOAssertions
      */
     public static void assertFilesEqual(File file1, File file2) throws IOException
     {
-        assertFilesEqual(file1, file2, new IdentityFunction<String>());
+        assertFilesEqual(file1, file2, Functions.<String>identity());
     }
 
     /**
@@ -101,7 +101,7 @@ public class IOAssertions
      * @throws junit.framework.AssertionFailedError if the contents of the files differ
      * @throws java.io.IOException if there is an error reading the files
      */
-    public static void assertFilesEqual(File file1, File file2, UnaryFunction<String, String> lineProcessingFunction) throws IOException
+    public static void assertFilesEqual(File file1, File file2, Function<String, String> lineProcessingFunction) throws IOException
     {
         if (!file1.isFile())
         {
@@ -121,8 +121,8 @@ public class IOAssertions
             rs2 = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
             while (true)
             {
-                String line1 = lineProcessingFunction.process(rs1.readLine());
-                String line2 = lineProcessingFunction.process(rs2.readLine());
+                String line1 = lineProcessingFunction.apply(rs1.readLine());
+                String line2 = lineProcessingFunction.apply(rs2.readLine());
 
                 if (line1 == null)
                 {

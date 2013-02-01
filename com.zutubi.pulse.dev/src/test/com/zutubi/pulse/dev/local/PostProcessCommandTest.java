@@ -1,9 +1,9 @@
 package com.zutubi.pulse.dev.local;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.IOAssertions;
@@ -87,9 +87,9 @@ public class PostProcessCommandTest extends PulseTestCase
         }
         else
         {
-            IOAssertions.assertFilesEqual(expectedOutput, output, new UnaryFunction<String, String>()
+            IOAssertions.assertFilesEqual(expectedOutput, output, new Function<String, String>()
             {
-                public String process(String line)
+                public String apply(String line)
                 {
                     if (line == null)
                     {

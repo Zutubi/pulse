@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
@@ -16,7 +17,10 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 
 import java.io.File;
@@ -253,9 +257,9 @@ public class ConfigurationUIModel
             {
                 final String remainderPath = PathUtils.getPath(2, pathElements);
                 final int topDepth = node.getDepth() + 1;
-                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                node.forEachDescendant(new Function<TemplateNode, Boolean>()
                 {
-                    public Boolean process(TemplateNode currentNode)
+                    public Boolean apply(TemplateNode currentNode)
                     {
                         String descendantPath = remainderPath == null ? currentNode.getPath() : PathUtils.getPath(currentNode.getPath(), remainderPath);
                         if (configurationTemplateManager.pathExists(descendantPath) && configurationSecurityManager.hasPermission(descendantPath, AccessManager.ACTION_VIEW))

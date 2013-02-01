@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
@@ -8,9 +9,12 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import static com.zutubi.tove.type.record.PathUtils.*;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.GraphFunction;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
@@ -500,9 +504,9 @@ public class ConfigurationRefactoringManager
                     Pair<String, String> scopeItemPair = ensurePathRefersToNonRootTemplatedCollectionItem(path, "Path");
                     TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scopeItemPair.first);
                     final TemplateNode moveNode = hierarchy.getNodeById(scopeItemPair.second);
-                    hierarchy.getRoot().forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    hierarchy.getRoot().forEachDescendant(new Function<TemplateNode, Boolean>()
                     {
-                        public Boolean process(TemplateNode node)
+                        public Boolean apply(TemplateNode node)
                         {
                             if (node == moveNode)
                             {
@@ -2001,9 +2005,9 @@ public class ConfigurationRefactoringManager
             // Specified ancestor must strictly be our ancestor.
             TemplateNode node = configurationTemplateManager.getTemplateNode(templateOwnerPath);
             final boolean[] found = new boolean[]{false};
-            node.forEachAncestor(new UnaryFunction<TemplateNode, Boolean>()
+            node.forEachAncestor(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode node)
+                public Boolean apply(TemplateNode node)
                 {
                     if (node.getId().equals(ancestorKey))
                     {
@@ -2170,9 +2174,9 @@ public class ConfigurationRefactoringManager
                 // canonicalised.
                 node = node.getChild(PathUtils.getElement(path, 1));
                 final CompositeType templateOwnerType = (CompositeType) configurationTemplateManager.getType(node.getPath());
-                node.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                node.forEachDescendant(new Function<TemplateNode, Boolean>()
                 {
-                    public Boolean process(TemplateNode node)
+                    public Boolean apply(TemplateNode node)
                     {
                         String descendantPath = node.getPath();
                         MutableRecord deepCopy = recordManager.select(descendantPath).copy(true, true);
@@ -2562,9 +2566,9 @@ public class ConfigurationRefactoringManager
             
             TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(moveItem.first);
             subtreeRoot = hierarchy.getNodeById(moveItem.second);
-            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            subtreeRoot.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode templateNode)
+                public Boolean apply(TemplateNode templateNode)
                 {
                     if (templateNode.getId().equals(newTemplateParentKey))
                     {
@@ -2575,9 +2579,9 @@ public class ConfigurationRefactoringManager
             }, true, null);
             
             configurationSecurityManager.ensurePermission(newTemplateParentPath, AccessManager.ACTION_VIEW);
-            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            subtreeRoot.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode templateNode)
+                public Boolean apply(TemplateNode templateNode)
                 {
                     configurationSecurityManager.ensurePermission(templateNode.getPath(), AccessManager.ACTION_WRITE);
                     return true;
@@ -2595,9 +2599,9 @@ public class ConfigurationRefactoringManager
             }
 
             newTemplateParentRecord = configurationTemplateManager.getRecord(newTemplateParentPath);
-            subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+            subtreeRoot.forEachDescendant(new Function<TemplateNode, Boolean>()
             {
-                public Boolean process(TemplateNode node)
+                public Boolean apply(TemplateNode node)
                 {
                     TemplateRecord existingRecord = (TemplateRecord) configurationTemplateManager.getRecord(node.getPath());
                     if (node.isConcrete())
@@ -2701,9 +2705,9 @@ public class ConfigurationRefactoringManager
                 try
                 {
                     // Detach all items we are moving (push down values).
-                    subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    subtreeRoot.forEachDescendant(new Function<TemplateNode, Boolean>()
                     {
-                        public Boolean process(TemplateNode node)
+                        public Boolean apply(TemplateNode node)
                         {
                             detach(node.getPath());
                             return true;
@@ -2716,9 +2720,9 @@ public class ConfigurationRefactoringManager
                     recordManager.update(path, record);
                     
                     // Heal all moved items.
-                    subtreeRoot.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+                    subtreeRoot.forEachDescendant(new Function<TemplateNode, Boolean>()
                     {
-                        public Boolean process(TemplateNode node)
+                        public Boolean apply(TemplateNode node)
                         {
                             ConfigurationHealthReport report = configurationHealthChecker.healPath(node.getPath());
                             if (!report.isHealthy())

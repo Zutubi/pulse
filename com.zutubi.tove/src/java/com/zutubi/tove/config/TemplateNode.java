@@ -1,6 +1,6 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 
 import java.util.Comparator;
 import java.util.List;
@@ -101,7 +101,7 @@ public interface TemplateNode
      * @param callback the callback to execute on each node
      * @param strict   if true, this node is not included in the walk
      */
-    void forEachAncestor(UnaryFunction<TemplateNode, Boolean>  callback, boolean strict);
+    void forEachAncestor(Function<TemplateNode, Boolean>  callback, boolean strict);
 
     /**
      * Walks down the hierarchy from this node, executing the given callback on
@@ -113,5 +113,5 @@ public interface TemplateNode
      * @param comparator if not null, a comparator that will be used to order
      *                   children before walking them
      */
-    void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator);
+    void forEachDescendant(Function<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator);
 }

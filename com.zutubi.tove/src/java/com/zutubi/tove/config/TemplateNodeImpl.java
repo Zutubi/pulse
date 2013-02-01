@@ -1,9 +1,9 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -120,17 +120,17 @@ public class TemplateNodeImpl implements TemplateNode
         }
     }
 
-    public void forEachAncestor(UnaryFunction<TemplateNode, Boolean> callback, boolean strict)
+    public void forEachAncestor(Function<TemplateNode, Boolean> callback, boolean strict)
     {
-        if((strict || callback.process(this)) && parent != null)
+        if((strict || callback.apply(this)) && parent != null)
         {
             parent.forEachAncestor(callback, false);
         }
     }
 
-    public void forEachDescendant(UnaryFunction<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator)
+    public void forEachDescendant(Function<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator)
     {
-        if (strict || callback.process(this))
+        if (strict || callback.apply(this))
         {
             List<TemplateNode> children;
             if (comparator == null)

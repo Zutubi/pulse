@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 
 /**
  * Adds the new project bootstrap configuration.
@@ -31,9 +31,9 @@ public class AddBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
     public void execute() throws TaskException
     {
         TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        details.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        details.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 String path = PathUtils.getPath(SCOPE_PROJECTS, node.getId(), "bootstrap");
                 if (recordManager.containsRecord(path))

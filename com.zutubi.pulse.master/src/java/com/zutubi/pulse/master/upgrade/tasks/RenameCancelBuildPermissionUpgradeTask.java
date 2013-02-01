@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.util.UnaryFunction;
-
 import static java.util.Arrays.asList;
+
 import java.util.List;
 
 /**
@@ -27,9 +27,9 @@ public class RenameCancelBuildPermissionUpgradeTask extends AbstractRecordProper
     protected List<RecordUpgrader> getRecordUpgraders()
     {
         return asList(
-                RecordUpgraders.newEditProperty(PROPERTY_ALLOWED_ACTIONS, new UnaryFunction<Object, Object>()
+                RecordUpgraders.newEditProperty(PROPERTY_ALLOWED_ACTIONS, new Function<Object, Object>()
                 {
-                    public Object process(Object o)
+                    public Object apply(Object o)
                     {
                         if (o != null && o instanceof String[])
                         {

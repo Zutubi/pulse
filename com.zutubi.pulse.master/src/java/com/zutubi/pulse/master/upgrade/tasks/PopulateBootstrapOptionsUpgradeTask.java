@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 
 /**
  * Populates the new bootstrap options based on existing checkout schemes and
@@ -31,9 +31,9 @@ public class PopulateBootstrapOptionsUpgradeTask extends AbstractUpgradeTask
     {
         PersistentScopes persistentScopes = new PersistentScopes(recordManager);
         TemplatedScopeDetails projectsScope = (TemplatedScopeDetails) persistentScopes.getScopeDetails("projects");
-        projectsScope.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        projectsScope.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 String project = node.getId();
                 String projectPath = "projects/" + project;

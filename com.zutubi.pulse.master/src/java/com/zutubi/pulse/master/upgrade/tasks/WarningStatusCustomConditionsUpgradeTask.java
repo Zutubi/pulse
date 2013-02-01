@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +22,9 @@ public class WarningStatusCustomConditionsUpgradeTask extends AbstractRecordProp
     @Override
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newEditProperty("customCondition", new UnaryFunction<Object, Object>()
+        return Arrays.asList(RecordUpgraders.newEditProperty("customCondition", new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 if (o != null && o instanceof String)
                 {

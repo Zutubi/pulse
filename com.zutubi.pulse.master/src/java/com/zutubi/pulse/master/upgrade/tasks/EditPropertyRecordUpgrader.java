@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.util.UnaryFunction;
 
 /**
  * Edits an existing property of a record, using a specified function.  The
@@ -17,7 +17,7 @@ import com.zutubi.util.UnaryFunction;
 class EditPropertyRecordUpgrader implements RecordUpgrader
 {
     private String name;
-    private UnaryFunction<Object, Object> editFn;
+    private Function<Object, Object> editFn;
 
     /**
      * @param name   the name of the property to add
@@ -26,7 +26,7 @@ class EditPropertyRecordUpgrader implements RecordUpgrader
      *               current value) and may produced a null output to indicate
      *               that any existing value should be removed.
      */
-    public EditPropertyRecordUpgrader(String name, UnaryFunction<Object, Object> editFn)
+    public EditPropertyRecordUpgrader(String name, Function<Object, Object> editFn)
     {
         this.name = name;
         this.editFn = editFn;
@@ -35,7 +35,7 @@ class EditPropertyRecordUpgrader implements RecordUpgrader
     public void upgrade(String path, MutableRecord record)
     {
         Object value = record.get(name);
-        value = editFn.process(value);
+        value = editFn.apply(value);
         if (value == null)
         {
             record.remove(name);

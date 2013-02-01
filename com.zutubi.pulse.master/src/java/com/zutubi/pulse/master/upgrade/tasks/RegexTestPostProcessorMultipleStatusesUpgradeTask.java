@@ -1,11 +1,10 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.UnaryFunction;
+import static java.util.Arrays.asList;
 
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * Updates regex-test post-processors to allow them to have multiple strings
@@ -44,9 +43,9 @@ public class RegexTestPostProcessorMultipleStatusesUpgradeTask extends AbstractR
         return true;
     }
 
-    private static class ToArrayFn implements UnaryFunction<Object, Object>
+    private static class ToArrayFn implements Function<Object, Object>
     {
-        public Object process(Object o)
+        public Object apply(Object o)
         {
             if (o == null)
             {

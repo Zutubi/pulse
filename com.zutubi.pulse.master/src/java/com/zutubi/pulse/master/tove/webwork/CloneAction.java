@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Function;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
@@ -14,7 +15,6 @@ import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -226,9 +226,9 @@ public class CloneAction extends ToveFormActionSupport
     {
         final Map parameters = ActionContext.getContext().getParameters();
         TemplateNode templateNode = configurationTemplateManager.getTemplateNode(path);
-        templateNode.forEachDescendant(new UnaryFunction<TemplateNode, Boolean>()
+        templateNode.forEachDescendant(new Function<TemplateNode, Boolean>()
         {
-            public Boolean process(TemplateNode node)
+            public Boolean apply(TemplateNode node)
             {
                 Record record = configurationTemplateManager.getRecord(node.getPath());
                 String key = getKey(record);

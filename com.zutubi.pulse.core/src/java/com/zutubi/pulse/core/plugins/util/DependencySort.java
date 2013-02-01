@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins.util;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class DependencySort
      * @param <T> the type of item we are dealing with
      * @return the sorted collection of items
      */
-    public static <T> List<T> sort(List<T> items, UnaryFunction<T, Set<T>> directDependentsFn)
+    public static <T> List<T> sort(List<T> items, Function<T, Set<T>> directDependentsFn)
     {
         // A normal sort will not work as there is no ordering relationship
         // between plugins that have no dependency relationship.
@@ -36,7 +36,7 @@ public class DependencySort
             // sure to insert before it.  If it comes after, it will end up
             // after by virtue of being inserted as late as possible.
             int i;
-            Set<T> dependents = new TransitiveFunction<T>(directDependentsFn).process(plugin);
+            Set<T> dependents = new TransitiveFunction<T>(directDependentsFn).apply(plugin);
             for (i = 0; i < sorted.size(); i++)
             {
                 if (dependents.contains(sorted.get(i)))

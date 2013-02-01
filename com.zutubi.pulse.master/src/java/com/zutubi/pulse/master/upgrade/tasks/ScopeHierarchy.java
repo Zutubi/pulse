@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.zutubi.util.UnaryFunction;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -67,7 +67,7 @@ public class ScopeHierarchy
      *
      * @param f the function to run
      */
-    public void forEach(UnaryFunction<Node, Boolean> f)
+    public void forEach(Function<Node, Boolean> f)
     {
         root.forEach(f);
     }
@@ -182,9 +182,9 @@ public class ScopeHierarchy
          *
          * @param f the function to run
          */
-        void forEach(UnaryFunction<Node, Boolean> f)
+        void forEach(Function<Node, Boolean> f)
         {
-            if (f.process(this))
+            if (f.apply(this))
             {
                 for (Node child: children)
                 {

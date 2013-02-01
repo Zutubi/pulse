@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.find;
@@ -12,7 +13,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -893,9 +893,9 @@ public class PluginManager
             byPlugin.add(extension);
         }
 
-        return DependencySort.sort(Arrays.asList(extensions), new UnaryFunction<IExtension, Set<IExtension>>()
+        return DependencySort.sort(Arrays.asList(extensions), new Function<IExtension, Set<IExtension>>()
         {
-            public Set<IExtension> process(IExtension extension)
+            public Set<IExtension> apply(IExtension extension)
             {
                 LocalPlugin contributingPlugin = (LocalPlugin) getPlugin(extension.getContributor().getName());
                 List<Plugin> dependentPlugins = getDependentPlugins(contributingPlugin);
@@ -937,9 +937,9 @@ public class PluginManager
             throw new IllegalStateException("Can not sort plugins that have not been installed.");
         }
 
-        return DependencySort.sort(plugins, new UnaryFunction<LocalPlugin, Set<LocalPlugin>>()
+        return DependencySort.sort(plugins, new Function<LocalPlugin, Set<LocalPlugin>>()
         {
-            public Set<LocalPlugin> process(LocalPlugin plugin)
+            public Set<LocalPlugin> apply(LocalPlugin plugin)
             {
                 return getDependentPlugins(plugin, plugins);
             }

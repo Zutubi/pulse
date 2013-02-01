@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import com.zutubi.util.UnaryFunction;
-
 import static java.util.Arrays.asList;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,9 +17,9 @@ public abstract class BaseAddTerminatedResultStateUpgradeTask extends AbstractRe
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return asList(RecordUpgraders.newEditProperty(getPropertyName(), new UnaryFunction<Object, Object>()
+        return asList(RecordUpgraders.newEditProperty(getPropertyName(), new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 if (o != null && o instanceof String[])
                 {

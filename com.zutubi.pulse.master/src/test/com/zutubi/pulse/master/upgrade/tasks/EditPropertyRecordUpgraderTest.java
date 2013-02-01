@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.MutableRecordImpl;
-import com.zutubi.util.UnaryFunction;
 
 public class EditPropertyRecordUpgraderTest extends PulseTestCase
 {
@@ -14,9 +14,9 @@ public class EditPropertyRecordUpgraderTest extends PulseTestCase
 
     public void testSimpleEdit()
     {
-        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new UnaryFunction<Object, Object>()
+        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 return PROPERTY_VALUE_EDITED;
             }
@@ -30,9 +30,9 @@ public class EditPropertyRecordUpgraderTest extends PulseTestCase
 
     public void testAdd()
     {
-        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new UnaryFunction<Object, Object>()
+        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 return PROPERTY_VALUE;
             }
@@ -45,9 +45,9 @@ public class EditPropertyRecordUpgraderTest extends PulseTestCase
 
     public void testRemove()
     {
-        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new UnaryFunction<Object, Object>()
+        EditPropertyRecordUpgrader upgrader = new EditPropertyRecordUpgrader(PROPERTY_NAME, new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 return null;
             }

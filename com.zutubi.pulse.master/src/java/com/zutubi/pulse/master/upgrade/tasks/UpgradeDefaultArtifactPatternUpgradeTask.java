@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Update any artifact patterns that match the previous default value to
@@ -36,9 +36,9 @@ public class UpgradeDefaultArtifactPatternUpgradeTask  extends AbstractRecordPro
         return false;
     }
 
-    private class UpdateDefaultValues implements UnaryFunction<Object, Object>
+    private class UpdateDefaultValues implements Function<Object, Object>
     {
-        public Object process(Object o)
+        public Object apply(Object o)
         {
             if (o == null)
             {

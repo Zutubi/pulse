@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.UnaryFunction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,9 +25,9 @@ public class UpdateTimeReportLabelUpgradeTask extends AbstractRecordPropertiesUp
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_LABEL, new UnaryFunction<Object, Object>()
+        return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_LABEL, new Function<Object, Object>()
         {
-            public Object process(Object currentValue)
+            public Object apply(Object currentValue)
             {
                 if (currentValue != null && currentValue instanceof String)
                 {

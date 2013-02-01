@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.plugins.util;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Fake dependent-generating function for testing.
  */
-class FixedDependentsFunction implements UnaryFunction<String, Set<String>>
+class FixedDependentsFunction implements Function<String, Set<String>>
 {
     private Map<String, Set<String>> dependencyMapping = new HashMap<String, Set<String>>();
 
@@ -26,7 +26,7 @@ class FixedDependentsFunction implements UnaryFunction<String, Set<String>>
         set.addAll(java.util.Arrays.asList(deps));
     }
 
-    public Set<String> process(String s)
+    public Set<String> apply(String s)
     {
         return get(s);
     }

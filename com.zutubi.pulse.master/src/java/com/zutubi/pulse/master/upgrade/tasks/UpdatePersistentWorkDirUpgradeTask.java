@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.UnaryFunction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,9 +29,9 @@ public class UpdatePersistentWorkDirUpgradeTask extends AbstractRecordProperties
 
     protected List<RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_PERSISTENT_WORK_DIR, new UnaryFunction<Object, Object>()
+        return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_PERSISTENT_WORK_DIR, new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 if (o == null)
                 {

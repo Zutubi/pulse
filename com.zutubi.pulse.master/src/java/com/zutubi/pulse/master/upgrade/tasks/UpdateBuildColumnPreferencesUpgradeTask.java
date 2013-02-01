@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 import static java.util.Arrays.asList;
 
 import java.util.List;
@@ -44,9 +43,9 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
                 RecordUpgraders.newEditProperty("projectHistoryColumns", editFn));
     }
 
-    private static class FixColumnsFn implements UnaryFunction<Object, Object>
+    private static class FixColumnsFn implements Function<Object, Object>
     {
-        public Object process(Object o)
+        public Object apply(Object o)
         {
             if (o != null && o instanceof String)
             {

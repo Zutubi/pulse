@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.WebUtils;
 
 import java.util.HashSet;
@@ -78,9 +78,9 @@ public class RecordUpgradeUtils
         ScopeHierarchy.Node owner = scope.getHierarchy().findNodeById(elements[1]);
 
         final Record skeleton = createSkeletonOf(record);
-        owner.forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        owner.forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 String path = PathUtils.getPath(elements[0], node.getId(), remainderPath);
                 if (!recordManager.containsRecord(path))

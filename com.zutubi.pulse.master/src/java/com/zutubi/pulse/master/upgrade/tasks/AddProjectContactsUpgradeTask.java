@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.UnaryFunction;
 
 /**
  * Adds the new "contacts" section to project configuration.
@@ -30,9 +30,9 @@ public class AddProjectContactsUpgradeTask extends AbstractUpgradeTask
     public void execute() throws TaskException
     {
         TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        details.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        details.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 MutableRecord contactsRecord = new MutableRecordImpl();
                 contactsRecord.setSymbolicName(TYPE_CONTACTS);

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.util.UnaryFunction;
+import com.google.common.base.Function;
 
 /**
  * Static factory methods for creating {@link RecordUpgrader} instances.
@@ -67,7 +67,7 @@ public class RecordUpgraders
      *               removed.
      * @return the new upgrader
      */
-    public static RecordUpgrader newEditProperty(String name, UnaryFunction<Object, Object> editFn)
+    public static RecordUpgrader newEditProperty(String name, Function<Object, Object> editFn)
     {
         return new EditPropertyRecordUpgrader(name, editFn);
     }

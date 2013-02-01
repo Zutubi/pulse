@@ -1,18 +1,17 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.adt.Pair;
 
 import java.util.*;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * A task to upgrade the template-based builtin project types (Ant, Make, etc)
@@ -131,9 +130,9 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
                 asPair("target", "target"),
                 asPair("action", "buildaction"),
                 asPair("settings", "settings"));
-        xcodeMapping.addPropertyFunction("settings", new UnaryFunction<Object, Object>()
+        xcodeMapping.addPropertyFunction("settings", new Function<Object, Object>()
         {
-            public Object process(Object o)
+            public Object apply(Object o)
             {
                 return splitString((String) o);
             }
@@ -308,14 +307,14 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
         return copyValueIfPresent(from, key, to, key, null);
     }
 
-    private Object copyValueIfPresent(Record from, String fromKey, MutableRecord to, String toKey, UnaryFunction<Object, Object> f)
+    private Object copyValueIfPresent(Record from, String fromKey, MutableRecord to, String toKey, Function<Object, Object> f)
     {
         Object value = from.get(fromKey);
         if (value != null)
         {
             if (f != null)
             {
-                value = f.process(value);
+                value = f.apply(value);
             }
 
             to.put(toKey, value);
@@ -333,7 +332,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     {
         private String toSymbolicName;
         private Map<String, String> propertyMappings;
-        private Map<String, UnaryFunction<Object, Object>> propertyFunctions = new HashMap<String, UnaryFunction<Object, Object>>();
+        private Map<String, Function<Object, Object>> propertyFunctions = new HashMap<String, Function<Object, Object>>();
         private Set<String> deepCopiedProperties = new HashSet<String>();
 
         public TypeMapping(String toSymbolicName, Pair<String, String>... propertyMappings)
@@ -342,7 +341,7 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
             this.propertyMappings = CollectionUtils.asMap(propertyMappings);
         }
 
-        public void addPropertyFunction(String name, UnaryFunction<Object, Object> f)
+        public void addPropertyFunction(String name, Function<Object, Object> f)
         {
             propertyFunctions.put(name, f);
         }

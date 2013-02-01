@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
 
@@ -29,9 +29,9 @@ public class SkeletonPostProcessorsUpgradeTask extends AbstractPredefinedRecords
         final Record postProcessorSkeletons = loadRecords(tempDir, ARCHIVE_NAME);
 
         TemplatedScopeDetails details = new TemplatedScopeDetails(SCOPE_PROJECTS, recordManager);
-        details.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        details.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 if (node.getParent() != null)
                 {

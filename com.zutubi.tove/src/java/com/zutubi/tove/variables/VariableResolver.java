@@ -1,10 +1,10 @@
 package com.zutubi.tove.variables;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
-import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
 import java.util.*;
@@ -21,45 +21,45 @@ public class VariableResolver
      */
     public static Set<Character> EXTENDED_SPECIAL_CHARS = Sets.newHashSet(')', '?', '|', '!', '%', '#', '&', '/', ':', ';');
 
-    private static final Map<String, UnaryFunction<String, String>> FILTER_FUNCTIONS = new HashMap<String, UnaryFunction<String, String>>();
+    private static final Map<String, Function<String, String>> FILTER_FUNCTIONS = new HashMap<String, Function<String, String>>();
 
     static
     {
-        FILTER_FUNCTIONS.put("trim", new UnaryFunction<String, String>()
+        FILTER_FUNCTIONS.put("trim", new Function<String, String>()
         {
-            public String process(String s)
+            public String apply(String s)
             {
                 return s.trim();
             }
         });
 
-        FILTER_FUNCTIONS.put("lower", new UnaryFunction<String, String>()
+        FILTER_FUNCTIONS.put("lower", new Function<String, String>()
         {
-            public String process(String s)
+            public String apply(String s)
             {
                 return s.toLowerCase();
             }
         });
 
-        FILTER_FUNCTIONS.put("upper", new UnaryFunction<String, String>()
+        FILTER_FUNCTIONS.put("upper", new Function<String, String>()
         {
-            public String process(String s)
+            public String apply(String s)
             {
                 return s.toUpperCase();
             }
         });
 
-        FILTER_FUNCTIONS.put("name", new UnaryFunction<String, String>()
+        FILTER_FUNCTIONS.put("name", new Function<String, String>()
         {
-            public String process(String s)
+            public String apply(String s)
             {
                 return s.trim().replaceAll("[\\\\/$]", ".");
             }
         });
 
-        FILTER_FUNCTIONS.put("normalise", new UnaryFunction<String, String>()
+        FILTER_FUNCTIONS.put("normalise", new Function<String, String>()
         {
-            public String process(String s)
+            public String apply(String s)
             {
                 return s.trim().replaceAll("[\\\\/]", Matcher.quoteReplacement(File.separator));
             }
@@ -697,7 +697,7 @@ public class VariableResolver
     {
         for (String filter : filters)
         {
-            UnaryFunction<String, String> fn = FILTER_FUNCTIONS.get(filter);
+            Function<String, String> fn = FILTER_FUNCTIONS.get(filter);
             if (fn == null)
             {
                 if (resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
@@ -707,7 +707,7 @@ public class VariableResolver
             }
             else
             {
-                value = fn.process(value);
+                value = fn.apply(value);
             }
         }
 

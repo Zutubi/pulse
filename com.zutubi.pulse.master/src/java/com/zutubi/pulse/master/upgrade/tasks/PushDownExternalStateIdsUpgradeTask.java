@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.UnaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -44,9 +44,9 @@ public class PushDownExternalStateIdsUpgradeTask extends AbstractUpgradeTask
         final Map<String, Object> removedIds = new HashMap<String, Object>();
         
         TemplatedScopeDetails scopeDetails = (TemplatedScopeDetails) scopes.getScopeDetails(scope);
-        scopeDetails.getHierarchy().forEach(new UnaryFunction<ScopeHierarchy.Node, Boolean>()
+        scopeDetails.getHierarchy().forEach(new Function<ScopeHierarchy.Node, Boolean>()
         {
-            public Boolean process(ScopeHierarchy.Node node)
+            public Boolean apply(ScopeHierarchy.Node node)
             {
                 String path = PathUtils.getPath(scope, node.getId());
                 Record record = recordManager.select(path);

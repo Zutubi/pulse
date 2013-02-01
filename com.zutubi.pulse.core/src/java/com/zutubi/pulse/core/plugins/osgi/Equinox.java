@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.plugins.osgi;
 
+import com.google.common.base.Function;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
-import com.zutubi.util.UnaryFunction;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
@@ -202,7 +202,7 @@ public class Equinox implements OSGiFramework
         return jobManager;
     }
 
-    private class DirectDependenciesFunction implements UnaryFunction<Bundle, Set<Bundle>> 
+    private class DirectDependenciesFunction implements Function<Bundle, Set<Bundle>> 
     {
         private List<Bundle> bundles;
 
@@ -211,7 +211,7 @@ public class Equinox implements OSGiFramework
             this.bundles = bundles;
         }
 
-        public Set<Bundle> process(Bundle bundle)
+        public Set<Bundle> apply(Bundle bundle)
         {
             Set<Bundle> result = new HashSet<Bundle>();
             BundleDescription description = stateManager.getSystemState().getBundle(bundle.getBundleId());
