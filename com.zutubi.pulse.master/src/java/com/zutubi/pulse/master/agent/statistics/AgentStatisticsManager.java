@@ -12,7 +12,6 @@ import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -53,7 +52,7 @@ public class AgentStatisticsManager implements EventListener
     {
         try
         {
-            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new Runnable()
             {
                 public void run()
                 {

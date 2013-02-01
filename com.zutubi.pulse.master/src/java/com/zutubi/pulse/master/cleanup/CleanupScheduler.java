@@ -13,7 +13,6 @@ import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -52,7 +51,7 @@ public class CleanupScheduler implements Stoppable
     {
         try
         {
-            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new Runnable()
             {
                 public void run()
                 {

@@ -1361,7 +1361,7 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private class RecipeTimeoutCallback implements NullaryProcedure
+    private class RecipeTimeoutCallback implements Runnable
     {
         private long buildResultId;
         private long recipeId;

@@ -30,7 +30,6 @@ import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.time.TestClock;
@@ -139,7 +138,7 @@ public class PollingServiceTest extends ZutubiTestCase
     {
         serviceHandle.init();
 
-        verify(callbackService, times(1)).registerCallback(anyString(), (NullaryProcedure) anyObject(), anyLong());
+        verify(callbackService, times(1)).registerCallback(anyString(), (Runnable) anyObject(), anyLong());
         verify(shutdownManager, times(1)).addStoppable(service);
     }
 

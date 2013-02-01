@@ -4,7 +4,6 @@ import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Date;
@@ -43,7 +42,7 @@ public class CallbackService
     /**
      * The map of callback id to callback instance.
      */
-    private Map<String, NullaryProcedure> registeredCallbacks = new HashMap<String, NullaryProcedure>();
+    private Map<String, Runnable> registeredCallbacks = new HashMap<String, Runnable>();
 
     /**
      * Register the procedure to be called back at the specified time.
@@ -51,7 +50,7 @@ public class CallbackService
      * @param callback  the procedure to be called
      * @param when      the time at which the procedure should be called.
      */
-    public synchronized void registerCallback(NullaryProcedure callback, Date when)
+    public synchronized void registerCallback(Runnable callback, Date when)
     {
         registerCallback(String.valueOf(nextCallbackId.getAndIncrement()), callback, when);
     }
@@ -63,7 +62,7 @@ public class CallbackService
      * @param callback  the procedure to be called.
      * @param when      the time at which the procedure will be called.
      */
-    public synchronized void registerCallback(String name, NullaryProcedure callback, Date when)
+    public synchronized void registerCallback(String name, Runnable callback, Date when)
     {
         assertNotRegistered(name, callback);
 
@@ -79,7 +78,7 @@ public class CallbackService
      * @param callback  the procedure to be called.
      * @param interval  the interval in milliseconds at which the callback is made.
      */
-    public synchronized void registerCallback(NullaryProcedure callback, long interval)
+    public synchronized void registerCallback(Runnable callback, long interval)
     {
         registerCallback(String.valueOf(nextCallbackId.getAndIncrement()), callback, interval);
     }
@@ -91,7 +90,7 @@ public class CallbackService
      * @param callback  the procedure to be called.
      * @param interval  the interval in milliseconds at which the callback is made.
      */
-    public synchronized void registerCallback(String name, NullaryProcedure callback, long interval)
+    public synchronized void registerCallback(String name, Runnable callback, long interval)
     {
         assertNotRegistered(name, callback);
 
@@ -101,7 +100,7 @@ public class CallbackService
         registerCallbackTrigger(callback, trigger);
     }
 
-    private void assertNotRegistered(String name, NullaryProcedure callback) throws IllegalArgumentException
+    private void assertNotRegistered(String name, Runnable callback) throws IllegalArgumentException
     {
         if (registeredCallbacks.containsKey(name))
         {
@@ -113,7 +112,7 @@ public class CallbackService
         }
     }
 
-    private synchronized void registerCallbackTrigger(NullaryProcedure callback, Trigger trigger)
+    private synchronized void registerCallbackTrigger(Runnable callback, Trigger trigger)
     {
         try
         {
@@ -136,9 +135,9 @@ public class CallbackService
      * @return true if the procedure was unregistered, false otherwise (for instance
      * if the procedure had not previously been registered) 
      */
-    public synchronized boolean unregisterCallback(NullaryProcedure callback)
+    public synchronized boolean unregisterCallback(Runnable callback)
     {
-        Map.Entry<String, NullaryProcedure> entry = find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback), null);
+        Map.Entry<String, Runnable> entry = find(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback), null);
         if (entry != null)
         {
             String triggerName = entry.getKey();
@@ -174,12 +173,12 @@ public class CallbackService
         }
     }
 
-    public synchronized NullaryProcedure getCallback(String name)
+    public synchronized Runnable getCallback(String name)
     {
         return registeredCallbacks.get(name);
     }
 
-    private boolean isRegistered(NullaryProcedure callback)
+    private boolean isRegistered(Runnable callback)
     {
         return any(registeredCallbacks.entrySet(), new ByCallbackPredicate(callback));
     }
@@ -196,7 +195,7 @@ public class CallbackService
 
         public void execute(TaskExecutionContext context)
         {
-            NullaryProcedure callback = service.getCallback(context.getTrigger().getName());
+            Runnable callback = service.getCallback(context.getTrigger().getName());
             if (callback != null)
             {
                 try
@@ -216,16 +215,16 @@ public class CallbackService
         }
     }
 
-    private static class ByCallbackPredicate implements Predicate<Map.Entry<String, NullaryProcedure>>
+    private static class ByCallbackPredicate implements Predicate<Map.Entry<String, Runnable>>
     {
-        private NullaryProcedure callback;
+        private Runnable callback;
 
-        private ByCallbackPredicate(NullaryProcedure callback)
+        private ByCallbackPredicate(Runnable callback)
         {
             this.callback = callback;
         }
 
-        public boolean apply(Map.Entry<String, NullaryProcedure> entry)
+        public boolean apply(Map.Entry<String, Runnable> entry)
         {
             return entry.getValue() == callback;
         }

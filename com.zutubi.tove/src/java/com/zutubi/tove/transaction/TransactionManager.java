@@ -2,14 +2,13 @@ package com.zutubi.tove.transaction;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * The transaction manager is responsible for managing the systems transactions.  It begins, rolls back,
@@ -278,7 +277,7 @@ public class TransactionManager
     public <T> T runInTransaction(final NullaryFunction<T> function, TransactionResource... resources)
     {
         final ResultHolder<T> holder = new ResultHolder<T>();
-        inTransaction(new NullaryProcedure()
+        inTransaction(new Runnable()
         {
             public void run()
             {
@@ -302,12 +301,12 @@ public class TransactionManager
      * @param procedure     the procedure to be run within the context of a transaction.
      * @param resources     resources to be bound to the transaction.
      */
-    public void runInTransaction(NullaryProcedure procedure, TransactionResource... resources)
+    public void runInTransaction(Runnable procedure, TransactionResource... resources)
     {
         inTransaction(procedure, resources);
     }
 
-    private void inTransaction(NullaryProcedure procedure, TransactionResource... resources)
+    private void inTransaction(Runnable procedure, TransactionResource... resources)
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = getTransaction() != null;

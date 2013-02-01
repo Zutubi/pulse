@@ -1,14 +1,12 @@
 package com.zutubi.pulse.master.scheduling;
 
+import static com.zutubi.pulse.master.scheduling.CallbackService.CALLBACK_TRIGGER_GROUP;
 import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
-
-import static com.zutubi.pulse.master.scheduling.CallbackService.CALLBACK_TRIGGER_GROUP;
-import static org.mockito.Mockito.*;
 
 public class CallbackServiceTest extends ZutubiTestCase
 {
@@ -144,7 +142,7 @@ public class CallbackServiceTest extends ZutubiTestCase
         }
     }
 
-    private static class CountCallback implements NullaryProcedure
+    private static class CountCallback implements Runnable
     {
         private int count = 0;
         public void run()

@@ -20,7 +20,6 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
@@ -94,7 +93,7 @@ public class PollingService implements Stoppable
 
         try
         {
-            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new Runnable()
             {
                 public void run()
                 {

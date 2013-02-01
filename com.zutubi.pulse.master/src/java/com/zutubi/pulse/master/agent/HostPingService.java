@@ -15,7 +15,6 @@ import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashSet;
@@ -257,7 +256,7 @@ public class HostPingService extends BackgroundServiceSupport implements EventLi
         this.hostManager = hostManager;
     }
 
-    private class PingHostsCallback implements NullaryProcedure
+    private class PingHostsCallback implements Runnable
     {
         public void run()
         {

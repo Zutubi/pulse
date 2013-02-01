@@ -4,7 +4,6 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.util.Constants;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
@@ -36,7 +35,7 @@ public class LastAccessManager
     {
         try
         {
-            callbackService.registerCallback(CALLBACK_NAME, new NullaryProcedure()
+            callbackService.registerCallback(CALLBACK_NAME, new Runnable()
             {
                 public void run()
                 {

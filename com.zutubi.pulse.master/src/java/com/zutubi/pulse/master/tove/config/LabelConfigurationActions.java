@@ -7,7 +7,6 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import com.zutubi.util.NullaryProcedure;
 
 import java.util.Collection;
 
@@ -36,7 +35,7 @@ public class LabelConfigurationActions
             }
         });
 
-        pulseTransactionManager.runInTransaction(new NullaryProcedure()
+        pulseTransactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {

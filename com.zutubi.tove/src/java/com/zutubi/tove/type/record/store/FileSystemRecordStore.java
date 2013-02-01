@@ -6,7 +6,6 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -512,7 +511,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void insert(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -527,7 +526,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void update(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -565,7 +564,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void importRecords(final Record record)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {

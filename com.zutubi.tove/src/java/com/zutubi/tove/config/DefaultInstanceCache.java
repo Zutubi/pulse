@@ -1,14 +1,13 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.inmemory.InMemoryMapStateWrapper;
 import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.util.UnaryProcedure;
+import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.NullaryProcedure;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.*;
 
@@ -34,7 +33,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void reset()
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -58,7 +57,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void markInvalid(final String path)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -161,7 +160,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void put(final String path, final Configuration instance, final boolean complete)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -172,7 +171,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void forAllInstances(final InstanceHandler handler, final boolean allowIncomplete, final boolean writable)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -194,7 +193,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void clearDirty()
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {
@@ -244,7 +243,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void indexReference(final String fromPropertyPath, final String toPath)
     {
-        transactionManager.runInTransaction(new NullaryProcedure()
+        transactionManager.runInTransaction(new Runnable()
         {
             public void run()
             {

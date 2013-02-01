@@ -17,7 +17,6 @@ import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.NullaryProcedure;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
@@ -88,7 +87,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
         super.init();
         eventManager.register(this);
 
-        callbackService.registerCallback("Agent Synchronisation Timeout Check", new NullaryProcedure()
+        callbackService.registerCallback("Agent Synchronisation Timeout Check", new Runnable()
         {
             public void run()
             {
