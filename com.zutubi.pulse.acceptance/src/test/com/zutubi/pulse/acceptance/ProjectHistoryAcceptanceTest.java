@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.filter;
 import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
@@ -17,7 +16,6 @@ import com.zutubi.pulse.master.xwork.actions.ajax.HistoryDataAction;
 import com.zutubi.tove.type.record.PathUtils;
 import org.python.google.common.collect.Lists;
 
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,13 +125,13 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         
         // Filter to broken
         setFilterAndWait(historyPage, HistoryDataAction.STATE_BROKEN);
-        Collection<BuildInfo> brokenBuilds = Collections2.filter(builds, new Predicate<BuildInfo>()
+        List<BuildInfo> brokenBuilds = Lists.newArrayList(filter(builds, new Predicate<BuildInfo>()
         {
             public boolean apply(BuildInfo buildInfo)
             {
                 return buildInfo.status != ResultState.SUCCESS;
             }
-        });
+        }));
         
         assertEquals(brokenBuilds.size(), historyPage.getBuildCount());
         assertNoPaging(historyPage, 2);
@@ -141,7 +139,7 @@ public class ProjectHistoryAcceptanceTest extends HistoryAcceptanceTestBase
         
         // Filter to successful (still multiple pages)
         setFilterAndWait(historyPage, HistoryDataAction.STATE_SUCCESS);
-        List<BuildInfo> successfulBuilds = Lists.newArrayList(Iterables.filter(builds, new Predicate<BuildInfo>()
+        List<BuildInfo> successfulBuilds = Lists.newArrayList(filter(builds, new Predicate<BuildInfo>()
         {
             public boolean apply(BuildInfo buildInfo)
             {
