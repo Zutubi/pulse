@@ -35,7 +35,6 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -64,6 +63,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
+
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -3712,7 +3713,12 @@ public class RemoteApi
         result.put("project", event.getProjectConfig().getName());
         result.put("owner", event.getOwner().getName());
         result.put("isPersonal", event.isPersonal());
-        result.put("requestSource", event.getRequestSource());
+        String requestSource = event.getRequestSource();
+        if (requestSource == null)
+        {
+            requestSource = "";
+        }
+        result.put("requestSource", requestSource);
         result.put("isReplaceable", event.isReplaceable());
         result.put("queuedTime", Long.toString(event.getQueued()));
         result.put("reason", event.getReason().getSummary());
