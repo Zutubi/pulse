@@ -52,7 +52,12 @@ public class PulseFileExpander
     {
         PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
         ProjectRecipesConfiguration recipes = new ProjectRecipesConfiguration();
-        File pulseFile = new File(options.getBaseDir(), options.getPulseFile());
+        File pulseFile = new File(options.getPulseFile());
+        if (!pulseFile.isAbsolute())
+        {
+            pulseFile = new File(options.getBaseDir(), options.getPulseFile());
+        }
+
         String recipe = options.getRecipe();
 
         InputStream is = null;
