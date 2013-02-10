@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.dependency.ivy;
 import com.zutubi.i18n.Messages;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import static com.zutubi.util.io.FileSystemUtils.rmdir;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.ivy.Ivy;
@@ -39,6 +38,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.util.io.FileSystemUtils.rmdir;
 
 /**
  * The ivy client provides the core interface for interacting with ivy processes, encapsulating
@@ -50,11 +53,27 @@ import java.util.*;
 public class IvyClient
 {
     private static final Messages I18N = Messages.getInstance(IvyClient.class);
-    private static final Logger LOG = Logger.getLogger(IvyClient.class);
+    private static final Logger   LOG  = Logger.getLogger(IvyClient.class);
+
+    /**
+     * After reports of "bad ivy file in cache" that suspiciously seem to come in pairs, I tested
+     * some Ivy operations from multiple threads.  I found multiple thread-safety issues, which
+     * manifest in different ways but often around corrupt descriptors.  Once of these is a classic
+     * use of SimpleDateFormat, which is fixed in later Ivy versions, but I don't believe all
+     * problems are down to that.  So it seems best just to serialise all Ivy operations in the
+     * same process.  Hence this shared lock.
+     * <p/>
+     * Note that some operations in this class involve network and file I/O, so serialisation
+     * could at times cause bottlenecks.  I hope this will not be a big issue, as the slower
+     * operations only happen on agents where concurrency is minimal.  On the master there will be
+     * more contention, but everything happens on the local file system so will hopefully not be
+     * too slow.
+     */
+    private static final Lock LOCK = new ReentrantLock();
 
     private static final String RESOLVER_NAME = "pulse";
 
-    private Ivy ivy;
+    private Ivy              ivy;
     private IvyConfiguration configuration;
 
     /**
@@ -65,42 +84,50 @@ public class IvyClient
      */
     public IvyClient(IvyConfiguration configuration) throws Exception
     {
-        if (configuration.getRepositoryBase() == null)
+        LOCK.lock();
+        try
         {
-            throw new IllegalArgumentException(I18N.format("configuration.repositoryBase.required"));
+            if (configuration.getRepositoryBase() == null)
+            {
+                throw new IllegalArgumentException(I18N.format("configuration.repositoryBase.required"));
+            }
+
+            this.configuration = configuration;
+
+            IvySettings settings = configuration.loadSettings();
+
+            String repositoryBase = configuration.getRepositoryBase();
+
+            AbstractPatternsBasedResolver resolver;
+            if (isFile(repositoryBase))
+            {
+                resolver = new FileSystemResolver();
+
+                // this resolver requires that the repository base be an absolute path when used in the patterns.
+                repositoryBase = new File(new URI(repositoryBase)).getCanonicalPath();
+            }
+            else
+            {
+                resolver = new URLResolver();
+            }
+
+            resolver.setName(RESOLVER_NAME);
+            resolver.addArtifactPattern(repositoryBase + "/" + configuration.getArtifactPattern());
+            resolver.addIvyPattern(repositoryBase + "/" + configuration.getIvyPattern());
+            resolver.setCheckmodified(true);
+
+            settings.addResolver(resolver);
+            settings.setDefaultResolver(RESOLVER_NAME);
+
+            // disable the caching of the artifacts themselves when they are already available on the local filesystem.
+            settings.setDefaultUseOrigin(true);
+
+            this.ivy = Ivy.newInstance(settings);
         }
-
-        this.configuration = configuration;
-
-        IvySettings settings = configuration.loadSettings();
-
-        String repositoryBase = configuration.getRepositoryBase();
-
-        AbstractPatternsBasedResolver resolver;
-        if (isFile(repositoryBase))
+        finally
         {
-            resolver = new FileSystemResolver();
-
-            // this resolver requires that the repository base be an absolute path when used in the patterns.
-            repositoryBase = new File(new URI(repositoryBase)).getCanonicalPath();
+            LOCK.unlock();
         }
-        else
-        {
-            resolver = new URLResolver();
-        }
-
-        resolver.setName(RESOLVER_NAME);
-        resolver.addArtifactPattern(repositoryBase + "/" + configuration.getArtifactPattern());
-        resolver.addIvyPattern(repositoryBase + "/" + configuration.getIvyPattern());
-        resolver.setCheckmodified(true);
-
-        settings.addResolver(resolver);
-        settings.setDefaultResolver(RESOLVER_NAME);
-
-        // disable the caching of the artifacts themselves when they are already available on the local filesystem.
-        settings.setDefaultUseOrigin(true);
-
-        this.ivy = Ivy.newInstance(settings);
     }
 
     /**
@@ -114,7 +141,15 @@ public class IvyClient
      */
     public ResolveReport resolveDescriptor(IvyModuleDescriptor descriptor) throws IOException, ParseException
     {
-        return resolve(descriptor.getDescriptor(), descriptor.getDescriptor().getConfigurationsNames());
+        LOCK.lock();
+        try
+        {
+            return resolve(descriptor.getDescriptor(), descriptor.getDescriptor().getConfigurationsNames());
+        }
+        finally
+        {
+            LOCK.unlock();
+        }
     }
 
     /**
@@ -125,24 +160,32 @@ public class IvyClient
      * @return a resolved version of the given descriptor
      * @throws Exception on error
      */
-    public synchronized IvyModuleDescriptor deliverDescriptor(IvyModuleDescriptor descriptor) throws Exception
+    public IvyModuleDescriptor deliverDescriptor(IvyModuleDescriptor descriptor) throws Exception
     {
-        // Deliver to a local temp file, and reload the descriptor from it.
-        File tmp = null;
+        LOCK.lock();
         try
         {
-            tmp = FileSystemUtils.createTempDir();
-            File ivyFile = new File(tmp, "ivy.xml");
-            ModuleRevisionId mrid = descriptor.getDescriptor().getModuleRevisionId();
-            ivy.deliver(mrid, descriptor.getRevision(), ivyFile.getCanonicalPath());
-            IvyModuleDescriptor deliveredDescriptor = IvyModuleDescriptor.newInstance(ivyFile, configuration);
-            // Hackishly disconnect the descriptor from the temp file.
-            ReflectionUtils.setFieldValue(deliveredDescriptor.getDescriptor(), "resource", null);
-            return deliveredDescriptor;
+            // Deliver to a local temp file, and reload the descriptor from it.
+            File tmp = null;
+            try
+            {
+                tmp = FileSystemUtils.createTempDir();
+                File ivyFile = new File(tmp, "ivy.xml");
+                ModuleRevisionId mrid = descriptor.getDescriptor().getModuleRevisionId();
+                ivy.deliver(mrid, descriptor.getRevision(), ivyFile.getCanonicalPath());
+                IvyModuleDescriptor deliveredDescriptor = IvyModuleDescriptor.newInstance(ivyFile, configuration);
+                // Hackishly disconnect the descriptor from the temp file.
+                ReflectionUtils.setFieldValue(deliveredDescriptor.getDescriptor(), "resource", null);
+                return deliveredDescriptor;
+            }
+            finally
+            {
+                cleanupTempDir(tmp);
+            }
         }
         finally
         {
-            cleanupTempDir(tmp);
+            LOCK.unlock();
         }
     }
 
@@ -158,42 +201,50 @@ public class IvyClient
      *                   blank, all artifacts will be published.
      * @throws IOException if there is a failure to publish an artifact.
      */
-    public synchronized void publishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
+    public void publishArtifacts(IvyModuleDescriptor descriptor, String... stageNames) throws IOException
     {
-        URLHandler originalDefault = URLHandlerRegistry.getDefault();
-        ivy.pushContext();
+        LOCK.lock();
         try
         {
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
-
-            DependencyResolver dependencyResolver = ivy.getSettings().getDefaultResolver();
-
-            PublishOptions options = new PublishOptions();
-            options.setOverwrite(true);
-            options.setUpdate(true);
-            options.setHaltOnMissing(true);
-
-            if (stageNames.length > 0)
+            URLHandler originalDefault = URLHandlerRegistry.getDefault();
+            ivy.pushContext();
+            try
             {
-                options.setConfs(IvyEncoder.encodeNames(stageNames));
+                URLHandlerRegistry.setDefault(new CustomURLHandler());
+
+                DependencyResolver dependencyResolver = ivy.getSettings().getDefaultResolver();
+
+                PublishOptions options = new PublishOptions();
+                options.setOverwrite(true);
+                options.setUpdate(true);
+                options.setHaltOnMissing(true);
+
+                if (stageNames.length > 0)
+                {
+                    options.setConfs(IvyEncoder.encodeNames(stageNames));
+                }
+
+                Collection bad = checkCanPublishArtifacts(descriptor, stageNames);
+                if (bad.size() > 0)
+                {
+                    throw new IOException(I18N.format("failure.publish.missingSourcefile"));
+                }
+
+                Collection missing = ivy.getPublishEngine().publish(descriptor.getDescriptor(), Arrays.asList("[" + IvyModuleDescriptor.SOURCEFILE + "]"), dependencyResolver, options);
+                if (missing.size() > 0)
+                {
+                    throw new IOException(I18N.format("failure.publish.general"));
+                }
             }
-
-            Collection bad = checkCanPublishArtifacts(descriptor, stageNames);
-            if (bad.size() > 0)
+            finally
             {
-                throw new IOException(I18N.format("failure.publish.missingSourcefile"));
-            }
-
-            Collection missing = ivy.getPublishEngine().publish(descriptor.getDescriptor(), Arrays.asList("[" + IvyModuleDescriptor.SOURCEFILE + "]"), dependencyResolver, options);
-            if (missing.size() > 0)
-            {
-                throw new IOException(I18N.format("failure.publish.general"));
+                ivy.popContext();
+                URLHandlerRegistry.setDefault(originalDefault);
             }
         }
         finally
         {
-            ivy.popContext();
-            URLHandlerRegistry.setDefault(originalDefault);
+            LOCK.unlock();
         }
     }
 
@@ -231,44 +282,53 @@ public class IvyClient
      * @param descriptor to be published
      * @throws IOException if there are any errors publishing the descriptor.
      */
-    public synchronized void publishDescriptor(IvyModuleDescriptor descriptor) throws IOException
+    public void publishDescriptor(IvyModuleDescriptor descriptor) throws IOException
     {
-        // we can only publish from a file, so we need to deliver the descriptor to a local file first.
-        File tmp = null;
-        // annoying but necessary.  See CustomURLHandler for details.
-        URLHandler originalDefault = URLHandlerRegistry.getDefault();
+        LOCK.lock();
+
         try
         {
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
-
-            String revision = descriptor.getRevision();
-
-            DefaultModuleDescriptor moduleDescriptor = descriptor.getDescriptor();
-
-            tmp = FileSystemUtils.createTempDir();
-            File ivyFile = new File(tmp, "ivy.xml");
-            XmlModuleDescriptorWriter.write(moduleDescriptor, ivyFile);
-
-            ModuleRevisionId mrid = moduleDescriptor.getModuleRevisionId();
-
-            PublishOptions options = new PublishOptions();
-            options.setOverwrite(true);
-            options.setUpdate(true);
-            options.setHaltOnMissing(false); // we don't care about missing artifacts here, just that the ivy file gets published.
-            options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
-            options.setSrcIvyPattern(ivyFile.getCanonicalPath());
-
-            if (StringUtils.stringSet(revision))
+            // we can only publish from a file, so we need to deliver the descriptor to a local file first.
+            File tmp = null;
+            // annoying but necessary.  See CustomURLHandler for details.
+            URLHandler originalDefault = URLHandlerRegistry.getDefault();
+            try
             {
-                options.setPubrevision(revision);
+                URLHandlerRegistry.setDefault(new CustomURLHandler());
+
+                String revision = descriptor.getRevision();
+
+                DefaultModuleDescriptor moduleDescriptor = descriptor.getDescriptor();
+
+                tmp = FileSystemUtils.createTempDir();
+                File ivyFile = new File(tmp, "ivy.xml");
+                XmlModuleDescriptorWriter.write(moduleDescriptor, ivyFile);
+
+                ModuleRevisionId mrid = moduleDescriptor.getModuleRevisionId();
+
+                PublishOptions options = new PublishOptions();
+                options.setOverwrite(true);
+                options.setUpdate(true);
+                options.setHaltOnMissing(false); // we don't care about missing artifacts here, just that the ivy file gets published.
+                options.setConfs(new String[]{IvyModuleDescriptor.ALL_STAGES});
+                options.setSrcIvyPattern(ivyFile.getCanonicalPath());
+
+                if (StringUtils.stringSet(revision))
+                {
+                    options.setPubrevision(revision);
+                }
+                ivy.publish(mrid, Collections.emptySet(), RESOLVER_NAME, options);
             }
-            ivy.publish(mrid, Collections.emptySet(), RESOLVER_NAME, options);
+            finally
+            {
+                URLHandlerRegistry.setDefault(originalDefault);
+
+                cleanupTempDir(tmp);
+            }
         }
         finally
         {
-            URLHandlerRegistry.setDefault(originalDefault);
-
-            cleanupTempDir(tmp);
+            LOCK.unlock();
         }
     }
 
@@ -286,57 +346,73 @@ public class IvyClient
      * @throws java.io.IOException  on error
      * @throws java.text.ParseException on error
      */
-    public synchronized IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern, boolean sync) throws IOException, ParseException
+    public IvyRetrievalReport retrieveArtifacts(DefaultModuleDescriptor descriptor, String stageName, String targetPattern, boolean sync) throws IOException, ParseException
     {
-        // annoying but necessary.  See CustomURLHandler for details.
-        URLHandler originalDefault = URLHandlerRegistry.getDefault();
+        LOCK.lock();
         try
         {
-            URLHandlerRegistry.setDefault(new CustomURLHandler());
-
-            IvyRetrievalReport report = new IvyRetrievalReport();
-
-            ModuleRevisionId mrid = descriptor.getModuleRevisionId();
-
-            String conf = IvyEncoder.encode(stageName);
-            ResolveReport resolveReport = resolve(descriptor, conf);
-            IvyModuleDescriptor ivyDescriptor = new IvyModuleDescriptor(descriptor, configuration);
-            if (resolveReportHasProblems(resolveReport, report, conf, ivyDescriptor.getOptionalDependencies()))
+            // annoying but necessary.  See CustomURLHandler for details.
+            URLHandler originalDefault = URLHandlerRegistry.getDefault();
+            try
             {
+                URLHandlerRegistry.setDefault(new CustomURLHandler());
+
+                IvyRetrievalReport report = new IvyRetrievalReport();
+
+                ModuleRevisionId mrid = descriptor.getModuleRevisionId();
+
+                String conf = IvyEncoder.encode(stageName);
+                ResolveReport resolveReport = resolve(descriptor, conf);
+                IvyModuleDescriptor ivyDescriptor = new IvyModuleDescriptor(descriptor, configuration);
+                if (resolveReportHasProblems(resolveReport, report, conf, ivyDescriptor.getOptionalDependencies()))
+                {
+                    return report;
+                }
+
+                RetrieveOptions options = new RetrieveOptions();
+                options.setConfs(new String[]{conf});
+                options.setSync(sync);
+
+                ivy.retrieve(mrid, targetPattern, options);
+
+                recordDownloadedArtifacts(targetPattern, report, mrid, options);
+                decodeArtifactFilenames(targetPattern, report);
+
                 return report;
             }
-
-            RetrieveOptions options = new RetrieveOptions();
-            options.setConfs(new String[]{conf});
-            options.setSync(sync);
-
-            ivy.retrieve(mrid, targetPattern, options);
-
-            recordDownloadedArtifacts(targetPattern, report, mrid, options);
-            decodeArtifactFilenames(targetPattern, report);
-
-            return report;
+            finally
+            {
+                URLHandlerRegistry.setDefault(originalDefault);
+            }
         }
         finally
         {
-            URLHandlerRegistry.setDefault(originalDefault);
+            LOCK.unlock();
         }
     }
 
     /**
      * Cleanup any items loaded into the cache used by this client.
      */
-    public synchronized void cleanup()
+    public void cleanup()
     {
-        IvySettings settings = ivy.getSettings();
-
-        ResolutionCacheManager resolutionCacheManager = settings.getResolutionCacheManager();
-        resolutionCacheManager.clean();
-
-        RepositoryCacheManager[] caches = settings.getRepositoryCacheManagers();
-        for (RepositoryCacheManager cache : caches)
+        LOCK.lock();
+        try
         {
-            cache.clean();
+            IvySettings settings = ivy.getSettings();
+
+            ResolutionCacheManager resolutionCacheManager = settings.getResolutionCacheManager();
+            resolutionCacheManager.clean();
+
+            RepositoryCacheManager[] caches = settings.getRepositoryCacheManagers();
+            for (RepositoryCacheManager cache : caches)
+            {
+                cache.clean();
+            }
+        }
+        finally
+        {
+            LOCK.unlock();
         }
     }
 
@@ -458,16 +534,18 @@ public class IvyClient
      * This logger will continue to receive messages until it is popped.
      *
      * @param logger the logger to receive logging messages.
-     * @see #popMessageLogger()
      */
     public synchronized void pushMessageLogger(MessageLogger logger)
     {
-        ivy.getLoggerEngine().pushLogger(logger);
-    }
-
-    public synchronized void popMessageLogger()
-    {
-        ivy.getLoggerEngine().popLogger();
+        LOCK.lock();
+        try
+        {
+            ivy.getLoggerEngine().pushLogger(logger);
+        }
+        finally
+        {
+            LOCK.unlock();
+        }
     }
 
     private boolean isFile(String path)
