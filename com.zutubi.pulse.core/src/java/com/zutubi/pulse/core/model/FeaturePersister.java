@@ -180,7 +180,7 @@ public class FeaturePersister
                 StoredArtifact artifact = result.getArtifact(name);
                 if(artifact == null)
                 {
-                    LOG.warning("Features file refers to unknown artifact '" + name + "'");
+                    LOG.info("Features file refers to unknown artifact '" + name + "'");
                     continue;
                 }
 
@@ -204,7 +204,7 @@ public class FeaturePersister
                 StoredFileArtifact fileArtifact = artifact.findFile(path);
                 if (fileArtifact == null)
                 {
-                    LOG.warning("Features file refers to unknown file artifact '" + path + "'");
+                    LOG.info("Features file refers to unknown file artifact '" + path + "'");
                     continue;
                 }
 
