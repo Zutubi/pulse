@@ -337,6 +337,38 @@ public class FileSystemUtils
         return tmp;
     }
 
+    /**
+     * Creates a new file at the given path.
+     * 
+     * @param file the file to create
+     * @param deleteExisting if true, when the file already exists it will be replaced with a new,
+     *                       empty file (otherwise an error is thrown in this case)
+     * @throws IOException if the file already exists and deleteExisting is false, if an existing
+     *                     file could not be deleted, or if creation fails for some other reason
+     */
+    public static void createNewFile(File file, boolean deleteExisting) throws IOException
+    {
+        if (file.exists())
+        {
+            if (deleteExisting)
+            {
+                if (!file.delete())
+                {
+                    throw new IOException(String.format("Can not create file. Existing file '%s' could not be deleted.", file));                    
+                }
+            }
+            else
+            {
+                throw new IOException(String.format("Can not create file. File '%s' already exists.", file));
+            }
+        }
+        
+        if (!file.createNewFile())
+        {
+            throw new IOException(String.format("Failed to create file '%s'", file));
+        }
+    }
+
     public static void createDirectory(File file) throws IOException
     {
         if (file.exists())
@@ -392,24 +424,24 @@ public class FileSystemUtils
         }
 
         // Strip the common prefix off the path
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder builder = new StringBuilder();
         if (pathLen > 1 && (pos < pathLen || from.getPath().charAt(pos) != SEPARATOR_CHAR))
         {
             // Not a direct ancestor, need to back up
             pos = from.getPath().lastIndexOf(SEPARATOR_CHAR, pos);
-            buffer.append(path.substring(pos));
+            builder.append(path.substring(pos));
         }
 
         // Prepend a '../' for each element in the base path past the common
         // prefix
-        buffer.insert(0, "..");
+        builder.insert(0, "..");
         pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
         while (pos != -1)
         {
-            buffer.insert(0, "../");
+            builder.insert(0, "../");
             pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
         }
-        return buffer.toString();
+        return builder.toString();
     }
 
     public static boolean isParentOf(File parent, File child) throws IOException
@@ -428,7 +460,7 @@ public class FileSystemUtils
      */
     public static boolean isRelativeSymlink(File file)
     {
-        // WARNING: only detects relative symnlinks
+        // WARNING: only detects relative symlinks
         if (!SystemUtils.IS_WINDOWS)
         {
             // Try testing the canonical path then.
@@ -454,11 +486,6 @@ public class FileSystemUtils
         }
 
         return false;
-    }
-
-    public static boolean pathContainsSymlink(File file) throws IOException
-    {
-        return !SystemUtils.IS_WINDOWS && !file.getCanonicalPath().equals(file.getAbsolutePath());
     }
 
     /**
@@ -1075,8 +1102,7 @@ public class FileSystemUtils
                 IOUtils.close(out);
             }
 
-            file.delete();
-            if (!tempFile.renameTo(file))
+            if (!file.delete() || !tempFile.renameTo(file))
             {
                 throw new IOException("Unable to rename temporary file '" + tempFile.getAbsolutePath() + "' to '" + file.getAbsolutePath() + "'");
             }
@@ -1092,7 +1118,10 @@ public class FileSystemUtils
         {
             if (tempFile != null)
             {
-                tempFile.delete();
+                if (!tempFile.delete())
+                {
+                    tempFile.deleteOnExit();
+                }
             }
         }
     }
