@@ -3,19 +3,18 @@ package com.zutubi.pulse.core.commands.api;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 public class FileArtifactTest extends PulseTestCase
 {
@@ -88,6 +87,30 @@ public class FileArtifactTest extends PulseTestCase
     public void testSimpleWildcard() throws IOException
     {
         capture("*.log");
+        assertFileCaptured(FILE_LOG);
+    }
+
+    public void testWildcardAndCurrentDirectoryAtStart() throws IOException
+    {
+        capture("./file*.log");
+        assertFileCaptured(FILE_LOG);
+    }
+
+    public void testWildcardAndCurrentDirectoryWithin() throws IOException
+    {
+        capture(DIR_NESTED + "/./file*");
+        assertFileCaptured(FILE_NESTED_TXT);
+    }
+
+    public void testWildcardAndParentDirectoryAtStart() throws IOException
+    {
+        capture("../" + baseDir.getName() + "/file*.log");
+        assertFileCaptured(FILE_LOG);
+    }
+
+    public void testWildcardAndParentDirectoryWithin() throws IOException
+    {
+        capture(DIR_NESTED + "/../file*.log");
         assertFileCaptured(FILE_LOG);
     }
 

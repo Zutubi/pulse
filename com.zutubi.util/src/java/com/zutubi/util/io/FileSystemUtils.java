@@ -1405,7 +1405,7 @@ public class FileSystemUtils
     }
 
     /**
-     * Joins a path to a base, canonicalising any separators and occurences of
+     * Joins a path to a base, canonicalising any separators and occurrences of
      * '.' or '..'.  The base path, if given, should already be an a canonical
      * form.  If the path is absolute (begins with a separator) it is returned
      * unchanged.
