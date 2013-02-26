@@ -11,8 +11,12 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
@@ -21,6 +25,7 @@ import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -36,12 +41,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  */
@@ -317,19 +316,27 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         final AgentState agentState = agentStateDao.findById(agent.getId());
         if (agentState != null)
         {
+            // Note that it is not tragic if a few duplicates slip in.  The duplicate detection is
+            // to stop the list of messages from growing out of hand for agents that are never
+            // online to synchronise.  We could also consider setting a time or count limit.
             final List<AgentSynchronisationMessage> messages = agentSynchronisationMessageDao.queryMessages(agentState, AgentSynchronisationMessage.Status.QUEUED, taskType);
+            final List<AgentSynchronisationMessage> newMessages = new ArrayList<AgentSynchronisationMessage>(propertiesDescriptionPairs.size());
+            for (final Pair<Properties, String> pair: propertiesDescriptionPairs)
+            {
+                if (!matchingMessageExists(messages, pair.first, pair.second))
+                {
+                    final SynchronisationMessage message = new SynchronisationMessage(taskType, pair.first);
+                    newMessages.add(new AgentSynchronisationMessage(agentState, message, pair.second));
+                }
+            }
+            
             agentStatusManager.withAgentsLock(new NullaryFunction<Object>()
             {
                 public Object process()
                 {
-                    for (final Pair<Properties, String> pair: propertiesDescriptionPairs)
+                    for (AgentSynchronisationMessage newMessage : newMessages)
                     {
-                        if (!matchingMessageExists(messages, pair.first, pair.second))
-                        {
-                            final SynchronisationMessage message = new SynchronisationMessage(taskType, pair.first);
-                            AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, pair.second);
-                            agentSynchronisationMessageDao.save(agentMessage);
-                        }
+                        agentSynchronisationMessageDao.save(newMessage);
                     }
                     
                     agentSynchronisationMessageDao.flush();
