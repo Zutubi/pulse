@@ -18,6 +18,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
 {
     private String port = "perforce:1666";
     private String user;
+    @Password
     private String password;
     @ControllingCheckbox(checkedFields = {"spec"}, uncheckedFields = {"options", "stream", "view"})
     private boolean useTemplateClient = true;
