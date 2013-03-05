@@ -13,7 +13,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import java.util.List;
 
 /**
- *
+ * Represents a Jabber account that can receive isntant message style notifications.
  */
 @SymbolicName("zutubi.jabberContactConfig")
 @Form(fieldOrder = {"name", "username"})
@@ -25,6 +25,10 @@ public class JabberContactConfiguration extends ContactConfiguration
     private static final Logger LOG = Logger.getLogger(JabberContactConfiguration.class);
     private static final String NO_SERVER_ERROR = "Unable to send Jabber notification: Jabber server not configured.";
     private static final String NO_CONNECTION_ERROR = "Unable to send Jabber notification: not connected to Jabber server.";
+    
+    private static final String PROPERTY_MESSAGE_LENGTH_LIMIT = "pulse.jabber.length.limit";
+    private static final int DEFAULT_MESSAGE_LENGTH_LIMIT = 16384;
+    private static final int MESSAGE_LENGTH_LIMIT = Integer.getInteger(PROPERTY_MESSAGE_LENGTH_LIMIT, DEFAULT_MESSAGE_LENGTH_LIMIT);
 
     @Required
     private String username;
@@ -66,7 +70,13 @@ public class JabberContactConfiguration extends ContactConfiguration
             try
             {
                 Chat chat = connection.createChat(getUsername());
-                chat.sendMessage(rendered.getContent());
+                String message = rendered.getContent();
+                if (message.length() > MESSAGE_LENGTH_LIMIT)
+                {
+                    LOG.warning("Jabber message too long (" + message.length() + " bytes), trimming to " + MESSAGE_LENGTH_LIMIT + " bytes (set system property '" + PROPERTY_MESSAGE_LENGTH_LIMIT + "' to change this limit).");
+                    message = rendered.getContentTrimmed(MESSAGE_LENGTH_LIMIT);
+                }
+                chat.sendMessage(message);
             }
             catch (Exception e)
             {
