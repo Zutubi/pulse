@@ -4,7 +4,6 @@ import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
@@ -22,9 +21,12 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
-import static java.util.Arrays.asList;
 
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static java.util.Arrays.asList;
 
 /**
  * Sanity acceptance tests for notifications.
@@ -317,7 +319,7 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private String createGroup(String group, String... users) throws Exception
     {
-        return rpcClient.RemoteApi.insertGroup(group, CollectionUtils.map(users, new Function<String, String>()
+        return rpcClient.RemoteApi.insertGroup(group, transform(asList(users), new Function<String, String>()
         {
             public String apply(String name)
             {

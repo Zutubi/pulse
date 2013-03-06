@@ -2,24 +2,13 @@ package com.zutubi.pulse.master.dependency;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
-
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.TreeNode;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -27,6 +16,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class ProjectDependencyGraphBuilderTest extends PulseTestCase
 {
@@ -85,7 +82,7 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 List<ProjectConfiguration> configs = (List<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return newArrayList(transform(configs, new Function<ProjectConfiguration, Project>()
+                return newArrayList(Iterables.transform(configs, new Function<ProjectConfiguration, Project>()
                 {
                     public Project apply(ProjectConfiguration projectConfiguration)
                     {
@@ -342,7 +339,7 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
         config.setHandle(nextId++);
         config.setProjectId(nextId++);
 
-        config.getDependencies().getDependencies().addAll(CollectionUtils.map(dependencies, new Function<Project, DependencyConfiguration>()
+        config.getDependencies().getDependencies().addAll(transform(asList(dependencies), new Function<Project, DependencyConfiguration>()
         {
             public DependencyConfiguration apply(Project project)
             {

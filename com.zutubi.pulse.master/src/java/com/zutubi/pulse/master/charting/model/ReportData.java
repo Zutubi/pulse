@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.charting.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
@@ -10,6 +9,9 @@ import com.zutubi.util.math.AggregationFunction;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.any;
 
 /**
  * Holds the data for a full report: a collection of multiple series.
@@ -74,13 +76,13 @@ public class ReportData
         List<Number> allValues = new LinkedList<Number>();
         for (SeriesData series: seriesList)
         {
-            CollectionUtils.map(series.getPoints(), new Function<DataPoint, Number>()
+            allValues.addAll(transform(series.getPoints(), new Function<DataPoint, Number>()
             {
                 public Number apply(DataPoint dataPoint)
                 {
                     return dataPoint.getY();
                 }
-            }, allValues);
+            }));
         }
 
         return CollectionUtils.asPair(AggregationFunction.MIN.aggregate(allValues), AggregationFunction.MAX.aggregate(allValues));

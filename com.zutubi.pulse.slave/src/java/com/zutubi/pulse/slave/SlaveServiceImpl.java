@@ -31,7 +31,6 @@ import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.InstallPluginsCommand;
 import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -39,6 +38,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -242,7 +245,7 @@ public class SlaveServiceImpl implements SlaveService
         File[] listing = path.listFiles();
         if (listing != null)
         {
-            return CollectionUtils.map(listing,  new ToFileInfoFunction());
+            return newArrayList(transform(asList(listing), new ToFileInfoFunction()));
         }
 
         return new LinkedList<FileInfo>();

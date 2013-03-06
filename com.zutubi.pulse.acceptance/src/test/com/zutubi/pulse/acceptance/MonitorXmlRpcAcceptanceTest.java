@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -18,7 +20,9 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.transform;
+import static com.google.common.collect.Sets.newHashSet;
 import static com.zutubi.util.Constants.MINUTE;
 import static java.util.Arrays.asList;
 
@@ -307,13 +311,13 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(statuses.containsKey(KEY_PROJECTS));
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> projects = (Vector<Hashtable<String, Object>>) statuses.get(KEY_PROJECTS);
-        Set<String> gotProjects = CollectionUtils.map(projects, new Function<Hashtable<String, Object>, String>()
+        Set<String> gotProjects = newHashSet(transform(projects, new Function<Hashtable<String, Object>, String>()
         {
             public String apply(Hashtable<String, Object> status)
             {
                 return (String) status.get(KEY_OWNER);
             }
-        }, new HashSet<String>());
+        }));
 
         assertEquals(new HashSet<String>(asList(expectedProjects)), gotProjects);
     }

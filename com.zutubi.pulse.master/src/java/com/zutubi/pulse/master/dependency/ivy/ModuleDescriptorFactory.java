@@ -16,7 +16,6 @@ import com.zutubi.pulse.master.tove.config.project.DependenciesConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.api.Configurations;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryProcedure;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
@@ -26,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * This factory creates an ivy module descriptor from the pulse data and configuration.
@@ -102,7 +103,7 @@ public class ModuleDescriptorFactory
                         stageNames.add(stage.getName());
                         break;
                     case SELECTED_STAGES:
-                        CollectionUtils.map(dependency.getStages(), STAGE_NAME_FUNCTION, stageNames);
+                        stageNames.addAll(transform(dependency.getStages(), STAGE_NAME_FUNCTION));
                         break;
                 }
 

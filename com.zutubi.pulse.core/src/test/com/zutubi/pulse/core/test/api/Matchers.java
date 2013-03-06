@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.test.api;
 
 import com.google.common.base.Function;
-import com.zutubi.util.CollectionUtils;
 import org.hamcrest.Matcher;
 
-import java.util.Arrays;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * Static factory methods for Pulse's own Hamcrest matchers.
@@ -23,13 +24,13 @@ public class Matchers
      */
     public static <T> Iterable<Matcher<? super T>> getEqualToMatchers(T... items)
     {
-        return CollectionUtils.map(items, new Function<T, Matcher<? super T>>()
+        return newArrayList(transform(asList(items), new Function<T, Matcher<? super T>>()
         {
             public Matcher<? super T> apply(T t)
             {
                 return org.hamcrest.Matchers.equalTo(t);
             }
-        });
+        }));
     }
 
     /**
@@ -58,7 +59,7 @@ public class Matchers
      */
     public static <T> IsOrderedIterable<T> hasOrderedItems(Matcher<? super T>... matchers)
     {
-        return new IsOrderedIterable<T>(Arrays.asList(matchers));
+        return new IsOrderedIterable<T>(asList(matchers));
     }
 
     /**

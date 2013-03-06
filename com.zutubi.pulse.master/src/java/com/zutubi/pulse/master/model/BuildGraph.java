@@ -2,12 +2,13 @@ package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.zutubi.util.CollectionUtils;
+import com.google.common.collect.Iterables;
 import com.zutubi.util.adt.DAGraph;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * A build dependency graph, linking a root build to all of its dependencies in one direction
@@ -53,14 +54,13 @@ public class BuildGraph extends DAGraph<BuildResult>
     public Set<BuildPath> getBuildPaths(Node<BuildResult> node)
     {
         Set<List<Node<BuildResult>>> paths = getAllPathsTo(node);
-        Set<BuildPath> buildPaths = new HashSet<BuildPath>();
-        return CollectionUtils.map(paths, new Function<List<Node<BuildResult>>, BuildPath>()
+        return newHashSet(Iterables.transform(paths, new Function<List<Node<BuildResult>>, BuildPath>()
         {
             public BuildPath apply(List<Node<BuildResult>> path)
             {
                 return new BuildPath(path);
             }
-        }, buildPaths);
+        }));
     }
 
     /**

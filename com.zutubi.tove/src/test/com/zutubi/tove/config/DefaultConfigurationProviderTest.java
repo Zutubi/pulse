@@ -10,14 +10,16 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.util.CollectionUtils;
-import static java.util.Arrays.asList;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Arrays.asList;
 
 public class DefaultConfigurationProviderTest extends AbstractConfigurationSystemTestCase
 {
@@ -206,13 +208,13 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     private Set<String> getAllDescendantPaths(String path, boolean strict, boolean concreteOnly)
     {
         Set<A> instances = configurationProvider.getAllDescendants(path, A.class, strict, concreteOnly);
-        return CollectionUtils.map(instances, new Function<A, String>()
+        return newHashSet(transform(instances, new Function<A, String>()
         {
             public String apply(A a)
             {
                 return a.getConfigurationPath();
             }
-        }, new HashSet<String>());
+        }));
     }
 
     @SymbolicName("a")

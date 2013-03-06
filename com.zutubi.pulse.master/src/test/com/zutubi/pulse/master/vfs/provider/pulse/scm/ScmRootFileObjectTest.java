@@ -8,7 +8,6 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import org.apache.commons.vfs.FileName;
@@ -19,11 +18,15 @@ import org.apache.commons.vfs.cache.NullFilesCache;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.mockito.Matchers;
+
+import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-
-import java.util.List;
 
 /**
  * Tests for the ScmRootFileObject AND the ScmFileObject classes.  It does not make
@@ -182,13 +185,13 @@ public class ScmRootFileObjectTest extends PulseTestCase
 
     private List<ScmFile> list(String... names)
     {
-        return CollectionUtils.map(names, new Function<String, ScmFile>()
+        return newArrayList(transform(asList(names), new Function<String, ScmFile>()
         {
             public ScmFile apply(String s)
             {
                 return new ScmFile(s, !s.endsWith(".txt"));
             }
-        });
+        }));
     }
 
     private void registerDirectoryListing(String dir, String... listing) throws ScmException

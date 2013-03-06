@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
@@ -33,6 +34,9 @@ import org.tmatesoft.svn.core.wc.SVNWCClient;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class SubversionWorkingCopyTest extends PulseTestCase
 {
@@ -502,14 +506,15 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         edit("dir1/file1");
         edit("dir1/file2");
         WorkingCopyStatus wcs = wc.getLocalStatus(context, "dir1");
-        Set<String> paths = CollectionUtils.map(wcs.getFileStatuses(), new Function<FileStatus, String>() {
+        Set<String> paths = newHashSet(transform(wcs.getFileStatuses(), new Function<FileStatus, String>()
+        {
 
             public String apply(FileStatus fileStatus)
             {
                 return fileStatus.getPath();
             }
-        }, new HashSet<String>(2));
-        assertEquals(Sets.newHashSet("dir1/file1", "dir1/file2"), paths);
+        }));
+        assertEquals(newHashSet("dir1/file1", "dir1/file2"), paths);
     }
 
     public void testUpdateAlreadyUpToDate() throws Exception

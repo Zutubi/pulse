@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -11,10 +13,11 @@ import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 public abstract class ProjectsModelTestBase extends PulseTestCase
 {
@@ -158,7 +161,7 @@ public abstract class ProjectsModelTestBase extends PulseTestCase
     {
         ProjectConfiguration configuration = new ProjectConfiguration();
         configuration.setName(name);
-        configuration.setLabels(CollectionUtils.map(labels, new Function<String, LabelConfiguration>()
+        configuration.setLabels(newArrayList(transform(asList(labels), new Function<String, LabelConfiguration>()
         {
             public LabelConfiguration apply(String s)
             {
@@ -166,7 +169,7 @@ public abstract class ProjectsModelTestBase extends PulseTestCase
                 label.setLabel(s);
                 return label;
             }
-        }));
+        })));
 
         Project project = new Project();
         project.setId(nextId++);

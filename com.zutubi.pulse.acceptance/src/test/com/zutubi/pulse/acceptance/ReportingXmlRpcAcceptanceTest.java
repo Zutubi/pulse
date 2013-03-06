@@ -2,16 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
-import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
 import com.zutubi.pulse.master.agent.AgentManager;
@@ -23,16 +13,27 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.IOUtils;
+
+import java.io.File;
+import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
+import static com.zutubi.pulse.acceptance.Constants.Project.AntCommand.TARGETS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.DirectoryArtifact.BASE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
-
-import java.io.File;
-import java.util.*;
 
 /**
  * Tests for the remote API, primarily the reporting functionality.
@@ -697,7 +698,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private void assertRequestStatusIn(Hashtable<String, Object> status, BuildRequestRegistry.RequestStatus... allowedStatuses)
     {
-        assertThat(CollectionUtils.map(allowedStatuses, Functions.toStringFunction()), hasItem((String) status.get("status")));
+        assertThat(transform(asList(allowedStatuses), Functions.toStringFunction()), hasItem((String) status.get("status")));
     }
 
     private void ensureProjectHierarchy() throws Exception

@@ -67,6 +67,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
 
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Lists.transform;
@@ -1818,7 +1819,7 @@ public class RemoteApi
     private Vector<String> getConfigNames(Collection<ProjectConfiguration> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
-        CollectionUtils.map(projects, Configurations.toConfigurationName(), result);
+        result.addAll(transform(projects, Configurations.toConfigurationName()));
 
         return result;
     }
@@ -1826,13 +1827,13 @@ public class RemoteApi
     private Vector<String> getNames(Collection<Project> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
-        CollectionUtils.map(projects, new Function<Project, String>()
+        result.addAll(transform(projects, new Function<Project, String>()
         {
             public String apply(Project project)
             {
                 return project.getName();
             }
-        }, result);
+        }));
 
         return result;
     }
@@ -1878,13 +1879,13 @@ public class RemoteApi
         {
             List<Agent> agents = agentManager.getAllAgents();
             Vector<String> result = new Vector<String>(agents.size());
-            CollectionUtils.map(agents, new Function<Agent, String>()
+            result.addAll(transform(agents, new Function<Agent, String>()
             {
                 public String apply(Agent agent)
                 {
                     return agent.getConfig().getName();
                 }
-            }, result);
+            }));
 
             return result;
         }

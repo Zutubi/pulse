@@ -5,7 +5,6 @@ import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  */
@@ -46,13 +47,13 @@ public class ProjectLabelOptionProvider extends ListOptionProvider
             }
         }
 
-        CollectionUtils.map(projectManager.getAllProjectGroups(), new Function<ProjectGroup, String>()
+        sortedLabels.addAll(transform(projectManager.getAllProjectGroups(), new Function<ProjectGroup, String>()
         {
             public String apply(ProjectGroup projectGroup)
             {
                 return projectGroup.getName();
             }
-        }, sortedLabels);
+        }));
 
         return new ArrayList<String>(sortedLabels);
     }

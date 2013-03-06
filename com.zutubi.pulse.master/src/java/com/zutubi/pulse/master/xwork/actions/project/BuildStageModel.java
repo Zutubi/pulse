@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -16,10 +17,10 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * Defines JSON data for a build stage.
@@ -61,7 +62,7 @@ public class BuildStageModel extends ResultModel
             List<ActionLink> collectedArtifacts = new LinkedList<ActionLink>();
             for (final CommandResult commandResult: recipeResult.getCommandResults())
             {
-                Iterable<StoredArtifact> commandFeaturedArtifacts = Iterables.filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
+                Collection<StoredArtifact> commandFeaturedArtifacts = filter(commandResult.getArtifacts(), new Predicate<StoredArtifact>()
                 {
                     public boolean apply(StoredArtifact storedArtifact)
                     {
@@ -69,7 +70,7 @@ public class BuildStageModel extends ResultModel
                     }
                 });
 
-                CollectionUtils.map(commandFeaturedArtifacts, new Function<StoredArtifact, ActionLink>()
+                collectedArtifacts.addAll(transform(commandFeaturedArtifacts, new Function<StoredArtifact, ActionLink>()
                 {
                     public ActionLink apply(StoredArtifact artifact)
                     {
@@ -108,7 +109,7 @@ public class BuildStageModel extends ResultModel
 
                         return new ActionLink(url, artifact.getName(), icon);
                     }
-                }, collectedArtifacts);
+                }));
             }
 
             if (collectedArtifacts.size() > 0)

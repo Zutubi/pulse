@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.webwork;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
@@ -38,7 +39,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
@@ -210,7 +211,7 @@ public class ToveUtils
             final Record value = configurationTemplateManager.getRecord(path);
 
             // Get property/display name pairs
-            List<Pair<String, String>> propertyDisplayPairs = newArrayList(transform(nestedProperties, new Function<String, Pair<String, String>>()
+            List<Pair<String, String>> propertyDisplayPairs = newArrayList(Iterables.transform(nestedProperties, new Function<String, Pair<String, String>>()
             {
                 public Pair<String, String> apply(String s)
                 {
@@ -230,13 +231,13 @@ public class ToveUtils
             });
 
             // Pull out property names and add to result
-            CollectionUtils.map(propertyDisplayPairs, new Function<Pair<String, String>, String>()
+            result.addAll(transform(propertyDisplayPairs, new Function<Pair<String, String>, String>()
             {
                 public String apply(Pair<String, String> pair)
                 {
                     return pair.first;
                 }
-            }, result);
+            }));
         }
 
         return result;

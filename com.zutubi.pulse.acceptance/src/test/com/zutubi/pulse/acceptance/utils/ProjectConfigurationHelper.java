@@ -11,15 +11,18 @@ import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.*;
+import static java.util.Arrays.asList;
 
 /**
  * The project configuration helper is the base class for the various types
@@ -169,13 +172,13 @@ public abstract class ProjectConfigurationHelper
         if (stageNames.length > 0)
         {
             dependency.setStageType(DependencyConfiguration.StageType.SELECTED_STAGES);
-            dependency.setStages(CollectionUtils.map(stageNames, new Function<String, BuildStageConfiguration>()
+            dependency.setStages(newArrayList(transform(asList(stageNames), new Function<String, BuildStageConfiguration>()
             {
                 public BuildStageConfiguration apply(String stageName)
                 {
                     return target.getStage(stageName);
                 }
-            }));
+            })));
         }
         return dependency;
     }

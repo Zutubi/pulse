@@ -15,7 +15,6 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.agent.SynchronisationTaskRunnerService;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.filesystem.ToFileInfoFunction;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
 
@@ -23,6 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * A service to communicate with agents running within the master.
@@ -121,7 +124,7 @@ public class MasterAgentService implements AgentService
         File[] listing = path.listFiles();
         if (listing != null)
         {
-            return CollectionUtils.map(listing,  new ToFileInfoFunction());
+            return newArrayList(transform(asList(listing), new ToFileInfoFunction()));
         }
 
         return new LinkedList<FileInfo>();

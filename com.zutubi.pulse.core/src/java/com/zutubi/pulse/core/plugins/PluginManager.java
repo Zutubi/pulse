@@ -2,15 +2,12 @@ package com.zutubi.pulse.core.plugins;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
 import com.zutubi.pulse.core.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -30,6 +27,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.*;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * The PluginManager is responsible for handling everything needed to support plugins.
@@ -741,15 +742,15 @@ public class PluginManager
         }
 
         BundleSpecification[] requiredBundles = description.getRequiredBundles();
-        return CollectionUtils.map(requiredBundles, new Function<BundleSpecification, PluginDependency>()
+        return newArrayList(transform(asList(requiredBundles), new Function<BundleSpecification, PluginDependency>()
         {
             public PluginDependency apply(BundleSpecification bundleSpecification)
             {
                 return new PluginDependency(bundleSpecification.getName(),
-                        convertVersionRange(bundleSpecification.getVersionRange()),
-                        getPlugin(bundleSpecification.getName()));
+                                            convertVersionRange(bundleSpecification.getVersionRange()),
+                                            getPlugin(bundleSpecification.getName()));
             }
-        });
+        }));
     }
 
     private PluginVersionRange convertVersionRange(org.eclipse.osgi.service.resolver.VersionRange versionRange)
@@ -892,7 +893,7 @@ public class PluginManager
             byPlugin.add(extension);
         }
 
-        return DependencySort.sort(Arrays.asList(extensions), new Function<IExtension, Set<IExtension>>()
+        return DependencySort.sort(asList(extensions), new Function<IExtension, Set<IExtension>>()
         {
             public Set<IExtension> apply(IExtension extension)
             {

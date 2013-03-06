@@ -3,7 +3,10 @@ package com.zutubi.pulse.core.scm.p4;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.partition;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -237,13 +240,13 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         command.add(clientName);
         command.add(COMMAND_WHERE);
 
-        CollectionUtils.map(changes, new Function<FileChange, String>()
+        command.addAll(transform(changes, new Function<FileChange, String>()
         {
             public String apply(FileChange fileChange)
             {
                 return fileChange.getPath();
             }
-        }, command);
+        }));
 
         final boolean[] stdoutSeen = new boolean[]{false};
         core.runP4WithHandler(new PerforceErrorDetectingFeedbackHandler(false)

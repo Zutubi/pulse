@@ -2,10 +2,7 @@ package com.zutubi.util.reflection;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.BeanUtils;
-import static java.util.Arrays.asList;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -15,6 +12,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
 
 /**
  *
@@ -96,13 +97,13 @@ public class AnnotationUtils
     private static List<Annotation> addMetaAnnotations(List<Annotation> annotations)
     {
         Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
-        CollectionUtils.map(annotations, new Function<Annotation, Class<? extends Annotation>>()
+        seenTypes.addAll(transform(annotations, new Function<Annotation, Class<? extends Annotation>>()
         {
             public Class<? extends Annotation> apply(Annotation annotation)
             {
                 return annotation.annotationType();
             }
-        }, seenTypes);
+        }));
 
         List<Annotation> result = new LinkedList<Annotation>();
         Queue<Annotation> toProcess = new LinkedList<Annotation>(annotations);
@@ -235,13 +236,13 @@ public class AnnotationUtils
     public static <T extends Annotation> T findAnnotation(List<Annotation> from, Class<T> clazz)
     {
         Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
-        CollectionUtils.map(from, new Function<Annotation, Class<? extends Annotation>>()
+        seenTypes.addAll(transform(from, new Function<Annotation, Class<? extends Annotation>>()
         {
             public Class<? extends Annotation> apply(Annotation annotation)
             {
                 return annotation.annotationType();
             }
-        }, seenTypes);
+        }));
 
         Queue<Annotation> toProcess = new LinkedList<Annotation>(from);
         while (!toProcess.isEmpty())

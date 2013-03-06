@@ -16,6 +16,8 @@ import java.io.File;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * The action that allows for the viewing of a test suite.  The input for this
@@ -131,13 +133,13 @@ public class ViewTestSuiteAction extends StageActionBase
         if(StringUtils.stringSet(path))
         {
             String[] elements = path.split("/");
-            paths = CollectionUtils.map(elements, new Function<String, String>()
+            paths = newArrayList(transform(asList(elements), new Function<String, String>()
             {
                 public String apply(String s)
                 {
                     return WebUtils.uriComponentDecode(s);
                 }
-            });
+            }));
 
             String[] encodedElements = CollectionUtils.mapToArray(paths, new Function<String, String>()
             {

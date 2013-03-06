@@ -28,7 +28,6 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.links.ConfigurationLinks;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 
@@ -38,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import static java.util.Arrays.asList;
@@ -82,8 +81,8 @@ public class ProjectHomeDataAction extends ProjectActionBase
         // that request must have been activate between snapshotting and
         // querying the builds.
         final Set<Long> activatedBuilds = new HashSet<Long>();
-        CollectionUtils.map(inProgress, BuildResults.toNumber(), activatedBuilds);
-        CollectionUtils.map(latestCompleted, BuildResults.toNumber(), activatedBuilds);
+        activatedBuilds.addAll(transform(inProgress, BuildResults.toNumber()));
+        activatedBuilds.addAll(transform(latestCompleted, BuildResults.toNumber()));
         Iterables.removeIf(queued, new Predicate<QueuedRequest>()
         {
             public boolean apply(QueuedRequest queuedRequest)
@@ -143,7 +142,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
             if (!brokenNodes.isEmpty())
             {
-                brokenStages = newArrayList(transform(brokenNodes, new Function<RecipeResultNode, BuildStageModel>()
+                brokenStages = newArrayList(Iterables.transform(brokenNodes, new Function<RecipeResultNode, BuildStageModel>()
                 {
                     public BuildStageModel apply(RecipeResultNode recipeResultNode)
                     {
@@ -182,13 +181,14 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private void addActivity(List<QueuedRequest> queued, List<BuildResult> inProgress, BuildResultToModelFunction buildMapping)
     {
         ProjectConfiguration projectConfig = getProject().getConfig();
-        CollectionUtils.map(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig.getChangeViewer()), model.getActivity());
-        CollectionUtils.map(inProgress, buildMapping, model.getActivity());
+        final List<BuildModel> activity = model.getActivity();
+        activity.addAll(transform(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig.getChangeViewer())));
+        activity.addAll(transform(inProgress, buildMapping));
     }
 
     private void addRecent(List<BuildResult> completed, BuildResultToModelFunction buildMapping)
     {
-        CollectionUtils.map(completed, buildMapping, model.getRecent());
+        model.getRecent().addAll(transform(completed, buildMapping));
     }
 
     private void addDescription(ProjectConfiguration projectConfig)
@@ -280,13 +280,13 @@ public class ProjectHomeDataAction extends ProjectActionBase
         ProjectConfiguration projectConfiguration = getProject().getConfig();
         final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
         final Collection<CommitMessageTransformerConfiguration> transformers = projectConfiguration.getCommitMessageTransformers().values();
-        CollectionUtils.map(latestChanges, new Function<PersistentChangelist, ChangelistModel>()
+        model.getChanges().addAll(transform(latestChanges, new Function<PersistentChangelist, ChangelistModel>()
         {
             public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, changeViewer, transformers);
             }
-        }, model.getChanges());
+        }));
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

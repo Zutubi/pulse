@@ -10,13 +10,15 @@ import com.zutubi.pulse.master.events.AgentStatusChangeEvent;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
 import com.zutubi.pulse.master.model.persistence.AgentDailyStatisticsDao;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Keeps agent statistics up to date by listening to agent status changes.
@@ -95,14 +97,13 @@ public class AgentStatisticsManager implements EventListener
         agentDailyStatisticsDao.deleteByDayStampBefore(calendar.getTimeInMillis());
 
         // And those that are for agents that no longer exist.
-        Set<Long> allIds = new HashSet<Long>();
-        CollectionUtils.map(agentManager.getAllAgents(), new Function<Agent, Long>()
+        Set<Long> allIds = newHashSet(transform(agentManager.getAllAgents(), new Function<Agent, Long>()
         {
             public Long apply(Agent agent)
             {
                 return agent.getId();
             }
-        }, allIds);
+        }));
 
         agentDailyStatisticsDao.deleteByAgentNotIn(allIds);
     }

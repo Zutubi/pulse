@@ -2,9 +2,12 @@ package com.zutubi.pulse.core.engine.api;
 
 import com.google.common.base.Function;
 import com.zutubi.pulse.core.test.api.IsOrderedIterable;
-import static com.zutubi.pulse.core.test.api.Matchers.hasOrderedItems;
 import com.zutubi.util.CollectionUtils;
 import org.hamcrest.Matcher;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.zutubi.pulse.core.test.api.Matchers.hasOrderedItems;
+import static java.util.Arrays.asList;
 
 /**
  * Helper class with static factories for building feature matchers.  These
@@ -61,7 +64,7 @@ public class FeatureMatchers
      */
     public static IsOrderedIterable<Feature> hasOrderedFeatures(Feature... features)
     {
-        return hasOrderedItems(CollectionUtils.map(features, new Function<Feature, Matcher<? super Feature>>()
+        return hasOrderedItems(transform(asList(features), new Function<Feature, Matcher<? super Feature>>()
         {
             public Matcher<? super Feature> apply(Feature feature)
             {
