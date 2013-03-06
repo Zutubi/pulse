@@ -6,40 +6,18 @@ import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
  */
 public class CollectionUtils
 {
-    public static <T, U> U[] mapToArray(Iterable<T> iterable, Function<T, U> m, U[] out)
-    {
-        int i = 0;
-        for(T t: iterable)
-        {
-            out[i++] = m.apply(t);
-        }
-
-        return out;
-    }
-
-    public static <T> T[] mapToArray(T[] in, Function<T, T> m)
-    {
-        return mapToArray(in, m, (T[])Array.newInstance(in.getClass().getComponentType(), in.length), 0);
-    }
-
     public static <T, U> U[] mapToArray(T[] in, Function<T, U> m, U[] out)
-    {
-        return mapToArray(in, m, out, 0);
-    }
-
-    public static <T, U> U[] mapToArray(T[] in, Function<T, U> m, U[] out, int offset)
     {
         int i = 0;
         for(T t: in)
         {
-            out[i++ + offset] = m.apply(t);
+            out[i++] = m.apply(t);
         }
 
         return out;

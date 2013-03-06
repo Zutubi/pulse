@@ -2,20 +2,15 @@ package com.zutubi.pulse.acceptance.forms;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.base.Predicates.instanceOf;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.tove.annotations.Field;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
-import static java.util.Arrays.asList;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -25,6 +20,12 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
 
 /**
  * Base for forms that are based off a configuration class, where
@@ -69,13 +70,13 @@ public class ConfigurationForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return CollectionUtils.mapToArray(fields, new Function<FieldInfo, String>()
+        return transform(fields, new Function<FieldInfo, String>()
         {
             public String apply(FieldInfo fieldInfo)
             {
                 return fieldInfo.name;
             }
-        }, new String[fields.size()]);
+        }).toArray(new String[fields.size()]);
     }
 
     public int[] getFieldTypes()

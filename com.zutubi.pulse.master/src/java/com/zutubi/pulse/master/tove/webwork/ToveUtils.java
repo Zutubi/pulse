@@ -27,7 +27,10 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.*;
+import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
+import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
 import freemarker.core.DelegateBuiltin;
@@ -117,7 +120,7 @@ public class ToveUtils
                 }
             }
 
-            parameterValue = CollectionUtils.mapToArray(parameterValue, StringUtils.trim(), new String[parameterValue.length]);            
+            parameterValue = transform(Arrays.asList(parameterValue), StringUtils.trim()).toArray(new String[parameterValue.length]);
 
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {

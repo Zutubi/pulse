@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.zutubi.pulse.core.model.PersistentTestSuiteResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -141,13 +141,13 @@ public class ViewTestSuiteAction extends StageActionBase
                 }
             }));
 
-            String[] encodedElements = CollectionUtils.mapToArray(paths, new Function<String, String>()
+            String[] encodedElements = Collections2.transform(paths, new Function<String, String>()
             {
                 public String apply(String s)
                 {
                     return urlEncode(s);
                 }
-            }, new String[elements.length]);
+            }).toArray(new String[elements.length]);
 
             testDir = new File(testDir, FileSystemUtils.composeFilename(encodedElements));
         }

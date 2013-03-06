@@ -2,10 +2,6 @@ package com.zutubi.util.reflection;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Sets.newHashSet;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 
@@ -14,6 +10,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Arrays.asList;
 
 /**
  * A collection of useful methods for reflection.  Essentially a higher-level
@@ -62,13 +64,13 @@ public class ReflectionUtils
     private static Set<Class> getInterfacesTransitive(Class clazz)
     {
         Queue<Class> toProcess = new LinkedList<Class>();
-        toProcess.addAll(Arrays.asList(clazz.getInterfaces()));
+        toProcess.addAll(asList(clazz.getInterfaces()));
         Set<Class> superInterfaces = new HashSet<Class>();
         while(!toProcess.isEmpty())
         {
             clazz = toProcess.remove();
             superInterfaces.add(clazz);
-            toProcess.addAll(Arrays.asList(clazz.getInterfaces()));
+            toProcess.addAll(asList(clazz.getInterfaces()));
         }
 
         return superInterfaces;
@@ -159,7 +161,7 @@ public class ReflectionUtils
         Set<Field> result = new HashSet<Field>();
         for (Class c: getSupertypes(clazz, stopClazz, false))
         {
-            result.addAll(Arrays.asList(c.getDeclaredFields()));
+            result.addAll(asList(c.getDeclaredFields()));
         }
 
         return result;
@@ -517,13 +519,13 @@ public class ReflectionUtils
             addBeanPropertiesFromClass(iface, null, descriptors);
         }
 
-        return CollectionUtils.mapToArray(descriptors.values(), new Function<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
+        return transform(descriptors.values(), new Function<Pair<Class, PropertyDescriptor>, PropertyDescriptor>()
         {
             public PropertyDescriptor apply(Pair<Class, PropertyDescriptor> pair)
             {
                 return pair.second;
             }
-        }, new PropertyDescriptor[descriptors.size()]);
+        }).toArray(new PropertyDescriptor[descriptors.size()]);
     }
 
     private static void addBeanPropertiesFromClass(Class<?> clazz, Class<Object> stopClass, Map<String, Pair<Class, PropertyDescriptor>> descriptors) throws IntrospectionException
@@ -557,14 +559,13 @@ public class ReflectionUtils
     {
         try
         {
-            Class[] types = new Class[args.length];
-            CollectionUtils.mapToArray(args, new Function<Object, Class>()
+            Class[] types = transform(asList(args), new Function<Object, Class>()
             {
                 public Class apply(Object o)
                 {
                     return o.getClass();
                 }
-            }, types);
+            }).toArray(new Class[args.length]);
 
             Method method = null;
             for (Class targetClass : getSuperclasses(target.getClass(), Object.class, false))

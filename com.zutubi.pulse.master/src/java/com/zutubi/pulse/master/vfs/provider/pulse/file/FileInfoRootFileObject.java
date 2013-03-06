@@ -3,13 +3,14 @@ package com.zutubi.pulse.master.vfs.provider.pulse.file;
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * A base implementation for any file object that intends to be the root of a
@@ -47,12 +48,12 @@ public abstract class FileInfoRootFileObject extends AbstractPulseFileObject imp
             return NO_CHILDREN;
         }
         
-        return UriParser.encode(CollectionUtils.mapToArray(children, new Function<FileInfo, String>()
+        return UriParser.encode(transform(children, new Function<FileInfo, String>()
         {
             public String apply(FileInfo fileInfo)
             {
                 return fileInfo.getName();
             }
-        }, new String[children.size()]));
+        }).toArray(new String[children.size()]));
     }
 }

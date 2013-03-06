@@ -13,12 +13,15 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+
+import static com.google.common.collect.Collections2.transform;
+import static java.util.Arrays.asList;
 
 public class DefaultCommandContextTest extends PulseTestCase
 {
@@ -143,18 +146,23 @@ public class DefaultCommandContextTest extends PulseTestCase
     
     private DefaultCommandContext createContextWithErrorFeatures(CommandResult commandResult, int perFileFeatureLimit, final String... errors)
     {
-        Feature[] features = CollectionUtils.mapToArray(errors, new Function<String, Feature>()
+        Collection<Feature> features = transform(asList(errors), new Function<String, Feature>()
         {
             public Feature apply(String s)
             {
                 return error(s);
             }
-        }, new Feature[errors.length]);
+        });
         
         return createContextWithFeatures(commandResult, perFileFeatureLimit, features);
     }
 
-    private DefaultCommandContext createContextWithFeatures(CommandResult commandResult, int perFileFeatureLimit, final Feature... features)
+    private DefaultCommandContext createContextWithFeatures(CommandResult commandResult, int perFileFeatureLimit, Feature... features)
+    {
+        return createContextWithFeatures(commandResult, perFileFeatureLimit, asList(features));
+    }
+
+    private DefaultCommandContext createContextWithFeatures(CommandResult commandResult, int perFileFeatureLimit, final Collection<Feature> features)
     {
         PulseExecutionContext executionContext = new PulseExecutionContext();
         executionContext.addValue(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());

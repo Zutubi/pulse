@@ -1,7 +1,7 @@
 package com.zutubi.util.reflection;
 
 import com.google.common.base.Function;
-import com.zutubi.util.CollectionUtils;
+import com.google.common.collect.Iterables;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -605,7 +605,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void declaredFieldsHelper(Class clazz, Class stopClazz, String... expected)
     {
-        List<String> names = newArrayList(transform(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameFunction()));
+        List<String> names = newArrayList(Iterables.transform(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameFunction()));
         Collections.sort(names);
         assertEquals(asList(expected), names);
     }
@@ -898,13 +898,13 @@ public class ReflectionUtilsTest extends ZutubiTestCase
     private void beanPropertiesHelper(final Class<?> clazz, String... expectedNames) throws IntrospectionException
     {
         PropertyDescriptor[] properties = ReflectionUtils.getBeanProperties(clazz);
-        String[] names = CollectionUtils.mapToArray(properties, new Function<PropertyDescriptor, String>()
+        String[] names = transform(asList(properties), new Function<PropertyDescriptor, String>()
         {
             public String apply(PropertyDescriptor propertyDescriptor)
             {
                 return propertyDescriptor.getName();
             }
-        }, new String[properties.length]);
+        }).toArray(new String[properties.length]);
 
         assertEquals(expectedNames.length, properties.length);
 

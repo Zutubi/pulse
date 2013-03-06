@@ -4,13 +4,14 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.ToPluginIdFunction;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * A file to represent all installed plugins.  Viewing gives a summary of all
@@ -48,7 +49,7 @@ public class PluginsFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         List<Plugin> allPlugins = pluginManager.getPlugins();
-        return UriParser.encode(CollectionUtils.mapToArray(allPlugins, new ToPluginIdFunction(), new String[allPlugins.size()]));
+        return UriParser.encode(transform(allPlugins, new ToPluginIdFunction()).toArray(new String[allPlugins.size()]));
     }
 
     @Override

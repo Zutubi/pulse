@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -15,14 +13,14 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Collections2.transform;
+
 /**
  * Represents the details of a single stage in a single build - tailored to
  * provide information for the details tab.
  */
 public class StageDetailsFileObject extends AbstractResultDetailsFileObject implements RecipeResultProvider
 {
-    private static final Logger LOG = Logger.getLogger(StageDetailsFileObject.class);
-    
     public StageDetailsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -44,13 +42,13 @@ public class StageDetailsFileObject extends AbstractResultDetailsFileObject impl
     protected String[] doListChildren() throws Exception
     {
         List<CommandResult> commandResults = getRecipeResult().getCommandResults();
-        return CollectionUtils.mapToArray(commandResults, new Function<CommandResult, String>()
+        return transform(commandResults, new Function<CommandResult, String>()
         {
             public String apply(CommandResult commandResult)
             {
                 return commandResult.getCommandName();
             }
-        }, new String[commandResults.size()]);
+        }).toArray(new String[commandResults.size()]);
     }
 
     public RecipeResult getRecipeResult() throws FileSystemException

@@ -7,13 +7,11 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectConfigProvider;
 import com.zutubi.pulse.master.vfs.provider.pulse.ProjectProvider;
 import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileName;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
@@ -23,6 +21,9 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
  * The base ScmFileObject class that contains the common functionality between
@@ -82,13 +83,13 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         List<ScmFile> children = getScmChildren();
-        return UriParser.encode(CollectionUtils.mapToArray(children, new Function<ScmFile, String>()
+        return UriParser.encode(transform(children, new Function<ScmFile, String>()
         {
             public String apply(ScmFile scmFile)
             {
                 return scmFile.getName() + ((scmFile.isDirectory()) ? DIRECTORY_SUFFIX : FILE_SUFFIX);
             }
-        }, new String[children.size()]));
+        }).toArray(new String[children.size()]));
     }
 
     private List<ScmFile> getScmChildren() throws FileSystemException

@@ -1,7 +1,6 @@
 package com.zutubi.tove.type.record;
 
 import com.google.common.base.Function;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
@@ -9,6 +8,9 @@ import nu.xom.*;
 import java.io.*;
 import java.text.DateFormat;
 import java.util.Date;
+
+import static com.google.common.collect.Collections2.transform;
+import static java.util.Arrays.asList;
 
 /**
  * A record serialiser that takes a record and writes it to file.
@@ -125,7 +127,7 @@ public class XmlRecordSerialiser
 
     private Element createElement(String elementName, String key, String[] values)
     {
-        return createElement(elementName, key, CollectionUtils.mapToArray(values, new Function<String, Element>()
+        return createElement(elementName, key, transform(asList(values), new Function<String, Element>()
         {
             public Element apply(String s)
             {
@@ -133,7 +135,7 @@ public class XmlRecordSerialiser
                 e.appendChild(new Text(s));
                 return e;
             }
-        }, new Element[values.length]));
+        }).toArray(new Element[values.length]));
     }
 
     private Element createElement(String elementName, String key, Node... children)

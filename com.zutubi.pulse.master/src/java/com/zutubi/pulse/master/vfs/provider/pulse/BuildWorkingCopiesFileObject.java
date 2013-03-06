@@ -3,13 +3,14 @@ package com.zutubi.pulse.master.vfs.provider.pulse;
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * Represents the working copies for a build, keyed by stage.
@@ -46,13 +47,13 @@ public class BuildWorkingCopiesFileObject extends AbstractPulseFileObject
         }
 
         List<RecipeResultNode> stages = result.getStages();
-        return CollectionUtils.mapToArray(stages, new Function<RecipeResultNode, String>()
+        return transform(stages, new Function<RecipeResultNode, String>()
         {
             public String apply(RecipeResultNode node)
             {
                 return Long.toString(node.getResult().getId());
             }
-        }, new String[stages.size()]);
+        }).toArray(new String[stages.size()]);
     }
 
     private BuildResult getBuildResult() throws FileSystemException

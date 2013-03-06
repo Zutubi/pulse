@@ -4,9 +4,11 @@ import com.google.common.base.Function;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.Arrays;
+
+import static com.google.common.collect.Collections2.transform;
+import static java.util.Arrays.asList;
 
 /**
  * Identifies a reference that is not pulled up to the highest level.  All
@@ -56,7 +58,7 @@ public class NonCanonicalReferenceProblem extends HealthProblemSupport
                 else if (value instanceof String[])
                 {
                     String[] references = (String[]) value;
-                    String[] canonicalised = CollectionUtils.mapToArray(references, new Function<String, String>()
+                    String[] canonicalised = transform(asList(references), new Function<String, String>()
                     {
                         public String apply(String s)
                         {
@@ -69,7 +71,7 @@ public class NonCanonicalReferenceProblem extends HealthProblemSupport
                                 return s;
                             }
                         }
-                    }, new String[references.length]);
+                    }).toArray(new String[references.length]);
                     
                     if (!Arrays.equals(references, canonicalised))
                     {

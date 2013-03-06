@@ -1,14 +1,11 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
 import com.google.common.base.Function;
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
-import static java.util.Arrays.asList;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -18,6 +15,11 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * Abstract base for all reference doc files.  Handles common behaviour such as
@@ -74,13 +76,13 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
             if (candidateDir.isDirectory())
             {
                 String[] templates = candidateDir.list(new SuffixFileFilter(SUFFIX_VELOCITY));
-                staticChildren = CollectionUtils.mapToArray(templates, new Function<String, String>()
+                staticChildren = transform(asList(templates), new Function<String, String>()
                 {
                     public String apply(String s)
                     {
                         return s.substring(0, s.length() - SUFFIX_VELOCITY.length());
                     }
-                }, new String[templates.length]);
+                }).toArray(new String[templates.length]);
             }
             else
             {

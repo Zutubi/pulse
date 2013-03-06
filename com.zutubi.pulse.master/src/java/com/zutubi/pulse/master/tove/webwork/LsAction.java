@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.webwork;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
@@ -18,11 +17,8 @@ import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
-import static java.util.Arrays.asList;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.UriParser;
 
@@ -32,6 +28,11 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -219,9 +220,9 @@ public class LsAction extends VFSActionSupport
         if (children != null)
         {
             sortChildren(fileObject, children);
-            extFiles = new ExtFile[children.length];
+
             final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
-            CollectionUtils.mapToArray(children, new Function<FileObject, ExtFile>()
+            extFiles = transform(asList(children), new Function<FileObject, ExtFile>()
             {
                 public ExtFile apply(FileObject child)
                 {
@@ -240,7 +241,7 @@ public class LsAction extends VFSActionSupport
 
                     return extFile;
                 }
-            }, extFiles);
+            }).toArray(new ExtFile[children.length]);
         }
 
         return extFiles;

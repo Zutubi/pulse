@@ -18,7 +18,6 @@ import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfigurationAct
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 
@@ -196,16 +195,21 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
 
     private void assertIndividualEmailsTo(String... suffixes)
     {
-        assertEmailsTo(suffixes.length, CollectionUtils.mapToArray(suffixes, new Function<String, String>()
+        assertEmailsTo(suffixes.length, transform(asList(suffixes), new Function<String, String>()
         {
             public String apply(String s)
             {
                 return random + "user" + s;
             }
-        }, new String[suffixes.length]));
+        }));
     }
 
     private void assertEmailsTo(final int emailCount, final String... recipients)
+    {
+        assertEmailsTo(emailCount, asList(recipients));
+    }
+
+    private void assertEmailsTo(final int emailCount, final Collection<String> recipients)
     {
         waitForCondition(new Condition()
         {

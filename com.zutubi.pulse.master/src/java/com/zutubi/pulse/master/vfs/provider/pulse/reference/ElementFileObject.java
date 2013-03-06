@@ -3,11 +3,12 @@ package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 import com.google.common.base.Function;
 import com.zutubi.pulse.core.marshal.doc.*;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Collection;
+
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * A file object representing an {@link com.zutubi.pulse.core.marshal.doc.ElementDocs}
@@ -26,13 +27,13 @@ public class ElementFileObject extends AbstractReferenceFileObject
     protected String[] getDynamicChildren()
     {
         Collection<ChildNodeDocs> children = elementDocs.getChildren();
-        return CollectionUtils.mapToArray(children, new Function<ChildNodeDocs, String>()
+        return transform(children, new Function<ChildNodeDocs, String>()
         {
             public String apply(ChildNodeDocs childNodeDocs)
             {
                 return childNodeDocs.getName();
             }
-        }, new String[children.size()]);
+        }).toArray(new String[children.size()]);
     }
 
     public AbstractPulseFileObject createDynamicFile(FileName fileName)

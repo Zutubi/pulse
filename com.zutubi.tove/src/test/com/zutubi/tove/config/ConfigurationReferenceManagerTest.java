@@ -16,6 +16,8 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
 
+import static com.google.common.collect.Collections2.transform;
+
 public class ConfigurationReferenceManagerTest extends AbstractConfigurationSystemTestCase
 {
     private static final String SCOPE_SUBSCRIPTION = "subscription";
@@ -314,14 +316,13 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
     private void assertNamedConfigurations(Collection<Configuration> collection, String... expected)
     {
         Sort.StringComparator comparator = new Sort.StringComparator();
-        String[] got = new String[collection.size()];
-        CollectionUtils.mapToArray(collection, new Function<Configuration, String>()
+        String[] got = transform(collection, new Function<Configuration, String>()
         {
             public String apply(Configuration configuration)
             {
-                return ((NamedConfiguration)configuration).getName();
+                return ((NamedConfiguration) configuration).getName();
             }
-        }, got);
+        }).toArray(new String[collection.size()]);
 
         Arrays.sort(expected, comparator);
         Arrays.sort(got, comparator);

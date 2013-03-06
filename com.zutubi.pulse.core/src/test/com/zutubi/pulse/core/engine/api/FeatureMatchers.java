@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.engine.api;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.test.api.IsOrderedIterable;
-import com.zutubi.util.CollectionUtils;
 import org.hamcrest.Matcher;
 
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Collections2.transform;
 import static com.zutubi.pulse.core.test.api.Matchers.hasOrderedItems;
 import static java.util.Arrays.asList;
 
@@ -64,7 +64,7 @@ public class FeatureMatchers
      */
     public static IsOrderedIterable<Feature> hasOrderedFeatures(Feature... features)
     {
-        return hasOrderedItems(transform(asList(features), new Function<Feature, Matcher<? super Feature>>()
+        return hasOrderedItems(Iterables.transform(asList(features), new Function<Feature, Matcher<? super Feature>>()
         {
             public Matcher<? super Feature> apply(Feature feature)
             {
@@ -91,13 +91,13 @@ public class FeatureMatchers
      */
     public static IsOrderedIterable<Feature> hasOrderedMessages(final Feature.Level level, String... messages)
     {
-        return hasOrderedFeatures(CollectionUtils.mapToArray(messages, new Function<String, Feature>()
+        return hasOrderedFeatures(transform(asList(messages), new Function<String, Feature>()
         {
             public Feature apply(String s)
             {
                 return new Feature(level, s);
             }
-        }, new Feature[messages.length]));
+        }).toArray(new Feature[messages.length]));
     }
 
     /**
