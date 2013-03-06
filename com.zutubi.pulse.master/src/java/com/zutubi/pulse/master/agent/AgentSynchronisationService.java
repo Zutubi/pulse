@@ -3,8 +3,6 @@ package com.zutubi.pulse.master.agent;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
-import com.google.common.collect.Lists;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -15,7 +13,6 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.events.SynchronisationMessageProcessedEvent;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
-import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
@@ -26,6 +23,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * Responsible for handling the {@link AgentStatus#SYNCHRONISING} state of
@@ -106,7 +107,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
             final long timeoutMillis = MESSAGE_TIMEOUT_SECONDS * Constants.SECOND;
 
             List<AgentSynchronisationMessage> processingMessages = agentManager.getProcessingSynchronisationMessages();
-            List<AgentSynchronisationMessage> timedOutMessages = Lists.newArrayList(Iterables.filter(processingMessages, new Predicate<AgentSynchronisationMessage>()
+            List<AgentSynchronisationMessage> timedOutMessages = newArrayList(Iterables.filter(processingMessages, new Predicate<AgentSynchronisationMessage>()
             {
                 public boolean apply(AgentSynchronisationMessage agentSynchronisationMessage)
                 {
@@ -153,7 +154,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                     try
                     {
                         List<AgentSynchronisationMessage> messages = agentManager.getSynchronisationMessages(agentId);
-                        List<AgentSynchronisationMessage> pendingMessages = Lists.newArrayList(Iterables.filter(messages, PENDING_MESSAGES_PREDICATE));
+                        List<AgentSynchronisationMessage> pendingMessages = newArrayList(Iterables.filter(messages, PENDING_MESSAGES_PREDICATE));
                         if (pendingMessages.size() > 0)
                         {
                             setMessagesToProcessing(pendingMessages);
@@ -190,7 +191,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
             private boolean sendPendingMessages(Agent agent, List<AgentSynchronisationMessage> pendingMessages)
             {
-                List<SynchronisationMessage> toSend = map(pendingMessages, new ExtractMessageFunction());
+                List<SynchronisationMessage> toSend = newArrayList(transform(pendingMessages, new ExtractMessageFunction()));
 
                 AgentService service = agent.getService();
                 List<SynchronisationMessageResult> results;
@@ -238,7 +239,7 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
 
             private void cleanupOldCompletedMessages(List<AgentSynchronisationMessage> messages)
             {
-                List<AgentSynchronisationMessage> completed = Lists.newArrayList(Iterables.filter(messages, COMPLETED_MESSAGES_PREDICATE));
+                List<AgentSynchronisationMessage> completed = newArrayList(Iterables.filter(messages, COMPLETED_MESSAGES_PREDICATE));
                 if (completed.size() > COMPLETED_MESSAGE_LIMIT)
                 {
                     agentManager.dequeueSynchronisationMessages(completed.subList(0, completed.size() - COMPLETED_MESSAGE_LIMIT));

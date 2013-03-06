@@ -3,8 +3,6 @@ package com.zutubi.pulse.master.model;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.size;
 import com.google.common.collect.Lists;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
@@ -49,7 +47,6 @@ import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -62,6 +59,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.google.common.collect.Iterables.*;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -218,7 +218,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         List<Long> downstreamHandles = configToDownstreamConfigHandles.get(oldProjectConfiguration);
         if (downstreamHandles != null)
         {
-            List<ProjectConfiguration> downstreamConfigs = CollectionUtils.map(downstreamHandles, new Function<Long, ProjectConfiguration>()
+            Iterable<ProjectConfiguration> downstreamConfigs = transform(downstreamHandles, new Function<Long, ProjectConfiguration>()
             {
                 public ProjectConfiguration apply(Long handle)
                 {
@@ -805,13 +805,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
     {
         List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
-        return CollectionUtils.map(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
+        return newArrayList(transform(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
         {
             public ProjectConfiguration apply(DependencyConfiguration dependencyConfiguration)
             {
                 return dependencyConfiguration.getProject();
             }
-        });
+        }));
     }
 
     private void addToDownstreamCache(ProjectConfiguration upstream, ProjectConfiguration config)
@@ -988,13 +988,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public List<Project> getDescendantProjects(String project, boolean strict, boolean allowInvalid)
     {
         Set<ProjectConfiguration> projectConfigs = configurationProvider.getAllDescendants(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project), ProjectConfiguration.class, strict, true);
-        List<Long> ids = CollectionUtils.map(projectConfigs, new Function<ProjectConfiguration, Long>()
+        List<Long> ids = newArrayList(transform(projectConfigs, new Function<ProjectConfiguration, Long>()
         {
             public Long apply(ProjectConfiguration projectConfiguration)
             {
                 return projectConfiguration.getProjectId();
             }
-        });
+        }));
 
         return getProjects(ids, allowInvalid);
     }
@@ -1412,13 +1412,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 result = Collections.emptyList();
             }
 
-            return CollectionUtils.map(result, new Function<Long, ProjectConfiguration>()
+            return newArrayList(transform(result, new Function<Long, ProjectConfiguration>()
             {
                 public ProjectConfiguration apply(Long handle)
                 {
                     return configurationProvider.get(handle, ProjectConfiguration.class);
                 }
-            });
+            }));
         }
         finally
         {

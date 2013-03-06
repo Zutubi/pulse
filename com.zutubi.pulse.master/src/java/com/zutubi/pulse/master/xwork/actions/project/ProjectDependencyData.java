@@ -3,13 +3,15 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.dependency.DependencyGraphData;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Holds data for a cell in a dependency grid.  This data contains the
@@ -109,7 +111,7 @@ public class ProjectDependencyData
      */
     public void flipHorizontal()
     {
-        classes = CollectionUtils.map(classes, new Function<String, String>()
+        classes = newArrayList(transform(classes, new Function<String, String>()
         {
             public String apply(String s)
             {
@@ -124,7 +126,7 @@ public class ProjectDependencyData
 
                 return s;
             }
-        });
+        }));
     }
 
     /**

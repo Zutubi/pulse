@@ -8,11 +8,13 @@ import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
-import com.zutubi.util.CollectionUtils;
-import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.Mockito.mock;
 
 public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 {
@@ -286,13 +288,13 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 
     private List<Project> getDependencyOwners(Project project)
     {
-        return CollectionUtils.map(project.getConfig().getDependencies().getDependencies(), new Function<DependencyConfiguration, Project>()
+        return newArrayList(transform(project.getConfig().getDependencies().getDependencies(), new Function<DependencyConfiguration, Project>()
         {
             public Project apply(DependencyConfiguration dependency)
             {
                 return projectManager.getProject(dependency.getProject().getProjectId(), false);
             }
-        });
+        }));
 
     }
 }

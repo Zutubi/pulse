@@ -2,20 +2,22 @@ package com.zutubi.util.reflection;
 
 import com.google.common.base.Function;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class ReflectionUtilsTest extends ZutubiTestCase
 {
@@ -603,7 +605,7 @@ public class ReflectionUtilsTest extends ZutubiTestCase
 
     private void declaredFieldsHelper(Class clazz, Class stopClazz, String... expected)
     {
-        List<String> names = map(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameFunction());
+        List<String> names = newArrayList(transform(ReflectionUtils.getDeclaredFields(clazz, stopClazz), new FieldNameFunction()));
         Collections.sort(names);
         assertEquals(asList(expected), names);
     }

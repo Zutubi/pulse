@@ -2,11 +2,12 @@ package com.zutubi.pulse.master.agent.statistics;
 
 import com.google.common.base.Function;
 import com.zutubi.pulse.master.model.AgentDailyStatistics;
-import static com.zutubi.util.CollectionUtils.map;
-import static com.zutubi.util.CollectionUtils.reduce;
 import com.zutubi.util.math.LongAddition;
 
 import java.util.List;
+
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.util.CollectionUtils.reduce;
 
 /**
  * Wrapper around statistics for a single agent over multiple days which
@@ -45,7 +46,7 @@ public class AgentStatistics
 
     private long total(Function<AgentDailyStatistics, Long> function)
     {
-        return reduce(map(dailyStatistics, function), 0L, new LongAddition());
+        return reduce(transform(dailyStatistics, function), 0L, new LongAddition());
     }
 
     private double percentage(long time)

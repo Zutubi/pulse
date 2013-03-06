@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.charting.model.DataPoint;
 import com.zutubi.pulse.master.charting.model.ReportData;
@@ -13,6 +14,9 @@ import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.BinaryFunction;
 import com.zutubi.util.CollectionUtils;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newLinkedList;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
@@ -107,13 +111,13 @@ public class ReportBuilder
 
         for (BuildResult build: dataSet)
         {
-            Collection<Number> values = CollectionUtils.map(build.getStages(), new Function<RecipeResultNode, Number>()
+            Collection<Number> values = newLinkedList(transform(build.getStages(), new Function<RecipeResultNode, Number>()
             {
                 public Number apply(RecipeResultNode node)
                 {
                     return extractFn.process(node.getResult(), customFieldSource);
                 }
-            });
+            }));
 
             Iterables.removeIf(values, Predicates.isNull());
             if (values.size()  > 0)

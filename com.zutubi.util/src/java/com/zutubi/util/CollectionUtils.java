@@ -13,13 +13,6 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T, U> List<U> map(Iterable<T> l, Function<? super T, U> m)
-    {
-        List<U> result = new LinkedList<U>();
-        map(l, m, result);
-        return result;
-    }
-
     public static <T, U, V extends Collection<U>> V map(Iterable<T> in, Function<? super T, U> m, V out)
     {
         for(T t: in)

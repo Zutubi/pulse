@@ -3,7 +3,6 @@ package com.zutubi.tove.actions;
 import com.google.common.base.Function;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.ActionResult;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -12,6 +11,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class ConfigurationActionsTest extends ZutubiTestCase
 {
@@ -250,13 +252,13 @@ public class ConfigurationActionsTest extends ZutubiTestCase
     private void assertActions(List<ConfigurationAction> got, String... expected)
     {
         assertEquals(expected.length, got.size());
-        List<String> gotNames = CollectionUtils.map(got, new Function<ConfigurationAction, String>()
+        List<String> gotNames = newArrayList(transform(got, new Function<ConfigurationAction, String>()
         {
             public String apply(ConfigurationAction configurationAction)
             {
                 return configurationAction.getName();
             }
-        });
+        }));
 
         Collections.sort(gotNames, new Sort.StringComparator());
         for (int i = 0; i < expected.length; i++)

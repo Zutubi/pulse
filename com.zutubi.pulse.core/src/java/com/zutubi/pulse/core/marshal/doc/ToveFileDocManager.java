@@ -1,15 +1,12 @@
 package com.zutubi.pulse.core.marshal.doc;
 
 import com.google.common.base.Function;
-import static com.google.common.base.Predicates.and;
-import static com.google.common.collect.Iterables.filter;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.Addable;
 import com.zutubi.pulse.core.engine.api.Content;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.marshal.ToveFileStorer;
 import com.zutubi.pulse.core.marshal.ToveFileUtils;
-import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
 import com.zutubi.pulse.core.marshal.TypeDefinitions;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Internal;
@@ -18,20 +15,25 @@ import com.zutubi.tove.config.docs.ConfigurationDocsManager;
 import com.zutubi.tove.config.docs.PropertyDocs;
 import com.zutubi.tove.config.docs.TypeDocs;
 import com.zutubi.tove.type.*;
-import static com.zutubi.util.CollectionUtils.map;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.validation.annotations.Required;
-import static java.util.Arrays.asList;
 import nu.xom.Element;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.convertPropertyNameToLocalName;
+import static com.zutubi.util.reflection.MethodPredicates.*;
+import static java.util.Arrays.asList;
 
 /**
  * Analyses types and creates data structures representing tove file
@@ -41,7 +43,7 @@ import java.util.*;
  */
 public class ToveFileDocManager
 {
-    private static final Logger LOG = Logger.getLogger(ToveFileDocManager.class);
+    private static final Logger   LOG  = Logger.getLogger(ToveFileDocManager.class);
     private static final Messages I18N = Messages.getInstance(ToveFileDocManager.class);
 
     private static final String KEY_SUFFIX_ADDABLE_ATTRIBUTE = "addable.attribute";
@@ -56,21 +58,21 @@ public class ToveFileDocManager
 
     private static final String EXAMPLE_METHOD_PREFIX = "get";
 
-    private static final List<ChildNodeDocs> BUILTINS = map(asList("import", "macro", "macro-ref", "scope"), new Function<String, ChildNodeDocs>()
+    private static final List<ChildNodeDocs> BUILTINS = newArrayList(transform(asList("import", "macro", "macro-ref", "scope"), new Function<String, ChildNodeDocs>()
     {
         public ChildNodeDocs apply(String name)
         {
             String doc = I18N.format(name + "." + KEY_SUFFIX_BUILTIN);
             return new ChildNodeDocs(name, new BuiltinElementDocs(doc, doc), Arity.ZERO_OR_MORE);
         }
-    });
+    }));
 
-    private Map<String, ElementDocs> rootElements = new HashMap<String, ElementDocs>();
-    private Map<CompositeType, ElementDocs> concreteCache = new HashMap<CompositeType, ElementDocs>();
+    private Map<String, ElementDocs>           rootElements    = new HashMap<String, ElementDocs>();
+    private Map<CompositeType, ElementDocs>    concreteCache   = new HashMap<CompositeType, ElementDocs>();
     private Map<CompositeType, ExtensibleDocs> extensibleCache = new HashMap<CompositeType, ExtensibleDocs>();
     private ConfigurationDocsManager configurationDocsManager;
-    private ObjectFactory objectFactory;
-    private PulseFileLoaderFactory fileLoaderFactory;
+    private ObjectFactory            objectFactory;
+    private PulseFileLoaderFactory   fileLoaderFactory;
 
     /**
      * Registers a root element for a specific type of file.  The root will be

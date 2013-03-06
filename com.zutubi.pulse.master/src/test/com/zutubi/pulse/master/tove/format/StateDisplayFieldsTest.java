@@ -8,6 +8,9 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 
 import java.util.Collection;
@@ -167,13 +170,13 @@ public class StateDisplayFieldsTest extends ZutubiTestCase
     {
         public List<String> formatCollectionA(Collection<T> ts)
         {
-            return CollectionUtils.map(ts, new Function<T, String>()
+            return newArrayList(transform(ts, new Function<T, String>()
             {
                 public String apply(T t)
                 {
                     return t.getName();
                 }
-            });
+            }));
         }
 
         public String formatCollectionB(Collection<T> ts)

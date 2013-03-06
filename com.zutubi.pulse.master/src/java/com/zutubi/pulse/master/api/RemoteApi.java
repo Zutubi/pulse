@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.api;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.Version;
@@ -68,6 +67,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.*;
 
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.newLinkedList;
+import static com.google.common.collect.Lists.transform;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
@@ -347,13 +349,13 @@ public class RemoteApi
         {
             TemplateNode node = getTemplateNode(path);
 
-            List<String> names = CollectionUtils.map(node.getChildren(), new Function<TemplateNode, String>()
+            List<String> names = newLinkedList(transform(node.getChildren(), new Function<TemplateNode, String>()
             {
                 public String apply(TemplateNode templateNode)
                 {
                     return templateNode.getId();
                 }
-            });
+            }));
 
             configurationSecurityManager.filterPaths(MasterConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
             return new Vector<String>(names);
@@ -3696,7 +3698,7 @@ public class RemoteApi
                 }
             }
 
-            return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Function<BuildRequestEvent, Hashtable<String, Object>>()
+            return new Vector<Hashtable<String, Object>>(transform(filteredQueue, new Function<BuildRequestEvent, Hashtable<String, Object>>()
             {
                 public Hashtable<String, Object> apply(BuildRequestEvent e)
                 {
@@ -3779,7 +3781,7 @@ public class RemoteApi
                         }
                     }
         
-                    return new Vector<Hashtable<String, Object>>(CollectionUtils.map(filteredQueue, new Function<BuildResult, Hashtable<String, Object>>()
+                    return new Vector<Hashtable<String, Object>>(transform(filteredQueue, new Function<BuildResult, Hashtable<String, Object>>()
                     {
                         public Hashtable<String, Object> apply(BuildResult build)
                         {

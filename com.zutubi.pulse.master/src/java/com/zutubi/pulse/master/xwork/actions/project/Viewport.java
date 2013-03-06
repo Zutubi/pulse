@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.master.model.BuildResult;
 import flexjson.JSON;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,10 +20,11 @@ public class Viewport
     private Data previousBroken;
     private Data latest;
 
-    public void addAll(List<Data> builds)
+    public void addAll(Collection<Data> builds)
     {
         this.builds.addAll(builds);
     }
+
     public void add(Data build)
     {
         this.builds.add(build);

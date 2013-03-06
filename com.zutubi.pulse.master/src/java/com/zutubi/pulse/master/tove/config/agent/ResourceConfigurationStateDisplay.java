@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.tove.config.agent;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -12,7 +11,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ResourceRequirementConfigurationToRequirement;
 import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.NamedConfigurationComparator;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.adt.TreeNode;
 
@@ -20,6 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Formats state information for resource requirements.
@@ -57,9 +57,8 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
             {
                 projectVariables.add(property.asResourceProperty());
             }
-            
-            List<ResourceRequirement> requirements = CollectionUtils.map(project.getRequirements(), new ResourceRequirementConfigurationToRequirement(projectVariables));
-            if (resourceRepository.satisfies(requirements))
+
+            if (resourceRepository.satisfies(transform(project.getRequirements(), new ResourceRequirementConfigurationToRequirement(projectVariables))))
             {
                 String stagePart;
                 List<String> compatibleStages = getCompatibleStageNames(resourceRepository, project, projectVariables);
@@ -129,8 +128,7 @@ public class ResourceConfigurationStateDisplay implements MessagesAware
             }
             
             ResourceRequirementConfigurationToRequirement fn = new ResourceRequirementConfigurationToRequirement(stageVariables);
-            List<ResourceRequirement> requirements = CollectionUtils.map(stage.getRequirements(), fn);
-            if (resourceRepository.satisfies(requirements))
+            if (resourceRepository.satisfies(transform(stage.getRequirements(), fn)))
             {
                 stageNames.add(stage.getName());
             }

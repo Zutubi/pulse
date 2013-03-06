@@ -5,7 +5,6 @@ import com.zutubi.pulse.master.committransformers.LinkSubstitution;
 import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.tove.annotations.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
@@ -13,6 +12,9 @@ import com.zutubi.validation.annotations.Url;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A transformer that links Jira issue keys to the issues in a Jira install.
@@ -78,13 +80,13 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
     public List<Substitution> substitutions()
     {
         final String linkUrl = StringUtils.join("/", true, this.url, "browse/$0");
-        return CollectionUtils.map(getKeyPatterns(), new Function<String, Substitution>()
+        return newArrayList(transform(getKeyPatterns(), new Function<String, Substitution>()
         {
             public Substitution apply(String keyPattern)
             {
                 return new LinkSubstitution(keyPattern + "-[0-9]+", linkUrl, "$0");
             }
-        });
+        }));
     }
 
     @Transient

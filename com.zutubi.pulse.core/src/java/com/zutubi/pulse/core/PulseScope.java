@@ -2,18 +2,20 @@ package com.zutubi.pulse.core;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
 
 /**
  * A scope holds named variables and has a parent.  When looking up a
@@ -125,24 +127,24 @@ public class PulseScope implements Scope
     
     public Collection<Variable> getVariables()
     {
-        return CollectionUtils.map(merge().values(), new Function<VariableInfo, Variable>()
+        return Lists.newArrayList(transform(merge().values(), new Function<VariableInfo, Variable>()
         {
             public Variable apply(VariableInfo variableInfo)
             {
                 return variableInfo.variable;
             }
-        });
+        }));
     }
 
     private Collection<Variable> getVariablesSatisfyingPredicate(Predicate<VariableInfo> p)
     {
-        return CollectionUtils.map(Collections2.filter(merge().values(), p), new Function<VariableInfo, Variable>()
+        return Lists.newArrayList(transform(filter(merge().values(), p), new Function<VariableInfo, Variable>()
         {
             public Variable apply(VariableInfo variableInfo)
             {
                 return variableInfo.variable;
             }
-        });
+        }));
     }
 
     public Collection<Variable> getVariables(final Class type)
@@ -347,13 +349,13 @@ public class PulseScope implements Scope
             }
         });
         
-        List<String> result = CollectionUtils.map(variables, new Function<Variable, String>()
+        List<String> result = Lists.newArrayList(transform(variables, new Function<Variable, String>()
         {
             public String apply(Variable variable)
             {
                 return (String) variable.getValue();
             }
-        });
+        }));
 
         // Reverse so the most local and recently added values end up earlier
         // in the path.

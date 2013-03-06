@@ -4,12 +4,14 @@ import com.google.common.base.Function;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.time.TimeStamps;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * A persistent wrapper around a Changelist, which associates the changelist
@@ -59,13 +61,13 @@ public class PersistentChangelist extends Entity
         time = data.getTime();
         author = data.getAuthor();
         comment = data.getComment();
-        changes = CollectionUtils.map(data.getChanges(), new Function<FileChange, PersistentFileChange>()
+        changes = newArrayList(transform(data.getChanges(), new Function<FileChange, PersistentFileChange>()
         {
             public PersistentFileChange apply(FileChange change)
             {
                 return new PersistentFileChange(change);
             }
-        });
+        }));
     }
 
     public Date getDate()

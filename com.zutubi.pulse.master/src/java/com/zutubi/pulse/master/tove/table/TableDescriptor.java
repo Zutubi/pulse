@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * The table descriptor represents the model used to render a table to the UI.
  */
@@ -200,13 +203,13 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         try
         {
             List<String> actionNames = actionManager.getActions((Configuration) instance, true, true);
-            return CollectionUtils.map(actionNames, new Function<String, ActionLink>()
+            return newArrayList(transform(actionNames, new Function<String, ActionLink>()
             {
                 public ActionLink apply(String actionName)
                 {
                     return ToveUtils.getActionLink(actionName, data, key, messages, systemPaths);
                 }
-            });
+            }));
         }
         catch (Exception e)
         {

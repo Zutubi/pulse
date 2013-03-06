@@ -5,15 +5,17 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class GraphBuilderTest extends BaseGraphTestCase
 {
@@ -53,13 +55,13 @@ public class GraphBuilderTest extends BaseGraphTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 List<ProjectConfiguration> configs = (List<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
+                return newArrayList(transform(configs, new Function<ProjectConfiguration, Project>()
                 {
                     public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }
-                });
+                }));
             }
         });
         stub(projectManager.getProject(anyLong(), anyBoolean())).toAnswer(new Answer<Project>()

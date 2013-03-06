@@ -2,12 +2,14 @@ package com.zutubi.pulse.core.scm.api;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 
 import java.io.File;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * A predicate that is satisfied if and only if the tested string passes
@@ -38,8 +40,8 @@ public class FilterPathsPredicate implements Predicate<String>
             }
         };
 
-        this.includedPaths = CollectionUtils.map(includedPaths, normaliseFunction);
-        this.excludedPaths = CollectionUtils.map(excludedPaths, normaliseFunction);
+        this.includedPaths = newArrayList(transform(includedPaths, normaliseFunction));
+        this.excludedPaths = newArrayList(transform(excludedPaths, normaliseFunction));
     }
 
     public boolean apply(String path)

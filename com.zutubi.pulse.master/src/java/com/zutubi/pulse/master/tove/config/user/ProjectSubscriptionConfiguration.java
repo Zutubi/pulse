@@ -23,6 +23,9 @@ import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * A subscription to results for project builds.
  */
@@ -120,13 +123,13 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
                 }
             }
 
-            List<String> projectLabels = CollectionUtils.map(project.getConfig().getLabels(), new Function<LabelConfiguration, String>()
+            List<String> projectLabels = newArrayList(transform(project.getConfig().getLabels(), new Function<LabelConfiguration, String>()
             {
                 public String apply(LabelConfiguration labelConfiguration)
                 {
                     return labelConfiguration.getLabel();
                 }
-            });
+            }));
 
             for (String label : labels)
             {

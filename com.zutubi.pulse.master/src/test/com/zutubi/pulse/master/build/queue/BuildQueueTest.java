@@ -7,11 +7,13 @@ import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static org.mockito.Mockito.*;
 
 public class BuildQueueTest extends BaseQueueTestCase
 {
@@ -212,7 +214,7 @@ public class BuildQueueTest extends BaseQueueTestCase
             requests.add(createRequest(p, "sourceA", true, null));
         }
 
-        buildQueue.enqueue(CollectionUtils.map(requests, new Function<BuildRequestEvent, QueuedRequest>()
+        buildQueue.enqueue(transform(requests, new Function<BuildRequestEvent, QueuedRequest>()
         {
             public QueuedRequest apply(BuildRequestEvent request)
             {
@@ -229,7 +231,7 @@ public class BuildQueueTest extends BaseQueueTestCase
             requestsToBeAssimilated.add(createRequest(p, "sourceA", true, null));
         }
 
-        buildQueue.enqueue(CollectionUtils.map(requestsToBeAssimilated, new Function<BuildRequestEvent, QueuedRequest>()
+        buildQueue.enqueue(transform(requestsToBeAssimilated, new Function<BuildRequestEvent, QueuedRequest>()
         {
             public QueuedRequest apply(BuildRequestEvent request)
             {

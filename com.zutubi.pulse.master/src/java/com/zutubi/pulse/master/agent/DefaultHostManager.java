@@ -3,17 +3,18 @@ package com.zutubi.pulse.master.agent;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.any;
-import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.master.model.persistence.EntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.services.SlaveService;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * Manages hosts where agents are located, sharing a single host among agents
@@ -171,7 +172,7 @@ public class DefaultHostManager implements HostManager
             return Collections.emptyList();
         }
 
-        List<Agent> agents = CollectionUtils.map(agentIds, new Function<Long, Agent>()
+        List<Agent> agents = transform(agentIds, new Function<Long, Agent>()
         {
             public Agent apply(Long agentHandle)
             {
@@ -179,7 +180,7 @@ public class DefaultHostManager implements HostManager
             }
         });
 
-        return Lists.newArrayList(Iterables.filter(agents, Predicates.notNull()));
+        return newArrayList(filter(agents, Predicates.notNull()));
     }
 
     public HostService getServiceForHost(Host host)

@@ -3,9 +3,7 @@ package com.zutubi.pulse.master.build.control;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.events.*;
@@ -18,7 +16,6 @@ import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentService;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -30,13 +27,9 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -47,6 +40,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmAction;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  *
@@ -232,7 +233,7 @@ public class RecipeController
         recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_BUILD_VERSION, buildResult.getVersion());
 
         Collection<ResourcePropertyConfiguration> agentProperties = agent.getConfig().getProperties().values();
-        recipeRequest.addAllProperties(CollectionUtils.map(agentProperties, new AsResourcePropertyFunction()));
+        recipeRequest.addAllProperties(transform(agentProperties, new AsResourcePropertyFunction()));
         for (ResourcePropertyConfiguration propertyConfig: agentProperties)
         {
             ResourceProperty property = propertyConfig.asResourceProperty();

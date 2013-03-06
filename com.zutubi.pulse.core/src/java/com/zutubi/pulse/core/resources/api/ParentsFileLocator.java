@@ -2,12 +2,13 @@ package com.zutubi.pulse.core.resources.api;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.zutubi.util.CollectionUtils;
 
 import java.io.File;
 import java.util.Collection;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A file locator takes the output of one locator and returns all non-null
@@ -29,7 +30,7 @@ public class ParentsFileLocator implements FileLocator
 
     public Collection<File> locate()
     {
-        return Lists.newArrayList(Collections2.filter(CollectionUtils.map(delegate.locate(), new Function<File, File>()
+        return newArrayList(filter(transform(delegate.locate(), new Function<File, File>()
         {
             public File apply(File file)
             {

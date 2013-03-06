@@ -5,6 +5,9 @@ import com.google.common.base.Predicates;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
 import static com.zutubi.util.io.FileSystemUtils.relativePath;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -1279,13 +1282,13 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     private List<String> mapToFilenames(List<File> files)
     {
-        return CollectionUtils.map(files, new Function<File, String>()
+        return newArrayList(transform(files, new Function<File, String>()
         {
             public String apply(File file)
             {
                 return file.getName();
             }
-        });
+        }));
     }
 
     public void testFilterEmptyDirectory() throws IOException

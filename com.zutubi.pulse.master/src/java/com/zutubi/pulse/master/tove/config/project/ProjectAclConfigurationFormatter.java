@@ -9,6 +9,9 @@ import com.zutubi.util.Sort;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Formats fields of {@link ProjectAclConfiguration} instances for the UI.
  */
@@ -24,13 +27,13 @@ public class ProjectAclConfigurationFormatter
     {
         List<String> allowedActions = configuration.getAllowedActions();
         final Messages messages = Messages.getInstance(ProjectAuthorityProvider.class);
-        allowedActions = CollectionUtils.map(allowedActions, new Function<String, String>()
+        allowedActions = newArrayList(transform(allowedActions, new Function<String, String>()
         {
             public String apply(String s)
             {
                 return messages.format(s + ".label");
             }
-        });
+        }));
         
         Collections.sort(allowedActions, new Sort.StringComparator());
         return allowedActions.toString();

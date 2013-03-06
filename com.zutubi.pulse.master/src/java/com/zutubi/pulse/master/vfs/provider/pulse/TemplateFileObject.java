@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Represents a node in a template hierarchy.
  *
@@ -76,13 +79,13 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
                 }
             });
 
-            List<String> childNodes = CollectionUtils.map(visibleChildren, new Function<TemplateNode, String>()
+            List<String> childNodes = newArrayList(transform(visibleChildren, new Function<TemplateNode, String>()
             {
                 public String apply(TemplateNode templateNode)
                 {
                     return templateNode.getId();
                 }
-            });
+            }));
 
 
             String[] children = new String[childNodes.size()];

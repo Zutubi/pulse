@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.core.scm.api.Changelist;
@@ -12,13 +12,16 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
-import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+import static java.util.Arrays.asList;
 
 /**
  * The changes tab for a build result.
@@ -148,7 +151,7 @@ public class BuildChangesPage extends SeleniumPage
 
     public List<Long> getChangeIds()
     {
-        Iterable<String> viewIdStrings = Iterables.filter(asList(browser.getAllLinks()), new Predicate<String>()
+        Iterable<String> viewIdStrings = filter(asList(browser.getAllLinks()), new Predicate<String>()
         {
             public boolean apply(String s)
             {
@@ -156,13 +159,13 @@ public class BuildChangesPage extends SeleniumPage
             }
         });
         
-        return CollectionUtils.map(viewIdStrings, new Function<String, Long>()
+        return Lists.newArrayList(transform(viewIdStrings, new Function<String, Long>()
         {
             public Long apply(String s)
             {
                 return Long.parseLong(s.substring(PREFIX_VIEW_LINK.length()));
             }
-        });
+        }));
     }
 
     /**

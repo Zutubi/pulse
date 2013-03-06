@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.scm.process.api.ScmByteHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmOutputHandlerSupport;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
@@ -22,6 +21,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * A patch format that uses hg diff/import commands to create and apply
@@ -160,13 +162,13 @@ public class MercurialPatchFormat implements PatchFormat
         {
             PatchFileParser parser = new PatchFileParser(new GitPatchParser());
             PatchFile gitPatch = parser.parse(new FileReader(patchFile));
-            return CollectionUtils.map(gitPatch.getPatches(), new Function<Patch, FileStatus>()
+            return newArrayList(transform(gitPatch.getPatches(), new Function<Patch, FileStatus>()
             {
                 public FileStatus apply(Patch patch)
                 {
                     return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
                 }
-            });
+            }));
         }
         catch (IOException e)
         {

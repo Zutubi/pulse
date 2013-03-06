@@ -15,7 +15,7 @@ public class EmptyResourceRepository implements ResourceRepository
         return false;
     }
 
-    public boolean satisfies(Collection<? extends ResourceRequirement> requirements)
+    public boolean satisfies(Iterable<? extends ResourceRequirement> requirements)
     {
         for (ResourceRequirement requirement: requirements)
         {

@@ -6,10 +6,12 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ChangelistManager;
 import com.zutubi.pulse.master.model.UpstreamChangelist;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Context in which notification conditions are evaluated.  Sharing this context among conditions eliminates the
@@ -126,7 +128,8 @@ public class NotifyConditionContext
     {
         if (upstreamChanges == null)
         {
-            upstreamChanges = buildResult == null ? Collections.<PersistentChangelist>emptyList() : CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getPrevious().getBuildResult()), new UpstreamChangelist.ToChangelistFunction());
+            upstreamChanges = buildResult == null ? Collections.<PersistentChangelist>emptyList() :
+                    newArrayList(transform(changelistManager.getUpstreamChangelists(buildResult, getPrevious().getBuildResult()), new UpstreamChangelist.ToChangelistFunction()));
         }
 
         return upstreamChanges;
@@ -176,7 +179,7 @@ public class NotifyConditionContext
             }
             else
             {
-                upstreamChangesSinceLastSuccess = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastSuccess()), new UpstreamChangelist.ToChangelistFunction());
+                upstreamChangesSinceLastSuccess = newArrayList(transform(changelistManager.getUpstreamChangelists(buildResult, getLastSuccess()), new UpstreamChangelist.ToChangelistFunction()));
             }
         }
 
@@ -227,7 +230,7 @@ public class NotifyConditionContext
             }
             else
             {
-                upstreamChangesSinceLastHealthy = CollectionUtils.map(changelistManager.getUpstreamChangelists(buildResult, getLastHealthy()), new UpstreamChangelist.ToChangelistFunction());
+                upstreamChangesSinceLastHealthy = newArrayList(transform(changelistManager.getUpstreamChangelists(buildResult, getLastHealthy()), new UpstreamChangelist.ToChangelistFunction()));
             }
         }
         return upstreamChangesSinceLastHealthy;

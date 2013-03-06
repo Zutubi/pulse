@@ -1,13 +1,14 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import com.google.common.base.Function;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Simple helper class for calculating valid URLs.
@@ -67,7 +68,7 @@ public class UrlEnumerator
 
     private static String collapse(List<Pair<String, Class>> currentPath)
     {
-        return StringUtils.join("/", CollectionUtils.map(currentPath, new Function<Pair<String, Class>, String>()
+        return StringUtils.join("/", transform(currentPath, new Function<Pair<String, Class>, String>()
         {
             public String apply(Pair<String, Class> pair)
             {

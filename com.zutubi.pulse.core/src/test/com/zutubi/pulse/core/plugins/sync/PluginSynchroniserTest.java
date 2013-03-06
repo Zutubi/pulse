@@ -1,22 +1,23 @@
 package com.zutubi.pulse.core.plugins.sync;
 
 import com.google.common.base.Function;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.PluginRepositoryException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.CollectionUtils;
-import static java.util.Arrays.asList;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.transform;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.*;
 
 public class PluginSynchroniserTest extends PulseTestCase
 {
@@ -224,13 +225,13 @@ public class PluginSynchroniserTest extends PulseTestCase
         if (actions.isRebootRequired())
         {
             assertEquals(0, installs.size());
-            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdFunction()), installRequests);
-            assertEquals(CollectionUtils.map(actions.getToUpgrade(), new PluginInfoToIdFunction()), upgrades);
+            assertEquals(transform(actions.getToInstall(), new PluginInfoToIdFunction()), installRequests);
+            assertEquals(transform(actions.getToUpgrade(), new PluginInfoToIdFunction()), upgrades);
             assertEquals(actions.getToUninstall(), uninstalls);
         }
         else
         {
-            assertEquals(CollectionUtils.map(actions.getToInstall(), new PluginInfoToIdFunction()), installs);
+            assertEquals(transform(actions.getToInstall(), new PluginInfoToIdFunction()), installs);
             assertEquals(0, installRequests.size());
             assertEquals(0, upgrades.size());
             assertEquals(0, uninstalls.size());

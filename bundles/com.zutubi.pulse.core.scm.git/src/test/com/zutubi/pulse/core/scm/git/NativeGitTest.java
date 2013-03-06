@@ -7,11 +7,7 @@ import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +16,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
+
+import static com.google.common.collect.Lists.transform;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class NativeGitTest extends PulseTestCase
 {
@@ -209,7 +210,7 @@ public class NativeGitTest extends PulseTestCase
 
         assertEquals("Dev3 (Name Lastname, lastname includes norwegian characters. Special norwegian characters are æ.ø,å)", logEntries.get(1).getAuthor());
 
-        List<String> revisions = CollectionUtils.map(logEntries, new Function<GitLogEntry, String>()
+        List<String> revisions = transform(logEntries, new Function<GitLogEntry, String>()
         {
             public String apply(GitLogEntry gitLogEntry)
             {

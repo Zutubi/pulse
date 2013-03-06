@@ -2,12 +2,8 @@ package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyEncoder;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
@@ -35,7 +31,6 @@ import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IsDirectoryPredicate;
 import com.zutubi.util.logging.Logger;
 
@@ -44,6 +39,10 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.*;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributePredicates.attributeEquals;
+import static com.zutubi.pulse.core.dependency.RepositoryAttributes.PROJECT_HANDLE;
 
 /**
  * The build manager interface implementation.
@@ -588,7 +587,7 @@ public class DefaultBuildManager implements BuildManager
     {
         final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();
         List<String> paths = repositoryAttributes.getPaths(attributeEquals(PROJECT_HANDLE, String.valueOf(project.getConfig().getHandle())));
-        return Iterables.filter(CollectionUtils.map(paths, new Function<String, File>()
+        return filter(transform(paths, new Function<String, File>()
         {
             public File apply(String s)
             {

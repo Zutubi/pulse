@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -10,15 +9,18 @@ import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.Constants.MINUTE;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.util.Constants.MINUTE;
+import static java.util.Arrays.asList;
 
 /**
  * Tests for {@link com.zutubi.pulse.master.api.MonitorApi} XML-RPC methods.
@@ -351,7 +353,7 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertTrue(status.containsKey(key));
         @SuppressWarnings("unchecked")
         Vector<Hashtable<String, Object>> builds = (Vector<Hashtable<String, Object>>) status.get(key);
-        List<Integer> gotBuilds = CollectionUtils.map(builds, new Function<Hashtable<String, Object>, Integer>()
+        List<Integer> gotBuilds = transform(builds, new Function<Hashtable<String, Object>, Integer>()
         {
             public Integer apply(Hashtable<String, Object> build)
             {

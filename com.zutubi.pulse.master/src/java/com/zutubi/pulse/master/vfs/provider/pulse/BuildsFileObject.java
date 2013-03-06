@@ -4,13 +4,15 @@ import com.google.common.base.Functions;
 import com.zutubi.pulse.core.model.EntityToIdFunction;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.util.CollectionUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Represents a collection of build results.  Sometimes scoped within a single
@@ -77,9 +79,9 @@ public class BuildsFileObject extends AbstractPulseFileObject
             Project project = provider.getProject();
 
             List<BuildResult> builds = buildManager.getLatestBuildResultsForProject(project, MAX_BUILDS);
-            List<String> buildIds = CollectionUtils.map(builds, 
-                    Functions.compose(Functions.toStringFunction(), new EntityToIdFunction<BuildResult>())
-            );
+            List<String> buildIds = newArrayList(transform(builds,
+                                                           Functions.compose(Functions.toStringFunction(), new EntityToIdFunction<BuildResult>())
+            ));
             return buildIds.toArray(new String[buildIds.size()]);
         }
 

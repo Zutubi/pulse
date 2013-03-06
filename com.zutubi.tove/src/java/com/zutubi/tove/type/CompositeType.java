@@ -3,6 +3,8 @@ package com.zutubi.tove.type;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.*;
+import static com.google.common.collect.Lists.newArrayList;
+
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.Configuration;
@@ -161,13 +163,13 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public List<String> getPropertyNames(Class<? extends Type> type)
     {
-        return CollectionUtils.map(getProperties(type), new Function<TypeProperty, String>()
+        return newArrayList(transform(getProperties(type), new Function<TypeProperty, String>()
         {
             public String apply(TypeProperty property)
             {
                 return property.getName();
             }
-        });
+        }));
     }
 
     public List<String> getPropertyNames()

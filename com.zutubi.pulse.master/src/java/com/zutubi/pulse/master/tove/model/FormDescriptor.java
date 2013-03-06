@@ -3,6 +3,9 @@ package com.zutubi.pulse.master.tove.model;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.tove.type.record.Record;
@@ -168,13 +171,13 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
             ordered.addAll(Arrays.asList((String[])getParameter(PARAMETER_FIELD_ORDER)));
         }
 
-        return ToveUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Function<FieldDescriptor, String>()
+        return ToveUtils.evaluateFieldOrder(ordered, newArrayList(transform(getFieldDescriptors(), new Function<FieldDescriptor, String>()
         {
             public String apply(FieldDescriptor fieldDescriptor)
             {
                 return fieldDescriptor.getName();
             }
-        }));
+        })));
     }
 
     public void setReadOnly(boolean readOnly)

@@ -18,7 +18,6 @@ import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransform
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.DAGraph;
@@ -26,6 +25,9 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Assembles JSON data for the changelist panel.
@@ -110,7 +112,7 @@ public class ChangelistDataAction extends ActionSupport
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         List<TreeBuildModel> treeBuilds = new LinkedList<TreeBuildModel>();
-        List<DAGraph.Node<BuildResult>> roots = CollectionUtils.map(buildGraphs, new DAGraph.ToRootFunction<BuildResult>());
+        List<DAGraph.Node<BuildResult>> roots = newArrayList(transform(buildGraphs, new DAGraph.ToRootFunction<BuildResult>()));
         Comparator<DAGraph.Node<BuildResult>> nodeComparator = new DAGraph.Node.CompareByData<BuildResult>(new BuildResult.CompareByOwnerThenNumber());
         Collections.sort(roots, nodeComparator);
         for (DAGraph.Node<BuildResult> root: roots)

@@ -3,8 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 
-import java.util.Collection;
-
 /**
  * Support base class for implementing resource repositories.  Implements
  * convenience methods on top of the basic resource access method.
@@ -17,7 +15,7 @@ public abstract class ResourceRepositorySupport implements ResourceRepository
         return resource != null && hasRequiredVersion(resource, requirement);
     }
 
-    public boolean satisfies(Collection<? extends ResourceRequirement> requirements)
+    public boolean satisfies(Iterable<? extends ResourceRequirement> requirements)
     {
         for (ResourceRequirement resourceRequirement: requirements)
         {

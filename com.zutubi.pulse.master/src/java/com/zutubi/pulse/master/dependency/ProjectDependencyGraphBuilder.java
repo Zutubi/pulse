@@ -6,11 +6,13 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.TreeNode;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Service to yield dependency graphs for projects.  Contains the building
@@ -93,13 +95,13 @@ public class ProjectDependencyGraphBuilder
     private List<ProjectConfiguration> getDependentProjectConfigs(ProjectConfiguration config)
     {
         List<DependencyConfiguration> dependencies = config.getDependencies().getDependencies();
-        return CollectionUtils.map(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
+        return newArrayList(transform(dependencies, new Function<DependencyConfiguration, ProjectConfiguration>()
         {
             public ProjectConfiguration apply(DependencyConfiguration dependencyConfiguration)
             {
                 return dependencyConfiguration.getProject();
             }
-        });
+        }));
     }
 
     private TreeNode<DependencyGraphData> buildDownstream(Project project, TransitiveMode mode, Set<Long> seenProjects)

@@ -1,14 +1,16 @@
 package com.zutubi.pulse.master.dependency;
 
 import com.google.common.base.Function;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Point;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 
 /**
@@ -85,13 +87,13 @@ public class SimpleTreeLayoutAlgorithm<T>
         }
         else
         {
-            List<TreeNode<Pair<T,Point>>> children = CollectionUtils.map(node, new Function<TreeNode<T>, TreeNode<Pair<T, Point>>>()
+            List<TreeNode<Pair<T,Point>>> children = newArrayList(transform(node, new Function<TreeNode<T>, TreeNode<Pair<T, Point>>>()
             {
                 public TreeNode<Pair<T, Point>> apply(TreeNode<T> child)
                 {
                     return layout(child, depth + 1, state);
                 }
-            });
+            }));
 
             TreeNode<Pair<T, Point>> result = new TreeNode<Pair<T, Point>>(asPair(node.getData(), new Point(depth, getAverageY(children))));
             result.addAll(children);

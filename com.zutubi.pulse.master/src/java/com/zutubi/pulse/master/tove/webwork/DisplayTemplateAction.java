@@ -16,6 +16,9 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Action for the information/action page for a templated record.
  */
@@ -125,13 +128,13 @@ public class DisplayTemplateAction extends ActionSupport implements MessagesProv
             }
 
             List<TemplateNode> children = node.getChildren();
-            childRecords = CollectionUtils.map(children, new Function<TemplateNode, Record>()
+            childRecords = newArrayList(transform(children, new Function<TemplateNode, Record>()
             {
                 public Record apply(TemplateNode templateNode)
                 {
                     return configurationTemplateManager.getRecord(templateNode.getPath());
                 }
-            });
+            }));
 
             return SUCCESS;
         }

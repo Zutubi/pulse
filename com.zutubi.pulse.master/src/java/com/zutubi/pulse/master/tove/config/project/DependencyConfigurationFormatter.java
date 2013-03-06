@@ -2,10 +2,9 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configurations;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 
-import java.util.List;
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * A custom formatter for the DependencyConfiguration object.
@@ -36,9 +35,9 @@ public class DependencyConfigurationFormatter
             case CORRESPONDING_STAGES:
                 return I18N.format("corresponding.label");
         }
-        List<String> stageNames = CollectionUtils.map(config.getStages(), Configurations.toConfigurationName());
-        String joinedStageNames = StringUtils.join(", ", stageNames);
-        return StringUtils.trimmedString(joinedStageNames, 15, "...");
+
+        String joinedStageNames = StringUtils.join(", ", transform(config.getStages(), Configurations.toConfigurationName()));
+        return StringUtils.trimmedString(joinedStageNames, 15);
     }
 
     public String getRevision(DependencyConfiguration config)

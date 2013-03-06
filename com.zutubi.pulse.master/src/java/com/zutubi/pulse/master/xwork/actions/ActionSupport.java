@@ -16,9 +16,7 @@ import com.zutubi.pulse.master.xwork.actions.project.Viewport;
 import com.zutubi.pulse.master.xwork.interceptor.Cancelable;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
-import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -29,6 +27,9 @@ import freemarker.template.utility.StringUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Base for all actions.  Includes standard i18n, encoding, security and other
@@ -264,7 +265,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         );
 
         List<BuildResult> builds = buildViewport.getVisibleBuilds();
-        viewport.addAll(CollectionUtils.map(builds, new Function<BuildResult, Viewport.Data>()
+        viewport.addAll(transform(builds, new Function<BuildResult, Viewport.Data>()
         {
             public Viewport.Data apply(BuildResult result)
             {

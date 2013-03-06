@@ -10,11 +10,13 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
-import com.zutubi.util.CollectionUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 
 /**
@@ -184,14 +186,14 @@ public class LogInformationAnalyser
                     lastChange.getDate().getTime(),
                     lastChange.getAuthor(),
                     lastChange.getMessage(),
-                    CollectionUtils.map(localChanges, new Function<Revision, FileChange>()
+                    newArrayList(transform(localChanges, new Function<Revision, FileChange>()
                     {
                         public FileChange apply(Revision revision)
                         {
                             return new FileChange(revision.getFilename(), new com.zutubi.pulse.core.scm.api.Revision(revision.getRevision()), revision.getAction());
                         }
                     })
-            );
+            ));
             changelists.add(changelist);
         }
 

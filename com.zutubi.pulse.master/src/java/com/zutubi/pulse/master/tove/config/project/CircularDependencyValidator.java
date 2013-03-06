@@ -4,12 +4,13 @@ import com.zutubi.tove.annotations.Wire;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.api.Configurations;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 
 import java.util.LinkedList;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * A validator that checks to ensure that if a dependency to the specified project
@@ -40,7 +41,7 @@ public class CircularDependencyValidator extends FieldValidatorSupport
         LinkedList<ProjectConfiguration> circularPath = new LinkedList<ProjectConfiguration>();
         if (findCircularDependency(instance, candidate, circularPath))
         {
-            String path = StringUtils.join("->", CollectionUtils.map(circularPath, Configurations.toConfigurationName()));
+            String path = StringUtils.join("->", transform(circularPath, Configurations.toConfigurationName()));
             addError("circular.error", path);
         }
     }

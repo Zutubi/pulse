@@ -18,7 +18,6 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.model.ActionLink;
@@ -32,13 +31,17 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.StringUtils;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static java.util.Arrays.asList;
 
 /**
  * An action that provides the JSON data for rendering a project home page.
@@ -140,13 +143,13 @@ public class ProjectHomeDataAction extends ProjectActionBase
 
             if (!brokenNodes.isEmpty())
             {
-                brokenStages = CollectionUtils.map(brokenNodes, new Function<RecipeResultNode, BuildStageModel>()
+                brokenStages = newArrayList(transform(brokenNodes, new Function<RecipeResultNode, BuildStageModel>()
                 {
                     public BuildStageModel apply(RecipeResultNode recipeResultNode)
                     {
                         return new BuildStageModel(latestCompleted, recipeResultNode, urls, false);
                     }
-                });
+                }));
             }
         }
         

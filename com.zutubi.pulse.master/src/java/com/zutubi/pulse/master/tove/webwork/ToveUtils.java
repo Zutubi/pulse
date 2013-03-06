@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Webwork environment specific tove utility methods.
  */
@@ -207,7 +210,7 @@ public class ToveUtils
             final Record value = configurationTemplateManager.getRecord(path);
 
             // Get property/display name pairs
-            List<Pair<String, String>> propertyDisplayPairs = CollectionUtils.map(nestedProperties, new Function<String, Pair<String, String>>()
+            List<Pair<String, String>> propertyDisplayPairs = newArrayList(transform(nestedProperties, new Function<String, Pair<String, String>>()
             {
                 public Pair<String, String> apply(String s)
                 {
@@ -215,7 +218,7 @@ public class ToveUtils
                     ComplexType propertyType = configurationTemplateManager.getType(propertyPath);
                     return new Pair<String, String>(s, getDisplayName(propertyPath, propertyType, type, (Record) value.get(s)));
                 }
-            });
+            }));
 
             // Sort by display name
             Collections.sort(propertyDisplayPairs, new Comparator<Pair<String, String>>()

@@ -1,13 +1,15 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.google.common.base.Function;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import junit.framework.AssertionFailedError;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 
 /**
  * Support base class for test report post-processor test cases.  This case
@@ -188,8 +190,8 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
         }
 
         TestResultToName<TestCaseResult> caseMapFn = new TestResultToName<TestCaseResult>();
-        List<String> expectedCases = CollectionUtils.map(expected.getCases(), caseMapFn);
-        List<String> actualCases = CollectionUtils.map(actual.getCases(), caseMapFn);
+        List<String> expectedCases = newArrayList(transform(expected.getCases(), caseMapFn));
+        List<String> actualCases = newArrayList(transform(actual.getCases(), caseMapFn));
         if (!expectedCases.equals(actualCases))
         {
             return "Nested case names differ: " + expectedCases + " != " + actualCases;
@@ -205,8 +207,8 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
         }
 
         TestResultToName<TestSuiteResult> suiteMapFn = new TestResultToName<TestSuiteResult>();
-        List<String> expectedSuites = CollectionUtils.map(expected.getSuites(), suiteMapFn);
-        List<String> actualSuites = CollectionUtils.map(actual.getSuites(), suiteMapFn);
+        List<String> expectedSuites = newArrayList(transform(expected.getSuites(), suiteMapFn));
+        List<String> actualSuites = newArrayList(transform(actual.getSuites(), suiteMapFn));
         if (!expectedSuites.equals(actualSuites))
         {
             return "Nested suite names differ: " + expectedSuites + " != " + actualSuites;

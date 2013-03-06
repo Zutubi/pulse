@@ -11,7 +11,6 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 
 import java.io.IOException;
@@ -19,6 +18,8 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Action to get a build or recipe log.  If a stage is specified, a recipe log
@@ -120,7 +121,7 @@ public class TailBuildLogAction extends StageActionBase
             }
         }
 
-        List<String> stageNames = CollectionUtils.map(buildResult.getStages(), new Function<RecipeResultNode, String>()
+        Iterable<String> stageNames = transform(buildResult.getStages(), new Function<RecipeResultNode, String>()
         {
             public String apply(RecipeResultNode recipeResultNode)
             {

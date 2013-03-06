@@ -18,6 +18,9 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  */
 public class ViewChangesAction extends BuildActionBase
@@ -133,13 +136,13 @@ public class ViewChangesAction extends BuildActionBase
         List<PersistentChangelist> rawChangelists = changelistManager.getChangesForBuild(result, sinceBuild, true);
         final ChangelistComparator changelistComparator = new ChangelistComparator();
         Collections.sort(rawChangelists, changelistComparator);
-        changelists = CollectionUtils.map(rawChangelists, new Function<PersistentChangelist, ChangelistModel>()
+        changelists = newArrayList(transform(rawChangelists, new Function<PersistentChangelist, ChangelistModel>()
         {
             public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT));
             }
-        });
+        }));
         
         List<UpstreamChangelist> rawUpstreamChangelists = changelistManager.getUpstreamChangelists(result, sinceResult);
         Collections.sort(rawUpstreamChangelists, new Comparator<UpstreamChangelist>()
@@ -150,14 +153,14 @@ public class ViewChangesAction extends BuildActionBase
             }
         });
         
-        upstreamChangelists = CollectionUtils.map(rawUpstreamChangelists, new Function<UpstreamChangelist, ChangelistModel>()
+        upstreamChangelists = newArrayList(transform(rawUpstreamChangelists, new Function<UpstreamChangelist, ChangelistModel>()
         {
             public ChangelistModel apply(UpstreamChangelist upstreamChangelist)
             {
                 PersistentChangelist persistentChangelist = upstreamChangelist.getChangelist();
                 return new ChangelistModel(persistentChangelist, changelistManager.getChangelistSize(persistentChangelist), changelistManager.getChangelistFiles(persistentChangelist, 0, FILE_LIMIT), upstreamChangelist.getUpstreamContexts());
             }
-        });
+        }));
         
         previousSuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getHealthyStates());
         previousUnsuccessful = buildManager.getPreviousBuildResultWithRevision(result, ResultState.getBrokenStates());

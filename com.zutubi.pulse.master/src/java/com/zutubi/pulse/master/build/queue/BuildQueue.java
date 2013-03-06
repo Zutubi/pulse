@@ -1,9 +1,5 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.find;
 import com.google.common.collect.Lists;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.PublishFlag;
@@ -15,6 +11,11 @@ import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.util.CollectionUtils;
 
 import java.util.*;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
 
 /**
  * The build queue tracks queued and active build requests.
@@ -75,7 +76,7 @@ public class BuildQueue
      *
      * @param requests the requests to be queued.
      */
-    public synchronized void enqueue(List<QueuedRequest> requests)
+    public synchronized void enqueue(Iterable<QueuedRequest> requests)
     {
         if (assimilateRequests(requests))
         {
@@ -110,7 +111,7 @@ public class BuildQueue
      * Enqueue the requests.
      *
      * @param requests the requests to enqueue.
-     * @see #enqueue(java.util.List)
+     * @see #enqueue(Iterable)
      */
     public synchronized void enqueue(QueuedRequest... requests)
     {
@@ -292,7 +293,7 @@ public class BuildQueue
      * @param requests  the requests to be assimilated.
      * @return true if the requests were assimilated, false otherwise.
      */
-    private boolean assimilateRequests(List<QueuedRequest> requests)
+    private boolean assimilateRequests(Iterable<QueuedRequest> requests)
     {
         Map<QueuedRequest, RequestHolder> assimilationTargets = new HashMap<QueuedRequest, RequestHolder>();
         for (QueuedRequest source : requests)
@@ -367,7 +368,7 @@ public class BuildQueue
      */
     public synchronized Collection<QueuedRequest> getQueuedRequestsByOwner(Object owner)
     {
-        return Lists.newArrayList(Collections2.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
+        return Lists.newArrayList(filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)));
     }
 
     /**
@@ -388,7 +389,7 @@ public class BuildQueue
      */
     public synchronized Collection<ActivatedRequest> getActivatedRequestsByOwner(Object owner)
     {
-        return Lists.newArrayList(Collections2.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)));
+        return Lists.newArrayList(filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)));
     }
 
     /**
@@ -411,8 +412,8 @@ public class BuildQueue
     public synchronized List<RequestHolder> getMetaBuildRequests(long metaBuildId)
     {
         LinkedList<RequestHolder> requests = new LinkedList<RequestHolder>();
-        requests.addAll(Collections2.filter(queuedRequests, new HasMetaIdPredicate<QueuedRequest>(metaBuildId)));
-        requests.addAll(Collections2.filter(activatedRequests, new HasMetaIdPredicate<ActivatedRequest>(metaBuildId)));
+        requests.addAll(filter(queuedRequests, new HasMetaIdPredicate<QueuedRequest>(metaBuildId)));
+        requests.addAll(filter(activatedRequests, new HasMetaIdPredicate<ActivatedRequest>(metaBuildId)));
         return requests;
     }
 
@@ -456,8 +457,8 @@ public class BuildQueue
     public synchronized List<BuildRequestEvent> getRequestsByOwner(Object owner)
     {
         List<BuildRequestEvent> byOwner = new LinkedList<BuildRequestEvent>();
-        byOwner.addAll(CollectionUtils.map(Iterables.filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestFunction<QueuedRequest>()));
-        byOwner.addAll(CollectionUtils.map(Iterables.filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestFunction<ActivatedRequest>()));
+        byOwner.addAll(transform(filter(queuedRequests, new HasOwnerPredicate<QueuedRequest>(owner)), new ExtractRequestFunction<QueuedRequest>()));
+        byOwner.addAll(transform(filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)), new ExtractRequestFunction<ActivatedRequest>()));
         return byOwner;
     }
 

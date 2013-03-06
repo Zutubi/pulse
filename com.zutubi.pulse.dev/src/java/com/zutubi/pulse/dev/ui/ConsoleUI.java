@@ -5,15 +5,16 @@ import com.zutubi.pulse.core.ui.api.MenuChoice;
 import com.zutubi.pulse.core.ui.api.MenuOption;
 import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
-import static java.util.Arrays.asList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.transform;
+import static java.util.Arrays.asList;
 
 /**
  * A personal build UI that uses the console to interact with the user.
@@ -180,7 +181,7 @@ public class ConsoleUI implements UserInterface
             validResponses.add(YesNoResponse.NEVER);
         }
 
-        String prompt = StringUtils.join("/", CollectionUtils.map(validResponses, new Function<YesNoResponse, String>()
+        String prompt = StringUtils.join("/", transform(validResponses, new Function<YesNoResponse, String>()
         {
             public String apply(YesNoResponse response)
             {

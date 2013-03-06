@@ -17,13 +17,15 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 
 import java.io.File;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Analyses a configuration path, extracting information that is used to
@@ -162,7 +164,7 @@ public class ConfigurationUIModel
             formHeading = ToveUtils.getFormHeading(ctype);
             simpleProperties = ctype.getSimplePropertyNames();
 
-            extensions.addAll(CollectionUtils.map(((CompositeType) targetType).getExtensions(), new Function<CompositeType, String>()
+            extensions.addAll(transform(((CompositeType) targetType).getExtensions(), new Function<CompositeType, String>()
             {
                 public String apply(CompositeType compositeType)
                 {
@@ -290,13 +292,13 @@ public class ConfigurationUIModel
                 key[0] = PathUtils.getBaseName(path);
             }
 
-            actions = CollectionUtils.map(actionNames, new Function<String, ActionLink>()
+            actions = newArrayList(transform(actionNames, new Function<String, ActionLink>()
             {
                 public ActionLink apply(String actionName)
                 {
                     return ToveUtils.getActionLink(actionName, parentRecord[0], key[0], messages, systemPaths);
                 }
-            });
+            }));
         }
         else
         {

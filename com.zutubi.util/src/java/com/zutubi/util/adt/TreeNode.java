@@ -4,12 +4,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.math.AggregationFunction;
-import static java.util.Arrays.asList;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  * Represents a node in a hierarchical structure.  Nodes can hold an arbitrary
@@ -158,13 +160,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>
         }
         else
         {
-            Number maxChildDepth = AggregationFunction.MAX.aggregate(CollectionUtils.map(children, new Function<TreeNode<T>, Number>()
+            Number maxChildDepth = AggregationFunction.MAX.aggregate(newArrayList(transform(children, new Function<TreeNode<T>, Number>()
             {
                 public Number apply(TreeNode<T> child)
                 {
                     return child.depth();
                 }
-            }));
+            })));
 
             return maxChildDepth.intValue() + 1;
         }

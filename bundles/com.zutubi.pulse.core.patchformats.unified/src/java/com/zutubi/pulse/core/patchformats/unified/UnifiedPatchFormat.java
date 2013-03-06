@@ -9,11 +9,13 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
-import com.zutubi.util.CollectionUtils;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 /**
  * A {@link com.zutubi.pulse.core.scm.patch.api.PatchFormat} implementation that reads unified
@@ -45,13 +47,13 @@ public class UnifiedPatchFormat implements PatchFormat
     public List<FileStatus> readFileStatuses(File patchFile) throws ScmException
     {
         PatchFile patch = parse(patchFile);
-        return CollectionUtils.map(patch.getPatches(), new Function<Patch, FileStatus>()
+        return newArrayList(transform(patch.getPatches(), new Function<Patch, FileStatus>()
         {
             public FileStatus apply(Patch patch)
             {
                 return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
             }
-        });
+        }));
     }
 
     public boolean isPatchFile(File patchFile)

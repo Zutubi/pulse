@@ -15,6 +15,8 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+
 /**
  * The action that allows for the viewing of a test suite.  The input for this
  * action is the path that defines the suite of interest.
@@ -97,7 +99,7 @@ public class ViewTestSuiteAction extends StageActionBase
         }
         else
         {
-            String uriPath = StringUtils.join("/", CollectionUtils.map(paths, new Function<String, String>()
+            String uriPath = StringUtils.join("/", transform(paths, new Function<String, String>()
             {
                 public String apply(String s)
                 {

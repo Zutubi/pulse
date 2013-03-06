@@ -3,6 +3,9 @@ package com.zutubi.pulse.master.dependency;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -10,6 +13,9 @@ import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.TreeNode;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -79,13 +85,13 @@ public class ProjectDependencyGraphBuilderTest extends PulseTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 List<ProjectConfiguration> configs = (List<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
+                return newArrayList(transform(configs, new Function<ProjectConfiguration, Project>()
                 {
                     public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }
-                });
+                }));
             }
         });
 

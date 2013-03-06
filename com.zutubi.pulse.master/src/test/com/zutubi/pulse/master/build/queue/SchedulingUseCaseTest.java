@@ -8,17 +8,19 @@ import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State;
-import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.model.Project.State;
+import static com.zutubi.pulse.master.model.Project.Transition;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Check that a set of use cases behave as expected.
@@ -443,7 +445,7 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
         Project a = createProject("A");
         Project b1 = createProject("B1", dependency(a));
         Project c1 = createProject("C1", dependency(b1));
-        Project d1 = createProject("D1", dependency(c1));
+        createProject("D1", dependency(c1));
         Project b2 = createProject("B2", dependency(a));
         Project c2 = createProject("C2", dependency(b2));
 
@@ -499,13 +501,13 @@ public class SchedulingUseCaseTest extends BaseQueueTestCase
     private void assertActivatedEvents(BuildRequestEvent... requests)
     {
         // activated event was generated.
-        List<BuildRequestEvent> activatedEvents = CollectionUtils.map(listener.getEventsReceived(BuildActivatedEvent.class), new Function<BuildActivatedEvent, BuildRequestEvent>()
+        List<BuildRequestEvent> activatedEvents = newArrayList(transform(listener.getEventsReceived(BuildActivatedEvent.class), new Function<BuildActivatedEvent, BuildRequestEvent>()
         {
             public BuildRequestEvent apply(BuildActivatedEvent buildActivatedEvent)
             {
                 return buildActivatedEvent.getEvent();
             }
-        });
+        }));
         assertItemsSame(Arrays.asList(requests), activatedEvents);
     }
 }

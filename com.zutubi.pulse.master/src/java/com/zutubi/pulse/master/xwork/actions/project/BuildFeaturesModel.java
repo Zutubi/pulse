@@ -11,6 +11,9 @@ import com.zutubi.util.CollectionUtils;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * JSON data model for features of a given level from a build.  Only includes
  * entries for stages, commands etc that have features of the given level.
@@ -25,7 +28,7 @@ public class BuildFeaturesModel
     {
         if (buildResult.hasDirectMessages(level))
         {
-            features = CollectionUtils.map(buildResult.getFeatures(level), new SimpleFeatureFunction());
+            features = newArrayList(transform(buildResult.getFeatures(level), new SimpleFeatureFunction()));
         }
         
         for (RecipeResultNode stageResult: buildResult.getStages())
@@ -72,7 +75,7 @@ public class BuildFeaturesModel
             
             if (recipeResult.hasDirectMessages(level))
             {
-                features = CollectionUtils.map(recipeResult.getFeatures(level), new SimpleFeatureFunction());
+                features = newArrayList(transform(recipeResult.getFeatures(level), new SimpleFeatureFunction()));
             }
             
             for (CommandResult command: recipeResult.getCommandResults())
@@ -132,7 +135,7 @@ public class BuildFeaturesModel
             name = commandResult.getCommandName();
             if (commandResult.hasDirectMessages(level))
             {
-                features = CollectionUtils.map(commandResult.getFeatures(level), new SimpleFeatureFunction());
+                features = newArrayList(transform(commandResult.getFeatures(level), new SimpleFeatureFunction()));
             }
             
             artifactsUrl = urls.commandArtifacts(buildResult, commandResult);

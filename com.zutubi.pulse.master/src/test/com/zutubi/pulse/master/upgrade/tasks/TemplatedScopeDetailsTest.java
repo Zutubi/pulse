@@ -14,6 +14,9 @@ import com.zutubi.util.Sort;
 import java.util.Collections;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 public class TemplatedScopeDetailsTest extends PulseTestCase
 {
     private static final String SCOPE_EMPTY    = "empty";
@@ -269,13 +272,13 @@ public class TemplatedScopeDetailsTest extends PulseTestCase
             assertEquals(expectedParentId, node.getParent().getId());
         }
 
-        List<String> gotChildIds = CollectionUtils.map(node.getChildren(), new Function<ScopeHierarchy.Node, String>()
+        List<String> gotChildIds = newArrayList(transform(node.getChildren(), new Function<ScopeHierarchy.Node, String>()
         {
             public String apply(ScopeHierarchy.Node node)
             {
                 return node.getId();
             }
-        });
+        }));
 
         Collections.sort(gotChildIds, new Sort.StringComparator());
         EqualityAssertions.assertListEquals(gotChildIds, expectedChildIds);

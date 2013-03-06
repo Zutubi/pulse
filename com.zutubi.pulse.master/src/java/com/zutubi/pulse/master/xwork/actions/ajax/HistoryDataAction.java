@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Action to supply JSON data to the project history tab.
  */
@@ -148,7 +151,7 @@ public class HistoryDataAction extends ActionSupport
             toModelMapping = new BuildResultToModelFunction(urls, project.getConfig().getChangeViewer());
         }
 
-        List<BuildModel> builds = CollectionUtils.map(page.getResults(), toModelMapping);
+        List<BuildModel> builds = newArrayList(transform(page.getResults(), toModelMapping));
         model = new HistoryModel(builds, new PagerModel(page.getTotalBuilds(), buildsPerPage, startPage));
 
         return SUCCESS;

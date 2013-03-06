@@ -8,12 +8,14 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.WebUtils;
 
 import java.util.Collection;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * JSON data model for failed tests in a build stage.
@@ -130,25 +132,25 @@ public class BuildStageTestFailuresModel
             List<PersistentTestSuiteResult> childSuites = suiteResult.getSuites();
             if (childSuites.size() > 0)
             {
-                suites = CollectionUtils.map(childSuites, new Function<PersistentTestSuiteResult, TestSuiteModel>()
+                suites = newArrayList(transform(childSuites, new Function<PersistentTestSuiteResult, TestSuiteModel>()
                 {
                     public TestSuiteModel apply(PersistentTestSuiteResult childSuite)
                     {
                         return new TestSuiteModel(childSuite);
                     }
-                });
+                }));
             }
 
             Collection<PersistentTestCaseResult> childCases = suiteResult.getCases();
             if (childCases.size() > 0)
             {
-                cases = CollectionUtils.map(childCases, new Function<PersistentTestCaseResult, TestCaseModel>()
+                cases = newArrayList(transform(childCases, new Function<PersistentTestCaseResult, TestCaseModel>()
                 {
                     public TestCaseModel apply(PersistentTestCaseResult childCase)
                     {
                         return new TestCaseModel(childCase);
                     }
-                });
+                }));
             }
         }
 

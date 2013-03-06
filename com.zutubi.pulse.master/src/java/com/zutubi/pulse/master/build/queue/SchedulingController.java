@@ -2,10 +2,7 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import static com.google.common.base.Predicates.not;
-import com.google.common.collect.Collections2;
-import static com.google.common.collect.Iterables.*;
-import static com.google.common.collect.Lists.newLinkedList;
+import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
@@ -24,6 +21,14 @@ import com.zutubi.util.logging.Logger;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newLinkedList;
 
 /**
  * The scheduling controller is the main component of the scheduling/queueing system.
@@ -108,7 +113,7 @@ public class SchedulingController
             {
                 final List<QueuedRequest> candidates = new LinkedList<QueuedRequest>(requestHandler.prepare(request));
     
-                List<BuildRequestEvent> allRequests = CollectionUtils.map(candidates, new ExtractRequestFunction<QueuedRequest>());
+                List<BuildRequestEvent> allRequests = newArrayList(transform(candidates, new ExtractRequestFunction<QueuedRequest>()));
                 projectManager.runUnderProjectLocks(new Runnable()
                 {
                     public void run()
@@ -195,8 +200,8 @@ public class SchedulingController
         @SuppressWarnings({"unchecked"})
         CanBuildPredicate<QueuedRequest> canBuild = objectFactory.buildBean(CanBuildPredicate.class);
 
-        List<QueuedRequest> accepted = newLinkedList(filter(candidates, canBuild));
-        List<QueuedRequest> rejected = newLinkedList(filter(candidates, not(canBuild)));
+        List<QueuedRequest> accepted = newLinkedList(Iterables.filter(candidates, canBuild));
+        List<QueuedRequest> rejected = newLinkedList(Iterables.filter(candidates, not(canBuild)));
 
         // Now we need to go through and move any requests that are in the accepted list that
         // depend on a request in the rejected list into the rejected list.  We do this until
@@ -204,8 +209,8 @@ public class SchedulingController
 
         while (true)
         {
-            final List<Object> rejectedOwners = CollectionUtils.map(rejected, new ExtractOwnerFunction<QueuedRequest>());
-            Collection<QueuedRequest> acceptedThatDependOnRejected = Collections2.filter(accepted, new Predicate<QueuedRequest>()
+            final List<Object> rejectedOwners = newArrayList(transform(rejected, new ExtractOwnerFunction<QueuedRequest>()));
+            Collection<QueuedRequest> acceptedThatDependOnRejected = filter(accepted, new Predicate<QueuedRequest>()
             {
                 public boolean apply(QueuedRequest queuedRequest)
                 {
@@ -288,7 +293,7 @@ public class SchedulingController
                         new HasDependencyOnPredicate(buildQueue, requestToComplete.getOwner())
                 );
                 
-                requestsToComplete.addAll(Collections2.filter(buildQueue.getQueuedRequests(), toCancelPredicate));
+                requestsToComplete.addAll(filter(buildQueue.getQueuedRequests(), toCancelPredicate));
             }
             internalCompleteRequests(requestHandler, requestsToComplete);
         }
@@ -300,7 +305,7 @@ public class SchedulingController
 
     private void internalCompleteRequests(final BuildRequestHandler requestHandler, final Collection<RequestHolder> completedRequests)
     {
-        final List<BuildRequestEvent> requestEvents = CollectionUtils.map(completedRequests, new ExtractRequestFunction<RequestHolder>());
+        final List<BuildRequestEvent> requestEvents = newArrayList(transform(completedRequests, new ExtractRequestFunction<RequestHolder>()));
 
         lock.lock();
         try
@@ -435,7 +440,7 @@ public class SchedulingController
                 try
                 {
                     List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-                    Collection<RequestHolder> queuedRequests = Collections2.filter(requests, Predicates.instanceOf(QueuedRequest.class));
+                    Collection<RequestHolder> queuedRequests = filter(requests, Predicates.instanceOf(QueuedRequest.class));
                     internalCompleteRequests(requestHandler, queuedRequests);
                     return queuedRequests.size() > 0;
                 }

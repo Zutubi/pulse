@@ -1,17 +1,20 @@
 package com.zutubi.pulse.core;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.api.Variable;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
+
+import static com.google.common.collect.Collections2.transform;
+import static java.util.Arrays.asList;
 
 public class PulseScopeTest extends PulseTestCase
 {
@@ -106,7 +109,7 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testAddAll()
     {
-        scope.addAll(Arrays.asList(new GenericVariable<String>("p1", "v1"), new GenericVariable<String>("p2", "v2")));
+        scope.addAll(asList(new GenericVariable<String>("p1", "v1"), new GenericVariable<String>("p2", "v2")));
         assertEquals("v1", scope.getVariableValue("p1", String.class));
         assertEquals("v2", scope.getVariableValue("p2", String.class));
     }
@@ -115,7 +118,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addAllUnique(Arrays.asList(new GenericVariable<String>(KEY_CHILD_ONLY, "")));
+            scope.addAllUnique(asList(new GenericVariable<String>(KEY_CHILD_ONLY, "")));
             fail();
         }
         catch (IllegalArgumentException e)
@@ -135,13 +138,13 @@ public class PulseScopeTest extends PulseTestCase
 
         Collection<Variable> variables = child.getVariables();
         assertEquals(3, variables.size());
-        EqualityAssertions.assertEquals(Arrays.asList(VALUE_PARENT, VALUE_CHILD, "both"), CollectionUtils.map(variables, new Function<Variable, String>()
+        EqualityAssertions.assertEquals(asList(VALUE_PARENT, VALUE_CHILD, "both"), Lists.newArrayList(transform(variables, new Function<Variable, String>()
         {
             public String apply(Variable variable)
             {
                 return variable.getName();
             }
-        }));
+        })));
     }
 
     public void testGetVariablesOfType()

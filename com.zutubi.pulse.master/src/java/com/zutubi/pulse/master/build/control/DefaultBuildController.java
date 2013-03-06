@@ -17,7 +17,6 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -34,7 +33,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -47,7 +45,6 @@ import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -58,7 +55,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.TimeStamps;
@@ -72,6 +68,12 @@ import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -317,7 +319,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Collection<? extends ResourceProperty> asResourceProperties(Collection<ResourcePropertyConfiguration> resourcePropertyConfigurations)
     {
-        return CollectionUtils.map(resourcePropertyConfigurations, new AsResourcePropertyFunction());
+        return transform(resourcePropertyConfigurations, new AsResourcePropertyFunction());
     }
 
     private AgentRequirements getAgentRequirements(BuildStageConfiguration stage)
@@ -378,7 +380,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private Collection<? extends ResourceRequirement> asResourceRequirements(List<ResourceRequirementConfiguration> requirements, final VariableMap variables)
     {
-        return CollectionUtils.map(requirements, new Function<ResourceRequirementConfiguration, ResourceRequirement>()
+        return transform(requirements, new Function<ResourceRequirementConfiguration, ResourceRequirement>()
         {
             public ResourceRequirement apply(ResourceRequirementConfiguration config)
             {

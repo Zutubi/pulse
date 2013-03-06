@@ -12,12 +12,18 @@ import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.tove.config.api.NamedConfiguration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
-import static com.zutubi.tove.type.record.PathUtils.getBaseName;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import static com.zutubi.util.CollectionUtils.*;
 import com.zutubi.validation.ValidationException;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.tove.type.record.PathUtils.getBaseName;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.util.CollectionUtils.*;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -25,9 +31,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import org.springframework.security.access.AccessDeniedException;
-
-import java.util.*;
 
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -462,8 +465,8 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
             }
         };
         
-        assertEquals(LIST_NAMES, map(instance.getOrderedBlist(), configToNameFn));
-        assertEquals(MAP_NAMES, map(instance.getOrderedBmap().values(), configToNameFn));
+        assertEquals(LIST_NAMES, newArrayList(transform(instance.getOrderedBlist(), configToNameFn)));
+        assertEquals(MAP_NAMES, newArrayList(transform(instance.getOrderedBmap().values(), configToNameFn)));
     }
 
     private void templateHierarchyHelper(Map<String, String> originalKeyToCloneKey) throws TypeException
@@ -626,13 +629,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/extracted", node.getTemplatePath());
 
         assertEquals(2, node.getChildren().size());
-        List<String> children = map(node.getChildren(), new Function<TemplateNode, String>()
+        List<String> children = newArrayList(transform(node.getChildren(), new Function<TemplateNode, String>()
         {
             public String apply(TemplateNode templateNode)
             {
                 return templateNode.getId();
             }
-        });
+        }));
         Collections.sort(children);
         assertEquals("1", children.get(0));
         assertEquals("2", children.get(1));
@@ -839,13 +842,13 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals("root/added", node.getTemplatePath());
 
         assertEquals(2, node.getChildren().size());
-        List<String> children = map(node.getChildren(), new Function<TemplateNode, String>()
+        List<String> children = newArrayList(transform(node.getChildren(), new Function<TemplateNode, String>()
         {
             public String apply(TemplateNode templateNode)
             {
                 return templateNode.getId();
             }
-        });
+        }));
         Collections.sort(children);
         assertEquals("1", children.get(0));
         assertEquals("2", children.get(1));
@@ -937,16 +940,16 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         Function<ConfigB, String> configToNameFn = Configurations.toConfigurationName();
         
         instance = configurationTemplateManager.getInstance(sourcePath, ConfigA.class);
-        assertEquals(LIST_NAMES, map(instance.getOrderedBlist(), configToNameFn));
-        assertEquals(MAP_NAMES, map(instance.getOrderedBmap().values(), configToNameFn));
+        assertEquals(LIST_NAMES, newArrayList(transform(instance.getOrderedBlist(), configToNameFn)));
+        assertEquals(MAP_NAMES, newArrayList(transform(instance.getOrderedBmap().values(), configToNameFn)));
 
         ConfigA extracted = configurationTemplateManager.getInstance(getPath(TEMPLATE_SCOPE, "extracted"), ConfigA.class);
-        assertEquals(LIST_NAMES, map(extracted.getOrderedBlist(), configToNameFn));
-        assertEquals(MAP_NAMES, map(extracted.getOrderedBmap().values(), configToNameFn));
+        assertEquals(LIST_NAMES, newArrayList(transform(extracted.getOrderedBlist(), configToNameFn)));
+        assertEquals(MAP_NAMES, newArrayList(transform(extracted.getOrderedBmap().values(), configToNameFn)));
 
         ConfigA clone = configurationTemplateManager.getInstance(clonePath, ConfigA.class);
-        assertEquals(LIST_NAMES, map(clone.getOrderedBlist(), configToNameFn));
-        assertEquals(MAP_NAMES, map(clone.getOrderedBmap().values(), configToNameFn));
+        assertEquals(LIST_NAMES, newArrayList(transform(clone.getOrderedBlist(), configToNameFn)));
+        assertEquals(MAP_NAMES, newArrayList(transform(clone.getOrderedBmap().values(), configToNameFn)));
     }
     
     public void testGetPullUpAncestorsInvalidPath()

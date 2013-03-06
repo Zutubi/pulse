@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -19,6 +21,9 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -94,13 +99,13 @@ public abstract class BaseQueueTestCase extends PulseTestCase
             public List<Project> answer(InvocationOnMock invocationOnMock) throws Throwable
             {
                 Collection<ProjectConfiguration> configs = (Collection<ProjectConfiguration>) invocationOnMock.getArguments()[0];
-                return CollectionUtils.map(configs, new Function<ProjectConfiguration, Project>()
+                return newArrayList(transform(configs, new Function<ProjectConfiguration, Project>()
                 {
                     public Project apply(ProjectConfiguration projectConfiguration)
                     {
                         return idToProject.get(projectConfiguration.getProjectId());
                     }
-                });
+                }));
             }
         });
         stub(projectManager.getProject(anyLong(), anyBoolean())).toAnswer(new Answer<Project>()

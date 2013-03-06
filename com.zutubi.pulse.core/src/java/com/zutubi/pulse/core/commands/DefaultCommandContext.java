@@ -1,18 +1,15 @@
 package com.zutubi.pulse.core.commands;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.*;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_CUSTOM_FIELDS;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
@@ -26,6 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_CUSTOM_FIELDS;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Default implementation of {@link com.zutubi.pulse.core.commands.api.CommandContext}.
@@ -173,13 +175,13 @@ public class DefaultCommandContext implements CommandContext
     {
         for (ArtifactSpec spec: registeredArtifacts.values())
         {
-            final List<PostProcessor> processors = CollectionUtils.map(spec.getProcessors(), new Function<PostProcessorConfiguration, PostProcessor>()
+            final List<PostProcessor> processors = Lists.newArrayList(transform(spec.getProcessors(), new Function<PostProcessorConfiguration, PostProcessor>()
             {
                 public PostProcessor apply(PostProcessorConfiguration postProcessorConfiguration)
                 {
                     return postProcessorFactory.create(postProcessorConfiguration);
                 }
-            });
+            }));
 
             DirectoryScanner scanner = new DirectoryScanner();
             scanner.setBasedir(spec.getToDir());

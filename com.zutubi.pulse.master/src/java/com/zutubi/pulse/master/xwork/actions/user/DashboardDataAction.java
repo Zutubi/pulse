@@ -19,12 +19,14 @@ import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelSorter;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectsModelsHelper;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Action to view the user's dashboard: their own Pulse "homepage".
@@ -79,13 +81,13 @@ public class DashboardDataAction extends ActionSupport
                 }
     
                 List<Project> responsibleFor = projectManager.findByResponsible(user);
-                List<UserResponsibilityModel> responsibilities = CollectionUtils.map(responsibleFor, new Function<Project, UserResponsibilityModel>()
+                List<UserResponsibilityModel> responsibilities = newArrayList(transform(responsibleFor, new Function<Project, UserResponsibilityModel>()
                 {
                     public UserResponsibilityModel apply(Project project)
                     {
                         return new UserResponsibilityModel(project.getName(), project.getId());
                     }
-                });
+                }));
     
                 final DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
     
@@ -167,13 +169,13 @@ public class DashboardDataAction extends ActionSupport
 
     private List<ChangelistModel> mapChangelists(List<PersistentChangelist> changelists)
     {
-        return CollectionUtils.map(changelists, new Function<PersistentChangelist, ChangelistModel>()
+        return newArrayList(transform(changelists, new Function<PersistentChangelist, ChangelistModel>()
         {
             public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
                 return new ChangelistModel(persistentChangelist, getChangeUrl(persistentChangelist), getChangelistResults(persistentChangelist), getCommitMessageSupport(persistentChangelist));
             }
-        });
+        }));
     }
 
     private String getChangeUrl(PersistentChangelist changelist)

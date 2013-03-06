@@ -1,17 +1,19 @@
 package com.zutubi.pulse.core.engine;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.InMemoryResourceRepository;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Lists.transform;
 
 /**
  * Configuration type used specifically for loading resources from a file.
@@ -55,12 +57,12 @@ public class ResourcesConfiguration extends AbstractConfiguration
 
     public List<ResourceRequirement> createRequirements()
     {
-        return CollectionUtils.map(requirements, new Function<SimpleResourceRequirementConfiguration, ResourceRequirement>()
+        return Lists.newArrayList(transform(requirements, new Function<SimpleResourceRequirementConfiguration, ResourceRequirement>()
         {
             public ResourceRequirement apply(SimpleResourceRequirementConfiguration requirementConfiguration)
             {
                 return requirementConfiguration.asResourceRequirement();
             }
-        });
+        }));
     }
 }

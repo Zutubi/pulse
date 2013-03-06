@@ -10,10 +10,11 @@ import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.VariableResolver;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 
 import java.util.List;
+
+import static com.google.common.collect.Lists.transform;
 
 /**
  * Utility methods for helping with marshalling configuration instances via
@@ -236,7 +237,7 @@ public class ToveFileUtils
         }
         else
         {
-            List<String> list = CollectionUtils.map(propertyValue, new Function<Object, String>()
+            List<String> list = transform(propertyValue, new Function<Object, String>()
             {
                 public String apply(Object o)
                 {

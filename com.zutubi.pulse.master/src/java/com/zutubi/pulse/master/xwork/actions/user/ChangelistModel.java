@@ -8,10 +8,12 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.util.CollectionUtils;
 import flexjson.JSON;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * JSON-encodable object representing a changelist.
@@ -38,13 +40,13 @@ public class ChangelistModel
     {
         this.changelist = changelist;
         this.url = url;
-        this.builds = CollectionUtils.map(buildResults, new Function<BuildResult, ChangelistBuildModel>()
+        this.builds = newArrayList(transform(buildResults, new Function<BuildResult, ChangelistBuildModel>()
         {
             public ChangelistBuildModel apply(BuildResult buildResult)
             {
                 return new ChangelistBuildModel(buildResult);
             }
-        });
+        }));
 
         this.commitMessageSupport = commitMessageSupport;
 

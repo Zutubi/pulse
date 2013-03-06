@@ -12,16 +12,18 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.vfs.provider.pulse.scm.ScmRootFileObject;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileDepthFilterSelector;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.Mockito.*;
 
 public class PulseFileSystemTest extends PulseTestCase
 {
@@ -114,13 +116,13 @@ public class PulseFileSystemTest extends PulseTestCase
 
     private List<ScmFile> asFiles(String... filenames)
     {
-        return CollectionUtils.map(Arrays.asList(filenames), new Function<String, ScmFile>()
+        return newArrayList(transform(Arrays.asList(filenames), new Function<String, ScmFile>()
         {
             public ScmFile apply(String s)
             {
                 return new ScmFile(s);
             }
-        });
+        }));
     }
 
     private Project createProject(long id)

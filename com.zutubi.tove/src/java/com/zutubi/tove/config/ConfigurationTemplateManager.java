@@ -23,7 +23,10 @@ import com.zutubi.tove.type.record.events.RecordDeletedEvent;
 import com.zutubi.tove.type.record.events.RecordEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
-import com.zutubi.util.*;
+import com.zutubi.util.GraphFunction;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
@@ -35,6 +38,9 @@ import com.zutubi.validation.i18n.TextProvider;
 import com.zutubi.validation.validators.RequiredValidator;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  */
@@ -541,13 +547,13 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         List<String> descendantPaths = getDescendantPaths(newPath, true, false, false);
         if(descendantPaths.size() > 0)
         {
-            List<String> descendantNames = CollectionUtils.map(descendantPaths, new Function<String, String>()
+            List<String> descendantNames = newArrayList(transform(descendantPaths, new Function<String, String>()
             {
                 public String apply(String descendantPath)
                 {
                     return PathUtils.getPathElements(descendantPath)[1];
                 }
-            });
+            }));
 
             throw new IllegalArgumentException("Unable to insert record with name '" + name + "' into path '" + path + "': a record with this name already exists in descendants " + descendantNames);
         }

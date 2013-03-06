@@ -6,13 +6,14 @@ import com.zutubi.pulse.master.notifications.condition.NotifyConditionFactory;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * A condition that is a disjunction of some common simple conditions.
@@ -184,7 +185,7 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
             String modifierExpression = "";
             if (modifiers.size() > 0)
             {
-                modifierExpression = "(" + StringUtils.join(",", CollectionUtils.map(modifiers, new ChangedNotifyCondition.Modifier.ToTextFunction())) + ")";
+                modifierExpression = "(" + StringUtils.join(",", transform(modifiers, new ChangedNotifyCondition.Modifier.ToTextFunction())) + ")";
             }
 
             expressions.add("changed" + modifierExpression);

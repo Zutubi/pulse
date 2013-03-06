@@ -11,10 +11,12 @@ import com.zutubi.pulse.master.tove.format.MessagesAware;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.Configurations;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Formats state fields for resource requirements.
@@ -68,7 +70,7 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
             }            
         }
 
-        List<ResourceRequirement> requirements = CollectionUtils.map(requirementConfigs, new ResourceRequirementConfigurationToRequirement(variables));
+        List<ResourceRequirement> requirements = newArrayList(transform(requirementConfigs, new ResourceRequirementConfigurationToRequirement(variables)));
         Set<AgentConfiguration> compatibleAgents = resourceManager.getCapableAgents(requirements);
         int compatibleCount = compatibleAgents.size();
         if (compatibleCount == 0)
@@ -85,7 +87,7 @@ public class ResourceRequirementConfigurationStateDisplay implements MessagesAwa
         }
         else
         {
-            List<String> agentNames = CollectionUtils.map(compatibleAgents, Configurations.toConfigurationName());
+            List<String> agentNames = newArrayList(transform(compatibleAgents, Configurations.toConfigurationName()));
 
             Collections.sort(agentNames, new Sort.StringComparator());
             return agentNames;

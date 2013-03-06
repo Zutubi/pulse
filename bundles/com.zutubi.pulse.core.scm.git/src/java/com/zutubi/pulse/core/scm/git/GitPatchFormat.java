@@ -9,20 +9,22 @@ import com.zutubi.diff.git.GitPatchParser;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchFormat;
 import com.zutubi.pulse.core.util.process.ForwardingCharHandler;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static java.util.Arrays.asList;
 
 /**
  * A {@link com.zutubi.pulse.core.scm.patch.api.PatchFormat} implementation for
@@ -151,13 +153,13 @@ public class GitPatchFormat implements PatchFormat
         {
             PatchFileParser parser = new PatchFileParser(new GitPatchParser());
             PatchFile gitPatch = parser.parse(new FileReader(patchFile));
-            return CollectionUtils.map(gitPatch.getPatches(), new Function<Patch, FileStatus>()
+            return newArrayList(transform(gitPatch.getPatches(), new Function<Patch, FileStatus>()
             {
                 public FileStatus apply(Patch patch)
                 {
                     return new FileStatus(patch.getNewFile(), FileStatus.State.valueOf(patch.getType()), false);
                 }
-            });
+            }));
         }
         catch (IOException e)
         {

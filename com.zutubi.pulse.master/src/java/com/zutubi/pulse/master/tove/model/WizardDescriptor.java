@@ -13,6 +13,9 @@ import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  *
  *
@@ -69,13 +72,13 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
 
     private void decorate(FormDescriptor descriptor)
     {
-        List<String> actions = CollectionUtils.map(wizardInstance.getAvailableActions(), new Function<WizardTransition, String>()
+        List<String> actions = newArrayList(transform(wizardInstance.getAvailableActions(), new Function<WizardTransition, String>()
         {
             public String apply(WizardTransition o)
             {
                 return o.name().toLowerCase();
             }
-        });
+        }));
 
         descriptor.setActions(actions);
 

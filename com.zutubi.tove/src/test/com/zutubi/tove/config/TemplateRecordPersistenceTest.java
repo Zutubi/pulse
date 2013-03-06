@@ -9,12 +9,14 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Tests that the records returned by the CTM are template records with
@@ -1537,13 +1539,13 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         else if(type instanceof ListType)
         {
             ConfigurationList instance = configurationTemplateManager.getInstance(path, ConfigurationList.class);
-            return CollectionUtils.<Configuration, String>map(instance, new Function<Configuration, String>()
+            return newArrayList(transform(instance, new Function<Configuration, String>()
             {
                 public String apply(Configuration o)
                 {
                     return PathUtils.getBaseName(o.getConfigurationPath());
                 }
-            });
+            }));
         }
         else
         {

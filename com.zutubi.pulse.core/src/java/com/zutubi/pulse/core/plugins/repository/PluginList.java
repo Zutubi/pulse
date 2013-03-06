@@ -4,7 +4,6 @@ import com.google.common.base.Function;
 import com.zutubi.pulse.core.plugins.Plugin;
 import com.zutubi.pulse.core.plugins.PluginDependency;
 import com.zutubi.pulse.core.util.api.XMLUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
@@ -12,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A utility class for working with lists of plugins and plugin infos.
@@ -38,13 +40,13 @@ public class PluginList
      */
     public static List<PluginInfo> toInfos(Iterable<Plugin> plugins)
     {
-        return CollectionUtils.map(plugins, new Function<Plugin, PluginInfo>()
+        return newArrayList(transform(plugins, new Function<Plugin, PluginInfo>()
         {
             public PluginInfo apply(Plugin plugin)
             {
                 return new PluginInfo(plugin.getId(), plugin.getVersion().toString(), getScope(plugin));
             }
-        });
+        }));
     }
 
     /**
@@ -58,7 +60,7 @@ public class PluginList
      */
     public static List<Hashtable<String, Object>> pluginsToHashes(Iterable<Plugin> plugins)
     {
-        return CollectionUtils.map(plugins, new Function<Plugin, Hashtable<String, Object>>()
+        return newArrayList(transform(plugins, new Function<Plugin, Hashtable<String, Object>>()
         {
             public Hashtable<String, Object> apply(Plugin plugin)
             {
@@ -68,7 +70,7 @@ public class PluginList
                 hash.put(KEY_SCOPE, getScope(plugin).toString());
                 return hash;
             }
-        });
+        }));
     }
 
     /**
@@ -82,7 +84,7 @@ public class PluginList
      */
     public static List<Hashtable<String, Object>> infosToHashes(Iterable<PluginInfo> pluginInfos)
     {
-        return CollectionUtils.map(pluginInfos, new Function<PluginInfo, Hashtable<String, Object>>()
+        return newArrayList(transform(pluginInfos, new Function<PluginInfo, Hashtable<String, Object>>()
         {
             public Hashtable<String, Object> apply(PluginInfo info)
             {
@@ -92,7 +94,7 @@ public class PluginList
                 hash.put(KEY_SCOPE, info.getScope().name());
                 return hash;
             }
-        });
+        }));
     }
     
     /**

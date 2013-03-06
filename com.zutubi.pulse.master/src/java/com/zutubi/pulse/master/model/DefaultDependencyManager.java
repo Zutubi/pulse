@@ -13,9 +13,7 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.WebUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -27,6 +25,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * Default implementation of DependencyManager.
@@ -273,13 +275,13 @@ public class DefaultDependencyManager implements DependencyManager
     {
         public List<Long> getLinkedBuilds(long id)
         {
-            return CollectionUtils.map(buildDependencyLinkDao.findAllUpstreamDependencies(id), new Function<BuildDependencyLink, Long>()
+            return newArrayList(transform(buildDependencyLinkDao.findAllUpstreamDependencies(id), new Function<BuildDependencyLink, Long>()
             {
                 public Long apply(BuildDependencyLink link)
                 {
                     return link.getUpstreamBuildId();
                 }
-            });
+            }));
         }
     }
 
@@ -290,13 +292,13 @@ public class DefaultDependencyManager implements DependencyManager
     {
         public List<Long> getLinkedBuilds(long id)
         {
-            return CollectionUtils.map(buildDependencyLinkDao.findAllDownstreamDependencies(id), new Function<BuildDependencyLink, Long>()
+            return newArrayList(transform(buildDependencyLinkDao.findAllDownstreamDependencies(id), new Function<BuildDependencyLink, Long>()
             {
                 public Long apply(BuildDependencyLink link)
                 {
                     return link.getDownstreamBuildId();
                 }
-            });
+            }));
         }
     }
 }

@@ -21,12 +21,14 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.TemplateRecord;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
@@ -248,13 +250,13 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         {
             @SuppressWarnings("unchecked")
             List<ResourceRequirement> defaultRequirements = commandExtensionManager.getDefaultResourceRequirements((Class<? extends CommandConfiguration>) commandType.getClazz());
-            List<ResourceRequirementConfiguration> configurations = CollectionUtils.map(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
+            List<ResourceRequirementConfiguration> configurations = newArrayList(transform(defaultRequirements, new Function<ResourceRequirement, ResourceRequirementConfiguration>()
             {
                 public ResourceRequirementConfiguration apply(ResourceRequirement resourceRequirement)
                 {
                     return new ResourceRequirementConfiguration(resourceRequirement);
                 }
-            });
+            }));
 
             try
             {

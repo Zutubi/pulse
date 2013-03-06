@@ -3,13 +3,11 @@ package com.zutubi.pulse.core.marshal;
 import com.google.common.base.Function;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.Addable;
-import static com.zutubi.pulse.core.marshal.ToveFileUtils.*;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.squeezer.SqueezeException;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
@@ -20,6 +18,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.pulse.core.marshal.ToveFileUtils.*;
 
 /**
  * Stores configuration objects to XML files in a human-readable way.  Uses
@@ -197,7 +199,7 @@ public class ToveFileStorer
 
         @SuppressWarnings({"unchecked"})
         List<Object> items = (List<Object>) getPropertyValue(configuration, property);
-        return CollectionUtils.map(items, new Function<Object, String>()
+        return newArrayList(transform(items, new Function<Object, String>()
         {
             public String apply(Object o)
             {
@@ -210,7 +212,7 @@ public class ToveFileStorer
                     throw new PulseRuntimeException("Unable to store property '" + property.getName() + "' of class '" + configuration.getClass().getName() + "': " + e.getMessage(), e);
                 }
             }
-        });
+        }));
     }
 
     private List<String> convertReferenceCollection(Configuration configuration, CompositeType type, TypeProperty property)

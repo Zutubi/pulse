@@ -3,7 +3,6 @@ package com.zutubi.util;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import static com.zutubi.util.Constants.UTF8;
 import com.zutubi.util.adt.Pair;
 
 import java.io.UnsupportedEncodingException;
@@ -12,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Miscellaneous utility methods useful for web-related things like URLs, HTML,
@@ -336,7 +338,7 @@ public class WebUtils
      */
     public static String uriPathEncode(String rawPath)
     {
-        List<String> components = CollectionUtils.map(splitPath(rawPath), new Function<String, String>()
+        Iterable<String> components = transform(splitPath(rawPath), new Function<String, String>()
         {
             public String apply(String s)
             {
@@ -358,7 +360,7 @@ public class WebUtils
      */
     public static String uriPathDecode(String encodedPath)
     {
-        List<String> components = CollectionUtils.map(splitPath(encodedPath), new Function<String, String>()
+        Iterable<String> components = transform(splitPath(encodedPath), new Function<String, String>()
         {
             public String apply(String s)
             {

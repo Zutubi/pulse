@@ -9,12 +9,14 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.CollectionUtils;
 import flexjson.JSON;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * The options action is used to dynamically load list options.
@@ -89,14 +91,14 @@ public class DependentOptionsAction extends ActionSupport
         List mapOptions = optionProvider.getOptions(instance, path, property);
 
         // convert the map options to a list of lists for easy consumption by the javascript.
-        options = CollectionUtils.map(mapOptions, new Function<Object, Object>()
+        options = newArrayList(transform(mapOptions, new Function<Object, Object>()
         {
             public Object apply(Object o)
             {
                 Map.Entry<String, String> entry = (Map.Entry<String, String>) o;
                 return Arrays.asList(entry.getKey(), entry.getValue());
             }
-        });
+        }));
 
         return SUCCESS;
     }

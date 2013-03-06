@@ -1,12 +1,14 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.DAGraph;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A thin veil over a list of build results, used to represent a path through a dependency graph.
@@ -32,7 +34,7 @@ public class BuildPath implements Iterable<BuildResult>
      */
     public BuildPath(List<DAGraph.Node<BuildResult>> path)
     {
-        this.builds = CollectionUtils.map(path, new DAGraph.Node.ToDataFunction<BuildResult>());
+        this.builds = newArrayList(transform(path, new DAGraph.Node.ToDataFunction<BuildResult>()));
     }
 
     /**

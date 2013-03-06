@@ -6,7 +6,6 @@ import com.zutubi.pulse.master.charting.model.ReportData;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.Pair;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -26,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.transform;
 
 /**
  * Abstract base for charts built from {@link com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration}.
@@ -150,14 +151,14 @@ public abstract class CustomChart implements Chart
         return -1;
     }
 
-    private List<String> getAllSeriesNames(ReportSeriesConfiguration seriesConfig)
+    private Iterable<String> getAllSeriesNames(ReportSeriesConfiguration seriesConfig)
     {
         if (seriesConfig instanceof StageReportSeriesConfiguration)
         {
             final StageReportSeriesConfiguration stageConfig = (StageReportSeriesConfiguration) seriesConfig;
             if (!stageConfig.isCombineStages())
             {
-                return CollectionUtils.map(getAllStageNames(builds), new Function<String, String>()
+                return transform(getAllStageNames(builds), new Function<String, String>()
                 {
                     public String apply(String s)
                     {

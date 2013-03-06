@@ -28,7 +28,7 @@ public interface ResourceRepository
      * @param requirements the requirements to test for
      * @return true of this repository can fulfil all of the given requirements
      */
-    boolean satisfies(Collection<? extends ResourceRequirement> requirements);
+    boolean satisfies(Iterable<? extends ResourceRequirement> requirements);
 
     /**
      * Indicates if this repository has a resource of the given name.
