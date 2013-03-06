@@ -24,10 +24,12 @@ import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorFactory;
 import com.zutubi.pulse.core.util.PulseZipUtils;
+import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 import java.io.File;
@@ -49,6 +51,9 @@ public class RecipeProcessor
 
     public static final String BUILD_FIELDS_FILE = "build." + ResultCustomFields.CUSTOM_FIELDS_FILE;
     public static final String PULSE_FILE = "pulse.xml";
+
+    public static final String PROPERTY_DEBUG_RESULT_COLLECTION = "pulse.debug.result.collection";
+    public static final boolean DEBUG_RESULT_COLLECTION = Boolean.getBoolean(PROPERTY_DEBUG_RESULT_COLLECTION);
 
     private static final String LABEL_EXECUTE = "execute";
 
@@ -187,6 +192,10 @@ public class RecipeProcessor
         {
             File zipFile = new File(dir.getAbsolutePath() + ".zip");
             PulseZipUtils.createZip(zipFile, dir, null);
+            if (DEBUG_RESULT_COLLECTION)
+            {
+                debugZip(zipFile);
+            }
             return true;
         }
         catch (IOException e)
@@ -194,6 +203,22 @@ public class RecipeProcessor
             LOG.severe(e);
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compression failed: " + e.getMessage() + "."));
             return false;
+        }
+    }
+
+    private void debugZip(File zipFile)
+    {
+        File retainedFile = new File(SystemUtils.getUserHome(), "pulse-" + runningRecipe + ".zip");
+        try
+        {
+            LOG.warning("Created zip '" + zipFile.getAbsolutePath() + "' (Length: " + zipFile.length() + ", MD5: " + SecurityUtils.digest("MD5", zipFile) + ")");
+            
+            FileSystemUtils.copy(retainedFile, zipFile);
+            LOG.warning("Zip copied to '" + retainedFile.getAbsolutePath() + "' for debugging");
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
         }
     }
 

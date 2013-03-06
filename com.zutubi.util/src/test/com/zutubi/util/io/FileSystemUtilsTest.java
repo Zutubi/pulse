@@ -8,6 +8,7 @@ import com.zutubi.util.SystemUtils;
 import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
 import static com.zutubi.util.io.FileSystemUtils.relativePath;
 import com.zutubi.util.junit.ZutubiTestCase;
+import static java.util.Arrays.asList;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 
@@ -852,7 +853,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirWholeDirectoryUnderSymlink() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File linkTarget = new File(tmpDir, "target");
             assertTrue(linkTarget.mkdir());
@@ -861,7 +862,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             createDirectoryLayout(dir);
 
             File link = new File(tmpDir, "link");
-            FileSystemUtils.createSymlink(link, linkTarget);
+            linkMaker.makeLink(link, linkTarget);
 
             File underLink = new File(link, "dir");
             FileSystemUtils.rmdir(underLink);
@@ -874,27 +875,32 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirDirectoryContainsSymlinkToOutside() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File linkTarget = new File(tmpDir, "target");
             assertTrue(linkTarget.mkdir());
+
+            File fileUnderLinkTarget = new File(linkTarget, "f.txt");
+            FileSystemUtils.createFile(fileUnderLinkTarget, "some text");
+            assertTrue(fileUnderLinkTarget.exists());
 
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
 
             File link = new File(dir, "link");
-            FileSystemUtils.createSymlink(link, linkTarget);
+            linkMaker.makeLink(link, linkTarget);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(link.exists());
             assertFalse(dir.exists());
             assertTrue(linkTarget.exists());
+            assertTrue(fileUnderLinkTarget.exists());
         }
     }
 
     public void testRmdirDirectoryContainsSymlinkToSibling() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
@@ -903,7 +909,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(linkTarget.mkdir());
 
             File link = new File(dir, "link");
-            FileSystemUtils.createSymlink(link, linkTarget);
+            linkMaker.makeLink(link, linkTarget);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
@@ -912,7 +918,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirDirectoryContainsSymlinkToUnderSibling() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
@@ -923,7 +929,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(linkTarget.mkdir());
 
             File link = new File(dir, "link");
-            FileSystemUtils.createSymlink(link, linkTarget);
+            linkMaker.makeLink(link, linkTarget);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
@@ -932,7 +938,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirDirectoryContainsSymlinkToParent() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
@@ -941,7 +947,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(parent.mkdir());
 
             File link = new File(parent, "link");
-            FileSystemUtils.createSymlink(link, parent);
+            linkMaker.makeLink(link, parent);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
@@ -950,7 +956,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirDirectoryContainsSymlinkToAncestor() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
@@ -961,7 +967,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(parent.mkdir());
 
             File link = new File(parent, "link");
-            FileSystemUtils.createSymlink(link, ancestor);
+            linkMaker.makeLink(link, ancestor);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
@@ -970,7 +976,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
     public void testRmdirDirectoryContainsSymlinkToDir() throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS)
+        for (LinkMaker linkMaker: getLinkMakers())
         {
             File dir = new File(tmpDir, "dir");
             createDirectoryLayout(dir);
@@ -979,7 +985,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(parent.mkdir());
 
             File link = new File(parent, "link");
-            FileSystemUtils.createSymlink(link, dir);
+            linkMaker.makeLink(link, dir);
 
             FileSystemUtils.rmdir(dir);
             assertFalse(dir.exists());
@@ -1487,8 +1493,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         Arrays.sort(files1);
         Arrays.sort(files2);
 
-        List<String> fileList1 = new LinkedList<String>(Arrays.asList(files1));
-        List<String> fileList2 = new LinkedList<String>(Arrays.asList(files2));
+        List<String> fileList1 = new LinkedList<String>(asList(files1));
+        List<String> fileList2 = new LinkedList<String>(asList(files2));
 
         // Ignore .svn directories
         fileList1.remove(".svn");
@@ -1514,6 +1520,41 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             {
                 assertFilesEqual(file1, file2);
             }
+        }
+    }
+
+
+    private interface LinkMaker
+    {
+        void makeLink(File link, File linkTarget) throws IOException;
+    }
+
+    private static class SymbolicLinkMaker implements LinkMaker
+    {
+        public void makeLink(File link, File linkTarget) throws IOException
+        {
+            FileSystemUtils.createSymlink(link, linkTarget);
+        }
+    }
+
+    private static class WindowsJunctionLinkMaker implements LinkMaker
+    {
+        public void makeLink(File link, File linkTarget) throws IOException
+        {
+            SystemUtils.runCommand("cmd", "/c", "mklink", "/j", link.getAbsolutePath(), linkTarget.getAbsolutePath());
+        }
+    }
+
+    private List<LinkMaker> getLinkMakers()
+    {
+        if (SystemUtils.IS_WINDOWS)
+        {
+            System.setProperty(FileSystemUtils.PROPERTY_RMDIR_COMMAND, "cmd /c rmdir /s /q ${dir}");
+            return Arrays.<LinkMaker>asList(new WindowsJunctionLinkMaker());
+        }
+        else
+        {
+            return Arrays.<LinkMaker>asList(new SymbolicLinkMaker());
         }
     }
 

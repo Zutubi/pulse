@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -10,6 +11,9 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -21,9 +25,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
-import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -106,11 +107,19 @@ public class SlaveAgentService implements AgentService
             IOUtils.close(fos);
             fos = null;
 
+            if (RecipeProcessor.DEBUG_RESULT_COLLECTION)
+            {
+                logZipInfo(zipFile);
+            }
+
             // now unzip the file
             PulseZipUtils.extractZip(zipFile, tempDir);
 
-            zipFile.delete();
-
+            if (!RecipeProcessor.DEBUG_RESULT_COLLECTION)
+            {
+                zipFile.delete();
+            }
+            
             try
             {
                 FileSystemUtils.rename(tempDir, destination, true);
@@ -141,6 +150,19 @@ public class SlaveAgentService implements AgentService
                     // Ignore.
                 }
             }
+        }
+    }
+
+    private void logZipInfo(File zipFile)
+    {
+        try
+        {
+            LOG.warning("Collected zip '" + zipFile.getAbsolutePath() + "' (Length: " + zipFile.length() + ", MD5: " + SecurityUtils.digest("MD5", zipFile) + ")");
+            LOG.warning("Zip retained for debugging");
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
         }
     }
 

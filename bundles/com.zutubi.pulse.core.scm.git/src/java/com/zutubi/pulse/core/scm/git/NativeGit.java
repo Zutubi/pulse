@@ -176,8 +176,7 @@ public class NativeGit
 
             if (scanned > 0)
             {
-                command.add(FLAG_SKIP);
-                command.add(Integer.toString(scanned));
+                command.add(FLAG_SKIP + "=" + scanned);
             }
 
             int max = changes - found.size();

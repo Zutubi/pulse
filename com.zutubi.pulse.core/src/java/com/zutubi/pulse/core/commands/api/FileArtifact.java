@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
@@ -45,14 +47,13 @@ public class FileArtifact extends FileSystemArtifactSupport
             return;
         }
 
-        // If the specified path was absolute with wildcards, then we need to
-        // jump through a few hoops.
-        if (absolutePathSpecified)
+        // If the specified path has wildcards and is either absolute or contains a . or .., then we
+        // need to jump through a few hoops.
+        if (absolutePathSpecified || containsSymbolicDirectories(file))
         {
-            // does the file contain any wild cards?
-            if (file.indexOf("*") != -1)
+            if (file.contains("*"))
             {
-                // if so, then take the directory immediately above the wild card and use it as the base directory
+                // Take the directory immediately above the wild card and use it as the base directory
                 // for the scan.
 
                 String filePath = captureFile.getAbsolutePath();
@@ -83,6 +84,21 @@ public class FileArtifact extends FileSystemArtifactSupport
             // The file path is relative, we have our base directory, lets get to work.
             scanAndCaptureFiles(toDir, context.getExecutionContext().getWorkingDir(), file, context);
         }
+    }
+
+    private boolean containsSymbolicDirectories(String file)
+    {
+        String normalised = FileSystemUtils.normaliseSeparators(file);
+        final String[] pieces = StringUtils.split(normalised, FileSystemUtils.NORMAL_SEPARATOR_CHAR);
+        for (String piece : pieces)
+        {
+            if (piece.equals(".") || piece.equals(".."))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private void scanAndCaptureFiles(File toDir, File baseDir, String file, CommandContext context)

@@ -373,18 +373,24 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         this.configuration = configuration;
         this.workspaceManager = workspaceManager;
 
-        this.core = new PerforceCore(configuration.getInactivityTimeout());
-        this.core.setEnv(ENV_PORT, configuration.getPort());
-        this.core.setEnv(ENV_USER, configuration.getUser());
+        core = new PerforceCore(configuration.getInactivityTimeout());
+        if (StringUtils.stringSet(configuration.getPort()))
+        {
+            core.setEnv(ENV_PORT, configuration.getPort());
+        }
+        if (StringUtils.stringSet(configuration.getUser()))
+        {
+            core.setEnv(ENV_USER, configuration.getUser());
+        }
         if (configuration.isUnicodeServer())
         {
-            this.core.setEnv(ENV_CHARSET, configuration.getCharset());
+            core.setEnv(ENV_CHARSET, configuration.getCharset());
         }
 
         String password = determinePassword(core, configuration);
         if (StringUtils.stringSet(password))
         {
-            this.core.setEnv(ENV_PASSWORD, password);
+            core.setEnv(ENV_PASSWORD, password);
         }
     }
 
@@ -435,12 +441,29 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     public String getUid(ScmContext context)
     {
-        return configuration.getPort();
+        return determinePort();
     }
 
     public String getLocation(ScmContext context)
     {
-        return getUniqueWorkspaceString() + "@" + configuration.getPort();
+        return getUniqueWorkspaceString() + "@" + determinePort();
+    }
+
+    private String determinePort()
+    {
+        String port = configuration.getPort();
+        if (port == null)
+        {
+            port = System.getenv(ENV_PORT);
+            if (port == null)
+            {
+                // Some customers have a custom p4 binary that doesn't require a port to be
+                // specified.
+                port = "unknown";
+            }
+        }
+        
+        return port;
     }
 
     private String getUniqueWorkspaceString()

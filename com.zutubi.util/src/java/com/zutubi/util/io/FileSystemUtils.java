@@ -24,9 +24,12 @@ public class FileSystemUtils
     private static final String PROPERTY_USE_EXTERNAL_COPY = "pulse.use.external.copy";
     private static final String PROPERTY_ROBUST_DELAY_MILLIS = "pulse.fs.robust.delay.millis";
     private static final String PROPERTY_ROBUST_RETRIES = "pulse.fs.robust.retries";
+    public static final String PROPERTY_RMDIR_COMMAND = "pulse.fs.rmdir.command";
 
     private static final int ROBUST_DELAY_MILLIS = Integer.getInteger(PROPERTY_ROBUST_DELAY_MILLIS, 100);
     private static final int ROBUST_RETRIES = Integer.getInteger(PROPERTY_ROBUST_RETRIES, 3);
+
+    private static final String VARIABLE_DIR = "${dir}";
 
     public static final String NORMAL_SEPARATOR = "/";
     public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
@@ -71,7 +74,7 @@ public class FileSystemUtils
      * Recursively delete a directory and its contents.
      *
      * @param dir the directory to delete
-     * @return true iff the whole directory was successfully deleted
+     * @throws IOException if the directory could not be deleted
      */
     public static void rmdir(File dir) throws IOException
     {
@@ -90,6 +93,18 @@ public class FileSystemUtils
             throw new IllegalArgumentException(String.format("removeDirectory can only be used on directories. %s is not a directory.", dir));
         }
 
+        if (System.getProperty(PROPERTY_RMDIR_COMMAND) == null)
+        {
+            internalRmdir(dir);
+        }
+        else
+        {
+            externalRmdir(dir);
+        }
+    }
+
+    private static void internalRmdir(File dir) throws IOException
+    {
         String canonicalDir = dir.getCanonicalPath();
         String[] contents = list(dir);
         if (contents.length > 0)
@@ -125,6 +140,48 @@ public class FileSystemUtils
         {
             throw new IOException("Unable to remove directory '" + dir.getAbsolutePath() + "'");
         }
+    }
+
+    private static void externalRmdir(File dir) throws IOException
+    {
+        ProcessBuilder processBuilder = new ProcessBuilder(createRmdirCommand(dir));
+        processBuilder.redirectErrorStream(true);
+        Process child = processBuilder.start();
+        try
+        {
+            IOUtils.joinStreams(child.getInputStream(), new NullOutputStream());
+            int exitCode = child.waitFor();
+            if(exitCode != 0)
+            {
+                throw new IOException("External rmdir process returned code " + exitCode);
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException("Interrupted waiting for external rmdir process");
+        }
+        finally
+        {
+            child.destroy();
+        }
+    }
+
+    private static List<String> createRmdirCommand(File dir)
+    {
+        List<String> command = new LinkedList<String>();
+        for (String piece: StringUtils.split(System.getProperty(PROPERTY_RMDIR_COMMAND)))
+        {
+            if (VARIABLE_DIR.equals(piece))
+            {
+                command.add(dir.getAbsolutePath());
+            }
+            else
+            {
+                command.add(piece);
+            }
+        }
+
+        return command;
     }
 
     private static boolean robustFn(File f, Predicate<File> fn)
@@ -338,6 +395,38 @@ public class FileSystemUtils
         return tmp;
     }
 
+    /**
+     * Creates a new file at the given path.
+     * 
+     * @param file the file to create
+     * @param deleteExisting if true, when the file already exists it will be replaced with a new,
+     *                       empty file (otherwise an error is thrown in this case)
+     * @throws IOException if the file already exists and deleteExisting is false, if an existing
+     *                     file could not be deleted, or if creation fails for some other reason
+     */
+    public static void createNewFile(File file, boolean deleteExisting) throws IOException
+    {
+        if (file.exists())
+        {
+            if (deleteExisting)
+            {
+                if (!file.delete())
+                {
+                    throw new IOException(String.format("Can not create file. Existing file '%s' could not be deleted.", file));                    
+                }
+            }
+            else
+            {
+                throw new IOException(String.format("Can not create file. File '%s' already exists.", file));
+            }
+        }
+        
+        if (!file.createNewFile())
+        {
+            throw new IOException(String.format("Failed to create file '%s'", file));
+        }
+    }
+
     public static void createDirectory(File file) throws IOException
     {
         if (file.exists())
@@ -393,24 +482,24 @@ public class FileSystemUtils
         }
 
         // Strip the common prefix off the path
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder builder = new StringBuilder();
         if (pathLen > 1 && (pos < pathLen || from.getPath().charAt(pos) != SEPARATOR_CHAR))
         {
             // Not a direct ancestor, need to back up
             pos = from.getPath().lastIndexOf(SEPARATOR_CHAR, pos);
-            buffer.append(path.substring(pos));
+            builder.append(path.substring(pos));
         }
 
         // Prepend a '../' for each element in the base path past the common
         // prefix
-        buffer.insert(0, "..");
+        builder.insert(0, "..");
         pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
         while (pos != -1)
         {
-            buffer.insert(0, "../");
+            builder.insert(0, "../");
             pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
         }
-        return buffer.toString();
+        return builder.toString();
     }
 
     public static boolean isParentOf(File parent, File child) throws IOException
@@ -429,7 +518,7 @@ public class FileSystemUtils
      */
     public static boolean isRelativeSymlink(File file)
     {
-        // WARNING: only detects relative symnlinks
+        // WARNING: only detects relative symlinks
         if (!SystemUtils.IS_WINDOWS)
         {
             // Try testing the canonical path then.
@@ -455,11 +544,6 @@ public class FileSystemUtils
         }
 
         return false;
-    }
-
-    public static boolean pathContainsSymlink(File file) throws IOException
-    {
-        return !SystemUtils.IS_WINDOWS && !file.getCanonicalPath().equals(file.getAbsolutePath());
     }
 
     /**
@@ -1076,8 +1160,7 @@ public class FileSystemUtils
                 IOUtils.close(out);
             }
 
-            file.delete();
-            if (!tempFile.renameTo(file))
+            if (!file.delete() || !tempFile.renameTo(file))
             {
                 throw new IOException("Unable to rename temporary file '" + tempFile.getAbsolutePath() + "' to '" + file.getAbsolutePath() + "'");
             }
@@ -1093,7 +1176,10 @@ public class FileSystemUtils
         {
             if (tempFile != null)
             {
-                tempFile.delete();
+                if (!tempFile.delete())
+                {
+                    tempFile.deleteOnExit();
+                }
             }
         }
     }
@@ -1320,7 +1406,7 @@ public class FileSystemUtils
     }
 
     /**
-     * Joins a path to a base, canonicalising any separators and occurences of
+     * Joins a path to a base, canonicalising any separators and occurrences of
      * '.' or '..'.  The base path, if given, should already be an a canonical
      * form.  If the path is absolute (begins with a separator) it is returned
      * unchanged.

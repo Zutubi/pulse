@@ -364,20 +364,40 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         File exeFile = new File(binary);
         if (!exeFile.isAbsolute())
         {
-            // CIB-902: search relative to the working directory before going
-            // to the path.
-            File relativeToWork = new File(workingDir, binary);
-            if(relativeToWork.exists())
+            // Act like a shell: if the given command includes path separators, treat it as a
+            // relative path (note we already checked and it is not absolute).
+            // Refer to CIB-902 and CIB-3011.
+            boolean fileFound = false;
+            final boolean containsSeparator = binary.contains("/") || binary.contains("\\");
+            if (containsSeparator)
             {
-                binary = relativeToWork.getAbsolutePath();
+                File relativeToWork = new File(workingDir, binary);
+                if (relativeToWork.isFile())
+                {
+                    binary = relativeToWork.getAbsolutePath();
+                    fileFound = true;
+                }
             }
-            else
+            
+            if (!fileFound)
             {
                 exeFile = SystemUtils.findInPath(binary, ((PulseExecutionContext) context).getScope().getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
+                    fileFound = true;
                 }
+            }
+            
+            // One shell-unlike concession for compatibility.  Try a file in the working directory,
+            // despite binary not looking like a path (often shells require ./<file> for this case).
+            if (!fileFound && !containsSeparator)
+            {
+                File relativeToWork = new File(workingDir, binary);
+                if (relativeToWork.isFile())
+                {
+                    binary = relativeToWork.getAbsolutePath();
+                }                
             }
         }
 

@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -80,13 +79,13 @@ public class PulseZipUtils
             throw new FileNotFoundException("Source '" + source.getAbsolutePath() + "' is not a directory");
         }
 
-        // ensure that the parent directory exists.
         if (zipFile.exists())
         {
-            zipFile.delete();
+            FileSystemUtils.delete(zipFile);
         }
         else
         {
+            // ensure that the parent directory exists.
             File parent = zipFile.getAbsoluteFile().getParentFile();
             if (!parent.isDirectory() && !parent.mkdirs())
             {
@@ -98,7 +97,7 @@ public class PulseZipUtils
         {
             // Special case: we create an empty file.  This is understood by
             // our inverse (extractZip).
-            zipFile.createNewFile();
+            FileSystemUtils.createNewFile(zipFile, false);
         }
         else
         {
@@ -187,7 +186,7 @@ public class PulseZipUtils
                 {
                     tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName());
                     File testDir = new File(tmpDir, "test");
-                    testDir.mkdir();
+                    FileSystemUtils.createDirectory(testDir);
                     File testFile = new File(testDir, "afile");
                     FileSystemUtils.createFile(testFile, "content");
                     File zipFile = new File(tmpDir, "test.zip");
@@ -312,101 +311,6 @@ public class PulseZipUtils
         }
     }
 
-    public static byte[] getZipModeBlock(int mode)
-    {
-        // extra field: (Variable)
-        //
-        //     ...
-        //     files, the following structure should be used for all
-        //     programs storing data in this field:
-        //
-        //     header1+data1 + header2+data2 . . .
-        //
-        //     Each header should consist of:
-        //
-        //       Header ID - 2 bytes
-        //       Data Size - 2 bytes
-        //
-        //     Note: all fields stored in Intel low-byte/high-byte order.
-        //
-        //     The Header ID field indicates the type of data that is in
-        //     the following data block.
-        // ...
-        //
-        // The Data Size field indicates the size of the following
-        // data block. Programs can use this value to skip to the
-        // next header block, passing over any data blocks that are
-        // not of interest.
-
-        // Value         Size            Description
-        // -----         ----            -----------
-        // (Unix3) 0x756e        Short           tag for this extra block type
-        //         TSize         Short           total data size for this block
-        //         CRC           Long            CRC-32 of the remaining data
-        //         Mode          Short           file permissions
-        //         SizDev        Long            symlink'd size OR major/minor dev num
-        //         UID           Short           user ID
-        //         GID           Short           group ID
-        //         (var.)        variable        symbolic link filename
-        byte[] data = new byte[18];
-
-        encodeZipShort(0x756E, data, 0);
-        encodeZipShort(14, data, 2);
-
-        // CRC fills this gap later
-
-        encodeZipShort(mode, data, 8);
-        Arrays.fill(data, 10, 18, (byte) 0);
-
-        CRC32 crc = new CRC32();
-        crc.update(data, 8, 10);
-        long checksum = crc.getValue();
-
-        encodeZipLong(checksum, data, 4);
-        return data;
-    }
-
-    public static void encodeZipShort(int value, byte[] block, int offset)
-    {
-        block[offset] = (byte) (value & 0xFF);
-        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
-    }
-
-    public static int decodeZipShort(byte[] block, int offset)
-    {
-        int value = (block[offset + 1] << 8) & 0xFF00;
-        value += (block[offset] & 0xFF);
-        return value;
-    }
-
-    public static void encodeZipLong(long value, byte[] block, int offset)
-    {
-        block[offset] = (byte) ((value & 0xFF));
-        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
-        block[offset + 2] = (byte) ((value & 0xFF0000) >> 16);
-        block[offset + 3] = (byte) ((value & 0xFF000000L) >> 24);
-    }
-
-    public static long decodeZipLong(byte[] block, int offset)
-    {
-        long value = (block[offset + 3] << 24) & 0xFF000000L;
-        value += (block[offset + 2] << 16) & 0xFF0000;
-        value += (block[offset + 1] << 8) & 0xFF00;
-        value += (block[offset] & 0xFF);
-        return value;
-    }
-
-    public static int getModeFromZipBlock(byte[] block)
-    {
-        // Currently assumes the block was made by us.
-        if (block.length == 18)
-        {
-            return decodeZipShort(block, 8);
-        }
-
-        return 0;
-    }
-
     public static void extractZip(File zipFile, File dir) throws IOException
     {
         if(!zipFile.isFile())
@@ -452,7 +356,7 @@ public class PulseZipUtils
                 {
                     tmpDir = FileSystemUtils.createTempDir(PulseZipUtils.class.getName());
                     File testDir = new File(tmpDir, "test");
-                    testDir.mkdir();
+                    FileSystemUtils.createDirectory(testDir);
                     File testFile = new File(testDir, "afile");
                     FileSystemUtils.createFile(testFile, "content");
                     File zipFile = new File(tmpDir, "test.zip");
@@ -460,7 +364,7 @@ public class PulseZipUtils
                     createZipInternal(zipFile, testDir, testDir);
 
                     File extractDir = new File(tmpDir, "extract");
-                    extractDir.mkdir();
+                    FileSystemUtils.createDirectory(extractDir);
                     extractZipExternal(zipFile, extractDir);
                     testFile = new File(extractDir, "afile");
                     if(!testFile.exists())

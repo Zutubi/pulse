@@ -270,7 +270,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         if (oldBootstrap == null || newBootstrap == null ||
             !StringUtils.equals(newBootstrap.getPersistentDirPattern(), oldBootstrap.getPersistentDirPattern()))
         {
-            workDirectoryCleanupService.cleanupWorkDirs(old, null);
+            workDirectoryCleanupService.asyncEnqueueCleanupMessages(old, null);
         }
     }
 
@@ -286,7 +286,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 }
             }))
             {
-                workDirectoryCleanupService.cleanupWorkDirs(old, oldStage);
+                workDirectoryCleanupService.asyncEnqueueCleanupMessages(old, oldStage);
             }
         }
     }
@@ -1048,14 +1048,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void cleanupWorkDirs(ProjectConfiguration projectConfig)
     {
-        workDirectoryCleanupService.cleanupWorkDirs(projectConfig, null);
+        // We enqueue the cleanup messages synchronously here, so users using the remote API can
+        // safely clean a project then trigger it (without the build being dispatched before the
+        // cleanup messages are enqueued).
+        workDirectoryCleanupService.enqueueCleanupMessages(projectConfig, null);
     }
     
     private void deleteProject(Project project)
     {
         projectInitialisationService.requestDestruction(project.getConfig(), true);
         buildManager.deleteAllBuilds(project);
-        workDirectoryCleanupService.cleanupWorkDirs(project.getConfig(), null);
+        workDirectoryCleanupService.asyncEnqueueCleanupMessages(project.getConfig(), null);
         
         testCaseIndexDao.deleteByProject(project.getId());
         

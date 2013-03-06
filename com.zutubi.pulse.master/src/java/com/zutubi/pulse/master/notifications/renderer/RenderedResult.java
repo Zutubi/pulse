@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
+import com.zutubi.util.StringUtils;
+
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a rendered notification message.
@@ -12,6 +12,7 @@ public class RenderedResult
 {
     private String subject;
     private String content;
+    private Map<Integer, String> trimmedContent = new HashMap<Integer, String>();
     private String mimeType;
     private List<InputStream> attachments = new LinkedList<InputStream>();
 
@@ -38,11 +39,35 @@ public class RenderedResult
      *
      * @return the message body
      *
+     * @see #getContentTrimmed(int) 
      * @see #getMimeType()
      */
     public String getContent()
     {
         return content;
+    }
+
+    /**
+     * The main body of the message, but limited to a maximum number of bytes.
+     * Obtaining the trimmed version this way allows it to be shared by calls
+     * using the same limit.
+     *
+     * @param limit maximum length of the content to return, if the content is
+     *              longer it will be trimmed (with ellipsis appended)
+     * @return the message body, possibly truncated
+     *
+     * @see #getContent() 
+     */
+    public String getContentTrimmed(int limit)
+    {
+        String trimmed = trimmedContent.get(limit);
+        if (trimmed == null)
+        {
+            trimmed = StringUtils.trimmedString(content, limit);
+            trimmedContent.put(limit, content);
+        }
+        
+        return trimmed;
     }
 
     /**
