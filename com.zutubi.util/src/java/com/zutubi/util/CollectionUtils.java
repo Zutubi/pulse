@@ -13,16 +13,6 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T, U, V extends Collection<U>> V map(T[] in, Function<T, U> m, V out)
-    {
-        for(T t: in)
-        {
-            out.add(m.apply(t));
-        }
-
-        return out;
-    }
-
     public static <T, U> U[] mapToArray(Iterable<T> iterable, Function<T, U> m, U[] out)
     {
         int i = 0;
