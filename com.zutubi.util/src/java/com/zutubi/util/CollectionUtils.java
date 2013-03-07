@@ -12,32 +12,6 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T, U> U[] mapToArray(T[] in, Function<T, U> m, U[] out)
-    {
-        int i = 0;
-        for(T t: in)
-        {
-            out[i++] = m.apply(t);
-        }
-
-        return out;
-    }
-
-    public static <K, T, U> Map<K, U> map(Map<K, T> in, Function<T, U> m)
-    {
-        Map<K, U> result = new HashMap<K,U>(in.size());
-        map(in, m, result);
-        return result;
-    }
-
-    public static <K, T, U> void map(Map<K, T> in, Function<T, U> m, Map<K, U> out)
-    {
-        for(Map.Entry<K, T> e: in.entrySet())
-        {
-            out.put(e.getKey(), m.apply(in.get(e.getKey())));
-        }
-    }
-
     public static <T> boolean containsIdentity(T[] a, T x)
     {
         for(T t: a)
