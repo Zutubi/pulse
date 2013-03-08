@@ -1,8 +1,9 @@
 package com.zutubi.pulse.master.project;
 
-import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.toArray;
+import com.google.common.base.Function;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.master.project.events.ProjectEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
@@ -10,22 +11,25 @@ import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.MultipleFileInputStream;
+import com.zutubi.util.io.IsFilePredicate;
 import com.zutubi.util.io.Tail;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+import static java.util.Arrays.asList;
+
 /**
  * Manages the log for a single project.  To prevent the log from growing
  * indefinitely, log files are rotated out when they hit a limit, and only two
  * files (including the current one) are kept.
  */
-public class ProjectLogger
+public class ProjectLogger implements InputSupplier<InputStream>
 {
     private static final Logger LOG = Logger.getLogger(ProjectLogger.class);
 
@@ -107,26 +111,15 @@ public class ProjectLogger
         return tail.getTail();
     }
 
-    /**
-     * Return an inputstream that provides access to the raw data of the project log.
-     * <p/>
-     * Note: the input stream will need to be closed by the caller.
-     *
-     * @return input stream that provides access to the project log.
-     *
-     * @throws IOException if there is a problem reading the log files.
-     */
-    public synchronized InputStream getRawInputStream() throws IOException
+    public synchronized InputStream getInput() throws IOException
     {
-        File[] files = toArray(filter(asList(lastFile, currentFile), new Predicate<File>()
-        {
-            public boolean apply(File file)
+        final Iterable<File> files = filter(asList(lastFile, currentFile), new IsFilePredicate());
+        return ByteStreams.join(transform(files, new Function<File, InputSupplier<FileInputStream>>() {
+            public InputSupplier<FileInputStream> apply(File input)
             {
-                return file.isFile();
+                return Files.newInputStreamSupplier(input);
             }
-        }), File.class);
-
-        return new MultipleFileInputStream(files);
+        })).getInput();
     }
 
     private void write(String message)

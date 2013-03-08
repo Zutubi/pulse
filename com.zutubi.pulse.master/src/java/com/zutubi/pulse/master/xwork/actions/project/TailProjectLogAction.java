@@ -24,7 +24,7 @@ public class TailProjectLogAction extends TailBuildLogAction
         {
             try
             {
-                inputStream = logger.getRawInputStream();
+                inputStream = logger.getInput();
                 return "raw";
             }
             catch (IOException e)
