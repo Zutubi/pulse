@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.commands.core;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -12,6 +13,7 @@ import org.hamcrest.Matchers;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -105,12 +107,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         if (SystemUtils.IS_WINDOWS)
         {
             file = new File(dir, "list.bat");
-            FileSystemUtils.createFile(file, "dir");
+            Files.write("dir", file, Charset.defaultCharset());
         }
         else
         {
             file = new File(dir, "./list.sh");
-            FileSystemUtils.createFile(file, "#! /bin/sh\nls");
+            Files.write("#! /bin/sh\nls", file, Charset.defaultCharset());
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
@@ -133,13 +135,13 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         {
             exe = "list.bat";
             file = new File(dir, exe);
-            FileSystemUtils.createFile(file, "dir");
+            Files.write("dir", file, Charset.defaultCharset());
         }
         else
         {
             exe = "list.sh";
             file = new File(dir, exe);
-            FileSystemUtils.createFile(file, "#! /bin/sh\nls");
+            Files.write("#! /bin/sh\nls", file, Charset.defaultCharset());
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 

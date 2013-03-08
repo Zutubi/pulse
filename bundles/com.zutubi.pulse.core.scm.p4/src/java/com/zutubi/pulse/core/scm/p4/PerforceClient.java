@@ -3,33 +3,33 @@ package com.zutubi.pulse.core.scm.p4;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-
-import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.Iterables.partition;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.google.common.collect.Iterables.partition;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
@@ -703,10 +703,10 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
         String clientName = PerforceWorkspaceManager.getSyncWorkspaceName(configuration, context);
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, clientName, COMMAND_INFO);
-        FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
+        Files.write(result.stdout.toString(), new File(outputDir, "server-info.txt"), Charset.defaultCharset());
 
         result = core.runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, clientName, COMMAND_CLIENT, FLAG_OUTPUT);
-        FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
+        Files.write(result.stdout.toString(), new File(outputDir, "template-client.txt"), Charset.defaultCharset());
     }
 
     public EOLStyle getEOLPolicy(ExecutionContext context) throws ScmException

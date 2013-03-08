@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.google.common.base.Function;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.unified.UnifiedHunk;
@@ -29,6 +30,7 @@ import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
@@ -84,7 +86,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
         // Allow anonymous writes
         File conf = new File(repoDir, FileSystemUtils.composeFilename("conf", "svnserve.conf"));
-        FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
+        Files.write("[general]\nanon-access = write\nauth-access = write\n", conf, Charset.defaultCharset());
 
         // Restore from dump
         unzipInput("repo", tempDir);
@@ -169,7 +171,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusEditedText() throws Exception
     {
         File test = new File(base, "textfile1");
-        FileSystemUtils.createFile(test, "hello");
+        Files.write("hello", test, Charset.defaultCharset());
         WorkingCopyStatus wcs = assertSimpleStatus("textfile1", FileStatus.State.MODIFIED);
         assertEOL(wcs, "textfile1", EOLStyle.NATIVE);
     }
@@ -186,7 +188,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusEditedLF() throws Exception
     {
         File test = new File(base, "unixfile1");
-        FileSystemUtils.createFile(test, "hello");
+        Files.write("hello", test, Charset.defaultCharset());
         WorkingCopyStatus wcs = assertSimpleStatus("unixfile1", FileStatus.State.MODIFIED);
         assertEOL(wcs, "unixfile1", EOLStyle.LINEFEED);
     }
@@ -210,7 +212,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusEditedRemovedExecutableProperty() throws Exception
     {
         File test = new File(base, "bin1");
-        FileSystemUtils.createFile(test, "hello");
+        Files.write("hello", test, Charset.defaultCharset());
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EXECUTABLE, null, true, SVNDepth.EMPTY, null, null);
         WorkingCopyStatus wcs = assertSimpleStatus("bin1", FileStatus.State.MODIFIED);
         assertExecutable(wcs, "bin1", false);
@@ -219,7 +221,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusAdded() throws Exception
     {
         File test = new File(base, "newfile");
-        FileSystemUtils.createFile(test, "hello");
+        Files.write("hello", test, Charset.defaultCharset());
 
         client.doAdd(test, true, false, false, SVNDepth.EMPTY, false, false);
         WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED);
@@ -229,7 +231,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testGetLocalStatusAddedText() throws Exception
     {
         File test = new File(base, "newfile");
-        FileSystemUtils.createFile(test, "hello");
+        Files.write("hello", test, Charset.defaultCharset());
 
         client.doAdd(test, true, false, false, SVNDepth.EMPTY, false, false);
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, SVNPropertyValue.create("native"), true, SVNDepth.EMPTY, null, null);
@@ -254,7 +256,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertTrue(dir.mkdir());
 
         File child = new File(dir, "newfile");
-        FileSystemUtils.createFile(child, "test");
+        Files.write("test", child, Charset.defaultCharset());
 
         client.doAdd(dir, true, false, false, SVNDepth.INFINITY, false, false);
         WorkingCopyStatus status = wc.getLocalStatus(context);
@@ -269,7 +271,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertTrue(dir.mkdir());
 
         File child = new File(dir, "newfile");
-        FileSystemUtils.createFile(child, "test");
+        Files.write("test", child, Charset.defaultCharset());
 
         client.doAdd(dir, true, false, false, SVNDepth.EMPTY, false, false);
         WorkingCopyStatus status = wc.getLocalStatus(context);
@@ -355,8 +357,8 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         File file1 = new File(base, "textfile1");
         File file2 = new File(base, "textfile2");
-        FileSystemUtils.createFile(file1, getName());
-        FileSystemUtils.createFile(file2, getName());
+        Files.write(getName(), file1, Charset.defaultCharset());
+        Files.write(getName(), file2, Charset.defaultCharset());
         clientManager.getChangelistClient().doAddToChangelist(new File[]{file1}, SVNDepth.INFINITY, "cl", null);
 
         WorkingCopyStatus wcs = wc.getLocalStatus(context, ":cl");
@@ -533,7 +535,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         otherEdit("file1");
 
         File test = new File(base, "file1");
-        FileSystemUtils.createFile(test, "goodbye");
+        Files.write("goodbye", test, Charset.defaultCharset());
         wc.update(context, Revision.HEAD);
         assertSimpleStatus("file1", FileStatus.State.UNRESOLVED);
     }
@@ -553,7 +555,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     public void testDiff() throws Exception
     {
         File f = new File(base, "file1");
-        FileSystemUtils.createFile(f, "a line\n");
+        Files.write("a line\n", f, Charset.defaultCharset());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wc.diff(context, "file1", baos);
@@ -642,7 +644,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     private long doEdit(String path, File baseDir, boolean commit) throws IOException, SVNException
     {
         File test = new File(baseDir, path);
-        FileSystemUtils.createFile(test, test.getAbsolutePath());
+        Files.write(test.getAbsolutePath(), test, Charset.defaultCharset());
         if(commit)
         {
             SVNCommitInfo info = clientManager.getCommitClient().doCommit(new File[] { test }, true, "edit file", null, null, false, false, SVNDepth.EMPTY);
@@ -660,7 +662,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     private long doAdd(String path, File baseDir, boolean commit) throws IOException, SVNException
     {
         File test = new File(baseDir, path);
-        FileSystemUtils.createFile(test, test.getAbsolutePath());
+        Files.write(test.getAbsolutePath(), test, Charset.defaultCharset());
         clientManager.getWCClient().doAdd(test, true, false, false, SVNDepth.INFINITY, false, false);
 
         if(commit)

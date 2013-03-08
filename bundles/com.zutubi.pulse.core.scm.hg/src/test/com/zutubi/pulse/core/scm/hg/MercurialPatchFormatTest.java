@@ -7,7 +7,6 @@ import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.util.config.CompositeConfig;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,8 +70,8 @@ public class MercurialPatchFormatTest extends MercurialTestBase
     public void testSimpleChange() throws ScmException, IOException
     {
         final String NEW_CONTENT = "this is\nnew content";
-        
-        FileSystemUtils.createFile(file1, NEW_CONTENT);
+
+        Files.write(NEW_CONTENT, file1, Charset.defaultCharset());
         assertTrue(patchFormat.writePatchFile(workingCopy, devContext, patchFile));
         assertTrue(patchFile.exists());
 
@@ -88,8 +87,8 @@ public class MercurialPatchFormatTest extends MercurialTestBase
     {
         final String CONTENT = "this is\na new file";
         final String FILENAME = "new";
-        
-        FileSystemUtils.createFile(new File(workingDir, FILENAME), CONTENT);
+
+        Files.write(CONTENT, new File(workingDir, FILENAME), Charset.defaultCharset());
         workingCore.add(null, FILENAME);
         assertTrue(patchFormat.writePatchFile(workingCopy, devContext, patchFile));
         assertTrue(patchFile.exists());
@@ -153,9 +152,9 @@ public class MercurialPatchFormatTest extends MercurialTestBase
     public void testSpecificFiles() throws IOException, ScmException
     {
         final String NEW_CONTENT = "this is\nnew content";
-        
-        FileSystemUtils.createFile(file1, NEW_CONTENT);
-        FileSystemUtils.createFile(file2, NEW_CONTENT);
+
+        Files.write(NEW_CONTENT, file1, Charset.defaultCharset());
+        Files.write(NEW_CONTENT, file2, Charset.defaultCharset());
         assertTrue(patchFormat.writePatchFile(workingCopy, devContext, patchFile, FILENAME_FILE1));
         assertTrue(patchFile.exists());
 

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.google.common.io.Files;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.PatchParseException;
@@ -15,12 +16,12 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.util.config.PropertiesConfig;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -361,7 +362,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
 
         openForEdit("file1");
         File file1 = new File(clientRoot, "file1");
-        FileSystemUtils.createFile(file1, "this");
+        Files.write("this", file1, Charset.defaultCharset());
 
         wc.update(context, Revision.HEAD);
         WorkingCopyStatus status = wc.getLocalStatus(context);
@@ -393,7 +394,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     public void testDiffTextFile() throws ScmException, PatchParseException, IOException
     {
         openForEdit("file1");
-        FileSystemUtils.createFile(new File(clientRoot, "file1"), "a line\n");
+        Files.write("a line\n", new File(clientRoot, "file1"), Charset.defaultCharset());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wc.diff(context, "file1", baos);
@@ -547,7 +548,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
     private void openForAdd(String type) throws IOException, ScmException
     {
         File newFile = new File(clientRoot, "newfile");
-        FileSystemUtils.createFile(newFile, "new");
+        Files.write("new", newFile, Charset.defaultCharset());
         if(type == null)
         {
             core.runP4(null, P4_COMMAND, COMMAND_ADD, "newfile");
@@ -599,7 +600,7 @@ public class PerforceWorkingCopyTest extends PerforceTestBase
         {
             otherCore.runP4(null, P4_COMMAND, COMMAND_EDIT, path);
             File other1 = new File(otherClientRoot, path);
-            FileSystemUtils.createFile(other1, "edited by " + getName());
+            Files.write("edited by " + getName(), other1, Charset.defaultCharset());
         }
 
         otherCore.submit("comment");

@@ -121,7 +121,7 @@ public class SubversionExternalsTest extends PulseTestCase
 
         // Allow anonymous writes
         File conf = new File(repoDir, FileSystemUtils.composeFilename("conf", "svnserve.conf"));
-        FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
+        Files.write("[general]\nanon-access = write\nauth-access = write\n", conf, Charset.defaultCharset());
 
         // Restore from dump
         String tag = getRepoTag();
@@ -271,7 +271,7 @@ public class SubversionExternalsTest extends PulseTestCase
         doCheckout(8);
 
         File f1 = new File(checkoutDir, "pull1/file1");
-        FileSystemUtils.createFile(f1, "edit in external");
+        Files.write("edit in external", f1, Charset.defaultCharset());
         clientManager.getCommitClient().doCommit(new File[]{f1}, true, "edit ext", null, null, false, false, SVNDepth.EMPTY);
     }
 

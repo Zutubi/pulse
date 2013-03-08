@@ -21,7 +21,6 @@ import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
-import static com.zutubi.util.io.FileSystemUtils.createFile;
 
 /**
  * The CvsClient provides all interactions with a cvs repository.
@@ -149,7 +148,7 @@ public class CvsClient implements ScmClient
                 {
                     throw new IOException("Failed to create new file: " + versionFile.getCanonicalPath());
                 }
-                createFile(versionFile, version);
+                Files.write(version, versionFile, Charset.defaultCharset());
                 return version;
             }
             catch (IOException e)

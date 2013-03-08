@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,7 +45,7 @@ public class GitSubmodulesTest extends GitClientTestBase
         git.setWorkingDirectory(submoduleDir);
         git.init(null);
         File textFile = new File(submoduleDir, TEXT_FILE_NAME);
-        FileSystemUtils.createFile(textFile, "some text");
+        Files.write("some text", textFile, Charset.defaultCharset());
         git.run(git.getGitCommand(), "add", textFile.getName());
         git.run(git.getGitCommand(), "commit", "-m", "Added a file");
         git.setWorkingDirectory(repositoryBase);

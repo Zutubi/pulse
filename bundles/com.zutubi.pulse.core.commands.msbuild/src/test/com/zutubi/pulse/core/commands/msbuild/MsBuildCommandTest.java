@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.commands.msbuild;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestCase;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class MsBuildCommandTest extends ExecutableCommandTestCase
 {
@@ -99,13 +100,13 @@ public class MsBuildCommandTest extends ExecutableCommandTestCase
     private void createSourceFile() throws IOException
     {
         File sourceFile = new File(baseDir, "Test.cs");
-        FileSystemUtils.createFile(sourceFile, "public class Test\n" +
-                "{\n" +
-                "    static int Main(string[] argv)\n" +
-                "    {\n" +
-                "        return 0;\n" +
-                "    }\n" +
-                "}");
+        Files.write("public class Test\n" +
+                            "{\n" +
+                            "    static int Main(string[] argv)\n" +
+                            "    {\n" +
+                            "        return 0;\n" +
+                            "    }\n" +
+                            "}", sourceFile, Charset.defaultCharset());
     }
 
     private TestCommandContext successRun(MsBuildCommandConfiguration commandConfiguration, String... contents) throws Exception

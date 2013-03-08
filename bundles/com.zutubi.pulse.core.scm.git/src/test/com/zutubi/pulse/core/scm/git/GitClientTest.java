@@ -10,7 +10,6 @@ import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.util.Sort;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -257,7 +256,7 @@ public class GitClientTest extends GitClientTestBase
         NativeGit git = getNativeGitOnMaster();
 
         File b = new File(repositoryBase, "b.txt");
-        FileSystemUtils.createFile(b, getName());
+        Files.write(getName(), b, Charset.defaultCharset());
         git.run(git.getGitCommand(), COMMAND_COMMIT, FLAG_ADD, FLAG_MESSAGE, "Will need merging");
     }
 

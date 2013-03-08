@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
@@ -8,11 +9,11 @@ import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.config.PropertiesConfig;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,14 +94,14 @@ public abstract class GitWorkingCopyTestBase extends PulseTestCase
     protected void editFile(File dir, String path) throws IOException
     {
         File f = new File(dir, path);
-        FileSystemUtils.createFile(f, "edited in " + getName());
+        Files.write("edited in " + getName(), f, Charset.defaultCharset());
         runGit(dir, COMMAND_COMMIT, FLAG_ALL, FLAG_MESSAGE, "made an edit");
     }
 
     protected void stageFile(File dir, String path) throws IOException
     {
         File f = new File(dir, path);
-        FileSystemUtils.createFile(f, "edited in " + getName());
+        Files.write("edited in " + getName(), f, Charset.defaultCharset());
         runGit(dir, COMMAND_ADD, path);
     }
 }
