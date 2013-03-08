@@ -5,13 +5,15 @@
 
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
 import org.netbeans.lib.cvsclient.ClientServices;
-import org.netbeans.lib.cvsclient.command.*;
+import org.netbeans.lib.cvsclient.command.BasicCommand;
+import org.netbeans.lib.cvsclient.command.Builder;
+import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.event.EventManager;
 import org.netbeans.lib.cvsclient.request.CommandRequest;
+
+import java.lang.reflect.Constructor;
 
 // Referenced classes of package com.zutubi.pulse.core.scm.cvs.client.commands:
 //            VersionBuilder
@@ -71,15 +73,14 @@ public class VersionCommand extends BasicCommand
 
     public String getCVSCommand()
     {
-        StringBuffer toReturn = new StringBuffer("version ");
+        StringBuilder toReturn = new StringBuilder("version ");
         toReturn.append(getCVSArguments());
         return toReturn.toString();
     }
 
     public String getCVSArguments()
     {
-        StringBuffer toReturn = new StringBuffer("");
-        return toReturn.toString();
+        return "";
     }
 
     /**

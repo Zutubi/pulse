@@ -46,6 +46,6 @@ public class RecipeStatusEvent extends RecipeEvent
 
     public String toString()
     {
-        return new StringBuilder("Recipe Status Event").append(": ").append(getRecipeId()).append(": ").append(message).toString();
+        return "Recipe Status Event" + ": " + getRecipeId() + ": " + message;
     }    
 }
