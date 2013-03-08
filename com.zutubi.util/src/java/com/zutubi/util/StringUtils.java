@@ -818,24 +818,6 @@ public class StringUtils
     }
 
     /**
-     * Remove any leading whitespace from the string.
-     * @param str string with leading whitespace
-     * @return the string with leading whitespace removed
-     */
-    public static String stripLeadingWhitespace(String str)
-    {
-        int i = 0;
-        for (; i < str.length(); i++)
-        {
-            if (!Character.isWhitespace(str.charAt(i)))
-            {
-                break;
-            }
-        }
-        return str.substring(i);
-    }
-
-    /**
      * Returns the given string with the given prefix stripped iff the string
      * begins with the prefix.  Otherwise, the string is returned unchanged.
      *

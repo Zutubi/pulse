@@ -759,18 +759,6 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals(javaApi, StringUtils.split(s, '/', true));
     }
 
-    public void testStripLeadingWhitespace()
-    {
-        assertEquals("", StringUtils.stripLeadingWhitespace(""));
-        assertEquals("", StringUtils.stripLeadingWhitespace(" "));
-        assertEquals("", StringUtils.stripLeadingWhitespace("  "));
-        assertEquals("abc", StringUtils.stripLeadingWhitespace("abc"));
-        assertEquals("abc", StringUtils.stripLeadingWhitespace(" abc"));
-        assertEquals("abc", StringUtils.stripLeadingWhitespace("  abc"));
-        assertEquals("abc  ", StringUtils.stripLeadingWhitespace("  abc  "));
-        assertEquals("", StringUtils.stripLeadingWhitespace("  \n   "));
-    }
-
     public void testStripPrefixEmptyEmpty()
     {
         assertEquals("", StringUtils.stripPrefix("", ""));
