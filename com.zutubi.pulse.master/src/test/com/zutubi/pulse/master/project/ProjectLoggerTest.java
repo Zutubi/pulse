@@ -2,13 +2,14 @@ package com.zutubi.pulse.master.project;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
-import static com.zutubi.util.io.IOUtils.fileToString;
-import static com.zutubi.util.io.IOUtils.inputStreamToString;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.zutubi.util.io.IOUtils.fileToString;
+import static com.zutubi.util.io.IOUtils.inputStreamToString;
+import static java.util.Collections.nCopies;
 
 public class ProjectLoggerTest extends PulseTestCase
 {
@@ -157,6 +158,6 @@ public class ProjectLoggerTest extends PulseTestCase
 
     private String getFullContent()
     {
-        return StringUtils.join(LINE_SEPARATOR, CollectionUtils.times(TEST_MESSAGE, LINE_LIMIT)) + LINE_SEPARATOR;
+        return StringUtils.join(LINE_SEPARATOR, nCopies(LINE_LIMIT, TEST_MESSAGE)) + LINE_SEPARATOR;
     }
 }

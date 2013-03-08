@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.build.log;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -11,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
+
+import static java.util.Collections.nCopies;
 
 public class LogFileTest extends PulseTestCase
 {
@@ -162,12 +163,12 @@ public class LogFileTest extends PulseTestCase
 
     private String nTestLines(int n)
     {
-        return StringUtils.join("", CollectionUtils.times(TEST_LINE, n));
+        return StringUtils.join("", nCopies(n, TEST_LINE));
     }
 
     private String writeCompressed() throws IOException
     {
-        List<String> lines = CollectionUtils.times(TEST_LINE, COMPRESS_THRESHOLD / TEST_LINE.length() + 1);
+        List<String> lines = nCopies(COMPRESS_THRESHOLD / TEST_LINE.length() + 1, TEST_LINE);
         writeLines(lines.toArray(new String[lines.size()]));
         return StringUtils.join("", lines);
     }

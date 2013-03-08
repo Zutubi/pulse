@@ -190,18 +190,6 @@ public class CollectionUtils
     }
 
     /**
-     * Creates a list holding count elements with the given value.
-     *
-     * @param value value to use for all list elements
-     * @param count number of list elements to add
-     * @return a list with count elements of value
-     */
-    public static <T> List<T> times(T value, int count)
-    {
-        return new LinkedList<T>(Collections.nCopies(count, value));
-    }
-
-    /**
      * Create a sorted version of the list using the provided comparator without changing the
      * original list.
      *

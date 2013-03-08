@@ -43,37 +43,6 @@ public class CollectionUtilsTest extends ZutubiTestCase
         }
     }
 
-    public void testTimesZero()
-    {
-        timesHelper(0);
-    }
-
-    public void testTimesOne()
-    {
-        timesHelper(1);
-    }
-
-    public void testTimesTwo()
-    {
-        timesHelper(2);
-    }
-
-    public void testTimesMany()
-    {
-        timesHelper(20);
-    }
-
-    private void timesHelper(int count)
-    {
-        Object o = new Object();
-        List<Object> list = CollectionUtils.times(o, count);
-        assertEquals(count, list.size());
-        for (Object p: list)
-        {
-            assertSame(o, p);
-        }
-    }
-
     public void testAsSet()
     {
         assertEquals(new HashSet<String>(Arrays.asList("foo", "bar", "baz")), Sets.newHashSet("bar", "foo", "baz", "bar"));
