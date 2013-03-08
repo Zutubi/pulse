@@ -797,21 +797,6 @@ public class FileSystemUtils
         return file;
     }
 
-    public static void createFile(File file, InputStream is) throws IOException
-    {
-        FileOutputStream os = null;
-
-        try
-        {
-            os = new FileOutputStream(file);
-            ByteStreams.copy(is, os);
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
-    }
-
     public static boolean createSymlink(File symlink, File destination) throws IOException
     {
         if (LN_AVAILABLE)

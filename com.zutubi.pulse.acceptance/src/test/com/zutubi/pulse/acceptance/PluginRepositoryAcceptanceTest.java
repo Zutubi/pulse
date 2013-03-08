@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository;
@@ -85,7 +87,7 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
         GetMethod getMethod = AcceptanceTestUtils.httpGet(uri.toString(), null);
         try
         {
-            FileSystemUtils.createFile(jar, getMethod.getResponseBodyAsStream());
+            ByteStreams.copy(getMethod.getResponseBodyAsStream(), Files.newOutputStreamSupplier(jar));
             return jar;
         }
         finally

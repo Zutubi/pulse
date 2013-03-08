@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
@@ -9,7 +11,6 @@ import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferListener;
 import com.zutubi.pulse.master.util.monitor.FeedbackAware;
 import com.zutubi.pulse.master.util.monitor.TaskFeedback;
-import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -71,7 +72,7 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
                 {
                     throw new ArchiveException("Failed to create new file: " + file.getCanonicalPath());
                 }
-                FileSystemUtils.createFile(file, resource.getInputStream());
+                ByteStreams.copy(resource.getInputStream(), Files.newOutputStreamSupplier(file));
             }
 
             File export = new File(base, EXPORT_FILENAME);
