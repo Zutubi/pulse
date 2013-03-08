@@ -10,7 +10,6 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.validation.annotations.Required;
 
@@ -326,7 +325,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
 
         Arrays.sort(expected, comparator);
         Arrays.sort(got, comparator);
-        assertTrue(CollectionUtils.equals(expected, got));
+        assertTrue(Arrays.equals(expected, got));
     }
 
     @SymbolicName("hook")

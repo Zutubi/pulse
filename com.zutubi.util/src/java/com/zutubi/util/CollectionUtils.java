@@ -9,45 +9,30 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
+ * Various utilities for working with collections.  Note that we prefer to use Guava utilities, and
+ * if Guava doesn't contain a utility we first ask why, as there may be a simple alternative by
+ * combining a couple of existing utilities that makes the behaviour explicit.  Where our style is
+ * different we end up with a method here.
  */
 public class CollectionUtils
 {
+    /**
+     * Tests if an array contains a value equal to the given one.  Essentially the same as
+     * Arrays.asList(a).contains(x), but doesn't create a list view over the array.
+     *
+     * @param a the array to search
+     * @param x the value to search for
+     * @param <T> type of the array elements
+     * @return true if a contains an element equal to v, false otherwise
+     */
     public static <T> boolean contains(T[] a, T x)
     {
-        for(T t: a)
+        for (T t: a)
         {
-            if(t.equals(x))
+            if (t.equals(x))
             {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    public static <T> boolean equals(T[] a1, T[] a2)
-    {
-        if(a1.length == a2.length)
-        {
-            for(int i = 0; i < a1.length; i++)
-            {
-                if(a1[i] == null)
-                {
-                    if(a2[i] != null)
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    if(!a1[i].equals(a2[i]))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
 
         return false;
