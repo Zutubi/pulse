@@ -1,6 +1,11 @@
 package com.zutubi.util.concurrent;
 
-import java.util.concurrent.*;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utilities built on top of java.util.concurrent classes.
@@ -23,34 +28,21 @@ public class ConcurrentUtils
      */
     public static <T> T runWithTimeout(Callable<T> callable, long timeout, TimeUnit timeUnit, T defaultValue)
     {
-        ExecutorService executor = null;
-        Future<T> future = null;
         try
         {
-            executor = Executors.newSingleThreadExecutor();
-            future = executor.submit(callable);
-            
-            return future.get(timeout, timeUnit);
+            return new SimpleTimeLimiter(Executors.newSingleThreadExecutor()).callWithTimeout(callable, timeout, timeUnit, true);
         }
         catch (InterruptedException e)
         {
             return defaultValue;
         }
-        catch (ExecutionException e)
+        catch (UncheckedTimeoutException e)
         {
-            throw new RuntimeException(e);
-        }
-        catch (TimeoutException e)
-        {
-            future.cancel(true);
             return defaultValue;
         }
-        finally
+        catch (Exception e)
         {
-            if (executor != null)
-            {
-                executor.shutdown();
-            }
+            throw new RuntimeException(e);
         }
     }
 }
