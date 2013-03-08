@@ -1,12 +1,14 @@
 package com.zutubi.i18n.context;
 
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 /**
  * This context resolver navigates the context's class hierarchy and
@@ -27,7 +29,7 @@ public class ExtendedPackageContextResolver implements ContextResolver<ClassCont
             }
         });
 
-        List<String> filteredNames = CollectionUtils.unique(resolvedNames);
+        List<String> filteredNames = newArrayList(newLinkedHashSet(resolvedNames));
 
         // move the base package to the END of the list.
         filteredNames.remove(PackageContextResolver.BUNDLE_NAME);

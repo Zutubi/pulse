@@ -1,53 +1,19 @@
 package com.zutubi.util;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
 import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.math.IntegerAddition;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.google.common.base.Predicates.equalTo;
 import static java.util.Arrays.asList;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {
-    public void testUniqueStrings()
-    {
-        assertUnique(asList("a", "b", "c"), asList("a", "b", "b", "c"));
-    }
-
-    public void testUniqueEmpty()
-    {
-        assertUnique(new LinkedList<Object>(), new LinkedList<Object>());
-    }
-
-    public void testUniqueContainsNull()
-    {
-        assertUnique(asList("a", null, "c"), asList("a", null, null, "c"));
-    }
-
-    public void testUniqueOrderMaintained()
-    {
-        assertUnique(asList("c", "1", "a", "5", "2", "x", "n"), asList("c", "1", "a", "c", "1", "5", "2", "x", "n", "a"));
-    }
-
-    private <T> void assertUnique(List<T> expected, List<T> test)
-    {
-        List<T> result = CollectionUtils.unique(test);
-        assertEquals(expected.size(), result.size());
-        for (int i = 0; i < expected.size(); i++)
-        {
-            assertEquals(expected.get(i), result.get(i));
-        }
-    }
-
-    public void testAsSet()
-    {
-        assertEquals(new HashSet<String>(Arrays.asList("foo", "bar", "baz")), Sets.newHashSet("bar", "foo", "baz", "bar"));
-    }
-
     public void testReduceEmpty()
     {
         int result = CollectionUtils.reduce(Collections.<Integer>emptyList(), 4, new IntegerAddition());

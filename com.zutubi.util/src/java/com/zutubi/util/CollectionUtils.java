@@ -96,21 +96,6 @@ public class CollectionUtils
     }
 
     /**
-     * Return a copy of the list c that has no duplicates.
-     *
-     * @param l the list from which duplicates will be removed.
-     *
-     * @return the copy of the list with duplicates removed.
-     */
-    public static <T> List<T> unique(List<T> l)
-    {
-        // sets by definition are unique, and so will do the processing for us.
-        LinkedHashSet<T> seen = new LinkedHashSet<T>();
-        seen.addAll(l);
-        return new LinkedList<T>(seen);
-    }
-
-    /**
      * Create a sorted version of the list using the provided comparator without changing the
      * original list.
      *

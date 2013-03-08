@@ -1,12 +1,14 @@
 package com.zutubi.i18n.bundle;
 
 import com.zutubi.i18n.context.*;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 /**
  * <class-comment/>
@@ -67,7 +69,7 @@ public class DefaultBundleManager implements BundleManager
             bundleNames.addAll(Arrays.asList(resolver.resolve(context)));
         }
 
-        bundleNames = CollectionUtils.unique(bundleNames);
+        bundleNames = newArrayList(newLinkedHashSet(bundleNames));
 
         for (String bundleName : bundleNames)
         {
