@@ -1,14 +1,16 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static java.util.Collections.nCopies;
@@ -137,14 +139,20 @@ public class LogFileTest extends PulseTestCase
     public void testOpenSecondWriterOnCompressedWhileReaderOpen() throws IOException
     {
         String compressedContent = writeCompressed();
-        InputStream is = logFile.openInputStream();
+        final InputStream is = logFile.openInputStream();
         assertTrue(logFile.isCompressed());
 
         Writer writer = logFile.openWriter();
         assertFalse(logFile.isCompressed());
 
-        assertEquals(compressedContent, IOUtils.inputStreamToString(is));
-        is.close();
+        assertEquals(compressedContent, CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        {
+            public InputStream getInput() throws IOException
+            {
+                return is;
+            }
+        }, Charset.defaultCharset())));
+
         assertFalse(logFile.isCompressed());
 
         writer.write(TEST_CONTENT);
@@ -185,15 +193,15 @@ public class LogFileTest extends PulseTestCase
 
     private String getContents() throws IOException
     {
-        InputStream is = logFile.openInputStream();
-        try
+        String content = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
         {
-            return IOUtils.inputStreamToString(is).replace("\r\n", "\n");
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
+            public InputStream getInput() throws IOException
+            {
+                return logFile.openInputStream();
+            }
+        }, Charset.defaultCharset()));
+
+        return content.replace("\r\n", "\n");
     }
 
 }

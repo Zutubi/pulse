@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.patch;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.diff.DiffException;
@@ -21,6 +22,7 @@ import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -291,7 +293,7 @@ public class PatchArchive
 
             if (status.getPayloadType() == FileStatus.PayloadType.DIFF)
             {
-                applyDiff(path, IOUtils.inputStreamToString(zin), f);
+                applyDiff(path, CharStreams.toString(new InputStreamReader(zin, Charset.defaultCharset())), f);
             }
             else
             {
@@ -373,8 +375,7 @@ public class PatchArchive
             {
                 if (entry.getName().equals(path))
                 {
-                    // This is it
-                    return IOUtils.inputStreamToString(zin);
+                    return CharStreams.toString(new InputStreamReader(zin, Charset.defaultCharset()));
                 }
             }
 

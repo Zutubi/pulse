@@ -1,7 +1,12 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.google.common.base.Predicate;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,5 +45,34 @@ public class ScmUtils
             }
         }
         return filteredChangelists;
+    }
+
+    /**
+     * A convenience wrapper for {@link ScmClient#retrieve(ScmContext, String, Revision)} which reads the entire file
+     * into a string using the default character set.  Useful for testing.
+     *
+     * @param client   client to retrieve the file from
+     * @param context  context to pass to retrieve
+     * @param path     path to pass to retrieve
+     * @param revision revision to pass to retrieve
+     * @return the content of the retrieved file as a string
+     * @throws IOException if the retrieve call fails or there is an error reading the content
+     */
+    public static String retrieveContent(final ScmClient client, final ScmContext context, final String path, final Revision revision) throws ScmException, IOException
+    {
+        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        {
+            public InputStream getInput() throws IOException
+            {
+                try
+                {
+                    return client.retrieve(context, path, revision);
+                }
+                catch (ScmException e)
+                {
+                    throw new IOException(e);
+                }
+            }
+        }, Charset.defaultCharset()));
     }
 }

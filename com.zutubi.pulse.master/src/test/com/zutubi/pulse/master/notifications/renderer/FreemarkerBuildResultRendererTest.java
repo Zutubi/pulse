@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
-import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -18,13 +18,17 @@ import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.*;
+
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.ERROR;
+import static com.zutubi.pulse.core.postprocessors.api.TestStatus.FAILURE;
+import static java.util.Arrays.asList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
@@ -553,22 +557,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         }
         else
         {
-            InputStream expectedStream = null;
-
-            try
-            {
-                expectedStream = getInput(expectedName, extension);
-
-                StringWriter writer = new StringWriter();
-                renderer.render(result, dataMap, type, writer);
-                String got = removeCR(replaceTimestamps(writer.getBuffer().toString()));
-                String expected = removeCR(replaceTimestamps(IOUtils.inputStreamToString(expectedStream)));
-                assertEquals(expected, got);
-            }
-            finally
-            {
-                IOUtils.close(expectedStream);
-            }
+            StringWriter writer = new StringWriter();
+            renderer.render(result, dataMap, type, writer);
+            String got = removeCR(replaceTimestamps(writer.getBuffer().toString()));
+            final String raw = CharStreams.toString(Resources.newReaderSupplier(getInputURL(expectedName, extension), Charset.defaultCharset()));
+            String expected = removeCR(replaceTimestamps(raw));
+            assertEquals(expected, got);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
@@ -14,6 +15,7 @@ import org.netbeans.lib.cvsclient.file.FileStatus;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -177,7 +179,7 @@ public class CvsCoreTest extends PulseTestCase
         List<String> statuses = updateChanges(new File(workdir, MODULE), byDate);
         assertEquals(1, statuses.size());
         assertTrue(x.exists());
-        assertEquals("some content", IOUtils.fileToString(x));
+        assertEquals("some content", Files.toString(x, Charset.defaultCharset()));
         assertEquals("U " + FILEPATH, statuses.get(0));
 
         byDate = new CvsRevision(null, null, toDate("2006-12-23 01:31:00 GMT"));
@@ -186,7 +188,7 @@ public class CvsCoreTest extends PulseTestCase
         assertEquals(1, statuses.size());
         assertEquals("U " + FILEPATH, statuses.get(0));
 
-        String fileContents = IOUtils.fileToString(x);
+        String fileContents = Files.toString(x, Charset.defaultCharset());
         assertTrue(fileContents.startsWith("some content"));
         assertTrue(fileContents.endsWith("Some more content"));
         assertEquals("U " + FILEPATH, statuses.get(0));
@@ -324,7 +326,7 @@ public class CvsCoreTest extends PulseTestCase
 
     private void assertContents(String expected, File file) throws IOException
     {
-        assertEquals(expected, IOUtils.fileToString(file).trim());
+        assertEquals(expected, Files.toString(file, Charset.defaultCharset()).trim());
     }
 
     private Date toDate(String time) throws ParseException

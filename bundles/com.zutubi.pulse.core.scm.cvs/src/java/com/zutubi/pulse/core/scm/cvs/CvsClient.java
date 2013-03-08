@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.google.common.base.Function;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
@@ -16,6 +17,7 @@ import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -160,7 +162,7 @@ public class CvsClient implements ScmClient
         {
             try
             {
-                return IOUtils.fileToString(versionFile);
+                return Files.toString(versionFile, Charset.defaultCharset());
             }
             catch (IOException e)
             {

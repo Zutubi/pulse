@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.util.cache.ehcache;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
 import net.sf.ehcache.Cache;
@@ -9,6 +11,7 @@ import org.hsqldb.lib.StringInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Handles the creation and configuration of the underlying EhCache manager,
@@ -25,19 +28,10 @@ public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheM
 
     public void init() throws IOException
     {
-        String configContent;
-        InputStream stream = getClass().getResourceAsStream(CONFIG_FILE);
-        try
-        {
-            configContent = IOUtils.inputStreamToString(stream);
-        }
-        finally
-        {
-            IOUtils.close(stream);
-            stream = null;
-        }
-
+        String configContent = CharStreams.toString(Resources.newReaderSupplier(getClass().getResource(CONFIG_FILE), Charset.defaultCharset()));
         configContent = configContent.replace(TEMP_DIR_TOKEN, systemPaths.getTmpRoot().getAbsolutePath());
+
+        InputStream stream = null;
         try
         {
             stream = new StringInputStream(configContent);

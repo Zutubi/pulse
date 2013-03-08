@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.core.scm.patch.api.WorkingCopyStatusBuilder;
 import com.zutubi.pulse.core.ui.api.UserInterface;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.Config;
-import com.zutubi.util.io.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
@@ -18,6 +18,7 @@ import org.netbeans.lib.cvsclient.event.FileInfoEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Set;
@@ -110,7 +111,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         try
         {
             File repositoryFile = new File(workingDir, "CVS" + File.separator + "Repository");
-            return IOUtils.fileToString(repositoryFile).trim();
+            return Files.toString(repositoryFile, Charset.defaultCharset()).trim();
         }
         catch (IOException e)
         {
@@ -131,7 +132,7 @@ public class CvsWorkingCopy implements WorkingCopy, WorkingCopyStatusBuilder
         {
             try
             {
-                rootString = IOUtils.fileToString(rootFile).trim();
+                rootString = Files.toString(rootFile, Charset.defaultCharset()).trim();
             }
             catch (IOException e)
             {

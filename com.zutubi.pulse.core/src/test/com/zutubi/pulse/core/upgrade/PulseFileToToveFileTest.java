@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.io.IOUtils;
 import nu.xom.ParsingException;
 
 import java.io.IOException;
@@ -58,9 +57,9 @@ public class PulseFileToToveFileTest extends PulseTestCase
 
     private void expectedOutputHelper(boolean stripWhitespace) throws IOException, ParsingException
     {
-        String in = IOUtils.inputStreamToString(getInput(getName() + ".in", EXTENSION_XML));
+        String in = readInputFully(getName() + ".in", EXTENSION_XML);
         String out = PulseFileToToveFile.convert(in);
-        String expected = IOUtils.inputStreamToString(getInput(getName() + ".out", EXTENSION_XML));
+        String expected = readInputFully(getName() + ".out", EXTENSION_XML);
         if (stripWhitespace)
         {
             out = stripWhitespace(out);

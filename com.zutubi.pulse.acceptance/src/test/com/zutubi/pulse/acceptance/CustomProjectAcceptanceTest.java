@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.concurrent.ConcurrentUtils;
-import com.zutubi.util.io.IOUtils;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.util.concurrent.Callable;
@@ -29,7 +28,7 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
 
     public void testValidationPerformanceOfLargeCustomPulseFile() throws Exception
     {
-        final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+        final String pulseFileString = readInputFully("pulseFile", "xml");
 
         String insertionPath = ConcurrentUtils.runWithTimeout(new Callable<String>()
         {
@@ -46,7 +45,7 @@ public class CustomProjectAcceptanceTest extends AcceptanceTestBase
 
     public void testValidationPerformedOnCustomPulseFile() throws Exception
     {
-        String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+        String pulseFileString = readInputFully("pulseFile", "xml");
 
         String invalidFragment = pulseFileString.substring(30, 300);
 

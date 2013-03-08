@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.hg;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
@@ -7,10 +8,10 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.util.config.CompositeConfig;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -80,7 +81,7 @@ public class MercurialPatchFormatTest extends MercurialTestBase
         assertModifiedStatus(fileStatuses.get(0), file1.getName());
 
         patchFormat.applyPatch(buildContext, patchFile, baseDir, null, null);
-        assertEquals(NEW_CONTENT, IOUtils.fileToString(new File(baseDir, file1.getName())));
+        assertEquals(NEW_CONTENT, Files.toString(new File(baseDir, file1.getName()), Charset.defaultCharset()));
     }
 
     public void testSimpleAdd() throws ScmException, IOException
@@ -98,7 +99,7 @@ public class MercurialPatchFormatTest extends MercurialTestBase
         assertAddedStatus(fileStatuses.get(0), FILENAME);
 
         patchFormat.applyPatch(buildContext, patchFile, baseDir, null, null);
-        assertEquals(CONTENT, IOUtils.fileToString(new File(baseDir, FILENAME)));
+        assertEquals(CONTENT, Files.toString(new File(baseDir, FILENAME), Charset.defaultCharset()));
     }
 
     public void testSimpleDelete() throws ScmException, IOException
@@ -162,15 +163,15 @@ public class MercurialPatchFormatTest extends MercurialTestBase
         assertEquals(1, fileStatuses.size());
         assertModifiedStatus(fileStatuses.get(0), file1.getName());
 
-        String original2Content = IOUtils.fileToString(new File(baseDir, file2.getName()));
+        String original2Content = Files.toString(new File(baseDir, file2.getName()), Charset.defaultCharset());
         patchFormat.applyPatch(buildContext, patchFile, baseDir, null, null);
-        assertEquals(NEW_CONTENT, IOUtils.fileToString(new File(baseDir, file1.getName())));
-        assertEquals(original2Content, IOUtils.fileToString(new File(baseDir, file2.getName())));
+        assertEquals(NEW_CONTENT, Files.toString(new File(baseDir, file1.getName()), Charset.defaultCharset()));
+        assertEquals(original2Content, Files.toString(new File(baseDir, file2.getName()), Charset.defaultCharset()));
     }
     
     private void assertContent(String expected) throws IOException
     {
-        assertEquals(expected, IOUtils.fileToString(new File(baseDir, CONTENT_FILE_PATH)));
+        assertEquals(expected, Files.toString(new File(baseDir, CONTENT_FILE_PATH), Charset.defaultCharset()));
     }
 
     private void assertModifiedStatus(FileStatus fileStatus, String path)

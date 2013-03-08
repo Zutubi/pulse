@@ -3,17 +3,18 @@ package com.zutubi.pulse.core.scm.git;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.util.PulseZipUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.List;
 
@@ -173,11 +174,11 @@ public class NativeGitTest extends PulseTestCase
         git.setWorkingDirectory(cloneBase);
         git.checkout(null, "master");
 
-        assertFalse(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
+        assertFalse(Files.toString(new File(cloneBase, "README.txt"), Charset.defaultCharset()).contains("ON BRANCH"));
 
         git.checkout(null, "origin/branch", "local");
 
-        assertTrue(IOUtils.fileToString(new File(cloneBase, "README.txt")).contains("ON BRANCH"));
+        assertTrue(Files.toString(new File(cloneBase, "README.txt"), Charset.defaultCharset()).contains("ON BRANCH"));
     }
 
     public void testLogParse() throws IOException, GitException

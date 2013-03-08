@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.marshal.ImportingNotSupportedFileResolver;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,6 +29,6 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
 
     private String getPulseFile(String name) throws IOException
     {
-        return IOUtils.inputStreamToString(getInput(name, "xml"));
+        return readInputFully(name, "xml");
     }
 }

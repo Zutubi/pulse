@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.ScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
@@ -161,7 +162,7 @@ public class CvsCore
                 LOG.error(repositoryFile.getCanonicalPath() + " does not exist.");
                 return null;
             }
-            return IOUtils.fileToString(repositoryFile);
+            return Files.toString(repositoryFile, Charset.defaultCharset());
         }
         catch (IOException e)
         {

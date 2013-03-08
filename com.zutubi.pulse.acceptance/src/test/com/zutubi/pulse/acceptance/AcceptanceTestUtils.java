@@ -1,7 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -294,17 +296,21 @@ public class AcceptanceTestUtils
      */
     public static String readUriContent(String contentUri, Credentials credentials) throws IOException
     {
-        InputStream input = null;
         GetMethod get = null;
         try
         {
             get = httpGet(contentUri, credentials);
-            input = get.getResponseBodyAsStream();
-            return IOUtils.inputStreamToString(input);
+            final GetMethod finalGet = get;
+            return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+            {
+                public InputStream getInput() throws IOException
+                {
+                    return finalGet.getResponseBodyAsStream();
+                }
+            }, Charset.defaultCharset()));
         }
         finally
         {
-            IOUtils.close(input);
             releaseConnection(get);
         }
     }

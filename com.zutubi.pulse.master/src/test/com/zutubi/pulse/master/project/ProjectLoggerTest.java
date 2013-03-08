@@ -1,15 +1,17 @@
 package com.zutubi.pulse.master.project;
 
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import static com.zutubi.util.io.IOUtils.inputStreamToString;
 import static java.util.Collections.nCopies;
 
 public class ProjectLoggerTest extends PulseTestCase
@@ -108,7 +110,7 @@ public class ProjectLoggerTest extends PulseTestCase
 
     public void testRawWithNoLogMessages() throws IOException
     {
-        assertEquals("", inputStreamToString(logger.getRawInputStream()));
+        assertEquals("", CharStreams.toString(CharStreams.newReaderSupplier(new ProjectLoggerInputSupplier(), Charset.defaultCharset())));
     }
 
     public void testRaw() throws IOException
@@ -138,7 +140,7 @@ public class ProjectLoggerTest extends PulseTestCase
             logMessage(TEST_MESSAGE);
         }
 
-        String raw = inputStreamToString(logger.getRawInputStream());
+        String raw = CharStreams.toString(CharStreams.newReaderSupplier(new ProjectLoggerInputSupplier(), Charset.defaultCharset()));
         assertEquals(expected, wipeTimestamps(raw));
     }
 
@@ -160,5 +162,13 @@ public class ProjectLoggerTest extends PulseTestCase
     private String getFullContent()
     {
         return StringUtils.join(LINE_SEPARATOR, nCopies(LINE_LIMIT, TEST_MESSAGE)) + LINE_SEPARATOR;
+    }
+
+    private class ProjectLoggerInputSupplier implements InputSupplier<InputStream>
+    {
+        public InputStream getInput() throws IOException
+        {
+            return logger.getRawInputStream();
+        }
     }
 }

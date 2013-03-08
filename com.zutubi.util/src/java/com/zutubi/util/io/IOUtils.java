@@ -109,14 +109,6 @@ public class IOUtils
         }
     }
 
-    public static String inputStreamToString(InputStream is) throws IOException
-    {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-        ByteStreams.copy(is, os);
-        return os.toString();
-    }
-
     public static byte[] fileToBytes(File file) throws IOException
     {
         FileInputStream is = null;

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util;
 
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.SystemUtils;
@@ -293,7 +294,7 @@ public class ZipUtilsTest extends PulseTestCase
 
     private String readContents(ZipFile zipFile, ZipEntry entry) throws IOException
     {
-        return IOUtils.inputStreamToString(zipFile.getInputStream(entry));
+        return CharStreams.toString(new InputStreamReader(zipFile.getInputStream(entry), Charset.defaultCharset()));
     }
 
     private void createDataFiles(Map<String, String> files) throws IOException

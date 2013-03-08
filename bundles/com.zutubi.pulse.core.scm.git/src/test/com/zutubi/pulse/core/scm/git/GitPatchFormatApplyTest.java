@@ -1,15 +1,17 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.api.Matchers;
-import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 
 public class GitPatchFormatApplyTest extends GitClientTestBase
 {
@@ -19,7 +21,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
         patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
-        assertEquals("edited by " + getName() + "\n", IOUtils.fileToString(new File(workingDir, "a.txt")));
+        assertEquals("edited by " + getName() + "\n", Files.toString(new File(workingDir, "a.txt"), Charset.defaultCharset()));
         assertCleanPatch();
     }
 
@@ -29,7 +31,7 @@ public class GitPatchFormatApplyTest extends GitClientTestBase
         handler.reset();
         GitPatchFormat patchFormat = new GitPatchFormat();
         patchFormat.applyPatch(context, getInputFile(EXTENSION_TXT), workingDir, null, handler);
-        assertEquals(CONTENT_A_TXT, IOUtils.fileToString(new File(workingDir, "ren.txt")));
+        assertEquals(CONTENT_A_TXT, Files.toString(new File(workingDir, "ren.txt"), Charset.defaultCharset()));
         assertCleanPatch();
     }
 

@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.security.ldap;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
-import com.zutubi.util.io.IOUtils;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
 import org.apache.directory.server.core.annotations.CreateDS;
@@ -16,6 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import static com.zutubi.pulse.master.security.ldap.AcegiLdapManager.EMAIL_CONTACT_NAME;
@@ -41,7 +44,8 @@ public class AcegiLdapManagerTest extends AbstractLdapTestUnit
     {
         config = createBaseConfiguration();
 
-        String ldif = IOUtils.inputStreamToString(AcegiLdapManagerTest.class.getResourceAsStream("AcegiLdapManagerTest.ldif"));
+        final URL ldifUrl = AcegiLdapManagerTest.class.getResource("AcegiLdapManagerTest.ldif");
+        String ldif = CharStreams.toString(Resources.newReaderSupplier(ldifUrl, Charset.defaultCharset()));
         DSAnnotationProcessor.injectEntries(service, ldif);
 
         UserManager userManager = mock(UserManager.class);

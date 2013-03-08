@@ -1,6 +1,7 @@
 package com.zutubi.util.junit;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.util.io.FileSystemUtils;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
@@ -166,6 +168,33 @@ public abstract class ZutubiTestCase extends TestCase
     public URL getInputURL(String name, String extension)
     {
         return getClass().getResource(getClass().getSimpleName() + "." + name + "." + extension);
+    }
+
+    /**
+     * Finds input as does {@link #getInputURL(String)}, then reads it fully
+     * into a string using the default character set.
+     *
+     * @param extension extension of the test data file
+     * @return the content of the file as a string
+     * @throws IOException on error reading the file
+     */
+    public String readInputFully(String extension) throws IOException
+    {
+        return readInputFully(getName(), extension);
+    }
+
+    /**
+     * Finds input as does {@link #getInputURL(String, String)}, then reads it
+     * fully into a string using the default character set.
+     *
+     * @param name      name of the test data file
+     * @param extension extension of the test data file
+     * @return the content of the file as a string
+     * @throws IOException on error reading the file
+     */
+    public String readInputFully(String name, String extension) throws IOException
+    {
+        return CharStreams.toString(Resources.newReaderSupplier(getInputURL(name, extension), Charset.defaultCharset()));
     }
 
     /**

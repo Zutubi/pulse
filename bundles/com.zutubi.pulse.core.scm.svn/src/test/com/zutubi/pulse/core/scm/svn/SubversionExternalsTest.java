@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
@@ -17,6 +18,7 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -458,7 +460,7 @@ public class SubversionExternalsTest extends PulseTestCase
     private void assertFile(String path, String content) throws IOException
     {
         File f = new File(checkoutDir, path);
-        assertEquals(content, IOUtils.fileToString(f));
+        assertEquals(content, Files.toString(f, Charset.defaultCharset()));
     }
 
     private static Revision createRevision(long rev)

@@ -19,7 +19,6 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.IOUtils;
 import org.openqa.selenium.By;
 
 import java.util.*;
@@ -642,7 +641,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
 
-        final String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+        final String pulseFileString = readInputFully("pulseFile", "xml");
 
         AddProjectWizard wizard = new AddProjectWizard(getBrowser(), rpcClient.RemoteApi);
         wizard.runAddProjectWizard(new AddProjectWizard.DefaultProjectWizardDriver(GLOBAL_PROJECT_NAME, random, false)
@@ -673,7 +672,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         String parent = random + "-parent";
         String child = random + "-child";
 
-        String pulseFileString = IOUtils.inputStreamToString(getInput("pulseFile", "xml"));
+        String pulseFileString = readInputFully("pulseFile", "xml");
         rpcClient.RemoteApi.insertProject(parent, GLOBAL_PROJECT_NAME, true, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), rpcClient.RemoteApi.getCustomTypeConfig(pulseFileString));
 
         getBrowser().loginAsAdmin();

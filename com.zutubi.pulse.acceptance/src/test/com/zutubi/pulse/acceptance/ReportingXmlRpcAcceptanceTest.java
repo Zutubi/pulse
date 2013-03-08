@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.util.*;
@@ -295,7 +294,7 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String projectName = randomName();
         Hashtable<String, Object> customType = rpcClient.RemoteApi.createDefaultConfig(CustomTypeConfiguration.class);
-        customType.put("pulseFileString", IOUtils.inputStreamToString(getInput("xml")));
+        customType.put("pulseFileString", readInputFully("xml"));
 
         rpcClient.RemoteApi.insertProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TRIVIAL_ANT_REPOSITORY), customType);
         int number = rpcClient.RemoteApi.runBuild(projectName);

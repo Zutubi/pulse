@@ -1,11 +1,15 @@
 package com.zutubi.pulse.core.marshal;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 public class LocalFileResolverTest extends PulseTestCase
 {
@@ -36,7 +40,22 @@ public class LocalFileResolverTest extends PulseTestCase
     {
         File f = new File(tempDir, FILENAME);
         FileSystemUtils.createFile(f, CONTENT_SIMPLE);
-        assertEquals(CONTENT_SIMPLE, IOUtils.inputStreamToString(resolver.resolve(FILENAME)));
+        final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        {
+            public InputStream getInput() throws IOException
+            {
+                try
+                {
+                    return resolver.resolve(FILENAME);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, Charset.defaultCharset()));
+
+        assertEquals(CONTENT_SIMPLE, resolvedContent);
     }
 
     public void testNested() throws Exception
@@ -45,6 +64,21 @@ public class LocalFileResolverTest extends PulseTestCase
         assertTrue(dir.mkdir());
         File nested = new File(dir, FILENAME);
         FileSystemUtils.createFile(nested, CONTENT_NESTED);
-        assertEquals(CONTENT_NESTED, IOUtils.inputStreamToString(resolver.resolve(PathUtils.getPath(DIRECTORY, FILENAME))));
+        final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        {
+            public InputStream getInput() throws IOException
+            {
+                try
+                {
+                    return resolver.resolve(PathUtils.getPath(DIRECTORY, FILENAME));
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, Charset.defaultCharset()));
+
+        assertEquals(CONTENT_NESTED, resolvedContent);
     }
 }

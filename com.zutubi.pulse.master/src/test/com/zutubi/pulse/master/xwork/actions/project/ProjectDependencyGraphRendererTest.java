@@ -11,7 +11,6 @@ import com.zutubi.util.Point;
 import com.zutubi.util.adt.Grid;
 import com.zutubi.util.adt.GridCell;
 import com.zutubi.util.adt.TreeNode;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 
@@ -56,14 +55,14 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
     {
         ProjectDependencyGraph graph = new ProjectDependencyGraph(null, tree);
         Grid<ProjectDependencyData> grid = renderer.renderDownstream(graph);
-        assertEquals(IOUtils.inputStreamToString(getInput("txt")), renderToAscii(grid));
+        assertEquals(readInputFully("txt"), renderToAscii(grid));
     }
 
     private void upstreamTest(TreeNode<DependencyGraphData> tree) throws IOException
     {
         ProjectDependencyGraph graph = new ProjectDependencyGraph(tree, null);
         Grid<ProjectDependencyData> grid = renderer.renderUpstream(graph);
-        assertEquals(IOUtils.inputStreamToString(getInput("txt")), renderToAscii(grid));
+        assertEquals(readInputFully("txt"), renderToAscii(grid));
     }
 
     private TreeNode<DependencyGraphData> getSimpleTree()

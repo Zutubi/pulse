@@ -1,10 +1,13 @@
 package com.zutubi.pulse.core.engine;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.marshal.FileResolver;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Provides pulse files from an external source by looking them up via a
@@ -32,17 +35,16 @@ public class ExternalPulseFileProvider implements PulseFileProvider
         return path;
     }
 
-    public String getFileContent(FileResolver resolver) throws Exception
+    public String getFileContent(final FileResolver resolver) throws Exception
     {
-        InputStream is = resolver.resolve(path);
-        try
+        final InputStream stream = resolver.resolve(path);
+        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
         {
-            return IOUtils.inputStreamToString(is);
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
+            public InputStream getInput() throws IOException
+            {
+                return stream;
+            }
+        }, Charset.defaultCharset()));
     }
 
     public File getImportRoot()

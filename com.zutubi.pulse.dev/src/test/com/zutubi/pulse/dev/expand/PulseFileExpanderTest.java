@@ -1,5 +1,7 @@
 package com.zutubi.pulse.dev.expand;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.core.NoopCommandConfiguration;
 import com.zutubi.pulse.core.NoopPostProcessorConfiguration;
 import com.zutubi.pulse.core.api.PulseException;
@@ -11,12 +13,11 @@ import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 
 public class PulseFileExpanderTest extends PulseTestCase
 {
@@ -190,17 +191,7 @@ public class PulseFileExpanderTest extends PulseTestCase
 
     private String getExpectedOutput()  throws IOException
     {
-        String expected;
-        InputStream is = getInput("out.xml");
-        try
-        {
-            expected = IOUtils.inputStreamToString(is);
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
-        return expected;
+        return CharStreams.toString(Resources.newReaderSupplier(getInputURL("out.xml"), Charset.defaultCharset()));
     }
 
 }
