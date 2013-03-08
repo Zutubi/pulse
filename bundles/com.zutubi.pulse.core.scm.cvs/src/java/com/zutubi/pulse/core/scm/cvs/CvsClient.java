@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -444,14 +443,20 @@ public class CvsClient implements ScmClient
                 throw new ScmException("Unable to checkout file '" + path + "' from cvs[" + getRoot() + "].");
             }
 
-            FileInputStream fis = new FileInputStream(checkedOutFile);
-            return new CleanupInputStream(fis, new CleanupInputStream.CleanupCallback()
-            {
-                public void execute()
+            return new FileInputStream(checkedOutFile) {
+                @Override
+                public void close() throws IOException
                 {
-                    removeTempDir(tmpDir[0]);
+                    try
+                    {
+                        super.close();
+                    }
+                    finally
+                    {
+                        removeTempDir(tmpDir[0]);
+                    }
                 }
-            });
+            };
         }
         catch (IOException e)
         {
