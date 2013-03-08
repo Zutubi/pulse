@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.jetty;
 
+import com.google.common.base.Charsets;
 import org.mortbay.http.HttpFields;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.HttpResponse;
@@ -13,9 +14,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
-
-import com.zutubi.util.Constants;
-import static com.zutubi.util.Constants.UTF8;
 
 /**
  * This resource handler implementation is an extension of the original implementation
@@ -178,7 +176,7 @@ public class ResourceHandler extends org.mortbay.http.handler.ResourceHandler
                         "No directory");
                 return;
             }
-            data = dir.getBytes(UTF8);
+            data = dir.getBytes(Charsets.UTF_8);
             if (resource instanceof CachedResource)
                 ((CachedResource) resource).setCachedData(data);
         }

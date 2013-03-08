@@ -1,8 +1,12 @@
 package com.zutubi.util;
 
+import com.google.common.base.Charsets;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -71,13 +75,12 @@ public class SecurityUtils
      * @return the digest as a hexadecimal string
      *
      * @throws NoSuchAlgorithmException if the given algorithm is unrecognised
-     * @throws UnsupportedEncodingException if UTF-8 is not supported
      *
      * @see #digestUnsafe(String, String)
      */
-    public static String digest(String algorithm, String input) throws NoSuchAlgorithmException, UnsupportedEncodingException
+    public static String digest(String algorithm, String input) throws NoSuchAlgorithmException
     {
-        return digest(algorithm, input.getBytes(Constants.UTF8));
+        return digest(algorithm, input.getBytes(Charsets.UTF_8));
     }
 
     /**

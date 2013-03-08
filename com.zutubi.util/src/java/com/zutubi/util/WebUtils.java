@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -13,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.transform;
-import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Miscellaneous utility methods useful for web-related things like URLs, HTML,
@@ -34,7 +34,7 @@ public class WebUtils
     {
         try
         {
-            return URLEncoder.encode(s, UTF8);
+            return URLEncoder.encode(s, Charsets.UTF_8.name());
         }
         catch (UnsupportedEncodingException e)
         {
@@ -213,19 +213,11 @@ public class WebUtils
                     sb = new StringBuilder(in.substring(0, i));
                 }
 
-                try
+                byte[] bytes = in.substring(i, i + 1).getBytes(Charsets.UTF_8);
+                for (byte b: bytes)
                 {
-                    byte[] bytes = in.substring(i, i + 1).getBytes(Constants.UTF8);
-                    for (byte b: bytes)
-                    {
-                        sb.append(tag);
-                        sb.append(toHexString(b));
-                    }
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    // Programmer error: not handleable
-                    throw new RuntimeException(e);
+                    sb.append(tag);
+                    sb.append(toHexString(b));
                 }
             }
         }
@@ -434,15 +426,8 @@ public class WebUtils
     {
         if(byteOffset > 0)
         {
-            try
-            {
-                sb.append(new String(bytes, 0, byteOffset, Constants.UTF8));
-                byteOffset = 0;
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new RuntimeException(e);
-            }
+            sb.append(new String(bytes, 0, byteOffset, Charsets.UTF_8));
+            byteOffset = 0;
         }
         return byteOffset;
     }

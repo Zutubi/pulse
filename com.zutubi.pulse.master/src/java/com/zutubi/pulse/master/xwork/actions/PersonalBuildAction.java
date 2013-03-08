@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
@@ -255,7 +256,7 @@ public class PersonalBuildAction extends ActionSupport
             Properties properties = new Properties();
             try
             {
-                properties.load(new ByteArrayInputStream(overrides.getBytes(Constants.UTF8)));
+                properties.load(new ByteArrayInputStream(overrides.getBytes(Charsets.UTF_8)));
                 for (Map.Entry<Object, Object> entry: properties.entrySet())
                 {
                     result.add(new ResourcePropertyConfiguration(entry.getKey().toString(), entry.getValue().toString()));

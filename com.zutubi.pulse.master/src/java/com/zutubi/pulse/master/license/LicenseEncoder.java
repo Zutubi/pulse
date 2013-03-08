@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.license;
 
-import static com.zutubi.util.Constants.UTF8;
+import com.google.common.base.Charsets;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.ByteArrayOutputStream;
@@ -39,7 +39,7 @@ public class LicenseEncoder implements LicenseKeyFactory
         String licenseStr = toString(license);
         try
         {
-            byte[] data = licenseStr.getBytes(UTF8);
+            byte[] data = licenseStr.getBytes(Charsets.UTF_8);
             // generate digital signature.
             byte[] sig = signData(data);
 

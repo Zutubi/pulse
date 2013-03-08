@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Charsets;
 import com.zutubi.pulse.core.postprocessors.api.TestResult;
 import com.zutubi.pulse.core.postprocessors.api.TestStatus;
 import com.zutubi.pulse.core.util.api.XMLUtils;
@@ -10,9 +11,8 @@ import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-import static com.zutubi.util.Constants.UTF8;
+import static com.google.common.base.Charsets.UTF_8;
 
 /**
  */
@@ -96,14 +96,7 @@ public class TestSuitePersister
 
     private String base64Encode(String value)
     {
-        try
-        {
-            return new String(Base64.encodeBase64(value.getBytes(UTF8)), UTF8);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return value;
-        }
+        return new String(Base64.encodeBase64(value.getBytes(Charsets.UTF_8)), Charsets.UTF_8);
     }
 
     private Attribute safeAttribute(String name, String value)
@@ -203,14 +196,7 @@ public class TestSuitePersister
 
     private String base64Decode(String value)
     {
-        try
-        {
-            return new String(Base64.decodeBase64(value.getBytes(UTF8)), UTF8);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            return value;
-        }
+        return new String(Base64.decodeBase64(value.getBytes(UTF_8)), UTF_8);
     }
 
     private String getSafeAttributeValue(Element element, String name)

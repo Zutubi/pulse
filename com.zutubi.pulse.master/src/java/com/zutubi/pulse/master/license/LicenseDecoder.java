@@ -1,13 +1,12 @@
 package com.zutubi.pulse.master.license;
 
+import com.google.common.base.Charsets;
 import com.zutubi.util.StringUtils;
-import static com.zutubi.util.Constants.UTF8;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -78,14 +77,7 @@ public class LicenseDecoder
         }
 
         // create the license instance.
-        try
-        {
-            return fromString(new String(licenseStr, UTF8));
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new LicenseException(e);
-        }
+        return fromString(new String(licenseStr, Charsets.UTF_8));
     }
 
     private License fromString(String data) throws LicenseException

@@ -1,5 +1,6 @@
 package com.zutubi.util;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -10,7 +11,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 
-import static com.zutubi.util.Constants.UTF8;
 import static com.zutubi.util.SecurityUtils.*;
 
 public class SecurityUtilsTest extends ZutubiTestCase
@@ -25,17 +25,8 @@ public class SecurityUtilsTest extends ZutubiTestCase
     private static final byte[] BYTES_HELLO;
     static
     {
-        byte[] bytes;
-        try
-        {
-            bytes = STRING_HELLO.getBytes(UTF8);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            bytes = new byte[0];
-        }
 
-        BYTES_HELLO = bytes;
+        BYTES_HELLO = STRING_HELLO.getBytes(Charsets.UTF_8);
     }
 
     public void testDigestBadAlgorithm()

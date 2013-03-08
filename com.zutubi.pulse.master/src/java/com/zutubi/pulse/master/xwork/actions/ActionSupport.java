@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
@@ -29,7 +30,6 @@ import java.net.URLDecoder;
 import java.util.*;
 
 import static com.google.common.collect.Collections2.transform;
-import static com.zutubi.util.Constants.UTF8;
 
 /**
  * Base for all actions.  Includes standard i18n, encoding, security and other
@@ -184,7 +184,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         try
         {
-            return URLDecoder.decode(s, UTF8);
+            return URLDecoder.decode(s, Charsets.UTF_8.name());
         }
         catch (UnsupportedEncodingException e)
         {

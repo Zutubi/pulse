@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.personal;
 
+import com.google.common.base.Charsets;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -20,7 +21,6 @@ import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.client.UserAbortException;
 import com.zutubi.pulse.dev.sync.SynchronisePluginsClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
-import com.zutubi.util.Constants;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
@@ -542,7 +542,7 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
         {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             overrides.store(outputStream, "");
-            return outputStream.toString(Constants.UTF8);
+            return new String(outputStream.toByteArray(), Charsets.UTF_8);
         }
         catch (IOException e)
         {
