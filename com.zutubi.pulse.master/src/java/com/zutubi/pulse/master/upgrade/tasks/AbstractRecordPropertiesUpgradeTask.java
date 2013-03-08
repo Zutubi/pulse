@@ -5,7 +5,6 @@ import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.NullaryFunction;
 
 import java.util.List;
 import java.util.Map;
@@ -45,9 +44,9 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
         final List<RecordUpgrader> recordUpgraders = getRecordUpgraders();
         wireExternalDependencies(recordLocator, recordUpgraders);
 
-        transactionManager.runInTransaction(new NullaryFunction<Void>()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Void process()
+            public void run()
             {
                 Map<String, Record> recordsToUpgrade = recordLocator.locate(recordManager);
                 for (Map.Entry<String, Record> recordEntry: recordsToUpgrade.entrySet())
@@ -61,7 +60,6 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
 
                     recordManager.update(path, mutableRecord);
                 }
-                return null;
             }
         });
     }

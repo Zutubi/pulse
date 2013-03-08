@@ -1,7 +1,5 @@
 package com.zutubi.tove.transaction;
 
-import com.zutubi.util.NullaryFunction;
-
 public class TransactionManagerTest extends AbstractTransactionTestCase
 {
     private TransactionManager transactionManager;
@@ -280,9 +278,9 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         try
         {
-            transactionManager.runInTransaction(new NullaryFunction()
+            transactionManager.runInTransaction(new Runnable()
             {
-                public Object process()
+                public void run()
                 {
                     resource.interactWithMe();
 
@@ -306,9 +304,9 @@ public class TransactionManagerTest extends AbstractTransactionTestCase
 
         try
         {
-            transactionManager.runInTransaction(new NullaryFunction()
+            transactionManager.runInTransaction(new Runnable()
             {
-                public Object process()
+                public void run()
                 {
                     resource.interactWithMe();
 

@@ -10,7 +10,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -69,16 +68,14 @@ public class ConfigurationStateManager
             if (force || getExternalStateId(instance) == 0)
             {
                 final long[] hax = {-1};
-                transactionManager.runInTransaction(new NullaryFunction<Object>()
+                transactionManager.runInTransaction(new Runnable()
                 {
-                    public Object process()
+                    public void run()
                     {
                         CompositeType type = typeRegistry.getType(instance.getClass());
 
                         hax[0] = manager.createState(instance);
                         updateProperty(type, instance, hax[0]);
-
-                        return null;
                     }
 
                 },

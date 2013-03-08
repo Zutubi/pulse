@@ -37,28 +37,26 @@ public class InMemoryRecordStore implements RecordStore
 
     public void insert(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryFunction<Object>()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Object process()
+            public void run()
             {
                 MutableRecord base = state.get(true);
                 isolate(base, PathUtils.getParentPath(path));
                 insert(base, path, record);
-                return null;
             }
         });
     }
 
     public void update(final String path, final Record record)
     {
-        transactionManager.runInTransaction(new NullaryFunction<Object>()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Object process()
+            public void run()
             {
                 MutableRecord base = state.get(true);
                 isolate(base, path);
                 update(base, path, record);
-                return null;
             }
         });
     }
@@ -94,12 +92,11 @@ public class InMemoryRecordStore implements RecordStore
 
     public void importRecords(final Record r)
     {
-        transactionManager.runInTransaction(new NullaryFunction<Object>()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Object process()
+            public void run()
             {
                 importRecords(state.get(true), r);
-                return null;
             }
         });
     }

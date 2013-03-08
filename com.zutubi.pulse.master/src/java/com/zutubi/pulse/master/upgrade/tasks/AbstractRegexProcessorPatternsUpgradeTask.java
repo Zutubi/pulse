@@ -6,7 +6,6 @@ import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.adt.Pair;
 
 import java.util.Map;
@@ -47,9 +46,9 @@ public abstract class AbstractRegexProcessorPatternsUpgradeTask extends Abstract
         PersistentScopes scopes = new PersistentScopes(recordManager);
         scope = (TemplatedScopeDetails) scopes.getScopeDetails(SCOPE_PROJECTS);
 
-        transactionManager.runInTransaction(new NullaryFunction()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Object process()
+            public void run()
             {
                 RecordLocator locator = newFirstDefinedFilter(newTypeFilter(newPathPattern(PATH_PATTERN_ALL_PROCESSORS), getProcessorType()), scope);
                 Map<String, Record> processors = locator.locate(recordManager);
@@ -57,8 +56,6 @@ public abstract class AbstractRegexProcessorPatternsUpgradeTask extends Abstract
                 {
                     addPatternsIfNotPresent(entry.getKey(), entry.getValue());
                 }
-                
-                return null;
             }
         });
     }

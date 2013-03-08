@@ -203,14 +203,13 @@ public class RecordManager implements HandleAllocator
         final MutableRecord copy = record.copy(true, true);
         allocateHandles(copy);
 
-        transactionManager.runInTransaction(new NullaryFunction<Object>()
+        transactionManager.runInTransaction(new Runnable()
         {
-            public Object process()
+            public void run()
             {
                 Map<Long, String> handleToPathMap = state.get(true);
                 addToHandleMap(handleToPathMap, path, copy);
                 recordStore.insert(path, copy);
-                return null;
             }
         });
 
