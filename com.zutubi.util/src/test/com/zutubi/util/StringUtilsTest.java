@@ -759,26 +759,6 @@ public class StringUtilsTest extends ZutubiTestCase
         assertEquals(javaApi, StringUtils.split(s, '/', true));
     }
 
-    public void testTimesEmptyString()
-    {
-        assertEquals("", StringUtils.times("", 10));
-    }
-
-    public void testTimesZeroCount()
-    {
-        assertEquals("", StringUtils.times("hello", 0));
-    }
-
-    public void testTimesOneCount()
-    {
-        assertEquals("hello", StringUtils.times("hello", 1));
-    }
-
-    public void testTimes()
-    {
-        assertEquals("123123123", StringUtils.times("123", 3));
-    }
-
     public void testStripLeadingWhitespace()
     {
         assertEquals("", StringUtils.stripLeadingWhitespace(""));

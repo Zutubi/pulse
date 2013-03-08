@@ -818,25 +818,6 @@ public class StringUtils
     }
 
     /**
-     * Returns a string that is built by concatenating together count copies
-     * of s.
-     *
-     * @param s     string to multiply to produce result
-     * @param count number of copies of s to concatenate
-     * @return count copies of s concatentated together
-     */
-    public static String times(String s, int count)
-    {
-        StringBuilder result = new StringBuilder(count * s.length());
-        for(int i = 0; i < count; i++)
-        {
-            result.append(s);
-        }
-
-        return result.toString();
-    }
-
-    /**
      * Remove any leading whitespace from the string.
      * @param str string with leading whitespace
      * @return the string with leading whitespace removed

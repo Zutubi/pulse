@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Strings;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.StringUtils;
 
 /**
  */
@@ -10,14 +10,14 @@ public class FeatureTest extends PulseTestCase
 {
     public void testSummaryBangOn()
     {
-        String s = StringUtils.times("x", 4095);
+        String s = Strings.repeat("x", 4095);
         PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, s);
         assertEquals(s, f.getSummary());
     }
 
     public void testSummaryTooLong()
     {
-        PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, StringUtils.times("x", 4096));
+        PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, Strings.repeat("x", 4096));
         assertEquals(getTrimmedSummary(), f.getSummary());
     }
 
@@ -30,14 +30,14 @@ public class FeatureTest extends PulseTestCase
 
     public void testAppendHitsLimit()
     {
-        PersistentFeature f = new PersistentFeature(Feature.Level.ERROR, StringUtils.times("x", 4094));
+        PersistentFeature f = new PersistentFeature(Feature.Level.ERROR, Strings.repeat("x", 4094));
         f.appendToSummary("x");
-        assertEquals(StringUtils.times("x", 4095), f.getSummary());
+        assertEquals(Strings.repeat("x", 4095), f.getSummary());
     }
     
     public void testAppendMakesSummaryTooLong()
     {
-        String s = StringUtils.times("x", 4090);
+        String s = Strings.repeat("x", 4090);
         PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, s);
         assertEquals(s, f.getSummary());
         f.appendToSummary("this is long enough");
@@ -46,7 +46,7 @@ public class FeatureTest extends PulseTestCase
 
     public void testAppendToExactMakesSummaryTooLong()
     {
-        String s = StringUtils.times("x", 4095);
+        String s = Strings.repeat("x", 4095);
         PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, s);
         assertEquals(s, f.getSummary());
         f.appendToSummary("w00t");
@@ -55,7 +55,7 @@ public class FeatureTest extends PulseTestCase
 
     public void testAppendToAlreadyTrimmedSummary()
     {
-        PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, StringUtils.times("x", 4096));
+        PersistentFeature f = new PersistentFeature(Feature.Level.WARNING, Strings.repeat("x", 4096));
         String trimmed = getTrimmedSummary();
         assertEquals(trimmed, f.getSummary());
         f.appendToSummary("again, again!");
@@ -64,6 +64,6 @@ public class FeatureTest extends PulseTestCase
             
     private String getTrimmedSummary()
     {
-        return StringUtils.times("x", 4082) + "... [trimmed]";
+        return Strings.repeat("x", 4082) + "... [trimmed]";
     }
 }
