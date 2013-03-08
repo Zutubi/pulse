@@ -1,6 +1,5 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 
@@ -9,6 +8,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.reverse;
+import static java.util.Arrays.asList;
 
 /**
  * Implementation for efficiently reading lines from the end of a file set,
@@ -22,7 +25,7 @@ public class Tail
     static final int DEFAULT_LINE_COUNT = 10;
     static final int ESTIMATED_BYTES_PER_LINE = 500;
 
-    private File[] files;
+    private List<File> files;
     private int maxLines;
 
     /**
@@ -46,8 +49,7 @@ public class Tail
     public Tail(int maxLines, File... files)
     {
         this.maxLines = maxLines;
-        this.files = files;
-        CollectionUtils.reverse(this.files);
+        this.files = newArrayList(reverse(asList(files)));
     }
 
     /**

@@ -175,38 +175,6 @@ public class CollectionUtils
     }
 
     /**
-     * In-place reversal of the elements of an object array.
-     *
-     * @param array the array to reverse
-     */
-    public static void reverse(Object[] array)
-    {
-        for (int i = 0, j = array.length - 1; i < j; i++, j--)
-        {
-            Object temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-    }
-
-    /**
-     * Get a new list with the items in the original list in reverse order.
-     *
-     * @param l     the list to be reversed.
-     * @param <T>   the type contained by the list
-     * @return  a new list with the elements of the original list in reverse order.
-     */
-    public static <T> List<T> reverse(List<T> l)
-    {
-        LinkedList<T> result = new LinkedList<T>();
-        for (T t : l)
-        {
-            result.addFirst(t);
-        }
-        return result;
-    }
-
-    /**
      * Return a copy of the list c that has no duplicates.
      *
      * @param l the list from which duplicates will be removed.
