@@ -162,43 +162,6 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertEquals("txt", FileSystemUtils.getFilenameExtension("foo.bar.txt"));
     }
 
-    public void testFilesMatchBothEmpty() throws IOException
-    {
-        filesMatchHelper("", "", true);
-    }
-
-    public void testFilesMatchFirstShorter() throws IOException
-    {
-        filesMatchHelper("short", "longer", false);
-    }
-
-    public void testFilesMatchSecondShorter() throws IOException
-    {
-        filesMatchHelper("longer", "short", false);
-    }
-
-    public void testFilesMatchSameContent() throws IOException
-    {
-        filesMatchHelper(TEST_FILE_CONTENT, TEST_FILE_CONTENT, true);
-    }
-
-    public void testFilesMatchSameLength() throws IOException
-    {
-        filesMatchHelper(TEST_FILE_CONTENT, "CONTENT", false);
-    }
-
-    public void testFilesMatchLongFiles() throws IOException
-    {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 10000; i++)
-        {
-            builder.append("some random string");
-        }
-
-        String content = builder.toString();
-        filesMatchHelper(content, content, true);
-    }
-
     public void testOverwritePreservesPermissions() throws IOException
     {
         if (SystemUtils.IS_LINUX)
@@ -1398,17 +1361,6 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 test.delete();
             }
         }
-    }
-
-    private void filesMatchHelper(String s1, String s2, boolean expected) throws IOException
-    {
-        File f1 = new File(tmpDir, "f1");
-        File f2 = new File(tmpDir, "f2");
-
-        Files.write(s1, f1, Charset.defaultCharset());
-        Files.write(s2, f2, Charset.defaultCharset());
-
-        assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
     }
 
     /**

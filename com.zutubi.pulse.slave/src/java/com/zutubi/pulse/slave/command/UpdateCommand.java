@@ -249,7 +249,7 @@ public class UpdateCommand implements Runnable
                     LOG.warning("Existing installation has no file '" + installFile.getAbsolutePath() + "', incoming package does.");
                 }
 
-                if (!FileSystemUtils.filesMatch(installFile, packageFile))
+                if (!Files.equal(installFile, packageFile))
                 {
                     LOG.warning("Existing installation file '" + installFile.getAbsolutePath() + "', does not match that from incoming package.");
                 }

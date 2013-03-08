@@ -1009,54 +1009,6 @@ public class FileSystemUtils
     }
 
     /**
-     * Tests if the two files given are identical.
-     *
-     * @param f1 the first file
-     * @param f2 the second file
-     * @return true iff the files are byte-by-byte identical
-     * @throws IOException if an error occurs reading file data
-     */
-    public static boolean filesMatch(File f1, File f2) throws IOException
-    {
-        if (f1.length() != f2.length())
-        {
-            return false;
-        }
-
-        FileInputStream in1 = null;
-        FileInputStream in2 = null;
-
-        try
-        {
-            in1 = new FileInputStream(f1);
-            in2 = new FileInputStream(f2);
-            byte[] b1 = new byte[1024];
-            byte[] b2 = new byte[1024];
-            int n;
-
-            while ((n = in2.read(b2)) > 0)
-            {
-                if (in1.read(b1) != n)
-                {
-                    return false;
-                }
-
-                if (!Arrays.equals(b2, b1))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        finally
-        {
-            IOUtils.close(in1);
-            IOUtils.close(in2);
-        }
-    }
-
-    /**
      * Translates all line endings (CR, CRLF or LF) in the given file to the
      * given bytes.
      *
