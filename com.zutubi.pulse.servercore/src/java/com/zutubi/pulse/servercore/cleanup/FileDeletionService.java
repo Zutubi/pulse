@@ -1,11 +1,11 @@
 package com.zutubi.pulse.servercore.cleanup;
 
+import com.google.common.util.concurrent.Futures;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.concurrent.FixedFuture;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -85,7 +85,7 @@ public class FileDeletionService extends BackgroundServiceSupport
 
         if (!file.exists() || !allowedToDelete(file))
         {
-            return new FixedFuture<Boolean>(true);
+            return Futures.immediateFuture(true);
         }
 
         // only rename the file if it has not already been renamed.
