@@ -1,12 +1,13 @@
 package com.zutubi.util.junit;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -200,7 +201,7 @@ public abstract class ZutubiTestCase extends TestCase
     public File copyInputToDirectory(String name, String extension, File directory) throws IOException
     {
         File destinationFile = new File(directory, name + "." + extension);
-        IOUtils.joinStreams(getInput(name, extension), new FileOutputStream(destinationFile), true);
+        ByteStreams.copy(Resources.newInputStreamSupplier(getInputURL(name, extension)), Files.newOutputStreamSupplier(destinationFile));
         return destinationFile;
     }
 

@@ -2,6 +2,9 @@ package com.zutubi.pulse.core.plugins;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
 import com.zutubi.pulse.core.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
@@ -10,7 +13,6 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -22,7 +24,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -833,7 +834,7 @@ public class PluginManager
                 throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
             }
 
-            IOUtils.joinStreams(source.toURL().openStream(), new FileOutputStream(tmpFile), true);
+            ByteStreams.copy(Resources.newInputStreamSupplier(source.toURL()), Files.newOutputStreamSupplier(tmpFile));
 
             // 'commit' the downloaded file by renaming it
             FileSystemUtils.rename(tmpFile, dest, true);

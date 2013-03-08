@@ -1,6 +1,7 @@
 package com.zutubi.util.io;
 
 import com.google.common.base.Predicate;
+import com.google.common.io.ByteStreams;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -149,7 +150,7 @@ public class FileSystemUtils
         Process child = processBuilder.start();
         try
         {
-            IOUtils.joinStreams(child.getInputStream(), new NullOutputStream());
+            ByteStreams.copy(child.getInputStream(), new NullOutputStream());
             int exitCode = child.waitFor();
             if(exitCode != 0)
             {
@@ -819,7 +820,7 @@ public class FileSystemUtils
         try
         {
             os = new FileOutputStream(file);
-            IOUtils.joinStreams(is, os);
+            ByteStreams.copy(is, os);
         }
         finally
         {

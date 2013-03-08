@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.servlet;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
@@ -51,7 +52,7 @@ public class DownloadPackageServlet extends HttpServlet
                 try
                 {
                     input = new FileInputStream(packageFile);
-                    IOUtils.joinStreams(input, response.getOutputStream());
+                    ByteStreams.copy(input, response.getOutputStream());
                 }
                 finally
                 {

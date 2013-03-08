@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.database;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -34,8 +35,8 @@ public class DriverRegistryTest extends PulseTestCase
         // copy the postgresql jar from the classpath into the temporary directory.
         ClassPathResource resource = new ClassPathResource("com/zutubi/pulse/master/database/lib/postgresql.jar");
         postgresqlJar = new File(tmp, "postgresql.jar");
-        
-        IOUtils.joinStreams(resource.getInputStream(), new FileOutputStream(postgresqlJar));
+
+        ByteStreams.copy(resource.getInputStream(), new FileOutputStream(postgresqlJar));
 
         registry = new DriverRegistry();
         registry.setDriverDir(driverDir);

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.scm.api.*;
@@ -188,7 +189,7 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
         {
             input = client.retrieve(context, prefix + "project/src/com/package.properties", null);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
-            IOUtils.joinStreams(input, output);
+            ByteStreams.copy(input, output);
             assertEquals("key=value\n", output.toString());
         }
         finally
@@ -206,14 +207,14 @@ public abstract class AbstractScmIntegrationTestCase extends ZutubiTestCase
         {
             input = client.retrieve(context, path, testData.getRevision(3));
             ByteArrayOutputStream output = new ByteArrayOutputStream();
-            IOUtils.joinStreams(input, output);
+            ByteStreams.copy(input, output);
             assertFalse(output.toString().contains("testSomethingElse"));
 
             IOUtils.close(input);
 
             input = client.retrieve(context, path, Revision.HEAD);
             output = new ByteArrayOutputStream();
-            IOUtils.joinStreams(input, output);
+            ByteStreams.copy(input, output);
             assertTrue(output.toString().contains("testSomethingElse"));
         }
         finally

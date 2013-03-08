@@ -1,12 +1,12 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.ByteStreams;
+
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static com.zutubi.util.io.IOUtils.joinStreams;
 
 /**
  * Basic utilities for zip files.
@@ -56,7 +56,7 @@ public class ZipUtils
         try
         {
             out = new FileOutputStream(file);
-            joinStreams(zin, out);
+            ByteStreams.copy(zin, out);
         }
         finally
         {
@@ -81,7 +81,7 @@ public class ZipUtils
         {
             is = new FileInputStream(in);
             os = new GZIPOutputStream(new FileOutputStream(out));
-            IOUtils.joinStreams(is, os);
+            ByteStreams.copy(is, os);
         }
         finally
         {
@@ -107,7 +107,7 @@ public class ZipUtils
         {
             is = new GZIPInputStream(new FileInputStream(in));
             os = new FileOutputStream(out);
-            IOUtils.joinStreams(is, os);
+            ByteStreams.copy(is, os);
         }
         finally
         {

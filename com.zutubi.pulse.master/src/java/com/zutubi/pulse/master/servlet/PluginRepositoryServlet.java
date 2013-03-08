@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.servlet;
 
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.core.plugins.repository.PluginList;
-import static com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository.*;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.StringUtils;
@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.zutubi.pulse.core.plugins.repository.http.HttpPluginRepository.*;
 
 /**
  * A servlet that implements a plugin repository around the plugin manager.
@@ -123,7 +125,7 @@ public class PluginRepositoryServlet extends HttpServlet
         try
         {
             inputStream = new FileInputStream(jarFile);
-            IOUtils.joinStreams(inputStream, response.getOutputStream());
+            ByteStreams.copy(inputStream, response.getOutputStream());
             response.getOutputStream().flush();
         }
         catch (IOException e)

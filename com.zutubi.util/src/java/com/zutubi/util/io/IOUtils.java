@@ -1,5 +1,6 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 
@@ -108,51 +109,6 @@ public class IOUtils
         }
     }
 
-    /**
-     * Reads all bytes from the input stream and writes them to the output
-     * stream.  Bytes are read and written in chunks.  The caller retains
-     * ownership of the streams - i.e. they are not closed by this method.
-     *
-     * @param input  stream to read from
-     * @param output stream to write to
-     * @throws IOException on any error
-     */
-    public static void joinStreams(InputStream input, OutputStream output) throws IOException
-    {
-        byte[] buffer = new byte[8192];
-        int n;
-
-        while (!Thread.interrupted() && (n = input.read(buffer)) > 0)
-        {
-            output.write(buffer, 0, n);
-        }
-    }
-
-    /**
-     * Reads all bytes from the input stream and writes them to the output
-     * stream.  Bytes are read and written in chunks.
-     *
-     * @param input  stream to read from
-     * @param output stream to write to
-     * @param close  if true, the streams will be closed on completion or error
-     * @throws IOException on any error
-     */
-    public static void joinStreams(InputStream input, OutputStream output, boolean close) throws IOException
-    {
-        try
-        {
-            joinStreams(input, output);
-        }
-        finally
-        {
-            if (close)
-            {
-                close(input);
-                close(output);
-            }
-        }
-    }
-
     public static void joinReaderToWriter(Reader reader, Writer writer) throws IOException
     {
         char[] buffer = new char[8192];
@@ -173,7 +129,7 @@ public class IOUtils
         {
             inStream = new FileInputStream(fromFile);
             outStream = new FileOutputStream(toFile);
-            joinStreams(inStream, outStream);
+            ByteStreams.copy(inStream, outStream);
         }
         finally
         {
@@ -186,7 +142,7 @@ public class IOUtils
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        IOUtils.joinStreams(is, os);
+        ByteStreams.copy(is, os);
         return os.toString();
     }
 
@@ -213,7 +169,7 @@ public class IOUtils
         {
             is = new FileInputStream(file);
             os = new ByteArrayOutputStream((int) file.length());
-            joinStreams(is, os);
+            ByteStreams.copy(is, os);
             return os.toByteArray();
         }
         finally
@@ -272,7 +228,7 @@ public class IOUtils
             // take url connection input stream and write contents to file
             fos = new FileOutputStream(destination);
             urlStream = urlConnection.getInputStream();
-            IOUtils.joinStreams(urlStream, fos);
+            ByteStreams.copy(urlStream, fos);
         }
         finally
         {

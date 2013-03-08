@@ -1,5 +1,8 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.AssertionFailedError;
 
@@ -21,9 +24,9 @@ public class PropertiesWriterTest extends ZutubiTestCase
         config = new File(tmpDir, "tmp.config.properties");
         assertTrue(config.createNewFile());
 
-        IOUtils.joinStreams(
-                getClass().getResourceAsStream(getClass().getSimpleName() + "." + getName() + ".original.properties"),
-                new FileOutputStream(config), true
+        ByteStreams.copy(
+                Resources.newInputStreamSupplier(getClass().getResource(getClass().getSimpleName() + "." + getName() + ".original.properties")),
+                Files.newOutputStreamSupplier(config)
         );
     }
 

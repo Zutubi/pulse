@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.servlet;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
@@ -99,7 +100,7 @@ public class DownloadResultsServlet extends HttpServlet
                 try
                 {
                     input = new FileInputStream(zipFile);
-                    IOUtils.joinStreams(input, response.getOutputStream());
+                    ByteStreams.copy(input, response.getOutputStream());
                 }
                 finally
                 {

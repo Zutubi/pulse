@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.patch;
 
+import com.google.common.io.ByteStreams;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.diff.DiffException;
@@ -224,13 +225,13 @@ public class PatchArchive
             {
                 return;
             }
-            IOUtils.joinStreams(zin, new NullOutputStream());
+            ByteStreams.copy(zin, new NullOutputStream());
 
             if (zin.getNextEntry() == null)
             {
                 return;
             }
-            IOUtils.joinStreams(zin, new NullOutputStream());
+            ByteStreams.copy(zin, new NullOutputStream());
 
             ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null)
@@ -299,7 +300,7 @@ public class PatchArchive
                 try
                 {
                     out = new FileOutputStream(f);
-                    IOUtils.joinStreams(zin, out);
+                    ByteStreams.copy(zin, out);
                 }
                 finally
                 {

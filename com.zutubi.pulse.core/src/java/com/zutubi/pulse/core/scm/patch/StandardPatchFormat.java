@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.patch;
 
+import com.google.common.io.ByteStreams;
 import com.thoughtworks.xstream.XStream;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -161,7 +162,7 @@ public class StandardPatchFormat implements PatchFormat
             try
             {
                 is = new FileInputStream(f);
-                IOUtils.joinStreams(is, os);
+                ByteStreams.copy(is, os);
             }
             finally
             {

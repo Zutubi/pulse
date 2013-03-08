@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
@@ -11,8 +12,6 @@ import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveService;
-import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -25,6 +24,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+
+import static com.zutubi.pulse.servercore.servlet.DownloadResultsServlet.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Service for communicating with agents run on slaves.  Wraps the more general
@@ -102,7 +104,7 @@ public class SlaveAgentService implements AgentService
             // take url connection input stream and write contents to zip file
             File zipFile = new File(destination.getAbsolutePath() + ".zip");
             fos = new FileOutputStream(zipFile);
-            IOUtils.joinStreams(urlConnection.getInputStream(), fos);
+            ByteStreams.copy(urlConnection.getInputStream(), fos);
             IOUtils.close(urlConnection.getInputStream());
             IOUtils.close(fos);
             fos = null;

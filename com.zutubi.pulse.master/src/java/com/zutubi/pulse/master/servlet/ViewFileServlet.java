@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.servlet;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -103,7 +104,7 @@ public class ViewFileServlet extends HttpServlet
         try
         {
             fis = new FileInputStream(file);
-            IOUtils.joinStreams(fis, httpServletResponse.getOutputStream());
+            ByteStreams.copy(fis, httpServletResponse.getOutputStream());
         }
         finally
         {

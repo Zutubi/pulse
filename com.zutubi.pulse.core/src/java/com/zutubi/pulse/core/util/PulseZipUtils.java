@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -123,7 +124,7 @@ public class PulseZipUtils
         Process child = pb.start();
         try
         {
-            IOUtils.joinStreams(child.getInputStream(), new NullOutputStream());
+            ByteStreams.copy(child.getInputStream(), new NullOutputStream());
             int exitCode = child.waitFor();
             if(exitCode != 0)
             {
@@ -302,7 +303,7 @@ public class PulseZipUtils
             try
             {
                 is = new FileInputStream(source);
-                IOUtils.joinStreams(is, os);
+                ByteStreams.copy(is, os);
             }
             finally
             {

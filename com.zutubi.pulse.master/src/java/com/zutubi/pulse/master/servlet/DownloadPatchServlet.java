@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.servlet;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -54,7 +55,7 @@ public class DownloadPatchServlet extends HttpServlet
                 try
                 {
                     input = new FileInputStream(patchFile);
-                    IOUtils.joinStreams(input, response.getOutputStream());
+                    ByteStreams.copy(input, response.getOutputStream());
                 }
                 finally
                 {

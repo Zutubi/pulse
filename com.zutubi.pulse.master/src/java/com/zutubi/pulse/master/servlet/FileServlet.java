@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.servlet;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
@@ -87,7 +88,7 @@ public class FileServlet extends HttpServlet
         try
         {
             is = pfo.getContent().getInputStream();
-            IOUtils.joinStreams(is, response.getOutputStream());
+            ByteStreams.copy(is, response.getOutputStream());
         }
         finally
         {
