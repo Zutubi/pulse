@@ -1,13 +1,14 @@
 package com.zutubi.tove.type.record;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Sets.newHashSet;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.GraphFunction;
-import com.zutubi.util.StringUtils;
 
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Convenient abstract base for record implementations.
@@ -144,7 +145,7 @@ public abstract class AbstractRecord implements Record
         }
 
         AbstractRecord other = (AbstractRecord) obj;
-        if(!StringUtils.equals(getSymbolicName(), other.getSymbolicName()))
+        if(!Objects.equal(getSymbolicName(), other.getSymbolicName()))
         {
             return false;
         }

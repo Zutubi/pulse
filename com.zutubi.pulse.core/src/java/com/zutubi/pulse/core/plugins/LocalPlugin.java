@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.google.common.base.Objects;
 import com.zutubi.util.StringUtils;
 import org.eclipse.osgi.framework.util.Headers;
 import org.eclipse.osgi.service.resolver.BundleDescription;
@@ -282,7 +283,7 @@ public abstract class LocalPlugin implements Plugin
         }
 
         LocalPlugin other = (LocalPlugin) obj;
-        return StringUtils.equals(getId(), other.getId()) && getVersion().equals(other.getVersion());
+        return Objects.equal(getId(), other.getId()) && getVersion().equals(other.getVersion());
     }
 
     public int hashCode()

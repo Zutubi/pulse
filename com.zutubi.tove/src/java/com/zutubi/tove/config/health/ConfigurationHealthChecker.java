@@ -1,5 +1,6 @@
 package com.zutubi.tove.config.health;
 
+import com.google.common.base.Objects;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
@@ -8,14 +9,14 @@ import com.zutubi.tove.config.ConfigurationScopeInfo;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.tove.type.record.PathUtils.getPathElements;
-import com.zutubi.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static com.zutubi.tove.type.record.PathUtils.getPathElements;
 
 /**
  * The health checker can be used to check the internal consistency of a tove
@@ -356,7 +357,7 @@ public class ConfigurationHealthChecker
                 String childPath = getPath(path, key);
                 Record nestedRecord = (Record) nested;
                 Record nestedTemplateParentRecord = (Record) templateParentRecord.get(key);
-                if (!StringUtils.equals(nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName()))
+                if (!Objects.equal(nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName()))
                 {
                     report.addProblem(new UnsolvableHealthProblem(childPath, I18N.format("inherited.type.mismatch", nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName())));
                     return false;
@@ -396,7 +397,7 @@ public class ConfigurationHealthChecker
         String nestedPath = getPath(scopeName, itemKey);
         // Go to the CTM so we get a templatised record.
         Record nestedRecord = configurationTemplateManager.getRecord(nestedPath);
-        if (StringUtils.equals(nestedRecord.getSymbolicName(), itemType.getSymbolicName()))
+        if (Objects.equal(nestedRecord.getSymbolicName(), itemType.getSymbolicName()))
         {
             checkRecord(nestedPath, itemType, nestedRecord, report);
         }

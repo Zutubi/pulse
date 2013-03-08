@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.util.logging;
 
-import com.zutubi.util.StringUtils;
+import com.google.common.base.Objects;
 import com.zutubi.util.adt.CircularBuffer;
 
 import java.util.Iterator;
@@ -38,8 +38,8 @@ public class ServerMessagesHandler extends Handler
                 if(records.getCount() > 0)
                 {
                     CustomLogRecord previous = records.getElement(records.getCount() - 1);
-                    if(StringUtils.equals(previous.getMessage(), record.getMessage()) &&
-                       StringUtils.equals(previous.getStackTrace(), CustomLogRecord.getStackTrace(record)))
+                    if(Objects.equal(previous.getMessage(), record.getMessage()) &&
+                            Objects.equal(previous.getStackTrace(), CustomLogRecord.getStackTrace(record)))
                     {
                         previous.repeated(record);
                         return;

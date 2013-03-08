@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
 import com.google.common.base.Function;
-import com.zutubi.util.StringUtils;
+import com.google.common.base.Objects;
 import junit.framework.AssertionFailedError;
 
 import java.io.IOException;
@@ -179,7 +179,7 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
 
     private static String getFirstDifference(TestSuiteResult expected, TestSuiteResult actual)
     {
-        if (!StringUtils.equals(expected.getName(), actual.getName()))
+        if (!Objects.equal(expected.getName(), actual.getName()))
         {
             return "Suite names differ: '" + expected.getName() + "' != '" + actual.getName() + "'";
         }
@@ -239,7 +239,7 @@ public abstract class TestPostProcessorTestCase extends PostProcessorTestCase
             message += ": durations differ: " + expectedCase.getDuration() + " != " + actualCase.getDuration();
         }
 
-        if (!StringUtils.equals(expectedCase.getMessage(), actualCase.getMessage()))
+        if (!Objects.equal(expectedCase.getMessage(), actualCase.getMessage()))
         {
             message += ": messages differ:\n--------------\n" + expectedCase.getMessage() + "\n----- != -----\n" + actualCase.getMessage() + "\n--------------";
         }

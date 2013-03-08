@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.TextBox;
 import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
@@ -12,11 +13,9 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
-import static com.zutubi.util.WebUtils.uriComponentEncode;
 import org.openqa.selenium.By;
 
 import java.util.Collections;
@@ -25,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -142,7 +144,7 @@ public class ProjectHomePage extends ResponsibilityPage
      */
     public boolean hasStatistics()
     {
-        return !StringUtils.equals(statusBox.getValue(PROPERTY_STATISTICS), "no builds");
+        return !Objects.equal(statusBox.getValue(PROPERTY_STATISTICS), "no builds");
     }
 
     /**

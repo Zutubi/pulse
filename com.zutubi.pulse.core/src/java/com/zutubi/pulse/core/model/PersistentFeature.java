@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.util.StringUtils;
 
@@ -68,7 +69,7 @@ public class PersistentFeature extends Entity
         if (o instanceof PersistentFeature)
         {
             PersistentFeature other = (PersistentFeature) o;
-            return other.level == level && StringUtils.equals(other.summary, summary);
+            return other.level == level && Objects.equal(other.summary, summary);
         }
 
         return false;

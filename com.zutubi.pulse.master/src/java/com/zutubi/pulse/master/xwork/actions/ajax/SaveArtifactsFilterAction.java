@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.StringUtils;
 
 /**
  * Action to save tail view settings to a user's preferences.  Invalid settings
@@ -30,7 +30,7 @@ public class SaveArtifactsFilterAction extends ActionSupport
         if (principle != null)
         {
             User user = userManager.getUser((String) principle);
-            if (user != null && !StringUtils.equals(user.getArtifactsFilter(), filter))
+            if (user != null && !Objects.equal(user.getArtifactsFilter(), filter))
             {
                 user.setArtifactsFilter(filter);
                 userManager.save(user);

@@ -1,10 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.size;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.NewLabelConfiguration;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -14,14 +12,17 @@ import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import com.zutubi.util.StringUtils;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 /**
  * A custom action for saving labels.  Checks for label renames, and if one is detected prompts the
@@ -176,7 +177,7 @@ public class SaveLabelAction extends SaveAction
         final LabelConfiguration originalLabel = configurationProvider.get(path, LabelConfiguration.class);
         originalName = originalLabel.getLabel();
         newName = (String) record.get("label");
-        if (StringUtils.equals(originalName, newName))
+        if (Objects.equal(originalName, newName))
         {
             return false;
         }

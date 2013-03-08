@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
@@ -7,7 +8,6 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
-import com.zutubi.util.StringUtils;
 
 import java.util.Hashtable;
 
@@ -292,8 +292,8 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         public boolean satisfied()
         {
             return page.hasResponsibleUser() &&
-                   StringUtils.equals(message, page.getResponsibleMessage()) &&
-                   StringUtils.equals(comment, page.getResponsibleComment());
+                    Objects.equal(message, page.getResponsibleMessage()) &&
+                    Objects.equal(comment, page.getResponsibleComment());
         }
     }
 

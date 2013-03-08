@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.util.StringUtils;
 
 /**
  * A predicate that matches a request holder containing a
@@ -29,6 +29,6 @@ public class HasOwnerAndSourcePredicate<T extends RequestHolder> implements Pred
     public boolean apply(T holder)
     {
         BuildRequestEvent request = holder.getRequest();
-        return request.getOwner().equals(owner) && StringUtils.equals(request.getOptions().getSource(), source);
+        return request.getOwner().equals(owner) && Objects.equal(request.getOptions().getSource(), source);
     }
 }

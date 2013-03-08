@@ -1,24 +1,23 @@
 package com.zutubi.tove.type;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.*;
-import static com.google.common.collect.Lists.newArrayList;
-
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.*;
+
+import static com.google.common.collect.Iterables.*;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A composite represents a user-defined Java type, i.e. a class.  Composites
@@ -725,7 +724,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
         // Check the types match
         String symbolicName = r1.getSymbolicName();
-        if(!StringUtils.equals(symbolicName, r2.getSymbolicName()))
+        if(!Objects.equal(symbolicName, r2.getSymbolicName()))
         {
             return false;
         }

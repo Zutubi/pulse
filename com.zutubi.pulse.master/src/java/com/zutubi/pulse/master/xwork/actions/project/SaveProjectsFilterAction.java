@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.util.StringUtils;
 
 /**
  * An action to save the value of the filter field on the dashboard/browse views.
@@ -34,13 +34,13 @@ public class SaveProjectsFilterAction extends ActionSupport
                 boolean changed = false;
                 if (dashboard)
                 {
-                    if (!StringUtils.equals(user.getDashboardFilter(), filter))
+                    if (!Objects.equal(user.getDashboardFilter(), filter))
                     {
                         user.setDashboardFilter(filter);
                         changed = true;
                     }
                 }
-                else if (!StringUtils.equals(user.getBrowseViewFilter(), filter))
+                else if (!Objects.equal(user.getBrowseViewFilter(), filter))
                 {
                     user.setBrowseViewFilter(filter);
                     changed = true;

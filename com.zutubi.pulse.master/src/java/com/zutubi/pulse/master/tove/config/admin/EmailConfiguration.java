@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
+import com.google.common.base.Objects;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
@@ -141,13 +142,13 @@ public class EmailConfiguration extends AbstractConfiguration implements Validat
     public boolean isEquivalentTo(EmailConfiguration other)
     {
         return other != null &&
-                StringUtils.equals(host, other.host) &&
+                Objects.equal(host, other.host) &&
                 ssl == other.ssl &&
-                StringUtils.equals(from, other.from) &&
-                StringUtils.equals(username, other.username) &&
-                StringUtils.equals(password, other.password) &&
-                StringUtils.equals(subjectPrefix, other.subjectPrefix) &&
-                StringUtils.equals(localhost, other.localhost) &&
+                Objects.equal(from, other.from) &&
+                Objects.equal(username, other.username) &&
+                Objects.equal(password, other.password) &&
+                Objects.equal(subjectPrefix, other.subjectPrefix) &&
+                Objects.equal(localhost, other.localhost) &&
                 customPort == other.customPort &&
                 (!customPort || port == other.port);
     }

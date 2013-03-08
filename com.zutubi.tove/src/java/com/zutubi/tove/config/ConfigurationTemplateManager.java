@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -26,7 +27,6 @@ import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Sort;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
@@ -594,7 +594,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     throw new IllegalArgumentException("Cannot insert record: nested item '" + nested.first + "' conflicts with hidden ancestor path '" + ancestorPath + "'");
                 }
             }
-            else if(!StringUtils.equals(parent.getSymbolicName(), nested.second.getSymbolicName()))
+            else if(!Objects.equal(parent.getSymbolicName(), nested.second.getSymbolicName()))
             {
                 throw new IllegalArgumentException("Cannot inserted record: nested item '" + nested.first + "' of type '" + nested.second.getSymbolicName() + "' conflicts with type in parent '" + parent.getSymbolicName() + "'");
             }
@@ -970,7 +970,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 for(String descedentPath: descendantPaths)
                 {
                     parentRecord = (TemplateRecord) getRecord(descedentPath);
-                    if(!StringUtils.equals(pathOwner, parentRecord.getOwner(baseName)))
+                    if(!Objects.equal(pathOwner, parentRecord.getOwner(baseName)))
                     {
                         return true;
                     }

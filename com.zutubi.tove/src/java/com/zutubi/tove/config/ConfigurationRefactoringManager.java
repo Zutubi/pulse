@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.ExternalState;
@@ -2647,7 +2648,7 @@ public class ConfigurationRefactoringManager
                 if (templateParentValue != null && templateParentValue instanceof Record)
                 {
                     Record templateParentNestedRecord = (Record) templateParentValue;
-                    if (StringUtils.equals(templateParentNestedRecord.getSymbolicName(), nestedExistingRecord.getSymbolicName()))
+                    if (Objects.equal(templateParentNestedRecord.getSymbolicName(), nestedExistingRecord.getSymbolicName()))
                     {
                         findIncompatible(nestedPath, nestedExistingRecord, templateParentNestedRecord, result);
                     }

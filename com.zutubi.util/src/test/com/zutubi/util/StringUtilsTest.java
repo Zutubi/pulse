@@ -349,20 +349,6 @@ public class StringUtilsTest extends ZutubiTestCase
         }
     }
 
-    public void testStringEquals()
-    {
-        assertTrue(StringUtils.equals(null, null));
-        assertTrue(StringUtils.equals("", ""));
-        assertTrue(StringUtils.equals("a", "a"));
-        assertTrue(StringUtils.equals("abcde", "abcde"));
-
-        assertFalse(StringUtils.equals("", null));
-        assertFalse(StringUtils.equals("vvv", null));
-        assertFalse(StringUtils.equals(null, ""));
-        assertFalse(StringUtils.equals(null, "aa"));
-        assertFalse(StringUtils.equals("aaa", "bbb"));
-    }
-
     public void testJoin()
     {
         assertEquals("a,b,c", StringUtils.join(",", "a", "b", "c"));

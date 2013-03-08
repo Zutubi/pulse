@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -48,7 +49,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -268,7 +268,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         BootstrapConfiguration newBootstrap = instance.getBootstrap();
         BootstrapConfiguration oldBootstrap = old.getBootstrap();
         if (oldBootstrap == null || newBootstrap == null ||
-            !StringUtils.equals(newBootstrap.getPersistentDirPattern(), oldBootstrap.getPersistentDirPattern()))
+            !Objects.equal(newBootstrap.getPersistentDirPattern(), oldBootstrap.getPersistentDirPattern()))
         {
             workDirectoryCleanupService.asyncEnqueueCleanupMessages(old, null);
         }

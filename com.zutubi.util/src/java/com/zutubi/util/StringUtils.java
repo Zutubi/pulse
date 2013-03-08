@@ -40,29 +40,6 @@ public class StringUtils
     }
 
     /**
-     * A null safe equals method for strings.
-     *
-     * @param a first string
-     * @param b second string
-     * @return true if the strings are equal, false otherwise.
-     */
-    public static boolean equals(String a, String b)
-    {
-        if (a == null)
-        {
-            return b == null;
-        }
-        else
-        {
-            if (b == null)
-            {
-                return false;
-            }
-        }
-        return a.equals(b);
-    }
-
-    /**
      * Equivalent to calling {@link #trimmedString(CharSequence, int, String)} with
      * the given string and length and a trim message of "...".
      *

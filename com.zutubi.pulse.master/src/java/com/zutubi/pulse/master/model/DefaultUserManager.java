@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.base.Objects;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -333,7 +334,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public boolean checkPassword(UserConfiguration user, String password)
     {
         String encodedPassword = passwordEncoder.encodePassword(password, null);
-        return StringUtils.equals(user.getPassword(), encodedPassword);
+        return Objects.equal(user.getPassword(), encodedPassword);
     }
 
     public void setPassword(UserConfiguration user, String rawPassword)
