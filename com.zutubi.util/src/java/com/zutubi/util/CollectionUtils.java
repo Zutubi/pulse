@@ -87,22 +87,6 @@ public class CollectionUtils
         return new Vector<T>(Arrays.asList(ts));
     }
 
-    public static <T, U> Map<T, U> retainAll(Map<T, U> m, Map<T, U> n)
-    {
-        Iterator<Map.Entry<T, U>> it = m.entrySet().iterator();
-        while(it.hasNext())
-        {
-            Map.Entry<T, U> entry = it.next();
-            U value = n.get(entry.getKey());
-            if(value == null || !value.equals(entry.getValue()))
-            {
-                it.remove();
-            }
-        }
-
-        return m;
-    }
-    
     public static <T> void traverse(Collection<T> c, UnaryProcedure<T> f)
     {
         for (T t : c)

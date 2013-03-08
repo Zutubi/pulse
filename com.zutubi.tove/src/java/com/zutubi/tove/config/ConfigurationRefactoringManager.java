@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.ExternalState;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
@@ -8,10 +9,7 @@ import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import static com.zutubi.tove.type.record.PathUtils.*;
 import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.StringUtils;
@@ -21,6 +19,10 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.*;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -1326,12 +1328,12 @@ public class ConfigurationRefactoringManager
                 }
                 else
                 {
-                    CollectionUtils.retainAll(commonMeta, getMeta(r));
+                    commonMeta = Maps.difference(commonMeta, getMeta(r)).entriesInCommon();
                     commonNestedKeySet.retainAll(r.nestedKeySet());
 
                     if (type instanceof CollectionType)
                     {
-                        CollectionUtils.retainAll(commonSimple, getSimple(r));
+                        commonSimple = Maps.difference(commonSimple, getSimple(r)).entriesInCommon();
                     }
                     else
                     {
