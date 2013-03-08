@@ -96,22 +96,6 @@ public class CollectionUtils
     }
 
     /**
-     * Create a sorted version of the list using the provided comparator without changing the
-     * original list.
-     *
-     * @param list          the list containing the items to be sorted.
-     * @param comparator    the comparator used to define the sort order.
-     * @param <T>           the type of item in the list.
-     * @return  a sorted copy of the list.
-     */
-    public static <T> List<T> sort(List<T> list, Comparator<T> comparator)
-    {
-        List<T> copy = new LinkedList<T>(list);
-        Collections.sort(copy, comparator);
-        return copy;
-    }
-
-    /**
      * Collapses a collection down to a single value by successive applications
      * of the given binary function.  The function is applied to the current
      * result and each item of the collection in turn.
