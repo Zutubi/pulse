@@ -12,6 +12,7 @@ import java.util.Map;
 public class WizardsFileObject extends AbstractPulseFileObject
 {
     private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
+    static
     {
         nodesDefinitions.put("projects", ProjectWizardsFileObject.class);
     }
