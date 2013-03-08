@@ -11,12 +11,13 @@ import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.CollectionUtils.asVector;
+import static java.util.Arrays.asList;
 
 /**
  * Acceptance tests for the users dashboard view.
@@ -81,7 +82,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         String group2 = random + "-group2";
         String project = random + "-project";
 
-        setDashboard(asPair(SHOW_ALL_GROUPS, false), asPair(SHOWN_GROUPS, asVector(group1)), asPair(SHOW_ALL_PROJECTS, true));
+        setDashboard(asPair(SHOW_ALL_GROUPS, false), asPair(SHOWN_GROUPS, new Vector<String>(asList(group1))), asPair(SHOW_ALL_PROJECTS, true));
 
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(project, false);
         addLabel(projectPath, group1);
@@ -175,28 +176,28 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
             
             getBrowser().refresh();
             buildIds = dashboard.getBuildIds(null, random);
-            assertEquals(Arrays.asList(1L), buildIds);
+            assertEquals(asList(1L), buildIds);
             
             project.releaseBuild();
             rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
             getBrowser().refresh();
             buildIds = dashboard.getBuildIds(null, random);
-            assertEquals(Arrays.asList(1L), buildIds);
+            assertEquals(asList(1L), buildIds);
 
             buildRunner.triggerBuild(project);
             rpcClient.RemoteApi.waitForBuildInProgress(random, 2);
             
             getBrowser().refresh();
             buildIds = dashboard.getBuildIds(null, random);
-            assertEquals(Arrays.asList(2L, 1L), buildIds);
+            assertEquals(asList(2L, 1L), buildIds);
 
             project.releaseBuild();
             rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
             getBrowser().refresh();
             buildIds = dashboard.getBuildIds(null, random);
-            assertEquals(Arrays.asList(2L, 1L), buildIds);
+            assertEquals(asList(2L, 1L), buildIds);
         }
         finally
         {

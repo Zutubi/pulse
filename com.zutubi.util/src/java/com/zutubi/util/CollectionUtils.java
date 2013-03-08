@@ -82,11 +82,6 @@ public class CollectionUtils
         return result;
     }
 
-    public static <T> Vector<T> asVector(T... ts)
-    {
-        return new Vector<T>(Arrays.asList(ts));
-    }
-
     /**
      * Collapses a collection down to a single value by successive applications
      * of the given binary function.  The function is applied to the current
