@@ -1,14 +1,15 @@
 package com.zutubi.util;
 
 import com.google.common.base.Predicate;
-import static com.google.common.base.Predicates.equalTo;
 import com.google.common.collect.Sets;
 import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.math.IntegerAddition;
-import static java.util.Arrays.asList;
 
 import java.util.*;
+
+import static com.google.common.base.Predicates.equalTo;
+import static java.util.Arrays.asList;
 
 public class CollectionUtilsTest extends ZutubiTestCase
 {
@@ -224,15 +225,6 @@ public class CollectionUtilsTest extends ZutubiTestCase
                         new TreeNode<String>("2-1"),
                         new TreeNode<String>("2-2"),
                         new TreeNode<String>("2-3")));
-    }
-
-    public void testReverse()
-    {
-        List<String> list = Arrays.asList("a", "b", "c");
-        List<String> reversed = CollectionUtils.reverse(list);
-        assertEquals("c", reversed.get(0));
-        assertEquals("b", reversed.get(1));
-        assertEquals("a", reversed.get(2));
     }
 
     public void testIndexOf()

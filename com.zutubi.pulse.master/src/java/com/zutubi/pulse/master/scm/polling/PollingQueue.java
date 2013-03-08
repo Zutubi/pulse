@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.scm.polling;
 
-import com.zutubi.util.CollectionUtils;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.reverse;
 
 /**
  * A queue of polling requests.
@@ -119,7 +119,7 @@ public class PollingQueue
         List<PollingRequest> queueSnapshot = new LinkedList<PollingRequest>();
         queueSnapshot.addAll(queuedRequests);
 
-        for (PollingRequest queuedRequest : CollectionUtils.reverse(queueSnapshot))
+        for (PollingRequest queuedRequest : reverse(queueSnapshot))
         {
             if (queuedRequest.satisfied())
             {

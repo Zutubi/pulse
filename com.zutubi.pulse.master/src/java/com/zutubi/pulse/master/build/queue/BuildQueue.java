@@ -8,7 +8,6 @@ import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.build.control.BuildControllerFactory;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.*;
 
@@ -16,6 +15,7 @@ import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.reverse;
 
 /**
  * The build queue tracks queued and active build requests.
@@ -255,7 +255,7 @@ public class BuildQueue
 
         // We need to update the queuedRequest and activatedRequest lists as we go to
         // ensure that subsequent .satisfied() checks have an accurate state to work with.
-        for (QueuedRequest queuedRequest : CollectionUtils.reverse(queueSnapshot))
+        for (QueuedRequest queuedRequest : reverse(queueSnapshot))
         {
             if (queuedRequest.satisfied())
             {

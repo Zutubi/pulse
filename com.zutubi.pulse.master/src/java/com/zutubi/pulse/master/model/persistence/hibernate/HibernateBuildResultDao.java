@@ -10,7 +10,6 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Order;
@@ -23,6 +22,9 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.reverse;
 
 /**
  * Hibernate-based implementation of {@link BuildResultDao}.
@@ -635,7 +637,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 return criteria.list();
             }
         });
-        return CollectionUtils.reverse(results);
+        return newArrayList(reverse(results));
     }
 
     public List<BuildResult> findByAfterBuild(final long buildId, final int maxResults, final ResultState... states)
