@@ -2,9 +2,8 @@ package com.zutubi.util.concurrent;
 
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 public class ConcurrentUtilsTest extends ZutubiTestCase
 {
@@ -55,60 +54,6 @@ public class ConcurrentUtilsTest extends ZutubiTestCase
         catch (RuntimeException e)
         {
             assertTrue(e.getMessage().contains("ouch"));
-        }
-    }
-
-    public void testWaitForTasks() throws InterruptedException
-    {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-        // create some processes that do stuff.
-        List<SleepyProcess> processes = createProcesses(10);
-        List<Future> futures = new LinkedList<Future>();
-        for (Runnable process : processes)
-        {
-            futures.add(executor.submit(process));
-        }
-        // wait for them to complete before continuing.
-        ConcurrentUtils.waitForTasks(futures, null);
-
-        // assert that they are completed as expected.
-        for (SleepyProcess process : processes)
-        {
-            assertTrue(process.isCompleted());
-        }
-    }
-
-    private List<SleepyProcess> createProcesses(int count)
-    {
-        List<SleepyProcess> processes = new LinkedList<SleepyProcess>();
-        for (int i = 0; i < count; i++)
-        {
-            processes.add(new SleepyProcess());
-        }
-        return processes;
-    }
-
-    private class SleepyProcess implements Runnable
-    {
-        private boolean completed;
-
-        public void run()
-        {
-            try
-            {
-                Thread.sleep(100);
-                completed = true;
-            }
-            catch (InterruptedException e)
-            {
-                // noop.
-            }
-        }
-
-        public boolean isCompleted()
-        {
-            return completed;
         }
     }
 }

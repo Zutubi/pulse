@@ -1,8 +1,5 @@
 package com.zutubi.util.concurrent;
 
-import com.zutubi.util.logging.Logger;
-
-import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -53,50 +50,6 @@ public class ConcurrentUtils
             if (executor != null)
             {
                 executor.shutdown();
-            }
-        }
-    }
-
-    /**
-     * Wait for the provided list of futures to complete before returning.
-     *
-     * @param futures   the futures we are waiting on
-     *
-     * @throws InterruptedException if the thread waiting for the futures is interrupted.
-     */
-    public static void waitForTasks(List<Future> futures) throws InterruptedException
-    {
-        waitForTasks(futures, null);        
-    }
-
-    /**
-     * Wait for the provided list of futures to complete before returning.
-     *
-     * @param futures   the futures we are waiting on
-     * @param log       the logger to received details of any exceptions encountered during
-     * the execution of the tasks.
-     *
-     * @throws InterruptedException if the thread waiting for the futures is interrupted.
-     */
-    public static void waitForTasks(List<Future> futures, Logger log) throws InterruptedException
-    {
-        for (Future task : futures)
-        {
-            try
-            {
-                task.get();
-            }
-            catch (CancellationException e)
-            {
-                // the task was cancelled, and hence is complete.  Lets keep going.
-            }
-            catch (ExecutionException e)
-            {
-                // the task generated an exception during execution. Log it and continue.
-                if (log != null)
-                {
-                    log.severe(e);
-                }
             }
         }
     }
