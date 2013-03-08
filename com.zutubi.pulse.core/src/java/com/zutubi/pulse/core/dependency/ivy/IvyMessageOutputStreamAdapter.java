@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
-import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
+import com.google.common.io.ByteStreams;
 import com.zutubi.util.Constants;
-import com.zutubi.util.io.NullOutputStream;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.util.Message;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static com.zutubi.pulse.core.dependency.ivy.IvyUtils.PROGRESS_CHARACTER;
 
 /**
  * An implementation of the ivy message logger base class that redirects some of the log
@@ -24,7 +25,7 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
 
     public IvyMessageOutputStreamAdapter(OutputStream output)
     {
-        this.output = output == null ? new NullOutputStream() : output;
+        this.output = output == null ? ByteStreams.nullOutputStream() : output;
     }
 
     protected void doProgress()

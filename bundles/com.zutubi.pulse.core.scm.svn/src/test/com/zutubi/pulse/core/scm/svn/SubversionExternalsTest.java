@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
@@ -127,7 +128,7 @@ public class SubversionExternalsTest extends PulseTestCase
         File dump = new File(tempDir, "SubversionExternalsTest." + tag);
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
         FileInputStream is = new FileInputStream(dump);
-        IOUtils.joinStreams(is, svnProcess.getOutputStream());
+        ByteStreams.copy(is, svnProcess.getOutputStream());
         svnProcess.getOutputStream().close();
         is.close();
         svnProcess.waitFor();

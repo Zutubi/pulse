@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
+import com.google.common.io.ByteStreams;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
@@ -9,7 +10,6 @@ import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.NullOutputStream;
 import org.apache.ivy.core.IvyPatternHelper;
 import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -59,7 +59,7 @@ public class RetrieveDependenciesCommand implements Command
                     OutputStream outputStream = context.getOutputStream();
                     if (outputStream == null)
                     {
-                        outputStream = new NullOutputStream();
+                        outputStream = ByteStreams.nullOutputStream();
                     }
                     
                     final PrintWriter outputWriter = new PrintWriter(outputStream);

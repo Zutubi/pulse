@@ -5,7 +5,6 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.NullOutputStream;
 import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -124,7 +123,7 @@ public class PulseZipUtils
         Process child = pb.start();
         try
         {
-            ByteStreams.copy(child.getInputStream(), new NullOutputStream());
+            ByteStreams.copy(child.getInputStream(), ByteStreams.nullOutputStream());
             int exitCode = child.waitFor();
             if(exitCode != 0)
             {

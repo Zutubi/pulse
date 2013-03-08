@@ -19,7 +19,6 @@ import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.io.NullOutputStream;
 
 import java.io.*;
 import java.util.Collections;
@@ -225,13 +224,13 @@ public class PatchArchive
             {
                 return;
             }
-            ByteStreams.copy(zin, new NullOutputStream());
+            ByteStreams.copy(zin, ByteStreams.nullOutputStream());
 
             if (zin.getNextEntry() == null)
             {
                 return;
             }
-            ByteStreams.copy(zin, new NullOutputStream());
+            ByteStreams.copy(zin, ByteStreams.nullOutputStream());
 
             ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null)

@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.commands.nant;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandTestCase;
 import com.zutubi.pulse.core.commands.api.TestCommandContext;
 import com.zutubi.pulse.core.commands.core.NamedArgumentCommand;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class NAntCommandTest extends OutputProducingCommandTestCase
 {
@@ -20,7 +21,7 @@ public class NAntCommandTest extends OutputProducingCommandTestCase
         if (SystemUtils.IS_WINDOWS)
         {
             File destinationFile = new File(baseDir, "default.build");
-            IOUtils.joinStreams(getInput(getName(), EXTENSION_XML), new FileOutputStream(destinationFile), true);
+            ByteStreams.copy(Resources.newInputStreamSupplier(getInputURL(getName(), EXTENSION_XML)), Files.newOutputStreamSupplier(destinationFile));
 
             TestCommandContext context = runCommand(new NamedArgumentCommand(new NAntCommandConfiguration()));
             assertEquals(ResultState.SUCCESS, context.getResultState());

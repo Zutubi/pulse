@@ -150,7 +150,7 @@ public class FileSystemUtils
         Process child = processBuilder.start();
         try
         {
-            ByteStreams.copy(child.getInputStream(), new NullOutputStream());
+            ByteStreams.copy(child.getInputStream(), ByteStreams.nullOutputStream());
             int exitCode = child.waitFor();
             if(exitCode != 0)
             {

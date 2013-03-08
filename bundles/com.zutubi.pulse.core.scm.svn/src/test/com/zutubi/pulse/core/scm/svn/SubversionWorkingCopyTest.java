@@ -1,8 +1,7 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
 import com.zutubi.diff.PatchFile;
 import com.zutubi.diff.PatchFileParser;
 import com.zutubi.diff.unified.UnifiedHunk;
@@ -19,10 +18,8 @@ import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.process.ProcessControl;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.config.PropertiesConfig;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -32,7 +29,6 @@ import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
 
 import java.io.*;
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
@@ -96,7 +92,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         File dump = new File(tempDir, "SubversionWorkingCopyTest.dump");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
         FileInputStream is = new FileInputStream(dump);
-        IOUtils.joinStreams(is, svnProcess.getOutputStream());
+        ByteStreams.copy(is, svnProcess.getOutputStream());
         svnProcess.getOutputStream().close();
         is.close();
         svnProcess.waitFor();

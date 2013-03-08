@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.postprocessors.ocunit;
 
 import com.google.common.base.Function;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -9,10 +12,8 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.postprocessors.DefaultPostProcessorContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -45,10 +46,9 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
     private StoredFileArtifact prepareArtifact(String name) throws IOException
     {
         File tmpFile = new File(tmpDir, name + ".txt");
-        IOUtils.joinStreams(
-                this.getClass().getResourceAsStream("OCUnitReportPostProcessorTest."+name+".txt"),
-                new FileOutputStream(tmpFile),
-                true
+        ByteStreams.copy(
+                Resources.newInputStreamSupplier(this.getClass().getResource("OCUnitReportPostProcessorTest." + name + ".txt")),
+                Files.newOutputStreamSupplier(tmpFile)
         );
 
         return new StoredFileArtifact( name + ".txt");
