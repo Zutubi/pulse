@@ -4,19 +4,21 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.reverse;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -572,7 +574,7 @@ public class GitClient implements ScmClient
         if (entries.size() == 0)
         {
             entries = git.log(getRevisionString(to), getRevisionString(from));
-            entries = CollectionUtils.reverse(entries);
+            entries = newArrayList(reverse(entries));
         }
         return entries;
     }
