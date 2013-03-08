@@ -5,10 +5,8 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.Command;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.NullaryFunctionE;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -22,6 +20,9 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.*;
 import java.net.URL;
+import java.util.concurrent.Callable;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A command that handles retrieving the dependencies for a build.  This
@@ -51,9 +52,9 @@ public class RetrieveDependenciesCommand implements Command
             URL masterUrl = new URL(context.getString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL));
             String host = masterUrl.getHost();
 
-            AuthenticatedAction.execute(host, context.getSecurityHash(), new NullaryFunctionE<Object, Exception>()
+            AuthenticatedAction.execute(host, context.getSecurityHash(), new Callable<Object>()
             {
-                public Object process() throws Exception
+                public Object call() throws Exception
                 {
                     OutputStream outputStream = context.getOutputStream();
                     if (outputStream == null)
