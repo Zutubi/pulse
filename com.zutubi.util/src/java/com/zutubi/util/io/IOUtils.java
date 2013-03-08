@@ -109,24 +109,6 @@ public class IOUtils
         }
     }
 
-    public static void copyFile(File fromFile, File toFile) throws IOException
-    {
-        InputStream inStream = null;
-        OutputStream outStream = null;
-
-        try
-        {
-            inStream = new FileInputStream(fromFile);
-            outStream = new FileOutputStream(toFile);
-            ByteStreams.copy(inStream, outStream);
-        }
-        finally
-        {
-            close(inStream);
-            close(outStream);
-        }
-    }
-
     public static String inputStreamToString(InputStream is) throws IOException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();

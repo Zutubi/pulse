@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions;
 
+import com.google.common.io.Files;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
@@ -19,7 +20,6 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -180,7 +180,7 @@ public class PersonalBuildAction extends ActionSupport
 
         try
         {
-            IOUtils.copyFile(uploadedPatch, patchFile);
+            Files.copy(uploadedPatch, patchFile);
             if (!uploadedPatch.delete())
             {
                 responseWarnings.add("Unable to clean up uploaded patch.");

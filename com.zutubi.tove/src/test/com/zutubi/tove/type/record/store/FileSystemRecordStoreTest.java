@@ -1,5 +1,6 @@
 package com.zutubi.tove.type.record.store;
 
+import com.google.common.io.Files;
 import com.zutubi.tove.transaction.*;
 import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -429,7 +430,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         MutableRecord newSample = createRandomSampleRecord();
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
         serialiser.serialise("sample", newSample, true, 1);
-        IOUtils.copyFile(new File(backupSnapshot, "snapshot_id.txt"), new File(snapshot, "snapshot_id.txt"));
+        Files.copy(new File(backupSnapshot, "snapshot_id.txt"), new File(snapshot, "snapshot_id.txt"));
 
         assertTrue(backupSnapshot.exists());
         assertTrue(snapshot.exists());

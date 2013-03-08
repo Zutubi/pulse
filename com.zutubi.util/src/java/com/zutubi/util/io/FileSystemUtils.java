@@ -3,6 +3,7 @@ package com.zutubi.util.io;
 import com.google.common.base.Predicate;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -1347,7 +1348,7 @@ public class FileSystemUtils
                 }
 
                 delete(dest);
-                IOUtils.copyFile(singleSource, dest);
+                Files.copy(singleSource, dest);
             }
             else if (singleSource.isDirectory())
             {
@@ -1403,7 +1404,7 @@ public class FileSystemUtils
             {
                 throw new IOException(String.format("Copy failed. Failed to create file %s", dest.getAbsolutePath()));
             }
-            IOUtils.copyFile(src, dest);
+            Files.copy(src, dest);
         }
     }
 

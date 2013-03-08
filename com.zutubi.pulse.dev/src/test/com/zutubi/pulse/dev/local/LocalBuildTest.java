@@ -1,5 +1,6 @@
 package com.zutubi.pulse.dev.local;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
@@ -132,7 +133,7 @@ public class LocalBuildTest extends PulseTestCase
         String pulseFile = copyFile("tests");
         File testFile = new File(getInputURL(name, "txt").toURI());
         File toFile = new File(baseDir, "test-report.txt");
-        IOUtils.copyFile(testFile, toFile);
+        Files.copy(testFile, toFile);
 
         builder.runBuild(baseDir, getOptions(pulseFile, null));
         compareOutput(name);

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
+import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.ZipUtils;
 import org.eclipse.osgi.service.resolver.BundleDescription;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import static com.zutubi.util.io.FileSystemUtils.delete;
-import static com.zutubi.util.io.IOUtils.copyFile;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -966,7 +966,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup() throws Exception
     {
         File pluginFile = new File(tmpDir, "com.zutubi.bundles.onstartup_1.0.0.jar");
-        copyFile(getInputFile("com.zutubi.bundles.onstartup_1.0.0_fails", EXTENSION_JAR), pluginFile);
+        Files.copy(getInputFile("com.zutubi.bundles.onstartup_1.0.0_fails", EXTENSION_JAR), pluginFile);
 
         manuallyDeploy(pluginFile);
 
@@ -978,7 +978,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         shutdownPluginCore();
 
         delete(pluginFile);
-        copyFile(getInputFile("com.zutubi.bundles.onstartup_1.0.0_succeeds", EXTENSION_JAR), pluginFile);
+        Files.copy(getInputFile("com.zutubi.bundles.onstartup_1.0.0_succeeds", EXTENSION_JAR), pluginFile);
         manuallyDeploy(pluginFile);
 
         startupPluginCore();

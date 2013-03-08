@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.core.postprocessors.api.PostProcessor;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorContext;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         URL url = getInputURL(name, "txt");
         File fromFile = new File(url.toURI());
         File toFile = new File(tempDir, fromFile.getName());
-        IOUtils.copyFile(fromFile, toFile);
+        Files.copy(fromFile, toFile);
         artifact = new StoredFileArtifact(toFile.getName());
     }
 
