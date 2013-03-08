@@ -1,24 +1,24 @@
 package com.zutubi.tove.config.docs;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
+import com.google.common.collect.ImmutableSortedMap;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
-import static com.zutubi.util.CollectionUtils.asOrderedMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
 
 /**
  * A repository for documentation of configuration types.  The information is
@@ -31,16 +31,17 @@ public class ConfigurationDocsManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationDocsManager.class);
 
-    private static final Map<String, String> TYPE_KEY_MAP = asOrderedMap(asPair("form.heading", "title"),
-                                                                         asPair("label", "title"),
-                                                                         asPair("introduction", "brief"),
-                                                                         asPair("verbose", "verbose"));
+    private static final Map<String, String> TYPE_KEY_MAP = ImmutableSortedMap.of("form.heading", "title",
+                                                                                  "label", "title",
+                                                                                  "introduction", "brief",
+                                                                                  "verbose", "verbose");
 
-    private static final Map<String, String> PROPERTY_KEY_MAP = asOrderedMap(asPair("label", "label"),
-                                                                             asPair("help", "brief"),
-                                                                             asPair("verbose", "verbose"));
 
-    private static final Map<String, String> EXAMPLE_KEY_MAP = asOrderedMap(asPair("blurb", "blurb"));
+    private static final Map<String, String> PROPERTY_KEY_MAP = ImmutableSortedMap.of("label", "label",
+                                                                                      "help", "brief",
+                                                                                      "verbose", "verbose");
+
+    private static final Map<String, String> EXAMPLE_KEY_MAP = ImmutableSortedMap.of("blurb", "blurb");
 
     private static final int TRIM_LIMIT = 100;
 
@@ -51,7 +52,7 @@ public class ConfigurationDocsManager
         if (useCache())
         {
             TypeDocs result = cache.get(type.getSymbolicName());
-            if(result == null)
+            if (result == null)
             {
                 result = generateDocs(type);
                 cache.put(type.getSymbolicName(), result);
@@ -77,8 +78,8 @@ public class ConfigurationDocsManager
 
         setDetails(messages, typeDocs, "", TYPE_KEY_MAP);
         ensureBrief(typeDocs);
-        
-        for(TypeProperty property: type.getProperties())
+
+        for (TypeProperty property : type.getProperties())
         {
             PropertyDocs propertyDocs = new PropertyDocs(property.getName(), property.getType().toString());
             setDetails(messages, propertyDocs, property.getName() + ".", PROPERTY_KEY_MAP);

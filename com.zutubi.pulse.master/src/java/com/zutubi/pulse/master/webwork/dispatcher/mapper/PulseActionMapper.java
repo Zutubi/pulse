@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
+import com.google.common.collect.ImmutableSortedMap;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.master.webwork.dispatcher.mapper.browse.BrowseActionReso
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.master.webwork.dispatcher.mapper.server.ServerActionResolver;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  */
@@ -428,14 +426,14 @@ public class PulseActionMapper implements ActionMapper
     public static void main(String argv[])
     {
         // Displays valid URLs for all namespaces except /admin.
-        Map<String, ActionResolver> baseResolvers = CollectionUtils.asOrderedMap(
-                asPair(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", (ActionResolver) null),
-                asPair(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, new MyBuildsActionResolver()),
-                asPair(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", (ActionResolver) null),
-                asPair(BROWSE_NAMESPACE, new BrowseActionResolver()),
-                asPair(SERVER_NAMESPACE, new ServerActionResolver()),
-                asPair(AGENTS_NAMESPACE, new AgentsActionResolver())
-        );
+        Map<String, ActionResolver> baseResolvers = ImmutableSortedMap.<String, ActionResolver>naturalOrder()
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", null)
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, new MyBuildsActionResolver())
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", null)
+                .put(BROWSE_NAMESPACE, new BrowseActionResolver())
+                .put(SERVER_NAMESPACE, new ServerActionResolver())
+                .put(AGENTS_NAMESPACE, new AgentsActionResolver())
+                .build();
 
         for (Map.Entry<String, ActionResolver> entry: baseResolvers.entrySet())
         {

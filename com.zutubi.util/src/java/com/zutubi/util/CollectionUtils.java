@@ -4,7 +4,9 @@ import com.google.common.base.Predicate;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Various utilities for working with collections.  Note that we prefer to use Guava utilities, and
@@ -48,22 +50,6 @@ public class CollectionUtils
     public static <T, U> Pair<T, U> asPair(T first, U second)
     {
         return new Pair<T,U>(first, second);
-    }
-
-    public static <T, U> Map<T, U> asOrderedMap(Pair<? extends T, ? extends U>... pairs)
-    {
-        return asOrderedMap(Arrays.asList(pairs));
-    }
-
-    public static <T, U> Map<T, U> asOrderedMap(Collection<? extends Pair<? extends T, ? extends U>> pairs)
-    {
-        HashMap<T, U> result = new LinkedHashMap<T,U>(pairs.size());
-        for(Pair<? extends T, ? extends U> pair: pairs)
-        {
-            result.put(pair.first, pair.second);
-        }
-
-        return result;
     }
 
     /**
