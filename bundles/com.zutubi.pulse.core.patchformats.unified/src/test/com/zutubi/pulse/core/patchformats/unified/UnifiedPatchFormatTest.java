@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.patchformats.unified;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -36,8 +37,8 @@ public class UnifiedPatchFormatTest extends PulseTestCase
                 FileSystemUtils.translateEOLs(file, SystemUtils.LF_BYTES, true);
             }
 
-            String patchedContent = IOUtils.fileToString(file);
-            String expectedContent = IOUtils.inputStreamToString(getInput("new", "txt"));
+            String patchedContent = Files.toString(file, Charset.defaultCharset());
+            String expectedContent = readInputFully("new", "txt");
             assertEquals(expectedContent, patchedContent);
         }
         finally

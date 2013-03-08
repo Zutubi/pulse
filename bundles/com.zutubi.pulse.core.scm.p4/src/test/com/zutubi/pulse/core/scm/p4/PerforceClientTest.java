@@ -10,7 +10,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.junit.IOAssertions;
 
 import java.io.File;
@@ -200,14 +199,14 @@ public class PerforceClientTest extends PerforceTestBase
     public void testCheckoutFile() throws ScmException, IOException
     {
         setupClient(DEPOT_WORKSPACE);
-        String content = IOUtils.inputStreamToString(client.retrieve(createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), null));
+        String content = ScmUtils.retrieveContent(client, createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), null);
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws ScmException, IOException
     {
         setupClient(DEPOT_WORKSPACE);
-        String content = IOUtils.inputStreamToString(client.retrieve(createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), createRevision(2)));
+        String content = ScmUtils.retrieveContent(client, createScmContext(), FileSystemUtils.composeFilename("depot", "file2"), createRevision(2));
         assertEquals("content of file2\n", content);
     }
 

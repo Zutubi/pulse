@@ -1,29 +1,33 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
-import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
+import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class GitClientTest extends GitClientTestBase
 {
@@ -277,31 +281,27 @@ public class GitClientTest extends GitClientTestBase
     public void testRetrieve() throws ScmException, IOException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, "a.txt", null);
-        assertEquals(CONTENT_A_TXT, IOUtils.inputStreamToString(content));
+        assertEquals(CONTENT_A_TXT, ScmUtils.retrieveContent(client, scmContext, "a.txt", null));
     }
 
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, "a.txt", new Revision(REVISION_MASTER_INTERMEDIATE));
-        assertEquals("content", IOUtils.inputStreamToString(content));
+        assertEquals("content", ScmUtils.retrieveContent(client, scmContext, "a.txt", new Revision(REVISION_MASTER_INTERMEDIATE)));
     }
 
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         client.setBranch(BRANCH_SIMPLE);
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, "1.txt", null);
-        assertEquals("", IOUtils.inputStreamToString(content));
+        assertEquals("", ScmUtils.retrieveContent(client, scmContext, "1.txt", null));
     }
 
     public void testRetrieveFromRevisionOnBranch() throws ScmException, IOException
     {
         client.setBranch(BRANCH_SIMPLE);
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608"));
-        assertEquals("content", IOUtils.inputStreamToString(content));
+        assertEquals("content", ScmUtils.retrieveContent(client, scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608")));
     }
 
     public void testUpdate() throws ScmException
@@ -381,12 +381,12 @@ public class GitClientTest extends GitClientTestBase
     private void updateToRevisionHelper() throws ScmException, IOException
     {
         client.checkout(context, null, handler);
-        assertEquals(CONTENT_A_TXT, IOUtils.fileToString(new File(workingDir, "a.txt")));
+        assertEquals(CONTENT_A_TXT, Files.toString(new File(workingDir, "a.txt"), Charset.defaultCharset()));
 
         Revision rev = client.update(context, new Revision(REVISION_MASTER_INTERMEDIATE), handler);
         assertEquals(REVISION_MASTER_INTERMEDIATE, rev.getRevisionString());
 
-        assertEquals("content", IOUtils.fileToString(new File(workingDir, "a.txt")));
+        assertEquals("content", Files.toString(new File(workingDir, "a.txt"), Charset.defaultCharset()));
     }
 
     public void testUpdateNoCheckout() throws ScmException
@@ -647,9 +647,9 @@ public class GitClientTest extends GitClientTestBase
         client.init(scmContext, new ScmFeedbackAdapter());
         client.tag(scmContext, new Revision(REVISION_INITIAL), TAG_NAME, false);
 
-        NativeGit nativeGit = new NativeGit();
+        final NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);
-        String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
+        String info = showTag(nativeGit, TAG_NAME);
         assertThat(info, containsString(REVISION_INITIAL));
         assertThat(info, containsString("initial commit"));
     }
@@ -664,9 +664,27 @@ public class GitClientTest extends GitClientTestBase
 
         NativeGit nativeGit = new NativeGit();
         nativeGit.setWorkingDirectory(repositoryBase);
-        String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
+        String info = showTag(nativeGit, TAG_NAME);
         assertThat(info, containsString(REVISION_MASTER_LATEST));
         assertThat(info, containsString("Edit, add and remove on master"));
+    }
+
+    private String showTag(final NativeGit nativeGit, final String tagName) throws IOException
+    {
+        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        {
+            public InputStream getInput() throws IOException
+            {
+                try
+                {
+                    return nativeGit.show(null, tagName);
+                }
+                catch (ScmException e)
+                {
+                    throw new IOException(e);
+                }
+            }
+        }, Charset.defaultCharset()));
     }
 
     private void assertLatestCheckedOut()

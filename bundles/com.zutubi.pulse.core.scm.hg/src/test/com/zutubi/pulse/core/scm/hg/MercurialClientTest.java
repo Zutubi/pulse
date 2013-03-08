@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core.scm.hg;
 
 import com.google.common.base.Function;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -154,31 +154,27 @@ public class MercurialClientTest extends MercurialTestBase
     public void testRetrieve() throws ScmException, IOException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, CONTENT_FILE_PATH, null);
-        assertEquals(CONTENT_DEFAULT_LATEST, IOUtils.inputStreamToString(content));
+        assertEquals(CONTENT_DEFAULT_LATEST, ScmUtils.retrieveContent(client, scmContext, CONTENT_FILE_PATH, null));
     }
 
     public void testRetrieveAtRevision() throws ScmException, IOException
     {
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, CONTENT_FILE_PATH, new Revision(REVISION_DEFAULT_PREVIOUS));
-        assertEquals(CONTENT_DEFAULT_PREVIOUS, IOUtils.inputStreamToString(content));
+        assertEquals(CONTENT_DEFAULT_PREVIOUS, ScmUtils.retrieveContent(client, scmContext, CONTENT_FILE_PATH, new Revision(REVISION_DEFAULT_PREVIOUS)));
     }
 
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         config.setBranch(BRANCH);
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, CONTENT_FILE_PATH, null);
-        assertEquals(CONTENT_BRANCH_LATEST, IOUtils.inputStreamToString(content));
+        assertEquals(CONTENT_BRANCH_LATEST, ScmUtils.retrieveContent(client, scmContext, CONTENT_FILE_PATH, null));
     }
 
     public void testRetrieveOnBranchAtRevision() throws ScmException, IOException
     {
         config.setBranch(BRANCH);
         client.init(scmContext, new ScmFeedbackAdapter());
-        InputStream content = client.retrieve(scmContext, CONTENT_FILE_PATH, new Revision(REVISION_BRANCH_PREVIOUS));
-        assertEquals(CONTENT_BRANCH_PREVIOUS, IOUtils.inputStreamToString(content));
+        assertEquals(CONTENT_BRANCH_PREVIOUS, ScmUtils.retrieveContent(client, scmContext, CONTENT_FILE_PATH, new Revision(REVISION_BRANCH_PREVIOUS)));
     }
 
     public void testUpdateNoNewRevisions() throws ScmException
@@ -470,7 +466,7 @@ public class MercurialClientTest extends MercurialTestBase
     {
         File file = new File(baseDir, path);
         assertTrue(file.isFile());
-        String content = IOUtils.fileToString(file);
+        String content = Files.toString(file, Charset.defaultCharset());
         assertEquals(normaliseLineEndings(expected), normaliseLineEndings(content));
     }
 

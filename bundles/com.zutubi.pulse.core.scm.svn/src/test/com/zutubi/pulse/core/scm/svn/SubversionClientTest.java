@@ -211,7 +211,7 @@ public class SubversionClientTest extends PulseTestCase
             assertEquals("bfolder", files.get(1).getName());
             assertEquals("foo", files.get(2).getName());
 
-            String foo = IOUtils.inputStreamToString(confirmServer.retrieve(null, "foo", null));
+            String foo = ScmUtils.retrieveContent(confirmServer, null, "foo", null);
             assertEquals("", foo);
         }
         finally
@@ -246,7 +246,7 @@ public class SubversionClientTest extends PulseTestCase
             assertEquals("bfolder", files.get(1).getName());
             assertEquals("foo", files.get(2).getName());
 
-            String foo = IOUtils.inputStreamToString(confirmServer.retrieve(null, "foo", null));
+            String foo = ScmUtils.retrieveContent(confirmServer, null, "foo", null);
             assertEquals("hello\n", foo);
         }
         finally
