@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -8,6 +9,7 @@ import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.junit.IOAssertions;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -566,7 +568,7 @@ public class ZipUtilsTest extends PulseTestCase
             // The symlink becomes a file with the path it was linking to
             File l = new File(unzipDir, "l");
             assertTrue(l.exists());
-            assertEquals("f", IOUtils.fileToString(l));
+            assertEquals("f", Files.toString(l, Charset.defaultCharset()));
         }
     }
 

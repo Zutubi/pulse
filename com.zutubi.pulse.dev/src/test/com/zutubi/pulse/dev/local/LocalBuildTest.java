@@ -12,6 +12,7 @@ import com.zutubi.util.junit.IOAssertions;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -84,7 +85,7 @@ public class LocalBuildTest extends PulseTestCase
     public void testInvalidPulseFile() throws PulseException, IOException
     {
         builder.runBuild(baseDir, getOptions("no-such-pulse.xml", "my-default"));
-        String log = IOUtils.fileToString(new File(baseDir, "build.log"));
+        String log = Files.toString(new File(baseDir, "build.log"), Charset.defaultCharset());
         assertThat(log, containsString("Unable to parse pulse file"));
         assertThat(log, containsString("No such file or directory"));
     }
@@ -216,7 +217,7 @@ public class LocalBuildTest extends PulseTestCase
         {
             File cleaned = new File(dir, "env.txt.cleaned");
             StringBuffer cleanedContent = new StringBuffer();
-            BufferedReader reader = new BufferedReader(new StringReader(IOUtils.fileToString(env)));
+            BufferedReader reader = new BufferedReader(new StringReader(Files.toString(env, Charset.defaultCharset())));
             for (int i = 0; i < 6; i++)
             {
                 cleanedContent.append(reader.readLine());

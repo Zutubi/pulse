@@ -1,10 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_FILE;
 import static com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport.OUTPUT_NAME;
@@ -59,7 +60,7 @@ public class LocalBuildAcceptanceTest extends DevToolsTestBase
     {
         File commandOutput = new File(tmpDir, FileSystemUtils.composeFilename(DEFAULT_OUTPUT_DIRECTORY, "00000001-hello", OUTPUT_NAME, OUTPUT_FILE));
         assertTrue(commandOutput.exists());
-        String output = normaliseLineEndings(IOUtils.fileToString(commandOutput));
+        String output = normaliseLineEndings(Files.toString(commandOutput, Charset.defaultCharset()));
         assertEquals("Hello, Pulse!\n", output);
     }
 

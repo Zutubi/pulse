@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.utils.*;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
@@ -20,6 +21,7 @@ import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -412,7 +414,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
     {
         String path = repository.getArtifactPath(project.getConfig().getOrganisation(), project.getConfig().getName(), stage, Integer.toString(buildNumber), "art", "txt");
         File aFile = new File(repository.getBase(), path);
-        assertThat(IOUtils.fileToString(aFile), containsString("PULSE_STAGE = " + stage));
+        assertThat(Files.toString(aFile, Charset.defaultCharset()), containsString("PULSE_STAGE = " + stage));
     }
 
     public void testRetrieve_SpecificRevision() throws Exception

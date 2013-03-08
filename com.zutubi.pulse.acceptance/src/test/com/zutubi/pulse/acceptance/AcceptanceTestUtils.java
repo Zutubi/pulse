@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
+import com.google.common.io.Files;
 import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -14,7 +14,6 @@ import com.zutubi.util.config.FileConfig;
 import com.zutubi.util.config.ReadOnlyConfig;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.httpclient.*;
@@ -25,8 +24,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
 
 public class AcceptanceTestUtils
 {
@@ -198,7 +201,7 @@ public class AcceptanceTestUtils
         }
         
         File tokenFile = new File(configDir, "admin.token");
-        return IOUtils.fileToString(tokenFile);
+        return Files.toString(tokenFile, Charset.defaultCharset());
     }
 
     /**
@@ -493,7 +496,7 @@ public class AcceptanceTestUtils
     private static void rewritePluginManifest(String id, String name, File unzipDir) throws IOException
     {
         File manifestFile = new File(unzipDir, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF"));
-        String manifest = IOUtils.fileToString(manifestFile);
+        String manifest = Files.toString(manifestFile, Charset.defaultCharset());
         manifest = manifest.replaceAll(PLUGIN_ID_TEST, id);
         manifest = manifest.replaceAll("Test Post-Processor", name);
         FileSystemUtils.createFile(manifestFile, manifest);
@@ -502,7 +505,7 @@ public class AcceptanceTestUtils
     private static void rewritePluginXml(String id, File unzipDir) throws IOException
     {
         File pluginXmlFile = new File(unzipDir, "plugin.xml");
-        String xml = IOUtils.fileToString(pluginXmlFile);
+        String xml = Files.toString(pluginXmlFile, Charset.defaultCharset());
         xml = xml.replaceAll("test\\.pp", id + ".pp");
         FileSystemUtils.createFile(pluginXmlFile, xml);
     }

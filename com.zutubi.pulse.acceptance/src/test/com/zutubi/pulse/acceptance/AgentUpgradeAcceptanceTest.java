@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
-import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
@@ -14,17 +14,19 @@ import com.zutubi.pulse.acceptance.support.jython.JythonPulseTestFactory;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
-import static com.zutubi.util.Constants.MINUTE;
-import static com.zutubi.util.Constants.SECOND;
 import com.zutubi.util.NullUnaryProcedure;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
+import static com.zutubi.util.Constants.MINUTE;
+import static com.zutubi.util.Constants.SECOND;
 
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
@@ -81,7 +83,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     private void editFile(File file) throws IOException
     {
         assertTrue(file.isFile());
-        String conf = IOUtils.fileToString(file);
+        String conf = Files.toString(file, Charset.defaultCharset());
         FileSystemUtils.createFile(file, conf + "\n");
     }
 

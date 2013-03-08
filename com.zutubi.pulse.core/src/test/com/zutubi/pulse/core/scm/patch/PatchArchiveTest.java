@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.patch;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -15,7 +16,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.ui.TestUI;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -108,8 +109,8 @@ public class PatchArchiveTest extends PulseTestCase
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
 
         List<Feature> features = createAndApplyPatch(status);
-        
-        assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
+
+        assertEquals(EDITED_CONTENT, Files.toString(targetTestFile, Charset.defaultCharset()));
         assertEquals(0, features.size());
     }
 
@@ -124,8 +125,8 @@ public class PatchArchiveTest extends PulseTestCase
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
 
         List<Feature> features = createAndApplyPatch(status);
-        
-        assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
+
+        assertEquals(EDITED_CONTENT, Files.toString(targetTestFile, Charset.defaultCharset()));
         assertEquals(FileSystemUtils.PERMISSION_OWNER_EXECUTE, FileSystemUtils.getPermissions(targetTestFile) & FileSystemUtils.PERMISSION_OWNER_EXECUTE);
         assertEquals(0, features.size());
     }
@@ -154,8 +155,8 @@ public class PatchArchiveTest extends PulseTestCase
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
 
         List<Feature> features = createAndApplyPatch(status);
-        
-        assertEquals(EDITED_CONTENT, IOUtils.fileToString(targetTestFile));
+
+        assertEquals(EDITED_CONTENT, Files.toString(targetTestFile, Charset.defaultCharset()));
         assertEquals(FileSystemUtils.PERMISSION_OWNER_EXECUTE, FileSystemUtils.getPermissions(targetTestFile) & FileSystemUtils.PERMISSION_OWNER_EXECUTE);
         assertEquals(0, features.size());
     }

@@ -1,18 +1,20 @@
 package com.zutubi.pulse.core.commands.api;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.SimpleRecipePaths;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.postprocessors.api.PostProcessorConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * Helper base class for implementing test cases for commands.
@@ -134,7 +136,7 @@ public abstract class CommandTestCase extends PulseTestCase
      */
     protected String getFileContent(String name, String path) throws IOException
     {
-        return IOUtils.fileToString(getFile(name, path));
+        return Files.toString(getFile(name, path), Charset.defaultCharset());
     }
 
     /**

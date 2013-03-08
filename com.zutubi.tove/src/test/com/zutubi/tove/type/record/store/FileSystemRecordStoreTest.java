@@ -6,10 +6,10 @@ import com.zutubi.tove.type.record.DefaultRecordSerialiser;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class FileSystemRecordStoreTest extends RecordStoreTestCase
 {
@@ -162,7 +162,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         // compaction removes this journal entry.
         recordStore.compactNow();
         assertTrue(snapshot.exists());
-        assertEquals("1", IOUtils.fileToString(snapshotId));
+        assertEquals("1", Files.toString(snapshotId, Charset.defaultCharset()));
         assertFalse(new File(persistentDirectory, "1").exists());
 
         // ensure that the journal entry id is correct
@@ -171,7 +171,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         assertTrue(new File(persistentDirectory, "2").exists());
 
         recordStore.compactNow();
-        assertEquals("2", IOUtils.fileToString(snapshotId));
+        assertEquals("2", Files.toString(snapshotId, Charset.defaultCharset()));
         assertFalse(new File(persistentDirectory, "2").exists());
 
         // check that the snapshot is as expected.
@@ -197,7 +197,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
         restartRecordStore();
         assertTrue(snapshot.exists());
         assertTrue(new File(snapshot, "sample").exists());
-        assertEquals("3", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+        assertEquals("3", Files.toString(new File(snapshot, "snapshot_id.txt"), Charset.defaultCharset()));
 
         // restart should cleanup unused journal files.
     }
@@ -261,7 +261,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
         // snapshot should be from before the transaction started and so only contain journal entry 1.
         assertTrue(snapshot.exists());
-        assertEquals("1", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+        assertEquals("1", Files.toString(new File(snapshot, "snapshot_id.txt"), Charset.defaultCharset()));
 
         // ensure that the snapshot is of the data from before the second transaction.
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
@@ -305,7 +305,7 @@ public class FileSystemRecordStoreTest extends RecordStoreTestCase
 
         // snapshot should be from before the transaction started and so only contain journal entry 1.
         assertTrue(snapshot.exists());
-        assertEquals("1", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+        assertEquals("1", Files.toString(new File(snapshot, "snapshot_id.txt"), Charset.defaultCharset()));
 
         // ensure that the snapshot is of the data from before the second transaction.
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);

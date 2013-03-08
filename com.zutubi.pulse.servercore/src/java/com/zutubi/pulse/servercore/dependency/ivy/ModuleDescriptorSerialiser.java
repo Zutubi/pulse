@@ -2,12 +2,13 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.hessian.io.AbstractSerializer;
+import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * An implementation of the hessian serialiser interface that handles
@@ -44,7 +45,7 @@ public class ModuleDescriptorSerialiser extends AbstractSerializer
         {
             tmp = createTempFile();
             descriptor.toIvyFile(tmp);
-            return IOUtils.fileToString(tmp);
+            return Files.toString(tmp, Charset.defaultCharset());
         }
         catch (Exception e)
         {

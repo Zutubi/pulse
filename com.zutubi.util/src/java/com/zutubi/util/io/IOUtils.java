@@ -117,20 +117,6 @@ public class IOUtils
         return os.toString();
     }
 
-    public static String fileToString(File file) throws IOException
-    {
-        FileInputStream is = null;
-        try
-        {
-            is = new FileInputStream(file);
-            return inputStreamToString(is);
-        }
-        finally
-        {
-            close(is);
-        }
-    }
-
     public static byte[] fileToBytes(File file) throws IOException
     {
         FileInputStream is = null;

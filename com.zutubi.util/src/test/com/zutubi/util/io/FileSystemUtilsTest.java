@@ -2,23 +2,24 @@ package com.zutubi.util.io;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
-import com.zutubi.util.CollectionUtils;
+import com.google.common.io.Files;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.junit.ZutubiTestCase;
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.zutubi.util.io.FileSystemUtils.NORMAL_SEPARATOR;
 import static com.zutubi.util.io.FileSystemUtils.relativePath;
-import com.zutubi.util.junit.ZutubiTestCase;
 import static java.util.Arrays.asList;
-import junit.framework.Assert;
-import junit.framework.AssertionFailedError;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 public class FileSystemUtilsTest extends ZutubiTestCase
 {
@@ -330,7 +331,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
                 FileSystemUtils.setPermissions(test, FileSystemUtils.PERMISSION_ALL_FULL);
                 FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-                Assert.assertEquals("line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n", IOUtils.fileToString(test));
+                Assert.assertEquals("line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n", Files.toString(test, Charset.defaultCharset()));
                 assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(test));
             }
             finally
@@ -350,7 +351,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "");
             FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-            Assert.assertEquals("", IOUtils.fileToString(test));
+            Assert.assertEquals("", Files.toString(test, Charset.defaultCharset()));
         }
         finally
         {
@@ -368,7 +369,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\n");
             FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-            Assert.assertEquals("\r\n", IOUtils.fileToString(test));
+            Assert.assertEquals("\r\n", Files.toString(test, Charset.defaultCharset()));
         }
         finally
         {
@@ -386,7 +387,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\r\r");
             FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
-            Assert.assertEquals("\n\n", IOUtils.fileToString(test));
+            Assert.assertEquals("\n\n", Files.toString(test, Charset.defaultCharset()));
         }
         finally
         {
@@ -683,7 +684,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         assertTrue(dest.isFile());
         assertFalse(FileSystemUtils.isRelativeSymlink(dest));
-        assertEquals(content, IOUtils.fileToString(dest));
+        assertEquals(content, Files.toString(dest, Charset.defaultCharset()));
     }
 
     public void testIsSymlinkRegularFile() throws IOException
@@ -1003,7 +1004,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
         FileSystemUtils.rename(src, dest, false);
 
-        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+        assertEquals(TEST_FILE_CONTENT, Files.toString(dest, Charset.defaultCharset()));
     }
 
     public void testRenameDirectory() throws IOException
@@ -1041,7 +1042,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
         FileSystemUtils.robustRename(src, dest);
 
-        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+        assertEquals(TEST_FILE_CONTENT, Files.toString(dest, Charset.defaultCharset()));
     }
 
     public void testRobustRenameDirectory() throws IOException
@@ -1133,7 +1134,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         assertTrue(dest.mkdir());
 
         FileSystemUtils.rename(src, dest, true);
-        assertEquals(TEST_FILE_CONTENT, IOUtils.fileToString(dest));
+        assertEquals(TEST_FILE_CONTENT, Files.toString(dest, Charset.defaultCharset()));
     }
 
     public void testRenameSourceParentNotReadable() throws IOException
@@ -1387,7 +1388,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
             FileSystemUtils.translateEOLs(test, eol, false);
-            Assert.assertEquals(out, IOUtils.fileToString(test));
+            Assert.assertEquals(out, Files.toString(test, Charset.defaultCharset()));
         }
         finally
         {

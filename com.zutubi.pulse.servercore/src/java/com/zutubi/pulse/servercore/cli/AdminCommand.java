@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.cli;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.util.config.EnvConfig;
@@ -10,7 +11,6 @@ import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.ConfigSupport;
 import com.zutubi.util.config.FileConfig;
-import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public abstract class AdminCommand implements Command
         File tokenFile = AdminTokenManager.getAdminTokenFilename(configurationManager.getSystemPaths().getConfigRoot());
         if (tokenFile.exists())
         {
-            return IOUtils.fileToString(tokenFile);
+            return Files.toString(tokenFile, Charset.defaultCharset());
         }
         return null;
     }

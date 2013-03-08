@@ -1,13 +1,14 @@
 package com.zutubi.pulse.master.project;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
-import static com.zutubi.util.io.IOUtils.fileToString;
 import static com.zutubi.util.io.IOUtils.inputStreamToString;
 import static java.util.Collections.nCopies;
 
@@ -40,7 +41,7 @@ public class ProjectLoggerTest extends PulseTestCase
     {
         logMessage(TEST_MESSAGE);
 
-        String written = fileToString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)));
+        String written = Files.toString(new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0)), Charset.defaultCharset());
         assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(written));
     }
 
@@ -68,10 +69,10 @@ public class ProjectLoggerTest extends PulseTestCase
         logMessage(TEST_MESSAGE);
         assertTrue(rotatedFile.exists());
 
-        assertEquals(getFullContent(), wipeTimestamps(fileToString(rotatedFile)));
+        assertEquals(getFullContent(), wipeTimestamps(Files.toString(rotatedFile, Charset.defaultCharset())));
 
         File primaryFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0));
-        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(fileToString(primaryFile)));
+        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(Files.toString(primaryFile, Charset.defaultCharset())));
     }
 
     public void testTailAfterRotate() throws IOException
@@ -99,10 +100,10 @@ public class ProjectLoggerTest extends PulseTestCase
         }
 
         File primaryFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 0));
-        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(fileToString(primaryFile)));
+        assertEquals(TEST_MESSAGE + LINE_SEPARATOR, wipeTimestamps(Files.toString(primaryFile, Charset.defaultCharset())));
 
         File rotatedFile = new File(tempDir, String.format(ProjectLogger.NAME_PATTERN, 1));
-        assertEquals(getFullContent(), wipeTimestamps(fileToString(rotatedFile)));
+        assertEquals(getFullContent(), wipeTimestamps(Files.toString(rotatedFile, Charset.defaultCharset())));
     }
 
     public void testRawWithNoLogMessages() throws IOException

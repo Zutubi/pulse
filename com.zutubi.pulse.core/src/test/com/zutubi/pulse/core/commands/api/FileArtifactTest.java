@@ -1,20 +1,22 @@
 package com.zutubi.pulse.core.commands.api;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 public class FileArtifactTest extends PulseTestCase
 {
@@ -338,7 +340,7 @@ public class FileArtifactTest extends PulseTestCase
 
         File capturedFile = new File(outputDir, FileSystemUtils.composeFilename(ARTIFACT_NAME, fileName));
         assertTrue(capturedFile.isFile());
-        assertEquals(TEST_CONTENT, IOUtils.fileToString(capturedFile));
+        assertEquals(TEST_CONTENT, Files.toString(capturedFile, Charset.defaultCharset()));
     }
 
     private void assertNoFilesCaptured()

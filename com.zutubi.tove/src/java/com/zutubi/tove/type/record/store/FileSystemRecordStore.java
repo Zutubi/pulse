@@ -1,5 +1,6 @@
 package com.zutubi.tove.type.record.store;
 
+import com.google.common.io.Files;
 import com.zutubi.tove.transaction.Transaction;
 import com.zutubi.tove.transaction.TransactionException;
 import com.zutubi.tove.transaction.TransactionManager;
@@ -11,6 +12,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -200,7 +202,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             DefaultRecordSerialiser recordSerialiser = new DefaultRecordSerialiser(snapshotDirectory);
             latestSnapshot = recordSerialiser.deserialise();
 
-            latestSnapshotId = Long.parseLong(IOUtils.fileToString(snapshotJournalIdFile));
+            latestSnapshotId = Long.parseLong(Files.toString(snapshotJournalIdFile, Charset.defaultCharset()));
         }
 
         inMemoryDelegate = new InMemoryRecordStore(latestSnapshot);

@@ -1,14 +1,15 @@
 package com.zutubi.pulse.servercore.services;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  */
@@ -36,7 +37,7 @@ public class ServiceTokenManager implements TokenManager
         {
             try
             {
-                token = IOUtils.fileToString(tokenFile);
+                token = Files.toString(tokenFile, Charset.defaultCharset());
             }
             catch (IOException e)
             {

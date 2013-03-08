@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.plugins;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
@@ -15,10 +16,10 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 
@@ -106,7 +107,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
     private File createPulseFile(String processorTag) throws IOException
     {
         File pulseFile = copyInputToDirectory("xml", tmpDir);
-        String pulseXml = IOUtils.fileToString(pulseFile);
+        String pulseXml = Files.toString(pulseFile, Charset.defaultCharset());
         pulseXml = pulseXml.replaceAll("test\\.pp", processorTag);
         FileSystemUtils.createFile(pulseFile, pulseXml);
         return pulseFile;

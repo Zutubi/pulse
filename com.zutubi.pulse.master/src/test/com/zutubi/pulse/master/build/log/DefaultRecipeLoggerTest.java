@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
@@ -7,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
@@ -46,13 +48,13 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         final String SHORT_STRING = "1";
 
         logger.log(SHORT_STRING.getBytes());
-        assertTrue(IOUtils.fileToString(logFile).length() > SHORT_STRING.length());
+        assertTrue(Files.toString(logFile, Charset.defaultCharset()).length() > SHORT_STRING.length());
     }
 
     public void testOffsetAndLength() throws IOException
     {
         logger.log("0123456789".getBytes("US-ASCII"), 2, 4);
-        assertLineContent(IOUtils.fileToString(logFile), "2345");
+        assertLineContent(Files.toString(logFile, Charset.defaultCharset()), "2345");
     }
 
     public void testNewlineOnBoundaryUnix() throws IOException
@@ -199,7 +201,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         logger.prepare();
         logger.logMarker("Second line");
 
-        String content = IOUtils.fileToString(logFile);
+        String content = Files.toString(logFile, Charset.defaultCharset());
         assertThat(content, containsString("First line"));
         assertThat(content, containsString("Second line"));
     }
