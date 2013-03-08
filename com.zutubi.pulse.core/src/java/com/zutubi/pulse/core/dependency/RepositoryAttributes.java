@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.dependency;
 
 import com.google.common.base.Predicate;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asMap;
 import com.zutubi.util.io.DirectoryFileFilter;
 import com.zutubi.util.io.IOUtils;
 
@@ -196,15 +195,18 @@ public class RepositoryAttributes
     {
         if (!cache.containsKey(path))
         {
+            Map<String, String> map = new HashMap<String, String>();
             File f = getAttributeFile(path);
             if (f.isFile())
             {
-                cache.put(path, asMap(IOUtils.read(f)));
+                Properties properties = IOUtils.read(f);
+                for (Object propertyName : properties.keySet())
+                {
+                    map.put((String) propertyName, properties.getProperty((String) propertyName));
+                }
             }
-            else
-            {
-                cache.put(path, new HashMap<String, String>());
-            }
+
+            cache.put(path, map);
         }
         return cache.get(path);
     }

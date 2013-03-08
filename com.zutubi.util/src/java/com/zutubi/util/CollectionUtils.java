@@ -36,26 +36,18 @@ public class CollectionUtils
         return false;
     }
 
+    /**
+     * Creates a new pair out of two values.
+     *
+     * @param first the first value
+     * @param second the second value
+     * @param <T> type of the first value
+     * @param <U> type of the second value
+     * @return the new pair
+     */
     public static <T, U> Pair<T, U> asPair(T first, U second)
     {
         return new Pair<T,U>(first, second);
-    }
-
-    /**
-     * Convert the properties instance into a map.
-     *
-     * @param properties    instance to be converted.
-     * @return  the new map instance with the same values as contained
-     * within the original properties instance.
-     */
-    public static Map<String, String> asMap(Properties properties)
-    {
-        Map<String, String> map = new HashMap<String, String>();
-        for (Object propertyName : properties.keySet())
-        {
-            map.put((String) propertyName, properties.getProperty((String) propertyName));
-        }
-        return map;
     }
 
     public static <T, U> Map<T, U> asMap(Pair<? extends T, ? extends U>... pairs)
