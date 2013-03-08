@@ -87,14 +87,6 @@ public class CollectionUtils
         return new Vector<T>(Arrays.asList(ts));
     }
 
-    public static <T> void traverse(Collection<T> c, UnaryProcedure<T> f)
-    {
-        for (T t : c)
-        {
-            f.run(t);
-        }
-    }
-
     /**
      * Collapses a collection down to a single value by successive applications
      * of the given binary function.  The function is applied to the current

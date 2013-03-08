@@ -8,8 +8,6 @@ import com.zutubi.pulse.master.transfer.jdbc.HibernateTransferTarget;
 import com.zutubi.pulse.master.transfer.jdbc.MappingUtils;
 import com.zutubi.pulse.master.transfer.xml.XMLTransferSource;
 import com.zutubi.pulse.master.transfer.xml.XMLTransferTarget;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
@@ -302,37 +300,28 @@ public class TransferAPI
 
         public void start() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
+            for (TransferListener transferListener: listeners)
             {
-                public void run(TransferListener transferListener)
-                {
-                    transferListener.start();
-                }
-            });
+                transferListener.start();
+            }
             delegate.start();
         }
 
         public void startTable(final com.zutubi.pulse.master.transfer.Table table) throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
+            for (TransferListener transferListener: listeners)
             {
-                public void run(TransferListener transferListener)
-                {
-                    transferListener.startTable(table);
-                }
-            });
+                transferListener.startTable(table);
+            }
             delegate.startTable(table);
         }
 
         public void row(final Map<String, Object> row) throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
+            for (TransferListener transferListener: listeners)
             {
-                public void run(TransferListener transferListener)
-                {
-                    transferListener.row(row);
-                }
-            });
+                transferListener.row(row);
+            }
             delegate.row(row);
         }
 
@@ -341,25 +330,19 @@ public class TransferAPI
 
         public void endTable() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
+            for (TransferListener transferListener: listeners)
             {
-                public void run(TransferListener transferListener)
-                {
-                    transferListener.endTable();
-                }
-            });
+                transferListener.endTable();
+            }
             delegate.endTable();
         }
 
         public void end() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
+            for (TransferListener transferListener: listeners)
             {
-                public void run(TransferListener transferListener)
-                {
-                    transferListener.end();
-                }
-            });
+                transferListener.end();
+            }
             delegate.end();
         }
 
