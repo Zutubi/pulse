@@ -1,11 +1,9 @@
 package com.zutubi.util;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.adt.TreeNode;
 
-import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -36,31 +34,6 @@ public class CollectionUtils
         }
 
         return false;
-    }
-
-    public static <T> void print(Collection<T> c, Function<T, String> m)
-    {
-        print(c, m, System.out);
-    }
-
-    public static <T> void print(Collection<T> c, Function<T, String> m, PrintStream stream)
-    {
-        boolean comma = false;
-        stream.print("[");
-        for(T t: c)
-        {
-            if(comma)
-            {
-                stream.print(", ");
-            }
-            else
-            {
-                comma = true;
-            }
-
-            stream.print(m.apply(t));
-        }
-        stream.println("]");
     }
 
     public static <T, U> Pair<T, U> asPair(T first, U second)
