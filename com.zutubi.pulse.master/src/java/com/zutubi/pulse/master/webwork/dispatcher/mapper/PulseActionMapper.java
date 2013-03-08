@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
@@ -426,27 +427,28 @@ public class PulseActionMapper implements ActionMapper
     public static void main(String argv[])
     {
         // Displays valid URLs for all namespaces except /admin.
-        Map<String, ActionResolver> baseResolvers = ImmutableSortedMap.<String, ActionResolver>naturalOrder()
-                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", null)
-                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, new MyBuildsActionResolver())
-                .put(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", null)
-                .put(BROWSE_NAMESPACE, new BrowseActionResolver())
-                .put(SERVER_NAMESPACE, new ServerActionResolver())
-                .put(AGENTS_NAMESPACE, new AgentsActionResolver())
+
+        Map<String, Optional<ActionResolver>> baseResolvers = ImmutableMap.<String, Optional<ActionResolver>>builder()
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_HOME + "/", Optional.<ActionResolver>absent())
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_MY_BUILDS, Optional.<ActionResolver>of(new MyBuildsActionResolver()))
+                .put(DASHBOARD_NAMESPACE + "/" + PATH_PREFERENCES + "/", Optional.<ActionResolver>absent())
+                .put(BROWSE_NAMESPACE, Optional.<ActionResolver>of(new BrowseActionResolver()))
+                .put(SERVER_NAMESPACE, Optional.<ActionResolver>of(new ServerActionResolver()))
+                .put(AGENTS_NAMESPACE, Optional.<ActionResolver>of(new AgentsActionResolver()))
                 .build();
 
-        for (Map.Entry<String, ActionResolver> entry: baseResolvers.entrySet())
+        for (Map.Entry<String, Optional<ActionResolver>> entry: baseResolvers.entrySet())
         {
-            if (entry.getValue() == null)
+            if (entry.getValue().isPresent())
             {
-                System.out.println(entry.getKey());
-            }
-            else
-            {
-                for (String url: UrlEnumerator.enumerate(entry.getValue()))
+                for (String url: UrlEnumerator.enumerate(entry.getValue().get()))
                 {
                     System.out.println(entry.getKey() + "/" + url);
                 }
+            }
+            else
+            {
+                System.out.println(entry.getKey());
             }
         }
     }

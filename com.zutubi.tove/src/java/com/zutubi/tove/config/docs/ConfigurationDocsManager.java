@@ -1,7 +1,7 @@
 package com.zutubi.tove.config.docs;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCreator;
@@ -31,17 +31,17 @@ public class ConfigurationDocsManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationDocsManager.class);
 
-    private static final Map<String, String> TYPE_KEY_MAP = ImmutableSortedMap.of("form.heading", "title",
-                                                                                  "label", "title",
-                                                                                  "introduction", "brief",
-                                                                                  "verbose", "verbose");
+    private static final Map<String, String> TYPE_KEY_MAP = ImmutableMap.of("form.heading", "title",
+                                                                            "label", "title",
+                                                                            "introduction", "brief",
+                                                                            "verbose", "verbose");
 
 
-    private static final Map<String, String> PROPERTY_KEY_MAP = ImmutableSortedMap.of("label", "label",
+    private static final Map<String, String> PROPERTY_KEY_MAP = ImmutableMap.of("label", "label",
                                                                                       "help", "brief",
                                                                                       "verbose", "verbose");
 
-    private static final Map<String, String> EXAMPLE_KEY_MAP = ImmutableSortedMap.of("blurb", "blurb");
+    private static final Map<String, String> EXAMPLE_KEY_MAP = ImmutableMap.of("blurb", "blurb");
 
     private static final int TRIM_LIMIT = 100;
 

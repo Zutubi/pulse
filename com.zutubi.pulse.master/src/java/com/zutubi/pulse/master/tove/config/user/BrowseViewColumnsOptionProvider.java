@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
@@ -14,18 +14,18 @@ import static com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfigurat
  */
 public class BrowseViewColumnsOptionProvider extends MapOptionProvider
 {
-    private static final Map<String, String> COLUMNS = ImmutableSortedMap.<String, String>naturalOrder()
-        .put(KEY_VERSION, "build version")
-        .put(KEY_COMPLETED, "completed time")
-        .put(KEY_ERRORS, "error count")
-        .put(KEY_MATURITY, "maturity")
-        .put(KEY_REASON, "reason")
-        .put(KEY_REVISION, "revision")
-        .put(KEY_ELAPSED, "running/remaining time")
-        .put(KEY_WHEN, "start time")
-        .put(KEY_TESTS, "test summary")
-        .put(KEY_WARNINGS, "warning count")
-        .build();
+    private static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
+            .put(KEY_VERSION, "build version")
+            .put(KEY_COMPLETED, "completed time")
+            .put(KEY_ERRORS, "error count")
+            .put(KEY_MATURITY, "maturity")
+            .put(KEY_REASON, "reason")
+            .put(KEY_REVISION, "revision")
+            .put(KEY_ELAPSED, "running/remaining time")
+            .put(KEY_WHEN, "start time")
+            .put(KEY_TESTS, "test summary")
+            .put(KEY_WARNINGS, "warning count")
+            .build();
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
