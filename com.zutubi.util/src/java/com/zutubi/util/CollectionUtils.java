@@ -12,19 +12,6 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T> boolean containsIdentity(T[] a, T x)
-    {
-        for(T t: a)
-        {
-            if(t == x)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public static <T> boolean contains(T[] a, T x)
     {
         for(T t: a)

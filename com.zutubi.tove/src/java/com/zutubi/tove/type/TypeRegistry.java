@@ -4,7 +4,6 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.record.HandleAllocator;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.reflection.AnnotationUtils;
 import com.zutubi.util.reflection.ReflectionUtils;
 
@@ -342,11 +341,6 @@ public class TypeRegistry
     public CompositeType getType(Class type)
     {
         return classMapping.get(type);
-    }
-
-    public static boolean isSimple(Class type)
-    {
-        return CollectionUtils.containsIdentity(BUILT_IN_TYPES, type) || type.isEnum();
     }
 
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
