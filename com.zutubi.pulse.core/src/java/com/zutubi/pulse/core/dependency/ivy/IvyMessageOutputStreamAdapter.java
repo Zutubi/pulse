@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.dependency.ivy;
 
 import com.google.common.io.ByteStreams;
-import com.zutubi.util.Constants;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.ivy.util.Message;
 
@@ -65,9 +65,9 @@ public class IvyMessageOutputStreamAdapter extends org.apache.ivy.util.AbstractM
             {
                 // some of the messages from ivy have new line characters at the end, others do not.  So
                 // that we get something sensible in our logs, we apply a new line when necessary.
-                if (!msg.endsWith(Constants.LINE_SEPARATOR))
+                if (!msg.endsWith(SystemUtils.LINE_SEPARATOR))
                 {
-                    msg = msg + Constants.LINE_SEPARATOR;
+                    msg = msg + SystemUtils.LINE_SEPARATOR;
                 }
                 output.write(msg.getBytes());
             }

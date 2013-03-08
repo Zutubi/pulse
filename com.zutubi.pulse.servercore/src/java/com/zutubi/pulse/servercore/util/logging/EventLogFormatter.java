@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.util.logging;
 
-import com.zutubi.util.Constants;
+import com.zutubi.util.SystemUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -36,7 +36,7 @@ public class EventLogFormatter extends Formatter
         builder.append(": ");
         String message = formatMessage(record);
         builder.append(message);
-        builder.append(Constants.LINE_SEPARATOR);
+        builder.append(SystemUtils.LINE_SEPARATOR);
         return builder.toString();
     }
 }

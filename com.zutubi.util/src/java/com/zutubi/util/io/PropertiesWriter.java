@@ -1,6 +1,6 @@
 package com.zutubi.util.io;
 
-import com.zutubi.util.Constants;
+import com.zutubi.util.SystemUtils;
 
 import java.io.*;
 import java.util.Enumeration;
@@ -37,7 +37,7 @@ public class PropertiesWriter
         // when we make a change to the config file the properties object is able to accurately read the values.
         convert(copy);
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
 
         BufferedReader reader = null;
         try
@@ -51,11 +51,11 @@ public class PropertiesWriter
                 if (trimmedLine.startsWith("#"))
                 {
                     // is a comment, just append it.
-                    buffer.append(line);
+                    builder.append(line);
                 }
                 else if (trimmedLine.length() == 0)
                 {
-                    buffer.append(line);
+                    builder.append(line);
                 }
                 else
                 {
@@ -63,7 +63,7 @@ public class PropertiesWriter
                     String propertyName = trimmedLine.substring(0, trimmedLine.indexOf('='));
                     if (copy.containsKey(propertyName))
                     {
-                        buffer.append(propertyName).append("=").append(copy.getProperty(propertyName));
+                        builder.append(propertyName).append("=").append(copy.getProperty(propertyName));
                         copy.remove(propertyName);
 
                         // If the property we are replacing is a multi line property, we need to remove all of it.
@@ -84,8 +84,8 @@ public class PropertiesWriter
                         boolean isMultiLine = line.endsWith("\\");
                         while (isMultiLine)
                         {
-                            buffer.append(line);
-                            buffer.append(Constants.LINE_SEPARATOR);
+                            builder.append(line);
+                            builder.append(SystemUtils.LINE_SEPARATOR);
                             line = reader.readLine();
                             if (line == null) // reached the end of the while loop.
                             {
@@ -93,10 +93,10 @@ public class PropertiesWriter
                             }                            
                             isMultiLine = line.endsWith("\\");
                         }
-                        buffer.append(line);
+                        builder.append(line);
                     }
                 }
-                buffer.append(Constants.LINE_SEPARATOR);
+                builder.append(SystemUtils.LINE_SEPARATOR);
             }
 
             // Write the remaining properties to the end of the file.
@@ -104,8 +104,8 @@ public class PropertiesWriter
             while (remainingNames.hasMoreElements())
             {
                 String propertyName = (String) remainingNames.nextElement();
-                buffer.append(propertyName).append("=").append(copy.getProperty(propertyName));
-                buffer.append(Constants.LINE_SEPARATOR);
+                builder.append(propertyName).append("=").append(copy.getProperty(propertyName));
+                builder.append(SystemUtils.LINE_SEPARATOR);
             }
         }
         finally
@@ -118,7 +118,7 @@ public class PropertiesWriter
         try
         {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config)));
-            writer.append(buffer.toString());
+            writer.append(builder.toString());
             writer.flush();
         }
         finally

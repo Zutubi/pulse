@@ -279,7 +279,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
         File envFileDir = commandContext.registerArtifact(ENV_ARTIFACT_NAME, null, false, false, null);
         File file = new File(envFileDir, ENV_FILENAME);
 
-        final String separator = Constants.LINE_SEPARATOR;
+        final String separator = SystemUtils.LINE_SEPARATOR;
 
         // buffered contents to be written to the file later.
         StringBuffer buffer = new StringBuffer();

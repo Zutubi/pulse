@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.xmlrpc;
 
-import com.zutubi.util.Constants;
+import com.zutubi.util.SystemUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
@@ -23,7 +23,7 @@ public class XmlRpcLogFormatter extends Formatter
 
     public String format(LogRecord record)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         // Minimize memory allocations here.
         date.setTime(record.getMillis());
@@ -39,7 +39,7 @@ public class XmlRpcLogFormatter extends Formatter
         sb.append(text);
         sb.append(": ");
         sb.append(record.getMessage());
-        sb.append(Constants.LINE_SEPARATOR);
+        sb.append(SystemUtils.LINE_SEPARATOR);
         return sb.toString();
     }
 
