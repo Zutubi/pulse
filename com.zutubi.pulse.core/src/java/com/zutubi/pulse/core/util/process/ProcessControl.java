@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.util.process;
 
+import com.google.common.io.CharStreams;
 import com.jezhumble.javasysmon.JavaSysMon;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -195,7 +196,7 @@ public class ProcessControl
             process.getOutputStream().close();
             InputStreamReader outputReader = new InputStreamReader(process.getInputStream());
             StringWriter outputWriter = new StringWriter();
-            IOUtils.joinReaderToWriter(outputReader, outputWriter);
+            CharStreams.copy(outputReader, outputWriter);
             int exitCode = process.waitFor();
             outputReader.close();
             if (exitCode != 0)

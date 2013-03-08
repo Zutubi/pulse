@@ -1,11 +1,9 @@
 package com.zutubi.util;
 
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterables.filter;
+import com.google.common.io.CharStreams;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -13,6 +11,10 @@ import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -96,7 +98,7 @@ public class SystemUtils
 
             InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
             StringWriter stdoutWriter = new StringWriter();
-            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+            CharStreams.copy(stdoutReader, stdoutWriter);
 
             int exitCode = 0;
             try

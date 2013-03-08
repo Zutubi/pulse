@@ -2,6 +2,7 @@ package com.zutubi.util.io;
 
 import com.google.common.base.Predicate;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
@@ -593,7 +594,7 @@ public class FileSystemUtils
 
             InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
             StringWriter stdoutWriter = new StringWriter();
-            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+            CharStreams.copy(stdoutReader, stdoutWriter);
 
             int exitCode = process.waitFor();
 
