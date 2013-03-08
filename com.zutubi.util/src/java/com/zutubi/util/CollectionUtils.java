@@ -324,27 +324,4 @@ public class CollectionUtils
         }
         return null;
     }
-
-    /**
-     * Returns the index of the specified object in the specified array.
-     *
-     * @param o     the object whose index is being determined
-     * @param array the array in which the object is being searched
-     * @return the index of the object in the array, or -1 if it is not
-     * present.
-     */
-    public static <T> int indexOf(T o, T... array)
-    {
-        if (array != null)
-        {
-            for (int index = 0; index < array.length; index++)
-            {
-                if (ObjectUtils.equals(array[index], o))
-                {
-                    return index;
-                }
-            }
-        }
-        return -1;
-    }
 }

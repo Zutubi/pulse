@@ -134,18 +134,4 @@ public class CollectionUtilsTest extends ZutubiTestCase
                         new TreeNode<String>("2-2"),
                         new TreeNode<String>("2-3")));
     }
-
-    public void testIndexOf()
-    {
-        assertEquals(0, CollectionUtils.indexOf("A", "A", "B", "C"));
-        assertEquals(1, CollectionUtils.indexOf("B", "A", "B", "C"));
-        assertEquals(2, CollectionUtils.indexOf("C", "A", "B", "C"));
-        assertEquals(-1, CollectionUtils.indexOf("D", "A", "B", "C"));
-        assertEquals(-1, CollectionUtils.indexOf("E"));
-        assertEquals(-1, CollectionUtils.indexOf(null));
-        assertEquals(0, CollectionUtils.indexOf(null, (Object)null));
-        assertEquals(-1, CollectionUtils.indexOf(null, "A", "B"));
-        assertEquals(-1, CollectionUtils.indexOf("A", null, "B"));
-        assertEquals(1, CollectionUtils.indexOf("B", null, "B"));
-    }
 }

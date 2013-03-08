@@ -3,7 +3,8 @@ package com.zutubi.pulse.core.engine.api;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 
-import static com.zutubi.util.CollectionUtils.indexOf;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The possible states for a build, stage or command result.  Indicates what
@@ -141,7 +142,8 @@ public enum ResultState
      */
     public static ResultState getAggregate(ResultState s1, ResultState s2, ResultState[] order)
     {
-        return (indexOf(s1, order) < indexOf(s2, order)) ? s2 : s1;
+        List<ResultState> orderList = Arrays.asList(order);
+        return (orderList.indexOf(s1) < orderList.indexOf(s2)) ? s2 : s1;
     }
 
     /**
