@@ -4,7 +4,6 @@ import com.google.common.io.Files;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -97,7 +96,7 @@ public class ServiceTokenManager implements TokenManager
         File tokenFile = getTokenFile();
         try
         {
-            FileSystemUtils.createFile(tokenFile, token);
+            Files.write(token, tokenFile, Charset.defaultCharset());
         }
         catch (IOException e)
         {

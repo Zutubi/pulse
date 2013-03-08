@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.io.Files;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
@@ -13,7 +14,6 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.FileSystemUtils;
 import freemarker.template.utility.StringUtil;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -764,7 +765,7 @@ public class SeleniumBrowser
             text = stackTraceAsString(e, "Unable to get HTML source using selenium:");
         }
 
-        FileSystemUtils.createFile(new File(getWorkingDirectory(), testName + "-failure.html"), text);
+        Files.write(text, new File(getWorkingDirectory(), testName + "-failure.html"), Charset.defaultCharset());
     }
 
     private void captureScreenshot(String testName) throws IOException
@@ -776,7 +777,7 @@ public class SeleniumBrowser
         }
         catch (Exception e)
         {
-            FileSystemUtils.createFile(new File(getWorkingDirectory(), testName + "-failure.png.txt"), stackTraceAsString(e, "Unable to capture screenshot with selenium:"));
+            Files.write(stackTraceAsString(e, "Unable to capture screenshot with selenium:"), new File(getWorkingDirectory(), testName + "-failure.png.txt"), Charset.defaultCharset());
         }
     }
 

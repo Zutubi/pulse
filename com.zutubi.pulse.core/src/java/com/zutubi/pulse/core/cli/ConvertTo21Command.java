@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.cli;
 
+import com.google.common.io.Files;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.upgrade.PulseFileToToveFile;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ConvertTo21Command implements Command
 
         String converted = PulseFileToToveFile.convert(new FileInputStream(inputFile));
         File outputFile = new File(argv[1]);
-        FileSystemUtils.createFile(outputFile, converted);
+        Files.write(converted, outputFile, Charset.defaultCharset());
 
         return 0;
     }

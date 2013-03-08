@@ -46,14 +46,14 @@ public class FileArtifactTest extends PulseTestCase
         assertTrue(baseDir.mkdir());
         outputDir = new File(tempDir, "output");
 
-        FileSystemUtils.createFile(new File(baseDir, FILE_NO_EXTENSION), TEST_CONTENT);
-        FileSystemUtils.createFile(new File(baseDir, FILE_TXT_1), TEST_CONTENT);
-        FileSystemUtils.createFile(new File(baseDir, FILE_TXT_2), TEST_CONTENT);
-        FileSystemUtils.createFile(new File(baseDir, FILE_LOG), TEST_CONTENT);
+        Files.write(TEST_CONTENT, new File(baseDir, FILE_NO_EXTENSION), Charset.defaultCharset());
+        Files.write(TEST_CONTENT, new File(baseDir, FILE_TXT_1), Charset.defaultCharset());
+        Files.write(TEST_CONTENT, new File(baseDir, FILE_TXT_2), Charset.defaultCharset());
+        Files.write(TEST_CONTENT, new File(baseDir, FILE_LOG), Charset.defaultCharset());
 
         File nested = new File(baseDir, DIR_NESTED);
         assertTrue(nested.mkdir());
-        FileSystemUtils.createFile(new File(nested, FILE_NESTED_TXT), TEST_CONTENT);
+        Files.write(TEST_CONTENT, new File(nested, FILE_NESTED_TXT), Charset.defaultCharset());
 
         executionContext = new PulseExecutionContext();
         executionContext.setWorkingDir(baseDir);

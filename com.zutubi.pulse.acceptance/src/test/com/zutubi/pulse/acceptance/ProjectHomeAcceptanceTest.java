@@ -1,15 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
-import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
-import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
-import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
-import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
@@ -20,18 +11,30 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
-import static java.util.Arrays.asList;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.FEATURED;
+import static com.zutubi.pulse.acceptance.Constants.Project.Command.FileArtifact.FILE;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
+import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
+import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
+import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import static com.zutubi.pulse.acceptance.Constants.TRIVIAL_ANT_REPOSITORY;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
+import static java.util.Arrays.asList;
 
 public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 {
@@ -214,7 +217,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
 
             File buildFile = new File(wcDir, "build.xml");
             assertTrue(buildFile.exists());
-            FileSystemUtils.createFile(buildFile, newContent);
+            Files.write(newContent, buildFile, Charset.defaultCharset());
 
             return workspace.doCommit(comment, buildFile);
         }

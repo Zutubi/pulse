@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.services;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
@@ -7,6 +8,7 @@ import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
@@ -62,7 +64,7 @@ public class ServiceTokenManagerTest extends PulseTestCase
     {
         assertNull(tokenManager.getToken());
         File tokenFile = tokenManager.getTokenFile();
-        FileSystemUtils.createFile(tokenFile, TEST_TOKEN);
+        Files.write(TEST_TOKEN, tokenFile, Charset.defaultCharset());
         tokenManager.init();
         assertEquals(TEST_TOKEN, tokenManager.getToken());
     }

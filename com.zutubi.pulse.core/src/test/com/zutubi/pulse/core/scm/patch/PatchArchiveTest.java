@@ -64,10 +64,10 @@ public class PatchArchiveTest extends PulseTestCase
         archiveFile = new File(tempDir, "patch.zip");
 
         wcTestFile = new File(wcDir, TEST_FILENAME);
-        FileSystemUtils.createFile(wcTestFile, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, wcTestFile, Charset.defaultCharset());
 
         targetTestFile = new File(targetDir, TEST_FILENAME);
-        FileSystemUtils.createFile(targetTestFile, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, targetTestFile, Charset.defaultCharset());
 
         context = new WorkingCopyContextImpl(wcDir, null, new TestUI());
         statusBuilder = mock(WorkingCopyStatusBuilder.class);
@@ -103,7 +103,7 @@ public class PatchArchiveTest extends PulseTestCase
     {
         String EDITED_CONTENT = "edited content";
 
-        FileSystemUtils.createFile(wcTestFile, EDITED_CONTENT);
+        Files.write(EDITED_CONTENT, wcTestFile, Charset.defaultCharset());
 
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
@@ -119,7 +119,7 @@ public class PatchArchiveTest extends PulseTestCase
         final String EDITED_CONTENT = "edited content";
         
         FileSystemUtils.setExecutable(targetTestFile);
-        FileSystemUtils.createFile(wcTestFile, EDITED_CONTENT);
+        Files.write(EDITED_CONTENT, wcTestFile, Charset.defaultCharset());
 
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
@@ -149,7 +149,7 @@ public class PatchArchiveTest extends PulseTestCase
         }).when(statusBuilder).diff(eq(context), anyString(), Matchers.<OutputStream>anyObject());
         
         FileSystemUtils.setExecutable(targetTestFile);
-        FileSystemUtils.createFile(wcTestFile, EDITED_CONTENT);
+        Files.write(EDITED_CONTENT, wcTestFile, Charset.defaultCharset());
 
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(TEST_FILENAME, FileStatus.State.MODIFIED, false));
@@ -179,7 +179,7 @@ public class PatchArchiveTest extends PulseTestCase
         File nestedTargetDir = new File(targetDir, "nested");
         assertTrue(nestedTargetDir.mkdir());
         File nestedTargetFile = new File(nestedTargetDir, "f");
-        FileSystemUtils.createFile(nestedTargetFile, "contents");
+        Files.write("contents", nestedTargetFile, Charset.defaultCharset());
 
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus("nested", FileStatus.State.DELETED, false));
@@ -197,7 +197,7 @@ public class PatchArchiveTest extends PulseTestCase
         final String MISSING_FILE_NAME = "notintarget";
 
         File modifiedWCFile = new File(wcDir, MISSING_FILE_NAME);
-        FileSystemUtils.createFile(modifiedWCFile, "content");
+        Files.write("content", modifiedWCFile, Charset.defaultCharset());
 
         WorkingCopyStatus status = new WorkingCopyStatus(wcDir);
         status.addFileStatus(new FileStatus(MISSING_FILE_NAME, FileStatus.State.MODIFIED, false));

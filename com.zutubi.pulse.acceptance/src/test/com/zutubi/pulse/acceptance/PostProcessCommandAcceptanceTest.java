@@ -1,9 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.io.FileSystemUtils;
+import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -52,8 +53,8 @@ public class PostProcessCommandAcceptanceTest extends DevToolsTestBase
     private void createInputAndPulseFiles() throws IOException
     {
         File inputFile = new File(tmpDir, INPUT_FILE_NAME);
-        FileSystemUtils.createFile(inputFile, INPUT);
+        Files.write(INPUT, inputFile, Charset.defaultCharset());
         File pulseFile = new File(tmpDir, PULSE_FILE_NAME);
-        FileSystemUtils.createFile(pulseFile, PULSE_FILE);
+        Files.write(PULSE_FILE, pulseFile, Charset.defaultCharset());
     }
 }

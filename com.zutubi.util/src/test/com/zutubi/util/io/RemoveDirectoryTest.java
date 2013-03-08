@@ -1,10 +1,12 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.Files;
 import com.zutubi.util.junit.ZutubiTestCase;
 import junit.framework.Assert;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  */
@@ -28,8 +30,8 @@ public class RemoveDirectoryTest extends ZutubiTestCase
         File aFile = new File(tmpDir, "aFile");
         File anotherFile = new File(tmpDir, "anotherFile");
 
-        FileSystemUtils.createFile(aFile, "content");
-        FileSystemUtils.createFile(anotherFile, "content");
+        Files.write("content", aFile, Charset.defaultCharset());
+        Files.write("content", anotherFile, Charset.defaultCharset());
 
         FileSystemUtils.rmdir(tmpDir);
         Assert.assertFalse(tmpDir.exists());
@@ -42,13 +44,13 @@ public class RemoveDirectoryTest extends ZutubiTestCase
         File tmpDir = createTmpDir();
 
         File aFile = new File(tmpDir, "aFile");
-        FileSystemUtils.createFile(aFile, "content");
+        Files.write("content", aFile, Charset.defaultCharset());
 
         File nestedDir = new File(tmpDir, "nested");
         Assert.assertTrue(nestedDir.mkdirs());
 
         File nestedFile = new File(nestedDir, "aFile");
-        FileSystemUtils.createFile(nestedFile, "data");
+        Files.write("data", nestedFile, Charset.defaultCharset());
 
         FileSystemUtils.rmdir(tmpDir);
         Assert.assertFalse(tmpDir.exists());

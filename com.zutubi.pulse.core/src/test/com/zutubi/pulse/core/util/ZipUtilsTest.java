@@ -411,7 +411,7 @@ public class ZipUtilsTest extends PulseTestCase
         if (FileSystemUtils.ZIP_AVAILABLE)
         {
             File f = new File(inDir, "f");
-            FileSystemUtils.createFile(f, "content");
+            Files.write("content", f, Charset.defaultCharset());
             FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_FULL);
 
             if (FileSystemUtils.getPermissions(f) != 0)
@@ -477,9 +477,9 @@ public class ZipUtilsTest extends PulseTestCase
     private void createBrokenSymlink() throws IOException
     {
         File f = new File(inDir, "f");
-        FileSystemUtils.createFile(f, "content");
+        Files.write("content", f, Charset.defaultCharset());
         File l = new File(inDir, "l");
-        FileSystemUtils.createFile(f, "content");
+        Files.write("content", f, Charset.defaultCharset());
         FileSystemUtils.createSymlink(l, f);
         assertTrue(f.delete());
     }
@@ -487,7 +487,7 @@ public class ZipUtilsTest extends PulseTestCase
     public void testBrokenZipCommand() throws IOException
     {
         File f = new File(inDir, "f");
-        FileSystemUtils.createFile(f, "content");
+        Files.write("content", f, Charset.defaultCharset());
 
         PulseZipUtils.setUseExternalArchiving(true);
         PulseZipUtils.setArchiveCommand("nonexistant");
@@ -500,7 +500,7 @@ public class ZipUtilsTest extends PulseTestCase
         if (FileSystemUtils.ZIP_AVAILABLE)
         {
             File f = new File(inDir, "f");
-            FileSystemUtils.createFile(f, "content");
+            Files.write("content", f, Charset.defaultCharset());
 
             PulseZipUtils.setUseExternalArchiving(true);
             PulseZipUtils.setArchiveCommand("zip -G ${zipfile} ${files}");
@@ -512,7 +512,7 @@ public class ZipUtilsTest extends PulseTestCase
     public void testBrokenUnzipCommand() throws IOException
     {
         File f = new File(inDir, "f");
-        FileSystemUtils.createFile(f, "content");
+        Files.write("content", f, Charset.defaultCharset());
 
         PulseZipUtils.setUseExternalArchiving(true);
         PulseZipUtils.setUnarchiveCommand("nonexistant");
@@ -525,7 +525,7 @@ public class ZipUtilsTest extends PulseTestCase
         if (FileSystemUtils.ZIP_AVAILABLE)
         {
             File f = new File(inDir, "f");
-            FileSystemUtils.createFile(f, "content");
+            Files.write("content", f, Charset.defaultCharset());
 
             PulseZipUtils.setUseExternalArchiving(true);
             PulseZipUtils.setUnarchiveCommand("unzip -G ${zipfile}");
@@ -539,7 +539,7 @@ public class ZipUtilsTest extends PulseTestCase
         if(FileSystemUtils.LN_AVAILABLE && FileSystemUtils.ZIP_AVAILABLE)
         {
             File f = new File(inDir, "f");
-            FileSystemUtils.createFile(f, "content");
+            Files.write("content", f, Charset.defaultCharset());
             ProcessBuilder pb = new ProcessBuilder("ln", "-s", "f", "l");
             pb.directory(inDir);
             Process p = pb.start();
@@ -557,7 +557,7 @@ public class ZipUtilsTest extends PulseTestCase
         if(FileSystemUtils.LN_AVAILABLE && FileSystemUtils.ZIP_AVAILABLE)
         {
             File f = new File(inDir, "f");
-            FileSystemUtils.createFile(f, "content");
+            Files.write("content", f, Charset.defaultCharset());
             ProcessBuilder pb = new ProcessBuilder("ln", "-s", "f", "l");
             pb.directory(inDir);
             Process p = pb.start();

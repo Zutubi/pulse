@@ -9,6 +9,7 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -750,29 +751,10 @@ public class FileSystemUtils
         robustRename(src, dest);
     }
 
-    public static void createFile(File file, String data) throws IOException
-    {
-        FileOutputStream os = null;
-        OutputStreamWriter ow = null;
-
-        try
-        {
-            os = new FileOutputStream(file);
-            ow = new OutputStreamWriter(os);
-            ow.write(data);
-            ow.flush();
-        }
-        finally
-        {
-            IOUtils.close(ow);
-            IOUtils.close(os);
-        }
-    }
-
     public static File createTempFile(String prefix, String suffix, String data) throws IOException
     {
         File file = File.createTempFile(prefix, suffix);
-        createFile(file, data);
+        Files.write(data, file, Charset.defaultCharset());
         return file;
     }
 

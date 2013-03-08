@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
+import com.google.common.io.Files;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
@@ -19,6 +20,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +52,7 @@ public class HostUpdaterTest extends PulseTestCase implements EventListener
         File packageDir = DownloadPackageServlet.getPackageDir(systemPaths);
         assertTrue(packageDir.mkdirs());
         File packageFile = DownloadPackageServlet.getAgentZip(systemPaths);
-        FileSystemUtils.createFile(packageFile, "dummy");
+        Files.write("dummy", packageFile, Charset.defaultCharset());
 
         hostState = new HostState();
         hostState.setId(222);

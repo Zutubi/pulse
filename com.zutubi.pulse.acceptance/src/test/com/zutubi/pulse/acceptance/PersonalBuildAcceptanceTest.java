@@ -1,15 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.pages.browse.BuildInfo;
 import com.zutubi.pulse.acceptance.pages.browse.BuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogPage;
 import com.zutubi.pulse.acceptance.pages.browse.PersonalBuildLogsPage;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.acceptance.support.PerforceUtils;
-import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
 import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
@@ -18,7 +16,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
-import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.pulse.dev.client.ClientException;
@@ -29,23 +26,29 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard;
 import com.zutubi.pulse.master.tove.config.project.hooks.*;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
-import static java.util.Arrays.asList;
 import org.openqa.selenium.By;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.support.PerforceUtils.*;
+import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Simple sanity checks for personal builds.
@@ -340,12 +343,12 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(random);
 
         File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
-        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
-                "<project default=\"build\">\n" +
-                "  <target name=\"build\">\n" +
-                "    <fail message=\"Force build failure\"/>\n" +
-                "  </target>\n" +
-                "</project>");
+        Files.write("<?xml version=\"1.0\"?>\n" +
+                            "<project default=\"build\">\n" +
+                            "  <target name=\"build\">\n" +
+                            "    <fail message=\"Force build failure\"/>\n" +
+                            "  </target>\n" +
+                            "</project>", buildFile, Charset.defaultCharset());
         runGit(workingCopyDir, "commit", "-a", "-m", "Make it fail");
         
         rpcClient.RemoteApi.waitForProjectToInitialise(random);
@@ -381,12 +384,12 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         createConfigFile(random);
 
         File buildFile = new File(workingCopyDir, DEFAULT_ANT_BUILD_FILE);
-        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
-                "<project default=\"build\">\n" +
-                "  <target name=\"build\">\n" +
-                "    <fail message=\"Force build failure\"/>\n" +
-                "  </target>\n" +
-                "</project>");
+        Files.write("<?xml version=\"1.0\"?>\n" +
+                            "<project default=\"build\">\n" +
+                            "  <target name=\"build\">\n" +
+                            "    <fail message=\"Force build failure\"/>\n" +
+                            "  </target>\n" +
+                            "</project>", buildFile, Charset.defaultCharset());
         runHg(workingCopyDir, "add", DEFAULT_ANT_BUILD_FILE);
         
         rpcClient.RemoteApi.waitForProjectToInitialise(random);
@@ -617,19 +620,19 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, path);
         String target = RandomUtils.randomString(10);
-        FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
-                "<project default=\"" + target + "\">\n" +
-                "    <target name=\"" + target + "\">\n" +
-                "        <nosuchcommand/>\n" +
-                "    </target>\n" +
-                "</project>");
+        Files.write("<?xml version=\"1.0\"?>\n" +
+                            "<project default=\"" + target + "\">\n" +
+                            "    <target name=\"" + target + "\">\n" +
+                            "        <nosuchcommand/>\n" +
+                            "    </target>\n" +
+                            "</project>", buildFile, Charset.defaultCharset());
     }
 
     private void makeChangeToImportedFile() throws IOException
     {
         File includedFile = new File(workingCopyDir, "properties.xml");
-        FileSystemUtils.createFile(includedFile, "<?xml version=\"1.0\"?>\n" +
-                "<project><notrecognised/></project>\n");
+        Files.write("<?xml version=\"1.0\"?>\n" +
+                            "<project><notrecognised/></project>\n", includedFile, Charset.defaultCharset());
     }
 
     private void editStageToRunOnAgent(String agent, String projectName) throws Exception

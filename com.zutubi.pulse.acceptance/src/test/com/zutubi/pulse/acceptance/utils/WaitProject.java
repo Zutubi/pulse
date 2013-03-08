@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.utils;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.commands.api.CommandConfiguration;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -9,6 +10,7 @@ import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,7 +93,7 @@ public class WaitProject extends ProjectConfigurationHelper
         {
             throw new IOException("Failed to create directory " + dir.getAbsolutePath());
         }
-        FileSystemUtils.createFile(waitFile, "test");
+        Files.write("test", waitFile, Charset.defaultCharset());
     }
 
     private File getWaitFile(String stageName)

@@ -16,7 +16,6 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.util.NullUnaryProcedure;
 import com.zutubi.util.UnaryProcedure;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +83,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     {
         assertTrue(file.isFile());
         String conf = Files.toString(file, Charset.defaultCharset());
-        FileSystemUtils.createFile(file, conf + "\n");
+        Files.write(conf + "\n", file, Charset.defaultCharset());
     }
 
     private void runAgentUpgrade(UnaryProcedure<Pulse> agentCallback) throws Exception

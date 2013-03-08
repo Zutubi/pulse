@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.cleanup;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
@@ -7,6 +8,7 @@ import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -175,8 +177,8 @@ public class FileDeletionServiceTest extends PulseTestCase
         
         File notDead = createNewFile("alive.txt");
         File index = new File(tmp, FileDeletionService.INDEX_FILE_NAME);
-        FileSystemUtils.createFile(index, "invalid\n" + notDead.getAbsolutePath() + "\n");
-        
+        Files.write("invalid\n" + notDead.getAbsolutePath() + "\n", index, Charset.defaultCharset());
+
         initService();
         
         Thread.sleep(100);

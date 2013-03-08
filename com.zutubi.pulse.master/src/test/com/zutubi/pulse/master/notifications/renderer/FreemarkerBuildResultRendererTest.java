@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
 import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.*;
@@ -79,9 +80,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             assertTrue(projectNotificationsDir.mkdirs());
 
             File customTemplate = new File(projectNotificationsDir, "custom.ftl");
-            FileSystemUtils.createFile(customTemplate, "dummy");
+            Files.write("dummy", customTemplate, Charset.defaultCharset());
             File customProperties = new File(projectNotificationsDir, "custom.properties");
-            FileSystemUtils.createFile(customProperties, "display=test display name\ntype=text/html");
+            Files.write("display=test display name\ntype=text/html", customProperties, Charset.defaultCharset());
 
             List<TemplateInfo> available = renderer.getAvailableTemplates(false);
             assertEquals(1, available.size());

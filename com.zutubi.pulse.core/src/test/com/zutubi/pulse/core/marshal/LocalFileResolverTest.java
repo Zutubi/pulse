@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class LocalFileResolverTest extends PulseTestCase
     public void testSimple() throws Exception
     {
         File f = new File(tempDir, FILENAME);
-        FileSystemUtils.createFile(f, CONTENT_SIMPLE);
+        Files.write(CONTENT_SIMPLE, f, Charset.defaultCharset());
         final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
         {
             public InputStream getInput() throws IOException
@@ -63,7 +63,7 @@ public class LocalFileResolverTest extends PulseTestCase
         File dir = new File(tempDir, DIRECTORY);
         assertTrue(dir.mkdir());
         File nested = new File(dir, FILENAME);
-        FileSystemUtils.createFile(nested, CONTENT_NESTED);
+        Files.write(CONTENT_NESTED, nested, Charset.defaultCharset());
         final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
         {
             public InputStream getInput() throws IOException

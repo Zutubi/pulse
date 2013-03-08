@@ -15,7 +15,6 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,7 +108,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         File pulseFile = copyInputToDirectory("xml", tmpDir);
         String pulseXml = Files.toString(pulseFile, Charset.defaultCharset());
         pulseXml = pulseXml.replaceAll("test\\.pp", processorTag);
-        FileSystemUtils.createFile(pulseFile, pulseXml);
+        Files.write(pulseXml, pulseFile, Charset.defaultCharset());
         return pulseFile;
     }
 }

@@ -1,5 +1,6 @@
 package com.zutubi.util.io;
 
+import com.google.common.io.Files;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.junit.IOAssertions;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -7,6 +8,7 @@ import com.zutubi.util.junit.ZutubiTestCase;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class ZipUtilsTest extends ZutubiTestCase
 {
@@ -37,7 +39,7 @@ public class ZipUtilsTest extends ZutubiTestCase
     public void testCompressUncompressSmall() throws IOException
     {
         File f = File.createTempFile(getName(), ".tmp", tmpDir);
-        FileSystemUtils.createFile(f, "a little data");
+        Files.write("a little data", f, Charset.defaultCharset());
         doCompressRoundTrip(f);
     }
 
@@ -93,9 +95,9 @@ public class ZipUtilsTest extends ZutubiTestCase
         File in = File.createTempFile(getName(), ".tmp", tmpDir);
         File compressed = new File(in.getAbsolutePath() + ".compressed");
         File uncompressed = new File(in.getAbsolutePath() + ".uncompressed");
-        FileSystemUtils.createFile(in, "a little data");
-        FileSystemUtils.createFile(compressed, "in the way");
-        FileSystemUtils.createFile(uncompressed, "also in the way");
+        Files.write("a little data", in, Charset.defaultCharset());
+        Files.write("in the way", compressed, Charset.defaultCharset());
+        Files.write("also in the way", uncompressed, Charset.defaultCharset());
 
         doCompressRoundTrip(in, compressed, uncompressed);
     }

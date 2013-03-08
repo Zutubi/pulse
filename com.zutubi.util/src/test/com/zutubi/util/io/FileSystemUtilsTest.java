@@ -453,7 +453,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 File from = new File(tmpDir, "from");
                 File to = new File(tmpDir, "to");
 
-                FileSystemUtils.createFile(from, "test");
+                Files.write("test", from, Charset.defaultCharset());
                 copier.copy(to, from);
                 assertFilesEqual(from, to);
             }
@@ -476,10 +476,10 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 File f4 = new File(nested, "f4");
 
                 Assert.assertTrue(nested.mkdirs());
-                FileSystemUtils.createFile(f1, "test f1");
-                FileSystemUtils.createFile(f2, "test f2");
-                FileSystemUtils.createFile(f3, "test f3");
-                FileSystemUtils.createFile(f4, "test f4");
+                Files.write("test f1", f1, Charset.defaultCharset());
+                Files.write("test f2", f2, Charset.defaultCharset());
+                Files.write("test f3", f3, Charset.defaultCharset());
+                Files.write("test f4", f4, Charset.defaultCharset());
 
                 copier.copy(toDir, fromDir);
                 assertDirectoriesEqual(fromDir, toDir);
@@ -504,10 +504,10 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
                 Assert.assertTrue(toDir.mkdirs());
                 Assert.assertTrue(nested.mkdirs());
-                FileSystemUtils.createFile(f1, "test f1");
-                FileSystemUtils.createFile(f2, "test f2");
-                FileSystemUtils.createFile(f3, "test f3");
-                FileSystemUtils.createFile(f4, "test f4");
+                Files.write("test f1", f1, Charset.defaultCharset());
+                Files.write("test f2", f2, Charset.defaultCharset());
+                Files.write("test f3", f3, Charset.defaultCharset());
+                Files.write("test f4", f4, Charset.defaultCharset());
 
                 copier.copy(toDir, fromDir);
                 assertDirectoriesEqual(fromDir, toDir);
@@ -522,10 +522,10 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             public void execute(Copier copier) throws IOException
             {
                 File src = new File(tmpDir, "src.txt");
-                FileSystemUtils.createFile(src, "Some text.");
+                Files.write("Some text.", src, Charset.defaultCharset());
 
                 File dest = new File(tmpDir, "dest.txt");
-                FileSystemUtils.createFile(dest, "Other text.");
+                Files.write("Other text.", dest, Charset.defaultCharset());
 
                 copier.copy(dest, src);
                 assertFilesEqual(src, dest);
@@ -540,7 +540,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             public void execute(Copier copier) throws IOException
             {
                 File src = new File(tmpDir, "src.txt");
-                FileSystemUtils.createFile(src, "Some text.");
+                Files.write("Some text.", src, Charset.defaultCharset());
 
                 File dest = new File(tmpDir, "dest");
                 Assert.assertTrue(dest.mkdirs());
@@ -559,9 +559,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             public void execute(Copier copier) throws IOException
             {
                 File srcA = new File(tmpDir, "srca.txt");
-                FileSystemUtils.createFile(srcA, "Some text.");
+                Files.write("Some text.", srcA, Charset.defaultCharset());
                 File srcB = new File(tmpDir, "srcb.txt");
-                FileSystemUtils.createFile(srcB, "Some text.");
+                Files.write("Some text.", srcB, Charset.defaultCharset());
 
                 File dest = new File(tmpDir, "dest");
 
@@ -582,9 +582,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             public void execute(Copier copier) throws IOException
             {
                 File srcA = new File(tmpDir, "srca.txt");
-                FileSystemUtils.createFile(srcA, "Some text.");
+                Files.write("Some text.", srcA, Charset.defaultCharset());
                 File srcB = new File(tmpDir, "srcb.txt");
-                FileSystemUtils.createFile(srcB, "Some text.");
+                Files.write("Some text.", srcB, Charset.defaultCharset());
 
                 File dest = new File(tmpDir, FileSystemUtils.composeFilename("dest", "nested"));
 
@@ -607,8 +607,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
                 File dir = new File(tmpDir, "dir");
                 dir.mkdirs();
 
-                FileSystemUtils.createFile(new File(dir, "a.txt"), "Text file a");
-                FileSystemUtils.createFile(new File(dir, "b.txt"), "Text file a");
+                Files.write("Text file a", new File(dir, "a.txt"), Charset.defaultCharset());
+                Files.write("Text file a", new File(dir, "b.txt"), Charset.defaultCharset());
 
                 File dest = new File(tmpDir, "dest");
                 Assert.assertFalse(dest.exists());
@@ -627,7 +627,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File from = new File(tmpDir, "from");
             File to = new File(tmpDir, "to");
 
-            FileSystemUtils.createFile(from, "test");
+            Files.write("test", from, Charset.defaultCharset());
             FileSystemUtils.setPermissions(from, 777);
             FileSystemUtils.unixCopy(to, from);
             assertEquals(777, FileSystemUtils.getPermissions(to));
@@ -639,7 +639,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         File from = new File(tmpDir, "from");
         File to = new File(tmpDir, "to");
 
-        FileSystemUtils.createFile(from, "test");
+        Files.write("test", from, Charset.defaultCharset());
         for (int i = 0; i < 2500; i++)
         {
             FileSystemUtils.copy(to, from);
@@ -675,7 +675,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     private File createSymlink(String content) throws IOException
     {
         File linkTarget = new File(tmpDir, "target");
-        FileSystemUtils.createFile(linkTarget, content);
+        Files.write(content, linkTarget, Charset.defaultCharset());
         File link = new File(tmpDir, "link");
         assertTrue(FileSystemUtils.createSymlink(link, linkTarget));
         return link;
@@ -693,7 +693,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         if (FileSystemUtils.LN_AVAILABLE)
         {
             File file = new File(tmpDir, "file");
-            FileSystemUtils.createFile(file, "data");
+            Files.write("data", file, Charset.defaultCharset());
             Assert.assertFalse(FileSystemUtils.isRelativeSymlink(file));
         }
     }
@@ -712,7 +712,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         {
             File file = new File(tmpDir, "file");
             File link = new File(tmpDir, "link");
-            FileSystemUtils.createFile(file, "data");
+            Files.write("data", file, Charset.defaultCharset());
             FileSystemUtils.createSymlink(link, file);
 
             Assert.assertTrue(FileSystemUtils.isRelativeSymlink(link));
@@ -740,7 +740,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File file = new File(link, "file");
             dir.mkdir();
             FileSystemUtils.createSymlink(link, dir);
-            FileSystemUtils.createFile(file, "data");
+            Files.write("data", file, Charset.defaultCharset());
 
             Assert.assertTrue(FileSystemUtils.isRelativeSymlink(link));
             Assert.assertFalse(FileSystemUtils.isRelativeSymlink(file));
@@ -757,7 +757,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             File fileLink = new File(dirLink, "filelink");
             dir.mkdir();
             FileSystemUtils.createSymlink(dirLink, dir);
-            FileSystemUtils.createFile(file, "data");
+            Files.write("data", file, Charset.defaultCharset());
             FileSystemUtils.createSymlink(fileLink, file);
 
             Assert.assertTrue(FileSystemUtils.isRelativeSymlink(dirLink));
@@ -886,7 +886,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             assertTrue(linkTarget.mkdir());
 
             File fileUnderLinkTarget = new File(linkTarget, "f.txt");
-            FileSystemUtils.createFile(fileUnderLinkTarget, "some text");
+            Files.write("some text", fileUnderLinkTarget, Charset.defaultCharset());
             assertTrue(fileUnderLinkTarget.exists());
 
             File dir = new File(tmpDir, "dir");
@@ -1001,7 +1001,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, src, Charset.defaultCharset());
 
         FileSystemUtils.rename(src, dest, false);
 
@@ -1039,7 +1039,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, src, Charset.defaultCharset());
 
         FileSystemUtils.robustRename(src, dest);
 
@@ -1077,7 +1077,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, src, Charset.defaultCharset());
         assertTrue(dest.mkdir());
 
         try
@@ -1095,7 +1095,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, src, Charset.defaultCharset());
         assertTrue(dest.mkdir());
 
         try
@@ -1131,7 +1131,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         File src = new File(tmpDir, "src");
         File dest = new File(tmpDir, "dest");
-        FileSystemUtils.createFile(src, TEST_FILE_CONTENT);
+        Files.write(TEST_FILE_CONTENT, src, Charset.defaultCharset());
         assertTrue(dest.mkdir());
 
         FileSystemUtils.rename(src, dest, true);
@@ -1365,9 +1365,9 @@ public class FileSystemUtilsTest extends ZutubiTestCase
 
         assertTrue(dir.mkdir());
         assertTrue(file1.createNewFile());
-        FileSystemUtils.createFile(file2, "some content\nin this file\n");
+        Files.write("some content\nin this file\n", file2, Charset.defaultCharset());
         assertTrue(nestedDir.mkdir());
-        FileSystemUtils.createFile(nestedFile, "yay");
+        Files.write("yay", nestedFile, Charset.defaultCharset());
     }
 
     private String getOtherSeparator()
@@ -1405,8 +1405,8 @@ public class FileSystemUtilsTest extends ZutubiTestCase
         File f1 = new File(tmpDir, "f1");
         File f2 = new File(tmpDir, "f2");
 
-        FileSystemUtils.createFile(f1, s1);
-        FileSystemUtils.createFile(f2, s2);
+        Files.write(s1, f1, Charset.defaultCharset());
+        Files.write(s2, f2, Charset.defaultCharset());
 
         assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
     }

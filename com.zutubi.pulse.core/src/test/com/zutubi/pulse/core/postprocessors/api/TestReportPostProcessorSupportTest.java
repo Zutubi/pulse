@@ -2,16 +2,18 @@ package com.zutubi.pulse.core.postprocessors.api;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.FileSystemUtils;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCase
 {
@@ -43,16 +45,14 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     public void testExpectedFailureFile() throws IOException
     {
         File failureFile = new File(tempDir, "failures.txt");
-        FileSystemUtils.createFile(failureFile,
-                StringUtils.join("\n",
-                        makeTestPath(SUITE_TOP, CASE_PASSED),
-                        makeTestPath(SUITE_TOP, CASE_EXPECTED_FAILURE),
-                        makeTestPath(SUITE_TOP, CASE_FAILED),
-                        makeTestPath(SUITE_TOP, CASE_ERRORED),
-                        makeTestPath(SUITE_TOP, "random case"),
-                        makeTestPath(SUITE_TOP, CASE_SKIPPED),
-                        makeTestPath("random suite", CASE_FAILED))
-        );
+        Files.write(StringUtils.join("\n",
+                                     makeTestPath(SUITE_TOP, CASE_PASSED),
+                                     makeTestPath(SUITE_TOP, CASE_EXPECTED_FAILURE),
+                                     makeTestPath(SUITE_TOP, CASE_FAILED),
+                                     makeTestPath(SUITE_TOP, CASE_ERRORED),
+                                     makeTestPath(SUITE_TOP, "random case"),
+                                     makeTestPath(SUITE_TOP, CASE_SKIPPED),
+                                     makeTestPath("random suite", CASE_FAILED)), failureFile, Charset.defaultCharset());
 
         Config config = new Config(failureFile.getName());
         TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
@@ -76,14 +76,12 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     public void testExpectedFailureFileNestedSuite() throws IOException
     {
         File failureFile = new File(tempDir, "failures.txt");
-        FileSystemUtils.createFile(failureFile,
-                StringUtils.join("\n",
-                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_PASSED),
-                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_EXPECTED_FAILURE),
-                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_FAILED),
-                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_ERRORED),
-                        makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_SKIPPED))
-        );
+        Files.write(StringUtils.join("\n",
+                                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_PASSED),
+                                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_EXPECTED_FAILURE),
+                                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_FAILED),
+                                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_ERRORED),
+                                     makeTestPath(SUITE_TOP, SUITE_NESTED, CASE_SKIPPED)), failureFile, Charset.defaultCharset());
 
         Config config = new Config(failureFile.getName());
         TestSuiteResult testSuiteResult = runProcessorAndGetTests(new Processor(config, makeSuite()));
@@ -107,14 +105,12 @@ public class TestReportPostProcessorSupportTest extends TestPostProcessorTestCas
     public void testExpectedFailureFileWrappingSuite() throws IOException
     {
         File failureFile = new File(tempDir, "failures.txt");
-        FileSystemUtils.createFile(failureFile,
-                                   StringUtils.join("\n",
-                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
-                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
-                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
-                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
-                                                    makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED))
-        );
+        Files.write(StringUtils.join("\n",
+                                     makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_PASSED),
+                                     makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_EXPECTED_FAILURE),
+                                     makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_FAILED),
+                                     makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_ERRORED),
+                                     makeTestPath(SUITE_WRAPPING, SUITE_TOP, CASE_SKIPPED)), failureFile, Charset.defaultCharset());
 
         Config config = new Config(failureFile.getName());
         config.setSuite(SUITE_WRAPPING);

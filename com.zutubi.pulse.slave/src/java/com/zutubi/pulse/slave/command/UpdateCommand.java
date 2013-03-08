@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave.command;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -270,7 +272,7 @@ public class UpdateCommand implements Runnable
     private void updateActiveVersion(File pulseHome) throws IOException
     {
         File activeVersionFile = PulseCtl.getActiveVersionFile(pulseHome);
-        FileSystemUtils.createFile(activeVersionFile, build);
+        Files.write(build, activeVersionFile, Charset.defaultCharset());
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

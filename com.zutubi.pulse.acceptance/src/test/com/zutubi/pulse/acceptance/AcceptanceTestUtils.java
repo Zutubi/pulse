@@ -505,7 +505,7 @@ public class AcceptanceTestUtils
         String manifest = Files.toString(manifestFile, Charset.defaultCharset());
         manifest = manifest.replaceAll(PLUGIN_ID_TEST, id);
         manifest = manifest.replaceAll("Test Post-Processor", name);
-        FileSystemUtils.createFile(manifestFile, manifest);
+        Files.write(manifest, manifestFile, Charset.defaultCharset());
     }
 
     private static void rewritePluginXml(String id, File unzipDir) throws IOException
@@ -513,7 +513,7 @@ public class AcceptanceTestUtils
         File pluginXmlFile = new File(unzipDir, "plugin.xml");
         String xml = Files.toString(pluginXmlFile, Charset.defaultCharset());
         xml = xml.replaceAll("test\\.pp", id + ".pp");
-        FileSystemUtils.createFile(pluginXmlFile, xml);
+        Files.write(xml, pluginXmlFile, Charset.defaultCharset());
     }
 
     private static void rewritePluginSymbolicName(String id, File unzipDir) throws IOException

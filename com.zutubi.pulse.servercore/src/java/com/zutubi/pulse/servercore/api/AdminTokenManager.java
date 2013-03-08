@@ -1,11 +1,12 @@
 package com.zutubi.pulse.servercore.api;
 
+import com.google.common.io.Files;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Manages a random, single-use admin token that is used by local command line
@@ -56,7 +57,7 @@ public class AdminTokenManager
         adminToken = RandomUtils.randomString(128);
         try
         {
-            FileSystemUtils.createFile(tokenFile, adminToken);
+            Files.write(adminToken, tokenFile, Charset.defaultCharset());
         }
         catch (IOException e)
         {

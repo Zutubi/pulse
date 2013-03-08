@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance.utils.workspace;
 
+import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDepth;
@@ -13,6 +14,7 @@ import org.tmatesoft.svn.core.wc.*;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Utility class that provides assistance when working with an svn workspace.
@@ -120,7 +122,7 @@ public class SubversionWorkspace implements Closeable
         {
             throw new AssertionError("Attempt to edit file that does not exist (" + filename + ")");
         }
-        FileSystemUtils.createFile(file, newContent);
+        Files.write(newContent, file, Charset.defaultCharset());
         return doCommit(comment, file);
     }
 

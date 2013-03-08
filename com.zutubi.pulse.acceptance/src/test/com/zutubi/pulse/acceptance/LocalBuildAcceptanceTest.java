@@ -53,7 +53,7 @@ public class LocalBuildAcceptanceTest extends DevToolsTestBase
     private void createTrivialPulseFile() throws IOException
     {
         File pulseFile = new File(tmpDir, DEFAULT_PULSE_FILE);
-        FileSystemUtils.createFile(pulseFile, TRIVIAL_PULSE_FILE);
+        Files.write(TRIVIAL_PULSE_FILE, pulseFile, Charset.defaultCharset());
     }
 
     private void assertTrivialCommandOutput() throws IOException

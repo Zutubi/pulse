@@ -2,25 +2,23 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectHealth;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.zutubi.util.Constants.MINUTE;
@@ -373,7 +371,7 @@ public class MonitorXmlRpcAcceptanceTest extends AcceptanceTestBase
         SubversionWorkspace workspace = new SubversionWorkspace(workingCopy, "pulse", "pulse");
         workspace.doCheckout(Constants.TRIVIAL_ANT_REPOSITORY);
         File newFile = new File(workingCopy, "file.txt");
-        FileSystemUtils.createFile(newFile, "new file");
+        Files.write("new file", newFile, Charset.defaultCharset());
         workspace.doAdd(newFile);
 
         PersonalBuildRunner buildRunner = new PersonalBuildRunner(rpcClient.RemoteApi);

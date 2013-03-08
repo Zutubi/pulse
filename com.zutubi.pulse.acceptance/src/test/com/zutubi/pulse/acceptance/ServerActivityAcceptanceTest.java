@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.components.pulse.server.ActiveBuildsTable;
 import com.zutubi.pulse.acceptance.components.pulse.server.QueuedBuildsTable;
 import com.zutubi.pulse.acceptance.components.table.ContentTable;
@@ -14,6 +15,7 @@ import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -375,7 +377,7 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         File waitFile = waitFiles.get(asPair(project, buildId));
         if (!waitFile.isFile())
         {
-            FileSystemUtils.createFile(waitFile, "test");
+            Files.write("test", waitFile, Charset.defaultCharset());
         }
         rpcClient.RemoteApi.waitForBuildToComplete(project, buildId);
     }

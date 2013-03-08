@@ -1,11 +1,13 @@
 package com.zutubi.util;
 
+import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 
 import static com.zutubi.util.Constants.UTF8;
@@ -125,7 +127,7 @@ public class SecurityUtilsTest extends ZutubiTestCase
     public void testMD5File() throws IOException, NoSuchAlgorithmException
     {
         File file = FileSystemUtils.createTempFile(FileSystemUtils.getSystemTempDir());
-        FileSystemUtils.createFile(file, STRING_HELLO);
+        Files.write(STRING_HELLO, file, Charset.defaultCharset());
         try
         {
             assertEquals(MD5_HELLO, SecurityUtils.digest(ALGORITHM_MD5, file));

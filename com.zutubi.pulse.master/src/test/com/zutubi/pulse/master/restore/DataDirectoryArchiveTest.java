@@ -4,7 +4,6 @@ import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
-import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.junit.IOAssertions;
 
 import java.io.File;
@@ -68,11 +67,11 @@ public class DataDirectoryArchiveTest extends PulseTestCase
         File restoreData = new File(tmp, "data-restore");
 
         File databaseProperties = new File(data, "config/database.properties");
-        FileSystemUtils.createFile(databaseProperties, "backup");
+        Files.write("backup", databaseProperties, Charset.defaultCharset());
 
         File newDatabaseProperties = new File(restoreData, "config/database.properties");
         assertTrue(newDatabaseProperties.getParentFile().mkdirs());
-        FileSystemUtils.createFile(newDatabaseProperties, "new");
+        Files.write("new", newDatabaseProperties, Charset.defaultCharset());
 
         backupAndRestore(restoreData);
 

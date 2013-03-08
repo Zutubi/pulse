@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.dependency.ivy;
 
 import com.caucho.hessian.io.AbstractDeserializer;
 import com.caucho.hessian.io.AbstractHessianInput;
+import com.google.common.io.Files;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptorParser;
 import com.zutubi.util.StringUtils;
@@ -13,6 +14,7 @@ import org.apache.ivy.plugins.repository.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 
 /**
@@ -67,7 +69,7 @@ public class ModuleDescriptorDeserialiser extends AbstractDeserializer
         {
             tmp = createTempFile();
 
-            FileSystemUtils.createFile(tmp, descriptor);
+            Files.write(descriptor, tmp, Charset.defaultCharset());
 
             // the name for this resource is pretty arbitrary at the moment, just something that
             // is at least somewhat indicative of what the resource represents.  I don't think it

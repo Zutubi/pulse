@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.util.adt.CircularBuffer;
-import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.Tail;
 import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -236,7 +237,7 @@ public class LogFile
             try
             {
                 Tail tail = new Tail(tailLimit, file);
-                FileSystemUtils.createFile(tailFile, tail.getTail());
+                Files.write(tail.getTail(), tailFile, Charset.defaultCharset());
                 ZipUtils.compressFile(file, zipFile);
                 cleanUp(file);
             }

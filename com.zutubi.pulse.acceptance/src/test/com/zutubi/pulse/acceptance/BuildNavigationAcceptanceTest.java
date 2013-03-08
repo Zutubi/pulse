@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.pages.PulseToolbar;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
@@ -11,9 +12,9 @@ import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 /**
  * Acceptance tests for the build navigation portion of the breadcrumbs.
@@ -198,7 +199,7 @@ public class BuildNavigationAcceptanceTest extends AcceptanceTestBase
 
         // make a change to the working copy so that we can run personal builds.
         File newFile = new File(workingCopy, "file.txt");
-        FileSystemUtils.createFile(newFile, "new file");
+        Files.write("new file", newFile, Charset.defaultCharset());
         workspace.doAdd(newFile);
 
         PersonalBuildRunner buildRunner = new PersonalBuildRunner(rpcClient.RemoteApi);

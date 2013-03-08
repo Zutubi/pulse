@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.google.common.io.Files;
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
@@ -14,7 +14,6 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -35,12 +34,16 @@ import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipes.
@@ -342,7 +345,7 @@ public class RecipeProcessor
     private void storePulseFile(String pulseFileContent, PulseExecutionContext context) throws IOException
     {
         RecipePaths paths = context.getValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
-        FileSystemUtils.createFile(new File(paths.getOutputDir(), PULSE_FILE), pulseFileContent);
+        Files.write(pulseFileContent, new File(paths.getOutputDir(), PULSE_FILE), Charset.defaultCharset());
     }
 
     public void executeRecipe(RecipeConfiguration config, RecipeLoadInterceptor loadInterceptor, RecipeStatus status, PulseExecutionContext context, File outputDir)

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.util;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -9,6 +10,7 @@ import com.zutubi.util.io.ZipUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -188,7 +190,7 @@ public class PulseZipUtils
                     File testDir = new File(tmpDir, "test");
                     FileSystemUtils.createDirectory(testDir);
                     File testFile = new File(testDir, "afile");
-                    FileSystemUtils.createFile(testFile, "content");
+                    Files.write("content", testFile, Charset.defaultCharset());
                     File zipFile = new File(tmpDir, "test.zip");
 
                     createZipExternal(zipFile, testDir, null);
@@ -358,7 +360,7 @@ public class PulseZipUtils
                     File testDir = new File(tmpDir, "test");
                     FileSystemUtils.createDirectory(testDir);
                     File testFile = new File(testDir, "afile");
-                    FileSystemUtils.createFile(testFile, "content");
+                    Files.write("content", testFile, Charset.defaultCharset());
                     File zipFile = new File(tmpDir, "test.zip");
 
                     createZipInternal(zipFile, testDir, testDir);

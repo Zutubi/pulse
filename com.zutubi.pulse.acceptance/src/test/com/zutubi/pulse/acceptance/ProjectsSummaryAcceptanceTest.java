@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.pages.ProjectsSummaryPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
@@ -10,6 +11,7 @@ import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 
 /**
@@ -75,7 +77,7 @@ public class ProjectsSummaryAcceptanceTest extends AcceptanceTestBase
                 }
             }, SeleniumBrowser.DEFAULT_TIMEOUT, "build to start");
 
-            FileSystemUtils.createFile(waitFile, "test");
+            Files.write("test", waitFile, Charset.defaultCharset());
             rpcClient.RemoteApi.waitForBuildToComplete(childProject, 1);
             getBrowser().refresh();
             TestUtils.waitForCondition(new Condition() {
