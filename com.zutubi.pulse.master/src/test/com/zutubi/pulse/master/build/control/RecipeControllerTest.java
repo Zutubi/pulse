@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
@@ -36,9 +35,12 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.io.FileSystemUtils;
+import org.mockito.Matchers;
 
 import java.io.File;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import static org.mockito.Mockito.*;
@@ -62,7 +64,8 @@ public class RecipeControllerTest extends PulseTestCase
         super.setUp();
         recipeDir = FileSystemUtils.createTempDir(RecipeControllerTest.class.getName(), "");
 
-        RecordingRecipeResultCollector resultCollector = new RecordingRecipeResultCollector();
+        RecipeResultCollector resultCollector = mock(RecipeResultCollector.class);
+        stub(resultCollector.getRecipeDir(Matchers.<BuildResult>anyObject(), anyLong())).toReturn(recipeDir);
         recipeQueue = new RecordingRecipeQueue();
         buildManager = mock(BuildManager.class);
         buildService = mock(AgentService.class);
@@ -307,33 +310,6 @@ public class RecipeControllerTest extends PulseTestCase
         assertEquals(ResultState.ERROR, recipeResult.getState());
         assertEquals(error.getErrorMessage(), recipeResult.getFeatures(Feature.Level.ERROR).get(0).getSummary());
         verify(buildManager, atLeastOnce()).save(recipeResult);
-    }
-
-    class RecordingRecipeResultCollector implements RecipeResultCollector
-    {
-        private Set<Long> preparedRecipes = new TreeSet<Long>();
-        private Map<Long, AgentService> collectedRecipes = new TreeMap<Long, AgentService>();
-        private Map<Long, AgentService> cleanedRecipes = new TreeMap<Long, AgentService>();
-
-        public void prepare(BuildResult result, long recipeId)
-        {
-            preparedRecipes.add(recipeId);
-        }
-
-        public void collect(BuildResult result, long recipeId, ExecutionContext context, AgentService agentService)
-        {
-            collectedRecipes.put(recipeId, agentService);
-        }
-
-        public void cleanup(long recipeId, ExecutionContext context, AgentService agentService)
-        {
-            cleanedRecipes.put(recipeId, agentService);
-        }
-
-        public File getRecipeDir(BuildResult result, long recipeId)
-        {
-            return recipeDir;
-        }
     }
 
     class RecordingRecipeQueue implements RecipeQueue
