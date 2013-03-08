@@ -2,6 +2,7 @@ package com.zutubi.util.io;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -416,7 +417,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", in);
             FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
 
-            byte[] got = IOUtils.fileToBytes(test);
+            byte[] got = ByteStreams.toByteArray(Files.newInputStreamSupplier(test));
             Assert.assertEquals(out.length, got.length);
             for (int i = 0; i < out.length; i++)
             {

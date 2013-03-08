@@ -109,25 +109,6 @@ public class IOUtils
         }
     }
 
-    public static byte[] fileToBytes(File file) throws IOException
-    {
-        FileInputStream is = null;
-        ByteArrayOutputStream os = null;
-
-        try
-        {
-            is = new FileInputStream(file);
-            os = new ByteArrayOutputStream((int) file.length());
-            ByteStreams.copy(is, os);
-            return os.toByteArray();
-        }
-        finally
-        {
-            close(is);
-            close(os);
-        }
-    }
-
     public static void forEachLine(File file, UnaryProcedure<String> p) throws IOException
     {
         BufferedReader reader = null;
