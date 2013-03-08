@@ -50,22 +50,6 @@ public class CollectionUtils
         return new Pair<T,U>(first, second);
     }
 
-    public static <T, U> Map<T, U> asMap(Pair<? extends T, ? extends U>... pairs)
-    {
-        return asMap(Arrays.asList(pairs));
-    }
-
-    public static <T, U> Map<T, U> asMap(Collection<? extends Pair<? extends T, ? extends U>> pairs)
-    {
-        HashMap<T, U> result = new HashMap<T,U>(pairs.size());
-        for(Pair<? extends T, ? extends U> pair: pairs)
-        {
-            result.put(pair.first, pair.second);
-        }
-
-        return result;
-    }
-
     public static <T, U> Map<T, U> asOrderedMap(Pair<? extends T, ? extends U>... pairs)
     {
         return asOrderedMap(Arrays.asList(pairs));

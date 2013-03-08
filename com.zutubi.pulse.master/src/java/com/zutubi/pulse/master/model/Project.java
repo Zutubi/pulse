@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.EnumUtils;
 
 import java.util.Map;
@@ -103,10 +103,10 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIAL),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
-                            CollectionUtils.asPair(Transition.DELETE, DELETING)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, INITIAL,
+                            Transition.INITIALISE, INITIALISING,
+                            Transition.DELETE, DELETING
                     );
                 }
 
@@ -142,10 +142,10 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIALISATION_FAILED),
-                            CollectionUtils.asPair(Transition.INITIALISE_FAILURE, INITIALISATION_FAILED),
-                            CollectionUtils.asPair(Transition.INITIALISE_SUCCESS, IDLE)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, INITIALISATION_FAILED,
+                            Transition.INITIALISE_FAILURE, INITIALISATION_FAILED,
+                            Transition.INITIALISE_SUCCESS, IDLE
                     );
                 }
 
@@ -180,10 +180,10 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIALISATION_FAILED),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
-                            CollectionUtils.asPair(Transition.DELETE, DELETING)
+                    validTransitions = ImmutableMap.of(
+                        Transition.STARTUP, INITIALISATION_FAILED,
+                        Transition.INITIALISE, INITIALISING,
+                        Transition.DELETE, DELETING
                     );
                 }
 
@@ -217,10 +217,10 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIALISATION_FAILED),
-                            CollectionUtils.asPair(Transition.IDLE, INITIALISING),
-                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, INITIALISATION_FAILED,
+                            Transition.IDLE, INITIALISING,
+                            Transition.CLEANUP, CLEANUP_ON_IDLE
                     );
                 }
 
@@ -253,14 +253,14 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, IDLE),
-                            CollectionUtils.asPair(Transition.BUILDING, BUILDING),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
-                            CollectionUtils.asPair(Transition.PAUSE, PAUSED),
-                            CollectionUtils.asPair(Transition.CLEANUP, CLEANING),
-                            CollectionUtils.asPair(Transition.DELETE, DELETING)
-                    );
+                    validTransitions = new ImmutableMap.Builder<Transition, State>()
+                            .put(Transition.STARTUP, IDLE)
+                            .put(Transition.BUILDING, BUILDING)
+                            .put(Transition.INITIALISE, INITIALISING)
+                            .put(Transition.PAUSE, PAUSED)
+                            .put(Transition.CLEANUP, CLEANING)
+                            .put(Transition.DELETE, DELETING)
+                            .build();
                 }
                 return validTransitions;
             }
@@ -291,12 +291,12 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, IDLE),
-                            CollectionUtils.asPair(Transition.IDLE, IDLE),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISE_ON_IDLE),
-                            CollectionUtils.asPair(Transition.PAUSE, PAUSE_ON_IDLE),
-                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, IDLE,
+                            Transition.IDLE, IDLE,
+                            Transition.INITIALISE, INITIALISE_ON_IDLE,
+                            Transition.PAUSE, PAUSE_ON_IDLE,
+                            Transition.CLEANUP, CLEANUP_ON_IDLE
                     );
                 }
                 return validTransitions;
@@ -328,12 +328,12 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, PAUSED),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISING),
-                            CollectionUtils.asPair(Transition.RESUME, IDLE),
-                            CollectionUtils.asPair(Transition.CLEANUP, CLEANING),
-                            CollectionUtils.asPair(Transition.DELETE, DELETING)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, PAUSED,
+                            Transition.INITIALISE, INITIALISING,
+                            Transition.RESUME, IDLE,
+                            Transition.CLEANUP, CLEANING,
+                            Transition.DELETE, DELETING
                     );
                 }
 
@@ -366,12 +366,12 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, PAUSED),
-                            CollectionUtils.asPair(Transition.INITIALISE, INITIALISE_ON_IDLE),
-                            CollectionUtils.asPair(Transition.IDLE, PAUSED),
-                            CollectionUtils.asPair(Transition.RESUME, BUILDING),
-                            CollectionUtils.asPair(Transition.CLEANUP, CLEANUP_ON_IDLE)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, PAUSED,
+                            Transition.INITIALISE, INITIALISE_ON_IDLE,
+                            Transition.IDLE, PAUSED,
+                            Transition.RESUME, BUILDING,
+                            Transition.CLEANUP, CLEANUP_ON_IDLE
                     );
                 }
 
@@ -405,9 +405,9 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, INITIAL),
-                            CollectionUtils.asPair(Transition.CLEANED, INITIAL)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, INITIAL,
+                            Transition.CLEANED, INITIAL
                     );
                 }
 
@@ -441,9 +441,9 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, IDLE),
-                            CollectionUtils.asPair(Transition.IDLE, CLEANING)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, IDLE,
+                            Transition.IDLE, CLEANING
                     );
                 }
 
@@ -477,8 +477,8 @@ public class Project extends Entity implements NamedEntity
             {
                 if (validTransitions == null)
                 {
-                    validTransitions = CollectionUtils.asMap(
-                            CollectionUtils.asPair(Transition.STARTUP, DELETING)
+                    validTransitions = ImmutableMap.of(
+                            Transition.STARTUP, DELETING
                     );
                 }
 

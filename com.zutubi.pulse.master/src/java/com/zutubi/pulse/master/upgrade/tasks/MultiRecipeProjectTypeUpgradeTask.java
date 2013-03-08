@@ -1,15 +1,13 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.pulse.master.util.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.adt.Pair;
 
 import java.util.*;
 
@@ -81,55 +79,56 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
     {
         HashMap<String, TypeMapping> mappings = new HashMap<String, TypeMapping>();
 
-        mappings.put("zutubi.antTypeConfig", new TypeMapping("zutubi.antCommandConfig",
-                asPair("work", "workingDir"),
-                asPair("file", "buildFile"),
-                asPair("target", "targets"),
-                asPair("args", "args")));
+        mappings.put("zutubi.antTypeConfig", new TypeMapping("zutubi.antCommandConfig", ImmutableMap.of(
+                "work", "workingDir",
+                "file", "buildFile",
+                "target", "targets",
+                "args", "args")));
 
-        mappings.put("zutubi.bjamTypeConfig", new TypeMapping("zutubi.bjamCommandConfig",
-                asPair("work", "workingDir"),
-                asPair("file", "jamfile"),
-                asPair("target", "targets"),
-                asPair("args", "args")));
+        mappings.put("zutubi.bjamTypeConfig", new TypeMapping("zutubi.bjamCommandConfig", ImmutableMap.of(
+                "work", "workingDir",
+                "file", "jamfile",
+                "target", "targets",
+                "args", "args")));
 
-        mappings.put("zutubi.executableTypeConfig", new TypeMapping("zutubi.executableCommandConfig",
-                asPair("workingDir", "workingDir"),
-                asPair("executable", "exe"),
-                asPair("arguments", "args")));
+        mappings.put("zutubi.executableTypeConfig", new TypeMapping("zutubi.executableCommandConfig", ImmutableMap.of(
+                "workingDir", "workingDir",
+                "executable", "exe",
+                "arguments", "args")));
 
-        mappings.put("zutubi.makeTypeConfig", new TypeMapping("zutubi.makeCommandConfig",
-                asPair("workingDir", "workingDir"),
-                asPair("makefile", "makefile"),
-                asPair("targets", "targets"),
-                asPair("arguments", "args")));
+        mappings.put("zutubi.makeTypeConfig", new TypeMapping("zutubi.makeCommandConfig", ImmutableMap.of(
+                "workingDir", "workingDir",
+                "makefile", "makefile",
+                "targets", "targets",
+                "arguments", "args")));
 
-        mappings.put("zutubi.mavenTypeConfig", new TypeMapping("zutubi.mavenCommandConfig",
-                asPair("workingDir", "workingDir"),
-                asPair("targets", "targets"),
-                asPair("arguments", "args")));
+        mappings.put("zutubi.mavenTypeConfig", new TypeMapping("zutubi.mavenCommandConfig", ImmutableMap.of(
+                "workingDir", "workingDir",
+                "targets", "targets",
+                "arguments", "args")));
 
-        mappings.put("zutubi.maven2TypeConfig", new TypeMapping("zutubi.maven2CommandConfig",
-                asPair("workingDir", "workingDir"),
-                asPair("goals", "goals"),
-                asPair("arguments", "args")));
+        mappings.put("zutubi.maven2TypeConfig", new TypeMapping("zutubi.maven2CommandConfig", ImmutableMap.of(
+                "workingDir", "workingDir",
+                "goals", "goals",
+                "arguments", "args")));
 
-        TypeMapping msBuildMapping = new TypeMapping("zutubi.msbuildCommandConfig",
-                asPair("workingDirectory", "workingDir"),
-                asPair("buildFile", "buildFile"),
-                asPair("targets", "targets"),
-                asPair("configuration", "configuration"),
-                asPair("arguments", "args"));
+        TypeMapping msBuildMapping = new TypeMapping("zutubi.msbuildCommandConfig", ImmutableMap.of(
+                "workingDirectory", "workingDir",
+                "buildFile", "buildFile",
+                "targets", "targets",
+                "configuration", "configuration",
+                "arguments", "args"));
         msBuildMapping.addDeepCopiedProperty("buildProperties");
         mappings.put("zutubi.msbuildTypeConfig", msBuildMapping);
 
-        TypeMapping xcodeMapping = new TypeMapping("zutubi.xcodeCommandConfig",
-                asPair("workingDir", "workingDir"),
-                asPair("config", "config"),
-                asPair("project", "project"),
-                asPair("target", "target"),
-                asPair("action", "buildaction"),
-                asPair("settings", "settings"));
+        TypeMapping xcodeMapping = new TypeMapping("zutubi.xcodeCommandConfig", new ImmutableMap.Builder<String, String>()
+                .put("workingDir", "workingDir")
+                .put("config", "config")
+                .put("project", "project")
+                .put("target", "target")
+                .put("action", "buildaction")
+                .put("settings", "settings")
+                .build());
         xcodeMapping.addPropertyFunction("settings", new Function<Object, Object>()
         {
             public Object apply(Object o)
@@ -335,10 +334,10 @@ public class MultiRecipeProjectTypeUpgradeTask extends AbstractUpgradeTask
         private Map<String, Function<Object, Object>> propertyFunctions = new HashMap<String, Function<Object, Object>>();
         private Set<String> deepCopiedProperties = new HashSet<String>();
 
-        public TypeMapping(String toSymbolicName, Pair<String, String>... propertyMappings)
+        public TypeMapping(String toSymbolicName, Map<String, String> propertyMappings)
         {
             this.toSymbolicName = toSymbolicName;
-            this.propertyMappings = CollectionUtils.asMap(propertyMappings);
+            this.propertyMappings = propertyMappings;
         }
 
         public void addPropertyFunction(String name, Function<Object, Object> f)

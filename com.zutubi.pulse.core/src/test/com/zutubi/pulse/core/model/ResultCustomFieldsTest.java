@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core.model;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.File;
 import java.util.Map;
-
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class ResultCustomFieldsTest extends PulseTestCase
 {
@@ -32,27 +30,27 @@ public class ResultCustomFieldsTest extends PulseTestCase
 
     public void testSimpleProperties()
     {
-        roundTrip(asMap(asPair("field1", "value1"), asPair("field2", "value2")));
+        roundTrip(ImmutableMap.of("field1", "value1", "field2", "value2"));
     }
 
     public void testExoticPropertyName()
     {
-        roundTrip(asMap(asPair(PUNCTUATION, "value")));
+        roundTrip(ImmutableMap.of(PUNCTUATION, "value"));
     }
 
     public void testExoticPropertyValue()
     {
-        roundTrip(asMap(asPair("field", PUNCTUATION)));
+        roundTrip(ImmutableMap.of("field", PUNCTUATION));
     }
 
     public void testLoadAfterUpdate()
     {
-        resultCustomFields.store(asMap(asPair("field1", "original value")));
+        resultCustomFields.store(ImmutableMap.of("field1", "original value"));
         Map<String, String> fields = resultCustomFields.load();
         assertEquals(1, fields.size());
         assertEquals("original value", fields.get("field1"));
 
-        resultCustomFields.store(asMap(asPair("field1", "new value"), asPair("field2", "value")));
+        resultCustomFields.store(ImmutableMap.of("field1", "new value", "field2", "value"));
         fields = resultCustomFields.load();
         assertEquals(2, fields.size());
         assertEquals("new value", fields.get("field1"));

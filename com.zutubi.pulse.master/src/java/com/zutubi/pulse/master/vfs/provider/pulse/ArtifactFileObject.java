@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
@@ -13,8 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.util.CollectionUtils.asMap;
 
 /**
  * Represents a single artifact in an artifacts tree.
@@ -228,6 +226,6 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     @Override
     public Map<String, Object> getExtraAttributes()
     {
-        return asMap(CollectionUtils.<String, Object>asPair("actions", getActions()));
+        return ImmutableMap.<String, Object>of("actions", getActions());
     }
 }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +33,7 @@ class PathRecordLocator implements RecordLocator
         }
         else
         {
-            return CollectionUtils.asMap(CollectionUtils.asPair(path, record));
+            return ImmutableMap.of(path, record);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.events.*;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -19,17 +19,17 @@ import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.variables.GenericVariable;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -1212,7 +1212,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     private HostStatus createBuildingStatus(long agentId, long recipeId)
     {
-        return new HostStatus(asMap(asPair(agentIdToHandle(agentId), recipeId)), false);
+        return new HostStatus(ImmutableMap.of(agentIdToHandle(agentId), recipeId), false);
     }
     
     private void sendPing(Agent agent, HostStatus status)

@@ -1,6 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.Ordered;
@@ -23,7 +24,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.zutubi.tove.type.record.PathUtils.getBaseName;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import static com.zutubi.util.CollectionUtils.*;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -313,7 +313,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("1"));
         configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("2"));
 
-        configurationRefactoringManager.clone(SAMPLE_SCOPE, asMap(asPair("1", "clone of 1"), asPair("2", "clone of 2")));
+        configurationRefactoringManager.clone(SAMPLE_SCOPE, ImmutableMap.of("1", "clone of 1", "2", "clone of 2"));
 
         assertClone(configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 1"), ConfigA.class), "1");
         assertClone(configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 2"), ConfigA.class), "2");
@@ -359,7 +359,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         instance2.setRefToRef(instance1.getRef());
         String path2 = configurationTemplateManager.insert(SAMPLE_SCOPE, instance2);
 
-        configurationRefactoringManager.clone(SAMPLE_SCOPE, asMap(asPair("1", "clone of 1"), asPair("2", "clone of 2")));
+        configurationRefactoringManager.clone(SAMPLE_SCOPE, ImmutableMap.of("1", "clone of 1", "2", "clone of 2"));
 
         instance1 = configurationTemplateManager.getInstance(path1, ConfigA.class);
         instance2 = configurationTemplateManager.getInstance(path2, ConfigA.class);
@@ -375,12 +375,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testMultipleCloneOfTemplateHierarchy() throws TypeException
     {
-        templateHierarchyHelper(asMap(asPair("parent", "clone of parent"), asPair("child", "clone of child")));
+        templateHierarchyHelper(ImmutableMap.of("parent", "clone of parent", "child", "clone of child"));
     }
 
     public void testMultipleCloneOfTemplateHierarchyChildFirst() throws TypeException
     {
-        templateHierarchyHelper(asMap(asPair("child", "clone of child"), asPair("parent", "clone of parent")));
+        templateHierarchyHelper(ImmutableMap.of("child", "clone of child", "parent", "clone of parent"));
     }
 
     public void testMultipleCloneWithReferenceBetweenInInheritedMapItem() throws TypeException
@@ -398,7 +398,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         mapItem.setRefToA(child2Instance);
         configurationTemplateManager.save(mapItem);
 
-        configurationRefactoringManager.clone(TEMPLATE_SCOPE, asMap(asPair("child1", "clone1"), asPair("child2", "clone2")));
+        configurationRefactoringManager.clone(TEMPLATE_SCOPE, ImmutableMap.of("child1", "clone1", "child2", "clone2"));
 
         child1Instance = configurationTemplateManager.getInstance(child1Path, ConfigA.class);
         child2Instance = configurationTemplateManager.getInstance(child2Path, ConfigA.class);
@@ -899,7 +899,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationTemplateManager.save(child);
 
 
-        configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, child.getName(), "child template", asMap(asPair(child.getName(), "clone")));
+        configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, child.getName(), "child template", ImmutableMap.of(child.getName(), "clone"));
 
 
         ConfigA extractedParent = configurationTemplateManager.getInstance(getPath(TEMPLATE_SCOPE, "child template"), ConfigA.class);
@@ -934,7 +934,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
 
         
-        String clonePath = configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, instance.getName(), "extracted", asMap(asPair(instance.getName(), "clone")));
+        String clonePath = configurationRefactoringManager.smartClone(TEMPLATE_SCOPE, instance.getName(), "extracted", ImmutableMap.of(instance.getName(), "clone"));
 
 
         Function<ConfigB, String> configToNameFn = Configurations.toConfigurationName();

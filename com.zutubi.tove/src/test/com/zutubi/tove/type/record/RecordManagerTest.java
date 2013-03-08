@@ -1,5 +1,6 @@
 package com.zutubi.tove.type.record;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
@@ -20,9 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 public class RecordManagerTest extends AbstractTransactionTestCase
 {
@@ -315,7 +313,7 @@ public class RecordManagerTest extends AbstractTransactionTestCase
 
     public void testSelectAllEmptyPath()
     {
-        assertEquals(asMap(asPair("", recordManager.select())), recordManager.selectAll(""));
+        assertEquals(ImmutableMap.of("", recordManager.select()), recordManager.selectAll(""));
     }
 
     public void testSelectEmptyPath()

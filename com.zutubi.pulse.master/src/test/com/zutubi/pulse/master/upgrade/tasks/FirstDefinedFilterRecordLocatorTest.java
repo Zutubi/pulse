@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import com.google.common.collect.ImmutableMap;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
@@ -8,8 +9,6 @@ import org.mockito.Matchers;
 
 import java.util.Map;
 
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -28,7 +27,7 @@ public class FirstDefinedFilterRecordLocatorTest extends ZutubiTestCase
         super.setUp();
         
         RecordLocator delegate = mock(RecordLocator.class);
-        Map<String, Record> delegateResults = asMap(asPair(PATH_FIRST_DEFINED, RECORD_FIRST_DEFINED), asPair(PATH_INHERITED, RECORD_INHERITED));
+        Map<String, Record> delegateResults = ImmutableMap.of(PATH_FIRST_DEFINED, RECORD_FIRST_DEFINED, PATH_INHERITED, RECORD_INHERITED);
         doReturn(delegateResults).when(delegate).locate(Matchers.<RecordManager>anyObject());
         
         TemplatedScopeDetails scope = mock(TemplatedScopeDetails.class);

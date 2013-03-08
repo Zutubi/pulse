@@ -2,6 +2,7 @@ package com.zutubi.tove.config;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.annotations.ExternalState;
@@ -22,8 +23,6 @@ import com.zutubi.validation.i18n.MessagesTextProvider;
 import java.util.*;
 
 import static com.zutubi.tove.type.record.PathUtils.*;
-import static com.zutubi.util.CollectionUtils.asMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Provides high-level refactoring actions for configuration.
@@ -156,7 +155,7 @@ public class ConfigurationRefactoringManager
                     throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
                 }
 
-                ConfigurationRefactoringManager.this.clone(parentPath, asMap(asPair(PathUtils.getBaseName(path), cloneKey)));
+                ConfigurationRefactoringManager.this.clone(parentPath, ImmutableMap.of(PathUtils.getBaseName(path), cloneKey));
                 return getPath(parentPath, cloneKey);
             }
         });
