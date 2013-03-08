@@ -1,14 +1,15 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
+import com.google.common.io.Files;
+import com.google.common.io.LineProcessor;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.WebUtils;
-import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * <p>
@@ -128,11 +129,17 @@ public abstract class TestReportPostProcessorSupport extends PostProcessorSuppor
             {
                 try
                 {
-                    IOUtils.forEachLine(failureFile, new UnaryProcedure<String>()
+                    Files.readLines(failureFile, Charset.defaultCharset(), new LineProcessor<Object>()
                     {
-                        public void run(String s)
+                        public boolean processLine(String line) throws IOException
                         {
-                            processExpectedFailure(suite, s);
+                            processExpectedFailure(suite, line);
+                            return true;
+                        }
+
+                        public Object getResult()
+                        {
+                            return null;
                         }
                     });
                 }

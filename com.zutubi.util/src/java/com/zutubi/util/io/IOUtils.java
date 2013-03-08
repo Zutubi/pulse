@@ -1,7 +1,6 @@
 package com.zutubi.util.io;
 
 import com.google.common.io.ByteStreams;
-import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -106,29 +105,6 @@ public class IOUtils
         catch (IOException e)
         {
             LOG.finest(e);
-        }
-    }
-
-    public static void forEachLine(File file, UnaryProcedure<String> p) throws IOException
-    {
-        BufferedReader reader = null;
-        try
-        {
-            reader = new BufferedReader(new FileReader(file));
-            forEachLine(reader, p);
-        }
-        finally
-        {
-            close(reader);
-        }
-    }
-
-    private static void forEachLine(BufferedReader reader, UnaryProcedure<String> p) throws IOException
-    {
-        String line;
-        while ((line = reader.readLine()) != null)
-        {
-            p.run(line);
         }
     }
 
