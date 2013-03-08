@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.license;
 
+import com.google.common.base.Objects;
 import com.zutubi.pulse.Version;
 import com.zutubi.util.Constants;
-import com.zutubi.util.ObjectUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -173,13 +173,13 @@ public final class License
         }
         License other = (License) o;
 
-        return ObjectUtils.equals(holder, other.holder) &&
-                ObjectUtils.equals(expiryDate, other.expiryDate) &&
-                ObjectUtils.equals(type, other.type) &&
-                ObjectUtils.equals(supportedAgents, other.supportedAgents) &&
-                ObjectUtils.equals(supportedUsers, other.supportedUsers) &&
-                ObjectUtils.equals(getSupportedContactPoints(), other.getSupportedContactPoints()) &&
-                ObjectUtils.equals(supportedProjects, other.supportedProjects);
+        return Objects.equal(holder, other.holder) &&
+                Objects.equal(expiryDate, other.expiryDate) &&
+                Objects.equal(type, other.type) &&
+                Objects.equal(supportedAgents, other.supportedAgents) &&
+                Objects.equal(supportedUsers, other.supportedUsers) &&
+                Objects.equal(getSupportedContactPoints(), other.getSupportedContactPoints()) &&
+                Objects.equal(supportedProjects, other.supportedProjects);
     }
 
     /**

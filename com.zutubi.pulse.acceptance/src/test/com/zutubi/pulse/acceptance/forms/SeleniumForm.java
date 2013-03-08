@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
-import com.zutubi.util.ObjectUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 import com.zutubi.util.adt.Pair;
@@ -392,7 +392,7 @@ public abstract class SeleniumForm
                 switch (types[i])
                 {
                     case SeleniumForm.TEXTFIELD:
-                        if (!ObjectUtils.equals(stripLineBreaks(values[i]), stripLineBreaks((String) getFieldValue(fieldName))))
+                        if (!Objects.equal(stripLineBreaks(values[i]), stripLineBreaks((String) getFieldValue(fieldName))))
                         {
                             return false;
                         }
@@ -400,14 +400,14 @@ public abstract class SeleniumForm
 
                     case SeleniumForm.CHECKBOX:
                         String expectedValue = Boolean.valueOf(values[i]) ? "on" : "off";
-                        if (!ObjectUtils.equals(expectedValue, getFieldValue(fieldName)))
+                        if (!Objects.equal(expectedValue, getFieldValue(fieldName)))
                         {
                              return false;
                         }
                         break;
 
                     case SeleniumForm.COMBOBOX:
-                        if (!ObjectUtils.equals(values[i], getFieldValue(fieldName)))
+                        if (!Objects.equal(values[i], getFieldValue(fieldName)))
                         {
                             return false;
                         }
@@ -427,7 +427,7 @@ public abstract class SeleniumForm
                             }
                             for (int j = 0; j < expected.size(); j++)
                             {
-                                if (!ObjectUtils.equals(expected.get(j), got.get(j)))
+                                if (!Objects.equal(expected.get(j), got.get(j)))
                                 {
                                     return false;
                                 }

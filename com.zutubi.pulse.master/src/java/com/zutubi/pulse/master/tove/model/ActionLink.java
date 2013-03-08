@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.model;
 
-import com.zutubi.util.ObjectUtils;
 import com.zutubi.util.Sort;
 
 /**
@@ -140,6 +139,6 @@ public class ActionLink implements Comparable<ActionLink>
     
     private String getCompareString()
     {
-        return ObjectUtils.toString(label) + ObjectUtils.toString(action) + ObjectUtils.toString(icon) + ObjectUtils.toString(argument);
+        return String.valueOf(label) + String.valueOf(action) + String.valueOf(icon) + String.valueOf(argument);
     }
 }

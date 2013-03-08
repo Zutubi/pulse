@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Vector;
 
 import static com.zutubi.util.CollectionUtils.asPair;
-import static com.zutubi.util.CollectionUtils.asVector;
 import static java.util.Arrays.asList;
 
 /**
@@ -130,7 +129,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         String project1Path = rpcClient.RemoteApi.insertSimpleProject(project1, false);
         rpcClient.RemoteApi.insertSimpleProject(project2, false);
 
-        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
+        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, new Vector<String>(asList(project1Path))));
 
         DashboardPage dashboard = getBrowser().openAndWaitFor(DashboardPage.class);
         assertTrue(dashboard.isUngroupedProjectPresent(project1));

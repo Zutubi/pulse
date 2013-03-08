@@ -1,7 +1,5 @@
 package com.zutubi.util.adt;
 
-import com.zutubi.util.ObjectUtils;
-
 /**
  * Simple struct to hold two objects.
  */
@@ -56,6 +54,6 @@ public class Pair<T, U>
     @Override
     public String toString()
     {
-        return "(" + ObjectUtils.toString(first) + "," + ObjectUtils.toString(second) + ")";
+        return "(" + String.valueOf(first) + "," + String.valueOf(second) + ")";
     }
 }
