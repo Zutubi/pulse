@@ -108,7 +108,7 @@ public class DatabaseConfig
 
     public int getPoolMaxActive()
     {
-        return getIntProperty(POOL_MAX_ACTIVE, 32);
+        return getIntProperty(POOL_MAX_ACTIVE, 256);
     }
 
     public int getPoolMaxIdle()
