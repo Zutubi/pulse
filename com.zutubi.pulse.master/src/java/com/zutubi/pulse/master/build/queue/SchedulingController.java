@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -421,28 +420,43 @@ public class SchedulingController
 
     /**
      * Cancel the specified build request.  A build request can only be cancelled if it
-     * is currently queued.  Enforces the cancel build permission.
+     * is currently queued.  Enforces the cancel build permission (or, for all requests,
+     * server admin permission).
      *
-     * @param id the id of the build request to be cancelled.
-     * @return true if the request was cancelled, false otherwise.
+     * @param id the id of the build request to be cancelled, -1 to cancel all requests
+     * @return true if a request was cancelled, false otherwise.
      */
     public boolean cancelRequest(long id)
     {
-        BuildRequestEvent request = buildQueue.getRequest(id);
-        if (request != null)
+        int cancelledCount = 0;
+        if (id == -1)
         {
-            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, request);
-            
-            BuildRequestHandler requestHandler = handlers.get(request.getMetaBuildId());
-            if (requestHandler != null)
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+
+            lock.lock();
+            try
             {
+                for (QueuedRequest request : buildQueue.getQueuedRequests())
+                {
+                    cancelledCount += cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()));
+                }
+            }
+            finally
+            {
+                lock.unlock();
+            }
+        }
+        else
+        {
+            BuildRequestEvent request = buildQueue.getRequest(id);
+            if (request != null)
+            {
+                accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, request);
+
                 lock.lock();
                 try
                 {
-                    List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-                    Collection<RequestHolder> queuedRequests = filter(requests, Predicates.instanceOf(QueuedRequest.class));
-                    internalCompleteRequests(requestHandler, queuedRequests);
-                    return queuedRequests.size() > 0;
+                    cancelledCount = cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()));
                 }
                 finally
                 {
@@ -450,8 +464,23 @@ public class SchedulingController
                 }
             }
         }
-        
-        return false;
+
+        return cancelledCount > 0;
+    }
+
+    private int cancelRequestsForMetaBuild(BuildRequestHandler requestHandler)
+    {
+        if (requestHandler != null)
+        {
+            List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
+            Collection<RequestHolder> queuedRequests = filter(requests, Predicates.instanceOf(QueuedRequest.class));
+            internalCompleteRequests(requestHandler, queuedRequests);
+            return queuedRequests.size();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     /**

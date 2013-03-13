@@ -93,6 +93,8 @@ Zutubi.pulse.server.ActivityPanel = Ext.extend(Zutubi.ActivePanel, {
     update: function(data)
     {
         this.updateToolbar(data);
+        Ext.getCmp(this.id + '-queued').setCancelAllPermitted(data.cancelAllPermitted);
+        Ext.getCmp(this.id + '-active').setCancelAllPermitted(data.cancelAllPermitted);
         Zutubi.pulse.server.ActivityPanel.superclass.update.apply(this, arguments);
     },
     

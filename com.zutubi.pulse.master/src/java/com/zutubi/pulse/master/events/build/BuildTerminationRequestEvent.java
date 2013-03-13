@@ -34,12 +34,12 @@ public class BuildTerminationRequestEvent extends Event
      * Request that all builds be terminated.
      *
      * @param source the source of the termination request
-     * @param reason the reason, a human readable message describing why
-     * the request has been made.
+     * @param reason a human readable message describing why the request has been made
+     * @param kill   true to forcefully kill the builds with no graceful cleanup
      */
-    public BuildTerminationRequestEvent(Object source, String reason)
+    public BuildTerminationRequestEvent(Object source, String reason, boolean kill)
     {
-        this(source, ALL_BUILDS, reason, false);
+        this(source, ALL_BUILDS, reason, kill);
     }
 
     public BuildTerminationRequestEvent(Object source, long buildId, String reason, boolean kill)

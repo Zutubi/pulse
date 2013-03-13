@@ -42,11 +42,11 @@ public class CancelQueuedBuildAction extends ActionSupport
         {
             if (fatController.cancelQueuedBuild(id))
             {
-                result = new SimpleResult(true, I18N.format("request.cancelled"));
+                result = new SimpleResult(true, I18N.format(id == -1 ? "all.cancelled" : "request.cancelled"));
             }
             else
             {
-                result = new SimpleResult(false, I18N.format("request.not.found"));
+                result = new SimpleResult(false, I18N.format(id == -1 ? "none.cancelled" : "request.not.found"));
             }
         }
         catch (AccessDeniedException e)

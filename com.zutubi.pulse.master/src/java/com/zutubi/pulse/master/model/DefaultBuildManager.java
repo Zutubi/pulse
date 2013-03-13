@@ -583,6 +583,12 @@ public class DefaultBuildManager implements BuildManager
         eventManager.publish(new BuildTerminationRequestEvent(this, buildResult.getId(), reason, kill));
     }
 
+    public void terminateAllBuilds(String reason, boolean kill)
+    {
+        accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+        eventManager.publish(new BuildTerminationRequestEvent(this, reason, kill));
+    }
+
     private Iterable<File> getRepositoryDirectoriesFor(final Project project) throws Exception
     {
         final File repositoryRoot = configurationManager.getUserPaths().getRepositoryRoot();

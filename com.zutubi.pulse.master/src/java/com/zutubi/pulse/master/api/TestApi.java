@@ -17,16 +17,17 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.agent.*;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 /**
  * Implements an XML-RPC API with testing-specific functionality.  Accepts
@@ -164,7 +165,7 @@ public class TestApi
         List<BuildResult> results = buildManager.queryBuilds(null, ResultState.getIncompleteStates(), -1, -1, -1, -1, false);
         for (BuildResult result : results)
         {
-            buildManager.terminateBuild(result, "Terminated by batch cancel.", true);
+            buildManager.terminateAllBuilds("Terminated by batch cancel.", true);
         }
         return true;
     }

@@ -5,6 +5,7 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Ajax action to cancel a running build.
@@ -35,16 +36,36 @@ public class CancelBuildAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        BuildResult build = buildManager.getBuildResult(buildId);
-        if (build == null)
+        String user = getPrinciple();
+        String reason = user == null ? null : "requested by '" + user + "'";
+        try
         {
-            throw new IllegalArgumentException("Unknown build '" + buildId + "'");
+            if (buildId == -1)
+            {
+                buildManager.terminateAllBuilds(reason, kill);
+                result = new SimpleResult(true, I18N.format("all.termination.requested"));
+            }
+            else
+            {
+                BuildResult build = buildManager.getBuildResult(buildId);
+                if (build == null)
+                {
+                    result = new SimpleResult(false, "Unknown build '" + buildId + "'");
+                }
+                else
+                {
+                    buildManager.terminateBuild(build, reason, kill);
+                    result = new SimpleResult(true, I18N.format("termination.requested"));
+                }
+            }
+
+            pauseForDramaticEffect();
+        }
+        catch (AccessDeniedException e)
+        {
+            result = new SimpleResult(false, I18N.format("termination.not.permitted"));
         }
 
-        String user = getPrinciple();
-        buildManager.terminateBuild(build, user == null ? null : "requested by '" + user + "'", kill);
-        pauseForDramaticEffect();
-        result = new SimpleResult(true, I18N.format("termination.requested"));
         return SUCCESS;
     }
 

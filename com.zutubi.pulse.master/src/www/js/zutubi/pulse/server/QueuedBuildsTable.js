@@ -17,6 +17,24 @@ Zutubi.pulse.server.QueuedBuildsTable = Ext.extend(Zutubi.table.SummaryTable, {
     emptyMessage: 'no queued builds',
     customisable: false,
 
+    template: new Ext.XTemplate(
+        '<table id="{id}" class="{cls}">' +
+            '<tr>' +
+                '<th class="heading" colspan="{columnCount}">' +
+                    '<span style="float: right">' +
+                        '<span id="{id}-cancel-all" style="display: none">' +
+                            '<a href="#" class="unadorned" onclick="Ext.getCmp(\'{id}\').cancelAll(); return false">' +
+                                '<img ext:qtip="cancel all queued builds" alt="cancel all" src="{[window.baseUrl]}/images/cancel.gif"/>' +
+                            '</a>' +
+                        '</span>' +
+                    '</span>' +
+                    '<span class="clear"/>' +
+                    '<span id="{id}-title">{title}</span>' +
+                '</th>' +
+            '</tr>' +
+        '</table>'
+    ),
+
     columns: [{
             name: 'owner',
             renderer: function(owner, request)
@@ -68,6 +86,35 @@ Zutubi.pulse.server.QueuedBuildsTable = Ext.extend(Zutubi.table.SummaryTable, {
         {
             return Zutubi.pulse.server.QueuedBuildsTable.superclass.generateRow.apply(this, arguments);
         }
+    },
+
+    renderDynamic: function()
+    {
+        Zutubi.table.SummaryTable.superclass.renderDynamic.apply(this, arguments);
+        this.updateCancelAll();
+    },
+
+    setCancelAllPermitted: function(permitted)
+    {
+        if (permitted !== this.cancelAllPermitted)
+        {
+            this.cancelAllPermitted = permitted;
+            this.updateCancelAll();
+        }
+    },
+
+    updateCancelAll: function()
+    {
+        var el= Ext.get(this.id + '-cancel-all');
+        if (el)
+        {
+            el.setStyle('display', this.cancelAllPermitted ? 'inline' : 'none');
+        }
+    },
+
+    cancelAll: function()
+    {
+        cancelQueuedBuild(-1);
     }
 });
 

@@ -16,7 +16,8 @@
  */
 Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
     columnCount: 4,
-    
+    cancelAllPermitted: false,
+
     template: new Ext.XTemplate(
         '<table id="{id}" class="{cls}">' +
             '<tr>' +
@@ -28,6 +29,12 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
                         '<a href="#" class="unadorned" onclick="Ext.getCmp(\'{id}\').collapseAll(); return false">' +
                             '<img ext:qtip="collapse all builds" alt="collapse all" src="{[window.baseUrl]}/images/collapse.gif"/>' +
                         '</a>' +
+                        '<span id="{id}-cancel-all" style="display: none">' +
+                            '<img src="{[window.baseUrl]}/images/default/s.gif" alt="-" width="16px"/>' +
+                            '<a href="#" class="unadorned" onclick="Ext.getCmp(\'{id}\').cancelAll(); return false">' +
+                                '<img ext:qtip="terminate all running builds" alt="cancel all" src="{[window.baseUrl]}/images/cancel.gif"/>' +
+                            '</a>' +
+                        '</span>' +
                     '</span>' +
                     '<span class="clear"/>' +
                     '<span id="{id}-title">{title}</span>' +
@@ -42,6 +49,12 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
         Zutubi.pulse.server.ActiveBuildsTable.superclass.initComponent.apply(this, arguments);
     },
     
+    renderDynamic: function()
+    {
+        Zutubi.table.SummaryTable.superclass.renderDynamic.apply(this, arguments);
+        this.updateCancelAll();
+    },
+
     dataExists: function()
     {
         return Zutubi.table.SummaryTable.superclass.dataExists.apply(this, arguments) && this.data.length > 0;
@@ -66,11 +79,29 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
                 build.appendRows(this.tbodyEl, previousBuild ? previousBuild.collapsed : true);
                 builds.push(build);
             }
-       }
+        }
        
-       this.builds = builds;
+        this.builds = builds;
     },
-    
+
+    setCancelAllPermitted: function(permitted)
+    {
+        if (permitted !== this.cancelAllPermitted)
+        {
+            this.cancelAllPermitted = permitted;
+            this.updateCancelAll();
+        }
+    },
+
+    updateCancelAll: function()
+    {
+        var el= Ext.get(this.id + '-cancel-all');
+        if (el)
+        {
+            el.setStyle('display', this.cancelAllPermitted ? 'inline' : 'none');
+        }
+    },
+
     findBuild: function(id)
     {
         var i, len, build;
@@ -105,6 +136,11 @@ Zutubi.pulse.server.ActiveBuildsTable = Ext.extend(Zutubi.table.ContentTable, {
         {
             this.builds[i].collapse();
         }
+    },
+
+    cancelAll: function()
+    {
+        cancelBuild(-1);
     }
 });
 

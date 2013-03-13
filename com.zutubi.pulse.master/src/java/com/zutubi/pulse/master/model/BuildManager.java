@@ -283,9 +283,18 @@ public interface BuildManager
      * Request that the specified build be terminated.
      *
      * @param buildResult   the build to terminate
-     * @param reason        the human readable reason for the termination request.
-     * @param kill          if true, kill teh build as quickly as possible with
+     * @param reason        the human readable reason for the termination request
+     * @param kill          if true, kill the build as quickly as possible with
      *                      no graceful cleanup
      */
     void terminateBuild(BuildResult buildResult, String reason, boolean kill);
+
+    /**
+     * Requests all running builds terminate.  This requires admin permission.
+     *
+     * @param reason a human-readable reason for the request
+     * @param kill   if true, kill the builds as quickly as possible with
+     *               no graceful cleanup
+     */
+    void terminateAllBuilds(String reason, boolean kill);
 }

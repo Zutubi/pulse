@@ -50,7 +50,8 @@ public class ServerActivityDataAction extends ActionSupport
         model.setBuildQueueRunning(schedulingController.isRunning());
         model.setStageQueueTogglePermitted(isAdmin);
         model.setStageQueueRunning(recipeQueue.isRunning());
-        
+        model.setCancelAllPermitted(isAdmin);
+
         final List<BuildRequestEvent> queuedBuilds = new LinkedList<BuildRequestEvent>();
         final List<BuildResult> activeBuilds = new LinkedList<BuildResult>();
         

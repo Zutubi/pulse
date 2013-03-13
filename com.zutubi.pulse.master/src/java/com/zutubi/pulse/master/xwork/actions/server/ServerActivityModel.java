@@ -20,6 +20,7 @@ public class ServerActivityModel
     private boolean buildQueueRunning;
     private boolean stageQueueTogglePermitted;
     private boolean stageQueueRunning;
+    private boolean cancelAllPermitted;
     private List<QueuedBuildModel> queued = new LinkedList<QueuedBuildModel>();
     private List<ActiveBuildModel> active = new LinkedList<ActiveBuildModel>();
 
@@ -61,6 +62,16 @@ public class ServerActivityModel
     public void setStageQueueRunning(boolean stageQueueRunning)
     {
         this.stageQueueRunning = stageQueueRunning;
+    }
+
+    public boolean isCancelAllPermitted()
+    {
+        return cancelAllPermitted;
+    }
+
+    public void setCancelAllPermitted(boolean cancelAllPermitted)
+    {
+        this.cancelAllPermitted = cancelAllPermitted;
     }
 
     public List<QueuedBuildModel> getQueued()

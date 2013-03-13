@@ -618,20 +618,76 @@ function handleCancelResponse(options, success, response)
 
 function cancelQueuedBuild(id)
 {
-    showStatus('Cancelling queued build...', 'working');
-    runAjaxRequest({
-        url: window.baseUrl + '/ajax/cancelQueuedBuild.action',
-        params: { id: id },
-        callback: handleCancelResponse
-    });
+    var url, params;
+    url = window.baseUrl + '/ajax/cancelQueuedBuild.action';
+    params = { id: id };
+
+    if (id === -1)
+    {
+        window.dialogBox = Ext.Msg.show({
+            title: 'Confirm',
+            msg: 'Are you sure you want to cancel all queued builds?',
+            fn: function(btn, text) {
+                    window.dialogBox = null;
+                    if (btn === 'yes')
+                    {
+                        showStatus('Cancelling all queued builds...', 'working');
+                        runAjaxRequest({
+                            url: url,
+                            params: params,
+                            callback: handleCancelResponse
+                        });
+                    }
+            },
+            width: 400,
+            buttons: Ext.Msg.YESNO
+        });
+    }
+    else
+    {
+        showStatus('Cancelling queued build...', 'working');
+        runAjaxRequest({
+            url: url,
+            params: { id: id },
+            callback: handleCancelResponse
+        });
+    }
 }
 
 function cancelBuild(id, kill)
 {
-    showStatus('Requesting build termination...', 'working');
-    runAjaxRequest({
-        url: window.baseUrl + '/ajax/cancelBuild.action',
-        params: { buildId: id, kill: kill },
-        callback: handleCancelResponse
-    });
+    var url, params;
+    url = window.baseUrl + '/ajax/cancelBuild.action';
+    params = { buildId: id, kill: kill };
+
+    if (id === -1)
+    {
+        window.dialogBox = Ext.Msg.show({
+            title: 'Confirm',
+            msg: 'Are you sure you want to terminate all running builds?',
+            fn: function(btn, text) {
+                    window.dialogBox = null;
+                    if (btn === 'yes')
+                    {
+                        showStatus('Terminating all builds...', 'working');
+                        runAjaxRequest({
+                            url: url,
+                            params: params,
+                            callback: handleCancelResponse
+                        });
+                    }
+            },
+            width: 400,
+            buttons: Ext.Msg.YESNO
+        });
+    }
+    else
+    {
+        showStatus('Requesting build termination...', 'working');
+        runAjaxRequest({
+            url: url,
+            params: params,
+            callback: handleCancelResponse
+        });
+    }
 }

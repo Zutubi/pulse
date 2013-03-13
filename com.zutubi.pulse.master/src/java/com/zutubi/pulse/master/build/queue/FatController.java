@@ -152,7 +152,7 @@ public class FatController implements EventListener, Stoppable
             if (force)
             {
                 // Notify controllers to stop forcefully
-                eventManager.publish(new BuildTerminationRequestEvent(this, "due to server shutdown"));
+                eventManager.publish(new BuildTerminationRequestEvent(this, "due to server shutdown", false));
             }
             else
             {
@@ -280,7 +280,7 @@ public class FatController implements EventListener, Stoppable
     /**
      * Cancel the queued build.
      *
-     * @param id uniquely representing the queued build.
+     * @param id uniquely representing the queued build, -1 to cancel all queued builds
      *
      * @return true if the build has been cancelled, false otherwise.
      */
