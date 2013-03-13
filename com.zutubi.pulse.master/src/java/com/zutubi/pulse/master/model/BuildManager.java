@@ -58,6 +58,20 @@ public interface BuildManager
     @SecureResult
     BuildResult getLatestBuildResult();
 
+    /**
+     * Queries for build results with the given criteria.  Personal builds are not included.  The first and max
+     * parameters may be used to page through results, and mostRecentFirst controls the order in which they are
+     * returned.
+     *
+     * @param projects          if not empty, only include builds of these projects
+     * @param states            if not empty, only include builds in these states
+     * @param earliestStartTime if greater than zero, limit to builds with a start time greater than or equal to this
+     * @param latestStartTime   if greater than zero, limit to builds with a start time less than or equal to this
+     * @param first             if non-negative, zero-based offset of the first build to return
+     * @param max               if non-negative, the maximum number of results to return (the actual number may be less)
+     * @param mostRecentFirst   if true, return more recent (by id, therefore activation time) results first
+     * @return a list of build results that meet the given criteria
+     */
     @SecureResult
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, int first, int max, boolean mostRecentFirst);
 

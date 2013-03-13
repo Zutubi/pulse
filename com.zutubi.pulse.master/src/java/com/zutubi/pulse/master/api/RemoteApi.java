@@ -59,7 +59,10 @@ import com.zutubi.tove.config.api.Configurations;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
-import com.zutubi.util.*;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
+import com.zutubi.util.UnaryProcedure;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.ByteArrayOutputStream;
@@ -69,8 +72,8 @@ import java.util.*;
 
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Lists.newArrayListWithExpectedSize;
 import static com.google.common.collect.Lists.newLinkedList;
-import static com.google.common.collect.Lists.transform;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 
 /**
@@ -1914,6 +1917,7 @@ public class RemoteApi
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      * @see #getPersonalBuild(String, int)
      */
@@ -2147,6 +2151,58 @@ public class RemoteApi
     }
 
     /**
+     * Finds and returns build results that meet the given criteria.  Paging is supported using the
+     * firstResult and maxResults parameters.
+     *
+     * @param token           authentication token, see {@link #login}
+     * @param projectNames    if not empty, only builds of the given projects name of the project
+     *                        to query the build results of; these may be the names of project
+     *                        templates in which case all concrete descendants of those templates
+     *                        will be queried (leave empty to efficiently include all projects)
+     * @param resultStates    if not empty, only return results with the given statuses (available
+     *                        states are given on the [RemoteApi.BuildResult] page)
+     * @param firstResult     zero-based index of the first result to return, allows paging through
+     *                        results
+     * @param maxResults      the maximum number of results to return
+     * @param mostRecentFirst if true, more recent build results will appear earlier in the array,
+     *                        if false they will appear later
+     * @return {@xtype array<[RemoteApi.BuildResult]>} all build results that meet the given
+     *         criteria
+     * @throws IllegalArgumentException if any of the given project names is invalid
+     * @access requires view permission for the given projects
+     * @see #getBuild(String, String, int)
+     * @see #getPreviousBuild(String, String, int)
+     * @see #getBuildRange(String, String, int, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
+     */
+    public Vector<Hashtable<String, Object>> queryBuilds(String token, final Vector<String> projectNames, final Vector<String> resultStates, final int firstResult, final int maxResults, final boolean mostRecentFirst)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+            {
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    ArrayList<Project> projects = newArrayListWithExpectedSize(projectNames.size());
+                    for (String projectName : projectNames)
+                    {
+                        projects.addAll(Arrays.asList(internalGetProjectSet(projectName, true)));
+                    }
+
+                    return ApiUtils.mapBuilds(buildManager.queryBuilds(projects.toArray(new Project[projects.size()]), mapStates(resultStates), -1, -1, firstResult, maxResults, mostRecentFirst), true);
+                }
+            });
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Finds and returns build results for the given project that meet the given criteria.  Paging
      * is supported using the firstResult and maxResults parameters.
      *
@@ -2155,7 +2211,7 @@ public class RemoteApi
      *                        a project template in which case all concrete descendants of that
      *                        template will be queried
      * @param resultStates    if not empty, only return results with the given statuses (available
-     *                        states are given on the [RemoteApi.BuildResult] page.
+     *                        states are given on the [RemoteApi.BuildResult] page)
      * @param firstResult     zero-based index of the first result to return, allows paging through
      *                        results
      * @param maxResults      the maximum number of results to return
@@ -2170,6 +2226,7 @@ public class RemoteApi
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      */
     public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, final String projectName, final Vector<String> resultStates, final int firstResult, final int maxResults, final boolean mostRecentFirst)
     {
@@ -2208,6 +2265,7 @@ public class RemoteApi
      * @see #getPreviousBuild(String, String, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
     public Vector<Hashtable<String, Object>> getBuildRange(String token, final String projectName, final int afterBuild, final int toBuild)
@@ -2254,6 +2312,7 @@ public class RemoteApi
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
     public Vector<Hashtable<String, Object>> getPreviousBuild(String token, final String projectName, final int id)
@@ -2398,6 +2457,7 @@ public class RemoteApi
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getPreviousBuild(String, String, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, final String projectName, final boolean completedOnly, final int maxResults)
@@ -2449,6 +2509,7 @@ public class RemoteApi
      * @see #getBuildRange(String, String, int, int)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      * @see #getPreviousBuild(String, String, int)
+     * @see #queryBuilds(String, java.util.Vector, java.util.Vector, int, int, boolean)
      * @see #queryBuildsForProject(String, String, java.util.Vector, int, int, boolean)
      */
     public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, boolean completedOnly)

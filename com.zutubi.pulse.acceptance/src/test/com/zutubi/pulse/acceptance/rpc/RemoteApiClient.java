@@ -1398,6 +1398,11 @@ public class RemoteApiClient extends ApiClient
         return call("getLatestBuildsForProject", project, completedOnly, maxResults);
     }
 
+    public Vector<Hashtable<String, Object>> queryBuilds(Vector<String> projects, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws Exception
+    {
+        return call("queryBuilds", projects, resultStates, firstResult, maxResults, mostRecentFirst);
+    }
+
     public Vector<Hashtable<String, Object>> queryBuildsForProject(String project, Vector<String> resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws Exception
     {
         return call("queryBuildsForProject", project, resultStates, firstResult, maxResults, mostRecentFirst);

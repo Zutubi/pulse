@@ -454,6 +454,17 @@ public class ReportingXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertEquals(PROJECT_HIERARCHY_CHILD1, build.get("project"));
     }
 
+    public void testQueryBuilds() throws Exception
+    {
+        String projectName = randomName();
+        rpcClient.RemoteApi.insertSimpleProject(projectName);
+        int number = rpcClient.RemoteApi.runBuild(projectName);
+
+        Vector<Hashtable<String, Object>> builds = rpcClient.RemoteApi.queryBuilds(new Vector<String>(asList(projectName)), new Vector<String>(), -1, 10, true);
+        assertEquals(1, builds.size());
+        assertEquals(number, builds.get(0).get("id"));
+    }
+
     public void testQueryBuildsForProject() throws Exception
     {
         String projectName = randomName();
