@@ -4,15 +4,16 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State;
-import static com.zutubi.pulse.master.model.Project.Transition;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;
 import com.zutubi.tove.security.AccessManager;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.pulse.master.model.Project.State;
+import static com.zutubi.pulse.master.model.Project.Transition;
+import static org.mockito.Mockito.*;
 
 public class SchedulingControllerTest extends BaseQueueTestCase
 {
@@ -257,6 +258,25 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         assertQueued();
     }
 
+    public void testCancelAllRequests()
+    {
+        BuildRequestEvent requestA = createRequest("a");
+        BuildRequestEvent requestB = createRequest("a");
+        BuildRequestEvent requestC = createRequest("a");
+        controller.handleBuildRequest(requestA);
+        controller.handleBuildRequest(requestB);
+        controller.handleBuildRequest(requestC);
+
+        assertActivated(requestA);
+        assertQueued(requestB, requestC);
+
+        assertTrue(controller.cancelRequest(-1));
+
+        assertActivated(requestA);
+        assertQueued();
+    }
+
+
     public void testCancelUnknownRequest()
     {
         BuildRequestEvent requestA = createRequest("a");
@@ -267,7 +287,7 @@ public class SchedulingControllerTest extends BaseQueueTestCase
         assertActivated(requestA);
         assertQueued(requestB);
 
-        assertFalse(controller.cancelRequest(-1));
+        assertFalse(controller.cancelRequest(-10));
 
         assertActivated(requestA);
         assertQueued(requestB);
