@@ -16,6 +16,8 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -35,8 +37,9 @@ public class BuildHookManager
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    private AccessManager accessManager;
     private MasterConfigurationManager configurationManager;
-    private MasterLocationProvider masterLocationProvider;
+    private MasterLocationProvider     masterLocationProvider;
 
     public void handleEvent(Event event, HookLogger logger)
     {
@@ -64,6 +67,8 @@ public class BuildHookManager
     {
         if (hook.canManuallyTriggerFor(result))
         {
+            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_TRIGGER_HOOK, result);
+
             HibernateBuildResultDao.initialise(result);
             executor.execute(new Runnable()
             {
@@ -169,6 +174,11 @@ public class BuildHookManager
                 LOG.severe("Error executing task for hook '" + hook.getName() + "': " + e.getMessage(), e);
             }
         }
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

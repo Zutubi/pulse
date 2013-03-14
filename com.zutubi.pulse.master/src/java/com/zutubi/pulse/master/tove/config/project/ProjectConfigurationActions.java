@@ -48,6 +48,7 @@ public class ProjectConfigurationActions
     public static final String ACTION_RESUME               = "resume";
     public static final String ACTION_VIEW_SOURCE          = "viewSource";
     public static final String ACTION_TRIGGER              = "trigger";
+    public static final String ACTION_TRIGGER_HOOK         = "triggerHook";
     public static final String ACTION_MARK_CLEAN           = "clean";
     public static final String ACTION_REBUILD              = "rebuild";
 

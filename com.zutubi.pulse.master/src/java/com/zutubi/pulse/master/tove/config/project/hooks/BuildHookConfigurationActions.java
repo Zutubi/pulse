@@ -6,6 +6,8 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 import java.util.LinkedList;
@@ -33,6 +35,7 @@ public class BuildHookConfigurationActions
         return actions;
     }
 
+    @Permission(ProjectConfigurationActions.ACTION_TRIGGER_HOOK)
     public void doTrigger(BuildHookConfiguration instance, BuildSelectorConfiguration build)
     {
         ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(instance, ProjectConfiguration.class);

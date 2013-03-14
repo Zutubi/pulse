@@ -32,6 +32,7 @@ public class ProjectAuthorityProvider extends MapOptionProvider
                                      ProjectConfigurationActions.ACTION_MARK_CLEAN,
                                      ProjectConfigurationActions.ACTION_PAUSE,
                                      ProjectConfigurationActions.ACTION_TRIGGER,
+                                     ProjectConfigurationActions.ACTION_TRIGGER_HOOK,
                                      ProjectConfigurationActions.ACTION_CANCEL_BUILD,
                                      ProjectConfigurationActions.ACTION_VIEW_SOURCE);
         return options;

@@ -198,6 +198,7 @@
                 <ref local="addOCUnitShortenSuiteNames"/>
                 <ref local="pushDownExternalStateIds"/>
                 <ref local="addGitCloneDepth"/>
+                <ref local="addProjectTriggerHookPermission"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1040,5 +1041,9 @@
 
     <bean id="addGitCloneDepth" class="com.zutubi.pulse.master.upgrade.tasks.AddGitCloneDepthUpgradeTask">
         <property name="buildNumber" value="205999001"/>
+    </bean>
+
+    <bean id="addProjectTriggerHookPermission" class="com.zutubi.pulse.master.upgrade.tasks.AddProjectTriggerHookPermissionUpgradeTask">
+        <property name="buildNumber" value="205999002"/>
     </bean>
 </beans>
