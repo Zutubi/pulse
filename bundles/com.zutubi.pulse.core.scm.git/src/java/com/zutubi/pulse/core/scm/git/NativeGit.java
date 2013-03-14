@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.git;
 import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import com.zutubi.pulse.core.scm.process.api.*;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
@@ -20,6 +19,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
@@ -92,9 +93,17 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_INIT);
     }
 
-    public void clone(ScmFeedbackHandler handler, String repository, String dir, boolean mirror) throws ScmException
+    public void clone(ScmFeedbackHandler handler, String repository, String dir, boolean mirror, int depth) throws ScmException
     {
-        run(handler, getGitCommand(), COMMAND_CLONE, mirror ? FLAG_MIRROR : FLAG_NO_CHECKOUT, repository, dir);
+        String mirrorFlag = mirror ? FLAG_MIRROR : FLAG_NO_CHECKOUT;
+        if (depth < 0)
+        {
+            run(handler, getGitCommand(), COMMAND_CLONE, mirrorFlag, repository, dir);
+        }
+        else
+        {
+            run(handler, getGitCommand(), COMMAND_CLONE, mirrorFlag, FLAG_DEPTH, Integer.toString(depth), repository, dir);
+        }
     }
 
     public void config(ScmFeedbackHandler handler, String name, boolean value) throws ScmException

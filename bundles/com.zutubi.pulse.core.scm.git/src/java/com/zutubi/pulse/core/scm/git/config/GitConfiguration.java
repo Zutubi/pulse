@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.git.config;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.git.GitClient;
 import com.zutubi.tove.annotations.*;
+import com.zutubi.validation.annotations.Min;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -10,11 +11,14 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.gitConfig")
 @ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "submoduleProcessing", "selectedSubmodules", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "cloneDepth", "submoduleProcessing", "selectedSubmodules",
+                    "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval",
+                    "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     public enum CloneType
     {
+        SHALLOW,
         SELECTED_BRANCH_ONLY,
         NORMAL,
         FULL_MIRROR,
@@ -30,16 +34,21 @@ public class GitConfiguration extends PollableScmConfiguration
     @Required
     private String repository;
     @Required
-    private String branch = "master";
+    private String branch    = "master";
     @Required
+    @ControllingSelect(dependentFields = "cloneDepth", enableSet = {"SHALLOW"})
     private CloneType cloneType = CloneType.NORMAL;
-    @Required @ControllingSelect(dependentFields = "selectedSubmodules", enableSet = {"UPDATE_SELECTED"})
+    @Min(0)
+    private int cloneDepth = 32;
+    @Required
+    @ControllingSelect(dependentFields = "selectedSubmodules", enableSet = {"UPDATE_SELECTED"})
     private SubmoduleProcessing submoduleProcessing = SubmoduleProcessing.NONE;
     private String selectedSubmodules;
-    @ControllingCheckbox(checkedFields = "inactivityTimeoutSeconds") @Wizard.Ignore
+    @ControllingCheckbox(checkedFields = "inactivityTimeoutSeconds")
+    @Wizard.Ignore
     private boolean inactivityTimeoutEnabled = false;
     @Wizard.Ignore
-    private int inactivityTimeoutSeconds = 300;
+    private int  inactivityTimeoutSeconds = 300;
 
     @Transient
     public String getType()
@@ -75,6 +84,16 @@ public class GitConfiguration extends PollableScmConfiguration
     public void setCloneType(CloneType cloneType)
     {
         this.cloneType = cloneType;
+    }
+
+    public int getCloneDepth()
+    {
+        return cloneDepth;
+    }
+
+    public void setCloneDepth(int cloneDepth)
+    {
+        this.cloneDepth = cloneDepth;
     }
 
     public SubmoduleProcessing getSubmoduleProcessing()
