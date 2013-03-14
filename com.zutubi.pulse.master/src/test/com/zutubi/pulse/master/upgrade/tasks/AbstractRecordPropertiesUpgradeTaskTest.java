@@ -2,16 +2,17 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.upgrade.UpgradeException;
+import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.tove.transaction.TransactionManager;
-import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.mockito.Mockito.*;
 
 public class AbstractRecordPropertiesUpgradeTaskTest extends PulseTestCase
 {
@@ -72,7 +73,7 @@ public class AbstractRecordPropertiesUpgradeTaskTest extends PulseTestCase
             return recordLocator;
         }
 
-        protected List<RecordUpgrader> getRecordUpgraders()
+        protected List<? extends RecordUpgrader> getRecordUpgraders()
         {
             return recordUpgraders;
         }

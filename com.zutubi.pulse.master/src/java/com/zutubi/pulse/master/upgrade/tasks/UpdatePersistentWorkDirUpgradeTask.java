@@ -27,7 +27,7 @@ public class UpdatePersistentWorkDirUpgradeTask extends AbstractRecordProperties
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE, PathUtils.WILDCARD_ANY_ELEMENT, PROPERTY_OPTIONS));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_PERSISTENT_WORK_DIR, new Function<Object, Object>()
         {

@@ -29,7 +29,7 @@ public class AddSubversionUseExportUpgradeTask extends AbstractRecordPropertiesU
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_EXPORT, Boolean.toString(false)));
     }

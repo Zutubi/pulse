@@ -25,7 +25,7 @@ public class HookTriggerOptionsUpgradeTask extends AbstractRecordPropertiesUpgra
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newAddProperty(PROPERTY_RUN_FOR_PERSONAL, "false"),

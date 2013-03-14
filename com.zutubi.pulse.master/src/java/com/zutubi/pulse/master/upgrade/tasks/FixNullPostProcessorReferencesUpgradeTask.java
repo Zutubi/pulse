@@ -2,16 +2,17 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.zutubi.tove.type.record.Record;
+
+import java.util.List;
+
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.toArray;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-import com.zutubi.tove.type.record.Record;
 import static java.util.Arrays.asList;
-
-import java.util.List;
 
 /**
  * Fixes null post-processor references that may have been created by a bug in
@@ -47,7 +48,7 @@ public class FixNullPostProcessorReferencesUpgradeTask extends AbstractRecordPro
         });
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(RecordUpgraders.newEditProperty(PROPERTY_POST_PROCESSORS, new Function<Object, Object>()
         {

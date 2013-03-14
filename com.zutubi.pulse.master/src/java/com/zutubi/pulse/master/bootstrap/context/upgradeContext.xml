@@ -197,6 +197,7 @@
                 <ref local="changedSelectedBuildsConditions"/>
                 <ref local="addOCUnitShortenSuiteNames"/>
                 <ref local="pushDownExternalStateIds"/>
+                <ref local="addGitCloneDepth"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1035,5 +1036,9 @@
 
     <bean id="pushDownExternalStateIds" class="com.zutubi.pulse.master.upgrade.tasks.PushDownExternalStateIdsUpgradeTask">
         <property name="buildNumber" value="205014001"/>
+    </bean>
+
+    <bean id="addGitCloneDepth" class="com.zutubi.pulse.master.upgrade.tasks.AddGitCloneDepthUpgradeTask">
+        <property name="buildNumber" value="205999001"/>
     </bean>
 </beans>

@@ -24,7 +24,7 @@ public class AddDependencyTransitiveModeUpgradeTask extends AbstractRecordProper
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_USERS, PathUtils.WILDCARD_ANY_ELEMENT, PROPERTY_PREFERENCES));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_MODE, "FULL"));
     }

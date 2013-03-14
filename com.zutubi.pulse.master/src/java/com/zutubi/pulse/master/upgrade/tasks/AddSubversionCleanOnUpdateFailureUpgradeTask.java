@@ -29,7 +29,7 @@ public class AddSubversionCleanOnUpdateFailureUpgradeTask extends AbstractRecord
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         // Set to false in existing installs to preserve current behaviour.
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_CLEAN_ON_UPDATE_FAILURE, Boolean.toString(false)));

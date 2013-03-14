@@ -34,7 +34,7 @@ public class AddGitCloneTypeUpgradeTask extends AbstractRecordPropertiesUpgradeT
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         RecordUpgrader upgrader = new RecordUpgrader()
         {

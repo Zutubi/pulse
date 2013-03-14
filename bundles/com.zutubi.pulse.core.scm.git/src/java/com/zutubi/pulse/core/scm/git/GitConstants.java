@@ -70,6 +70,7 @@ public class GitConstants
     // Command flags.
 
     public static final String FLAG_BRANCH = "-b";
+    public static final String FLAG_DEPTH = "--depth";
     public static final String FLAG_FORCE = "-f";
     public static final String FLAG_MIRROR = "--mirror";
     public static final String FLAG_NAME_STATUS = "--name-status";

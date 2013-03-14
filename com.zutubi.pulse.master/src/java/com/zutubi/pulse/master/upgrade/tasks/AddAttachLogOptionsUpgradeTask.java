@@ -24,7 +24,7 @@ public class AddAttachLogOptionsUpgradeTask extends AbstractRecordPropertiesUpgr
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(
                 RecordUpgraders.newAddProperty("attachLogs", "false"),

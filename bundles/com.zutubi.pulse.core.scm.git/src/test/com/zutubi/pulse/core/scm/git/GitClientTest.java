@@ -613,7 +613,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testTestConnectionBadRepo()
     {
-        client = new GitClient("file:///no/such/repo", "master", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
+        client = new GitClient("file:///no/such/repo", "master", 0, GitConfiguration.CloneType.NORMAL, 0, false, Collections.<String>emptyList());
         try
         {
             client.testConnection(scmContext);
@@ -627,7 +627,7 @@ public class GitClientTest extends GitClientTestBase
 
     public void testTestConnectionBadBranch()
     {
-        client = new GitClient(repository, "nosuchbranch", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
+        client = new GitClient(repository, "nosuchbranch", 0, GitConfiguration.CloneType.NORMAL, 0, false, Collections.<String>emptyList());
         try
         {
             client.testConnection(scmContext);

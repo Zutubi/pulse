@@ -62,7 +62,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
             return RecordLocators.newPathPattern("projects/*/dependencies");
         }
 
-        protected List<RecordUpgrader> getRecordUpgraders()
+        protected List<? extends RecordUpgrader> getRecordUpgraders()
         {
             return Arrays.asList(RecordUpgraders.newDeleteProperty("publicationPattern"));
         }
@@ -83,7 +83,7 @@ public class RefactorDependencyPublicationUpgradeTask extends AbstractUpgradeTas
             ) ;
         }
 
-        protected List<RecordUpgrader> getRecordUpgraders()
+        protected List<? extends RecordUpgrader> getRecordUpgraders()
         {
             return Arrays.asList(RecordUpgraders.newAddProperty("publish", "false"),
                     RecordUpgraders.newAddProperty("artifactPattern", "(.+)\\.(.+)"));

@@ -23,7 +23,7 @@ public class GitInactivityTimeoutUpgradeTask extends AbstractRecordPropertiesUpg
         return RecordLocators.newTypeFilter(triggerLocator, "zutubi.gitConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("inactivityTimeoutEnabled", "false"),
                              RecordUpgraders.newAddProperty("inactivityTimeoutSeconds", "300"));

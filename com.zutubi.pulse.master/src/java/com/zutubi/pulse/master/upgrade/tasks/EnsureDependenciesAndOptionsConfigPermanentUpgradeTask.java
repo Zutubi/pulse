@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.config.api.Configuration;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 /**
  * Adds the permanent flag to all of the projects dependencies and options configurations
@@ -31,7 +32,7 @@ public class EnsureDependenciesAndOptionsConfigPermanentUpgradeTask extends Abst
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddMetaProperty(Configuration.PERMANENT_KEY, Boolean.toString(true)));
     }

@@ -33,7 +33,7 @@ public class RefactorCleanupWhatFieldUpgradeTask extends AbstractRecordPropertie
         return RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "cleanup", PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList((RecordUpgrader)new CleanupRecordUpgrader());
     }

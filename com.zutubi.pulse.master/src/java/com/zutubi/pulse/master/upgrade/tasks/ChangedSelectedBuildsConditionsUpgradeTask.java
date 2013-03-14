@@ -27,7 +27,7 @@ public class ChangedSelectedBuildsConditionsUpgradeTask extends AbstractRecordPr
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         RecordUpgrader updateChangesProperty = new RecordUpgrader()
         {

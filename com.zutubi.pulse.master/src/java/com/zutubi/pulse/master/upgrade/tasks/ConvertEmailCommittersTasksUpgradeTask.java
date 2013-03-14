@@ -31,7 +31,7 @@ public class ConvertEmailCommittersTasksUpgradeTask extends AbstractRecordProper
         return RecordLocators.newTypeFilter(allHookTasks, TYPE_OLD);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newChangeSymbolicName(TYPE_OLD, TYPE_NEW),

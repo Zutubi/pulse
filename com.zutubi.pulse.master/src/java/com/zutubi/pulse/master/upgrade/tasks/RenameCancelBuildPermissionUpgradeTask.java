@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
+
+import java.util.List;
+
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
-
-import java.util.List;
 
 /**
  * Updates the value for cancel build permissions to be camel-cased, so we can
@@ -24,7 +25,7 @@ public class RenameCancelBuildPermissionUpgradeTask extends AbstractRecordProper
         return RecordLocators.newPathPattern(getPath(SCOPE_PROJECTS, WILDCARD_ANY_ELEMENT, PROPERTY_PERMISSIONS, WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(
                 RecordUpgraders.newEditProperty(PROPERTY_ALLOWED_ACTIONS, new Function<Object, Object>()

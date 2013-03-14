@@ -41,7 +41,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     public void execute() throws UpgradeException
     {
         final RecordLocator recordLocator = getRecordLocator();
-        final List<RecordUpgrader> recordUpgraders = getRecordUpgraders();
+        final List<? extends RecordUpgrader> recordUpgraders = getRecordUpgraders();
         wireExternalDependencies(recordLocator, recordUpgraders);
 
         transactionManager.runInTransaction(new Runnable()
@@ -64,7 +64,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
         });
     }
 
-    private void wireExternalDependencies(RecordLocator recordLocator, List<RecordUpgrader> recordUpgraders) throws UpgradeException
+    private void wireExternalDependencies(RecordLocator recordLocator, List<? extends RecordUpgrader> recordUpgraders) throws UpgradeException
     {
         // Create the details lazily as it takes some time and will not
         // be necessary for all tasks.
@@ -102,7 +102,7 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
      * @return a list of upgraders to apply in order to all records upgraded by
      *         this task
      */
-    protected abstract List<RecordUpgrader> getRecordUpgraders();
+    protected abstract List<? extends RecordUpgrader> getRecordUpgraders();
 
     public void setRecordManager(RecordManager recordManager)
     {

@@ -33,7 +33,7 @@ public class WarningStatusConfigurationUpgradeTask extends AbstractRecordPropert
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         Function<Object, Object> editFn = new Function<Object, Object>()
         {

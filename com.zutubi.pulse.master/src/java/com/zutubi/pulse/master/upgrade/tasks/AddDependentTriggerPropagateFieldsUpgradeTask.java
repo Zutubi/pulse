@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+
+import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
 
 /**
  * Upgrade task that adds the propagate status and version fields to the dependent build trigger configuration.
@@ -29,7 +30,7 @@ public class AddDependentTriggerPropagateFieldsUpgradeTask extends AbstractRecor
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(newAddProperty(PROPERTY_PROPAGATE_STATUS, DEFAULT_PROPAGATE_STATUS),
                 newAddProperty(PROPERTY_PROPAGATE_VERSION, DEFAULT_PROPAGATE_VERSION));

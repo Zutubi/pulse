@@ -33,7 +33,7 @@ public class DependencyCorrespondingStagesUpgradeTask extends AbstractRecordProp
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         RecordUpgrader upgrader = new RecordUpgrader()
         {

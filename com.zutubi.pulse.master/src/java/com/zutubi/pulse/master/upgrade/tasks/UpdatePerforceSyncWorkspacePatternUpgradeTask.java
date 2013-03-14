@@ -21,7 +21,7 @@ public class UpdatePerforceSyncWorkspacePatternUpgradeTask extends AbstractRecor
         return RecordLocators.newTypeFilter(RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "scm")), "zutubi.perforceConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY, new Function<Object, Object>()
         {

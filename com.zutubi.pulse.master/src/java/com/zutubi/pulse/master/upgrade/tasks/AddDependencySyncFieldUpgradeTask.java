@@ -18,7 +18,7 @@ public class AddDependencySyncFieldUpgradeTask extends AbstractRecordPropertiesU
         return RecordLocators.newPathPattern(PathUtils.getPath("projects/*/dependencies"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SYNC, DEFAULT_VALUE));
     }

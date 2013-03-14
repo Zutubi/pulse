@@ -51,7 +51,7 @@ public abstract class GitClientTestBase extends PulseTestCase
         repositoryBase = new File(tmp, "repo");
         repository = "file://" + repositoryBase.getCanonicalPath();
 
-        client = new GitClient(repository, "master", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
+        client = new GitClient(repository, "master", 0, GitConfiguration.CloneType.NORMAL, 0, false, Collections.<String>emptyList());
 
         workingDir = new File(tmp, "wd");
         context = new PulseExecutionContext();

@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.tove.type.record.PathUtils;
-
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Add the statuses field to the cleanup configurations.
@@ -17,7 +15,7 @@ public class AddCleanupStatusesFieldUpgradeTask extends AbstractRecordProperties
          return RecordLocators.newPathPattern("projects/*/cleanup/*");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_STATUSES, new String[0]));
     }

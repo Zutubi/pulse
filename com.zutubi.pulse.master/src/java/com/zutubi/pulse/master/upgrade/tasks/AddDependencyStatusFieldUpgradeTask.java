@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Upgrade task that adds the status field to the project/dependencies
@@ -19,7 +19,7 @@ public class AddDependencyStatusFieldUpgradeTask extends AbstractRecordPropertie
         return RecordLocators.newPathPattern(PathUtils.getPath("projects", PathUtils.WILDCARD_ANY_ELEMENT, "dependencies"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_STATUS, DEFAULT_STATUS));
     }

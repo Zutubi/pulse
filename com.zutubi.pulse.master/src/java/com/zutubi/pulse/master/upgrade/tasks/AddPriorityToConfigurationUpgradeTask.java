@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
-
 import java.util.List;
+
+import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
 import static java.util.Arrays.asList;
 
 /**
@@ -19,7 +19,7 @@ public class AddPriorityToConfigurationUpgradeTask extends AbstractRecordPropert
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(newAddProperty("priority", ""));
     }

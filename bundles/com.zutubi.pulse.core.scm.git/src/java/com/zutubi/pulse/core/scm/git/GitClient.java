@@ -88,17 +88,19 @@ public class GitClient implements ScmClient
      */
     private int inactivityTimeout;
     private GitConfiguration.CloneType cloneType;
+    private int cloneDepth;
     private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
     private boolean processSubmodules;
     private List<String> submoduleNames = Collections.emptyList();
 
-    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, boolean processSubmodules, List<String> submoduleNames)
+    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, int cloneDepth, boolean processSubmodules, List<String> submoduleNames)
     {
         this.repository = repository;
         this.branch = branch;
         this.inactivityTimeout = inactivityTimeout;
         this.cloneType = cloneType;
+        this.cloneDepth = cloneDepth;
         this.processSubmodules = processSubmodules;
         this.submoduleNames = submoduleNames;
     }
@@ -136,7 +138,7 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
-        git.clone(handler, repository, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR);
+        git.clone(handler, repository, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR, -1);
         handler.status("Repository cloned.");
     }
 
@@ -183,14 +185,6 @@ public class GitClient implements ScmClient
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException
     {
-        // IMPLEMENTATION NOTE:
-        //  we can improve the speed of the checkout by running git clone -depth 1, thereby not downloading all of the
-        // repositories history.  However, given the current interaction between the scm client and pulse, the working
-        // directory created by the checkout may be used subsequently for an update, or multiple updates, as well as
-        // an update to an old revision.  This would not be possible with a restricted history repository.  So, we go
-        // with the slower checkout for now.  If users have issues with the speed of the checkout in builds, they
-        // should select an alternate checkout scheme - both CLEAN_UPDATE and INCREMENTAL_UPDATE would do the trick. 
-
         File workingDir = context.getWorkingDir();
 
         // Git likes to create the directory we clone into, so we need to ensure that it can do so.
@@ -211,6 +205,14 @@ public class GitClient implements ScmClient
 
         switch (cloneType)
         {
+            case SHALLOW:
+            {
+                // git clone --no-checkout --depth <clone depth> <repository> <dir>
+                git.setWorkingDirectory(workingDir.getParentFile());
+                git.clone(handler, repository, workingDir.getName(), false, cloneDepth);
+                git.setWorkingDirectory(workingDir);
+                break;
+            }
             case SELECTED_BRANCH_ONLY:
             {
                 if (!workingDir.mkdir())
@@ -229,9 +231,9 @@ public class GitClient implements ScmClient
             }
             case NORMAL:
             {
-                // git clone -n <repository> <dir>
+                // git clone --no-checkout <repository> <dir>
                 git.setWorkingDirectory(workingDir.getParentFile());
-                git.clone(handler, repository, workingDir.getName(), false);
+                git.clone(handler, repository, workingDir.getName(), false, -1);
                 git.setWorkingDirectory(workingDir);
                 break;
             }
@@ -244,7 +246,7 @@ public class GitClient implements ScmClient
                 }
 
                 git.setWorkingDirectory(workingDir);
-                git.clone(handler, repository, GIT_REPOSITORY_DIRECTORY, true);
+                git.clone(handler, repository, GIT_REPOSITORY_DIRECTORY, true, -1);
                 git.config(handler, CONFIG_BARE, false);
                 break;
             }

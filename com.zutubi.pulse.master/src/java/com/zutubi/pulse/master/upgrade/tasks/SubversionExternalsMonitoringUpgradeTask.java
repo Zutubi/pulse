@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static java.util.Arrays.asList;
 
 /**
  * Adds the new externalsMonitoring field to Subversion configs.
@@ -31,7 +32,7 @@ public class SubversionExternalsMonitoringUpgradeTask extends AbstractRecordProp
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(RecordUpgraders.newAddProperty(PROPERTY_MONITORING, "MONITOR_SELECTED"));
     }

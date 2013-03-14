@@ -23,7 +23,7 @@ public class AddAgentDataDirectoryUpgradeTask extends AbstractRecordPropertiesUp
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY, "${data.dir}/agents/${agent}"));
     }

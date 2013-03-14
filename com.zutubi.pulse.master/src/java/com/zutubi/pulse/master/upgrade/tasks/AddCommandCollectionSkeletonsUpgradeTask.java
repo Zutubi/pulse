@@ -39,7 +39,7 @@ public class AddCommandCollectionSkeletonsUpgradeTask extends AbstractRecordProp
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         List<RecordUpgrader> upgraders = new LinkedList<RecordUpgrader>();
         upgraders.add(new RecordUpgrader()

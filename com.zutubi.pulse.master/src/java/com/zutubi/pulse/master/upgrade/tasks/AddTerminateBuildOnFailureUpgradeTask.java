@@ -24,7 +24,7 @@ public class AddTerminateBuildOnFailureUpgradeTask extends AbstractRecordPropert
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_PROJECTS, PathUtils.WILDCARD_ANY_ELEMENT, PROPERTY_STAGES, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_TERMINATE, "false"));
     }

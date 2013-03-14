@@ -2,8 +2,9 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.MutableRecord;
 
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Adds the new serviceName field to jabber configuration.
@@ -22,7 +23,7 @@ public class AddJabberServiceNameUpgradeTask extends AbstractRecordPropertiesUpg
         return RecordLocators.newPath("settings/jabber");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         RecordUpgrader upgrader = new RecordUpgrader()
         {

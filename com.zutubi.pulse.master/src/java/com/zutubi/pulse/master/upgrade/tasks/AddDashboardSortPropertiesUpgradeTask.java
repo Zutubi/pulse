@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Upgrade task to add two properties to the users dashboard configuration.  The sortProjectsAlphabetically
@@ -22,7 +22,7 @@ public class AddDashboardSortPropertiesUpgradeTask extends AbstractRecordPropert
         return RecordLocators.newTypeFilter(locator, "zutubi.dashboardConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("sortProjectsAlphabetically", "true"),
                              RecordUpgraders.newAddProperty("sortGroupsAlphabetically", "true"));

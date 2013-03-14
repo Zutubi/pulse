@@ -24,7 +24,7 @@ public class AddLogCompressionEnabledUpgradeTask extends AbstractRecordPropertie
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_PROJECTS, PathUtils.WILDCARD_ANY_ELEMENT, PROPERTY_OPTIONS));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_ENABLED, "true"));
     }

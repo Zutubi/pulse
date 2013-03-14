@@ -24,7 +24,7 @@ public class EnsureGlobalConfigPermanentUpgradeTask extends AbstractRecordProper
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_SETTINGS, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddMetaProperty(Configuration.PERMANENT_KEY, Boolean.toString(true)));
     }

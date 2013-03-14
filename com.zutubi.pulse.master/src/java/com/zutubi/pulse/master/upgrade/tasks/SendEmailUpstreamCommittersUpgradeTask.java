@@ -31,7 +31,7 @@ public class SendEmailUpstreamCommittersUpgradeTask extends AbstractRecordProper
         return RecordLocators.newTypeFilter(triggerLocator, TYPE_SEND_EMAIL);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_INCLUDE_UPSTREAM, "false"));
     }

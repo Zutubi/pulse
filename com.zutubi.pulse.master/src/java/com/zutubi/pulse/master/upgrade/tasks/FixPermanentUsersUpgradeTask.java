@@ -33,7 +33,7 @@ public class FixPermanentUsersUpgradeTask extends AbstractRecordPropertiesUpgrad
         });
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newDeleteMetaProperty(Configuration.PERMANENT_KEY));
     }

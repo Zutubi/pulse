@@ -32,7 +32,7 @@ public class GitClientIntegrationTest extends AbstractScmIntegrationTestCase
         URL url = getClass().getResource("GitClientIntegrationTest.git.zip");
         PulseZipUtils.extractZip(new File(url.toURI()), new File(tmp, "repo"));
 
-        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, GitConfiguration.CloneType.NORMAL, false, Collections.<String>emptyList());
+        this.client = new GitClient("file://" + new File(tmp, "repo").getCanonicalPath(), "master", 0, GitConfiguration.CloneType.NORMAL, 0, false, Collections.<String>emptyList());
         this.testData = new ExpectedTestResults(revisions);
         this.prefix = ""; // hmm, this is duplicated in the expected test results instance as well.
 

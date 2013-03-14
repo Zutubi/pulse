@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Add the suite group configuration property to the regex test post processor configurations.
@@ -21,7 +21,7 @@ public class AddRegexTestPostProcessorConfigurationSuiteGroupUpgradeTask  extend
         ), TYPE);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SUITE_GROUP, "-1"));
     }

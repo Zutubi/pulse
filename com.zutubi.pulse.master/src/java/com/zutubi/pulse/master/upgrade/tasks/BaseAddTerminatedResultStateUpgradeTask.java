@@ -2,10 +2,11 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static java.util.Arrays.asList;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * A base upgrade task class for adding the terminated result state to any configurations that
@@ -15,7 +16,7 @@ public abstract class BaseAddTerminatedResultStateUpgradeTask extends AbstractRe
 {
     protected abstract String getPropertyName();
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(RecordUpgraders.newEditProperty(getPropertyName(), new Function<Object, Object>()
         {

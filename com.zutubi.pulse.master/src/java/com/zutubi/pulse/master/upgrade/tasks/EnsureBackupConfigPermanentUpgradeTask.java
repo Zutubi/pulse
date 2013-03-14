@@ -24,7 +24,7 @@ public class EnsureBackupConfigPermanentUpgradeTask extends AbstractRecordProper
         return RecordLocators.newPath(PathUtils.getPath(SCOPE_SETTINGS, "backup"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddMetaProperty(Configuration.PERMANENT_KEY, Boolean.toString(true)));
     }

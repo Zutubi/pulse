@@ -24,7 +24,7 @@ public class EnsureAgentPingConfigPermanentUpgradeTask extends AbstractRecordPro
         return RecordLocators.newPath(PathUtils.getPath(SCOPE_SETTINGS, "agentPing"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddMetaProperty(Configuration.PERMANENT_KEY, Boolean.toString(true)));
     }

@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Add the version field to the proejct dependencies configuration.
@@ -19,7 +19,7 @@ public class AddDependencyVersionFieldUpgradeTask  extends AbstractRecordPropert
         return RecordLocators.newPathPattern(PathUtils.getPath("projects/*/dependencies"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_VERSION, DEFAULT_VERSION));
     }

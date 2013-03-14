@@ -20,7 +20,7 @@ public class WarningStatusCustomConditionsUpgradeTask extends AbstractRecordProp
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newEditProperty("customCondition", new Function<Object, Object>()
         {

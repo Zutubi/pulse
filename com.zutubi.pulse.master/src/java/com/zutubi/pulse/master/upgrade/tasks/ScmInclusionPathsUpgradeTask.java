@@ -32,7 +32,7 @@ public class ScmInclusionPathsUpgradeTask extends AbstractRecordPropertiesUpgrad
         });
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newAddProperty(PROPERTY_INCLUDED_PATHS, new String[0]),

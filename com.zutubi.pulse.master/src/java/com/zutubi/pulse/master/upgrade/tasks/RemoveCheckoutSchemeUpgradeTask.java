@@ -14,7 +14,7 @@ public class RemoveCheckoutSchemeUpgradeTask extends AbstractRecordPropertiesUpg
         return RecordLocators.newPathPattern("projects/*/scm");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newDeleteProperty("checkoutScheme"));
     }

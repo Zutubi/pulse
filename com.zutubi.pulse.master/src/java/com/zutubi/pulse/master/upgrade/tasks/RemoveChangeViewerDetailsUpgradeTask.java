@@ -13,7 +13,7 @@ public class RemoveChangeViewerDetailsUpgradeTask extends AbstractRecordProperti
         return RecordLocators.newPathPattern("projects/*/changeViewer");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newDeleteProperty("details"));
     }

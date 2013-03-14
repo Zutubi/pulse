@@ -23,7 +23,7 @@ public class LdapGroupDnsUpgradeTask extends AbstractRecordPropertiesUpgradeTask
         return RecordLocators.newPathPattern(PathUtils.getPath("settings", "ldap"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         RecordUpgrader upgrader = new RecordUpgrader()
         {

@@ -24,7 +24,7 @@ public class AddConcurrentBuildsFieldUpgradeTask extends AbstractRecordPropertie
         return RecordLocators.newPathPattern(SCOPE_PROJECTS + "/"+globalProjectName+"/options");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_CONCURRENT_BUILDS, "1"));
     }

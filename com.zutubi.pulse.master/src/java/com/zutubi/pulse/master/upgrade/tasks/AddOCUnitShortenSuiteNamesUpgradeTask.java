@@ -21,7 +21,7 @@ public class AddOCUnitShortenSuiteNamesUpgradeTask extends AbstractRecordPropert
         ), TYPE);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SHORTEN_SUITE_NAMES, "false"));
     }

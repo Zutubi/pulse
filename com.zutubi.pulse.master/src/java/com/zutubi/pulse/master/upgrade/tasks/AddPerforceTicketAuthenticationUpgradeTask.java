@@ -29,7 +29,7 @@ public class AddPerforceTicketAuthenticationUpgradeTask extends AbstractRecordPr
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_TICKET_AUTH, Boolean.toString(false)));
     }

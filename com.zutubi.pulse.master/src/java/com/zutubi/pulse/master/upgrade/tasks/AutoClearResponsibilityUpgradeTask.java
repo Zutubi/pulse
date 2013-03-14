@@ -21,7 +21,7 @@ public class AutoClearResponsibilityUpgradeTask extends AbstractRecordProperties
         return RecordLocators.newPathPattern("projects/*/options");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY, "true"));
     }

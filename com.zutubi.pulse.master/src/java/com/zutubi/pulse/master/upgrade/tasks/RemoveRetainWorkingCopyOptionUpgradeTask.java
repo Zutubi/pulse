@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * CIB-2365: remove the option to retain the working copies from the build options.
@@ -13,7 +13,7 @@ public class RemoveRetainWorkingCopyOptionUpgradeTask extends AbstractRecordProp
         return RecordLocators.newPathPattern("projects/*/options");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newDeleteProperty("retainWorkingCopy"));
     }

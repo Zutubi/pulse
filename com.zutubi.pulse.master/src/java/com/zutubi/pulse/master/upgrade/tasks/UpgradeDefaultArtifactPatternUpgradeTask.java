@@ -2,10 +2,11 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 /**
  * Update any artifact patterns that match the previous default value to
@@ -23,7 +24,7 @@ public class UpgradeDefaultArtifactPatternUpgradeTask  extends AbstractRecordPro
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE, WILDCARD_ANY_ELEMENT, "type", "recipes", WILDCARD_ANY_ELEMENT, "commands", WILDCARD_ANY_ELEMENT, "artifacts", WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newEditProperty(PROPERTY_ARTIFACT_PATTERN, new UpdateDefaultValues())

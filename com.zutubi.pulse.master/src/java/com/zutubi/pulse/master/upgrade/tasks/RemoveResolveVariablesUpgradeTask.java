@@ -49,7 +49,7 @@ public class RemoveResolveVariablesUpgradeTask extends AbstractRecordPropertiesU
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(new RecordUpgrader()
         {

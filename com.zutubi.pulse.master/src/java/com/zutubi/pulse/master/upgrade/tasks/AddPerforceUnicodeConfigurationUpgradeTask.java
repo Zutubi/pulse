@@ -28,7 +28,7 @@ public class AddPerforceUnicodeConfigurationUpgradeTask extends AbstractRecordPr
         return RecordLocators.newTypeFilter(locator, TYPE_PERFORCE);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newAddProperty(PROPERTY_UNICODE_SERVER, Boolean.toString(false)),

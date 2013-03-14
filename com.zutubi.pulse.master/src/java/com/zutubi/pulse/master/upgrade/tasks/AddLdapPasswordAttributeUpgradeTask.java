@@ -24,7 +24,7 @@ public class AddLdapPasswordAttributeUpgradeTask extends AbstractRecordPropertie
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_GLOBAL, PROPERTY_LDAP));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_PASSWORD_ATTRIBUTE, ""));
     }

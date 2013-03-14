@@ -25,7 +25,7 @@ public class SubscribeByLabelUpgradeTask extends AbstractRecordPropertiesUpgrade
         return RecordLocators.newTypeFilter(RecordLocators.newPathPattern("users/*/preferences/subscriptions/*"), "zutubi.projectSubscriptionConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.<RecordUpgrader>asList(new RecordUpgrader()
         {

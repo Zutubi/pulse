@@ -23,7 +23,7 @@ public class GitTrackSelectedBranchUpgradeTask extends AbstractRecordPropertiesU
         return RecordLocators.newTypeFilter(locator, "zutubi.gitConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("trackSelectedBranch", "false"));
     }

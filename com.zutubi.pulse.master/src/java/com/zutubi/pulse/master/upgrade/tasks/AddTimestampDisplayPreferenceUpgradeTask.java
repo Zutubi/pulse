@@ -22,7 +22,7 @@ public class AddTimestampDisplayPreferenceUpgradeTask extends AbstractRecordProp
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_TIMESTAMP_DISPLAY, DEFAULT_VALUE));
     }

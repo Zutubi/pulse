@@ -28,7 +28,7 @@ public class AddPerforceTimeOffsetUpgradeTask extends AbstractRecordPropertiesUp
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_TIME_OFFSET, "0"));
     }

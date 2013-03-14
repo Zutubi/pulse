@@ -24,7 +24,7 @@ public class AddConfigAuditLoggingEnabledUpgradeTask extends AbstractRecordPrope
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_GLOBAL, PROPERTY_LOGGING));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_CONFIG_AUDIT_ENABLED, "false"));
     }

@@ -14,7 +14,7 @@ public class RemovePersistentWorkDirOptionUpgradeTask extends AbstractRecordProp
         return RecordLocators.newPathPattern("projects/*/options");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newDeleteProperty("persistentWorkDir"));
     }

@@ -29,7 +29,7 @@ public class AddSubversionEnableHttpSpoolingUpgradeTask extends AbstractRecordPr
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SPOOLING, Boolean.toString(false)));
     }

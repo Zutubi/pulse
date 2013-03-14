@@ -20,7 +20,7 @@ public class AgentPriorityUpgradeTask extends AbstractRecordPropertiesUpgradeTas
         return RecordLocators.newPathPattern(PathUtils.getPath("agents", PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("priority", "0"));
     }

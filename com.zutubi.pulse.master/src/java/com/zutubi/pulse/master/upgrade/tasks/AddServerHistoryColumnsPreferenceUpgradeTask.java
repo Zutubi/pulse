@@ -22,7 +22,7 @@ public class AddServerHistoryColumnsPreferenceUpgradeTask extends AbstractRecord
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_COLUMNS, DEFAULT_VALUES));
     }

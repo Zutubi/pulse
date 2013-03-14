@@ -5,9 +5,10 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
-import static java.util.Arrays.asList;
 
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Upgrade task to add two properties to the users dashboard configuration.  The sortProjectsAlphabetically
@@ -33,7 +34,7 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_USERS, PathUtils.WILDCARD_ANY_ELEMENT, PROPERTY_PREFERENCES));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         FixColumnsFn editFn = new FixColumnsFn();
         return asList(RecordUpgraders.newDeleteProperty("myProjectsColumns"),

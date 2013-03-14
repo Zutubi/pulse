@@ -1,10 +1,11 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 
 /**
  * Adds a new property to resource requirements allowing them to be marked as
@@ -33,7 +34,7 @@ public class ResourceRequirementOptionalUpgradeTask extends AbstractRecordProper
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newAddProperty(PROPERTY_OPTIONAL, Boolean.toString(false))

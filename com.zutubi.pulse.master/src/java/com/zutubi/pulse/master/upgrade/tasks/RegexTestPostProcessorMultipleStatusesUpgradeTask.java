@@ -2,9 +2,10 @@ package com.zutubi.pulse.master.upgrade.tasks;
 
 import com.google.common.base.Function;
 import com.zutubi.tove.type.record.PathUtils;
-import static java.util.Arrays.asList;
 
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * Updates regex-test post-processors to allow them to have multiple strings
@@ -26,7 +27,7 @@ public class RegexTestPostProcessorMultipleStatusesUpgradeTask extends AbstractR
         ), TYPE);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         ToArrayFn editFn = new ToArrayFn();
         return asList(

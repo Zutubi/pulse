@@ -23,7 +23,7 @@ public class UpdateTimeReportLabelUpgradeTask extends AbstractRecordPropertiesUp
         return RecordLocators.newPath(PathUtils.getPath(SCOPE_PROJECTS, globalProject, PATH_REPORT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newEditProperty(PROPERTY_LABEL, new Function<Object, Object>()
         {

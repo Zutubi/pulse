@@ -35,7 +35,7 @@ public class EmailCommittersSinceSuccessUpgradeTask extends AbstractRecordProper
         return RecordLocators.newTypeFilter(triggerLocator, TYPE_EMAIL_COMMITTERS);
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_SINCE_SUCCESS, "false"),
                              RecordUpgraders.newAddProperty(PROPERTY_SCM_EMAILS, "false"));

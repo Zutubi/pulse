@@ -30,7 +30,7 @@ public class AddPerforceViewUpgradeTask extends AbstractRecordPropertiesUpgradeT
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newAddProperty(PROPERTY_USE_TEMPLATE_CLIENT, Boolean.toString(true)),

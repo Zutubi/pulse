@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
-
-import static java.util.Arrays.asList;
 import java.util.List;
+
+import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
+import static java.util.Arrays.asList;
 
 /**
  * Upgrade task to add the enabled (default true) flag to all project commands and stages.
@@ -18,7 +18,7 @@ public class AddEnableDisableToProjectCommandsAndStagesUpgradeTask extends Abstr
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(
                 newAddProperty("enabled", Boolean.toString(true))

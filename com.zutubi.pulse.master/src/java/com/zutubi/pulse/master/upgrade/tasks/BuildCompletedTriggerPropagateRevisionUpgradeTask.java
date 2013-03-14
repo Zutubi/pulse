@@ -23,7 +23,7 @@ public class BuildCompletedTriggerPropagateRevisionUpgradeTask extends AbstractR
         return RecordLocators.newTypeFilter(triggerLocator, "zutubi.buildCompletedConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("propagateRevision", "false"),
                              RecordUpgraders.newAddProperty("supercedeQueued", "false"));

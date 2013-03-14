@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
+import java.util.List;
+
 import static com.zutubi.pulse.master.upgrade.tasks.RecordLocators.newPathPattern;
 import static com.zutubi.pulse.master.upgrade.tasks.RecordLocators.newTypeFilter;
 import static com.zutubi.pulse.master.upgrade.tasks.RecordUpgraders.newAddProperty;
 import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
-
 import static java.util.Arrays.asList;
-import java.util.List;
 
 /**
  * Adds the new hashing options to file system artifacts.
@@ -26,7 +26,7 @@ public class AddArtifactHashUpgradeTask extends AbstractRecordPropertiesUpgradeT
                              "zutubi.fileArtifactConfig", "zutubi.directoryArtifactConfig");
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return asList(
                 newAddProperty("calculateHash", Boolean.toString(false)),

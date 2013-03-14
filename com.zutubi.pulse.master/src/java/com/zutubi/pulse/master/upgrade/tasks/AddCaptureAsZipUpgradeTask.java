@@ -18,7 +18,7 @@ public class AddCaptureAsZipUpgradeTask extends AbstractRecordPropertiesUpgradeT
         );
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("captureAsZip", "false"));
     }

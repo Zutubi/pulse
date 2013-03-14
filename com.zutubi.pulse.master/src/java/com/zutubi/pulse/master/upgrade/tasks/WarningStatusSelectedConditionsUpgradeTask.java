@@ -18,7 +18,7 @@ public class WarningStatusSelectedConditionsUpgradeTask extends AbstractRecordPr
     }
 
     @Override
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(
                 RecordUpgraders.newRenameProperty("unsuccessful", "broken"),

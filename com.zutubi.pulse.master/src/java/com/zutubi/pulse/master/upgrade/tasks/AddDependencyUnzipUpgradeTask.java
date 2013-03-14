@@ -15,7 +15,7 @@ public class AddDependencyUnzipUpgradeTask extends AbstractRecordPropertiesUpgra
         return RecordLocators.newPathPattern(PathUtils.getPath("projects/*/dependencies"));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty("unzipRetrievedArchives", "false"));
     }

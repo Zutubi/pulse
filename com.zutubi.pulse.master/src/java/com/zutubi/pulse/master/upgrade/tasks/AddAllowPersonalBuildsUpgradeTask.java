@@ -23,7 +23,7 @@ public class AddAllowPersonalBuildsUpgradeTask extends AbstractRecordPropertiesU
         return RecordLocators.newPathPattern(PathUtils.getPath(SCOPE_AGENTS, PathUtils.WILDCARD_ANY_ELEMENT));
     }
 
-    protected List<RecordUpgrader> getRecordUpgraders()
+    protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
         return Arrays.asList(RecordUpgraders.newAddProperty(PROPERTY_NAME, Boolean.toString(true)));
     }
