@@ -30,6 +30,10 @@
         </and>
     </condition>
 
+    <presetdef name="javac">
+      <javac includeantruntime="false" />
+    </presetdef>
+
     <target name="init">
         <dirname property="project.root.dir" file="./build.xml"/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
