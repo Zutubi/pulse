@@ -2743,7 +2743,8 @@ public class RemoteApi
 
     /**
      * Returns an array of new changes detected in the given build.  These are the changes between
-     * the given build's revision and the previous build's revision.
+     * the given build's revision and the previous build's revision.  Upstream changes (where
+     * dependencies are involved) are not included.
      *
      * @param token       authentication token, see {@link #login}
      * @param projectName name of the project that owns the build
@@ -2753,11 +2754,38 @@ public class RemoteApi
      * @throws IllegalArgumentException if the given project name is invalid, or the given build
      *                                  does not exist
      * @access requires view permission for the given project
+     * @see #getChangesInBuild(String, String, int, boolean)
      * @see #getBuild(String, String, int)
      * @see #getLatestBuildForProject(String, String, boolean)
      * @see #getLatestBuildsForProject(String, String, boolean, int)
      */
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id)
+    {
+        return getChangesInBuild(token, projectName, id, false);
+    }
+
+    /**
+     * Returns an array of new changes detected in the given build.  These are the changes between
+     * the given build's revision and the previous build's revision.  Upstream changes (where
+     * dependencies are involved) may optionally be included.  Those changes include additional
+     * details about the builds they directly applied to (and how they relate to the given build).
+     *
+     * @param token           authentication token, see {@link #login}
+     * @param projectName     name of the project that owns the build
+     * @param id              ID of the build to retrieve the changes for
+     * @param includeUpstream if true, changes the indirectly affected this build (via upstream
+     *                        dependencies) are included in the returned list
+     * @return {@xtype array<[RemoteApi.Changelist]>} all new code changes that participated in the
+     *         given build, possibly including indirect changes from upstream dependencies
+     * @throws IllegalArgumentException if the given project name is invalid, or the given build
+     *                                  does not exist
+     * @access requires view permission for the given project
+     * @see #getChangesInBuild(String, String, int)
+     * @see #getBuild(String, String, int)
+     * @see #getLatestBuildForProject(String, String, boolean)
+     * @see #getLatestBuildsForProject(String, String, boolean, int)
+     */
+    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id, final boolean includeUpstream)
     {
         tokenManager.loginUser(token);
         try
@@ -2778,6 +2806,16 @@ public class RemoteApi
                     for (PersistentChangelist change : changelists)
                     {
                         result.add(convertChangelist(change));
+                    }
+
+                    if (includeUpstream)
+                    {
+                        BuildResult previous = buildManager.getPreviousBuildResultWithRevision(build, ResultState.getCompletedStates());
+                        List<UpstreamChangelist> upstreamChangelists = changelistManager.getUpstreamChangelists(build, previous);
+                        for (UpstreamChangelist change : upstreamChangelists)
+                        {
+                            result.add(convertUpstreamChangelist(change));
+                        }
                     }
                     return result;
                 }
@@ -2834,6 +2872,29 @@ public class RemoteApi
         {
             result.put("action", change.getActionName().toLowerCase());
         }
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertUpstreamChangelist(UpstreamChangelist change)
+    {
+        Hashtable<String, Object> result = convertChangelist(change.getChangelist());
+        Vector<Vector<Hashtable<String, Object>>> via = new Vector<Vector<Hashtable<String, Object>>>(change.getUpstreamContexts().size());
+        for (BuildPath context : change.getUpstreamContexts())
+        {
+            Vector<Hashtable<String, Object>> path = new Vector<Hashtable<String, Object>>(context.size());
+            for (BuildResult build : context)
+            {
+                Hashtable<String, Object> pathEntry = new Hashtable<String, Object>();
+                pathEntry.put("id", (int) build.getNumber());
+                pathEntry.put("project", build.getProject().getName());
+                path.add(pathEntry);
+            }
+
+            via.add(path);
+        }
+
+        result.put("via", via);
 
         return result;
     }

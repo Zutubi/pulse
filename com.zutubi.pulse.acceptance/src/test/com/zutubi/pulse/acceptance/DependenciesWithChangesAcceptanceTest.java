@@ -7,13 +7,14 @@ import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.TriviAntProject;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
-import static java.util.Arrays.asList;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
  * Acceptance tests for interactions between dependencies and changes between builds.
@@ -52,6 +53,20 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerSuccessfulBuild(upstream);
         rpcClient.RemoteApi.waitForBuildToComplete(downstream.getName(), 2);
 
+        // Check changes via the API.
+        Vector<Hashtable<String,Object>> changes = rpcClient.RemoteApi.getChangesInBuild(downstream.getName(), 2, false);
+        assertEquals(1, changes.size());
+        Hashtable<String, Object> change = changes.get(0);
+        assertEquals("a change", change.get("comment"));
+        assertNull(change.get("via"));
+
+        changes = rpcClient.RemoteApi.getChangesInBuild(downstream.getName(), 2, true);
+        assertEquals(2, changes.size());
+        change = changes.get(0);
+        assertEquals("a change", change.get("comment"));
+        assertNull(change.get("via"));
+        assertUpstreamChange(changes.get(1), "a change", upstream.getName() + ":2");
+
         // Now check the upstream change appears in the changes affecting the downstream build.
         getBrowser().loginAsAdmin();
         BuildChangesPage changesPage = getBrowser().openAndWaitFor(BuildChangesPage.class, downstream.getName(), 2L);
@@ -77,7 +92,7 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
     public void testSameChangeToMultipleUpstreamBuilds() throws Exception
     {
         // util <-+
-        //  ^      \ 
+        //  ^      \
         //  |      app
         //  |      /
         // lib  <-+
@@ -100,6 +115,20 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
         buildRunner.triggerSuccessfulBuild(util);
         rpcClient.RemoteApi.waitForBuildToComplete(app.getName(), 2);
 
+        // Check changes via the API.
+        Vector<Hashtable<String,Object>> changes = rpcClient.RemoteApi.getChangesInBuild(app.getName(), 2, false);
+        assertEquals(1, changes.size());
+        Hashtable<String, Object> change = changes.get(0);
+        assertEquals("multi ball", change.get("comment"));
+        assertNull(change.get("via"));
+
+        changes = rpcClient.RemoteApi.getChangesInBuild(app.getName(), 2, true);
+        assertEquals(2, changes.size());
+        change = changes.get(0);
+        assertEquals("multi ball", change.get("comment"));
+        assertNull(change.get("via"));
+        assertUpstreamChange(changes.get(1), "multi ball", util.getName() + ":2", lib.getName() + ":2", lib.getName() + ":2/" + util.getName() + ":2");
+
         // Now check the upstream change appears via multiple paths when looking at the changes to
         // the app project.
         getBrowser().loginAsAdmin();
@@ -118,7 +147,7 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
                 {
                     return o1.size() - o2.size();
                 }
-                
+
                 for (int i = 0; i < o1.size(); i++)
                 {
                     int nameComp = o1.get(i).first.compareTo(o2.get(i).first);
@@ -127,11 +156,11 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
                         return nameComp;
                     }
                 }
-                
+
                 return 0;
             }
         });
-        
+
         assertEquals(asList(
                 asList(asPair(lib.getName(), 2L)),
                 asList(asPair(util.getName(), 2L)),
@@ -151,5 +180,34 @@ public class DependenciesWithChangesAcceptanceTest extends AcceptanceTestBase
                   new BuildInfo(lib.getName(), 2, ResultState.SUCCESS, null),
                     new BuildInfo(app.getName(), 2, ResultState.SUCCESS, null)
         ), changelistPage.getBuilds());
+    }
+
+    private void assertUpstreamChange(Hashtable<String, Object> change, String comment, String... viaPaths)
+    {
+        assertEquals(comment, change.get("comment"));
+        Vector<Vector<Hashtable<String, Object>>> via = (Vector<Vector<Hashtable<String, Object>>>) change.get("via");
+        assertNotNull(via);
+        assertEquals(viaPaths.length, via.size());
+        List<String> viaList = asList(viaPaths);
+        for (int i = 0; i < viaPaths.length; i++)
+        {
+            // Render paths as strings for simplicity: <project>:<build>/<project>:<build>...
+            StringBuilder pathBuilder = new StringBuilder();
+
+            Vector<Hashtable<String, Object>> path = via.get(i);
+            for (Hashtable<String, Object> pathEntry : path)
+            {
+                if (pathBuilder.length() > 0)
+                {
+                    pathBuilder.append("/");
+                }
+
+                pathBuilder.append(pathEntry.get("project"));
+                pathBuilder.append(":");
+                pathBuilder.append(pathEntry.get("id"));
+            }
+
+            assertThat(viaList, hasItem(pathBuilder.toString()));
+        }
     }
 }

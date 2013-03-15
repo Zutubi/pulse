@@ -366,6 +366,11 @@ public class RemoteApiClient extends ApiClient
         return call("getArtifactFileListingPersonal", id, stageName, commandName, artifactName, path);
     }
 
+    public Vector<Hashtable<String, Object>> getChangesInBuild(String project, long buildNumber, boolean includeUpstream) throws Exception
+    {
+        return call("getChangesInBuild", project, (int)buildNumber, includeUpstream);
+    }
+
     public String insertSimpleProject(String name) throws Exception
     {
         return insertSimpleProject(name, false);
