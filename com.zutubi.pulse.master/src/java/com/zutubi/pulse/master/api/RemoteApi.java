@@ -2392,6 +2392,25 @@ public class RemoteApi
     }
 
     /**
+     * @internal Prefer the variant that takes an int.
+     *
+     * @param token       authentication token, see {@link #login}
+     * @param projectName name of the project to set the next build number for
+     * @param number      the next build number to set - must be greater than the largest build ID
+     *                    used by the project so far
+     * @return true
+     * @throws IllegalArgumentException if the given project name is invalid or the given number is
+     *                                  not greater than the largest id for the project
+     * @throws NumberFormatException    if the given number string cannot be parsed as a number
+     * @access requires write permission for the given project
+     * @see #getNextBuildNumber(String, String)
+     */
+    public boolean setNextBuildNumber(String token, String projectName, final String number)
+    {
+        return setNextBuildNumber(token, projectName, Integer.parseInt(number));
+    }
+
+    /**
      * Sets the next build number for the given project.  This number will be used for the next
      * build of the project, and the numbers will continue to increment from there.  Note that the
      * number cannot be decreased - build numbers for later builds must always be higher than those
@@ -2408,24 +2427,23 @@ public class RemoteApi
      * @access requires write permission for the given project
      * @see #getNextBuildNumber(String, String)
      */
-    public boolean setNextBuildNumber(String token, String projectName, final String number)
+    public boolean setNextBuildNumber(String token, String projectName, final int number)
     {
         tokenManager.loginUser(token);
         try
         {
-            final long n = Long.parseLong(number);
             final Project project = internalGetProject(projectName, true);
             projectManager.runUnderProjectLocks(new Runnable()
             {
                 public void run()
                 {
                     long next = project.getNextBuildNumber();
-                    if (next > n)
+                    if (next > number)
                     {
                         throw new IllegalArgumentException("The existing next build number '" + next + "' is larger than the given number '" + number + "' (build numbers must always increase)");
                     }
 
-                    project.setNextBuildNumber(n);
+                    project.setNextBuildNumber(number);
                     projectManager.save(project);
                 }
             }, project.getId());

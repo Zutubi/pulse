@@ -827,9 +827,9 @@ public class RemoteApiClient extends ApiClient
         return (Integer) call("getNextBuildNumber", projectName);
     }
 
-    public void setNextBuildNumber(String projectName, long number) throws Exception
+    public void setNextBuildNumber(String projectName, int number) throws Exception
     {
-        call("setNextBuildNumber", projectName, Long.toString(number));
+        call("setNextBuildNumber", projectName, number);
     }
 
     public void triggerBuild(String projectName) throws Exception
