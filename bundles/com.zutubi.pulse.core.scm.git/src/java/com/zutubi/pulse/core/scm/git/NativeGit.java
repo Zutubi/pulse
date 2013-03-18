@@ -234,7 +234,7 @@ public class NativeGit
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
         command.add(FLAG_SHOW_MERGE_FILES);
-        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%cn%n%ct%n%s%n%b%n" + LOG_SENTINAL);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%an%n%ct%n%s%n%b%n" + LOG_SENTINAL);
         command.add(FLAG_REVERSE);
         return command;
     }
