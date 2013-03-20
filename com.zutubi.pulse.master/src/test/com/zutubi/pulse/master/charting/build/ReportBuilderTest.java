@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.charting.build;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -10,12 +11,18 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static com.google.common.collect.Lists.transform;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static java.util.Arrays.asList;
 
 public class ReportBuilderTest extends PulseTestCase
 {
@@ -23,6 +30,7 @@ public class ReportBuilderTest extends PulseTestCase
     private static final String STAGE_WINDOWS = "windows";
     private static final String STAGE_MAC = "mac";
     private static final String SERIES_PREFIX = "prefix";
+    private static final List<String> SERIES_SUFFIXES = asList("1", "2");
 
     private static final long DAY_1 = new GregorianCalendar(2000, 5, 10).getTimeInMillis();
     private static final long DAY_2 = new GregorianCalendar(2000, 5, 11).getTimeInMillis();
@@ -48,6 +56,29 @@ public class ReportBuilderTest extends PulseTestCase
             {
                 return "3";
             }
+
+            public List<Pair<String, String>> getAllFieldValues(Result result, Pattern namePattern)
+            {
+                if (namePattern.pattern().contains("*"))
+                {
+                    // When there is a wildcard we return a set of pairs:
+                    //   (SERIES_PREFIX + suffix, suffix)
+                    // for each suffix in SERIES_SUFFIXES -- note their use as values means they
+                    // should be integral numbers.
+                    return transform(SERIES_SUFFIXES, new Function<String, Pair<String, String>>()
+                    {
+                        public Pair<String, String> apply(String suffix)
+                        {
+                            return asPair(SERIES_PREFIX + suffix, suffix);
+                        }
+                    });
+                }
+                else
+                {
+                    return asList(asPair(namePattern.pattern(), "3"));
+                }
+            }
+
         };
 
         // Set up 10 build results:
@@ -149,22 +180,43 @@ public class ReportBuilderTest extends PulseTestCase
     public void testReportCustomStageFieldSeparated()
     {
         ReportConfiguration reportConfig = new ReportConfiguration();
-        reportConfig.addSeries(createCustomSeriesConfig());
+        reportConfig.addSeries(createCustomSeriesConfig(SERIES_PREFIX));
         reportConfig.setDomainUnits(DomainUnit.BUILD_IDS);
 
         ReportBuilder builder = new ReportBuilder(reportConfig, fieldSource);
         ReportData reportData = builder.build(builds);
 
         assertEquals(3, reportData.getSeriesList().size());
-        assertEquals(createCustomSeries(STAGE_LINUX, 3), reportData.getSeriesList().get(0));
-        assertEquals(createCustomSeries(STAGE_WINDOWS, 3), reportData.getSeriesList().get(1));
-        assertEquals(createCustomSeries(STAGE_MAC, 3), reportData.getSeriesList().get(2));
+        assertEquals(createCustomSeries(null, STAGE_LINUX, 3), reportData.getSeriesList().get(0));
+        assertEquals(createCustomSeries(null, STAGE_WINDOWS, 3), reportData.getSeriesList().get(1));
+        assertEquals(createCustomSeries(null, STAGE_MAC, 3), reportData.getSeriesList().get(2));
+    }
+
+    public void testReportCustomStageFieldWildcardSeparated()
+    {
+        ReportConfiguration reportConfig = new ReportConfiguration();
+        reportConfig.addSeries(createCustomSeriesConfig(SERIES_PREFIX + ".*"));
+        reportConfig.setDomainUnits(DomainUnit.BUILD_IDS);
+
+        ReportBuilder builder = new ReportBuilder(reportConfig, fieldSource);
+        ReportData reportData = builder.build(builds);
+
+        List<String> stageNames = asList(STAGE_LINUX, STAGE_WINDOWS, STAGE_MAC);
+        assertEquals(stageNames.size() * SERIES_SUFFIXES.size(), reportData.getSeriesList().size());
+        int i = 0;
+        for (String stage : stageNames)
+        {
+            for (String suffix : SERIES_SUFFIXES)
+            {
+                assertEquals(createCustomSeries(suffix, stage, Integer.parseInt(suffix)), reportData.getSeriesList().get(i++));
+            }
+        }
     }
 
     public void testReportCustomStageFieldCombined()
     {
         ReportConfiguration reportConfig = new ReportConfiguration();
-        StageReportSeriesConfiguration seriesConfig = createCustomSeriesConfig();
+        StageReportSeriesConfiguration seriesConfig = createCustomSeriesConfig(SERIES_PREFIX);
         seriesConfig.setCombineStages(true);
         seriesConfig.setAggregationFunction(AggregationFunction.SUM);
         reportConfig.addSeries(seriesConfig);
@@ -174,13 +226,13 @@ public class ReportBuilderTest extends PulseTestCase
         ReportData reportData = builder.build(builds);
 
         assertEquals(1, reportData.getSeriesList().size());
-        assertEquals(createCustomSeries(null, 9), reportData.getSeriesList().get(0));
+        assertEquals(createCustomSeries(null, null, 9), reportData.getSeriesList().get(0));
     }
 
     public void testReportCustomStageFieldCombineStagesAndDays()
     {
         ReportConfiguration reportConfig = new ReportConfiguration();
-        StageReportSeriesConfiguration seriesConfig = createCustomSeriesConfig();
+        StageReportSeriesConfiguration seriesConfig = createCustomSeriesConfig(SERIES_PREFIX);
         seriesConfig.setCombineStages(true);
         seriesConfig.setAggregationFunction(AggregationFunction.SUM);
         reportConfig.addSeries(seriesConfig);
@@ -194,27 +246,28 @@ public class ReportBuilderTest extends PulseTestCase
         assertEquals(createSeries(SERIES_PREFIX, false, DAY_1, 9, DAY_2, 18, DAY_3, 27, DAY_4, 27, DAY_5, 9), reportData.getSeriesList().get(0));
     }
 
-    private StageReportSeriesConfiguration createCustomSeriesConfig()
+    private StageReportSeriesConfiguration createCustomSeriesConfig(String field)
     {
         StageReportSeriesConfiguration seriesConfig = new StageReportSeriesConfiguration();
-        seriesConfig.setName(SERIES_PREFIX);
+        seriesConfig.setName("anything");
         seriesConfig.setMetric(StageMetric.CUSTOM_FIELD);
-        seriesConfig.setField("anything");
+        seriesConfig.setField(field);
         seriesConfig.setFieldType(MetricType.INTEGRAL);
         seriesConfig.setCombineStages(false);
         return seriesConfig;
     }
 
-    private SeriesData createCustomSeries(String stageName, int value)
+    private SeriesData createCustomSeries(String suffix, String stageName, int value)
     {
-        String seriesName;
-        if (stageName == null)
+        String seriesName = SERIES_PREFIX;
+        if (suffix != null)
         {
-            seriesName = SERIES_PREFIX;
+            seriesName += suffix;
         }
-        else
+
+        if (stageName != null)
         {
-            seriesName = SERIES_PREFIX + " (" + stageName + ")";
+            seriesName += " (" + stageName + ")";
         }
 
         return createSeries(seriesName, false, 1, value, 2, value, 3, value, 4, value, 5, value, 6, value, 7, value, 8, value, 9, value, 10, value);

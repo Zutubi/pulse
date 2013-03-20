@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.util.logging.Logger;
 
 /**
  * Metrics that can be extracted from individual build stages.
@@ -158,22 +157,10 @@ public enum StageMetric
     {
         public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            String fieldName = config.getField();
-            String fieldValue = context.getFieldValue(recipeResult, fieldName);
-            if (fieldValue != null)
-            {
-                try
-                {
-                    context.addMetricValue(config.getName(), buildResult, config.getFieldType().parse(fieldValue));
-                }
-                catch (NumberFormatException e)
-                {
-                    LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
-                }
-            }
+            MetricUtils.extractMetrics(buildResult, recipeResult, config, context);
         }
     };
-    private static final Logger LOG = Logger.getLogger(StageMetric.class);
+
     private boolean timeBased;
 
     StageMetric(boolean timeBased)

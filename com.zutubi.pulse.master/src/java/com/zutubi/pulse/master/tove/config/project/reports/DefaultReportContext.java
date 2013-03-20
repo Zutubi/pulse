@@ -7,11 +7,13 @@ import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.master.charting.model.DataPoint;
 import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of {@link ReportContext} which handles both build and stage metrics and
@@ -54,6 +56,11 @@ public class DefaultReportContext implements ReportContext
     public String getFieldValue(Result result, String name)
     {
         return fieldSource.getFieldValue(result, name);
+    }
+
+    public List<Pair<String, String>> getAllFieldValues(Result result, Pattern namePattern)
+    {
+        return fieldSource.getAllFieldValues(result, namePattern);
     }
 
     public void addMetricValue(String name, BuildResult build, Number value)

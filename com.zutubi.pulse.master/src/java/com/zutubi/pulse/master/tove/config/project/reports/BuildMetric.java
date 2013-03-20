@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.util.logging.Logger;
 
 /**
  * Metrics that apply to a whole build result.
@@ -154,26 +153,13 @@ public enum BuildMetric
      * The value of a custom field whose name is specified in the {@link BuildReportSeriesConfiguration}.
      */
     CUSTOM_FIELD(false)
-            {
-                public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
-                {
-                    String fieldName = config.getField();
-                    String fieldValue = context.getFieldValue(buildResult, fieldName);
-                    if (fieldValue != null)
-                    {
-                        try
-                        {
-                            context.addMetricValue(config.getName(), buildResult, config.getFieldType().parse(fieldValue));
-                        }
-                        catch (NumberFormatException e)
-                        {
-                            LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
-                        }
-                    }
-                }
-            };
+    {
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
+        {
+            MetricUtils.extractMetrics(buildResult, buildResult, config, context);
+        }
+    };
 
-    private static final Logger LOG = Logger.getLogger(BuildMetric.class);
     private boolean timeBased;
 
     BuildMetric(boolean timeBased)
