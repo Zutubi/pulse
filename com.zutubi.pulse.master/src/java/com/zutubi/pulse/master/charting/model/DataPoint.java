@@ -87,4 +87,10 @@ public class DataPoint implements Comparable
             return 0;
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return "(" + x + "," + y + ")";
+    }
 }

@@ -214,7 +214,7 @@ public class ReportBuilderTest extends PulseTestCase
         }
         else
         {
-            seriesName = ReportBuilder.getStageSeriesName(SERIES_PREFIX, stageName);
+            seriesName = SERIES_PREFIX + " (" + stageName + ")";
         }
 
         return createSeries(seriesName, false, 1, value, 2, value, 3, value, 4, value, 5, value, 6, value, 7, value, 8, value, 9, value, 10, value);

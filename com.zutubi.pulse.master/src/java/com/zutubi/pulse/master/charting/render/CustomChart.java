@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.charting.render;
 
-import com.google.common.base.Function;
 import com.zutubi.pulse.master.charting.build.ReportBuilder;
 import com.zutubi.pulse.master.charting.model.ReportData;
+import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
 import com.zutubi.util.adt.Pair;
 import org.jfree.chart.ChartFactory;
@@ -21,12 +20,7 @@ import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static com.google.common.collect.Iterables.transform;
 
 /**
  * Abstract base for charts built from {@link com.zutubi.pulse.master.tove.config.project.reports.ReportConfiguration}.
@@ -91,7 +85,7 @@ public abstract class CustomChart implements Chart
             rangeAxis = numberAxis;
         }
 
-        XYPlot plot = new XYPlot(xyDataset, createDomainAxis(), rangeAxis, configureRenderer(xyDataset));
+        XYPlot plot = new XYPlot(xyDataset, createDomainAxis(), rangeAxis, configureRenderer(xyDataset, reportData));
 
         JFreeChart chart = new JFreeChart(configuration.getName(), plot);
         chart.setBackgroundPaint(Color.WHITE);
@@ -113,25 +107,24 @@ public abstract class CustomChart implements Chart
         return true;
     }
 
-    private XYItemRenderer configureRenderer(XYDataset dataset)
+    private XYItemRenderer configureRenderer(XYDataset dataset, ReportData reportData)
     {
         XYItemRenderer renderer = createRenderer();
-        for (ReportSeriesConfiguration seriesConfig: configuration.getSeriesMap().values())
+        for (SeriesData series : reportData.getSeriesList())
         {
-            if (seriesConfig.isUseCustomColour())
+            String customColour = series.getCustomColour();
+            if (customColour != null)
             {
                 try
                 {
-                    Color colour = ColourValidator.parseColour(seriesConfig.getCustomColour());
-                    for (String name: getAllSeriesNames(seriesConfig))
-                    {
-                        renderer.setSeriesPaint(getSeriesIndex(dataset, name), colour);
-                    }
+                    Color colour = ColourValidator.parseColour(customColour);
+                    renderer.setSeriesPaint(getSeriesIndex(dataset, series.getName()), colour);
                 }
                 catch (IllegalArgumentException e)
                 {
                     // Just take the default colour.
                 }
+
             }
         }
 
@@ -149,40 +142,6 @@ public abstract class CustomChart implements Chart
         }
 
         return -1;
-    }
-
-    private Iterable<String> getAllSeriesNames(ReportSeriesConfiguration seriesConfig)
-    {
-        if (seriesConfig instanceof StageReportSeriesConfiguration)
-        {
-            final StageReportSeriesConfiguration stageConfig = (StageReportSeriesConfiguration) seriesConfig;
-            if (!stageConfig.isCombineStages())
-            {
-                return transform(getAllStageNames(builds), new Function<String, String>()
-                {
-                    public String apply(String s)
-                    {
-                        return ReportBuilder.getStageSeriesName(stageConfig.getName(), s);
-                    }
-                });
-            }
-        }
-
-        return Arrays.asList(seriesConfig.getName());
-    }
-
-    private Set<String> getAllStageNames(List<BuildResult> builds)
-    {
-        Set<String> stages = new HashSet<String>();
-        for (BuildResult buildResult: builds)
-        {
-            for (RecipeResultNode node: buildResult.getStages())
-            {
-                stages.add(node.getStageName());
-            }
-        }
-
-        return stages;
     }
 
     private XYItemRenderer createRenderer()

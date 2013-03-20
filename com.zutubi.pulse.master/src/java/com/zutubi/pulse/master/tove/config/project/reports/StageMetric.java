@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.util.BinaryFunction;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -16,15 +16,9 @@ public enum StageMetric
      */
     ELAPSED_TIME(true)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return (double)recipeResult.getStamps().getElapsed();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, (double)recipeResult.getStamps().getElapsed());
         }
     },
     /**
@@ -32,15 +26,9 @@ public enum StageMetric
      */
     TEST_TOTAL_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getTotal();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getTotal());
         }
     },
     /**
@@ -48,15 +36,9 @@ public enum StageMetric
      */
     TEST_PASS_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getPassed();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getPassed());
         }
     },
     /**
@@ -64,15 +46,9 @@ public enum StageMetric
      */
     TEST_EXPECTED_FAIL_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getExpectedFailures();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getExpectedFailures());
         }
     },
     /**
@@ -80,15 +56,9 @@ public enum StageMetric
      */
     TEST_FAIL_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getFailures();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getFailures());
         }
     },
     /**
@@ -96,15 +66,9 @@ public enum StageMetric
      */
     TEST_ERROR_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getErrors();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getErrors());
         }
     },
     /**
@@ -112,15 +76,9 @@ public enum StageMetric
      */
     TEST_SKIPPED_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getSkipped();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getSkipped());
         }
     },
     /**
@@ -128,15 +86,9 @@ public enum StageMetric
      */
     TEST_BROKEN_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getBroken();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getBroken());
         }
     },
     /**
@@ -144,15 +96,9 @@ public enum StageMetric
      */
     TEST_SUCCESS_PERCENTAGE(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getTestSummary().getSuccessPercent();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getTestSummary().getSuccessPercent());
         }
     },
     /**
@@ -160,15 +106,9 @@ public enum StageMetric
      */
     TEST_FAILED_PERCENTAGE(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return 100 - recipeResult.getTestSummary().getSuccessPercent();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, 100 - recipeResult.getTestSummary().getSuccessPercent());
         }
     },
     /**
@@ -176,15 +116,9 @@ public enum StageMetric
      */
     ERROR_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getErrorFeatureCount();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getErrorFeatureCount());
         }
     },
     /**
@@ -192,15 +126,9 @@ public enum StageMetric
      */
     WARNING_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getWarningFeatureCount();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getWarningFeatureCount());
         }
     },
     /**
@@ -208,15 +136,9 @@ public enum StageMetric
      */
     BROKEN_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getState().isBroken() ? 1 : 0;
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getState().isBroken() ? 1 : 0);
         }
     },
     /**
@@ -224,15 +146,9 @@ public enum StageMetric
      */
     SUCCESS_COUNT(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
-            {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
-                {
-                    return recipeResult.getState().isBroken() ? 0 : 1;
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, recipeResult.getState().isBroken() ? 0 : 1);
         }
     },
     /**
@@ -240,29 +156,21 @@ public enum StageMetric
      */
     CUSTOM_FIELD(false)
     {
-        public BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(final StageReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<RecipeResult, CustomFieldSource, Number>()
+            String fieldName = config.getField();
+            String fieldValue = context.getFieldValue(recipeResult, fieldName);
+            if (fieldValue != null)
             {
-                public Number process(RecipeResult recipeResult, CustomFieldSource recipeFields)
+                try
                 {
-                    String fieldName = config.getField();
-                    String fieldValue = recipeFields.getFieldValue(recipeResult, fieldName);
-                    if (fieldValue != null)
-                    {
-                        try
-                        {
-                            return config.getFieldType().parse(fieldValue);
-                        }
-                        catch (NumberFormatException e)
-                        {
-                            LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
-                        }
-                    }
-
-                    return null;
+                    context.addMetricValue(config.getName(), buildResult, config.getFieldType().parse(fieldValue));
                 }
-            };
+                catch (NumberFormatException e)
+                {
+                    LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
+                }
+            }
         }
     };
     private static final Logger LOG = Logger.getLogger(StageMetric.class);
@@ -274,14 +182,14 @@ public enum StageMetric
     }
     
     /**
-     * Returns a function that can extract a value for this metric from a
-     * recipe result.  The returned function may return null if passed a result
-     * that does not have a value for this metric.
+     * Extracts values for this metric from the given stage, adding them to the given context.
      *
+     * @param buildResult the build the stage belongs to
+     * @param recipeResult the recipe result from the stage to extract the values from
      * @param config the series configuration this metric is being used for
-     * @return a function that can extract the metric value from recipe results
+     * @param context the context to add values to
      */
-    public abstract BinaryFunction<RecipeResult, CustomFieldSource, Number> getExtractionFunction(StageReportSeriesConfiguration config);
+    public abstract void extractMetrics(BuildResult buildResult, RecipeResult recipeResult, StageReportSeriesConfiguration config, ReportContext context);
 
     public boolean isTimeBased()
     {

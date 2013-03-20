@@ -6,6 +6,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,16 @@ public class ReportData
     public void addSeries(SeriesData series)
     {
         seriesList.add(series);
+    }
+
+    /**
+     * Adds all series from a collection to the end of the list for this report.
+     *
+     * @param allSeriesData colleciton of series to add
+     */
+    public void addAllSeries(Collection<SeriesData> allSeriesData)
+    {
+        seriesList.addAll(allSeriesData);
     }
 
     /**

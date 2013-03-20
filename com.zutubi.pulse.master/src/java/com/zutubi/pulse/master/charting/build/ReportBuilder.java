@@ -1,27 +1,19 @@
 package com.zutubi.pulse.master.charting.build;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.master.charting.model.DataPoint;
 import com.zutubi.pulse.master.charting.model.ReportData;
 import com.zutubi.pulse.master.charting.model.SeriesData;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
-import com.zutubi.util.BinaryFunction;
-import com.zutubi.util.CollectionUtils;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newLinkedList;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.math.AggregationFunction;
 
 import java.util.*;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Builds reports by combining configuration with a set of build results.
@@ -77,93 +69,28 @@ public class ReportBuilder
 
     private void addBuildSeries(ReportData reportData, BuildReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
-        SeriesData seriesData = new SeriesData(seriesConfig.getName());
-        BinaryFunction<BuildResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
-
+        DefaultReportContext context = new DefaultReportContext(seriesConfig, customFieldSource);
         for (BuildResult build: dataSet)
         {
-            Number value = extractFn.process(build, customFieldSource);
-            if (value != null)
-            {
-                seriesData.addPoint(new DataPoint(build.getNumber(), value));
-            }
+            seriesConfig.getMetric().extractMetrics(build, seriesConfig, context);
         }
 
-        reportData.addSeries(seriesData);
+        reportData.addAllSeries(context.getAllSeriesData());
     }
 
     private void addStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
     {
-        if (seriesConfig.isCombineStages())
-        {
-            addCombinedStageSeries(reportData, seriesConfig, dataSet);
-        }
-        else
-        {
-            addSeparateStageSeries(reportData, seriesConfig, dataSet);
-        }
-    }
-
-    private void addCombinedStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
-    {
-        SeriesData seriesData = new SeriesData(seriesConfig.getName());
-        final BinaryFunction<RecipeResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
-
-        for (BuildResult build: dataSet)
-        {
-            Collection<Number> values = newLinkedList(transform(build.getStages(), new Function<RecipeResultNode, Number>()
-            {
-                public Number apply(RecipeResultNode node)
-                {
-                    return extractFn.process(node.getResult(), customFieldSource);
-                }
-            }));
-
-            Iterables.removeIf(values, Predicates.isNull());
-            if (values.size()  > 0)
-            {
-                seriesData.addPoint(new DataPoint(build.getNumber(), seriesConfig.getAggregationFunction().aggregate(values)));
-            }
-        }
-
-        reportData.addSeries(seriesData);
-    }
-
-    private void addSeparateStageSeries(ReportData reportData, StageReportSeriesConfiguration seriesConfig, Iterable<BuildResult> dataSet)
-    {
-        BinaryFunction<RecipeResult, CustomFieldSource, Number> extractFn = seriesConfig.getMetric().getExtractionFunction(seriesConfig);
-        Map<String, SeriesData> seriesByStage = new LinkedHashMap<String, SeriesData>();
-
+        DefaultReportContext context = new DefaultReportContext(seriesConfig, customFieldSource);
         for (BuildResult build: dataSet)
         {
             for (RecipeResultNode node: build.getStages())
             {
-                String stageName = node.getStageName();
-                SeriesData series = seriesByStage.get(stageName);
-                if (series == null)
-                {
-                    String seriesName = seriesConfig.getName();
-                    series = new SeriesData(getStageSeriesName(seriesName, stageName));
-                    seriesByStage.put(stageName, series);
-                }
-
-                Number value = extractFn.process(node.getResult(), customFieldSource);
-                if (value != null)
-                {
-                    series.addPoint(new DataPoint(build.getNumber(), value));
-                }
+                context.setStageName(node.getStageName());
+                seriesConfig.getMetric().extractMetrics(build, node.getResult(), seriesConfig, context);
             }
         }
 
-        for (SeriesData series: seriesByStage.values())
-        {
-            reportData.addSeries(series);
-        }
-    }
-
-    public static String getStageSeriesName(String seriesName, String stageName)
-    {
-        return seriesName + " (" + stageName + ")";
+        reportData.addAllSeries(context.getAllSeriesData());
     }
 
     private ReportData buildByDay(List<BuildResult> dataSet, AggregationFunction fn)
@@ -202,7 +129,7 @@ public class ReportBuilder
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        SeriesData aggregatedSeries = new SeriesData(seriesData.getName());
+        SeriesData aggregatedSeries = new SeriesData(seriesData.getName(), seriesData.getCustomColour());
         List<DataPoint> points = new LinkedList<DataPoint>();
         for (Map.Entry<Pair<Integer, Integer>, List<Number>> entry: valuesByDay.entrySet())
         {

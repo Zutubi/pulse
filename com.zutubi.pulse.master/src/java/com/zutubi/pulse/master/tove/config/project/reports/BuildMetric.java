@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.reports;
 
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.util.BinaryFunction;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -15,32 +14,20 @@ public enum BuildMetric
      * The time the build took to execute, in seconds.
      */
     ELAPSED_TIME(true)
-    {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
-        {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
+                public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
                 {
-                    return (double)buildResult.getStamps().getElapsed();
+                    context.addMetricValue(config.getName(), buildResult, buildResult.getStamps().getElapsed());
                 }
-            };
-        }
-    },
+            },
     /**
      * The total number of tests in the build.
      */
     TEST_TOTAL_COUNT(false)
-    {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
-        {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
+                public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
                 {
-                    return buildResult.getTestSummary().getTotal();
-                }
-            };
+                    context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getTotal());
         }
     },
     /**
@@ -48,15 +35,9 @@ public enum BuildMetric
      */
     TEST_PASS_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getPassed();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getPassed());
         }
     },
     /**
@@ -64,15 +45,9 @@ public enum BuildMetric
      */
     TEST_EXPECTED_FAIL_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getExpectedFailures();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getExpectedFailures());
         }
     },
     /**
@@ -80,15 +55,9 @@ public enum BuildMetric
      */
     TEST_FAIL_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getFailures();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getFailures());
         }
     },
     /**
@@ -96,15 +65,9 @@ public enum BuildMetric
      */
     TEST_ERROR_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getErrors();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getErrors());
         }
     },
     /**
@@ -112,15 +75,9 @@ public enum BuildMetric
      */
     TEST_SKIPPED_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getSkipped();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getSkipped());
         }
     },
     /**
@@ -128,15 +85,9 @@ public enum BuildMetric
      */
     TEST_BROKEN_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getBroken();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getBroken());
         }
     },
     /**
@@ -144,15 +95,9 @@ public enum BuildMetric
      */
     TEST_SUCCESS_PERCENTAGE(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getTestSummary().getSuccessPercent();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getTestSummary().getSuccessPercent());
         }
     },
     /**
@@ -160,15 +105,9 @@ public enum BuildMetric
      */
     TEST_BROKEN_PERCENTAGE(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return 100 - buildResult.getTestSummary().getSuccessPercent();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, 100 - buildResult.getTestSummary().getSuccessPercent());
         }
     },
     /**
@@ -176,15 +115,9 @@ public enum BuildMetric
      */
     ERROR_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getErrorFeatureCount();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getErrorFeatureCount());
         }
     },
     /**
@@ -192,15 +125,9 @@ public enum BuildMetric
      */
     WARNING_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getWarningFeatureCount();
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getWarningFeatureCount());
         }
     },
     /**
@@ -208,15 +135,9 @@ public enum BuildMetric
      */
     BROKEN_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getState().isBroken() ? 1 : 0;
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getState().isBroken() ? 1 : 0);
         }
     },
     /**
@@ -224,47 +145,33 @@ public enum BuildMetric
      */
     SUCCESS_COUNT(false)
     {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config)
+        public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
         {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
-            {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
-                {
-                    return buildResult.getState().isBroken() ? 0 : 1;
-                }
-            };
+            context.addMetricValue(config.getName(), buildResult, buildResult.getState().isBroken() ? 0 : 1);
         }
     },
     /**
      * The value of a custom field whose name is specified in the {@link BuildReportSeriesConfiguration}.
      */
     CUSTOM_FIELD(false)
-    {
-        public BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(final BuildReportSeriesConfiguration config)
-        {
-            return new BinaryFunction<BuildResult, CustomFieldSource, Number>()
             {
-                public Number process(BuildResult buildResult, CustomFieldSource recipeFields)
+                public void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context)
                 {
                     String fieldName = config.getField();
-                    String fieldValue = recipeFields.getFieldValue(buildResult, fieldName);
+                    String fieldValue = context.getFieldValue(buildResult, fieldName);
                     if (fieldValue != null)
                     {
                         try
                         {
-                            return config.getFieldType().parse(fieldValue);
+                            context.addMetricValue(config.getName(), buildResult, config.getFieldType().parse(fieldValue));
                         }
                         catch (NumberFormatException e)
                         {
                             LOG.warning("Unable to parse value of field '" + fieldName + "' (" + fieldValue + ") as a number for reporting");
                         }
                     }
-
-                    return null;
                 }
             };
-        }
-    };
 
     private static final Logger LOG = Logger.getLogger(BuildMetric.class);
     private boolean timeBased;
@@ -273,16 +180,15 @@ public enum BuildMetric
     {
         this.timeBased = timeBased;
     }
-    
+
     /**
-     * Returns a function that can extract a value for this metric from a build
-     * result.  The returned function may return null if passed a result that
-     * does not have a value for this metric.
+     * Extracts values for this metric from the given build, adding them to the given context.
      *
+     * @param buildResult the build to extract the values from
      * @param config the series configuration this metric is being used for
-     * @return a function that can extract the metric value from build results
+     * @param context the context to add values to
      */
-    public abstract BinaryFunction<BuildResult, CustomFieldSource, Number> getExtractionFunction(BuildReportSeriesConfiguration config);
+    public abstract void extractMetrics(BuildResult buildResult, BuildReportSeriesConfiguration config, ReportContext context);
 
     public boolean isTimeBased()
     {

@@ -11,16 +11,29 @@ import java.util.List;
 public class SeriesData
 {
     private String name;
+    private String customColour;
     private List<DataPoint> points =  new LinkedList<DataPoint>();
 
     /**
-     * Creates a series.
+     * Creates a series which will render with a generated colour.
      *
      * @param name name of the series, used e.g. to label it
      */
     public SeriesData(String name)
     {
+        this(name, null);
+    }
+
+    /**
+     * Creates a series.
+     *
+     * @param name name of the series, used e.g. to label it
+     * @param customColour if not null a custom colour to use for the series
+     */
+    public SeriesData(String name, String customColour)
+    {
         this.name = name;
+        this.customColour = customColour;
     }
 
     /**
@@ -29,6 +42,14 @@ public class SeriesData
     public String getName()
     {
         return name;
+    }
+
+    /**
+     * @return a custom colour to use for this series,  or null for any generated colour
+     */
+    public String getCustomColour()
+    {
+        return customColour;
     }
 
     /**
@@ -94,5 +115,11 @@ public class SeriesData
         int result = name.hashCode();
         result = 31 * result + points.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return name + ": " + points;
     }
 }
