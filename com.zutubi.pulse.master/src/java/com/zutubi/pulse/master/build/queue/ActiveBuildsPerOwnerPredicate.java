@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.build.queue;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.size;
 import com.zutubi.pulse.core.model.NamedEntity;
-import com.zutubi.pulse.master.model.Project;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 
 /**
  * This predicate ensures that at most a predefined number of request can be activated
@@ -14,14 +14,16 @@ import java.util.List;
 public class ActiveBuildsPerOwnerPredicate implements QueuedRequestPredicate
 {
     private BuildQueue buildQueue;
+    private int allowedActiveBuilds;
 
-    public ActiveBuildsPerOwnerPredicate(BuildQueue buildQueue)
+    public ActiveBuildsPerOwnerPredicate(BuildQueue buildQueue, int allowedActiveBuilds)
     {
         if (buildQueue == null)
         {
             throw new IllegalArgumentException();
         }
         this.buildQueue = buildQueue;
+        this.allowedActiveBuilds = allowedActiveBuilds;
     }
 
     /**
@@ -38,14 +40,6 @@ public class ActiveBuildsPerOwnerPredicate implements QueuedRequestPredicate
         NamedEntity owner = request.getRequest().getOwner();
 
         int ownerRequests = size(filter(activatedRequests, new HasOwnerPredicate<ActivatedRequest>(owner)));
-        
-        int allowedActiveBuilds = 1;
-        if (owner instanceof Project)
-        {
-            Project project = (Project) owner;
-            allowedActiveBuilds = project.getConfig().getOptions().getConcurrentBuilds();
-        }
-
         return ownerRequests < allowedActiveBuilds;
     }
 }

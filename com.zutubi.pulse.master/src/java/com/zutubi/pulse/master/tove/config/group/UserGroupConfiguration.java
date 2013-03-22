@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.group;
 
-import com.zutubi.tove.annotations.*;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.tove.annotations.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * permissions to multiple users.
  */
 @SymbolicName("zutubi.groupConfig")
-@Form(fieldOrder = {"name", "members", "serverPermissions"})
+@Form(fieldOrder = {"name", "members", "serverPermissions", "concurrentPersonalBuilds"})
 @Classification(single = "group")
 public class UserGroupConfiguration extends GroupConfiguration
 {

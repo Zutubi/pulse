@@ -99,4 +99,13 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      * @param user  whose responsibilities will be cleared.
      */
     void clearAllResponsibilities(User user);
+
+    /**
+     * Returns the maximum number of concurrent personal builds a given user is allowed to run.
+     * Note that this does <b>not</b> ensure the user has permission to run personal builds.
+     *
+     * @param user the user to get the limit for
+     * @return the maximum number of concurrent personal builds the user can run
+     */
+    int getConcurrentPersonalBuilds(User user);
 }

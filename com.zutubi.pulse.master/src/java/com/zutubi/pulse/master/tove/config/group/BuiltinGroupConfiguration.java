@@ -7,7 +7,7 @@ import com.zutubi.tove.annotations.*;
 @Internal
 @SymbolicName("zutubi.builtinGroupConfig")
 @Classification(single = "group")
-@Form(fieldOrder = {"name", "serverPermissions"})
+@Form(fieldOrder = {"name", "serverPermissions", "concurrentPersonalBuilds"})
 public class BuiltinGroupConfiguration extends GroupConfiguration
 {
     @Internal

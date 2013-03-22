@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.UserManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
  */
 public class PersonalBuildRequestHandler extends BaseBuildRequestHandler
 {
+    private UserManager userManager;
+
     public List<QueuedRequest> prepare(BuildRequestEvent request)
     {
         if (request.getMetaBuildId() != 0)
@@ -26,9 +30,14 @@ public class PersonalBuildRequestHandler extends BaseBuildRequestHandler
         request.setMetaBuildId(getMetaBuildId());
 
         QueuedRequest queuedRequest = new QueuedRequest(request,
-                new ActiveBuildsPerOwnerPredicate(buildQueue),
+                new ActiveBuildsPerOwnerPredicate(buildQueue, userManager.getConcurrentPersonalBuilds((User) request.getOwner())),
                 new HeadOfOwnerQueuePredicate(buildQueue)
         );
         return Arrays.asList(queuedRequest);
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

@@ -209,6 +209,24 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         projectManager.clearResponsibilities(user);
     }
 
+    public int getConcurrentPersonalBuilds(User user)
+    {
+        int max = allUsersGroup.getConcurrentPersonalBuilds();
+        List<UserGroupConfiguration> groups = groupsByUser.get(user.getConfig());
+        if (groups != null)
+        {
+            for (UserGroupConfiguration group : groups)
+            {
+                if (group.getConcurrentPersonalBuilds() > max)
+                {
+                    max = group.getConcurrentPersonalBuilds();
+                }
+            }
+        }
+
+        return max;
+    }
+
     public long updateAndGetNextBuildNumber(User user)
     {
         user = getUser(user.getId());
