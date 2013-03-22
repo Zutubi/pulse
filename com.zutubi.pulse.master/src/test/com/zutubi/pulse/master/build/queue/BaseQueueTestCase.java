@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -21,23 +19,22 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -53,6 +50,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
     protected Scheduler scheduler;
     private BuildManager buildManager;
     protected ProjectManager projectManager;
+    protected UserManager userManager;
     protected BuildRequestRegistry buildRequestRegistry;
     protected BuildControllerFactory buildControllerFactory;
     protected EventManager eventManager;
@@ -137,6 +135,9 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         doAnswer(answer).when(projectManager).runUnderProjectLocks(Matchers.<Runnable>anyObject(), anyLong(), anyLong(), anyLong(), anyLong(), anyLong(), anyLong());
 
         stub(projectManager.updateAndGetNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
+
+        userManager = mock(UserManager.class);
+        stub(userManager.getConcurrentPersonalBuilds(Matchers.<User>anyObject())).toReturn(1);
 
         buildControllerFactory = mock(BuildControllerFactory.class);
         stub(buildControllerFactory.create((BuildRequestEvent)anyObject())).toAnswer(new Answer()
