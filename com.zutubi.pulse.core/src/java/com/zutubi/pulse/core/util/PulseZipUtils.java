@@ -283,6 +283,7 @@ public class PulseZipUtils
                 ZipEntry entry = new ZipEntry(dirPath);
                 entry.setTime(modifiedTime);
                 os.putNextEntry(entry);
+                os.closeEntry();
             }
 
             for (String filename : FileSystemUtils.list(source))
@@ -307,6 +308,7 @@ public class PulseZipUtils
             finally
             {
                 IOUtils.close(is);
+                os.closeEntry();
             }
         }
     }
