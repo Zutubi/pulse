@@ -1954,7 +1954,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         if (recordContainsKeyIgnoreCase(getRecord(parentPath), baseName))
         {
-            throw new ValidationException(textProvider.getText(".inuse", fieldName));
+            throw new ValidationException(textProvider.getText(".inuse", fieldName, baseName));
         }
 
         if (PathUtils.getPathElements(parentPath).length > 2)
