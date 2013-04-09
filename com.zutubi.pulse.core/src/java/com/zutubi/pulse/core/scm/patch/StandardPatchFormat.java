@@ -111,11 +111,13 @@ public class StandardPatchFormat implements PatchFormat
         os.putNextEntry(entry);
         XStream xstream = PatchArchive.createXStream();
         xstream.toXML(metadata, os);
+        os.closeEntry();
     }
 
     private static void addFiles(File base, PatchMetadata metadata, WorkingCopyStatusBuilder statusBuilder, WorkingCopyContext context, ZipOutputStream os) throws IOException, ScmException
     {
         os.putNextEntry(new ZipEntry(PatchArchive.FILES_PATH));
+        os.closeEntry();
         for(FileStatus fs: metadata.getFileStatuses())
         {
             if (fs.getPayloadType() != FileStatus.PayloadType.NONE)
@@ -141,6 +143,7 @@ public class StandardPatchFormat implements PatchFormat
         ZipEntry entry = new ZipEntry(entryPath);
         os.putNextEntry(entry);
         statusBuilder.diff(context, filePath, os);
+        os.closeEntry();
     }
 
     private static void addEntry(ZipOutputStream os, File f, String path, boolean directory) throws IOException
@@ -169,6 +172,8 @@ public class StandardPatchFormat implements PatchFormat
                 IOUtils.close(is);
             }
         }
+
+        os.closeEntry();
     }
 
     private static void reportStatus(UserInterface ui, String message)
