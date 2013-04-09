@@ -225,7 +225,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testCloneDuplicateCloneName() throws TypeException
     {
         insertTemplateA(rootPath, "existing", false);
-        invalidCloneNameHelper(insertTemplateA(rootPath, "a", false), "existing", "name is already in use, please select another name");
+        invalidCloneNameHelper(insertTemplateA(rootPath, "a", false), "existing", "name \"existing\" is already in use, please select another name");
     }
 
     public void testCloneCloneNameInAncestor() throws TypeException
@@ -560,7 +560,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testIntroduceParentTemplateParentNameNotUnique() throws TypeException
     {
         insertTemplateA(rootPath, "a", true);
-        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "name is already in use, please select another name");
+        introduceParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "name \"a\" is already in use, please select another name");
     }
 
     private void introduceParentTemplateErrorHelper(String parentPath, List<String> childKeys, String parentTemplateName, String expectedError)
