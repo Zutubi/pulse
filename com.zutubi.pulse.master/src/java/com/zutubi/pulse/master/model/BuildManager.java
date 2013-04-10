@@ -234,7 +234,7 @@ public interface BuildManager
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void delete(BuildResult result);
 
-    @SecureParameter(action = AccessManager.ACTION_WRITE)
+    @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
     boolean togglePin(BuildResult buildResult, boolean pin);
 
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_WRITE)
