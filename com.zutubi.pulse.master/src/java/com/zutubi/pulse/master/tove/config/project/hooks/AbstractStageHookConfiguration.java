@@ -20,6 +20,7 @@ public abstract class AbstractStageHookConfiguration extends AutoBuildHookConfig
     private boolean applyToAllStages = true;
     @Reference
     private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
+    private boolean runTaskOnAgents;
 
     public boolean isApplyToAllStages()
     {
@@ -41,6 +42,16 @@ public abstract class AbstractStageHookConfiguration extends AutoBuildHookConfig
         this.stages = stages;
     }
 
+    public boolean isRunTaskOnAgents()
+    {
+        return runTaskOnAgents;
+    }
+
+    public void setRunTaskOnAgents(boolean runTaskOnAgents)
+    {
+        this.runTaskOnAgents = runTaskOnAgents;
+    }
+
     public boolean appliesTo(BuildResult result)
     {
         return false;
@@ -49,6 +60,11 @@ public abstract class AbstractStageHookConfiguration extends AutoBuildHookConfig
     public boolean appliesTo(RecipeResultNode result)
     {
         return stageMatches(result.getStageHandle());
+    }
+
+    public boolean runsOnAgent()
+    {
+        return runTaskOnAgents;
     }
 
     protected boolean stageMatches(long stage)

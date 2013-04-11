@@ -11,7 +11,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * stages.
  */
 @SymbolicName("zutubi.preStageHookConfig")
-@Form(fieldOrder = {"name", "applyToAllStages", "stages", "failOnError", "runForPersonal", "allowManualTrigger"})
+@Form(fieldOrder = {"name", "applyToAllStages", "stages", "failOnError", "runTaskOnAgents", "runForPersonal", "allowManualTrigger"})
 public class PreStageHookConfiguration extends AbstractStageHookConfiguration
 {
     public boolean triggeredBy(BuildEvent event)

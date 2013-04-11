@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerInfoModel;
@@ -114,4 +115,17 @@ public interface SlaveService
      * @return a file info object for the requested path.
      */
     FileInfo getFileInfo(String token, AgentRecipeDetails details, String path);
+
+    /**
+     * Executes a command on the slave.
+     *
+     * @param token secure token for inter-agent communication
+     * @param master the master URL
+     * @param context execution context for resolving properties in the workingDir
+     * @param commandLine command (and arguments) to run
+     * @param workingDir if not null, directory in which to run the command (may contain properties)
+     * @param streamId id of the stream to use in {@link com.zutubi.pulse.core.events.GenericOutputEvent}s
+     * @param timeout if non-zero, a time limit in seconds to apply to the command
+     */
+    void runCommand(String token, String master, ExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout);
 }

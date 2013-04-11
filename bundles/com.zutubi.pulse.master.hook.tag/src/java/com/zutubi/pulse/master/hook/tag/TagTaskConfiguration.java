@@ -59,7 +59,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         this.moveExisting = moveExisting;
     }
 
-    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode) throws Exception
+    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean onAgent) throws Exception
     {
         Revision revision = buildResult.getRevision();
         if(revision == null)

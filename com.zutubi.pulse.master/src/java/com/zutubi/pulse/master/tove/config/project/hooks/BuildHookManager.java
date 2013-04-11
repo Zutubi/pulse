@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.Result;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
@@ -157,7 +158,8 @@ public class BuildHookManager
         {
             try
             {
-                task.execute(context, buildResult, resultNode);
+                SpringComponentContext.autowire(task);
+                task.execute(context, buildResult, resultNode, hook.runsOnAgent());
             }
             catch (Exception e)
             {

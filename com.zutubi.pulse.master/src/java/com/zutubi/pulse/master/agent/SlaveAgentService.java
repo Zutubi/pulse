@@ -1,9 +1,11 @@
 package com.zutubi.pulse.master.agent;
 
 import com.google.common.io.ByteStreams;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -17,10 +19,12 @@ import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -41,6 +45,7 @@ public class SlaveAgentService implements AgentService
     private AgentConfiguration agentConfig;
     private ServiceTokenManager serviceTokenManager;
     private MasterLocationProvider masterLocationProvider;
+    private SlaveOutputListener slaveOutputListener;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -207,6 +212,30 @@ public class SlaveAgentService implements AgentService
         return service.getFileInfo(serviceTokenManager.getToken(), recipeDetails, path);    
     }
 
+    public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
+    {
+        OutputStream outputStream = context.getOutputStream();
+        if (outputStream == null)
+        {
+            outputStream = new NullOutputStream();
+        }
+
+        long streamId = slaveOutputListener.registerStream(outputStream);
+
+        // Now we can clear out the stream info rather than send the stream over hessian.
+        context = new PulseExecutionContext((PulseExecutionContext) context);
+        ((PulseExecutionContext) context).setOutputStream(null);
+
+        try
+        {
+            service.runCommand(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), context, commandLine, workingDir, streamId, timeout);
+        }
+        finally
+        {
+            slaveOutputListener.unregisterStream(streamId);
+        }
+    }
+
     public AgentConfiguration getAgentConfig()
     {
         return agentConfig;
@@ -237,5 +266,10 @@ public class SlaveAgentService implements AgentService
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setSlaveOutputListener(SlaveOutputListener slaveOutputListener)
+    {
+        this.slaveOutputListener = slaveOutputListener;
     }
 }

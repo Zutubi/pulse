@@ -46,7 +46,7 @@ public class MasterRecipeRunner implements RecipeRunner
         File dataDir = configurationManager.getUserPaths().getData();
         ServerRecipePaths recipePaths = new ServerRecipePaths(context, dataDir);
 
-        CommandEventOutputStream outputStream = null;
+        EventOutputStream outputStream = null;
         context.push();
         try
         {
@@ -58,7 +58,7 @@ public class MasterRecipeRunner implements RecipeRunner
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-            outputStream = new CommandEventOutputStream(eventManager, request.getId());
+            outputStream = new EventOutputStream(eventManager, true, request.getId());
             context.setOutputStream(outputStream);
             context.setWorkingDir(recipePaths.getBaseDir());
 

@@ -30,7 +30,9 @@ public abstract class BuildHookConfiguration extends AbstractNamedConfiguration
     public abstract boolean appliesTo(BuildResult result);
     public abstract boolean appliesTo(RecipeResultNode result);
     public abstract boolean failOnError();
+    public abstract boolean runsOnAgent();
     public abstract boolean enabled();
+
     /**
      * Indicates if this hook can be manually triggered for a given build
      * result.  Note that the result may be null, in which case this method

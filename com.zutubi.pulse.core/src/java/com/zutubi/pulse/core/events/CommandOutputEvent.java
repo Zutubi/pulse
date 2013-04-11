@@ -49,8 +49,6 @@ public class CommandOutputEvent extends RecipeEvent implements OutputEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Command Output Event: ");
-        buff.append(getRecipeId());
-        return buff.toString();
+        return "Command Output Event: " + getRecipeId();
     }
 }

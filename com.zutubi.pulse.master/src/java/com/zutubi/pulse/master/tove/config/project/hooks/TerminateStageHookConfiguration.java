@@ -10,7 +10,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * recipe/build stage is sent to an agent.
  */
 @SymbolicName("zutubi.terminateStageHookConfig")
-@Form(fieldOrder = {"name", "applyToAllStages", "stages", "failOnError", "runForPersonal", "allowManualTrigger"})
+@Form(fieldOrder = {"name", "applyToAllStages", "stages", "failOnError", "runTaskOnAgents", "runForPersonal", "allowManualTrigger"})
 public class TerminateStageHookConfiguration extends AbstractStageHookConfiguration
 {
     public boolean triggeredBy(BuildEvent event)

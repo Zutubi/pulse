@@ -480,7 +480,7 @@ public class RecipeController
         {
             logger.cleaningComplete();
         }
-    
+
         sendPostStageEvent();
     }
 

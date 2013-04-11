@@ -154,6 +154,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
             // hooks
             registerConfigurationType(ManualBuildHookConfiguration.class);
+            registerConfigurationType(AbstractBuildHookConfiguration.class);
             registerConfigurationType(AutoBuildHookConfiguration.class);
             registerConfigurationType(PreBuildHookConfiguration.class);
             registerConfigurationType(PostBuildHookConfiguration.class);

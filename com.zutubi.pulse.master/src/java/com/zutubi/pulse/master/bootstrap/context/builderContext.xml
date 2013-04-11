@@ -252,4 +252,6 @@
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
 
     <bean id="workDirectoryCleanupService" class="com.zutubi.pulse.master.agent.WorkDirectoryCleanupService" init-method="init"/>
+
+    <bean id="slaveOutputListener" class="com.zutubi.pulse.master.agent.SlaveOutputListener"/>
 </beans>

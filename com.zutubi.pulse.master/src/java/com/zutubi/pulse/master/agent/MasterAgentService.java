@@ -3,6 +3,9 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
+import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.master.MasterRecipeRunner;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.ResourceManager;
@@ -22,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -135,6 +139,21 @@ public class MasterAgentService implements AgentService
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File base = recipePaths.getBaseDir();
         return new FileInfo(new File(base, relativePath));
+    }
+
+    public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
+    {
+        ServerRecipePaths recipePaths = new ServerRecipePaths(context, configurationManager.getUserPaths().getData());
+        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BASE_DIR, recipePaths.getBaseDir().getAbsolutePath());
+        workingDir = context.resolveVariables(workingDir);
+        try
+        {
+            ProcessWrapper.runCommand(commandLine, workingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);
+        }
+        catch (Exception e)
+        {
+            throw new BuildException("Could not run command on agent: " + e.getMessage(), e);
+        }
     }
 
     @Override

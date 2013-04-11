@@ -1,8 +1,13 @@
 package com.zutubi.pulse.slave;
 
 import com.google.common.collect.Iterables;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.EventOutputStream;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.api.BuildException;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -13,6 +18,7 @@ import com.zutubi.pulse.core.plugins.sync.SynchronisationActions;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerInfoModel;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
@@ -38,6 +44,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -62,6 +69,7 @@ public class SlaveServiceImpl implements SlaveService
     private PluginManager pluginManager;
     private PluginSynchroniser pluginSynchroniser;
     private ResourceLocatorExtensionManager resourceLocatorExtensionManager;
+    private EventManager eventManager;
 
     private boolean firstStatus = true;
 
@@ -166,16 +174,8 @@ public class SlaveServiceImpl implements SlaveService
     public List<SynchronisationMessageResult> synchronise(String token, String master, long agentId, List<SynchronisationMessage> messages)
     {
         serviceTokenManager.validateToken(token);
-        try
-        {
-            MasterService masterService = masterProxyFactory.createProxy(master);
-            forwardingEventListener.setMaster(master, masterService);
-            return synchronisationTaskRunnerService.synchronise(agentId, messages);
-        }
-        catch (MalformedURLException e)
-        {
-            throw new RuntimeException(e);
-        }
+        updateMaster(master);
+        return synchronisationTaskRunnerService.synchronise(agentId, messages);
     }
 
     private List<PluginInfo> pongMaster(String master) throws MalformedURLException
@@ -190,19 +190,11 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
 
-        try
-        {
-            MasterService masterService = masterProxyFactory.createProxy(master);
-            forwardingEventListener.setMaster(master, masterService);
-            SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
-            ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
-            serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
-            return true;
-        }
-        catch (MalformedURLException e)
-        {
-            throw new RuntimeException(e);
-        }
+        MasterService masterService = updateMaster(master);
+        SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
+        ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
+        serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
+        return true;
     }
 
     public void cleanupRecipe(String token, AgentRecipeDetails recipeDetails) throws InvalidTokenException
@@ -258,6 +250,37 @@ public class SlaveServiceImpl implements SlaveService
         ServerRecipePaths recipePaths = new ServerRecipePaths(recipeDetails, configurationManager.getUserPaths().getData());
         File base = recipePaths.getBaseDir();
         return new FileInfo(new File(base, relativePath));
+    }
+
+    public void runCommand(String token, String master, ExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
+    {
+        serviceTokenManager.validateToken(token);
+        updateMaster(master);
+        try
+        {
+            ServerRecipePaths paths = new ServerRecipePaths(context, configurationManager.getUserPaths().getData());
+            context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BASE_DIR, paths.getBaseDir().getAbsolutePath());
+            workingDir = context.resolveVariables(workingDir);
+            ProcessWrapper.runCommand(commandLine, workingDir, new EventOutputStream(eventManager, false, streamId), timeout, TimeUnit.SECONDS);
+        }
+        catch (Exception e)
+        {
+            throw new BuildException(e);
+        }
+    }
+
+    private MasterService updateMaster(String master)
+    {
+        try
+        {
+            MasterService masterService = masterProxyFactory.createProxy(master);
+            forwardingEventListener.setMaster(master, masterService);
+            return masterService;
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public ServiceTokenManager getServiceTokenManager()
@@ -330,5 +353,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setResourceLocatorExtensionManager(ResourceLocatorExtensionManager resourceLocatorExtensionManager)
     {
         this.resourceLocatorExtensionManager = resourceLocatorExtensionManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * hook can be easily applied to multiple stages.
  */
 @SymbolicName("zutubi.postStageHookConfig")
-@Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
+@Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError", "runTaskOnAgents", "runForPersonal", "allowManualTrigger"})
 public class PostStageHookConfiguration extends AbstractStageHookConfiguration
 {
     @ControllingCheckbox(uncheckedFields = "runForStates")

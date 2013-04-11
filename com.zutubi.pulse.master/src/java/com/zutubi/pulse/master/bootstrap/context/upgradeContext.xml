@@ -200,6 +200,7 @@
                 <ref local="addGitCloneDepth"/>
                 <ref local="addProjectTriggerHookPermission"/>
                 <ref local="addGroupConcurrentPersonalBuilds"/>
+                <ref local="addRunHookTaskOnAgents"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1050,5 +1051,9 @@
 
     <bean id="addGroupConcurrentPersonalBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddGroupConcurrentPersonalBuildsUpgradeTask">
         <property name="buildNumber" value="205999003"/>
+    </bean>
+
+    <bean id="addRunHookTaskOnAgents" class="com.zutubi.pulse.master.upgrade.tasks.AddRunHookTaskOnAgentsUpgradeTask">
+        <property name="buildNumber" value="205999004"/>
     </bean>
 </beans>

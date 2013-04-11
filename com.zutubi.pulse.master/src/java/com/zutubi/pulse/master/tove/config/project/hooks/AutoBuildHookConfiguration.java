@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
-import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -9,7 +8,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * A build hook that is triggered automatically at some point in a build.
  */
 @SymbolicName("zutubi.autoBuildHookConfig")
-public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
+public abstract class AutoBuildHookConfiguration extends AbstractBuildHookConfiguration
 {
     @Internal
     private boolean enabled = true;
@@ -72,8 +71,6 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
     {
         return allowManualTrigger && (result == null || !result.isPersonal() || runForPersonal);
     }
-
-    public abstract boolean triggeredBy(BuildEvent event);
 
     protected boolean triggeredByBuildType(BuildResult buildResult)
     {

@@ -1,24 +1,25 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.pulse.core.util.process.ByteHandler;
-import com.zutubi.pulse.core.util.process.ForwardingByteHandler;
-import com.zutubi.pulse.core.util.process.NullByteHandler;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_AGENT_HANDLE;
 
 /**
  * Run executable tasks are used to execute an arbitrary command in a hook.
@@ -35,6 +36,9 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
     private boolean timeoutApplied;
     @Numeric(min = 0)
     private int timeout;
+
+    @Transient
+    private AgentManager agentManager;
 
     public String getCommand()
     {
@@ -86,49 +90,43 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         this.timeout = timeout;
     }
 
-    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode) throws Exception
+    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean onAgent) throws Exception
     {
-        ProcessWrapper processWrapper = null;
-        try
+        List<String> resolvedArguments = context.splitAndResolveVariables(arguments);
+        List<String> commandLine = new LinkedList<String>();
+        commandLine.add(context.resolveVariables(command));
+        commandLine.addAll(resolvedArguments);
+
+        if (resultNode != null && onAgent)
         {
-            List<String> resolvedArguments = context.splitAndResolveVariables(arguments);
-            List<String> commandLine = new LinkedList<String>();
-            commandLine.add(command);
-            commandLine.addAll(resolvedArguments);
-
-            ProcessBuilder builder = new ProcessBuilder(commandLine);
-            builder.redirectErrorStream(true);
-            if(StringUtils.stringSet(workingDir))
-            {
-                builder.directory(new File(workingDir));
-            }
-            
-            ByteHandler byteHandler;
-            if(context.getOutputStream() == null)
-            {
-                byteHandler = new NullByteHandler();
-            }
-            else
-            {
-                byteHandler = new ForwardingByteHandler(context.getOutputStream());
-            }
-
-            processWrapper = new ProcessWrapper(builder.start(), byteHandler, false);
+            executeOnAgent(context, commandLine);
+        }
+        else
+        {
+            String resolvedWorkingDir = StringUtils.stringSet(workingDir) ? context.resolveVariables(workingDir) : null;
             if (timeoutApplied)
             {
-                processWrapper.waitForSuccessOrThrow(timeout, TimeUnit.SECONDS);
+                ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);
             }
             else
             {
-                processWrapper.waitForSuccess();
+                ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, context.getOutputStream());
             }
         }
-        finally
+    }
+
+    private void executeOnAgent(ExecutionContext context, List<String> commandLine)
+    {
+        long agentHandle = context.getLong(PROPERTY_AGENT_HANDLE, 0);
+        Agent agent = agentManager.getAgentByHandle(agentHandle);
+        if (agent != null)
         {
-            if (processWrapper != null)
-            {
-                processWrapper.destroy();
-            }
+            agent.getService().executeCommand(context, commandLine, workingDir, timeout);
         }
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

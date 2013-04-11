@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
-import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessageResult;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 
 import java.io.File;
 import java.util.List;
@@ -75,4 +76,16 @@ public interface AgentService
      * @return a file info object for the requested path.
      */
     FileInfo getFile(AgentRecipeDetails recipeDetails, String path);
+
+    /**
+     * Executes a command on the agent.
+     *
+     * @param context context providing an output stream, and properties to resolve the workingDir
+     *                (once the base directory property is added, which must be done on the agent)
+     * @param commandLine command (and arguments) to run
+     * @param workingDir if not null, directory in which to run the command, may contain properties
+     *                   to be resolved using the context
+     * @param timeout if non-zero, a time limit in seconds to apply to the command
+     */
+    void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout);
 }

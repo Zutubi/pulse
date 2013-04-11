@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.hook.email;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -21,8 +20,11 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.CollectionUtils;
 import org.mockito.Matchers;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.google.common.collect.Lists.transform;
 import static java.util.Arrays.asList;
@@ -30,11 +32,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 public class SendEmailTaskConfigurationTest extends PulseTestCase
 {
@@ -90,7 +87,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         projectConfig.getContacts().getUsers().addAll(asList(user1, user2));
 
         taskConfig.setEmailContacts(true);
-        taskConfig.execute(null, createCompleteResult(), null);
+        taskConfig.execute(null, createCompleteResult(), null, false);
         assertEmailsSentTo("1", "2");
     }
 
@@ -100,7 +97,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         groupMembers.add(createUserWithPrimaryEmail("1"));
         
         taskConfig.setEmailContacts(true);
-        taskConfig.execute(null, createCompleteResult(), null);
+        taskConfig.execute(null, createCompleteResult(), null, false);
         assertEmailsSentTo("1");
     }
 
@@ -112,7 +109,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         groupMembers.add(user);
         
         taskConfig.setEmailContacts(true);
-        taskConfig.execute(null, createCompleteResult(), null);
+        taskConfig.execute(null, createCompleteResult(), null, false);
         assertEmailsSentTo("1");
     }
 
@@ -121,7 +118,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         projectConfig.getContacts().getUsers().add(new UserConfiguration());
 
         taskConfig.setEmailContacts(true);
-        taskConfig.execute(null, createCompleteResult(), null);
+        taskConfig.execute(null, createCompleteResult(), null, false);
         assertEquals(0, emailService.getEmailCount());
     }
 
@@ -135,7 +132,7 @@ public class SendEmailTaskConfigurationTest extends PulseTestCase
         projectConfig.getContacts().getUsers().add(user);
 
         taskConfig.setEmailContacts(true);
-        taskConfig.execute(null, createCompleteResult(), null);
+        taskConfig.execute(null, createCompleteResult(), null, false);
         assertEquals(0, emailService.getEmailCount());
     }
     

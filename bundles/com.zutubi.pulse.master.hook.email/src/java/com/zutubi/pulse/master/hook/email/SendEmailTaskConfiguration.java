@@ -185,7 +185,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
         this.ignorePulseUsers = ignorePulseUsers;
     }
 
-    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode) throws Exception
+    public void execute(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean onAgent) throws Exception
     {
         if (!buildResult.completed())
         {

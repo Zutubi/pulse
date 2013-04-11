@@ -89,7 +89,7 @@ public class SlaveRecipeRunner implements RecipeRunner
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
                 if (isLiveLoggingEnabled())
                 {
-                    outputStream = new CommandEventOutputStream(eventManager, request.getId());
+                    outputStream = new EventOutputStream(eventManager, true, request.getId());
                     context.setOutputStream(outputStream);
                 }
                 context.setWorkingDir(processorPaths.getBaseDir());

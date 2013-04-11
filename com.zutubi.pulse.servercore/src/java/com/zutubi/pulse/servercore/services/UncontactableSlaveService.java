@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.services;
 
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerInfoModel;
@@ -90,6 +91,11 @@ public class UncontactableSlaveService implements SlaveService
     }
 
     public FileInfo getFileInfo(String token, AgentRecipeDetails recipeDetails, String path)
+    {
+        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
+    }
+
+    public void runCommand(String token, String master, ExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

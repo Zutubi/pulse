@@ -5,6 +5,7 @@ import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.*;
@@ -883,6 +884,11 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         public FileInfo getFile(AgentRecipeDetails recipeDetails, String path)
         {
             return null;
+        }
+
+        public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
+        {
+            throw new RuntimeException("Not yet implemented");
         }
 
         public long getType()

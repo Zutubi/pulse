@@ -11,7 +11,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  */
 @SymbolicName("zutubi.manualBuildHookConfig")
 @Form(fieldOrder = "name")
-public class ManualBuildHookConfiguration extends BuildHookConfiguration
+public class ManualBuildHookConfiguration extends AbstractBuildHookConfiguration
 {
     public boolean triggeredBy(BuildEvent event)
     {

@@ -1,11 +1,10 @@
 package com.zutubi.pulse.core.util.process;
 
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -30,6 +29,7 @@ public class ProcessWrapper
 {
     private static final int READER_JOIN_TIMEOUT = 30000;
     private static final int BUFFER_SIZE = 4096;
+    private static final int TIMEOUT_NONE = 0;
 
     private Process process;
     private AtomicBoolean destroyed = new AtomicBoolean(false);
@@ -43,6 +43,75 @@ public class ProcessWrapper
     Thread stdoutThread = null;
     Thread stderrThread = null;
     Thread waiterThread = null;
+
+    /**
+     * Convenience method to run a command under a wrapper sending all output to a stream.
+     *
+     * @param command the command to run
+     * @param inDir if not null, the working directory to run in
+     * @param outputStream if not null, the stream to send all output to
+     * @throws InterruptedException if we're interrupted waiting for the command to run
+     * @throws TimeoutException never thrown (this variant uses an infinite timeout)
+     * @throws IOException on I/O error creating or reading output from the process
+     */
+    public static void runCommand(List<String> command, String inDir, OutputStream outputStream) throws InterruptedException, TimeoutException, IOException
+    {
+        runCommand(command, inDir, outputStream, TIMEOUT_NONE, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Convenience method to run a command under a wrapper sending all output to a stream.
+     *
+     * @param command the command to run
+     * @param inDir if not null, the working directory to run in
+     * @param outputStream if not null, the stream to send all output to
+     * @param timeout time limit to apply to wait for the command to finish
+     * @param timeUnit units of the timeout
+     * @throws InterruptedException if we're interrupted waiting for the command to run
+     * @throws TimeoutException never thrown (this variant uses an infinite timeout)
+     * @throws IOException on I/O error creating or reading output from the process
+     */
+    public static void runCommand(List<String> command, String inDir, OutputStream outputStream, long timeout, TimeUnit timeUnit) throws IOException, InterruptedException, TimeoutException
+    {
+        ProcessWrapper processWrapper = null;
+        try
+        {
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.redirectErrorStream(true);
+            if (StringUtils.stringSet(inDir))
+            {
+                builder.directory(new File(inDir));
+            }
+
+            ByteHandler byteHandler;
+            if (outputStream == null)
+            {
+                byteHandler = new NullByteHandler();
+            }
+            else
+            {
+                byteHandler = new ForwardingByteHandler(outputStream);
+            }
+
+            processWrapper = new ProcessWrapper(builder.start(), byteHandler, false);
+            if (timeout != TIMEOUT_NONE)
+            {
+                processWrapper.waitForSuccessOrThrow(timeout, timeUnit);
+            }
+            else
+            {
+                processWrapper.waitForSuccess();
+            }
+        }
+        finally
+        {
+            if (processWrapper != null)
+            {
+                processWrapper.destroy();
+            }
+        }
+
+    }
 
     private ProcessWrapper(Process process, StreamerBuilder streamerBuilder, boolean readErrors)
     {
