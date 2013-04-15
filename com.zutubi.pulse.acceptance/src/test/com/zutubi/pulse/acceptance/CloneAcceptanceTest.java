@@ -140,7 +140,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + TEST_PROPERTY_NAME + "\" is already in use");
     }
 
     public void testCloneMapItemCancel() throws Exception
@@ -199,7 +199,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements(random);
         cloneForm.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + random + "\" is already in use");
     }
 
     public void testCloneProjectHierarchyNoChild() throws Exception
@@ -262,7 +262,7 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
         cloneForm.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + parentName + "\" is already in use");
 
         cloneForm.cloneFormElements(random, "true", random);
         cloneForm.waitFor();
@@ -299,11 +299,11 @@ public class CloneAcceptanceTest extends AcceptanceTestBase
 
         cloneForm.cloneFormElements(random, random + PARENT_PROPERTY_NAME);
         cloneForm.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + random + "\" is already in use");
 
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random);
         cloneForm.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + random + "\" is already in use");
     }
 
     public void testSmartCloneProjectHierarchyWithChild() throws Exception

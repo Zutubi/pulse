@@ -168,6 +168,24 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
     }
 
+    public void testPostStageHookOnAgent() throws Exception
+    {
+        rpcClient.RemoteApi.ensureAgent(AGENT_NAME);
+        assignStageToAgent(PROJECT_NAME, "default", AGENT_NAME);
+        chooseHookType("zutubi.postStageHookConfig");
+
+        ConfigurationForm hookForm = getBrowser().createForm(ConfigurationForm.class, PostStageHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextNamedFormElements(asPair("name", random), asPair("runTaskOnAgents", "true"));
+
+        selectFromStageTasks();
+
+        addDumpEnvTask("${project} ${stage} ${agent}");
+
+        rpcClient.RemoteApi.runBuild(PROJECT_NAME);
+        assertArgs(PROJECT_NAME, "default", AGENT_NAME);
+    }
+
     public void testStageDirProperty() throws Exception
     {
         postStageHelper();

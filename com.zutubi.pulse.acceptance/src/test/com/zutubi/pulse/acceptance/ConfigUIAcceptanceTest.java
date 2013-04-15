@@ -280,7 +280,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         form.waitFor();
-        getBrowser().waitForTextPresent("name is already in use, please select another name");
+        getBrowser().waitForTextPresent("name \"p1\" is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInherited() throws Exception
@@ -298,7 +298,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.finishFormElements("p1", "value", null, null, null);
         form.waitFor();
-        getBrowser().waitForTextPresent("name is already in use, please select another name");
+        getBrowser().waitForTextPresent("name \"p1\" is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInDescendant() throws Exception
@@ -1034,7 +1034,7 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         form.okFormElements(random, "true");
         
         form.waitFor();
-        getBrowser().waitForTextPresent("name is already in use");
+        getBrowser().waitForTextPresent("name \"" + random + "\" is already in use");
         form.cancelFormElements(random, "false");
         hierarchyPage.waitFor();
     }

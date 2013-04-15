@@ -153,8 +153,8 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(LinkTransformerConfiguration.class);
 
             // hooks
-            registerConfigurationType(ManualBuildHookConfiguration.class);
             registerConfigurationType(AbstractBuildHookConfiguration.class);
+            registerConfigurationType(ManualBuildHookConfiguration.class);
             registerConfigurationType(AutoBuildHookConfiguration.class);
             registerConfigurationType(PreBuildHookConfiguration.class);
             registerConfigurationType(PostBuildHookConfiguration.class);

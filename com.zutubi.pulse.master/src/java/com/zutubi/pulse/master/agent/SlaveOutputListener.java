@@ -8,6 +8,7 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ public class SlaveOutputListener implements EventListener
     private static final Logger LOG = Logger.getLogger(SlaveOutputListener.class);
 
     private long nextId = 1;
-    private Map<Long, OutputStream> idToStream;
+    private Map<Long, OutputStream> idToStream = new HashMap<Long, OutputStream>();
 
     public synchronized long registerStream(OutputStream stream)
     {
