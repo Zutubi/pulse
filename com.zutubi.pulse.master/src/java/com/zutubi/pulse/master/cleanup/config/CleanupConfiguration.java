@@ -1,14 +1,17 @@
 package com.zutubi.pulse.master.cleanup.config;
 
-import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.tove.annotations.*;
-import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.annotations.ControllingCheckbox;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.Format;
+import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.Constants;
-import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
@@ -20,8 +23,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.cleanupConfig")
 @Form(fieldOrder = {"name", "cleanupAll", "what", "retain", "unit", "states", "statuses"})
-@Table(columns = {"name", "what", "after", "states"})
-public class CleanupConfiguration extends AbstractNamedConfiguration
+public class CleanupConfiguration extends AbstractCleanupConfiguration
 {
     @ControllingCheckbox(uncheckedFields = {"what"})
     private boolean cleanupAll = true;
@@ -29,19 +31,6 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     @Required
     @Format("CleanupWhatColumnFormatter")
     private List<CleanupWhat> what;
-
-    @Numeric(min = 0)
-    private int retain;
-
-    @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
-    private CleanupUnit unit;
-
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
-    @Format("CleanupStateColumnFormatter")
-    private List<ResultState> states;
-
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
-    private List<String> statuses = new LinkedList<String>();
 
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
     {
@@ -74,46 +63,6 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         this.what = what;
     }
 
-    public List<ResultState> getStates()
-    {
-        return states;
-    }
-
-    public void setStates(List<ResultState> states)
-    {
-        this.states = states;
-    }
-
-    public List<String> getStatuses()
-    {
-        return statuses;
-    }
-
-    public void setStatuses(List<String> statuses)
-    {
-        this.statuses = statuses;
-    }
-
-    public int getRetain()
-    {
-        return retain;
-    }
-
-    public void setRetain(int retain)
-    {
-        this.retain = retain;
-    }
-
-    public CleanupUnit getUnit()
-    {
-        return unit;
-    }
-
-    public void setUnit(CleanupUnit unit)
-    {
-        this.unit = unit;
-    }
-
     public boolean isCleanupAll()
     {
         return cleanupAll;
@@ -124,27 +73,11 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
         this.cleanupAll = cleanupAll;
     }
 
+    @Override
     public List<BuildResult> getMatchingResults(Project project, BuildResultDao dao)
     {
-        ResultState[] allowedStates = null;
-        if (states != null)
-        {
-            allowedStates = states.toArray(new ResultState[states.size()]);
-        }
-        if(allowedStates == null || allowedStates.length == 0)
-        {
-            allowedStates = ResultState.getCompletedStates();
-        }
-
-        String[] allowedStatuses = null;
-        if (statuses != null)
-        {
-            allowedStatuses = statuses.toArray(new String[statuses.size()]);
-        }
-        if (allowedStatuses == null || allowedStatuses.length == 0)
-        {
-            allowedStatuses = IvyStatus.getStatuses().toArray(new String[IvyStatus.getStatuses().size()]);
-        }
+        ResultState[] allowedStates = resolveAllowedStates();
+        String[] allowedStatuses = resolveAllowedStatuses();
 
         List<BuildResult> results = new LinkedList<BuildResult>();
         if(unit == CleanupUnit.BUILDS)
@@ -164,6 +97,30 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
             results.addAll(dao.queryBuilds(new Project[]{project}, allowedStates, allowedStatuses, 0, startTime, -1, -1, false, false));
         }
+
         return results;
+    }
+
+    @Override
+    public String summarise()
+    {
+        String whatString;
+        if (cleanupAll)
+        {
+            whatString = "everything";
+        }
+        else
+        {
+            final CleanupWhatColumnFormatter whatFormatter = new CleanupWhatColumnFormatter();
+            whatString = StringUtils.join(", ", Iterables.transform(what, new Function<CleanupWhat, String>()
+            {
+                public String apply(CleanupWhat input)
+                {
+                    return whatFormatter.format(input);
+                }
+            }));
+        }
+
+        return "remove " + whatString + " for " + summariseFilter() + " after " + getRetain() + " " + getUnit().toString().toLowerCase();
     }
 }

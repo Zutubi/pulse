@@ -1,6 +1,8 @@
 package com.zutubi.pulse.master.cleanup.requests;
 
+import com.zutubi.pulse.master.cleanup.config.AbstractCleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
 import com.zutubi.pulse.master.model.BuildCleanupOptions;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -9,8 +11,10 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A request to cleanup a projects builds.  Which builds and what specifically
@@ -33,31 +37,44 @@ public class ProjectCleanupRequest extends EntityCleanupRequest
     {
         ProjectConfiguration projectConfig = project.getConfig();
         @SuppressWarnings({"unchecked"})
-        Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_CLEANUP);
+        Map<String, AbstractCleanupConfiguration> cleanupConfigs = (Map<String, AbstractCleanupConfiguration>) projectConfig.getExtensions().get(MasterConfigurationRegistry.EXTENSION_PROJECT_CLEANUP);
 
         if (cleanupConfigs != null)
         {
-            // if cleanup rules are specified.  Maybe we should always have at least an empty map?
-            for (CleanupConfiguration rule : cleanupConfigs.values())
+            Set<BuildResult> excludedBuilds = new HashSet<BuildResult>();
+            for (AbstractCleanupConfiguration rule : cleanupConfigs.values())
             {
-                List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
-
-                for (BuildResult build : oldBuilds)
+                if (rule instanceof RetainConfiguration)
                 {
-                    BuildCleanupOptions options = new BuildCleanupOptions(false);
-                    if (rule.isCleanupAll())
-                    {
-                        options = new BuildCleanupOptions(true);
-                    }
-                    else
-                    {
-                        if (rule.getWhat() != null)
-                        {
-                            options = new BuildCleanupOptions(rule.getWhat());
-                        }
-                    }
+                    excludedBuilds.addAll(rule.getMatchingResults(project, buildResultDao));
+                }
+            }
 
-                    buildManager.cleanup(build, options);
+            for (AbstractCleanupConfiguration rule : cleanupConfigs.values())
+            {
+                if (rule instanceof CleanupConfiguration)
+                {
+                    CleanupConfiguration cleanupRule = (CleanupConfiguration) rule;
+                    List<BuildResult> oldBuilds = cleanupRule.getMatchingResults(project, buildResultDao);
+                    oldBuilds.removeAll(excludedBuilds);
+
+                    for (BuildResult build : oldBuilds)
+                    {
+                        BuildCleanupOptions options = new BuildCleanupOptions(false);
+                        if (cleanupRule.isCleanupAll())
+                        {
+                            options = new BuildCleanupOptions(true);
+                        }
+                        else
+                        {
+                            if (cleanupRule.getWhat() != null)
+                            {
+                                options = new BuildCleanupOptions(cleanupRule.getWhat());
+                            }
+                        }
+
+                        buildManager.cleanup(build, options);
+                    }
                 }
             }
         }

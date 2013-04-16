@@ -2,7 +2,9 @@ package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
 import com.zutubi.pulse.core.tove.config.CoreConfigurationRegistry;
+import com.zutubi.pulse.master.cleanup.config.AbstractCleanupConfiguration;
 import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
 import com.zutubi.pulse.master.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
@@ -173,7 +175,9 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
 
             // register cleanup configuration.  This will eventually be handled as an extension point
-            registerProjectMapExtension(EXTENSION_PROJECT_CLEANUP, CleanupConfiguration.class);
+            registerProjectMapExtension(EXTENSION_PROJECT_CLEANUP, AbstractCleanupConfiguration.class);
+            registerConfigurationType(CleanupConfiguration.class);
+            registerConfigurationType(RetainConfiguration.class);
 
             TemplatedMapType agentCollection = new TemplatedMapType(registerConfigurationType(AgentConfiguration.class), typeRegistry);
             configurationPersistenceManager.register(AGENTS_SCOPE, agentCollection);
