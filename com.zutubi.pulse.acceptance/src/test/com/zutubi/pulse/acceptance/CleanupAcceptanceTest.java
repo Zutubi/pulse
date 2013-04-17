@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.acceptance.pages.browse.*;
 import com.zutubi.pulse.acceptance.utils.CleanupTestUtils;
+import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -23,6 +24,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
     private static final long CLEANUP_TIMEOUT = SECOND * 10;
 
     private CleanupTestUtils utils;
+    private String projectName;
 
     @Override
     protected void setUp() throws Exception
@@ -36,7 +38,8 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
         Hashtable<String, Object> antConfig = rpcClient.RemoteApi.getAntConfig();
         antConfig.put(Constants.Project.AntCommand.TARGETS, "build");
-        rpcClient.RemoteApi.insertSingleCommandProject(random, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), antConfig);
+        projectName = random;
+        rpcClient.RemoteApi.insertSingleCommandProject(projectName, ProjectManager.GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(Constants.TEST_ANT_REPOSITORY), antConfig);
         utils.deleteCleanupRule(random, "default");
     }
 
@@ -52,8 +55,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     public void testCleanupBuildArtifacts() throws Exception
     {
-        final String projectName = random;
-
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
 
         rpcClient.RemoteApi.runBuild(projectName);
@@ -130,10 +131,36 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
         }
     }
 
+    public void testRetainRule() throws Exception
+    {
+        utils.addCleanupRule(projectName, "everything");
+        utils.addRetainRule(projectName, "success", ResultState.SUCCESS, ResultState.WARNINGS);
+
+        rpcClient.RemoteApi.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+        assertTrue(utils.hasBuild(projectName, 1));
+
+        utils.setAntTarget(projectName, "nosuchtarget");
+
+        rpcClient.RemoteApi.runBuild(projectName);
+        waitForCleanupToRunAsynchronously();
+        assertTrue(utils.hasBuild(projectName, 1));
+        assertTrue(utils.hasBuild(projectName, 2));
+
+        rpcClient.RemoteApi.runBuild(projectName);
+        waitForCleanupToRunAsynchronously(new InvertedCondition()
+        {
+            public boolean notSatisfied() throws Exception
+            {
+                return utils.hasBuild(projectName, 2);
+            }
+        });
+        assertTrue(utils.hasBuild(projectName, 1));
+        assertTrue(utils.hasBuild(projectName, 3));
+    }
+
     public void testTestCleanup() throws Exception
     {
-        final String projectName = random;
-
         utils.setAntTarget(projectName, "test");
         utils.insertTestCapture("projects/" + projectName, "junit xml report processor");
         utils.addCleanupRule(projectName, "build_artifacts", CleanupWhat.BUILD_ARTIFACTS);
@@ -177,7 +204,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     public void testCleanupRepositoryArtifacts() throws Exception
     {
-        final String projectName = random;
         prepareProjectWithRepositoryCleanup(projectName);
 
         rpcClient.RemoteApi.runBuild(projectName);
@@ -196,7 +222,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     public void testCleanupRepositoryArtifactsAfterProjectRename() throws Exception
     {
-        final String projectName = random;
         prepareProjectWithRepositoryCleanup(projectName);
 
         // rename the project.
@@ -227,8 +252,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     public void testCleanupLogs() throws Exception
     {
-        final String projectName = random;
-
         utils.addCleanupRule(projectName, "logs", CleanupWhat.LOGS);
 
         rpcClient.RemoteApi.runBuild(projectName);
@@ -260,8 +283,6 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     public void testPinnedBuildsImmune() throws Exception
     {
-        final String projectName = random;
-
         utils.addCleanupRule(projectName, "everything");
 
         rpcClient.RemoteApi.runBuild(projectName);

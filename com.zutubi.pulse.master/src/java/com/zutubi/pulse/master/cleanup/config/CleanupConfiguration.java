@@ -121,6 +121,12 @@ public class CleanupConfiguration extends AbstractCleanupConfiguration
             }));
         }
 
-        return "remove " + whatString + " for " + summariseFilter() + " after " + getRetain() + " " + getUnit().toString().toLowerCase();
+        String unit = getUnit().toString().toLowerCase();
+        if (getRetain() == 1)
+        {
+            unit = StringUtils.stripSuffix(unit, "s");
+        }
+
+        return "remove " + whatString + " for " + summariseFilter() + " after " + getRetain() + " " + unit;
     }
 }

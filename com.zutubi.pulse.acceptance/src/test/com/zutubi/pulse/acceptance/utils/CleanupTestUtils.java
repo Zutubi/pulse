@@ -1,10 +1,26 @@
 package com.zutubi.pulse.acceptance.utils;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.filter;
 import com.zutubi.pulse.acceptance.AcceptanceTestUtils;
 import com.zutubi.pulse.acceptance.Constants;
+import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
+import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.master.build.log.BuildLogFile;
+import com.zutubi.pulse.master.build.log.LogFile;
+import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
+import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
+import com.zutubi.pulse.master.cleanup.config.RetainConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.util.io.IsDirectoryPredicate;
+
+import java.io.File;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.filter;
 import static com.zutubi.pulse.acceptance.Constants.Project.Cleanup.*;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.ARTIFACTS;
 import static com.zutubi.pulse.acceptance.Constants.Project.Command.Artifact.POSTPROCESSORS;
@@ -15,20 +31,7 @@ import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Reci
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
-import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
-import com.zutubi.pulse.core.commands.api.DirectoryArtifactConfiguration;
-import com.zutubi.pulse.master.build.log.BuildLogFile;
-import com.zutubi.pulse.master.build.log.LogFile;
-import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
-import com.zutubi.pulse.master.cleanup.config.CleanupUnit;
-import com.zutubi.pulse.master.cleanup.config.CleanupWhat;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.io.IsDirectoryPredicate;
 import static java.util.Arrays.asList;
-
-import java.io.File;
-import java.util.Hashtable;
-import java.util.Vector;
 
 /**
  * A set of utility methods used by the cleanup acceptance tests.
@@ -73,6 +76,26 @@ public class CleanupTestUtils
         remoteApi.insertConfig(cleanupPath, data);
     }
     
+    public void addRetainRule(String projectName, String name, ResultState... states) throws Exception
+    {
+        Hashtable<String, Object> data = remoteApi.createDefaultConfig(RetainConfiguration.class);
+        data.put(NAME, name);
+        data.put(RETAIN, 1);
+        data.put(UNIT, CleanupUnit.BUILDS.toString());
+        if (states != null && states.length > 0)
+        {
+            Vector<String> vector = new Vector<String>();
+            for (ResultState s : states)
+            {
+                vector.add(s.toString());
+            }
+            data.put(STATES, vector);
+        }
+
+        String cleanupPath = "projects/" + projectName + "/cleanup";
+        remoteApi.insertConfig(cleanupPath, data);
+    }
+
     public boolean hasBuild(String projectName, int buildNumber) throws Exception
     {
         return remoteApi.getBuild(projectName, buildNumber) != null;

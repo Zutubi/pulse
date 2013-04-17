@@ -242,6 +242,7 @@ public class Constants
             public static final String RETAIN = "retain";
             public static final String UNIT = "unit";
             public static final String WHAT = "what";
+            public static final String STATES = "states";
             public static final String CLEANUP_ALL = "cleanupAll";
         }
 

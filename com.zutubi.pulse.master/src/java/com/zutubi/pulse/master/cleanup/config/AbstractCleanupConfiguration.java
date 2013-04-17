@@ -29,7 +29,7 @@ public abstract class AbstractCleanupConfiguration extends AbstractNamedConfigur
     @Numeric(min = 0)
     protected int retain;
     @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
-    protected CleanupUnit unit;
+    protected CleanupUnit unit = CleanupUnit.BUILDS;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     @Format("CleanupStateColumnFormatter")
     protected List<ResultState> states;

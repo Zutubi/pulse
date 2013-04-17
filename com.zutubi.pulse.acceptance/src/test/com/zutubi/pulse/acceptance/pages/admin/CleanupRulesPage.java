@@ -13,4 +13,9 @@ public class CleanupRulesPage extends ListPage
     {
         super(browser, urls, path);
     }
+
+    public String getSummary(int itemIndex)
+    {
+        return getCellContent(itemIndex, 1);
+    }
 }
