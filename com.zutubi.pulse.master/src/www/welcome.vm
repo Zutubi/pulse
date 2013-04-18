@@ -14,11 +14,11 @@
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to Pulse 2.5!  This page provides information on common next steps and important
-        new features in the 2.5 release.
+        Welcome to Pulse 2.6!  This page provides information to help you get started and important
+        new features in the 2.6 release.
     </p>
     <p>
-        You can return to this page at any time by clicking on the "pulse 2.5" link in the top left
+        You can return to this page at any time by clicking on the "pulse 2.6" link in the top left
         corner.
     </p>
     <h1> :: getting started :: </h1>
@@ -80,176 +80,80 @@
 
     <h1> :: what's new :: </h1>
     <p>
-        Pulse 2.5 is very much a user-focused release.  We've always used feedback to improve
-        Pulse, and this release is almost entirely feedback-driven.  Key updates include:
+        Pulse 2.6 includes new features and improvements in a wide range of areas.  Key updates include:
     </p>
     <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
         <tr>
-            <th class="category" colspan="2">new in 2.5</th>
+            <th class="category" colspan="2">new in 2.6</th>
         </tr>
         <tr>
-            #actionHeader("filter" "filter main views" "accept" false)
+            #actionHeader("concurrentpersonal" "concurrent personal builds" "accept" false)
             <td>
-                The browse and dashboard pages may now be filtered by build state.  This allows
-                you to easily find projects that are broken and need attention.
+                Individual users may now run multiple personal builds in parallel.  Limits on concurrency
+                can be set by administrators (via user groups).
             </td>
         </tr>
         <tr>
-            #actionHeader("mstest" "mstest support" "accept" false)
+            #actionHeader("agenthooks" "stage hooks on agents" "accept" false)
             <td>
-                A new plugin has been added to process TRX reports produced by MSTest, integrating
-                test results into your build.
+                It is now possible to configure stage hooks to run their tasks on agents.  Task
+                commands and working directories can also reference build properties.
             </td>
         </tr>
         <tr>
-            #actionHeader("warning status" "separate warning status" "accept" false)
+            #actionHeader("dynamicfields" "dynamic report fields" "accept" false)
             <td>
-                Builds (and the steps within them) that include warnings now complete with a new warning
-                status.  This makes it easier to find, subscribe to, and generally work with builds with
-                warnings.
+                Reports that plot custom fields may now reference fields dynamically using wildcards.
+                This allows reports to adapt to changing fields without reconfiguration.
             </td>
         </tr>
         <tr>
-            #actionHeader("comments" "comment visibility" "accept" false)
+            #actionHeader("retainrules" "retain rules" "accept" false)
             <td>
-                The visibility of builds comments has been raised, making them easier to notice and
-                access.
+                Automatic cleanup rules have been augmented with retain rules.  These rules allow
+                you to exclude matched builds from cleanup.
             </td>
         </tr>
         <tr>
-            #actionHeader("agentcomments" "agent comments" "accept" false)
+            #actionHeader("triggerpermission" "project trigger permission" "accept" false)
             <td>
-                Comments may be left on agents, allowing communication between users.  For example,
-                an admin can make a note of why an agent has been disabled.
+                A separate permission has been added for project triggering.  This allows granting
+                of trigger rights without allowing write access to the project.
             </td>
         </tr>
         <tr>
-            #actionHeader("agentproperties" "agent properties" "accept" false)
+            #actionHeader("shallowclones" "git shallow clones" "accept" false)
             <td>
-                Properties can now be configured directly on agents, giving a simpler way to
-                parameterise your build depending on the machine it runs on.
+                Git projects can now opt for shallow clones with a configurable depth to save on
+                network I/O and disk space.
             </td>
         </tr>
         <tr>
-            #actionHeader("scmproperties" "scm properties" "accept" false)
+            #actionHeader("concurrentpoll" "concurrent scm polling" "accept" false)
             <td>
-                SCM configuration can now reference project properties.  This allows you to parameterise
-                your SCM settings, making them easier to maintain across many projects.
+                Pulse will now use multiple threads to poll a single SCM server, useful for large
+                installations using a single SCM server like Perforce.
             </td>
         </tr>
         <tr>
-            #actionHeader("scmresources" "scm resources" "accept" false)
+            #actionHeader("apimethods" "remote api methods" "accept" false)
             <td>
-                SCM support that is built upon command-line clients can now be customised using
-                resources.  This gives you simple control of the commands used for SCM integration.
+                The remote API has been expanded to allow access to full server history, full
+                agent state and upstream changelist information.
             </td>
         </tr>
         <tr>
-            #actionHeader("masterresources" "master resources" "accept" false)
+            #actionHeader("cancelall" "cancel all builds" "accept" false)
             <td>
-                As with agents, the Pulse master now supports a resource repository.  Resources
-                will allow you to customise tools used by the master outside of builds.
+                A new action makes it much simpler to cancel all pending builds from the server
+                activity tab.
             </td>
         </tr>
         <tr>
-            #actionHeader("logattachments" "log attachments" "accept" false)
-            <td>
-                Build notification emails may now optionally have logs attached.  This includes both
-                the overall build log and output logs from each stage.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("newstagehooks" "new stage hooks" "accept" false)
-            <td>
-                Two new hook points have been added, allowing you to run a task just before a build
-                stage is dispatched to an agent, or when a build stage is being terminated.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("upstreamchanges" "upstream change reporting" "accept" false)
-            <td>
-               The build changes view now reports indirect changes via upstream dependencies.
-               Similarly, the changelist view shows builds affected indirectly via downstream
-               dependencies.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("dependencynotifications" "dependency notifications" "accept" false)
-            <td>
-               Committers may now be notified of build results that are affected by their changes
-               indirectly via dependencies.  This goes for both the email hook and personal
-               subscriptions.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("archivedartifacts" "artifact archives" "accept" false)
-            <td>
-               Directory artifacts can now be captured as a single archive file.  When retrieved
-               in dependent builds, you can opt to have archives unpacked automatically.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("flexiblebootstrapping" "flexible bootstrapping" "accept" false)
-            <td>
-                The build bootstrapping step has been made more flexible.  You can now configure
-                the path for clean builds, and can choose to skip the SCM boostrap if desired.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("scminclusions" "scm inclusion filters" "accept" false)
-            <td>
-                SCM monitoring can now be customised with inclusive filters, complimenting the
-                existing exclusion filters.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("inverseresources" "inverse resource requirements" "accept" false)
-            <td>
-                Builds may now be configured to avoid agents that have a specific resource.  This
-                compliments the existing ability to assign builds by agent capabilities.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("renamelabels" "rename labels" "accept" false)
-            <td>
-                When a label is edited you are now prompted to choose whether all such labels
-                should be renamed.  This makes renaming existing labels much simpler.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("cleanuppermission" "cleanup permission" "accept" false)
-            <td>
-                The ability to clean up build directories has been classified as a separate
-                permission, allowing finer control of user access.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("subversion17" "subversion 1.7 support" "accept" false)
-            <td>
-                The Subversion plugin now has support for Subversion 1.7 format working copies.
-                This allows personal builds to be submitted easily from the new working copy format.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("perforcestreams" "perforce stream support" "accept" false)
-            <td>
-                The Perforce plugin has been enhanced to support streams, a kind of built-in
-                 branching model in newer Perforce releases.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("gitsubmodules" "git submodule support" "accept" false)
-            <td>
-                The git plugin has been enhanced to support submodules, allowing Pulse to
-                automatically update selected (or all) submodules when bootstrapping builds.
-            </td>
-        </tr>
-       <tr>
             #actionHeader("more" "and more..." "accept" false)
             <td>
-                This release also includes numerous smaller improvements and fixes. These include
-                UI refinements, remote API additions, better artifact retrieval feedback, better
-                Subversion externals support and much more.
+                This release also includes numerous smaller improvements and fixes. Many are
+                behind-the-scenes, making Pulse more maintainable into the future.
             </td>
         </tr>
     </table>
