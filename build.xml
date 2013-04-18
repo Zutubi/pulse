@@ -591,9 +591,6 @@
             <link href="http://www.cafeconleche.org/XOM/apidocs/"/>
             <link href="http://www.jmock.org/javadoc/2.0.0/"/>
 
-            <!-- The whole diff package is documented -->
-            <fileset dir="com.zutubi.diff/src/java"/>
-
             <!-- Just the top level i18n package to show Messages -->
             <fileset dir="com.zutubi.i18n/src/java">
                 <include name="com/zutubi/i18n/*.java"/>
