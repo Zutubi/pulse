@@ -115,10 +115,10 @@
             </td>
         </tr>
         <tr>
-            #actionHeader("triggerpermission" "project trigger permission" "accept" false)
+            #actionHeader("triggerpermission" "project trigger hook permission" "accept" false)
             <td>
-                A separate permission has been added for project triggering.  This allows granting
-                of trigger rights without allowing write access to the project.
+                A separate permission has been added for build hook triggering.  This allows granting
+                of hook trigger rights without allowing write access to the project.
             </td>
         </tr>
         <tr>
