@@ -74,30 +74,37 @@ public class ConfigAuditLogger implements EventListener
 
             builder.append(key);
             builder.append(": ");
-            
-            Object value = record.get(key);
-            if (value instanceof String)
+
+            if (key.toLowerCase().contains("password"))
             {
-                builder.append(value);
+                builder.append("[scrubbed]");
             }
             else
             {
-                boolean arrayFirst = true;
-                builder.append("[");
-                for (String item: (String[]) value)
+                Object value = record.get(key);
+                if (value instanceof String)
                 {
-                    if (arrayFirst)
-                    {
-                        arrayFirst = false;
-                    }
-                    else
-                    {
-                        builder.append(", ");
-                    }
-
-                    builder.append(item);
+                    builder.append(value);
                 }
-                builder.append("]");
+                else
+                {
+                    boolean arrayFirst = true;
+                    builder.append("[");
+                    for (String item: (String[]) value)
+                    {
+                        if (arrayFirst)
+                        {
+                            arrayFirst = false;
+                        }
+                        else
+                        {
+                            builder.append(", ");
+                        }
+
+                        builder.append(item);
+                    }
+                    builder.append("]");
+                }
             }
         }
 

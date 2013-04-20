@@ -214,7 +214,8 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             // User is defined in LDAP, but has not authenticated since Pulse was started.  If group integration is
             // enabled we have to do a manual bind and group lookup here.
             LDAPConfiguration configuration = configurationProvider.get(LDAPConfiguration.class);
-            if (!configuration.getGroupBaseDns().isEmpty())
+            List<String> groupBaseDns = configuration.getGroupBaseDns();
+            if (groupBaseDns != null && !groupBaseDns.isEmpty())
             {
                 populateGroupAuthorities(user, username, configuration);
             }
