@@ -23,6 +23,8 @@ public class PersistentTestSuiteResult extends PersistentTestResult
     private LinkedHashMap<String, PersistentTestCaseResult> cases;
     private TestResultComparator comparator = new TestResultComparator();
 
+    private NameConflictResolution conflictResolution = NameConflictResolution.WORST_RESULT;
+
     private int total;
     private int expectedFailures;
     private int errors;
@@ -49,6 +51,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
     public PersistentTestSuiteResult(TestSuiteResult suite, NameConflictResolution resolution)
     {
         this(suite.getName(), suite.getDuration());
+        this.conflictResolution = resolution;
         for (TestSuiteResult nestedSuite : suite.getSuites())
         {
             add(new PersistentTestSuiteResult(nestedSuite, resolution));
@@ -56,7 +59,7 @@ public class PersistentTestSuiteResult extends PersistentTestResult
 
         for (TestCaseResult caseResult : suite.getCases())
         {
-            add(convertCase(caseResult, resolution));
+            add(convertCase(caseResult));
         }
     }
 
@@ -101,12 +104,28 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         }
         else
         {
-            if(childCase.getStatus().compareTo(existing.getStatus()) > 0)
+            if (shouldReplace(childCase, existing))
             {
-                // The new is more severe.  Although we can't keep all info,
-                // be nice and keep the worst result.
                 cases.put(childCase.getName(), childCase);
             }
+        }
+    }
+
+    private boolean shouldReplace(PersistentTestCaseResult newCase, PersistentTestCaseResult existingCase)
+    {
+        switch (conflictResolution)
+        {
+            case WORST_RESULT:
+                return newCase.getStatus().compareTo(existingCase.getStatus()) > 0;
+
+            case BEST_RESULT:
+                return newCase.getStatus().compareTo(existingCase.getStatus()) < 0;
+
+            case LAST_RESULT:
+                return true;
+
+            default:
+                return false;
         }
     }
 
@@ -315,26 +334,26 @@ public class PersistentTestSuiteResult extends PersistentTestResult
         return null;
     }
 
-    private PersistentTestCaseResult convertCase(TestCaseResult caseResult, NameConflictResolution resolution)
+    private PersistentTestCaseResult convertCase(TestCaseResult caseResult)
     {
         String name = caseResult.getName();
-        if (resolution != NameConflictResolution.OFF && hasCase(name))
+        if (conflictResolution.isUniqueNameGenerated() && hasCase(name))
         {
             int addition = 2;
-            while (hasCase(makeCaseName(name, addition, resolution)))
+            while (hasCase(makeCaseName(name, addition)))
             {
                 addition++;
             }
 
-            name = makeCaseName(name, addition, resolution);
+            name = makeCaseName(name, addition);
         }
 
         return new PersistentTestCaseResult(name, caseResult.getDuration(), caseResult.getStatus(), caseResult.getMessage());
     }
 
-    private String makeCaseName(String name, int addition, NameConflictResolution resolution)
+    private String makeCaseName(String name, int addition)
     {
-        if (resolution == NameConflictResolution.APPEND)
+        if (conflictResolution == NameConflictResolution.APPEND)
         {
             return name + addition;
         }

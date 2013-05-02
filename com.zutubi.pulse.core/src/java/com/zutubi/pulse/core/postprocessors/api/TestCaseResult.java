@@ -1,14 +1,12 @@
 package com.zutubi.pulse.core.postprocessors.api;
 
-import com.zutubi.util.StringUtils;
-
 /**
  * Represents the result of executing a single test case.  Cases are usually
  * combined into larger {@link com.zutubi.pulse.core.postprocessors.api.TestSuiteResult}s.
  */
 public class TestCaseResult extends TestResult
 {
-    private static final int MESSAGE_LENGTH_LIMIT = 10 * 1024;
+    private static final int MESSAGE_LENGTH_LIMIT = Integer.getInteger("pulse.test.message.limit", 10 * 1024);
 
     private TestStatus status;
     private String message;
@@ -96,7 +94,19 @@ public class TestCaseResult extends TestResult
      */
     public void setMessage(String message)
     {
-        this.message = message == null ? null : StringUtils.trimmedString(message, MESSAGE_LENGTH_LIMIT);
+        this.message = message == null ? null : trimMessage(message);
+    }
+
+    private String trimMessage(String message)
+    {
+        int length = message.length();
+        if (length <= MESSAGE_LENGTH_LIMIT)
+        {
+            return message;
+        }
+
+        int partLength = MESSAGE_LENGTH_LIMIT / 2 - 3;
+        return message.substring(0, partLength) + "..." + message.substring(message.length() - partLength);
     }
 
     @Override

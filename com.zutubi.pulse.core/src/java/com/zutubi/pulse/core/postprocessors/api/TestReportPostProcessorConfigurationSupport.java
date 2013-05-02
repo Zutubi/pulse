@@ -29,7 +29,7 @@ public abstract class TestReportPostProcessorConfigurationSupport extends PostPr
     @Wizard.Ignore
     private boolean failOnFailure = true;
     @Wizard.Ignore @Required
-    private NameConflictResolution resolveConflicts = NameConflictResolution.OFF;
+    private NameConflictResolution resolveConflicts = NameConflictResolution.WORST_RESULT;
     @Wizard.Ignore
     private String expectedFailureFile;
 

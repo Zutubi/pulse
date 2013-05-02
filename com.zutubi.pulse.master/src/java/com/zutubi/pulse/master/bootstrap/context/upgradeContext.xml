@@ -201,6 +201,7 @@
                 <ref local="addProjectTriggerHookPermission"/>
                 <ref local="addGroupConcurrentPersonalBuilds"/>
                 <ref local="addRunHookTaskOnAgents"/>
+                <ref local="updateNameConflictResolution"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1055,5 +1056,9 @@
 
     <bean id="addRunHookTaskOnAgents" class="com.zutubi.pulse.master.upgrade.tasks.AddRunHookTaskOnAgentsUpgradeTask">
         <property name="buildNumber" value="205999004"/>
+    </bean>
+
+    <bean id="updateNameConflictResolution" class="com.zutubi.pulse.master.upgrade.tasks.UpdateNameConflictResolutionUpgradeTask">
+        <property name="buildNumber" value="206002001"/>
     </bean>
 </beans>
