@@ -85,6 +85,7 @@ based upon the Spring Security system.
         <property name="authenticationSuccessHandler">
             <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
                 <property name="defaultTargetUrl" value="/"/>
+                <property name="requestCache"><ref local="requestCache"/></property>
             </bean>
         </property>
         <property name="authenticationFailureHandler">
@@ -105,7 +106,9 @@ based upon the Spring Security system.
         </constructor-arg>
     </bean>
 
-    <bean id="requestCacheFilter" class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter" />
+    <bean id="requestCacheFilter" class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter">
+        <property name="requestCache"><ref local="requestCache"/></property>
+    </bean>
     
     <!--
     This filter provides support for processing basic authentication credentials presented in HTTP headers.
@@ -177,18 +180,31 @@ based upon the Spring Security system.
     <bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
         <!-- This endpoint defines where a user is directed when authentication is required. -->
         <property name="authenticationEntryPoint"><ref local="loginUrlAuthenticationEntryPoint"/></property>
+        <property name="requestCache"><ref local="requestCache"/></property>
     </bean>
 
     <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
         <property name="loginFormUrl" value="/login!input.action"/>
         <property name="portResolver"><ref local="portResolver"/></property>
+        <property name="portMapper"><ref local="portMapper"/></property>
+    </bean>
+
+    <bean id="requestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache">
+        <property name="portResolver"><ref local="portResolver"/></property>
     </bean>
 
     <bean id="portResolver" class="org.springframework.security.web.PortResolverImpl">
-        <property name="portMapper">
-            <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
-                <property name="portMappings"><map><entry key="80" value="80"/></map></property>
-            </bean>
+        <property name="portMapper"><ref local="portMapper"/></property>
+    </bean>
+
+    <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
+        <property name="portMappings">
+            <map>
+                <!-- This disables mapping between 80/843 and 8080/8443 for HTTP/HTTPS.  Since we only allow
+                     all-or-none SSL, the mapping does not help us and leads to confusion like CIB-3025. -->
+                <entry key="80" value="80"/>
+                <entry key="8080" value="8080"/>
+            </map>
         </property>
     </bean>
 
