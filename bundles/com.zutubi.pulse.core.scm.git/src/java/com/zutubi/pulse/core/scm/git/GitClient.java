@@ -1,9 +1,11 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.google.common.base.Objects;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.util.StringUtils;
@@ -648,6 +650,18 @@ public class GitClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        GitConfiguration oldGit = (GitConfiguration) oldConfig;
+        GitConfiguration newGit = (GitConfiguration) newConfig;
+        return !Objects.equal(oldGit.getRepository(), newGit.getRepository()) ||
+                !Objects.equal(oldGit.getBranch(), newGit.getBranch()) ||
+                oldGit.getCloneType() != newGit.getCloneType() ||
+                oldGit.getCloneDepth() != newGit.getCloneDepth() ||
+                oldGit.getSubmoduleProcessing() != newGit.getSubmoduleProcessing() ||
+                !Objects.equal(oldGit.getSelectedSubmodules(), newGit.getSelectedSubmodules());
     }
 
     private String getRemoteBranchRef()

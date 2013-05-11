@@ -1,12 +1,14 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.zutubi.i18n.Messages;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -27,6 +29,8 @@ import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 
 import java.io.*;
 import java.util.*;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A connection to a subversion server.
@@ -1042,6 +1046,17 @@ public class SubversionClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        SubversionConfiguration oldSvn = (SubversionConfiguration) oldConfig;
+        SubversionConfiguration newSvn = (SubversionConfiguration) newConfig;
+        return !Objects.equal(oldSvn.getUrl(), newSvn.getUrl()) ||
+                oldSvn.isUseExport() != newSvn.isUseExport() ||
+                oldSvn.getExternalsMonitoring() != newSvn.getExternalsMonitoring() ||
+                !Objects.equal(oldSvn.getExternalMonitorPaths(), newSvn.getExternalMonitorPaths()) ||
+                oldSvn.getVerifyExternals() != newSvn.getVerifyExternals();
     }
 
     private static class ChangeEventHandler implements ISVNEventHandler

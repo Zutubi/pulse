@@ -1,13 +1,16 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
+import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -367,6 +370,15 @@ public class CvsClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        CvsConfiguration oldCvs = (CvsConfiguration) oldConfig;
+        CvsConfiguration newCvs = (CvsConfiguration) newConfig;
+        return !Objects.equal(oldCvs.getRoot(), newCvs.getRoot()) ||
+                !Objects.equal(oldCvs.getModule(), newCvs.getModule()) ||
+                !Objects.equal(oldCvs.getBranch(), newCvs.getBranch());
     }
 
     public Revision checkout(ExecutionContext context, Revision revision, ScmFeedbackHandler handler) throws ScmException

@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm.noop;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,5 +127,10 @@ public class NoopScmClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        return false;
     }
 }

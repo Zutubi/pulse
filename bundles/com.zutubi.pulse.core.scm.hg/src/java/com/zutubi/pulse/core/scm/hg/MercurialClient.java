@@ -1,22 +1,25 @@
 package com.zutubi.pulse.core.scm.hg;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
-import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandlerSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.zutubi.pulse.core.scm.hg.MercurialConstants.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
@@ -381,6 +384,13 @@ public class MercurialClient implements ScmClient
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
         throw new ScmException("Operation not supported");
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        MercurialConfiguration oldMerc = (MercurialConfiguration) oldConfig;
+        MercurialConfiguration newMerc = (MercurialConfiguration) newConfig;
+        return !Objects.equal(oldMerc.getRepository(), newMerc.getRepository()) || !Objects.equal(oldMerc.getBranch(), newMerc.getBranch());
     }
 
     private String getRevisionString(Revision revision)

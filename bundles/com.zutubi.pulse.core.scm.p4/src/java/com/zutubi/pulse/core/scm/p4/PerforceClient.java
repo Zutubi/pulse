@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.patch.api.FileStatus;
 import com.zutubi.pulse.core.scm.patch.api.PatchInterceptor;
@@ -826,6 +828,19 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
             // User may not exist.
             return null;
         }
+    }
+
+    public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
+    {
+        PerforceConfiguration oldP4 = (PerforceConfiguration) oldConfig;
+        PerforceConfiguration newP4 = (PerforceConfiguration) newConfig;
+        return !Objects.equal(oldP4.getPort(), newP4.getPort()) ||
+                oldP4.getUseTemplateClient() != newP4.getUseTemplateClient() ||
+                !Objects.equal(oldP4.getSpec(), newP4.getSpec()) ||
+                !Objects.equal(oldP4.getView(), newP4.getView()) ||
+                !Objects.equal(oldP4.getOptions(), newP4.getOptions()) ||
+                !Objects.equal(oldP4.getStream(), newP4.getStream()) ||
+                !Objects.equal(oldP4.getSyncWorkspacePattern(), newP4.getSyncWorkspacePattern());
     }
 
     public boolean labelExists(String client, String name) throws ScmException
