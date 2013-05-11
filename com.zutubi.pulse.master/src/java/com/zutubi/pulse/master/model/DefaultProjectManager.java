@@ -14,6 +14,7 @@ import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.agent.WorkDirectoryCleanupService;
@@ -49,6 +50,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
 
@@ -186,27 +188,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 if (old != null)
                 {
                     // Check for addition or removal of an SCM.  Note this must
-                    // come after registering the new config.  Handling this here
-                    // rather than in the SCM config listener is easier as we
-                    // know only the SCM has been added/removed (not the whole
-                    // project).
-                    checkForScmAddOrRemove(instance, old);
+                    // come after registering the new config.
+                    checkForScmChanges(instance, old);
                     checkForPersistentWorkDirChange(instance, old);
                     checkForStageRemoval(instance, old);
                 }
             }
         };
         projectListener.register(configurationProvider, true);
-
-        TypeListener<ScmConfiguration> scmListener = new TypeAdapter<ScmConfiguration>(ScmConfiguration.class)
-        {
-            @Override
-            public void postSave(ScmConfiguration scmConfiguration, boolean nested)
-            {
-                handleNewScm(configurationProvider.getAncestorOfType(scmConfiguration, ProjectConfiguration.class));
-            }
-        };
-        scmListener.register(configurationProvider, true);
     }
 
     private void reloadDownstreamProjects(ProjectConfiguration oldProjectConfiguration)
@@ -245,20 +234,40 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }
     }
 
-    private void checkForScmAddOrRemove(ProjectConfiguration instance, ProjectConfiguration old)
+    private void checkForScmChanges(ProjectConfiguration instance, ProjectConfiguration old)
     {
-        if (old.getScm() == null)
+        ScmConfiguration oldScm = old.getScm();
+        ScmConfiguration newScm = instance.getScm();
+        if (oldScm == null)
         {
-            if (instance.getScm() != null)
+            if (newScm != null && configurationTemplateManager.isDeeplyValid(instance.getConfigurationPath()))
             {
-                handleNewScm(instance);
+                makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);
             }
         }
-        else
+        else if (newScm == null)
         {
-            if (instance.getScm() == null)
+            makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
+        }
+        else if (newScm != oldScm)
+        {
+            ScmClient client = null;
+            try
             {
-                makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
+                client = scmManager.createClient(newScm);
+                if (client.configChangeRequiresClean(oldScm, newScm))
+                {
+                    makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);
+                }
+                client.close();
+            }
+            catch (ScmException e)
+            {
+                LOG.severe(e);
+            }
+            finally
+            {
+                IOUtils.close(client);
             }
         }
     }
@@ -852,14 +861,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         finally
         {
             unlockProjectStates(id);
-        }
-    }
-
-    private void handleNewScm(ProjectConfiguration projectConfig)
-    {
-        if (configurationTemplateManager.isDeeplyValid(projectConfig.getConfigurationPath()))
-        {
-            makeStateTransition(projectConfig.getProjectId(), Project.Transition.INITIALISE);
         }
     }
 

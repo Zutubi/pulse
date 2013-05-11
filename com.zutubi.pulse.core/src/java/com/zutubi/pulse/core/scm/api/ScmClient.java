@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 
 import java.io.Closeable;
 import java.io.File;
@@ -364,4 +365,18 @@ public interface ScmClient extends Closeable
      * @throws ScmException on any error
      */
     String getEmailAddress(ScmContext context, String user) throws ScmException;
+
+    /**
+     * Indicates if a change to configuration requires a project/build
+     * directory clean.  Cleans can be expensive for large projects, so should
+     * only be used when an existing checkout of the code may be invalidated by
+     * the configuration change.
+     *
+     * @param oldConfig configuration before the change
+     * @param newConfig configuration after the change
+     * @return true to force a project reinitialise/persistent directory
+     *         cleanup, false to allow existing checkouts to continue to be
+     *         used
+     */
+    boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig);
 }
