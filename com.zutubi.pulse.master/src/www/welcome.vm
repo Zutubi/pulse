@@ -143,6 +143,13 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("testhandling" "test handling improvements" "accept" false)
+            <td>
+                The combination of duplicate test cases is now more flexible, and the trimming
+                of oversized messages is smarter.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("cancelall" "cancel all builds" "accept" false)
             <td>
                 A new action makes it much simpler to cancel all pending builds from the server
