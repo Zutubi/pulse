@@ -371,6 +371,8 @@ public interface ScmClient extends Closeable
      * directory clean.  Cleans can be expensive for large projects, so should
      * only be used when an existing checkout of the code may be invalidated by
      * the configuration change.
+     * <p/>
+     * Required for all implementations.
      *
      * @param oldConfig configuration before the change
      * @param newConfig configuration after the change
