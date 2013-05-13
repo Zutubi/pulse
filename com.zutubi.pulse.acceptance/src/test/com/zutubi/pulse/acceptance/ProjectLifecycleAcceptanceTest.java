@@ -50,7 +50,7 @@ public class ProjectLifecycleAcceptanceTest extends AcceptanceTestBase
 
         String scmPath = PathUtils.getPath(path, Constants.Project.SCM);
         Hashtable<String, Object> scmConfig = rpcClient.RemoteApi.getConfig(scmPath);
-        scmConfig.put(Constants.Project.Scm.QUIET_PERIOD_ENABLED, true);
+        scmConfig.put("useExport", true);
         rpcClient.RemoteApi.saveConfig(scmPath, scmConfig, false);
 
         assertProjectHasReinitialised(random);
