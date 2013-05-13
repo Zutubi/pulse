@@ -266,6 +266,9 @@ Ext.extend(Zutubi.tree.ConfigTree, Ext.tree.TreePanel, {
                 }
 
                 node.attributes.extraAttributes.collapsedCollection = collapsedCollection;
+
+                // Presence or otherwise of children may have changed (CIB-2980).
+                node.reload();
             }
         }
     },
