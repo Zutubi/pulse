@@ -14,6 +14,7 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.validation.NameValidator;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -133,6 +134,10 @@ public class CloneAction extends ToveFormActionSupport
         if(!StringUtils.stringSet(value))
         {
             addFieldError(name, I18N.format("name.required"));
+        }
+        else if (NameValidator.nameContentIsInvalid(value))
+        {
+            addFieldError(name, I18N.format("name.invalid"));
         }
         else
         {

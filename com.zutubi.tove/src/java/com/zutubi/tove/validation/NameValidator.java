@@ -32,9 +32,14 @@ public class NameValidator extends StringFieldValidatorSupport
             // Invalid variable reference, proceed to normal validation.
         }
 
-        if(Character.isWhitespace(s.charAt(0)) || Character.isWhitespace(s.charAt(s.length() - 1)) || s.contains("/") || s.contains("\\") || s.contains("$"))
+        if (nameContentIsInvalid(s))
         {
             addError();
         }
+    }
+
+    public static boolean nameContentIsInvalid(String s)
+    {
+        return Character.isWhitespace(s.charAt(0)) || Character.isWhitespace(s.charAt(s.length() - 1)) || s.contains("/") || s.contains("\\") || s.contains("$");
     }
 }
