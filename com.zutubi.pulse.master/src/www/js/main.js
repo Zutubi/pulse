@@ -331,7 +331,7 @@ function actionPath(path, action, fromParent, onDescendants)
     url = window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?' + action + '=input';
     if (fromParent)
     {
-        url += '&newPath=' + getParentPath(path);
+        url += '&newPath=' + encodeURIPath(getParentPath(path));
     }
     if (onDescendants)
     {
