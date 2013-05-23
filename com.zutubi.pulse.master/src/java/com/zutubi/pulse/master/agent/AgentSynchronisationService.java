@@ -18,6 +18,7 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.Clock;
 import com.zutubi.util.time.SystemClock;
 
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -202,7 +203,16 @@ public class AgentSynchronisationService extends BackgroundServiceSupport implem
                 catch (Exception e)
                 {
                     // Could not complete the service call.  Mark messages for retry later.
-                    LOG.warning("Unable to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
+                    Throwable cause = e.getCause();
+                    if (cause instanceof SocketException)
+                    {
+                        LOG.info("Network error synchronising agent '" + agent.getName() + "': " + e.getMessage(), e);
+                    }
+                    else
+                    {
+                        LOG.warning("Unable to synchronise agent '" + agent.getName() + "': " + e.getMessage(), e);
+                    }
+
                     for (AgentSynchronisationMessage pending : pendingMessages)
                     {
                         pending.applySendingException(e);
