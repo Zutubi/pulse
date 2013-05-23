@@ -173,7 +173,7 @@ public class BuildHookManager
                     }
                 }
 
-                LOG.severe("Error executing task for hook '" + hook.getName() + "': " + e.getMessage(), e);
+                LOG.info("Error executing task for hook '" + hook.getName() + "': " + e.getMessage(), e);
             }
         }
     }
