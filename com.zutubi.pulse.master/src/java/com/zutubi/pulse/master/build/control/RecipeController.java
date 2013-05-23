@@ -69,7 +69,7 @@ public class RecipeController
     private BuildManager buildManager;
     /**
      * An explicit flag set on receipt of the recipe commenced event.  We don't
-     * user {@link com.zutubi.pulse.core.model.RecipeResult#commenced()} as it
+     * use {@link com.zutubi.pulse.core.model.RecipeResult#commenced()} as it
      * may be true without us ever having received the event (e.g. for a recipe
      * that errored out before commencing).
      */
@@ -98,19 +98,12 @@ public class RecipeController
         this.collector = collector;
     }
 
-    public void prepare(BuildResult buildResult)
-    {
-        // Errors handled by BuildController
-        collector.prepare(buildResult, recipeResultNode.getResult().getId());
-        logger.prepare();
-    }
-
     public void initialise(Bootstrapper bootstrapper)
     {
         try
         {
-            // allow for just in time setting of the bootstrapper since this can not be configured during
-            // the build initialisation.
+            collector.prepare(buildResult, recipeResultNode.getResult().getId());
+            logger.prepare();
             assignmentRequest.getRequest().setBootstrapper(bootstrapper);
             recipeQueue.enqueue(assignmentRequest);
         }

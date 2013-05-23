@@ -482,18 +482,15 @@ public class DefaultBuildController implements EventListener, BuildController
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
         buildLogger.preBuildCompleted();
 
-        for (RecipeController controller: controllers)
+        if (controllers.size() > 0)
         {
-            controller.prepare(buildResult);
+            initialiseControllers();
         }
-
-        initialiseControllers();
-
-        // If there are no executing controllers, then there is nothing more to be done.
-        // Complete the build now as we will not be receiving event triggered callbacks
-        // to complete the build.
-        if (executingControllers.size() == 0)
+        else
         {
+            // If there are no controllers, then there is nothing more to be done.
+            // Complete the build now as we will not be receiving event triggered callbacks
+            // to complete the build.
             handleBuildCommenced();
             completeBuild(false);
         }
