@@ -32,7 +32,7 @@ class UserStateCleanupTask extends DatabaseStateCleanupTaskSupport
         {
             // Wait for a running personal build to complete
             BuildResult build = buildManager.getLatestBuildResult(user);
-            if(build != null && build.inProgress())
+            if(build != null && build.running())
             {
                 throw new ToveRuntimeException("Unable to delete user: the user has a personal build in progress.");
             }

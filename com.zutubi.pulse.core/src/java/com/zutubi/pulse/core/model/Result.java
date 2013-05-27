@@ -111,6 +111,11 @@ public abstract class Result extends Entity
         return state.isCompleted();
     }
 
+    public boolean running()
+    {
+        return commenced() && !completed();
+    }
+
     public void queue()
     {
         stamps.setQueueTime(System.currentTimeMillis());
