@@ -210,7 +210,7 @@ public class MonitorApi
 
         for (BuildResult build: personalBuilds)
         {
-            if (build.inProgress())
+            if (build.running())
             {
                 inProgress.add(build);
             }

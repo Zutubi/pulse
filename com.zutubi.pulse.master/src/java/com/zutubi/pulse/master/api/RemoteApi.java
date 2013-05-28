@@ -4449,7 +4449,7 @@ public class RemoteApi
         {
             Project project = internalGetProject(projectName, true);
             BuildResult build = buildManager.getByProjectAndNumber(project, id);
-            if (build == null || !build.inProgress())
+            if (build == null || !build.running())
             {
                 return false;
             }
@@ -4486,7 +4486,7 @@ public class RemoteApi
         {
             Project project = internalGetProject(projectName, true);
             BuildResult build = buildManager.getByProjectAndNumber(project, id);
-            if (build == null || !build.inProgress())
+            if (build == null || !build.running())
             {
                 return false;
             }
@@ -4521,7 +4521,7 @@ public class RemoteApi
         try
         {
             BuildResult build = buildManager.getByUserAndNumber(user, id);
-            if (build == null || !build.inProgress())
+            if (build == null || !build.running())
             {
                 return false;
             }
@@ -4557,7 +4557,7 @@ public class RemoteApi
         try
         {
             BuildResult build = buildManager.getByUserAndNumber(internalGetUser(user), id);
-            if (build == null || !build.inProgress())
+            if (build == null || !build.running())
             {
                 return false;
             }
