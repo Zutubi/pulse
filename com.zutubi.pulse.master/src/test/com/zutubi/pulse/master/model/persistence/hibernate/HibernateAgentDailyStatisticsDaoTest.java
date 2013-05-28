@@ -76,7 +76,7 @@ public class HibernateAgentDailyStatisticsDaoTest extends MasterPersistenceTestC
         agentDailyStatisticsDao.save(otherAgentAndDay);
         agentDailyStatisticsDao.save(otherAgentAndOtherDay);
         
-        AgentDailyStatistics found = agentDailyStatisticsDao.safeFindByAgentAndDay(AGENT_ID, DAY_STAMP);
+        AgentDailyStatistics found = agentDailyStatisticsDao.findByAgentAndDaySafe(AGENT_ID, DAY_STAMP);
         assertEquals(agentAndDay, found);
     }
 
@@ -91,7 +91,7 @@ public class HibernateAgentDailyStatisticsDaoTest extends MasterPersistenceTestC
         agentDailyStatisticsDao.save(agentAndDay);
         agentDailyStatisticsDao.save(sameAgentAndDay);
         
-        AgentDailyStatistics found = agentDailyStatisticsDao.safeFindByAgentAndDay(AGENT_ID, DAY_STAMP);
+        AgentDailyStatistics found = agentDailyStatisticsDao.findByAgentAndDaySafe(AGENT_ID, DAY_STAMP);
         assertNull(found);
     }
     

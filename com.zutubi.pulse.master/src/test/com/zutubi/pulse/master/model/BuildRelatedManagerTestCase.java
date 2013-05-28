@@ -7,18 +7,19 @@ import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import static java.util.Arrays.asList;
 import org.mockito.Matchers;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 /**
  * Helper base class for testing managers that deal with builds/changes/dependencies.  Sets up some
@@ -60,7 +61,7 @@ public abstract class BuildRelatedManagerTestCase extends PulseTestCase
             }
         });
         
-        stub(changelistDao.getAllAffectedResultIds(Matchers.<PersistentChangelist>anyObject())).toAnswer(new Answer<Set<Long>>()
+        stub(changelistDao.findAllAffectedResultIds(Matchers.<PersistentChangelist>anyObject())).toAnswer(new Answer<Set<Long>>()
         {
             public Set<Long> answer(InvocationOnMock invocationOnMock) throws Throwable
             {

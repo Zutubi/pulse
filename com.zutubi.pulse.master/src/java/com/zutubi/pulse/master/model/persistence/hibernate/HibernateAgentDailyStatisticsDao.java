@@ -40,7 +40,7 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
         });
     }
 
-    public AgentDailyStatistics safeFindByAgentAndDay(final long agentId, final long dayStamp)
+    public AgentDailyStatistics findByAgentAndDaySafe(final long agentId, final long dayStamp)
     {
         List<AgentDailyStatistics> results = getHibernateTemplate().execute(new HibernateCallback<List<AgentDailyStatistics>>()
         {

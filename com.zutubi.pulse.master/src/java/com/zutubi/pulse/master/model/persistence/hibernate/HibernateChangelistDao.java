@@ -25,7 +25,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         return PersistentChangelist.class;
     }
 
-    public Set<Long> getAllAffectedProjectIds(PersistentChangelist changelist)
+    public Set<Long> findAllAffectedProjectIds(PersistentChangelist changelist)
     {
         List<PersistentChangelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();
@@ -37,7 +37,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         return ids;
     }
 
-    public Set<Long> getAllAffectedResultIds(PersistentChangelist changelist)
+    public Set<Long> findAllAffectedResultIds(PersistentChangelist changelist)
     {
         List<PersistentChangelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();

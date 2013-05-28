@@ -156,7 +156,7 @@ public class AgentStatisticsManager implements EventListener
 
     private void updateStatistics(long agentId, AgentStatus status, int duration, boolean newRecipe)
     {
-        AgentDailyStatistics currentStats = agentDailyStatisticsDao.safeFindByAgentAndDay(agentId, todayStamp);
+        AgentDailyStatistics currentStats = agentDailyStatisticsDao.findByAgentAndDaySafe(agentId, todayStamp);
         if (currentStats == null)
         {
             currentStats = new AgentDailyStatistics(agentId, todayStamp);

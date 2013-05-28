@@ -29,7 +29,7 @@ public interface AgentDailyStatisticsDao extends EntityDao<AgentDailyStatistics>
      * @return the statistics for the given agent on the given day, or null if
      *         there are no such statistics yet
      */
-    AgentDailyStatistics safeFindByAgentAndDay(long agentId, long dayStamp);
+    AgentDailyStatistics findByAgentAndDaySafe(long agentId, long dayStamp);
 
     /**
      * Deletes all statistics for days before the given day stamp.

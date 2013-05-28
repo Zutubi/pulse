@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
@@ -13,6 +12,8 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * The default implementation of {@link ChangelistManager}.
@@ -78,12 +79,12 @@ public class DefaultChangelistManager implements ChangelistManager
 
     public Set<Long> getAffectedProjectIds(PersistentChangelist changelist)
     {
-        return changelistDao.getAllAffectedProjectIds(changelist);
+        return changelistDao.findAllAffectedProjectIds(changelist);
     }
 
     public Set<Long> getAffectedBuildIds(PersistentChangelist changelist)
     {
-        return changelistDao.getAllAffectedResultIds(changelist);
+        return changelistDao.findAllAffectedResultIds(changelist);
     }
 
     public List<BuildGraph> getAffectedBuilds(PersistentChangelist changelist)

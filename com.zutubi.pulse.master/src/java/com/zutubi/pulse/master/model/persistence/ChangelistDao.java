@@ -13,8 +13,8 @@ import java.util.Set;
  */
 public interface ChangelistDao extends EntityDao<PersistentChangelist>
 {
-    Set<Long> getAllAffectedProjectIds(PersistentChangelist changelist);
-    Set<Long> getAllAffectedResultIds(PersistentChangelist changelist);
+    Set<Long> findAllAffectedProjectIds(PersistentChangelist changelist);
+    Set<Long> findAllAffectedResultIds(PersistentChangelist changelist);
 
     /**
      * Returns a list of up to max changelists submitted by the given user.
