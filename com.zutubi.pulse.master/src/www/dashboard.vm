@@ -92,10 +92,10 @@
     <table class="columns" width="98%">
         <tr>
             <td>
-                <h2 style="margin-top: 0;">
+                <h2 style="margin-top: 0; white-space: nowrap">
                     :: #wwtext("name=my.projects") ::
 #if($rssEnabled)
-                    <a style="border-bottom: none" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                    <a style="border-bottom: none; margin-right: 8px" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
 #end
                 </h2>
             </td>
