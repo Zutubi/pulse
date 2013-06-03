@@ -406,6 +406,7 @@ public class SubversionClient implements ScmClient
 
         if (handler != null)
         {
+            handler.status("Checking out " + repository.getLocation().toString() + " at revision " + svnRevision);
             updateClient.setEventHandler(new ChangeEventHandler(handler));
         }
 
@@ -782,16 +783,19 @@ public class SubversionClient implements ScmClient
         SVNUpdateClient client = null;
         try
         {
+            SVNRevision svnRevision = convertRevision(rev);
+
             // CIB-610: cleanup before update in case WC is locked.
             cleanup(context);
 
             client = new SVNUpdateClient(authenticationManager, null);
             if (handler != null)
             {
+                handler.status("Updating from " + repository.getLocation().toString() + " at revision " + svnRevision);
                 client.setEventHandler(new ChangeEventHandler(handler));
             }
 
-            update(context.getWorkingDir(), convertRevision(rev), client);
+            update(context.getWorkingDir(), svnRevision, client);
             updateExternals(context, rev, client, handler);
         }
         catch (ScmCancelledException e)
