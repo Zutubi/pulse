@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -41,7 +42,8 @@ public class SubversionClientTest extends PulseTestCase
     private File gotDir;
     private File expectedDir;
     private Process serverProcess;
-    private PulseExecutionContext context;
+    private PulseExecutionContext executionContext;
+    private ScmContext context;
     private SVNClientManager clientManager;
 
 //    $ svn log -v svn://localhost/test
@@ -115,8 +117,9 @@ public class SubversionClientTest extends PulseTestCase
         gotDir = new File(repoDir, "got");
         FileSystemUtils.createDirectory(gotDir);
 
-        context = new PulseExecutionContext();
-        context.setWorkingDir(gotDir);
+        executionContext = new PulseExecutionContext();
+        executionContext.setWorkingDir(gotDir);
+        context = new ScmContextImpl(null, executionContext);
 
         unzipInput("data", repoDir);
         serverProcess = Runtime.getRuntime().exec(new String[]{"svnserve", "--foreground", "--listen-port=3690", "--listen-host=127.0.0.1", "-dr", "."}, null, repoDir);
@@ -142,12 +145,12 @@ public class SubversionClientTest extends PulseTestCase
     public void testGetLatestRevision() throws ScmException
     {
         client = createSubversionClient("svn://localhost/");
-        assertEquals("8", client.getLatestRevision(null).getRevisionString());
+        assertEquals("8", client.getLatestRevision(context).getRevisionString());
     }
 
     public void testGetLatestRevisionRestrictedToFiles() throws ScmException
     {
-        assertEquals("4", client.getLatestRevision(null).getRevisionString());
+        assertEquals("4", client.getLatestRevision(context).getRevisionString());
     }
 
     public void testGetLatestRevisionNewBranch() throws ScmException, SVNException
@@ -157,7 +160,7 @@ public class SubversionClientTest extends PulseTestCase
         SVNCommitInfo info = client.doCopy(copySource, SVNURL.parseURIDecoded(BRANCH_PATH), false, true, true, "Create a branch", null);
 
         SubversionClient branchClient = new SubversionClient(BRANCH_PATH, false);
-        assertEquals(Long.toString(info.getNewRevision()), branchClient.getLatestRevision(null).getRevisionString());
+        assertEquals(Long.toString(info.getNewRevision()), branchClient.getLatestRevision(context).getRevisionString());
     }
 
     public void testGetLatestRevisionBadRepository()
@@ -165,7 +168,7 @@ public class SubversionClientTest extends PulseTestCase
         try
         {
             client = createSubversionClient("svn://localhost/no/such/repo");
-            client.getLatestRevision(null);
+            client.getLatestRevision(context);
             fail();
         }
         catch (ScmException e)
@@ -271,7 +274,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testChangesSince() throws ScmException
     {
-        List<Changelist> changes = client.getChanges(null, createRevision(2), null);
+        List<Changelist> changes = client.getChanges(context, createRevision(2), null);
         assertEquals(2, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -287,7 +290,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testChangesBetweenTwoRevisions() throws ScmException
     {
-        List<Changelist> changes = client.getChanges(null, createRevision(2), createRevision(3));
+        List<Changelist> changes = client.getChanges(context, createRevision(2), createRevision(3));
         assertEquals(1, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -298,7 +301,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testChangesBetweenReversedRange() throws ScmException
     {
-        List<Changelist> changes = client.getChanges(null, createRevision(3), createRevision(2));
+        List<Changelist> changes = client.getChanges(context, createRevision(3), createRevision(2));
         assertEquals(1, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -309,7 +312,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testRevisionsSince() throws ScmException
     {
-        List<Revision> revisions = client.getRevisions(null, createRevision(2), null);
+        List<Revision> revisions = client.getRevisions(context, createRevision(2), null);
         assertEquals(2, revisions.size());
         assertEquals("3", revisions.get(0).getRevisionString());
         assertEquals("4", revisions.get(1).getRevisionString());
@@ -317,7 +320,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testRevisionsSinceLatestInFiles() throws ScmException
     {
-        List<Revision> revisions = client.getRevisions(null, createRevision(6), null);
+        List<Revision> revisions = client.getRevisions(context, createRevision(6), null);
         assertEquals(0, revisions.size());
     }
 
@@ -325,7 +328,7 @@ public class SubversionClientTest extends PulseTestCase
     {
         try
         {
-            client.getRevisions(null, createRevision(9), null);
+            client.getRevisions(context, createRevision(9), null);
         }
         catch (ScmException e)
         {
@@ -335,7 +338,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetRevisionsInRange() throws ScmException
     {
-        List<Revision> revisions = client.getRevisions(null, createRevision(2), createRevision(4));
+        List<Revision> revisions = client.getRevisions(context, createRevision(2), createRevision(4));
         assertEquals(2, revisions.size());
         assertEquals("3", revisions.get(0).getRevisionString());
         assertEquals("4", revisions.get(1).getRevisionString());
@@ -343,7 +346,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testGetRevisionsInReverseRange() throws ScmException
     {
-        List<Revision> revisions = client.getRevisions(null, createRevision(4), createRevision(2));
+        List<Revision> revisions = client.getRevisions(context, createRevision(4), createRevision(2));
         assertEquals(2, revisions.size());
         assertEquals("4", revisions.get(0).getRevisionString());
         assertEquals("3", revisions.get(1).getRevisionString());
@@ -351,7 +354,7 @@ public class SubversionClientTest extends PulseTestCase
 
     public void testCheckout() throws ScmException, IOException
     {
-        client.checkout(context, null, null);
+        client.checkout(executionContext, null, null);
         assertRevision(gotDir, 8);
         assertTrue(new File(gotDir, ".svn").isDirectory());
     }
@@ -359,24 +362,24 @@ public class SubversionClientTest extends PulseTestCase
     public void testExport() throws ScmException, IOException
     {
         client.setUseExport(true);
-        client.checkout(context, null, null);
+        client.checkout(executionContext, null, null);
         assertRevision(gotDir, 8);
         assertFalse(new File(gotDir, ".svn").isDirectory());
     }
     
     public void testUpdate() throws ScmException, IOException
     {
-        client.checkout(context, createRevision(1), null);
+        client.checkout(executionContext, createRevision(1), null);
         assertRevision(gotDir, 1);
-        client.update(context, null, null);
+        client.update(executionContext, null, null);
         assertRevision(gotDir, 8);
     }
 
     public void testMultiUpdate() throws ScmException, IOException
     {
-        client.checkout(context, createRevision(1), null);
-        client.update(context, createRevision(4), null);
-        client.update(context, createRevision(8), null);
+        client.checkout(executionContext, createRevision(1), null);
+        client.update(executionContext, createRevision(4), null);
+        client.update(executionContext, createRevision(8), null);
         assertRevision(gotDir, 8);
     }
 
@@ -402,21 +405,21 @@ public class SubversionClientTest extends PulseTestCase
 
     private RecordingScmFeedbackHandler runRecordedUpdate() throws ScmException
     {
-        client.checkout(context, createRevision(1), null);
+        client.checkout(executionContext, createRevision(1), null);
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
-        client.update(context, null, handler);
+        client.update(executionContext, null, handler);
         return handler;
     }
 
     public void testUpdateBrokenWorkingCopy() throws Exception
     {
         client.setCleanOnUpdateFailure(true);
-        client.checkout(context, createRevision(1), null);
+        client.checkout(executionContext, createRevision(1), null);
         File rootSvnDir = new File(gotDir, ".svn");
         FileSystemUtils.rmdir(rootSvnDir);
         
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
-        Revision revision = client.update(context, null, handler);
+        Revision revision = client.update(executionContext, null, handler);
         assertTrue(rootSvnDir.isDirectory());
         assertEquals(Integer.toString(REVISION_TRUNK_LATEST), revision.getRevisionString());
         assertRevision(gotDir, REVISION_TRUNK_LATEST);
@@ -426,14 +429,14 @@ public class SubversionClientTest extends PulseTestCase
     public void testUpdateBrokenWorkingCopyNoRecovery() throws Exception
     {
         client.setCleanOnUpdateFailure(false);
-        client.checkout(context, createRevision(1), null);
+        client.checkout(executionContext, createRevision(1), null);
         File rootSvnDir = new File(gotDir, ".svn");
         FileSystemUtils.rmdir(rootSvnDir);
         
         RecordingScmFeedbackHandler handler = new RecordingScmFeedbackHandler();
         try
         {
-            client.update(context, null, handler);
+            client.update(executionContext, null, handler);
             fail("Expected update to fail");
         }
         catch (ScmException e)
@@ -463,7 +466,7 @@ public class SubversionClientTest extends PulseTestCase
         // We use a file:// url so that the url path does not match the
         // repository path (to catch incorrect use of the url path to filter).
         client = createSubversionClient("file://" + tmpDir.getAbsolutePath() + "/repo/test/trunk/afolder");
-        List<Changelist> changelists = client.getChanges(null, createRevision(0), createRevision(1));
+        List<Changelist> changelists = client.getChanges(context, createRevision(0), createRevision(1));
 
         assertEquals(1, changelists.size());
         Changelist changelist = changelists.get(0);
@@ -471,7 +474,7 @@ public class SubversionClientTest extends PulseTestCase
 
         // exclude the new changes
         client.setFilterPaths(Collections.<String>emptyList(), Arrays.asList("**/afolder/**"));
-        changelists = client.getChanges(null, createRevision(0), createRevision(1));
+        changelists = client.getChanges(context, createRevision(0), createRevision(1));
 
         assertEquals(0, changelists.size());
     }

@@ -4,8 +4,10 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
@@ -395,7 +397,7 @@ public class SubversionClient implements ScmClient
 
         if (revision == null)
         {
-            svnRevision = convertRevision(getLatestRevision(null));
+            svnRevision = convertRevision(getLatestRevision(new ScmContextImpl(null, context)));
         }
         else
         {
@@ -421,7 +423,7 @@ public class SubversionClient implements ScmClient
                 }
                 
                 updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), SVNRevision.UNDEFINED, svnRevision, SVNDepth.INFINITY, false);
-                updateExternals(context.getWorkingDir(), revision, updateClient, handler);
+                updateExternals(context, revision, updateClient, handler);
             }
         }
         catch (SVNException e)
@@ -436,9 +438,9 @@ public class SubversionClient implements ScmClient
         return new Revision(svnRevision.getNumber());
     }
 
-    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmFeedbackHandler handler) throws ScmException
+    private void updateExternals(ExecutionContext context, Revision revision, SVNUpdateClient client, ScmFeedbackHandler handler) throws ScmException
     {
-        List<ExternalDefinition> externals = getExternals(revision);
+        List<ExternalDefinition> externals = getExternals(context, revision);
         for (ExternalDefinition external : externals)
         {
             if (handler != null)
@@ -446,7 +448,7 @@ public class SubversionClient implements ScmClient
                 handler.status("Processing external '" + external.path + "'");
             }
 
-            update(new File(toDirectory, FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
+            update(new File(context.getWorkingDir(), FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
 
             if (handler != null)
             {
@@ -471,11 +473,11 @@ public class SubversionClient implements ScmClient
         return new ByteArrayInputStream(os.toByteArray());
     }
 
-    private boolean reportChanges(ChangeHandler handler, Revision from, Revision to) throws ScmException
+    private boolean reportChanges(ExecutionContext context, ChangeHandler handler, Revision from, Revision to) throws ScmException
     {
         if (to == null)
         {
-            to = getLatestRevision(null);
+            to = getLatestRevision(new ScmContextImpl(null, context));
         }
 
         SVNRevision fromRevision = convertRevision(from);
@@ -502,7 +504,7 @@ public class SubversionClient implements ScmClient
                     return true;
                 }
 
-                List<ExternalDefinition> externals = getExternals(to);
+                List<ExternalDefinition> externals = getExternals(context, to);
                 for (ExternalDefinition external : externals)
                 {
                     SVNRepository repo = null;
@@ -602,7 +604,7 @@ public class SubversionClient implements ScmClient
         return false;
     }
 
-    List<ExternalDefinition> getExternals(Revision revision) throws ScmException
+    List<ExternalDefinition> getExternals(ExecutionContext context, Revision revision) throws ScmException
     {
         final List<ExternalDefinition> result = new LinkedList<ExternalDefinition>();
         try
@@ -610,7 +612,7 @@ public class SubversionClient implements ScmClient
             long rev = revision == null ? repository.getLatestRevision() : convertRevision(revision).getNumber();
             if (monitorAllExternals)
             {
-                addExternalsFromUrl(rev, "", repository.getLocation(), SVNDepth.INFINITY, result);
+                addExternalsFromUrl(context, rev, "", repository.getLocation(), SVNDepth.INFINITY, result);
             }
             else if (externalsPaths.size() > 0)
             {
@@ -622,7 +624,7 @@ public class SubversionClient implements ScmClient
                     }
                     
                     SVNURL url = repository.getLocation().appendPath(externalsPath, false);
-                    addExternalsFromUrl(rev, externalsPath, url, SVNDepth.EMPTY, result);
+                    addExternalsFromUrl(context, rev, externalsPath, url, SVNDepth.EMPTY, result);
                 }
             }
         }
@@ -634,7 +636,7 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    private void addExternalsFromUrl(final long revision, final String ownerPath, final SVNURL ownerURL, final SVNDepth depth, final List<ExternalDefinition> result) throws SVNException
+    private void addExternalsFromUrl(final ExecutionContext context, final long revision, final String ownerPath, final SVNURL ownerURL, final SVNDepth depth, final List<ExternalDefinition> result) throws SVNException
     {
         SVNRepository repository = null;
         try
@@ -651,7 +653,7 @@ public class SubversionClient implements ScmClient
                 }
             };
 
-            repository.status(revision, null, depth, reporter, new GetExternalsEditor(revision, ownerPath, ownerURL, result));
+            repository.status(revision, null, depth, reporter, new GetExternalsEditor(context, revision, ownerPath, ownerURL, result));
         }
         finally
         {
@@ -662,13 +664,13 @@ public class SubversionClient implements ScmClient
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         ChangelistAccumulator accumulator = new ChangelistAccumulator();
-        reportChanges(accumulator, from, to);
+        reportChanges(context.getEnvironmentContext(), accumulator, from, to);
         return accumulator.getChangelists();
     }
 
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        List<Changelist> changes = getChanges(null, from, to);
+        List<Changelist> changes = getChanges(context, from, to);
 
         List<Revision> result = new LinkedList<Revision>();
         for (Changelist change : changes)
@@ -679,28 +681,13 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    public boolean hasChangedSince(Revision since) throws ScmException
-    {
-        Revision latestRevision = getLatestRevision(null);
-        if (latestRevision != since)
-        {
-            ChangeDetector detector = new ChangeDetector();
-            reportChanges(detector, since, latestRevision);
-            return detector.isChanged();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
         try
         {
             long revision = getLatestRepositoryRevision(repository);
             
-            for (ExternalDefinition external: getExternals(null))
+            for (ExternalDefinition external: getExternals(context.getEnvironmentContext(), null))
             {
                 SVNRepository repo = null;
                 try
@@ -784,7 +771,7 @@ public class SubversionClient implements ScmClient
     {
         if (rev == null)
         {
-            rev = getLatestRevision(null);
+            rev = getLatestRevision(new ScmContextImpl(null, context));
         }
 
         if (useExport)
@@ -805,7 +792,7 @@ public class SubversionClient implements ScmClient
             }
 
             update(context.getWorkingDir(), convertRevision(rev), client);
-            updateExternals(context.getWorkingDir(), rev, client, handler);
+            updateExternals(context, rev, client, handler);
         }
         catch (ScmCancelledException e)
         {
@@ -1331,13 +1318,15 @@ public class SubversionClient implements ScmClient
     private class GetExternalsEditor implements ISVNEditor
     {
         private Stack<String> dirStack;
+        private ExecutionContext context;
         private final long revision;
         private final String ownerPath;
         private final SVNURL ownerURL;
         private final List<ExternalDefinition> result;
 
-        public GetExternalsEditor(long revision, String ownerPath, SVNURL ownerURL, List<ExternalDefinition> result)
+        public GetExternalsEditor(ExecutionContext context, long revision, String ownerPath, SVNURL ownerURL, List<ExternalDefinition> result)
         {
+            this.context = context;
             this.revision = revision;
             this.ownerPath = ownerPath;
             this.ownerURL = ownerURL;
@@ -1408,12 +1397,12 @@ public class SubversionClient implements ScmClient
                             }
                             else
                             {
-                                LOG.warning("Ignoring external at URL '" + definition.url.toDecodedString() + "': UID does not match");
+                                LOG.warning(getWarningPrefix()+ "Ignoring external at URL '" + definition.url.toDecodedString() + "': UID does not match");
                             }
                         }
                         catch (Exception e)
                         {
-                            LOG.warning("Ignoring external at URL '" + definition.url.toDecodedString() + "'", e);
+                            LOG.warning(getWarningPrefix()+ "Ignoring external at URL '" + definition.url.toDecodedString() + "'", e);
                         }
                     }
                     else
@@ -1424,12 +1413,25 @@ public class SubversionClient implements ScmClient
             }
         }
 
+        private String getWarningPrefix()
+        {
+            String projectName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
+            if (projectName == null)
+            {
+                return "";
+            }
+            else
+            {
+                return "Project '" + projectName + "': ";
+            }
+        }
+
         private void addExternal(long revision, ExternalDefinition definition, List<ExternalDefinition> externals) throws SVNException
         {
             externals.add(definition);
             if (monitorAllExternals)
             {
-                addExternalsFromUrl(revision, definition.path, definition.url, SVNDepth.INFINITY, externals);
+                addExternalsFromUrl(context, revision, definition.path, definition.url, SVNDepth.INFINITY, externals);
             }
         }
         

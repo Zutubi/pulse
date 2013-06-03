@@ -12,8 +12,11 @@ import com.zutubi.pulse.acceptance.support.ProxyServer;
 import com.zutubi.pulse.acceptance.utils.AcceptancePersonalBuildUI;
 import com.zutubi.pulse.acceptance.utils.PersonalBuildRunner;
 import com.zutubi.pulse.acceptance.utils.workspace.SubversionWorkspace;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.p4.PerforceCore;
@@ -283,7 +286,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
 
         // Check that we actually built against the latest.
         SubversionClient client = new SubversionClient(Constants.TRIVIAL_ANT_REPOSITORY, false);
-        Revision revision = client.getLatestRevision(null);
+        Revision revision = client.getLatestRevision(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
 
         PersonalBuildChangesPage changesPage = getBrowser().openAndWaitFor(PersonalBuildChangesPage.class, buildNumber);
         assertEquals(revision.getRevisionString(), changesPage.getCheckedOutRevision());

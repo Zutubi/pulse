@@ -3,6 +3,8 @@ package com.zutubi.pulse.core.scm.svn;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.TestUtils;
@@ -174,7 +176,7 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testGetExternals() throws Exception
     {
         client.addExternalPath(".");
-        List<SubversionClient.ExternalDefinition> externals = client.getExternals(createRevision(8));
+        List<SubversionClient.ExternalDefinition> externals = client.getExternals(new PulseExecutionContext(), createRevision(8));
         assertEquals(2, externals.size());
         assertExternal(externals.get(0), "pull1", "svn://localhost/ext1/trunk");
         assertExternal(externals.get(1), "pull2", "svn://localhost/ext2/trunk");
@@ -182,22 +184,27 @@ public class SubversionExternalsTest extends PulseTestCase
 
     public void testGetExternalsNoPath() throws Exception
     {
-        List<SubversionClient.ExternalDefinition> externals = client.getExternals(createRevision(8));
+        List<SubversionClient.ExternalDefinition> externals = client.getExternals(new PulseExecutionContext(), createRevision(8));
         assertEquals(0, externals.size());
     }
 
     public void testGetChangesOnExternal() throws Exception
     {
         client.addExternalPath(".");
-        List<Changelist> changes = client.getChanges(null, createRevision(5), createRevision(6));
+        List<Changelist> changes = client.getChanges(createContext(), createRevision(5), createRevision(6));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "6", "/ext1/trunk/file1");
+    }
+
+    private ScmContext createContext()
+    {
+        return new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext());
     }
 
     public void testGetChangesOnExternalAndBundle() throws Exception
     {
         client.addExternalPath(".");
-        List<Changelist> changes = client.getChanges(null, createRevision(4), createRevision(6));
+        List<Changelist> changes = client.getChanges(createContext(), createRevision(4), createRevision(6));
         assertEquals(2, changes.size());
         assertChange(changes.get(0), "5", "/bundle/trunk/file1");
         assertChange(changes.get(1), "6", "/ext1/trunk/file1");
@@ -206,14 +213,14 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testGetChangesOnMetaExternals() throws Exception
     {
         client.addExternalPath(".");
-        List<Changelist> changes = client.getChanges(null, createRevision(6), createRevision(7));
+        List<Changelist> changes = client.getChanges(createContext(), createRevision(6), createRevision(7));
         assertEquals(0, changes.size());
     }
 
     public void testGetChangesOnAll() throws Exception
     {
         client.addExternalPath(".");
-        List<Changelist> changes = client.getChanges(null, createRevision(7), createRevision(8));
+        List<Changelist> changes = client.getChanges(createContext(), createRevision(7), createRevision(8));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "8", "/bundle/trunk/file2", "/ext1/trunk/file2", "/ext2/trunk/file2", "/meta/trunk/file2");
     }
@@ -254,7 +261,7 @@ public class SubversionExternalsTest extends PulseTestCase
     {
         checkoutAndEditExternal();
         
-        assertEquals("9", client.getLatestRevision(null).getRevisionString());
+        assertEquals("9", client.getLatestRevision(createContext()).getRevisionString());
     }
 
     public void testGuessLocalRevisionLatestInExternal() throws ScmException, IOException, SVNException
@@ -353,19 +360,19 @@ public class SubversionExternalsTest extends PulseTestCase
                 new SubversionClient.ExternalDefinition("Directory/Project3", "svn://localhost/Project3"),
                 new SubversionClient.ExternalDefinition("Directory/Project3/Project4", "svn://localhost/Project4"),
                 new SubversionClient.ExternalDefinition("Directory/Project3/Directory/Project5", "svn://localhost/Project5")
-        ), client.getExternals(null));
+        ), client.getExternals(new PulseExecutionContext(), null));
     }
 
     public void testNestedNoExternalsMonitored() throws ScmException
     {
-        assertEquals("5", client.getLatestRevision(null).getRevisionString());
+        assertEquals("5", client.getLatestRevision(createContext()).getRevisionString());
     }
 
     public void testNestedMonitorRelativeExternal() throws ScmException
     {
         // Should pick up external to Project2, changed more recently than Project1.
         client.addExternalPath(".");
-        assertEquals("6", client.getLatestRevision(null).getRevisionString());
+        assertEquals("6", client.getLatestRevision(createContext()).getRevisionString());
     }
 
     public void testNestedMonitorAll() throws ScmException
@@ -373,7 +380,7 @@ public class SubversionExternalsTest extends PulseTestCase
         // The latest project to change - Project5 - is only referenced
         // indirectly via Project3.
         client.setMonitorAllExternals(true);
-        assertEquals("7", client.getLatestRevision(null).getRevisionString());
+        assertEquals("7", client.getLatestRevision(createContext()).getRevisionString());
     }
 
     public void testNestedCheckoutMonitorAll() throws ScmException, IOException
