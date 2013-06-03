@@ -41,6 +41,7 @@ public class FeaturePersister
     private static final String ATTRIBUTE_LAST_LINE = "last-line";
     private static final String ATTRIBUTE_LINE = "line";
 
+    private String lastLogMessage;
 
     public File writeFeatures(CommandResult result, File recipeDir) throws IOException
     {
@@ -158,7 +159,7 @@ public class FeaturePersister
                 // only trigger the callback if there is something to process.
                 if (reader.isStartElement())
                 {
-                    readArtifacts(reader, result, perFileArtifactLimit);
+                    readArtifacts(featuresFile, reader, result, perFileArtifactLimit);
                 }
             }
             finally
@@ -168,7 +169,7 @@ public class FeaturePersister
         }
     }
 
-    private void readArtifacts(XMLStreamReader reader, CommandResult result, int perFileArtifactLimit) throws XMLStreamException
+    private void readArtifacts(File file, XMLStreamReader reader, CommandResult result, int perFileArtifactLimit) throws XMLStreamException
     {
         nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_ARTIFACT))
@@ -180,11 +181,11 @@ public class FeaturePersister
                 StoredArtifact artifact = result.getArtifact(name);
                 if(artifact == null)
                 {
-                    LOG.info("Features file refers to unknown artifact '" + name + "'");
+                    log("Features file '" + file.getAbsolutePath() + "' refers to unknown artifact '" + name + "'");
                     continue;
                 }
 
-                readArtifact(reader, artifact, perFileArtifactLimit);
+                readArtifact(file, reader, artifact, perFileArtifactLimit);
             }
 
             expectEndTag(ELEMENT_ARTIFACT, reader);
@@ -192,7 +193,7 @@ public class FeaturePersister
         }
     }
 
-    private void readArtifact(XMLStreamReader reader, StoredArtifact artifact, int perFileArtifactLimit) throws XMLStreamException
+    private void readArtifact(File file, XMLStreamReader reader, StoredArtifact artifact, int perFileArtifactLimit) throws XMLStreamException
     {
         nextTagOrEnd(reader);
         while (nextSiblingTag(reader, ELEMENT_FILE_ARTIFACT))
@@ -204,11 +205,11 @@ public class FeaturePersister
                 StoredFileArtifact fileArtifact = artifact.findFile(path);
                 if (fileArtifact == null)
                 {
-                    LOG.info("Features file refers to unknown file artifact '" + path + "'");
+                    log("Features file '" + file.getAbsolutePath() + "' refers to unknown file artifact '" + path + "'");
                     continue;
                 }
 
-                readFileArtifact(reader, fileArtifact, perFileArtifactLimit);
+                readFileArtifact(file, reader, fileArtifact, perFileArtifactLimit);
             }
 
             expectEndTag(ELEMENT_FILE_ARTIFACT, reader);
@@ -216,7 +217,7 @@ public class FeaturePersister
         }
     }
 
-    private int readFileArtifact(XMLStreamReader reader, StoredFileArtifact fileArtifact, int limit) throws XMLStreamException
+    private int readFileArtifact(File file, XMLStreamReader reader, StoredFileArtifact fileArtifact, int limit) throws XMLStreamException
     {
         int featuresRead = 0;
         
@@ -228,13 +229,13 @@ public class FeaturePersister
                 try
                 {
                     Map<String, String> attributes = getAttributes(reader);
-                    Feature.Level level = Feature.Level.valueOf(getRequiredAttribute(attributes, ATTRIBUTE_LEVEL));
+                    Feature.Level level = Feature.Level.valueOf(getRequiredAttribute(file, attributes, ATTRIBUTE_LEVEL));
                     String summary = reader.getElementText();
                     if (attributes.containsKey(ATTRIBUTE_FIRST_LINE))
                     {
-                        long firstLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_FIRST_LINE));
-                        long lastLine = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LAST_LINE));
-                        long line = Long.parseLong(getRequiredAttribute(attributes, ATTRIBUTE_LINE));
+                        long firstLine = Long.parseLong(getRequiredAttribute(file, attributes, ATTRIBUTE_FIRST_LINE));
+                        long lastLine = Long.parseLong(getRequiredAttribute(file, attributes, ATTRIBUTE_LAST_LINE));
+                        long line = Long.parseLong(getRequiredAttribute(file, attributes, ATTRIBUTE_LINE));
 
                         fileArtifact.addFeature(new PersistentPlainFeature(level, summary, firstLine, lastLine, line));
                     }
@@ -262,14 +263,23 @@ public class FeaturePersister
         return featuresRead;
     }
 
-    private String getRequiredAttribute(Map<String, String> attributes, String name)
+    private String getRequiredAttribute(File file, Map<String, String> attributes, String name)
     {
         String value = attributes.get(name);
         if (value == null)
         {
-            throw new IllegalArgumentException("Required attribute '" + name + "' not found");
+            throw new IllegalArgumentException("Features file '" + file.getAbsolutePath() + "': Required attribute '" + name + "' not found");
         }
 
         return value;
+    }
+
+    private void log(String message)
+    {
+        if (!message.equals(lastLogMessage))
+        {
+            lastLogMessage = message;
+            LOG.info(message);
+        }
     }
 }
