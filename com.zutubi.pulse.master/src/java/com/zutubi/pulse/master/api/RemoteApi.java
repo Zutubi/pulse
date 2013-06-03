@@ -4155,6 +4155,8 @@ public class RemoteApi
      * <li><b>force</b>: indicates that a build should be triggered even if no unbuilt revision is
      * available and changelist isolation is active for this project.</li>
      * <li><b>properties</b>: {@xtype struct<string>} a mapping of property names to property values.</li>
+     * <li><b>reason</b>: a string, up to 255 characters long, with a custom reason message for this
+     * build.</li>
      * <li><b>rebuild</b>: if true do a build with all dependencies.  If not specified, dependencies
      * will not be built.</li>
      * <li><b>replaceable</b>: indicates that this build can be replaced by a subsequent build in the
@@ -4191,8 +4193,19 @@ public class RemoteApi
                 revision = parseRevision((String) triggerOptions.get("revision"), project);
             }
 
+            BuildReason reason;
+            String reasonString = (String) triggerOptions.get("reason");
+            if (reasonString == null)
+            {
+                reason = new RemoteTriggerBuildReason(user.getLogin());
+            }
+            else
+            {
+                reason = new CustomBuildReason(StringUtils.trimmedString(reasonString, 255));
+            }
+
             // convert options
-            TriggerOptions options = new TriggerOptions(new RemoteTriggerBuildReason(user.getLogin()), "remote api");
+            TriggerOptions options = new TriggerOptions(reason, "remote api");
             if (triggerOptions.containsKey("replaceable"))
             {
                 options.setReplaceable(getBoolean(triggerOptions.get("replaceable")));

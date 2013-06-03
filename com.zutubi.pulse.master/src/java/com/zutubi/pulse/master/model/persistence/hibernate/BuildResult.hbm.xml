@@ -79,6 +79,10 @@
 
         <discriminator column="REASON_TYPE" type="string" length="255"/>
 
+        <subclass name="com.zutubi.pulse.master.model.CustomBuildReason" discriminator-value="CUSTOM" lazy="false">
+            <property name="summary" type="string" column="DETAILS" length="255"/>
+        </subclass>
+
         <subclass name="com.zutubi.pulse.master.model.ManualTriggerBuildReason" discriminator-value="MANUAL_TRIGGER" lazy="false">
             <property name="username" type="string" column="DETAILS" length="255"/>
         </subclass>

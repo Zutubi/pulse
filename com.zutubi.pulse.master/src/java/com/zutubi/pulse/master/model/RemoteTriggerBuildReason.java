@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 /**
- * The build was triggered via the remote API.
+ * The build was triggered via the remote API with no additional reason specified.
  */
 public class RemoteTriggerBuildReason extends AbstractBuildReason
 {
