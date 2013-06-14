@@ -12,13 +12,14 @@ import com.zutubi.pulse.servercore.agent.SynchronisationTaskFactory;
 import com.zutubi.pulse.servercore.util.background.BackgroundServiceSupport;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.tove.variables.api.VariableMap;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.adt.Pair;
 
 import java.util.*;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Queueing all the synchronisation messages required to clean up persistent working directories may
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class WorkDirectoryCleanupService extends BackgroundServiceSupport
 {
     private static final Messages I18N = Messages.getInstance(WorkDirectoryCleanupService.class);
-    private static final int MAX_THREADS = 3;
+    private static final int MAX_THREADS = 6;
     private static final long THREAD_IDLE_TIMEOUT = 60L;
 
     private AgentManager agentManager;
@@ -37,7 +38,7 @@ public class WorkDirectoryCleanupService extends BackgroundServiceSupport
     public WorkDirectoryCleanupService()
     {
         super("Work Directory Cleanup Service",
-              new ThreadPoolExecutor(0, MAX_THREADS, THREAD_IDLE_TIMEOUT, TimeUnit.SECONDS, new SynchronousQueue<Runnable>()),
+              new ThreadPoolExecutor(0, MAX_THREADS, THREAD_IDLE_TIMEOUT, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new ThreadPoolExecutor.CallerRunsPolicy()),
               false);
     }
 
