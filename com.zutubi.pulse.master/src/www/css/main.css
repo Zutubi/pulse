@@ -2220,8 +2220,13 @@ h3.config-header-small
 
 ul.config-errors li, ul.config-links li, ul.config-actions li
 {
-    padding: 1px;
-    line-height: 1.4em;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+ul.config-errors li img, ul.config-links li img, ul.config-actions li img
+{
+    vertical-align: text-bottom;
 }
 
 ul.config-errors li
