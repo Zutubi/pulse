@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.health.ConfigurationHealthChecker;
-import com.zutubi.tove.config.health.ConfigurationHealthReport;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
@@ -183,7 +182,7 @@ public class ConfigurationArchiver
             long otherParentHandle = getTemplateParentHandle(otherItem);
             if (otherParentHandle == originalHandle)
             {
-                importItemAndChildren(scope, scopeRecord, item, newHandle, insertedPaths);
+                importItemAndChildren(scope, scopeRecord, otherItem, newHandle, insertedPaths);
             }
         }
     }
