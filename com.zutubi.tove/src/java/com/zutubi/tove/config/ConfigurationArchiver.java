@@ -80,43 +80,55 @@ public class ConfigurationArchiver
                 for (String scope : archiveRecord.getScopes())
                 {
                     Record scopeRecord = archiveRecord.getScope(scope);
-                    if (configurationTemplateManager.isTemplatedPath(scope))
+                    try
                     {
-                        // Import multiple items in inheritance order.  Find all within the archive that have no parent, and
-                        // import them (in any order) and their children recursively.
-                        Set<Long> handles = new HashSet<Long>();
-                        for (String name : scopeRecord.nestedKeySet())
+                        if (configurationTemplateManager.isTemplatedPath(scope))
                         {
-                            Record item = (Record) scopeRecord.get(name);
-                            handles.add(item.getHandle());
-                        }
-
-                        long rootHandle = configurationTemplateManager.getRootInstance(scope, Configuration.class).getHandle();
-                        for (String name : scopeRecord.nestedKeySet())
-                        {
-                            MutableRecord item = (MutableRecord) scopeRecord.get(name);
-                            long parentHandle = getTemplateParentHandle(item);
-                            if (!handles.contains(parentHandle))
+                            // Import multiple items in inheritance order.  Find all within the archive that have no parent, and
+                            // import them (in any order) and their children recursively.
+                            Set<Long> handles = new HashSet<Long>();
+                            for (String name : scopeRecord.nestedKeySet())
                             {
-                                importItemAndChildren(scope, scopeRecord, item, rootHandle, insertedPaths);
+                                Record item = (Record) scopeRecord.get(name);
+                                handles.add(item.getHandle());
+                            }
+
+                            long rootHandle = configurationTemplateManager.getRootInstance(scope, Configuration.class).getHandle();
+
+                            configurationTemplateManager.suspendInstanceCache();
+                            for (String name : scopeRecord.nestedKeySet())
+                            {
+                                MutableRecord item = (MutableRecord) scopeRecord.get(name);
+                                long parentHandle = getTemplateParentHandle(item);
+                                if (!handles.contains(parentHandle))
+                                {
+                                    importItemAndChildren(scope, scopeRecord, item, rootHandle, insertedPaths);
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        for (String name : scopeRecord.nestedKeySet())
+                        else
                         {
-                            Record item = (Record) scopeRecord.get(name);
-                            insertedPaths.add(configurationTemplateManager.insertRecord(scope, item));
+                            configurationTemplateManager.suspendInstanceCache();
+                            for (String name : scopeRecord.nestedKeySet())
+                            {
+                                Record item = (Record) scopeRecord.get(name);
+                                insertedPaths.add(configurationTemplateManager.insertRecord(scope, item, false));
+                            }
+                        }
+
+                        restoreReferences(pathToReferencedHandles, handleToPath);
+
+                        for (String insertedPath : insertedPaths)
+                        {
+                            configurationHealthChecker.healPath(insertedPath);
                         }
                     }
-                }
+                    finally
+                    {
+                        configurationTemplateManager.resumeInstanceCache();
+                    }
 
-                restoreReferences(pathToReferencedHandles, handleToPath);
-
-                for (String insertedPath : insertedPaths)
-                {
-                    configurationHealthChecker.healPath(insertedPath);
+                    configurationTemplateManager.raiseInsertEvents(insertedPaths);
                 }
 
                 return null;
@@ -144,7 +156,7 @@ public class ConfigurationArchiver
             {
                 MutableRecord item = (MutableRecord) scopeRecord.get(name);
                 ReferenceExtractingFunction fn = new ReferenceExtractingFunction((ComplexType) type.getTargetType(), item, PathUtils.getPath(scope, name), pathToReferencedHandles, handleToPath);
-                fn.process(item);
+                item.forEach(fn);
             }
         }
     }
@@ -172,7 +184,7 @@ public class ConfigurationArchiver
         long originalHandle = item.getHandle();
 
         item.putMeta(TemplateRecord.PARENT_KEY, Long.toString(templateParentHandle));
-        String path = configurationTemplateManager.insertRecord(scope, item);
+        String path = configurationTemplateManager.insertRecord(scope, item, false);
         insertedPaths.add(path);
         long newHandle = configurationTemplateManager.getRecord(path).getHandle();
 
@@ -364,6 +376,8 @@ public class ConfigurationArchiver
         @Override
         protected void handleReference(String path, Record record, TypeProperty property, String value)
         {
+            String fullPath = PathUtils.getPath(path, property.getName());
+            pathToReferencedHandles.put(fullPath, Long.parseLong(value));
             super.handleReference(path, record, property, value);
         }
 

@@ -179,6 +179,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         archiveAndRestore(SCOPE_TEMPLATED, parent, child);
 
         ArchiveProject restoredParent = configurationTemplateManager.getInstance(parentPath, ArchiveProject.class);
+        assertFalse(restoredParent.isConcrete());
         assertEquals(parent.getName(), restoredParent.getName());
         assertEquals(parent.getDescription(), restoredParent.getDescription());
         assertEquals(parent.getOptions().getTimeout(), restoredParent.getOptions().getTimeout());
@@ -186,11 +187,83 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertEquals(parent.getTriggers().keySet(), restoredParent.getTriggers().keySet());
 
         ArchiveProject restoredChild = configurationTemplateManager.getInstance(childPath, ArchiveProject.class);
+        assertTrue(restoredChild.isConcrete());
         assertEquals(child.getName(), restoredChild.getName());
         assertEquals(child.getDescription(), restoredChild.getDescription());
         assertEquals(child.getOptions().getTimeout(), restoredChild.getOptions().getTimeout());
         assertEquals(child.getScm().getClass(), restoredChild.getScm().getClass());
         assertEquals(child.getTriggers().keySet(), restoredChild.getTriggers().keySet());
+    }
+
+    public void testReferencesToOutsideArchive()
+    {
+        ArchiveProject upstream = new ArchiveProject("upstream");
+        String upstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, upstream, rootPath, false);
+        upstream = configurationTemplateManager.getInstance(upstreamPath, ArchiveProject.class);
+
+        ArchiveProject downstream = new ArchiveProject("downstream");
+        ArchiveBuildCompletedTrigger trigger = new ArchiveBuildCompletedTrigger("post up");
+        trigger.setProject(upstream);
+        downstream.addTrigger(trigger);
+        downstream.getDependencies().addProject(upstream);
+
+        String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
+        downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
+
+        ArchiveProject restoredDownstream = archiveAndRestore(SCOPE_TEMPLATED, downstream);
+
+        ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
+        assertNull(restoredTrigger.getProject());
+        assertEquals(0, restoredDownstream.getDependencies().getProjects().size());
+    }
+
+    public void testReferencesToInsideArchive()
+    {
+        ArchiveProject upstream = new ArchiveProject("upstream");
+        String upstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, upstream, rootPath, false);
+        upstream = configurationTemplateManager.getInstance(upstreamPath, ArchiveProject.class);
+
+        ArchiveProject downstream = new ArchiveProject("downstream");
+        ArchiveBuildCompletedTrigger trigger = new ArchiveBuildCompletedTrigger("post up");
+        trigger.setProject(upstream);
+        downstream.addTrigger(trigger);
+        downstream.getDependencies().addProject(upstream);
+
+        String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
+        downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
+
+        ArchiveProject restoredDownstream = archiveAndRestore(SCOPE_TEMPLATED, downstream, upstream);
+        ArchiveProject restoredUpstream = configurationTemplateManager.getInstance(upstreamPath, ArchiveProject.class);
+
+        ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
+        assertSame(restoredUpstream, restoredTrigger.getProject());
+        assertEquals(1, restoredDownstream.getDependencies().getProjects().size());
+        assertSame(restoredUpstream, restoredDownstream.getDependencies().getProjects().iterator().next());
+    }
+
+    public void testImportWithIncompatibleTypes()
+    {
+        ArchiveProject project = new ArchiveProject("p");
+        project.setScm(new ArchiveGitScm());
+        project.addTrigger(new ArchiveScmTrigger("t"));
+
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, SCOPE_TEMPLATED, project.getName());
+        configurationTemplateManager.delete(projectPath);
+
+        ArchiveProject root = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(rootPath, ArchiveProject.class));
+        root.setScm(new ArchiveSubversionScm());
+        root.addTrigger(new ArchiveBuildCompletedTrigger("t"));
+        configurationTemplateManager.save(root);
+
+        configurationArchiver.restore(archiveFile, new TestVersionChecker());
+        ArchiveProject restoredProject = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        assertEquals(ArchiveSubversionScm.class, restoredProject.getScm().getClass());
+        assertEquals(1, restoredProject.getTriggers().size());
+        assertEquals(ArchiveBuildCompletedTrigger.class, restoredProject.getTriggers().get("t").getClass());
     }
 
     private ArchiveProject archiveAndRestore(String scope, ArchiveProject... projects)
@@ -211,13 +284,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
             }
         }
 
-        configurationArchiver.restore(archiveFile, new ConfigurationArchiver.VersionChecker()
-        {
-            public void checkVersion(String version) throws ToveRuntimeException
-            {
-                assertEquals(VERSION, version);
-            }
-        });
+        configurationArchiver.restore(archiveFile, new TestVersionChecker());
 
         return configurationTemplateManager.getInstance(projects[0].getConfigurationPath(), ArchiveProject.class);
     }
@@ -415,6 +482,19 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void setProjects(List<ArchiveProject> projects)
         {
             this.projects = projects;
+        }
+
+        public void addProject(ArchiveProject project)
+        {
+            projects.add(project);
+        }
+    }
+
+    private static class TestVersionChecker implements ConfigurationArchiver.VersionChecker
+    {
+        public void checkVersion(String version) throws ToveRuntimeException
+        {
+            assertEquals(VERSION, version);
         }
     }
 }

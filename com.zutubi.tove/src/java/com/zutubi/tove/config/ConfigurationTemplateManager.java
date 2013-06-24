@@ -464,6 +464,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     public String insertRecord(final String path, final Record r)
     {
+        return insertRecord(path, r, true);
+    }
+
+    public String insertRecord(final String path, final Record r, final boolean checkCompatibility)
+    {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
 
@@ -511,7 +516,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     if (elements.length == 2)
                     {
                         // Brand new, if we have a parent we need to skeletonise.
-                        record = applyParentSkeleton(newPath, record, actualType);
+                        record = applyParentSkeleton(newPath, record, actualType, checkCompatibility);
                     }
                     else
                     {
@@ -559,12 +564,15 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private MutableRecord applyParentSkeleton(String newPath, MutableRecord record, CompositeType actualType)
+    private MutableRecord applyParentSkeleton(String newPath, MutableRecord record, CompositeType actualType, boolean checkCompatibility)
     {
         String templateParentPath = getTemplateParentPath(newPath, record, true);
         if (templateParentPath != null)
         {
-            checkNestedPathsCompatibleWithAncestry(templateParentPath, record);
+            if (checkCompatibility)
+            {
+                checkNestedPathsCompatibleWithAncestry(templateParentPath, record);
+            }
 
             TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
             if(isConcreteOwner(templateParent))
