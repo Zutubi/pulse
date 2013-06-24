@@ -39,7 +39,7 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
     {
         Referee ee = new Referee("ee");
         Referer er = new Referer("er", ee);
-        String erPath = configurationTemplateManager.insert("refs", er);
+        String erPath = configurationTemplateManager.insertInstance("refs", er);
         String eePath = PathUtils.getPath(erPath, "r");
 
         Record eeRecord = configurationTemplateManager.getRecord(eePath);
@@ -70,7 +70,7 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
     {
         Referee ee = new Referee("ee");
         Referer er = new Referer("er", ee);
-        String erPath = configurationTemplateManager.insert("refs", er);
+        String erPath = configurationTemplateManager.insertInstance("refs", er);
         String eePath = PathUtils.getPath(erPath, "r");
 
         Record eeRecord = configurationTemplateManager.getRecord(eePath);

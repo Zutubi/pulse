@@ -270,7 +270,7 @@ public class RemoteApi
 
             if (path.length() == 0)
             {
-                result = new Vector<String>(configurationTemplateManager.getRootListing());
+                result = new Vector<String>(configurationTemplateManager.getPersistentScopes());
             }
             else
             {

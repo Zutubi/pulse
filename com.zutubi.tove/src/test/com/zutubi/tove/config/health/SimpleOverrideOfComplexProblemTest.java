@@ -6,19 +6,19 @@ import com.zutubi.tove.type.record.Record;
 
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 
-public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
+public class SimpleOverrideOfComplexProblemTest extends AbstractHealthProblemTestCase
 {
     private static final String PARENT_PATH = "parent";
     private static final String PATH = "child";
     private static final String KEY = "key";
     
-    private MissingSkeletonsProblem problem;
+    private SimpleOverrideOfComplexProblem problem;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        problem = new MissingSkeletonsProblem(PATH, "message", KEY, PARENT_PATH);
+        problem = new SimpleOverrideOfComplexProblem(PATH, "message", KEY, PARENT_PATH);
     }
 
     public void testParentRecordDoesNotExist()
@@ -36,11 +36,19 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
 
     public void testParentRecordHasSimpleKey()
     {
-        recordManager.insert(PATH, new MutableRecordImpl());
         MutableRecord parent = new MutableRecordImpl();
         parent.put(KEY, "simple");
         recordManager.insert(PARENT_PATH, parent);
+
+        MutableRecord child = new MutableRecordImpl();
+        child.put(KEY, "othersimple");
+        recordManager.insert(PATH, child);
+
         problem.solve(recordManager);
+
+        Record after = recordManager.select(PATH);
+        assertNotNull(after);
+        assertEquals("othersimple", after.get(KEY));
     }
     
     public void testContainingRecordDoesNotExist()
@@ -51,7 +59,7 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
         problem.solve(recordManager);
     }
 
-    public void testSkeletonExists()
+    public void testChildRecordExists()
     {
         MutableRecord parent = new MutableRecordImpl();
         parent.put(KEY, new MutableRecordImpl());
@@ -70,22 +78,7 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
         assertEquals("bar", skeletonAfter.get("foo"));
     }
 
-    public void testChildRecordContainsSimpleKey()
-    {
-        MutableRecord parent = new MutableRecordImpl();
-        parent.put(KEY, new MutableRecordImpl());
-        recordManager.insert(PARENT_PATH, parent);
-
-        MutableRecord child = new MutableRecordImpl();
-        child.put(KEY, "simple");
-        recordManager.insert(PATH, child);
-        
-        problem.solve(recordManager);
-        
-        assertFalse(recordManager.containsRecord(getPath(PATH, KEY)));
-    }
-    
-    public void testCreateSkeleton()
+    public void testReplaceWithSkeleton()
     {
         MutableRecord parent = new MutableRecordImpl();
         MutableRecord inherited = new MutableRecordImpl();
@@ -94,7 +87,9 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
         parent.put(KEY, inherited);
         recordManager.insert(PARENT_PATH, parent);
 
-        recordManager.insert(PATH, new MutableRecordImpl());
+        MutableRecordImpl child = new MutableRecordImpl();
+        child.put(KEY, "value");
+        recordManager.insert(PATH, child);
         problem.solve(recordManager);
         
         Record skeleton = recordManager.select(getPath(PATH, KEY));

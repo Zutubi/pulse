@@ -58,15 +58,15 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         normalProject.addLabel(new Label("groupy"));
         normalProject.addStage(new Stage("default"));
         normalProject.addHook(new Hook("a hook"));
-        configurationTemplateManager.insert(SCOPE_NORMAL, normalProject);
+        configurationTemplateManager.insertInstance(SCOPE_NORMAL, normalProject);
 
         Project global = new Project("global template");
         global.addStage(new Stage("default"));
-        String globalPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, global, null, true);
+        String globalPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, global, null, true);
 
         Project child = createChildProject(globalPath, "child");
         child.addStage(new Stage("another stage"));
-        configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child, globalPath, false);
+        configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, child, globalPath, false);
         
         checkAllTest();
     }
@@ -90,7 +90,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     public void testCheckAllCollectionWithSymbolicName()
     {
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("pro"));
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("pro"));
         String stagesPath = getPath(projectPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
         stagesRecord.setSymbolicName("atype");
@@ -101,7 +101,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     public void testCheckAllCollectionWithSimpleKey()
     {
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("pro"));
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("pro"));
         String stagesPath = getPath(projectPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
         stagesRecord.put("simple", "value");
@@ -112,7 +112,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     public void testCheckAllCollectionWithBadOrder()
     {
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("pro"));
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("pro"));
         String stagesPath = getPath(projectPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
         MapType.setOrder(stagesRecord, asList("bad"));
@@ -123,7 +123,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     
     public void testCheckAllCollectionWithOrderReferringToSimple()
     {
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("pro"));
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("pro"));
         String stagesPath = getPath(projectPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
         MapType.setOrder(stagesRecord, asList("simple"));
@@ -137,7 +137,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckAllInheritedOrderRefersToHiddenItem()
     {
         String rootPath = insertRootProjectWithStages("s1", "s2");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
         
         configurationTemplateManager.setOrder(getPath(rootPath, "stages"), asList("s2", "s1"));
         configurationTemplateManager.delete(getPath(childPath, "stages", "s2"));
@@ -160,7 +160,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckAllCollectionHiddenItemExists()
     {
         String rootPath = insertRootProjectWithStages("s1", "s2");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
 
         String stagesPath = getPath(childPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
@@ -173,7 +173,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckAllCollectionHiddenItemNotInParent()
     {
         String rootPath = insertRootProjectWithStages("s1", "s2");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
 
         String stagesPath = getPath(childPath, "stages");
         MutableRecord stagesRecord = recordManager.select(stagesPath).copy(false, true);
@@ -186,7 +186,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckAllCollectionHiddenItemRefersToSimple()
     {
         String rootPath = insertRootProjectWithStages("s1", "s2");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
 
         String rootStagesPath = getPath(rootPath, "stages");
         MutableRecord rootStagesRecord = recordManager.select(rootStagesPath).copy(false, true);
@@ -224,7 +224,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     public void testCheckAllCompositeUnrecognisedSimpleProperty()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
         MutableRecord record = configurationTemplateManager.getRecord(path).copy(false, true);
         record.put("unknown", "value");
         recordManager.update(path, record);
@@ -234,7 +234,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     
     public void testCheckAllCompositeUnrecognisedComplexProperty()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
         recordManager.insert(getPath(path, "unknown"), new MutableRecordImpl());
         
         checkAllTest(new UnexpectedNestedRecordProblem(path, I18N.format("unexpected.nested.record", "unknown"), "unknown"));
@@ -242,7 +242,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     
     public void testCheckAllCompositeCompositePropertySimple()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
         MutableRecord record = configurationTemplateManager.getRecord(path).copy(false, true);
         record.put("options", "value");
         recordManager.update(path, record);
@@ -252,7 +252,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     
     public void testCheckAllCompositeCollectionPropertySimple()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
         MutableRecord record = configurationTemplateManager.getRecord(path).copy(false, true);
         record.put("stages", "value");
         recordManager.update(path, record);
@@ -271,7 +271,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     
     public void testCheckAllCompositeSimplePropertyCollection()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
         recordManager.insert(getPath(path, "description"), new MutableRecordImpl());
         
         checkAllTest(new UnsolvableHealthProblem(path, I18N.format("simple.property.complex.value", "description")));
@@ -281,7 +281,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         Project project = new Project("p");
         project.addHook(new Hook("h"));
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, project);
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, project);
         String hookPath = getPath(projectPath, "hooks", "h");
         MutableRecord hookRecord = recordManager.select(hookPath).copy(false, true);
         hookRecord.put("stage", "invalid");
@@ -294,7 +294,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         Project project = new Project("p");
         project.addHook(new Hook("h"));
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, project);
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, project);
         String hookPath = getPath(projectPath, "hooks", "h");
         MutableRecord hookRecord = recordManager.select(hookPath).copy(false, true);
         hookRecord.put("stage", "388765");
@@ -312,7 +312,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         recipe.addCommand(command);
         Project project = new Project("p");
         project.addRecipe(recipe);
-        String projectPath = configurationTemplateManager.insert(SCOPE_NORMAL, project);
+        String projectPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, project);
         String artifactPath = getPath(projectPath, "recipes", "r", "commands", "c", "artifacts", "a");
         MutableRecord artifactRecord = recordManager.select(artifactPath).copy(false, true);
         artifactRecord.put("processors", new String[]{ReferenceType.NULL_REFERENCE});
@@ -326,7 +326,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String rootPath = insertRootProjectWithStages("default");
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
         configurationTemplateManager.delete(getPath(childPath, "stages", "default"));
 
         Project rootProject = configurationTemplateManager.getInstance(rootPath, Project.class);
@@ -344,7 +344,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         configurationTemplateManager.save(rootProject);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         String childHookPath = getPath(childPath, "hooks", "h");
         long nonCanonicalHandle = recordManager.select(getPath(childPath, "stages", "default")).getHandle();
@@ -361,10 +361,10 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         Project rootProject = new Project("root");
         rootProject.setScm(new Perforce());
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         MutableRecordImpl childScmRecord = new MutableRecordImpl();
         childScmRecord.setSymbolicName("subversion");
@@ -372,48 +372,48 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         recordManager.delete(childScmPath);
         recordManager.insert(childScmPath, childScmRecord);
         
-        checkAllTest(new UnsolvableHealthProblem(childScmPath, I18N.format("inherited.type.mismatch", "subversion", "perforce")));
+        checkAllTest(new IncompatibleOverrideOfComplexProblem(childPath, I18N.format("inherited.type.mismatch", "subversion", "perforce"), "scm", rootPath));
     }
     
     public void testCheckAllSimpleOverridesRecord()
     {
         Project rootProject = new Project("root");
         rootProject.setScm(new Perforce());
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         recordManager.delete(getPath(childPath, "scm"));
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         childRecord.put("scm", "value");
         recordManager.update(childPath, childRecord);
         
-        checkAllTest(new UnsolvableHealthProblem(childPath, I18N.format("inherited.record.simple.in.child", "scm")));
+        checkAllTest(new SimpleOverrideOfComplexProblem(childPath, I18N.format("inherited.record.simple.in.child", "scm"), "scm", rootPath));
     }
 
     public void testCheckAllMissingSkeleton()
     {
         Project rootProject = new Project("root");
         rootProject.setScm(new Perforce());
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         recordManager.delete(getPath(childPath, "scm"));
         
-        checkAllTest(new MissingSkeletonsProblem(childPath, I18N.format("inherited.missing.skeletons", "scm"), rootPath, "scm"));
+        checkAllTest(new MissingSkeletonsProblem(childPath, I18N.format("inherited.missing.skeletons", "scm"), "scm", rootPath));
     }
 
     public void testCheckAllInheritedSimpleValueNotScrubbed()
     {
         Project rootProject = new Project("root");
         rootProject.setDescription("mundane");
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         childRecord.put("description", "mundane");
@@ -425,13 +425,13 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     public void testCheckAllEmptySimpleValueNotInParentNotMarkedForScrub()
     {
         Project rootProject = new Project("root");
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
 
         Project childProject = createChildProject(rootPath, "child");
         Perforce scm = new Perforce();
         scm.setClient("");
         childProject.setScm(scm);
-        configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         checkAllTest();
     }
@@ -442,11 +442,11 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         
         Project rootProject = new Project("root");
         rootProject.addTrigger(new Trigger(TRIGGER_NAME));
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         // Also add a concrete child to make sure its trigger id is fine.
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         String rootTriggerPath = addExternalStateToTrigger(rootPath, TRIGGER_NAME);
         addExternalStateToTrigger(childPath, TRIGGER_NAME);
@@ -467,7 +467,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         String rootPath = insertRootProjectWithStages();
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
         
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         childRecord.putMeta(TemplateRecord.PARENT_KEY, "invalid");
@@ -480,7 +480,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         String rootPath = insertRootProjectWithStages();
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
         
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         childRecord.putMeta(TemplateRecord.PARENT_KEY, "33115599");
@@ -491,11 +491,11 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
 
     public void testCheckAllTemplateParentNotItemOfTemplateCollection()
     {
-        String normalPath = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("norm"));
+        String normalPath = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("norm"));
         
         String rootPath = insertRootProjectWithStages();
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
         
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         long normalHandle = recordManager.select(normalPath).getHandle();
@@ -510,8 +510,8 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         String rootPath = insertRootProjectWithStages();
         Project child1Project = createChildProject(rootPath, "child1");
         Project child2Project = createChildProject(rootPath, "child2");
-        String child1Path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child1Project, rootPath, false);
-        String child2Path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child2Project, rootPath, false);
+        String child1Path = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, child1Project, rootPath, false);
+        String child2Path = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, child2Project, rootPath, false);
         
         MutableRecord child1Record = recordManager.select(child1Path).copy(false, true);
         long child2Handle = recordManager.select(child2Path).getHandle();
@@ -559,7 +559,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         String rootPath = insertRootProjectWithStages();
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         checkPathTest(childPath);
         
@@ -575,7 +575,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         String rootPath = insertRootProjectWithStages();
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
         
         MutableRecord childRecord = recordManager.select(childPath).copy(false, true);
         childRecord.setSymbolicName("stage");
@@ -588,22 +588,22 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     {
         Project rootProject = new Project("root");
         rootProject.setScm(new Perforce());
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
         
         Project childProject = createChildProject(rootPath, "child");
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, childProject, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, childProject, rootPath, false);
 
         checkPathTest(childPath);
 
         // Now mess up the structure and ensure it is detected.
         recordManager.delete(getPath(childPath, "scm"));
 
-        checkPathTest(childPath, new MissingSkeletonsProblem(childPath, I18N.format("inherited.missing.skeletons", "scm"), rootPath, "scm"));
+        checkPathTest(childPath, new MissingSkeletonsProblem(childPath, I18N.format("inherited.missing.skeletons", "scm"), "scm", rootPath));
     }
 
     public void testCheckPathNormalPath()
     {
-        String path = configurationTemplateManager.insert(SCOPE_NORMAL, new Project("p"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_NORMAL, new Project("p"));
 
         checkPathTest(path);
 
@@ -634,9 +634,9 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         // zeroed out, then the zero needs scrubbing.
         Project rootProject = new Project("root");
         rootProject.addHook(new Hook("h"));
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, rootProject, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, rootProject, null, true);
 
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, createChildProject(rootPath, "child"), rootPath, false);
         String hookPath = getPath(childPath, "hooks", "h");
         MutableRecord hookRecord = recordManager.select(hookPath).copy(false, true);
         hookRecord.put("stage", "invalid");
@@ -665,7 +665,7 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
         {
             root.addStage(new Stage(stage));
         }
-        return configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
+        return configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
     }
 
     private Project createChildProject(String parentPath, String name)
@@ -681,7 +681,8 @@ public class ConfigurationHealthCheckerTest extends AbstractConfigurationSystemT
     private void checkAllTest(HealthProblem... expectedProblems)
     {
         ConfigurationHealthReport expectedReport = new ConfigurationHealthReport(expectedProblems);
-        assertEquals(expectedReport, configurationHealthChecker.checkAll());
+        ConfigurationHealthReport gotReport = configurationHealthChecker.checkAll();
+        assertEquals(expectedReport, gotReport);
 
         ConfigurationHealthReport healedReport = configurationHealthChecker.healAll();
         assertEquals(expectedReport.isSolvable(), healedReport.isHealthy());

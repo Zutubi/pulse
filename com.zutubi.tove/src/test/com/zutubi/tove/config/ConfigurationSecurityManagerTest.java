@@ -47,8 +47,8 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
             }
         });
 
-        pathA1 = configurationTemplateManager.insert(SCOPE_A, new ConfigA("a1"));
-        pathA2 = configurationTemplateManager.insert(SCOPE_A, new ConfigA("a2"));
+        pathA1 = configurationTemplateManager.insertInstance(SCOPE_A, new ConfigA("a1"));
+        pathA2 = configurationTemplateManager.insertInstance(SCOPE_A, new ConfigA("a2"));
 
         ConfigA a = new ConfigA("global");
         MutableRecord record = unstantiate(a);
@@ -61,8 +61,8 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.setParentTemplate(record, handle);
         pathChild = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
 
-        pathB1 = configurationTemplateManager.insert(SCOPE_B, new ConfigB("b1"));
-        configurationTemplateManager.insert(SCOPE_B, new ConfigB("b2"));
+        pathB1 = configurationTemplateManager.insertInstance(SCOPE_B, new ConfigB("b1"));
+        configurationTemplateManager.insertInstance(SCOPE_B, new ConfigB("b2"));
 
         pathNestedB = ((ConfigA) configurationTemplateManager.getInstance(pathA1)).getB().getConfigurationPath();
     }

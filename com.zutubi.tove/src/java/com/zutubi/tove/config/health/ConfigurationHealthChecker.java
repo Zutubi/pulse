@@ -350,16 +350,16 @@ public class ConfigurationHealthChecker
                 Object nested = record.get(key);
                 if (!(nested instanceof Record))
                 {
-                    report.addProblem(new UnsolvableHealthProblem(path, I18N.format("inherited.record.simple.in.child", key)));
+                    report.addProblem(new SimpleOverrideOfComplexProblem(path, I18N.format("inherited.record.simple.in.child", key), key, templateParentPath));
                     return false;
                 }
 
-                String childPath = getPath(path, key);
                 Record nestedRecord = (Record) nested;
                 Record nestedTemplateParentRecord = (Record) templateParentRecord.get(key);
                 if (!Objects.equal(nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName()))
                 {
-                    report.addProblem(new UnsolvableHealthProblem(childPath, I18N.format("inherited.type.mismatch", nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName())));
+                    String message = I18N.format("inherited.type.mismatch", nestedRecord.getSymbolicName(), nestedTemplateParentRecord.getSymbolicName());
+                    report.addProblem(new IncompatibleOverrideOfComplexProblem(path, message, key, templateParentPath));
                     return false;
                 }
 
@@ -370,7 +370,7 @@ public class ConfigurationHealthChecker
             }
             else if (!isHidden(key, record))
             {
-                report.addProblem(new MissingSkeletonsProblem(path, I18N.format("inherited.missing.skeletons", key), templateParentPath, key));
+                report.addProblem(new MissingSkeletonsProblem(path, I18N.format("inherited.missing.skeletons", key), key, templateParentPath));
                 return false;
             }
         }

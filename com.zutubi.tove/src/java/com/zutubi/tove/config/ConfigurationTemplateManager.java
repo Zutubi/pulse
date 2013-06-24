@@ -336,7 +336,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    public String insert(final String path, Object instance)
+    public String insertInstance(final String path, Object instance)
     {
         CompositeType type = getInstanceType(instance);
         try
@@ -371,7 +371,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *                           is null
      * @return the new path at which the instance was inserted.
      */
-    public String insertTemplated(final String scope, Object instance, String templateParentPath, boolean template)
+    public String insertTemplatedInstance(final String scope, Object instance, String templateParentPath, boolean template)
     {
         ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
         if (scopeInfo == null)
@@ -462,7 +462,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return type;
     }
 
-    public String insertRecord(final String path, final MutableRecord r)
+    public String insertRecord(final String path, final Record r)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
@@ -471,7 +471,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         {
             public String process()
             {
-                MutableRecord record = r;
+                MutableRecord record = r.copy(true, true);
 
                 ComplexType type = getType(path);
 
@@ -717,7 +717,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return instance != null && typeRegistry.getType(instance.getClass()) != null;
     }
 
-    private CompositeType checkRecordType(Type expectedType, MutableRecord record)
+    private CompositeType checkRecordType(Type expectedType, Record record)
     {
         if (!(expectedType instanceof CompositeType))
         {
@@ -2089,30 +2089,39 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
     RecordCleanupTask getCleanupTasks(final String path, final boolean checkTemplateParent)
     {
-        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>() {
-            public RecordCleanupTask process() {
+        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>()
+        {
+            public RecordCleanupTask process()
+            {
                 Record record = recordManager.select(path);
-                if (record == null) {
+                if (record == null)
+                {
                     throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
                 }
 
-                if (record.isPermanent()) {
+                if (record.isPermanent())
+                {
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
                 String[] pathElements = PathUtils.getPathElements(path);
-                if (pathElements.length == 1) {
+                if (pathElements.length == 1)
+                {
                     throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete a scope");
                 }
 
-                if (isTemplatedPath(path)) {
+                if (isTemplatedPath(path))
+                {
                     RecordCleanupTaskSupport result;
-                    if (pathElements.length == 2 || !checkTemplateParent) {
+                    if (pathElements.length == 2 || !checkTemplateParent)
+                    {
                         // Deleting an entire templated instance, or sure that
                         // we should delete the record regardless of
                         // inheritance.
                         result = new DeleteRecordCleanupTask(path, false);
-                    } else {
+                    }
+                    else
+                    {
                         // We are not deleting an entire templated instance.
                         // We need to determine if this is a hide or actual
                         // delete.
@@ -2121,17 +2130,23 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                         TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
                         TemplateRecord parentsTemplateParent = parentRecord.getParent();
 
-                        if (parentsTemplateParent == null || !parentsTemplateParent.containsKey(baseName)) {
+                        if (parentsTemplateParent == null || !parentsTemplateParent.containsKey(baseName))
+                        {
                             // This record does not exist in the parent: it
                             // has been added at this level.  It should be
                             // deleted.
                             result = new DeleteRecordCleanupTask(path, false);
-                        } else {
+                        }
+                        else
+                        {
                             // The record exists in the parent.  Check it is
                             // a collection item, and if so hide it.
-                            if (parentRecord.isCollection()) {
+                            if (parentRecord.isCollection())
+                            {
                                 result = new HideRecordCleanupTask(path, false);
-                            } else {
+                            }
+                            else
+                            {
                                 throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete an inherited composite property");
                             }
                         }
@@ -2141,11 +2156,14 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                     // All descendants must be deleted.
                     List<String> descendantPaths = getDescendantPaths(path, true, false, true);
-                    for (String descendantPath : descendantPaths) {
+                    for (String descendantPath : descendantPaths)
+                    {
                         result.addCascaded(getDescendantCleanupTask(descendantPath));
                     }
                     return result;
-                } else {
+                }
+                else
+                {
                     // Much simpler, just delete the record and run custom and reference cleanup tasks.
                     DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false);
                     addAdditionalTasks(path, result);
@@ -2221,20 +2239,25 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        executeInsideTransaction(new NullaryFunction<Object>() {
-            public Object process() {
+        executeInsideTransaction(new NullaryFunction<Object>()
+        {
+            public Object process()
+            {
                 Record record = recordManager.select(path);
-                if (record == null) {
+                if (record == null)
+                {
                     throw new IllegalArgumentException("No such path '" + path + "'");
                 }
-                if (record.isPermanent()) {
+                if (record.isPermanent())
+                {
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
                 List<ConfigurationEvent> events = configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
                 refreshCaches();
 
-                for (ConfigurationEvent e : events) {
+                for (ConfigurationEvent e : events)
+                {
                     publishEvent(e);
                 }
 
@@ -2812,9 +2835,12 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return configurationPersistenceManager.getType(path);
     }
 
-    public List<String> getRootListing()
+    /**
+     * @return the set of all persistent scopes in the configuration system
+     */
+    public Set<String> getPersistentScopes()
     {
-        List<String> result = new LinkedList<String>();
+        Set<String> result = new HashSet<String>();
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
             if (scope.isPersistent())

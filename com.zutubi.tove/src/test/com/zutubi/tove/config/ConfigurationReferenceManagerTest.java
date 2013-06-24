@@ -52,14 +52,14 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         Project p1 = new Project("p1");
         p1.addStage(new Stage("p1s1"));
         p1.addStage(new Stage("p1s2"));
-        configurationTemplateManager.insert("project", p1);
+        configurationTemplateManager.insertInstance("project", p1);
 
         Project p2 = new Project("p2");
         p2.addStage(new Stage("p2s1"));
-        configurationTemplateManager.insert("project", p2);
+        configurationTemplateManager.insertInstance("project", p2);
 
         Project p3 = new Project("p3");
-        configurationTemplateManager.insert("project", p3);
+        configurationTemplateManager.insertInstance("project", p3);
 
         MutableRecord global = projectType.createNewRecord(false);
         global.put("name", "global");
@@ -229,7 +229,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         Subscription subscription = new Subscription(getName());
         subscription.getProjectRefs().add(configurationTemplateManager.getInstance(projectPath, Project.class));
 
-        String path = configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SUBSCRIPTION, subscription);
         subscription = configurationTemplateManager.getInstance(path, Subscription.class);
         assertSame(configurationTemplateManager.getInstance(projectPath), subscription.getProjectRefs().get(0));
     }
@@ -259,7 +259,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         Subscription subscription = new Subscription(getName());
         subscription.setStageRef(configurationTemplateManager.getInstance(stagePath, Stage.class));
 
-        String path = configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SUBSCRIPTION, subscription);
         subscription = configurationTemplateManager.getInstance(path, Subscription.class);
         assertSame(configurationTemplateManager.getInstance(stagePath), subscription.getStageRef());
     }
@@ -285,7 +285,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         // subscription scope is instantiated first, this triggers CIB-2622.
         Subscription subscription = new Subscription(getName());
         subscription.getProjectRefs().add(configurationTemplateManager.getInstance(PATH_TEMPLATE_CHILD, Project.class));
-        configurationTemplateManager.insert(SCOPE_SUBSCRIPTION, subscription);
+        configurationTemplateManager.insertInstance(SCOPE_SUBSCRIPTION, subscription);
 
         hookReferencesStageHelper(PATH_TEMPLATE_CHILD, "default");
     }

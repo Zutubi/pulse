@@ -39,7 +39,7 @@ public class InvalidReferenceProblem extends HealthProblemSupport
     public void solve(RecordManager recordManager)
     {
         // For single references, we null (zero) the invalid value out.  For
-        // collections, we filter out all occurences of the bad reference.
+        // collections, we filter out all occurrences of the bad reference.
         Record record = recordManager.select(getPath());
         if (record != null)
         {

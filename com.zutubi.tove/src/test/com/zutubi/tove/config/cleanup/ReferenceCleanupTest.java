@@ -47,23 +47,23 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
 
         RefProject global = new RefProject(PROJECT_GLOBAL);
         global.putMeta(TemplateRecord.TEMPLATE_KEY, "true");
-        globalPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, global);
+        globalPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, global);
         this.global = configurationTemplateManager.getInstance(globalPath, RefProject.class);
 
         RefProject referee = createProject(PROJECT_REFEREE1);
-        String refereePath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referee);
+        String refereePath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referee);
         referee1 = configurationTemplateManager.getInstance(refereePath, RefProject.class);
 
         referee = createProject(PROJECT_REFEREE2);
-        refereePath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referee);
+        refereePath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referee);
         referee2 = configurationTemplateManager.getInstance(refereePath, RefProject.class);
 
         referee = createProject(PROJECT_REFEREE3);
-        refereePath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referee);
+        refereePath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referee);
         referee3 = configurationTemplateManager.getInstance(refereePath, RefProject.class);
 
         referee = createProject(PROJECT_REFEREE4);
-        refereePath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referee);
+        refereePath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referee);
         referee4 = configurationTemplateManager.getInstance(refereePath, RefProject.class);
 
         listener = registerListener();
@@ -73,7 +73,7 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
     {
         RefProject referer = createProject("referer");
         referer.setProjectRef(referee1);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
 
         listener.clearEvents();
@@ -93,11 +93,11 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
     {
         RefProject parent = createProject("parent", globalPath, true);
         parent.setProjectRef(referee1);
-        String parentPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, parent);
+        String parentPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, parent);
         
         RefProject referer = createProject("referer", parentPath, false);
         referer.setProjectRef(referee1);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(referrerPath);
         assertEquals("parent", record.getOwner(PROPERTY_PROJECT_REF));
@@ -126,7 +126,7 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
     {
         RefProject referer = createProject("referer");
         referer.getProjectRefList().add(referee1);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
 
         listener.clearEvents();
@@ -143,11 +143,11 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
     {
         RefProject parent = createProject("parent", globalPath, true);
         parent.getProjectRefList().add(referee1);
-        String parentPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, parent);
+        String parentPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, parent);
         
         RefProject referer = createProject("referer", parentPath, false);
         referer.setProjectRefList(null);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(referrerPath);
         assertEquals("parent", record.getOwner("projectRefList"));
@@ -176,7 +176,7 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         list.add(referee1);
         list.add(referee2);
         list.add(referee3);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
 
         listener.clearEvents();
@@ -197,11 +197,11 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         RefProject parent = createProject("parent", globalPath, true);
         parent.getProjectRefList().add(referee1);
         parent.getProjectRefList().add(referee2);
-        String parentPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, parent);
+        String parentPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, parent);
 
         RefProject referer = createProject("referer", parentPath, false);
         referer.setProjectRefList(null);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
         referer = configurationTemplateManager.getInstance(referrerPath, RefProject.class);
         referer.getProjectRefList().add(referee3);
@@ -227,11 +227,11 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         RefProject parent = createProject("parent", globalPath, true);
         parent.getProjectRefList().add(referee1);
         parent.getProjectRefList().add(referee2);
-        String parentPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, parent);
+        String parentPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, parent);
 
         RefProject referer = createProject("referer", parentPath, false);
         referer.setProjectRefList(null);
-        String referrerPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String referrerPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
         referer = configurationTemplateManager.getInstance(referrerPath, RefProject.class);
         referer.getProjectRefList().add(referee3);
@@ -258,7 +258,7 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         Holder holder = new Holder();
         holder.setRequiredProjectRef(referee1);
         referer.setHolder(holder);
-        String refererPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String refererPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
 
         listener.clearEvents();
@@ -277,10 +277,10 @@ public class ReferenceCleanupTest extends AbstractConfigurationSystemTestCase
         holder.setRequiredProjectRef(referee1);
         RefProject parent = createProject("parent", globalPath, true);
         parent.setHolder(holder);
-        String parentPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, parent);
+        String parentPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, parent);
 
         RefProject referer = createProject("referer", parentPath, false);
-        String refererPath = configurationTemplateManager.insert(SCOPE_TEMPLATED, referer);
+        String refererPath = configurationTemplateManager.insertInstance(SCOPE_TEMPLATED, referer);
 
 
         listener.clearEvents();

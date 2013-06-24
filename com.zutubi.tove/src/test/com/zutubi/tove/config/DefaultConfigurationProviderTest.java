@@ -67,7 +67,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         A a = new A("a");
 
         // check the insert events.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         listener.assertNextEvent(InsertEvent.class, "sample/a");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a");
         listener.assertNoMoreEvents();
@@ -99,13 +99,13 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         A a = new A("a");
 
         // check the insert events.
-        String aPath = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String aPath = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         includingChildren.assertNextEvent(InsertEvent.class, "sample/a");
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
-        configurationTemplateManager.insert("sample/a/b", new B("b"));
+        configurationTemplateManager.insertInstance("sample/a/b", new B("b"));
         includingChildren.assertNextEvent(InsertEvent.class, "sample/a/b");
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
@@ -151,7 +151,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         a.setB(new B("b"));
 
         // check the insert event.
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         listener.assertNextEvent(InsertEvent.class, "sample/a/b");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         listener.assertNoMoreEvents();

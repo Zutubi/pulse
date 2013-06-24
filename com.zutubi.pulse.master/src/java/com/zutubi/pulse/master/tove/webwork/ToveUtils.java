@@ -157,7 +157,7 @@ public class ToveUtils
 
         if (path.length() == 0)
         {
-            listing = configurationTemplateManager.getRootListing();
+            listing = new ArrayList<String>(configurationTemplateManager.getPersistentScopes());
             Collections.sort(listing, STRING_COMPARATOR);
             listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
         }
@@ -166,7 +166,7 @@ public class ToveUtils
             Record record = configurationTemplateManager.getRecord(path);
             if (record != null)
             {
-                listing = new LinkedList<String>(((CollectionType) type).getOrder(record));
+                listing = new ArrayList<String>(((CollectionType) type).getOrder(record));
                 listing = configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
             }
         }

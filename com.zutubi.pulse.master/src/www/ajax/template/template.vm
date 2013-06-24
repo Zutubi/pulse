@@ -34,6 +34,12 @@
     </tr>
 #end
 #end
+#auth("path=$path" "action=administer")
+    <tr>
+        #actionHeader("export" "export" "export" "actionPath('#jss(${path})', 'export', false, false)")
+        <td>export the configuration of this #i18n("key=label") #if(!$concrete) template and its descendants #end to a file</td>
+    </tr>
+#end
 #if(!$concrete)
 #auth("path=$path" "action=create")
     <tr>
@@ -43,6 +49,12 @@
     <tr>
         #actionHeader("add.template" "add new template" "add" "addToPath('#jss($path)', true)")
         <td>add a new #i18n("key=label") template as a child of this template</td>
+    </tr>
+#end
+#auth("path=$path" "action=administer")
+    <tr>
+        #actionHeader("import" "import" "import" "actionPath('#jss(${path})', 'import', false, false)")
+        <td>import a #i18n("key=label") as a child of this template</td>
     </tr>
 #end
 #end

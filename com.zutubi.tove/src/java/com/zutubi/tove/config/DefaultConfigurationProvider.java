@@ -162,7 +162,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public String insert(String parentPath, Configuration instance)
     {
-        return configurationTemplateManager.insert(parentPath, instance);
+        return configurationTemplateManager.insertInstance(parentPath, instance);
     }
 
     public String save(Configuration instance)

@@ -6,19 +6,22 @@ import com.zutubi.tove.type.record.Record;
 
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 
-public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
+public class IncompatibleOverrideOfComplexProblemTest extends AbstractHealthProblemTestCase
 {
     private static final String PARENT_PATH = "parent";
     private static final String PATH = "child";
     private static final String KEY = "key";
-    
-    private MissingSkeletonsProblem problem;
+
+    private static final String TYPE1 = "type1";
+    private static final String TYPE2 = "type2";
+
+    private IncompatibleOverrideOfComplexProblem problem;
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        problem = new MissingSkeletonsProblem(PATH, "message", KEY, PARENT_PATH);
+        problem = new IncompatibleOverrideOfComplexProblem(PATH, "message", KEY, PARENT_PATH);
     }
 
     public void testParentRecordDoesNotExist()
@@ -51,23 +54,26 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
         problem.solve(recordManager);
     }
 
-    public void testSkeletonExists()
+    public void testCompatibleExists()
     {
         MutableRecord parent = new MutableRecordImpl();
-        parent.put(KEY, new MutableRecordImpl());
+        MutableRecordImpl inherited = new MutableRecordImpl();
+        inherited.setSymbolicName(TYPE1);
+        parent.put(KEY, inherited);
         recordManager.insert(PARENT_PATH, parent);
 
         MutableRecord child = new MutableRecordImpl();
-        MutableRecord skeleton = new MutableRecordImpl();
-        skeleton.put("foo", "bar");
-        child.put(KEY, skeleton);
+        MutableRecord compatible = new MutableRecordImpl();
+        compatible.setSymbolicName(TYPE1);
+        compatible.put("foo", "bar");
+        child.put(KEY, compatible);
         recordManager.insert(PATH, child);
         
         problem.solve(recordManager);
         
-        Record skeletonAfter = recordManager.select(getPath(PATH, KEY));
-        assertNotNull(skeletonAfter);
-        assertEquals("bar", skeletonAfter.get("foo"));
+        Record compatibleAfter = recordManager.select(getPath(PATH, KEY));
+        assertNotNull(compatibleAfter);
+        assertEquals("bar", compatibleAfter.get("foo"));
     }
 
     public void testChildRecordContainsSimpleKey()
@@ -85,16 +91,19 @@ public class MissingSkeletonsProblemTest extends AbstractHealthProblemTestCase
         assertFalse(recordManager.containsRecord(getPath(PATH, KEY)));
     }
     
-    public void testCreateSkeleton()
+    public void testReplaceIncompatibleWithSkeleton()
     {
         MutableRecord parent = new MutableRecordImpl();
         MutableRecord inherited = new MutableRecordImpl();
+        inherited.setSymbolicName(TYPE1);
         inherited.put("simple", "value");
         inherited.put("nested", new MutableRecordImpl());
         parent.put(KEY, inherited);
         recordManager.insert(PARENT_PATH, parent);
 
-        recordManager.insert(PATH, new MutableRecordImpl());
+        MutableRecordImpl incompatible = new MutableRecordImpl();
+        incompatible.setSymbolicName(TYPE2);
+        recordManager.insert(PATH, incompatible);
         problem.solve(recordManager);
         
         Record skeleton = recordManager.select(getPath(PATH, KEY));

@@ -1635,118 +1635,15 @@ public class ConfigurationRefactoringManager
         }
     }
 
-    /**
-     * Base class for record walking functions that need to be aware of the
-     * types of the records.
-     */
-    private static abstract class TypeAwareFunction implements GraphFunction<Record>
-    {
-        protected Stack<ComplexType> typeStack = new Stack<ComplexType>();
-        protected Stack<Record> recordStack = new Stack<Record>();
-        protected String path;
-
-        public TypeAwareFunction(ComplexType type, Record record, String path)
-        {
-            typeStack.push(type);
-            recordStack.push(record);
-            this.path = path;
-        }
-
-        public void push(String edge)
-        {
-            path = PathUtils.getPath(path, edge);
-            Record record = (Record) recordStack.peek().get(edge);
-            typeStack.push((ComplexType) typeStack.peek().getActualPropertyType(edge, record));
-            recordStack.push(record);
-        }
-
-        public void process(Record record)
-        {
-            process(path, record, typeStack.peek());
-        }
-
-        public void pop()
-        {
-            path = PathUtils.getParentPath(path);
-            recordStack.pop();
-            typeStack.pop();
-        }
-
-        protected abstract void process(String path, Record record, Type type);
-    }
-
-    /**
-     * Base for record walking functions that process references in those
-     * records in some way.
-     */
-    private abstract class ReferenceWalkingFunction extends TypeAwareFunction
+    private abstract class TemplateOwnerAwareReferenceUpdatingFunction extends ReferenceUpdatingFunction
     {
         protected String templateOwnerPath;
 
-        public ReferenceWalkingFunction(ComplexType type, Record record, String path)
+        public TemplateOwnerAwareReferenceUpdatingFunction(ComplexType type, MutableRecord record, String path)
         {
             super(type, record, path);
             templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
         }
-
-        protected  void process(String path, Record record, Type type)
-        {
-            if (type instanceof CompositeType)
-            {
-                CompositeType compositeType = (CompositeType) type;
-                for (TypeProperty property: compositeType.getProperties(ReferenceType.class))
-                {
-                    String value = (String) record.get(property.getName());
-                    if (value != null)
-                    {
-                        handleReference(path, record, property, value);
-                    }
-                }
-
-                for (TypeProperty property: compositeType.getProperties(ListType.class))
-                {
-                    Type targetType = property.getType().getTargetType();
-                    if (targetType instanceof ReferenceType)
-                    {
-                        String[] value = (String[]) record.get(property.getName());
-                        if (value != null)
-                        {
-                            handleReferenceList(path, record, property, value);
-                        }
-                    }
-                }
-            }
-        }
-
-        protected abstract void handleReferenceList(String path, Record record, TypeProperty property, String[] value);
-        protected abstract void handleReference(String path, Record record, TypeProperty property, String value);
-    }
-
-    /**
-     * Base for reference walking functions that update references in place.
-     * Returns a mutable record as input.
-     */
-    private abstract class ReferenceUpdatingFunction extends ReferenceWalkingFunction
-    {
-        public ReferenceUpdatingFunction(ComplexType type, MutableRecord record, String path)
-        {
-            super(type, record, path);
-        }
-
-        protected void handleReferenceList(String path, Record record, TypeProperty property, String[] value)
-        {
-            for (int i = 0; i < value.length; i++)
-            {
-                value[i] = updateReference(value[i]);
-            }
-        }
-
-        protected void handleReference(String path, Record record, TypeProperty property, String value)
-        {
-            ((MutableRecord) record).put(property.getName(), updateReference(value));
-        }
-
-        protected abstract String updateReference(String value);
     }
 
     /**
@@ -1755,7 +1652,7 @@ public class ConfigurationRefactoringManager
      * all pulled-up references use the handle from the first sibling in the
      * smart clone operation -- the from owner is this sibling.
      */
-    private class PullUpReferencesFunction extends ReferenceUpdatingFunction
+    private class PullUpReferencesFunction extends TemplateOwnerAwareReferenceUpdatingFunction
     {
         private String fromOwnerPath;
 
@@ -1803,7 +1700,7 @@ public class ConfigurationRefactoringManager
      * internal references may be pointing to items that have now been pulled
      * up into the parent -- these reference handles need fixing.
      */
-    private class CanonicaliseReferencesFunction extends ReferenceUpdatingFunction
+    private class CanonicaliseReferencesFunction extends TemplateOwnerAwareReferenceUpdatingFunction
     {
         public CanonicaliseReferencesFunction(ComplexType type, MutableRecord record, String path)
         {
@@ -2206,7 +2103,7 @@ public class ConfigurationRefactoringManager
 
         private void transferExternalState(CompositeType type, Record fromRecord, final MutableRecord toRecord)
         {
-            fromRecord.forEach(new TypeAwareFunction(type, fromRecord, "")
+            fromRecord.forEach(new TypeAwareRecordWalkingFunction(type, fromRecord, "")
             {
                 @Override
                 protected void process(String path, Record record, Type type)

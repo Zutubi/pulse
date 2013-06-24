@@ -137,35 +137,35 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
                 emailContact.setPrimary(true);
                 adminUser.getPreferences().addContact(emailContact);
             }
-            configurationTemplateManager.insert(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.USERS_SCOPE, adminUser);
 
             // Special all-users group.
             BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, Role.USER);
             allUsersGroup.setPermanent(true);
-            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
 
             // Special anonymous users group.
             BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, Role.GUEST);
             anonymousUsersGroup.setPermanent(true);
-            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
             
             // create an administrators group (for convenience)
             UserGroupConfiguration adminGroup = new UserGroupConfiguration(UserManager.ADMINS_GROUP_NAME);
             adminGroup.addServerPermission(ServerPermission.ADMINISTER);
             adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
-            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, adminGroup);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, adminGroup);
 
             // and a project admins group that has admin access to all projects
             UserGroupConfiguration projectAdmins = new UserGroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
             projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
             projectAdmins.addServerPermission(ServerPermission.CREATE_PROJECT);
             projectAdmins.addServerPermission(ServerPermission.DELETE_PROJECT);
-            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
 
             // and a developers group that has personal build access (for convenience)
             UserGroupConfiguration developersGroup = new UserGroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
             developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
-            configurationTemplateManager.insert(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
+            configurationTemplateManager.insertInstance(MasterConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
             // apply the settings
             MutableRecord record = configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).copy(false, true);

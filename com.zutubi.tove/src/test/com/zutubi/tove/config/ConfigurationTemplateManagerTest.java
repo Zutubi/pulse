@@ -73,7 +73,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testInsertIntoCollection()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("sample/a");
         assertNotNull(loaded);
@@ -84,10 +84,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testInsertIntoObject()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         ConfigB b = new ConfigB("b");
-        configurationTemplateManager.insert("sample/a/composite", b);
+        configurationTemplateManager.insertInstance("sample/a/composite", b);
 
         ConfigB loaded = (ConfigB) configurationTemplateManager.getInstance("sample/a/composite");
         assertNotNull(loaded);
@@ -97,14 +97,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testInsertExistingPath()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         ConfigB b = new ConfigB("b");
-        configurationTemplateManager.insert("sample/a/composite", b);
+        configurationTemplateManager.insertInstance("sample/a/composite", b);
 
         try
         {
-            configurationTemplateManager.insert("sample/a/composite", b);
+            configurationTemplateManager.insertInstance("sample/a/composite", b);
             fail();
         }
         catch (IllegalArgumentException e)
@@ -126,7 +126,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         try
         {
-            configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
+            configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("a"));
             fail();
         }
         catch (Exception e)
@@ -137,7 +137,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertTemplatedRoot()
     {
-        String path = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        String path = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
         assertEquals(getPath(SCOPE_TEMPLATED, "root"), path);
 
         Record record = configurationTemplateManager.getRecord(path);
@@ -154,13 +154,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         root.setC("c");
         root.getCs().put("c1", new ConfigC("c1"));
 
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
 
         ConfigA child = new ConfigA("child");
         child.setB("b");
         child.setC("override");
 
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, child, rootPath, false);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, child, rootPath, false);
 
         assertEquals(getPath(SCOPE_TEMPLATED, "child"), childPath);
 
@@ -187,8 +187,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             root.addC(new ConfigC(name));
         }
 
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
 
 
         String collectionPath = getPath(childPath, "cs");
@@ -213,8 +213,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
             root.addC(new ConfigC(name));
         }
 
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, root, null, true);
-        String childPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
 
         String collectionPath = getPath(childPath, "cs");
         configurationTemplateManager.setOrder(collectionPath, EXPLICIT_ORDER);
@@ -234,7 +234,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated("invalid", new ConfigA(), null, true);
+            configurationTemplateManager.insertTemplatedInstance("invalid", new ConfigA(), null, true);
             fail("Should not be able to insert into invalid scope");
         }
         catch (Exception e)
@@ -247,7 +247,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_SAMPLE, new ConfigA(), null, true);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_SAMPLE, new ConfigA(), null, true);
             fail("Should not be able to insert into a non-templated scope");
         }
         catch (Exception e)
@@ -260,7 +260,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigB(), null, true);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigB(), null, true);
             fail("Should not be able to insert an item of the wrong type");
         }
         catch (Exception e)
@@ -273,7 +273,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), getPath(SCOPE_TEMPLATED, "invalid"), true);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("joe"), getPath(SCOPE_TEMPLATED, "invalid"), true);
             fail("Should not be able to insert an item with an invalid parent");
         }
         catch (Exception e)
@@ -284,10 +284,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertTemplatedTemplateParentNotItemOfSameCollection()
     {
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bad parental"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("bad parental"));
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), path, true);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("joe"), path, true);
             fail("Should not be able to insert an item with a bad parent");
         }
         catch (Exception e)
@@ -298,11 +298,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertTemplatedTemplateParentConcrete()
     {
-        String rootPath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
-        String concretePath = configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("conker"), rootPath, false);
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        String concretePath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("conker"), rootPath, false);
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("joe"), concretePath, false);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("joe"), concretePath, false);
             fail("Should not be able to insert an item with a concrete parent");
         }
         catch (Exception e)
@@ -315,7 +315,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, false);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("root"), null, false);
             fail("Should not be able to insert a concrete item as the scope root");
         }
         catch (Exception e)
@@ -326,10 +326,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testInsertTemplatedSecondRoot()
     {
-        configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
+        configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("root"), null, true);
         try
         {
-            configurationTemplateManager.insertTemplated(SCOPE_TEMPLATED, new ConfigA("twoot"), null, true);
+            configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("twoot"), null, true);
             fail("Should not be able to insert a second root");
         }
         catch (Exception e)
@@ -341,7 +341,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testSave()
     {
         ConfigA a = new ConfigA("a");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNotNull(a);
@@ -359,7 +359,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals("b", a.getComposite().getB());
@@ -375,7 +375,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testSaveInsertsTransitively()
     {
         ConfigA a = new ConfigA("a");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(0, a.getCs().size());
@@ -404,7 +404,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("a");
         a.getCs().put("c", c);
 
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
@@ -425,7 +425,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testSaveChildObjectAdded()
     {
         ConfigA a = new ConfigA("a");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNull(a.getComposite());
@@ -443,7 +443,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNotNull(a.getComposite());
@@ -460,7 +460,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testSaveCollectionElementAdded()
     {
         ConfigA a = new ConfigA("a");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(0, a.getCs().size());
@@ -478,7 +478,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.getCs().put("jim", new ConfigC("jim"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(1, a.getCs().size());
@@ -494,7 +494,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testSaveNoPermission()
     {
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("a"));
 
         accessManager.setActorProvider(new ActorProvider()
         {
@@ -520,7 +520,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testRename()
     {
         ConfigA a = new ConfigA("a");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertNotNull(a);
@@ -557,7 +557,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
 
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertEquals(4, events.size());
         assertTrue(events.get(0) instanceof InsertEvent);
@@ -648,7 +648,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigB b = new ConfigB("bburger");
         a.setComposite(b);
 
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = configurationTemplateManager.getInstance("sample/aburger", ConfigA.class);
         ConfigA aClone = configurationTemplateManager.deepClone(a);
@@ -664,14 +664,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testDeepCloneWithReferences()
     {
         Referee ee = new Referee("ee");
-        configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        configurationTemplateManager.insertInstance(SCOPE_REFEREE, ee);
         ee = configurationTemplateManager.getInstance("referee/ee", Referee.class);
 
         Referer er = new Referer("er");
         er.setRefToRef(ee);
         er.getRefToRefs().add(ee);
 
-        configurationTemplateManager.insert(SCOPE_REFERER, er);
+        configurationTemplateManager.insertInstance(SCOPE_REFERER, er);
         er = configurationTemplateManager.getInstance("referer/er", Referer.class);
         ee = configurationTemplateManager.getInstance("referee/ee", Referee.class);
 
@@ -692,7 +692,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         Referee ee = new Referee("ee");
         Referer er = new Referer("er");
         er.setRef(ee);
-        configurationTemplateManager.insert(SCOPE_REFERER, er);
+        configurationTemplateManager.insertInstance(SCOPE_REFERER, er);
         er = configurationTemplateManager.getInstance("referer/er", Referer.class);
         er = configurationTemplateManager.deepClone(er);
         ee = er.getRef();
@@ -721,7 +721,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.setComposite(new ConfigB("b"));
         a.getCs().put("c", new ConfigC("c"));
         a.getDs().add(new ConfigD("d"));
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = (ConfigA) configurationTemplateManager.getInstance("sample/a");
 
@@ -738,7 +738,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.setComposite(new ConfigB("b"));
         a.getCs().put("c", new ConfigC("c"));
         a.getDs().add(new ConfigD("d"));
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         a = (ConfigA) configurationTemplateManager.getInstance("sample/a");
 
@@ -848,7 +848,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB());
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         ConfigB instance = configurationTemplateManager.getInstance("sample/a/composite", ConfigB.class);
         final List<String> errors = instance.getFieldErrors("b");
@@ -876,7 +876,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, record);
 
-        configurationTemplateManager.insert("template/a/composite", new ConfigB());
+        configurationTemplateManager.insertInstance("template/a/composite", new ConfigB());
 
         ConfigB instance = configurationTemplateManager.getInstance("template/a/composite", ConfigB.class);
         assertTrue(instance.isValid());
@@ -965,7 +965,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("test");
         a.setPermanent(true);
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertFalse(configurationTemplateManager.canDelete(path));
     }
 
@@ -977,7 +977,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCanDeleteSimple()
     {
         ConfigA a = new ConfigA("test");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.canDelete(path));
     }
 
@@ -985,7 +985,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("test");
         a.setComposite(new ConfigB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.canDelete(getPath(path, "composite")));
     }
 
@@ -993,7 +993,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("test");
         a.getCs().put("cee", new ConfigC("cee"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.canDelete(getPath(path, "cs/cee")));
     }
 
@@ -1026,7 +1026,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testDelete()
     {
         ConfigA a = new ConfigA("test");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         configurationTemplateManager.delete(path);
 
@@ -1041,7 +1041,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         {
             ConfigA a = new ConfigA("test");
             a.setPermanent(true);
-            String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+            String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
             configurationTemplateManager.delete(path);
             fail();
@@ -1065,7 +1065,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
     public void testDeleteNoPermission()
     {
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("a"));
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("a"));
         configurationSecurityManager.registerGlobalPermission("sample/*", AccessManager.ACTION_DELETE, AccessManager.ACTION_DELETE);
         accessManager.setActorProvider(new ActorProvider()
         {
@@ -1099,7 +1099,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testDeleteAllTrivial()
     {
         ConfigA a = new ConfigA("test");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertEquals(1, configurationTemplateManager.deleteAll(path));
 
@@ -1117,8 +1117,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a1 = new ConfigA("a1");
         ConfigA a2 = new ConfigA("a2");
-        String path1 = configurationTemplateManager.insert(SCOPE_SAMPLE, a1);
-        String path2 = configurationTemplateManager.insert(SCOPE_SAMPLE, a2);
+        String path1 = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a1);
+        String path2 = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a2);
 
         assertEquals(2, configurationTemplateManager.deleteAll("sample/*"));
 
@@ -1139,8 +1139,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         ConfigA tempA = new ConfigA("tempA");
         ConfigA permA = new ConfigA("permA");
         permA.setPermanent(true);
-        String path1 = configurationTemplateManager.insert(SCOPE_SAMPLE, tempA);
-        String path2 = configurationTemplateManager.insert(SCOPE_SAMPLE, permA);
+        String path1 = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, tempA);
+        String path2 = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, permA);
 
         assertEquals(1, configurationTemplateManager.deleteAll("sample/*"));
 
@@ -1163,7 +1163,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.getDs().add(d1);
         a.getDs().add(d2);
 
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         a = configurationTemplateManager.getInstance(path, ConfigA.class);
         assertEquals(2, a.getDs().size());
         assertEquals("d1", a.getDs().get(0).getName());
@@ -1240,14 +1240,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testPathExistsExistantPath()
     {
         ConfigA a = new ConfigA("test");
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertTrue(configurationTemplateManager.pathExists(path));
     }
 
     public void testEventGeneratedOnSave()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         RecordingEventListener listener = new RecordingEventListener();
         eventManager.register(listener);
@@ -1272,7 +1272,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         eventManager.register(listener);
 
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertEquals(2, listener.getEvents().size());
         Event evt = listener.getEvents().get(0);
@@ -1284,7 +1284,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testEventsGeneratedOnDelete()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         RecordingEventListener listener = new RecordingEventListener();
         eventManager.register(listener);
@@ -1309,7 +1309,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         eventManager.register(listener);
 
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertEquals(1, listener.getEvents().size());
 
@@ -1327,7 +1327,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         eventManager.register(listener);
 
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertEquals(1, listener.getEvents().size());
 
@@ -1342,7 +1342,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         transaction.begin();
 
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertNotNull(configurationTemplateManager.getInstance("sample/a"));
 
@@ -1357,7 +1357,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         transaction.begin();
 
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         assertNotNull(configurationTemplateManager.getInstance("sample/a"));
 
@@ -1404,7 +1404,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertFalse(configurationTemplateManager.existsInTemplateParent(getPath(path, "composite")));
     }
 
@@ -1494,7 +1494,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
         assertFalse(configurationTemplateManager.isOverridden(getPath(path, "composite")));
     }
 
@@ -1616,7 +1616,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         ReadOnlyFieldA a = new ReadOnlyFieldA("id", "A");
 
-        String path = configurationTemplateManager.insert("readOnlyFields", a);
+        String path = configurationTemplateManager.insertInstance("readOnlyFields", a);
         a = (ReadOnlyFieldA) configurationTemplateManager.getInstance(path);
         a.setA("B");
 
@@ -1639,7 +1639,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         ReadOnlyFieldA a = new ReadOnlyFieldA("id", "A");
 
-        String path = configurationTemplateManager.insert("readOnlyFields", a);
+        String path = configurationTemplateManager.insertInstance("readOnlyFields", a);
         a = (ReadOnlyFieldA) configurationTemplateManager.getInstance(path);
         a.setA("A");
 
@@ -1728,14 +1728,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         // Inserting a new collection entry should refresh the parent instance.
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("bar"));
         assertNotSame(collection, configurationTemplateManager.getInstance(SCOPE_SAMPLE));
     }
 
     public void testCacheUpdateUpdatesParent()
     {
         // Updating a collection entry should refresh the parent instance.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("foo"));
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
 
         ConfigA item = configurationTemplateManager.getInstance(path, ConfigA.class);
@@ -1749,7 +1749,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCacheDeleteUpdatesParent()
     {
         // Deleting a collection entry should refresh the parent instance.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("foo"));
         Configuration collection = configurationTemplateManager.getInstance(SCOPE_SAMPLE);
 
         configurationTemplateManager.delete(path);
@@ -1761,10 +1761,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         // Inserting a new collection entry should not cause existing items in
         // that collection to refresh.
-        String path = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
+        String path = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("foo"));
         ConfigA sibling = configurationTemplateManager.getInstance(path, ConfigA.class);
 
-        configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("bar"));
         assertSame(sibling, configurationTemplateManager.getInstance(path, ConfigA.class));
     }
 
@@ -1772,8 +1772,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         // Updating a collection entry should not cause other items in that
         // collection to refresh.
-        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
-        String changedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        String unchangedPath = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("foo"));
+        String changedPath = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("bar"));
         ConfigA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, ConfigA.class);
 
         ConfigA item = configurationTemplateManager.getInstance(changedPath, ConfigA.class);
@@ -1788,8 +1788,8 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         // Deleting a collection entry should not cause other items in that
         // collection to refresh.
-        String unchangedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("foo"));
-        String deletedPath = configurationTemplateManager.insert(SCOPE_SAMPLE, new ConfigA("bar"));
+        String unchangedPath = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("foo"));
+        String deletedPath = configurationTemplateManager.insertInstance(SCOPE_SAMPLE, new ConfigA("bar"));
         ConfigA unchangedInstance = configurationTemplateManager.getInstance(unchangedPath, ConfigA.class);
 
         configurationTemplateManager.delete(deletedPath);
@@ -1800,26 +1800,26 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCacheUpdateUpdatesReferers()
     {
         Referee ee = new Referee("ee");
-        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        String refereePath = configurationTemplateManager.insertInstance(SCOPE_REFEREE, ee);
         ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
         Referer er = new Referer("er");
         er.setRefToRef(ee);
 
-        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        String refererPath = configurationTemplateManager.insertInstance(SCOPE_REFERER, er);
         updateRefereeAndCheck(refereePath, refererPath);
     }
 
     public void testCacheUpdateUpdatesReferersCollection()
     {
         Referee ee = new Referee("ee");
-        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        String refereePath = configurationTemplateManager.insertInstance(SCOPE_REFEREE, ee);
         ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
         Referer er = new Referer("er");
         er.getRefToRefs().add(ee);
 
-        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        String refererPath = configurationTemplateManager.insertInstance(SCOPE_REFERER, er);
         updateRefereeAndCheck(refereePath, refererPath);
     }
 
@@ -1840,13 +1840,13 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCacheDeleteUpdatesReferers()
     {
         Referee ee = new Referee("ee");
-        String refereePath = configurationTemplateManager.insert(SCOPE_REFEREE, ee);
+        String refereePath = configurationTemplateManager.insertInstance(SCOPE_REFEREE, ee);
         ee = configurationTemplateManager.getInstance(refereePath, Referee.class);
 
         Referer er = new Referer("er");
         er.setRefToRef(ee);
 
-        String refererPath = configurationTemplateManager.insert(SCOPE_REFERER, er);
+        String refererPath = configurationTemplateManager.insertInstance(SCOPE_REFERER, er);
         Configuration erCollection = configurationTemplateManager.getInstance(SCOPE_REFERER);
         er = configurationTemplateManager.getInstance(refererPath, Referer.class);
 
@@ -2049,7 +2049,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testGetAncestorOfType_Self()
     {
         ConfigA a = new ConfigA("a");
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a"));
         assertNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class));
@@ -2059,7 +2059,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "composite"));
         ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
@@ -2070,7 +2070,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.getCs().put("cee", new ConfigC("cee"));
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "cs", "cee"));
         ConfigA ancestor = configurationTemplateManager.getAncestorOfType(loaded, ConfigA.class);
@@ -2081,7 +2081,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         ConfigA a = new ConfigA("a");
         a.setComposite(new ConfigB("b"));
-        configurationTemplateManager.insert(SCOPE_SAMPLE, a);
+        configurationTemplateManager.insertInstance(SCOPE_SAMPLE, a);
 
         Configuration loaded = configurationTemplateManager.getInstance(getPath(SCOPE_SAMPLE, "a", "composite"));
         assertNull(configurationTemplateManager.getAncestorOfType(loaded, ConfigC.class));
@@ -2098,7 +2098,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         ExtensionConfig extended = new ExtensionConfig("extended");
         extended.setComposite(new ConfigA("a"));
-        configurationTemplateManager.insert(scope, extended);
+        configurationTemplateManager.insertInstance(scope, extended);
 
         ConfigA loaded = (ConfigA) configurationTemplateManager.getInstance("base/extended/composite");
         assertNotNull(loaded);
