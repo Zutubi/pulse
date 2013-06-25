@@ -28,7 +28,7 @@ public class ConfigurationArchiver
      * @param file the file to archive the records in
      * @param mode determines how an existing file is handled
      * @param version version string to store in the archive, for verification at restore time
-     * @param scope configuration scope to export from - must be a collection
+     * @param scope configuration scope to export from - must be a map
      * @param items keys of the collection items from the scope to archive
      * @throws ToveRuntimeException on error writing to the given file
      */
@@ -85,6 +85,7 @@ public class ConfigurationArchiver
         MutableRecord record = serialiser.deserialise(file);
         final ArchiveRecord archiveRecord = new ArchiveRecord(record);
         versionChecker.checkVersion(archiveRecord.getVersion());
+        verifyScopes(file, archiveRecord);
 
         // References are tricky.  Some may refer to things that are not in the archive, and can be discarded.  But
         // we want to preserve any that refer to other things within the archive.  The tricky part is they use
@@ -93,7 +94,7 @@ public class ConfigurationArchiver
         final Multimap<String, Long> pathToReferencedHandles = ArrayListMultimap.create();
         final Map<Long, String> handleToPath = new HashMap<Long, String>();
 
-        extractReferences(file, archiveRecord, pathToReferencedHandles, handleToPath);
+        extractReferences(archiveRecord, pathToReferencedHandles, handleToPath);
 
         configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Void>()
         {
@@ -102,6 +103,8 @@ public class ConfigurationArchiver
                 List<String> insertedPaths = new ArrayList<String>();
                 for (String scope : archiveRecord.getScopes())
                 {
+                    MapType itemType = (MapType) configurationTemplateManager.getType(scope);
+                    Set<String> existingItems = new HashSet<String>(itemType.getOrder(configurationTemplateManager.getRecord(scope)));
                     Record scopeRecord = archiveRecord.getScope(scope);
                     try
                     {
@@ -125,7 +128,7 @@ public class ConfigurationArchiver
                                 long parentHandle = getTemplateParentHandle(item);
                                 if (!handles.contains(parentHandle))
                                 {
-                                    importItemAndChildren(scope, scopeRecord, item, rootHandle, insertedPaths);
+                                    importItemAndChildren(scope, itemType, existingItems, scopeRecord, item, rootHandle, insertedPaths);
                                 }
                             }
                         }
@@ -134,7 +137,8 @@ public class ConfigurationArchiver
                             configurationTemplateManager.suspendInstanceCache();
                             for (String name : scopeRecord.nestedKeySet())
                             {
-                                Record item = (Record) scopeRecord.get(name);
+                                MutableRecord item = (MutableRecord) scopeRecord.get(name);
+                                ensureItemNameUnique(itemType, existingItems, item);
                                 insertedPaths.add(configurationTemplateManager.insertRecord(scope, item, false));
                             }
                         }
@@ -159,7 +163,19 @@ public class ConfigurationArchiver
         });
     }
 
-    private void extractReferences(File file, ArchiveRecord archiveRecord, Multimap<String, Long> pathToReferencedHandles, Map<Long, String> handleToPath)
+    private void ensureItemNameUnique(MapType type, Set<String> existingItems, MutableRecord item)
+    {
+        String itemKey = type.getItemKey(null, item);
+        while (existingItems.contains(itemKey))
+        {
+            itemKey += " (restored)";
+        }
+
+        existingItems.add(itemKey);
+        item.put(type.getKeyProperty(), itemKey);
+    }
+
+    private void verifyScopes(File file, ArchiveRecord archiveRecord)
     {
         for (String scope : archiveRecord.getScopes())
         {
@@ -169,16 +185,23 @@ public class ConfigurationArchiver
             }
 
             ComplexType type = configurationTemplateManager.getType(scope);
-            if (!(type instanceof CollectionType))
+            if (!(type instanceof MapType))
             {
-                throw new ToveRuntimeException("Archive '" + file.getAbsolutePath() + "' contains invalid scope '" + scope + "' (not a collection)");
+                throw new ToveRuntimeException("Archive '" + file.getAbsolutePath() + "' contains invalid scope '" + scope + "' (not a map)");
             }
+        }
+    }
 
+    private void extractReferences(ArchiveRecord archiveRecord, Multimap<String, Long> pathToReferencedHandles, Map<Long, String> handleToPath)
+    {
+        for (String scope : archiveRecord.getScopes())
+        {
+            MapType type = (MapType) configurationTemplateManager.getType(scope);
             Record scopeRecord = archiveRecord.getScope(scope);
             for (String name : scopeRecord.nestedKeySet())
             {
                 MutableRecord item = (MutableRecord) scopeRecord.get(name);
-                ReferenceExtractingFunction fn = new ReferenceExtractingFunction((ComplexType) type.getTargetType(), item, PathUtils.getPath(scope, name), pathToReferencedHandles, handleToPath);
+                ReferenceExtractingFunction fn = new ReferenceExtractingFunction(type.getTargetType(), item, PathUtils.getPath(scope, name), pathToReferencedHandles, handleToPath);
                 item.forEach(fn);
             }
         }
@@ -202,10 +225,11 @@ public class ConfigurationArchiver
         return parentHandle;
     }
 
-    private void importItemAndChildren(String scope, Record scopeRecord, MutableRecord item, long templateParentHandle, List<String> insertedPaths)
+    private void importItemAndChildren(String scope, MapType type, Set<String> existingItems, Record scopeRecord, MutableRecord item, long templateParentHandle, List<String> insertedPaths)
     {
         long originalHandle = item.getHandle();
 
+        ensureItemNameUnique(type, existingItems, item);
         item.putMeta(TemplateRecord.PARENT_KEY, Long.toString(templateParentHandle));
         String path = configurationTemplateManager.insertRecord(scope, item, false);
         insertedPaths.add(path);
@@ -217,7 +241,7 @@ public class ConfigurationArchiver
             long otherParentHandle = getTemplateParentHandle(otherItem);
             if (otherParentHandle == originalHandle)
             {
-                importItemAndChildren(scope, scopeRecord, otherItem, newHandle, insertedPaths);
+                importItemAndChildren(scope, type, existingItems, scopeRecord, otherItem, newHandle, insertedPaths);
             }
         }
     }

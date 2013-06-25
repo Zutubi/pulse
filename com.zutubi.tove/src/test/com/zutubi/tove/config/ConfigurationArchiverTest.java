@@ -266,6 +266,28 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertEquals(ArchiveBuildCompletedTrigger.class, restoredProject.getTriggers().get("t").getClass());
     }
 
+    public void testImportExistingItemHasSameName()
+    {
+        ArchiveProject project = new ArchiveProject("p");
+        project.setDescription("exported");
+
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+
+        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, SCOPE_TEMPLATED, project.getName());
+        project = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(projectPath, ArchiveProject.class));
+        project.setDescription("edited");
+        configurationTemplateManager.save(project);
+
+        configurationArchiver.restore(archiveFile, new TestVersionChecker());
+
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+        assertEquals("edited", project.getDescription());
+
+        ArchiveProject restoredProject = configurationTemplateManager.getInstance(projectPath + " (restored)", ArchiveProject.class);
+        assertNotNull(restoredProject);
+        assertEquals("exported", restoredProject.getDescription());
+    }
+
     private ArchiveProject archiveAndRestore(String scope, ArchiveProject... projects)
     {
         for (ArchiveProject project : projects)

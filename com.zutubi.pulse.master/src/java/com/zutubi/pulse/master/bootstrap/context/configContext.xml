@@ -25,52 +25,53 @@
     </bean>
 
     <!-- Config system -->
-    <bean id="recordTransactionManager" class="com.zutubi.tove.transaction.TransactionManager" autowire="byName"/>
+    <bean id="recordTransactionManager" class="com.zutubi.tove.transaction.TransactionManager"/>
 
     <bean id="handleAllocator" class="com.zutubi.tove.type.record.DelegatingHandleAllocator"/>
-    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
-    <bean id="configurationRegistry" class="com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry" autowire="byName"/>
-    <bean id="configurationExtensionManager" class="com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager" autowire="byName"/>
-    <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager" autowire="byName"/>
-    <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager" autowire="byName"/>
-    <bean id="configurationRefactoringManager" class="com.zutubi.tove.config.ConfigurationRefactoringManager" autowire="byName"/>
-    <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager" autowire="byName"/>
-    <bean id="configurationDocsManager" class="com.zutubi.tove.config.docs.ConfigurationDocsManager" autowire="byName"/>
-    <bean id="configurationStateManager" class="com.zutubi.tove.config.ConfigurationStateManager" autowire="byName">
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry"/>
+    <bean id="configurationRegistry" class="com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry"/>
+    <bean id="configurationExtensionManager" class="com.zutubi.pulse.master.tove.config.ConfigurationExtensionManager"/>
+    <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager"/>
+    <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager"/>
+    <bean id="configurationRefactoringManager" class="com.zutubi.tove.config.ConfigurationRefactoringManager"/>
+    <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager"/>
+    <bean id="configurationDocsManager" class="com.zutubi.tove.config.docs.ConfigurationDocsManager"/>
+    <bean id="configurationStateManager" class="com.zutubi.tove.config.ConfigurationStateManager">
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
-    <bean id="configurationTemplateManager" class="com.zutubi.tove.config.ConfigurationTemplateManager" autowire="byName">
+    <bean id="configurationTemplateManager" class="com.zutubi.tove.config.ConfigurationTemplateManager">
         <property name="transactionManager" ref="pulseTransactionManager"/>
     </bean>
-    <bean id="configurationHealthChecker" class="com.zutubi.tove.config.health.ConfigurationHealthChecker" autowire="byName"/>
-    <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
-    <bean id="linkManager" class="com.zutubi.tove.links.LinkManager" autowire="byName"/>
-    <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager" autowire="byName"/>
-    <bean id="stateDisplayRenderer" class="com.zutubi.pulse.master.tove.webwork.StateDisplayRenderer" autowire="byName"/>
-    <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager" autowire="byName"/>
+    <bean id="configurationHealthChecker" class="com.zutubi.tove.config.health.ConfigurationHealthChecker"/>
+    <bean id="configurationArchiver" class="com.zutubi.tove.config.ConfigurationArchiver"/>
+    <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager"/>
+    <bean id="linkManager" class="com.zutubi.tove.links.LinkManager"/>
+    <bean id="stateDisplayManager" class="com.zutubi.pulse.master.tove.format.StateDisplayManager"/>
+    <bean id="stateDisplayRenderer" class="com.zutubi.pulse.master.tove.webwork.StateDisplayRenderer"/>
+    <bean id="classificationManager" class="com.zutubi.pulse.master.tove.classification.ClassificationManager"/>
 
-    <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" autowire="byName" init-method="init"/>
-    <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
+    <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" init-method="init"/>
+    <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"/>
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <!-- Security system -->
-    <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager" autowire="byName"/>
-    <bean id="accessManager" class="com.zutubi.tove.security.DefaultAccessManager" autowire="byName"/>
-    <bean id="actorProvider" class="com.zutubi.pulse.master.security.SpringSecurityActorProvider" autowire="byName"/>
-    <bean id="globalAuthorityProvider" class="com.zutubi.pulse.master.security.GlobalAuthorityProvider" autowire="byName"/>
-    <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="projectAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectAuthorityProvider" autowire="byName"/>
-    <bean id="buildResultAuthorityProvider" class="com.zutubi.pulse.master.security.BuildResultAuthorityProvider" autowire="byName"/>
-    <bean id="commentAuthorityProvider" class="com.zutubi.pulse.master.security.CommentAuthorityProvider" autowire="byName"/>
-    <bean id="buildRequestEventAuthorityProvider" class="com.zutubi.pulse.master.security.BuildRequestEventAuthorityProvider" autowire="byName"/>
-    <bean id="agentConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.AgentConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="agentAuthorityProvider" class="com.zutubi.pulse.master.security.AgentAuthorityProvider" autowire="byName"/>
-    <bean id="groupConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.GroupConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.UserConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider" autowire="byName"/>
-    <bean id="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider" autowire="byName"/>
+    <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager"/>
+    <bean id="accessManager" class="com.zutubi.tove.security.DefaultAccessManager"/>
+    <bean id="actorProvider" class="com.zutubi.pulse.master.security.SpringSecurityActorProvider"/>
+    <bean id="globalAuthorityProvider" class="com.zutubi.pulse.master.security.GlobalAuthorityProvider"/>
+    <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectConfigurationAuthorityProvider"/>
+    <bean id="projectAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectAuthorityProvider"/>
+    <bean id="buildResultAuthorityProvider" class="com.zutubi.pulse.master.security.BuildResultAuthorityProvider"/>
+    <bean id="commentAuthorityProvider" class="com.zutubi.pulse.master.security.CommentAuthorityProvider"/>
+    <bean id="buildRequestEventAuthorityProvider" class="com.zutubi.pulse.master.security.BuildRequestEventAuthorityProvider"/>
+    <bean id="agentConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.AgentConfigurationAuthorityProvider"/>
+    <bean id="agentAuthorityProvider" class="com.zutubi.pulse.master.security.AgentAuthorityProvider"/>
+    <bean id="groupConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.GroupConfigurationAuthorityProvider"/>
+    <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.UserConfigurationAuthorityProvider"/>
+    <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider"/>
+    <bean id="repositoryAuthorityProvider" class="com.zutubi.pulse.master.security.RepositoryAuthorityProvider"/>
 
-    <bean id="securityInterceptor" class="com.zutubi.pulse.master.security.SecurityInterceptor" autowire="byName"/>
+    <bean id="securityInterceptor" class="com.zutubi.pulse.master.security.SecurityInterceptor"/>
 
     <bean id="configAuditLogger" class="com.zutubi.pulse.master.logging.ConfigAuditLogger"/>    
 </beans>
