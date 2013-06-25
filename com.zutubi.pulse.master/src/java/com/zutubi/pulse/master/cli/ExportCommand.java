@@ -63,6 +63,7 @@ public class ExportCommand extends AdminCommand
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
+        options.put("-o [--overwrite]", "overwrite (rather than add to) an existing file");
         options.putAll(super.getOptions());
         return options;
     }
