@@ -68,4 +68,15 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
     {
         trigger.setName(getName());
     }
+
+    /**
+     * Called each time a trigger fires (but before the task is run).  This default implementation
+     * does nothing, subclasses may override as desired.
+     *
+     * @param trigger the entity for this trigger
+     */
+    public void postFire(Trigger trigger)
+    {
+        // Do nothing by default.
+    }
 }

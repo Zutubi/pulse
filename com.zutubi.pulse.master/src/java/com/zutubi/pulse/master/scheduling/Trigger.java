@@ -128,6 +128,10 @@ public abstract class Trigger extends Entity implements NamedEntity
     {
         triggerCount++;
         previousTriggerTime = Calendar.getInstance().getTime();
+        if (config != null)
+        {
+            config.postFire(this);
+        }
     }
 
     public Date getPreviousTriggerTime()

@@ -202,6 +202,7 @@
                 <ref local="addGroupConcurrentPersonalBuilds"/>
                 <ref local="addRunHookTaskOnAgents"/>
                 <ref local="updateNameConflictResolution"/>
+                <ref local="addAutoDisableToCronTrigger"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1060,5 +1061,9 @@
 
     <bean id="updateNameConflictResolution" class="com.zutubi.pulse.master.upgrade.tasks.UpdateNameConflictResolutionUpgradeTask">
         <property name="buildNumber" value="206002001"/>
+    </bean>
+
+    <bean id="addAutoDisableToCronTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddAutoDisableToCronTriggerUpgradeTask">
+        <property name="buildNumber" value="206003001"/>
     </bean>
 </beans>
