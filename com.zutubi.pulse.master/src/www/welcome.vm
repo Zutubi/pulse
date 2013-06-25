@@ -108,10 +108,24 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("exportimport" "configuration archiving" "accept" false)
+            <td>
+                Configuration for projects, agents and users may now be selectively exported to an
+                archive, and later imported into a compatible Pulse instance.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("retainrules" "retain rules" "accept" false)
             <td>
                 Automatic cleanup rules have been augmented with retain rules.  These rules allow
                 you to exclude matched builds from cleanup.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("oneshottrigger" "one-shot triggers" "accept" false)
+            <td>
+                Cron triggers may be configured to automatically pause after firing, allowing them
+                to be used for one-shot triggering.
             </td>
         </tr>
         <tr>
