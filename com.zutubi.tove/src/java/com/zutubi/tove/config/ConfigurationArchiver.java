@@ -19,6 +19,19 @@ public class ConfigurationArchiver
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationHealthChecker configurationHealthChecker;
 
+    /**
+     * Archives records from the configuration system to a file.  The records may later be restored into a compatible
+     * configuration system.  Note that references, including to template parents, are conserved within a set of records
+     * that are archived together in a single call to this method.  References not within the set are removed and
+     * therefore cannot be restored.
+     *
+     * @param file the file to archive the records in
+     * @param mode determines how an existing file is handled
+     * @param version version string to store in the archive, for verification at restore time
+     * @param scope configuration scope to export from - must be a collection
+     * @param items keys of the collection items from the scope to archive
+     * @throws ToveRuntimeException on error writing to the given file
+     */
     public void archive(File file, ArchiveMode mode, String version, String scope, String... items)
     {
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
@@ -29,7 +42,7 @@ public class ConfigurationArchiver
             archive = new ArchiveRecord(record);
             if (!archive.getVersion().equals(version))
             {
-                throw new ConfigurationException("Cannot append to an archive with version '" + archive.getVersion() + "' (this is version '" + version + "')");
+                throw new ToveRuntimeException("Cannot append to an archive with version '" + archive.getVersion() + "' (this is version '" + version + "')");
             }
         }
         else
@@ -56,6 +69,16 @@ public class ConfigurationArchiver
         serialiser.serialise(file, archive.getRecord(), true);
     }
 
+    /**
+     * Restores all records from an archive file, if version-compatible with this configuration system.  If the records
+     * belong to a templated scope, any trees within the archive are restored as trees under the root template in that
+     * scope (i.e. if the archive contains the template parent of an item that item will be restored under the restored
+     * parent, else the item will be restored under the root).
+     *
+     * @param file the file to restore from
+     * @param versionChecker pluggable verification of the archive version before restoration
+     * @throws ToveRuntimeException on error reading from the given file or restoring the items
+     */
     public void restore(final File file, VersionChecker versionChecker)
     {
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
@@ -253,7 +276,14 @@ public class ConfigurationArchiver
      */
     public enum ArchiveMode
     {
+        /**
+         * Add new records to the existing archive.  Note if records with the same path exist in the archive they will
+         * be replaced.
+         */
         MODE_APPEND,
+        /**
+         * Replace the existing archive with the new records.
+         */
         MODE_OVERWRITE,
     }
 
@@ -262,6 +292,13 @@ public class ConfigurationArchiver
      */
     public interface VersionChecker
     {
+        /**
+         * Called back to verify an archive version before restoration.  Should throw {@link ToveRuntimeException} if
+         * the version is not acceptable.
+         *
+         * @param version the version in the archive
+         * @throws ToveRuntimeException if this configuration system cannot restore from the given archive version
+         */
         public void checkVersion(String version) throws ToveRuntimeException;
     }
 

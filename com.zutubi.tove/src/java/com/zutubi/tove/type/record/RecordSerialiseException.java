@@ -1,10 +1,12 @@
 package com.zutubi.tove.type.record;
 
+import com.zutubi.tove.config.ToveRuntimeException;
+
 /**
  * An error serialising or deserialising a record, which is considered fatal
  * to the operation.
  */
-public class RecordSerialiseException extends RuntimeException
+public class RecordSerialiseException extends ToveRuntimeException
 {
     public RecordSerialiseException()
     {
