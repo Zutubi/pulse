@@ -27,6 +27,15 @@ public interface UpgradeManager
     boolean isUpgradeRequired();
 
     /**
+     * Indicates whether or not an upgrade is required to move between the given builds.
+     *
+     * @param fromBuildNumber the original build number
+     * @param toBuildNumber the target build number
+     * @return true if an upgrade is required, false otherwise.
+     */
+    boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber);
+
+    /**
      * Prepare upgrade is the first step for the upgrade processing.
      *
      * @return the list of upgrade task groups that make up the prepared upgrade.

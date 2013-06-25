@@ -222,6 +222,14 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         return upgradeRequired;
     }
 
+    public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
+    {
+        // FIXME: Plugin upgrades use different build numbers, so we don't know...
+        // This is OK at the moment (no third-party plugins with upgrades), but we need a better system (the archive or
+        // records themselves need to include plugin version information).
+        return false;
+    }
+
     public List<UpgradeableComponent> getUpgradeableComponents()
     {
         return upgradeableComponents;
@@ -272,6 +280,12 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         public boolean isUpgradeRequired()
         {
             return true;
+        }
+
+        public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
+        {
+            /** FIXME see {@link PluginUpgradeManager#isUpgradeRequired(int, int)}. */
+            return false;
         }
 
         public List<UpgradeTask> getUpgradeTasks()

@@ -40,6 +40,26 @@ public class DefaultUpgradeManager implements UpgradeManager
         return false;
     }
 
+    public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
+    {
+        for (UpgradeableComponentSource source : upgradeableSources)
+        {
+            if (source.isUpgradeRequired(fromBuildNumber, toBuildNumber))
+            {
+                return true;
+            }
+        }
+
+        for (UpgradeableComponent component : upgradeableComponents)
+        {
+            if (component.isUpgradeRequired(fromBuildNumber, toBuildNumber))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Register an upgradeable component with the upgrade manager
      *

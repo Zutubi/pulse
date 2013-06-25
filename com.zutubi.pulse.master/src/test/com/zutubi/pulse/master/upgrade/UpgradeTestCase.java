@@ -40,6 +40,11 @@ public abstract class UpgradeTestCase extends ZutubiTestCase
             return upgradeRequired;
         }
 
+        public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
+        {
+            return false;
+        }
+
         public List<UpgradeTask> getUpgradeTasks()
         {
             return new LinkedList<UpgradeTask>(tasks);
@@ -185,6 +190,19 @@ public abstract class UpgradeTestCase extends ZutubiTestCase
         public boolean isUpgradeRequired()
         {
             return components.size() > 0;
+        }
+
+        public boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber)
+        {
+            for (UpgradeableComponent component : components)
+            {
+                if (component.isUpgradeRequired(fromBuildNumber, toBuildNumber))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public List<UpgradeableComponent> getUpgradeableComponents()

@@ -1,53 +1,53 @@
 package com.zutubi.pulse.master.cli;
 
 import com.zutubi.pulse.core.cli.HelpCommand;
-import com.zutubi.pulse.master.transfer.TransferAPI;
-import com.zutubi.pulse.master.transfer.TransferException;
+import com.zutubi.pulse.servercore.cli.AdminCommand;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.ParseException;
+import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 /**
+ * Imports configuration from a previously-exported archive file.
  */
-public class ImportCommand extends DataCommand
+public class ImportCommand extends AdminCommand
 {
-    public int doExecute(CommandLine commandLine) throws IOException, ParseException
+    public int doExecute(String[] argv) throws IOException, ParseException
     {
-        String[] args = commandLine.getArgs();
-        if (args.length != 1)
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, false);
+        processSharedOptions(commandLine);
+        argv = commandLine.getArgs();
+
+        if (argv.length != 1)
         {
             HelpCommand helpCommand = new HelpCommand();
             helpCommand.showHelp("import", this);
             return 1;
         }
 
-        File inFile = new File(args[0]);
-        if (!inFile.exists())
+        File inputFile = new File(argv[0]);
+        if (!inputFile.exists())
         {
-            System.err.println("Input file '" + inFile.getPath() + "' does not exist");
-            return 2;
+            System.err.println("Input file '" + argv[0] + "' does not exist");
+            System.exit(1);
         }
 
-        TransferAPI transferAPI = new TransferAPI();
         try
         {
-            transferAPI.restore(configuration, inFile, dataSource);
+            xmlRpcClient.execute("RemoteApi.importConfig", new Vector<Object>(Arrays.asList(adminToken, argv[0])));
         }
-        catch (TransferException e)
+        catch (XmlRpcException e)
         {
-            System.err.println("Error importing data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
-            e.printStackTrace(System.err);
-            return 2;
-        }
-        catch (Exception e)
-        {
-            System.err.println("Error importing data.  Trace below:");
-            e.printStackTrace(System.err);
-            return 2;
+            System.err.println(e.getMessage());
+            System.exit(2);
         }
 
         return 0;
@@ -60,14 +60,15 @@ public class ImportCommand extends DataCommand
 
     public String getHelp()
     {
-        return "imports the Pulse database from a file";
+        return "imports archived Pulse configuration from a file";
     }
 
     public String getDetailedHelp()
     {
-        return "Imports the data in the given file to the current Pulse database.  This\n" +
-               "data should previously have been exported from Pulse, and the target\n" +
-               "database should be empty.";
+        return "Imports the configuration in the given file to this Pulse instance.\n" +
+                "The data must have been exported from a compatible version of Pulse.\n" +
+                "If any of the imported items conflict with existing configuration,\n" +
+                "the conflict is resolved by appending (restored) to the name.";
     }
 
     public List<String> getAliases()

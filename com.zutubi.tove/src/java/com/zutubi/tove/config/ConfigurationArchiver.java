@@ -28,11 +28,10 @@ public class ConfigurationArchiver
      * @param file the file to archive the records in
      * @param mode determines how an existing file is handled
      * @param version version string to store in the archive, for verification at restore time
-     * @param scope configuration scope to export from - must be a map
-     * @param items keys of the collection items from the scope to archive
+     * @param paths configuration paths to export from - each must refer to an item in a top-level map
      * @throws ToveRuntimeException on error writing to the given file
      */
-    public void archive(File file, ArchiveMode mode, String version, String scope, String... items)
+    public void archive(File file, ArchiveMode mode, String version, String... paths)
     {
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         ArchiveRecord archive;
@@ -50,23 +49,56 @@ public class ConfigurationArchiver
             archive = new ArchiveRecord(version);
         }
 
-        for (String item : items)
+        Multimap<String, String> scopeToItems = convertPaths(paths);
+        for (String scope : scopeToItems.keys())
         {
-            Record record = configurationTemplateManager.getRecord(PathUtils.getPath(scope, item));
-            MutableRecord mutableRecord;
-            if (record instanceof TemplateRecord)
+            MapType mapType = (MapType) configurationTemplateManager.getType(scope);
+            TypeProperty externalStateProperty = mapType.getTargetType().getExternalStateProperty();
+            for (String item : scopeToItems.get(scope))
             {
-                mutableRecord = ((TemplateRecord) record).flatten(true);
-            }
-            else
-            {
-                mutableRecord = record.copy(true, true);
+                Record record = configurationTemplateManager.getRecord(PathUtils.getPath(scope, item));
+                MutableRecord mutableRecord;
+                if (record instanceof TemplateRecord)
+                {
+                    mutableRecord = ((TemplateRecord) record).flatten(true);
+                }
+                else
+                {
+                    mutableRecord = record.copy(true, true);
+                }
+
+                if (externalStateProperty != null)
+                {
+                    mutableRecord.remove(externalStateProperty.getName());
+                }
+
+                archive.addItem(scope, item, mutableRecord);
             }
 
-            archive.addItem(scope, item, mutableRecord);
+            serialiser.serialise(file, archive.getRecord(), true);
+        }
+    }
+
+    private Multimap<String, String> convertPaths(String... paths)
+    {
+        Multimap<String, String> result = ArrayListMultimap.create();
+        for (String path : paths)
+        {
+            if (!configurationTemplateManager.pathExists(path))
+            {
+                throw new ToveRuntimeException("Invalid path '" + path + "': path does not exist");
+            }
+
+            String[] components = PathUtils.getPathElements(path);
+            if (components.length != 2 || !(configurationTemplateManager.getType(components[0]) instanceof MapType))
+            {
+                throw new ToveRuntimeException("Invalid path '" + path + "': does not refer to a top-level map item");
+            }
+
+            result.put(components[0], components[1]);
         }
 
-        serialiser.serialise(file, archive.getRecord(), true);
+        return result;
     }
 
     /**
@@ -227,6 +259,8 @@ public class ConfigurationArchiver
 
     private void importItemAndChildren(String scope, MapType type, Set<String> existingItems, Record scopeRecord, MutableRecord item, long templateParentHandle, List<String> insertedPaths)
     {
+        // Shallow copy so we don't modify the version in the archive (it confuses later processing).
+        item = item.copy(false, true);
         long originalHandle = item.getHandle();
 
         ensureItemNameUnique(type, existingItems, item);

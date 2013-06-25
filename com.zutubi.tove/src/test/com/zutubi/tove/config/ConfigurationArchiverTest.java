@@ -90,7 +90,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         String path = templated ? configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false) : configurationTemplateManager.insertInstance(scope, project);
         project = configurationTemplateManager.getInstance(path, ArchiveProject.class);
 
-        ArchiveProject restored = archiveAndRestore(scope, project);
+        ArchiveProject restored = archiveAndRestore(project);
         assertEquals(project.getName(), restored.getName());
         assertEquals(project.getDescription(), restored.getDescription());
         assertEquals(project.getOptions().getThings(), restored.getOptions().getThings());
@@ -117,7 +117,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         configurationTemplateManager.delete(PathUtils.getPath(childPath, "triggers", "hideme"));
         child = configurationTemplateManager.getInstance(childPath, ArchiveProject.class);
 
-        ArchiveProject restored = archiveAndRestore(SCOPE_TEMPLATED, child);
+        ArchiveProject restored = archiveAndRestore(child);
 
         assertEquals(child.getName(), restored.getName());
         assertEquals(child.getDescription(), restored.getDescription());
@@ -144,7 +144,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         child = configurationTemplateManager.getInstance(childPath, ArchiveProject.class);
         configurationTemplateManager.delete(PathUtils.getPath(childPath, "triggers", "hideme"));
 
-        ArchiveProject restored = archiveAndRestore(SCOPE_TEMPLATED, child);
+        ArchiveProject restored = archiveAndRestore(child);
 
         // Despite moving away from the parent that defines the values, we should be restored with them intact (just no
         // longer inherited!).  To make extra sure, we actually delete the parent!
@@ -176,7 +176,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         configurationTemplateManager.delete(PathUtils.getPath(childPath, "triggers", "hideme"));
         child = configurationTemplateManager.getInstance(childPath, ArchiveProject.class);
 
-        archiveAndRestore(SCOPE_TEMPLATED, parent, child);
+        archiveAndRestore(parent, child);
 
         ArchiveProject restoredParent = configurationTemplateManager.getInstance(parentPath, ArchiveProject.class);
         assertFalse(restoredParent.isConcrete());
@@ -210,7 +210,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
         downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
 
-        ArchiveProject restoredDownstream = archiveAndRestore(SCOPE_TEMPLATED, downstream);
+        ArchiveProject restoredDownstream = archiveAndRestore(downstream);
 
         ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
         assertNull(restoredTrigger.getProject());
@@ -232,7 +232,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
         downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
 
-        ArchiveProject restoredDownstream = archiveAndRestore(SCOPE_TEMPLATED, downstream, upstream);
+        ArchiveProject restoredDownstream = archiveAndRestore(downstream, upstream);
         ArchiveProject restoredUpstream = configurationTemplateManager.getInstance(upstreamPath, ArchiveProject.class);
 
         ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
@@ -250,7 +250,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
         project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
 
-        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, SCOPE_TEMPLATED, project.getName());
+        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, project.getConfigurationPath());
         configurationTemplateManager.delete(projectPath);
 
         ArchiveProject root = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(rootPath, ArchiveProject.class));
@@ -273,7 +273,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
         String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
 
-        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, SCOPE_TEMPLATED, project.getName());
+        configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, projectPath);
         project = configurationTemplateManager.deepClone(configurationTemplateManager.getInstance(projectPath, ArchiveProject.class));
         project.setDescription("edited");
         configurationTemplateManager.save(project);
@@ -288,11 +288,11 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertEquals("exported", restoredProject.getDescription());
     }
 
-    private ArchiveProject archiveAndRestore(String scope, ArchiveProject... projects)
+    private ArchiveProject archiveAndRestore(ArchiveProject... projects)
     {
         for (ArchiveProject project : projects)
         {
-            configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, scope, project.getName());
+            configurationArchiver.archive(archiveFile, ConfigurationArchiver.ArchiveMode.MODE_APPEND, VERSION, project.getConfigurationPath());
         }
 
         // Deleting a template can delete children, hence we need to do this after all archiving.

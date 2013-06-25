@@ -121,7 +121,7 @@ public abstract class AdminCommand implements Command
                 path = contextPath;
             }
 
-            StringBuffer remoteApiPath = new StringBuffer();
+            StringBuilder remoteApiPath = new StringBuilder();
             if (!path.startsWith("/"))
             {
                 remoteApiPath.append("/");

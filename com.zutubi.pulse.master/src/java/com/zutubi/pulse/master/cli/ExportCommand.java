@@ -1,87 +1,88 @@
 package com.zutubi.pulse.master.cli;
 
 import com.zutubi.pulse.core.cli.HelpCommand;
-import com.zutubi.pulse.master.transfer.TransferAPI;
-import com.zutubi.pulse.master.transfer.TransferException;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
+import com.zutubi.pulse.servercore.cli.AdminCommand;
+import org.apache.commons.cli.*;
+import org.apache.xmlrpc.XmlRpcException;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
+ * Command-line interface to RemoteApi.exportConfig, used for archiving configuration.
  */
-public class ExportCommand extends DataCommand
+public class ExportCommand extends AdminCommand
 {
-    public int doExecute(CommandLine commandLine) throws IOException, ParseException
+    private boolean append = true;
+
+    public void setAppend(boolean append)
     {
-        String[] args = commandLine.getArgs();
-        if (args.length != 1)
+        this.append = append;
+    }
+
+    @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
+    private String[] parse(String... argv) throws ParseException
+    {
+        Options options = getSharedOptions();
+        options.addOption(new Option("o", "overwrite", false, "overwrite existing file"));
+
+        CommandLineParser parser = new GnuParser();
+        CommandLine commandLine = parser.parse(options, argv, false);
+
+        setAppend(!commandLine.hasOption('o'));
+        processSharedOptions(commandLine);
+        return commandLine.getArgs();
+    }
+
+    public int doExecute(String argv[]) throws IOException, ParseException
+    {
+        argv = parse(argv);
+
+        if (argv.length < 2)
         {
             HelpCommand helpCommand = new HelpCommand();
             helpCommand.showHelp("export", this);
             return 1;
         }
 
-        File outFile = new File(args[0]);
-        if (outFile.exists() && !outFile.delete())
-        {
-            System.err.println("Unable to remove existing file '" + outFile.getPath() + "'");
-            return 2;
-        }
-
+        Vector<String> paths = new Vector<String>(Arrays.asList(argv).subList(1, argv.length));
         try
         {
-            if (!outFile.createNewFile())
-            {
-                System.err.println("Unable to create output file '" + outFile.getPath() + "'");
-                return 2;
-            }
+            xmlRpcClient.execute("RemoteApi.exportConfig", new Vector<Object>(Arrays.asList(adminToken, argv[0], append, paths)));
         }
-        catch (IOException e)
+        catch (XmlRpcException e)
         {
-            System.err.println("Unable to create output file '" + outFile.getPath() + "': " + e.getMessage());
-            return 2;
-        }
-
-        TransferAPI transferAPI = new TransferAPI();
-        try
-        {
-            transferAPI.dump(configuration, dataSource, outFile);
-        }
-        catch (TransferException e)
-        {
-            System.err.println("Error exporting data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
-            e.printStackTrace(System.err);
-            return 2;
-        }
-        catch (Exception e)
-        {
-            System.err.println("Error exporting data.  Trace below:");
-            e.printStackTrace(System.err);
-            return 2;
+            System.err.println(e.getMessage());
+            System.exit(2);
         }
 
         return 0;
     }
 
+    @Override
+    public Map<String, String> getOptions()
+    {
+        Map<String, String> options = new LinkedHashMap<String, String>();
+        options.putAll(super.getOptions());
+        return options;
+    }
+
     public List<String> getUsages()
     {
-        return Arrays.asList("<output file>");
+        return Arrays.asList("<output file> <configuration path>...");
     }
 
     public String getHelp()
     {
-        return "exports the Pulse database to a file";
+        return "exports a subset of your Pulse configuration to a file";
     }
 
     public String getDetailedHelp()
     {
-        return "Exports the data in the current Pulse database to a file.  This data can\n" +
-               "then be imported into another database (after updating your Pulse\n" +
-               "configuration).";
+        return "Exports a subset of your Pulse configuration to a file.  This data can\n" +
+               "then be imported into another compatible Pulse instance.  If the file\n" +
+                "already exists, by default the configuration will be added to it, use\n" +
+                "the overwrite option to discard any existing file.";
     }
 
     public List<String> getAliases()

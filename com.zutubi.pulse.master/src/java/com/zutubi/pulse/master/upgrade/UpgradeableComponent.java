@@ -17,6 +17,15 @@ public interface UpgradeableComponent
     boolean isUpgradeRequired();
 
     /**
+     * Indicates whether or not this upgradeable component requires an upgrade to move between the given builds.
+     *
+     * @param fromBuildNumber the original build number
+     * @param toBuildNumber the target build number
+     * @return true if an upgrade is required, false otherwise.
+     */
+    boolean isUpgradeRequired(int fromBuildNumber, int toBuildNumber);
+
+    /**
      * The list of configured upgrade tasks that need to be executed in order to
      * carry out the upgrade.
      *

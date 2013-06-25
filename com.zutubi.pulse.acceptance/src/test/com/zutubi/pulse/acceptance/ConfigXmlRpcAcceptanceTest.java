@@ -21,7 +21,9 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.FileSystemUtils;
 
+import java.io.File;
 import java.util.*;
 
 import static com.google.common.collect.Iterables.transform;
@@ -1278,6 +1280,44 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, String> state = rpcClient.RemoteApi.getConfigState(getPath(projectPath, Constants.Project.REQUIREMENTS));
         assertEquals("all agents", state.get("compatibleAgents"));
+    }
+
+    public void testExportAndImport() throws Exception
+    {
+        String random = randomName();
+        String template = random + "-template";
+        String child1 = random + "-child1";
+        String child2 = random + "-child2";
+
+        String templatePath = rpcClient.RemoteApi.insertTrivialProject(template, true);
+        String child1Path = rpcClient.RemoteApi.insertSimpleProject(child1, template, false);
+        String child2Path = rpcClient.RemoteApi.insertProject(child2, template, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("path"));
+
+        Hashtable<String, Object> child2Before = rpcClient.RemoteApi.getConfig(child2Path);
+
+        File temp = FileSystemUtils.createTempFile(getName(), ".tmp", "");
+        try
+        {
+            rpcClient.RemoteApi.exportConfig(temp.getAbsolutePath(), false, templatePath, child2Path);
+
+            assertTrue(rpcClient.RemoteApi.deleteConfig(templatePath));
+            assertFalse(rpcClient.RemoteApi.configPathExists(templatePath));
+            assertFalse(rpcClient.RemoteApi.configPathExists(child1Path));
+            assertFalse(rpcClient.RemoteApi.configPathExists(child2Path));
+
+            rpcClient.RemoteApi.importConfig(temp.getAbsolutePath());
+            assertTrue(rpcClient.RemoteApi.configPathExists(templatePath));
+            assertFalse(rpcClient.RemoteApi.configPathExists(child1Path));
+            assertTrue(rpcClient.RemoteApi.configPathExists(child2Path));
+            assertTrue(rpcClient.RemoteApi.getAllProjectNames().contains(child2));
+
+            Hashtable<String, Object> child2After = rpcClient.RemoteApi.getConfig(child2Path);
+            assertEquals(child2Before, child2After);
+        }
+        finally
+        {
+            assertTrue(temp.delete());
+        }
     }
 
     private String renameRecipe(String projectPath, String originalName, String newName) throws Exception

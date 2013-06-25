@@ -47,6 +47,7 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfigurat
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -93,6 +94,7 @@ public class RemoteApi
     private ConfigurationRefactoringManager configurationRefactoringManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationProvider configurationProvider;
+    private ConfigurationArchiver configurationArchiver;
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
 
@@ -110,6 +112,7 @@ public class RemoteApi
     private StateDisplayManager stateDisplayManager;
     private RecipeQueue recipeQueue;
     private SchedulingController schedulingController;
+    private UpgradeManager upgradeManager;
 
     public RemoteApi()
     {
@@ -1588,7 +1591,74 @@ public class RemoteApi
             tokenManager.logoutUser();
         }
     }
-    
+
+    /**
+     * Exports a subset of the configuration to a file which may be imported into a compatible Pulse instance.  Any
+     * number of projects, agents and users may be included in the archive.  In the case of projects and users, template
+     * relationships between items in the archive are preserved (any hierarchy not represented in the export is lost).
+     * References (e.g. project dependency relationships) where both ends of the relationship are in the export are
+     * preserved, other references are lost.  For this reason it is best to perform a single export operation for all
+     * items you want to move as a unit, otherwise some manual restoration may be required.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param filename path of the file to export to
+     * @param append if true and the file already exists, the export will append items to it (otherwise it will be
+     *               overwritten).  Note that if you append to an archive that contains an item being exported again,
+     *               this latest exported item will replace the existing one.
+     * @param paths configuration paths of items to export (e.g. "projects/my project", "agents/linux64", "users/jim"
+     * @return true
+     * @throws ToveRuntimeException on error writing to the file
+     * @access requires server administration permission
+     * @see #importConfig(String, String)
+     */
+    public boolean exportConfig(String token, String filename, boolean append, Vector<String> paths)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+            ConfigurationArchiver.ArchiveMode mode = append ? ConfigurationArchiver.ArchiveMode.MODE_APPEND : ConfigurationArchiver.ArchiveMode.MODE_OVERWRITE;
+            String[] pathArray = paths.toArray(new String[paths.size()]);
+            configurationArchiver.archive(new File(filename), mode, Version.getVersion().getBuildNumber(), pathArray);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Imports archive configuration from into this Pulse instance.  The archive must have been created with a
+     * compatible version of Pulse (an earlier or equal version, where there are no upgrades between versions).  If the
+     * archive contains items with names that clash with existing configuration the clashes are resolved by appending
+     * " (restored)" to the imported name.  When importing projects and agents, if the export contains the original
+     * template parent of an item then the restored item will be added under the restored parent.  Otherwise the
+     * restored item will be added under the global template (you may then move it if desired).
+     *
+     * @param token authentication token (see {@link #login})
+     * @param filename path of the file to import from
+     * @return true
+     * @throws ToveRuntimeException on error reading from the file
+     * @access requires server administration permission
+     * @see #exportConfig(String, String, boolean, java.util.Vector)
+     */
+    public boolean importConfig(String token, String filename)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+            configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager));
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
+    }
+
     /**
      * Indicates the number of users configured on this server.
      *
@@ -5168,6 +5238,11 @@ public class RemoteApi
         this.configurationProvider = configurationProvider;
     }
 
+    public void setConfigurationArchiver(ConfigurationArchiver configurationArchiver)
+    {
+        this.configurationArchiver = configurationArchiver;
+    }
+
     public void setFatController(FatController fatController)
     {
         this.fatController = fatController;
@@ -5206,5 +5281,10 @@ public class RemoteApi
     public void setSchedulingController(SchedulingController schedulingController)
     {
         this.schedulingController = schedulingController;
+    }
+
+    public void setUpgradeManager(UpgradeManager upgradeManager)
+    {
+        this.upgradeManager = upgradeManager;
     }
 }
