@@ -1063,7 +1063,7 @@
         <property name="buildNumber" value="206002001"/>
     </bean>
 
-    <bean id="addAutoDisableToCronTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddAutoDisableToCronTriggerUpgradeTask">
+    <bean id="addAutoDisableToCronTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddAutoPauseToCronTriggerUpgradeTask">
         <property name="buildNumber" value="206003001"/>
     </bean>
 </beans>

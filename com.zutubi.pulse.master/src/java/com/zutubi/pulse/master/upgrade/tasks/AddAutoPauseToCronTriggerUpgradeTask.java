@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Adds the disableAfterFiring field to cron triggers (for CIB-2959).
+ * Adds the pauseAfterFiring field to cron triggers (for CIB-2959).
  */
-public class AddAutoDisableToCronTriggerUpgradeTask extends AbstractRecordPropertiesUpgradeTask
+public class AddAutoPauseToCronTriggerUpgradeTask extends AbstractRecordPropertiesUpgradeTask
 {
     protected RecordLocator getRecordLocator()
     {
@@ -15,7 +15,7 @@ public class AddAutoDisableToCronTriggerUpgradeTask extends AbstractRecordProper
 
     protected List<? extends RecordUpgrader> getRecordUpgraders()
     {
-        return Arrays.asList(RecordUpgraders.newAddProperty("disableAfterFiring", "false"));
+        return Arrays.asList(RecordUpgraders.newAddProperty("pauseAfterFiring", "false"));
     }
 
     public boolean haltOnFailure()

@@ -15,7 +15,7 @@ import com.zutubi.validation.annotations.Required;
  * Used to configure a trigger that is defined by a Cron-like expression.
  */
 @SymbolicName("zutubi.cronTriggerConfig")
-@Form(fieldOrder = {"name", "cron", "disableAfterFiring"})
+@Form(fieldOrder = {"name", "cron", "pauseAfterFiring"})
 @Wire
 public class CronBuildTriggerConfiguration extends TriggerConfiguration
 {
@@ -24,7 +24,7 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
     @Required
     @Constraint("CronExpressionValidator")
     private String cron;
-    private boolean disableAfterFiring;
+    private boolean pauseAfterFiring;
     private Scheduler scheduler;
 
     public String getCron()
@@ -37,14 +37,14 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
         this.cron = cron;
     }
 
-    public boolean isDisableAfterFiring()
+    public boolean isPauseAfterFiring()
     {
-        return disableAfterFiring;
+        return pauseAfterFiring;
     }
 
-    public void setDisableAfterFiring(boolean disableAfterFiring)
+    public void setPauseAfterFiring(boolean pauseAfterFiring)
     {
-        this.disableAfterFiring = disableAfterFiring;
+        this.pauseAfterFiring = pauseAfterFiring;
     }
 
     public Trigger newTrigger()
@@ -63,7 +63,7 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
     public void postFire(Trigger trigger)
     {
         super.postFire(trigger);
-        if (disableAfterFiring)
+        if (pauseAfterFiring)
         {
             try
             {
