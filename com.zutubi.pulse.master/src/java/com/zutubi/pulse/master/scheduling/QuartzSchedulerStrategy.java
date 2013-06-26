@@ -131,7 +131,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
             quartzTrigger.setJobName(CALLBACK_JOB_NAME);
             quartzTrigger.setJobGroup(CALLBACK_JOB_GROUP);
 
-            QuartzTaskCallbackTriggerSource source = objectFactory.buildBean(QuartzTaskCallbackTriggerSource.class, new Class[]{Trigger.class}, new Object[]{trigger});
+            QuartzTaskCallbackTriggerSource source = objectFactory.buildBean(QuartzTaskCallbackTriggerSource.class, trigger);
             quartzTrigger.getJobDataMap().put(SOURCE_PROP, source);
 
             getQuartzScheduler().scheduleJob(quartzTrigger);

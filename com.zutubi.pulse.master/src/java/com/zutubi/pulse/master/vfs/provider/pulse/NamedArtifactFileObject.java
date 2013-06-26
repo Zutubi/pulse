@@ -29,10 +29,7 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
         String name = fileName.getBaseName();
         File newFile = new File(getArtifactBase(), name);
 
-        return objectFactory.buildBean(NamedFileArtifactFileObject.class,
-                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
-                new Object[]{fileName, newFile, pfs}
-        );
+        return objectFactory.buildBean(NamedFileArtifactFileObject.class, fileName, newFile, pfs);
     }
 
     protected FileType doGetType() throws Exception

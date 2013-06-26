@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ArtifactStageFileObject extends AbstractPulseFileObject implements RecipeResultProvider
 {
-    private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
+    private static final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
     private final long recipeId;
 
@@ -33,18 +33,12 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
         String childName = fileName.getBaseName();
         if (childName.equals(IN_PROGRESS))
         {
-            return objectFactory.buildBean(TextMessageFileObject.class,
-                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                    new Object[]{fileName, ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_IN_PROGRESS, pfs}
-            );
+            return objectFactory.buildBean(TextMessageFileObject.class, fileName, ArtifactFileObject.CLASS_PREFIX + ArtifactFileObject.CLASS_SUFFIX_IN_PROGRESS, pfs);
         }
 
         long commandResultId = Long.parseLong(fileName.getBaseName());
 
-        return objectFactory.buildBean(CommandResultFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, commandResultId, pfs}
-        );
+        return objectFactory.buildBean(CommandResultFileObject.class, fileName, commandResultId, pfs);
     }
 
     protected FileType doGetType() throws Exception

@@ -64,7 +64,7 @@ public class HostStatusManager implements EventListener, Stoppable
         {
             if (!updaters.containsKey(host.getId()) && setUpgradeState(host, HostState.PersistentUpgradeState.UPGRADING))
             {
-                HostUpdater updater = objectFactory.buildBean(HostUpdater.class, new Class[]{DefaultHost.class, HostService.class}, new Object[]{host, hostManager.getServiceForHost(host)});
+                HostUpdater updater = objectFactory.buildBean(HostUpdater.class, host, hostManager.getServiceForHost(host));
                 updaters.put(host.getId(), updater);
                 updater.start();
             }

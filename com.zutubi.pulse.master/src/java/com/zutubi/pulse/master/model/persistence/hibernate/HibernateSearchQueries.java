@@ -15,7 +15,7 @@ public class HibernateSearchQueries
 
     public HibernateSearchQuery<BuildResult> getBuildResults()
     {
-        return objectFactory.buildBean(HibernateSearchQuery.class, new Class[]{Class.class}, new Object[]{BuildResult.class});
+        return objectFactory.buildBean(HibernateSearchQuery.class, BuildResult.class);
     }
 
     /**
@@ -26,7 +26,7 @@ public class HibernateSearchQueries
      */
     public HibernateSearchQuery<Long> getIds(Class type)
     {
-        return objectFactory.buildBean(HibernateSearchQuery.class, new Class[]{Class.class}, new Object[]{type});
+        return objectFactory.buildBean(HibernateSearchQuery.class, type);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

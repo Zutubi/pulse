@@ -29,7 +29,23 @@ public interface ObjectFactory
 
     /**
      * Creates an instance of the given class using a constructor with the
-     * given argument types.
+     * given arguments.  This may fail if multiple constructors could accept
+     * the given arguments, in which case
+     * {@link #buildBean(Class, Class[], Object[])} should be used.
+     *
+     * @param clazz    the type to construct an instance of
+     * @param args     arguments to pass to the constructor (must match a
+     *                 single constructor)
+     * @param <T> the type of the returned instance
+     * @return the new instance
+     * @throws RuntimeException on error
+     */
+    <T> T buildBean(Class<? extends T> clazz, Object... args);
+
+    /**
+     * Creates an instance of the given class using a constructor with the
+     * given argument types.  Only required in the case where the matching
+     * constructor cannot be inferred from the argument values.
      *
      * @param clazz    the type to construct an instance of
      * @param argTypes types of the constructor arguments

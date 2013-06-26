@@ -16,9 +16,7 @@ public class ProjectConfigsFileObject extends AbstractPulseFileObject implements
 
     public AbstractPulseFileObject createFile(FileName fileName)
     {
-        return objectFactory.buildBean(ProjectConfigFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class},
-                new Object[]{fileName, pfs});
+        return objectFactory.buildBean(ProjectConfigFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

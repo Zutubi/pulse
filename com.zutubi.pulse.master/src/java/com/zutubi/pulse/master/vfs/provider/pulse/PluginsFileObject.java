@@ -34,11 +34,7 @@ public class PluginsFileObject extends AbstractPulseFileObject
             throw new PulseRuntimeException("Unknown plugin [" + fileName.getBaseName() + "]");
         }
 
-        return objectFactory.buildBean(PluginFileObject.class,
-                new Class[]{FileName.class, Plugin.class, AbstractFileSystem.class},
-                new Object[]{fileName, plugin, pfs}
-        );
-
+        return objectFactory.buildBean(PluginFileObject.class, fileName, plugin, pfs);
     }
 
     protected FileType doGetType() throws Exception

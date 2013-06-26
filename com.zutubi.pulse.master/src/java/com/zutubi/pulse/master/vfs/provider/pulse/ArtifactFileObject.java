@@ -46,10 +46,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         File base = getArtifactBase();
         File newBase = new File(base, fileName.getBaseName());
 
-        return objectFactory.buildBean(FileArtifactFileObject.class,
-                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
-                new Object[]{fileName, newBase, pfs}
-        );
+        return objectFactory.buildBean(FileArtifactFileObject.class, fileName, newBase, pfs);
     }
 
     public File toFile()

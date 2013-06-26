@@ -25,10 +25,7 @@ public class NamedStageFileObject extends AbstractPulseFileObject implements Rec
     public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
-        return objectFactory.buildBean(NamedCommandFileObject.class,
-                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                new Object[]{fileName, name, pfs}
-        );
+        return objectFactory.buildBean(NamedCommandFileObject.class, fileName, name, pfs);
     }
 
     protected FileType doGetType() throws Exception

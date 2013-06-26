@@ -55,7 +55,7 @@ public class ColumnDescriptor
 
     private FormattingWrapper newWrapper(Object instance)
     {
-        return objectFactory.buildBean(FormattingWrapper.class, new Class[]{Object.class, CompositeType.class}, new Object[]{instance, type});
+        return objectFactory.buildBean(FormattingWrapper.class, instance, type);
     }
 
     public String getName()

@@ -40,7 +40,6 @@ import com.zutubi.pulse.master.build.log.DefaultBuildLogger;
 import com.zutubi.pulse.master.build.log.DefaultRecipeLogger;
 import com.zutubi.pulse.master.build.log.RecipeLogFile;
 import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
-import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
@@ -55,6 +54,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.TimeStamps;
@@ -96,7 +96,6 @@ public class DefaultBuildController implements EventListener, BuildController
     private TestManager testManager;
     private MasterLocationProvider masterLocationProvider;
     private MasterConfigurationManager configurationManager;
-    private RecipeQueue recipeQueue;
     private RecipeResultCollector collector;
     private List<RecipeController> controllers;
     private List<RecipeController> executingControllers = new LinkedList<RecipeController>();
@@ -113,10 +112,9 @@ public class DefaultBuildController implements EventListener, BuildController
     private ScmManager scmManager;
     private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private ThreadFactory threadFactory;
-    private ResourceManager resourceManager;
+    private ObjectFactory objectFactory;
 
     private DefaultBuildLogger buildLogger;
-    private RecipeDispatchService recipeDispatchService;
 
     private IvyManager ivyManager;
     private IvyClient ivy;
@@ -269,31 +267,11 @@ public class DefaultBuildController implements EventListener, BuildController
                 recipeRequest.addAllResourceRequirements(resourceRequirements);
 
                 RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
-                if (request.getOptions().hasPriority())
-                {
-                    assignmentRequest.setPriority(request.getOptions().getPriority());
-                }
-                else if (stageConfig.hasPriority())
-                {
-                    assignmentRequest.setPriority(stageConfig.getPriority());
-                }
-                else if (request.getProjectConfig().getOptions().hasPriority())
-                {
-                    assignmentRequest.setPriority(request.getProjectConfig().getOptions().getPriority());
-                }
+                setRequestPriority(assignmentRequest, stageConfig);
 
                 RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
-                RecipeController rc = new RecipeController(projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector);
-                rc.setRecipeQueue(recipeQueue);
-                rc.setBuildManager(buildManager);
-                rc.setEventManager(eventManager);
-                rc.setBuildHookManager(buildHookManager);
-                rc.setConfigurationManager(configurationManager);
-                rc.setResourceManager(resourceManager);
-                rc.setRecipeDispatchService(recipeDispatchService);
-                rc.setScmManager(scmManager);
-
-                controllers.add(rc);
+                RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector);
+                controllers.add(recipeController);
                 pendingRecipes++;
             }
             else
@@ -314,6 +292,22 @@ public class DefaultBuildController implements EventListener, BuildController
         catch (Exception e)
         {
             throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
+        }
+    }
+
+    private void setRequestPriority(RecipeAssignmentRequest assignmentRequest, BuildStageConfiguration stageConfig)
+    {
+        if (request.getOptions().hasPriority())
+        {
+            assignmentRequest.setPriority(request.getOptions().getPriority());
+        }
+        else if (stageConfig.hasPriority())
+        {
+            assignmentRequest.setPriority(stageConfig.getPriority());
+        }
+        else if (request.getProjectConfig().getOptions().hasPriority())
+        {
+            assignmentRequest.setPriority(request.getProjectConfig().getOptions().getPriority());
         }
     }
 
@@ -1276,11 +1270,6 @@ public class DefaultBuildController implements EventListener, BuildController
         this.testManager = testManager;
     }
 
-    public void setRecipeQueue(RecipeQueue recipeQueue)
-    {
-        this.recipeQueue = recipeQueue;
-    }
-
     public void setCollector(RecipeResultCollector collector)
     {
         this.collector = collector;
@@ -1301,9 +1290,9 @@ public class DefaultBuildController implements EventListener, BuildController
         this.threadFactory = threadFactory;
     }
 
-    public void setResourceManager(ResourceManager resourceManager)
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-        this.resourceManager = resourceManager;
+        this.objectFactory = objectFactory;
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
@@ -1314,11 +1303,6 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setBuildHookManager(BuildHookManager buildHookManager)
     {
         this.buildHookManager = buildHookManager;
-    }
-
-    public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
-    {
-        this.recipeDispatchService = recipeDispatchService;
     }
 
     public void setRepositoryAuthenticationProvider(RepositoryAuthenticationProvider repositoryAuthenticationProvider)

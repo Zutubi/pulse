@@ -138,7 +138,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
         }
         else
         {
-            return objectFactory.buildBean(SpecificAgentRequirements.class, new Class[]{ AgentConfiguration.class }, new Object[]{ agent });
+            return objectFactory.buildBean(SpecificAgentRequirements.class, agent);
         }
     }
 

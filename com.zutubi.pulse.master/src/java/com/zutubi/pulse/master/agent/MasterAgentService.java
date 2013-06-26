@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
@@ -56,7 +55,7 @@ public class MasterAgentService implements AgentService
 
     public boolean build(RecipeRequest request)
     {
-        MasterRecipeRunner recipeRunner = objectFactory.buildBean(MasterRecipeRunner.class, new Class[]{ResourceRepository.class}, new Object[]{resourceManager.getAgentRepository(agentConfig)});
+        MasterRecipeRunner recipeRunner = objectFactory.buildBean(MasterRecipeRunner.class, resourceManager.getAgentRepository(agentConfig));
         serverRecipeService.processRecipe(agentConfig.getHandle(), request, recipeRunner);
         return true;
     }

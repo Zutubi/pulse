@@ -28,10 +28,7 @@ public class StageDetailsFileObject extends AbstractResultDetailsFileObject impl
 
     public AbstractPulseFileObject createFile(final FileName fileName)
     {
-        return objectFactory.buildBean(CommandDetailsFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class},
-                new Object[]{fileName, pfs}
-        );
+        return objectFactory.buildBean(CommandDetailsFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

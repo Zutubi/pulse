@@ -24,32 +24,20 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
         String name = fileName.getBaseName();
         if (name.equals("artifacts"))
         {
-            return objectFactory.buildBean(BuildArtifactsFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
+            return objectFactory.buildBean(BuildArtifactsFileObject.class, fileName, pfs);
         }
         else if (name.equals("details"))
         {
-            return objectFactory.buildBean(BuildDetailsFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
+            return objectFactory.buildBean(BuildDetailsFileObject.class, fileName, pfs);
         }
         else if (name.equals("stages"))
         {
-            return objectFactory.buildBean(BuildStagesFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
+            return objectFactory.buildBean(BuildStagesFileObject.class, fileName, pfs);
         }
         else if (name.equals("wc"))
         {
             accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, getBuildResult());
-            return objectFactory.buildBean(BuildWorkingCopiesFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
+            return objectFactory.buildBean(BuildWorkingCopiesFileObject.class, fileName, pfs);
         }
         else 
         {

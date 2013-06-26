@@ -37,7 +37,7 @@ public class FileTypeFileObject extends AbstractReferenceFileObject
             return null;
         }
 
-        return objectFactory.buildBean(ElementFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, ElementDocs.class}, new Object[]{fileName, getFileSystem(), child});
+        return objectFactory.buildBean(ElementFileObject.class, fileName, getFileSystem(), child);
     }
 
     @Override

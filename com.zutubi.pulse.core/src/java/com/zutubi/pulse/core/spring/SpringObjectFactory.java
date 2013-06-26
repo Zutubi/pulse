@@ -20,6 +20,14 @@ public class SpringObjectFactory extends DefaultObjectFactory
         return buildBean(this.<T>getClassInstance(className, supertype));
     }
 
+    @Override
+    public <T> T buildBean(Class<? extends T> clazz, Object... args)
+    {
+        T object = super.buildBean(clazz, args);
+        SpringComponentContext.autowire(object);
+        return object;
+    }
+
     public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
     {
         T object = super.buildBean(clazz, argTypes, args);

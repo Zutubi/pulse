@@ -24,10 +24,7 @@ public class BuildStagesFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
-        return objectFactory.buildBean(NamedStageFileObject.class,
-                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                new Object[]{fileName, fileName.getBaseName(), pfs}
-        );
+        return objectFactory.buildBean(NamedStageFileObject.class, fileName, fileName.getBaseName(), pfs);
     }
 
     protected FileType doGetType() throws Exception

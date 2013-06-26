@@ -114,10 +114,7 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
 
     protected AbstractPulseFileObject createStaticFile(FileName fileName)
     {
-        return objectFactory.buildBean(StaticReferenceFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class},
-                new Object[]{fileName, pfs}
-        );
+        return objectFactory.buildBean(StaticReferenceFileObject.class, fileName, pfs);
     }
 
     /**

@@ -71,16 +71,8 @@ public class PollingService implements Stoppable
 
     public void init()
     {
-        limitActivePollsPerScmPredicate = objectFactory.buildBean(
-                LimitActivePollsPerScmPredicate.class,
-                new Class[]{int.class, PollingQueue.class, Map.class},
-                new Object[]{activePollsPerScmLimit, requestQueue, projectUidCache}
-        );
-        noDependencyBeingPolledPredicate = objectFactory.buildBean(
-                HasNoDependencyBeingPolledPredicate.class,
-                new Class[]{PollingQueue.class},
-                new Object[]{requestQueue}
-        );
+        limitActivePollsPerScmPredicate = objectFactory.buildBean(LimitActivePollsPerScmPredicate.class, activePollsPerScmLimit, requestQueue, projectUidCache);
+        noDependencyBeingPolledPredicate = objectFactory.buildBean(HasNoDependencyBeingPolledPredicate.class, requestQueue);
 
         int pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT, DEFAULT_POLL_THREAD_COUNT);
         executorService = Executors.newFixedThreadPool(pollThreadCount, threadFactory);
@@ -406,11 +398,7 @@ public class PollingService implements Stoppable
     {
         public void onActivation(final PollingRequest request)
         {
-            final ProjectPoll poll = objectFactory.buildBean(
-                    ProjectPoll.class,
-                    new Class[] {Project.class, ProjectPollingState.class, Clock.class},
-                    new Object[] {request.getProject(), request.getState(), clock}
-            );
+            final ProjectPoll poll = objectFactory.buildBean(ProjectPoll.class, request.getProject(), request.getState(), clock);
             completionService.submit(new Callable<ProjectPollingState>()
             {
                 public ProjectPollingState call() throws Exception

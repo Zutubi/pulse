@@ -82,19 +82,11 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
             childPath = PathUtils.getPath(path, collapsedCollection, decodedBaseName);
         }
 
-        Type childType = configurationTemplateManager.getType(childPath);
-        if (!(childType instanceof ComplexType))
+        ComplexType childType = configurationTemplateManager.getType(childPath);
+        if (childType == null)
         {
-            if (childType == null)
-            {
-                // Could be a type that is not registered (missing plugin?).
-                return objectFactory.buildBean(ConfigErrorFileObject.class,
-                        new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class, ComplexType.class, Record.class, String.class},
-                        new Object[]{fileName, pfs, childPath, type, null, null, "Path does not have a type: perhaps it is from a missing plugin?"}
-                );
-            }
-
-            throw new FileSystemException("Illegal path '" + childPath + "': does not refer to a valid type");
+            // Could be a type that is not registered (missing plugin?).
+            return objectFactory.buildBean(ConfigErrorFileObject.class, fileName, pfs, childPath, type, null, null, "Path does not have a type: perhaps it is from a missing plugin?");
         }
 
         Type childParentType = collapsedCollection == null ? type : configurationTemplateManager.getType(PathUtils.getParentPath(childPath));
@@ -119,10 +111,7 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
             }
         }
 
-        return objectFactory.buildBean(ConfigFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class, ComplexType.class, Record.class},
-                new Object[]{fileName, pfs, childPath, childParentType, (ComplexType) childType, childValue}
-        );
+        return objectFactory.buildBean(ConfigFileObject.class, fileName, pfs, childPath, childParentType, childType, childValue);
     }
 
     public String getDisplayName()

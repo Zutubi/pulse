@@ -52,7 +52,7 @@ public class TableDescriptorFactory
 
     private ColumnDescriptor newColumnDescriptor(String name, CompositeType type)
     {
-        return objectFactory.buildBean(ColumnDescriptor.class, new Class[]{String.class, CompositeType.class}, new Object[]{name, type});
+        return objectFactory.buildBean(ColumnDescriptor.class, name, type);
     }
 
     public void setActionManager(ActionManager actionManager)

@@ -8,7 +8,6 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
@@ -49,10 +48,7 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
 
     public AbstractPulseFileObject createFile(final FileName fileName)
     {
-        return objectFactory.buildBean(TemplateFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class},
-                new Object[]{fileName, pfs}
-        );
+        return objectFactory.buildBean(TemplateFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

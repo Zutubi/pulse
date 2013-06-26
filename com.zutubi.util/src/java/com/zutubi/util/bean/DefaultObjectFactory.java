@@ -1,8 +1,11 @@
 package com.zutubi.util.bean;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.zutubi.util.reflection.ReflectionUtils;
+
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A default implementation of an object factory.  Beans are created using
@@ -65,6 +68,38 @@ public class DefaultObjectFactory implements ObjectFactory
         // javac cannot infer this type argument
         Class<? extends T> clazz = this.<T>getClassInstance(className, supertype);
         return newInstance(clazz);
+    }
+
+    public <T> T buildBean(Class<? extends T> clazz, final Object... args)
+    {
+        List<Constructor<?>> constructors = Arrays.asList(clazz.getConstructors());
+        final Class<?>[] argTypes = new Class[args.length];
+        for (int i = 0; i < args.length; i++)
+        {
+            argTypes[i] = args[i] == null ? null : args[i].getClass();
+        }
+
+        Collection<Constructor<?>> matchingConstructors = Collections2.filter(constructors, new Predicate<Constructor<?>>()
+        {
+            public boolean apply(Constructor<?> constructor)
+            {
+                return ReflectionUtils.acceptsParameters(constructor, argTypes);
+            }
+        });
+
+        if (matchingConstructors.size() != 1)
+        {
+            throw new RuntimeException("Could not instantiate object of type '" + clazz.getName() + "': " + matchingConstructors.size() + " matching constructors found");
+        }
+
+        try
+        {
+            return clazz.cast(matchingConstructors.iterator().next().newInstance(args));
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Unable to instantiate object of type '" + clazz.getName() + "': " + e.getMessage(), e);
+        }
     }
 
     public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)

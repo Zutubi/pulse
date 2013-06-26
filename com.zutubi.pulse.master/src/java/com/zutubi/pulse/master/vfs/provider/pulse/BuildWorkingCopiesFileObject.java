@@ -26,10 +26,7 @@ public class BuildWorkingCopiesFileObject extends AbstractPulseFileObject
     {
         long recipeId = Long.parseLong(fileName.getBaseName());
 
-        return objectFactory.buildBean(WorkingCopyStageFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, recipeId, pfs}
-        );
+        return objectFactory.buildBean(WorkingCopyStageFileObject.class, fileName, recipeId, pfs);
     }
 
     protected FileType doGetType() throws Exception

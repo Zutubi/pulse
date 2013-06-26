@@ -21,7 +21,7 @@ public class GraphFilters
      */
     public GraphFilter status(String status)
     {
-        return objectFactory.buildBean(StatusFilter.class, new Class[]{String.class}, new Object[]{status});
+        return objectFactory.buildBean(StatusFilter.class, status);
     }
 
     /**

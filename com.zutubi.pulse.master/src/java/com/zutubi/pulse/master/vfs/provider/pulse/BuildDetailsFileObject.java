@@ -31,10 +31,7 @@ public class BuildDetailsFileObject extends AbstractResultDetailsFileObject impl
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws FileSystemException
     {
-        return objectFactory.buildBean(StageDetailsFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class},
-                new Object[]{fileName, pfs}
-        );
+        return objectFactory.buildBean(StageDetailsFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

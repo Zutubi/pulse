@@ -19,9 +19,7 @@ public class DefaultBuildControllerFactory implements BuildControllerFactory
 
     public BuildController create(BuildRequestEvent request)
     {
-        DefaultBuildController controller = objectFactory.buildBean(DefaultBuildController.class,
-                                                             new Class[] { BuildRequestEvent.class },
-                                                             new Object[] { request });
+        DefaultBuildController controller = objectFactory.buildBean(DefaultBuildController.class, request);
         DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configurationManager);
         collector.setProjectConfig(request.getProjectConfig());
         controller.setCollector(collector);

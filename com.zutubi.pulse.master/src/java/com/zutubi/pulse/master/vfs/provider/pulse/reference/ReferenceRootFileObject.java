@@ -43,7 +43,7 @@ public class ReferenceRootFileObject extends AbstractReferenceFileObject impleme
 
     public AbstractPulseFileObject createDynamicFile(FileName fileName)
     {
-        return objectFactory.buildBean(FileTypeFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, String.class}, new Object[]{fileName, getFileSystem(), FILE_TYPES.get(fileName.getBaseName())});
+        return objectFactory.buildBean(FileTypeFileObject.class, fileName, getFileSystem(), FILE_TYPES.get(fileName.getBaseName()));
     }
 
     @Override

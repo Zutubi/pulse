@@ -46,18 +46,12 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
         String childName = fileName.getBaseName();
         if (childName.equals(NO_WORKING_COPY_AVAILABLE))
         {
-            return objectFactory.buildBean(TextMessageFileObject.class,
-                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                    new Object[]{fileName, null, pfs}
-            );
+            return objectFactory.buildBean(TextMessageFileObject.class, fileName, null, pfs);
         }
 
         FileInfo child = getFileInfo(fileName.getBaseName());
 
-        return objectFactory.buildBean(WorkingCopyFileInfoFileObject.class,
-                new Class[]{FileInfo.class, FileName.class, AbstractFileSystem.class},
-                new Object[]{child, fileName, pfs}
-        );
+        return objectFactory.buildBean(WorkingCopyFileInfoFileObject.class, child, fileName, pfs);
     }
 
     protected String[] doListChildren() throws Exception

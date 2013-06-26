@@ -34,10 +34,7 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
 
             fileName = new PulseFileName(fileName.getScheme(), absPath, fileName.getType());
 
-            return objectFactory.buildBean(ProjectFileObject.class,
-                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                    new Object[]{fileName, projectId, pfs}
-            );
+            return objectFactory.buildBean(ProjectFileObject.class, fileName, projectId, pfs);
         }
         
         // we need to return a place holder here.

@@ -34,10 +34,7 @@ public class BuildArtifactsFileObject extends AbstractPulseFileObject implements
             long recipeId = Long.parseLong(fileName.getBaseName());
             if(buildManager.getRecipeResult(recipeId) != null)
             {
-                return objectFactory.buildBean(ArtifactStageFileObject.class,
-                                               new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                                               new Object[]{fileName, recipeId, pfs}
-                );
+                return objectFactory.buildBean(ArtifactStageFileObject.class, fileName, recipeId, pfs);
             }
         }
         catch (NumberFormatException e)
@@ -45,10 +42,7 @@ public class BuildArtifactsFileObject extends AbstractPulseFileObject implements
             // Maybe a stage name, continue the research Smithers.
         }
         
-        return objectFactory.buildBean(NamedStageFileObject.class,
-                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                new Object[]{fileName, fileName.getBaseName(), pfs}
-        );
+        return objectFactory.buildBean(NamedStageFileObject.class, fileName, fileName.getBaseName(), pfs);
     }
 
     protected FileType doGetType() throws Exception

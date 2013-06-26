@@ -191,7 +191,7 @@ public class SlaveServiceImpl implements SlaveService
         serviceTokenManager.validateToken(token);
 
         MasterService masterService = updateMaster(master);
-        SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, new Class[]{String.class}, new Object[]{master});
+        SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, master);
         ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
         serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
         return true;

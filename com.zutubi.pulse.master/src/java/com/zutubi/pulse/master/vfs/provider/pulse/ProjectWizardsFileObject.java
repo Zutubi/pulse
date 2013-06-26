@@ -16,9 +16,7 @@ public class ProjectWizardsFileObject extends AbstractPulseFileObject
     public AbstractPulseFileObject createFile(FileName fileName)
     {
         // the fileName is the name of the parent project
-        return objectFactory.buildBean(ProjectWizardFileObject.class,
-                                       new Class[]{FileName.class, AbstractFileSystem.class},
-                                       new Object[]{fileName, pfs});
+        return objectFactory.buildBean(ProjectWizardFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

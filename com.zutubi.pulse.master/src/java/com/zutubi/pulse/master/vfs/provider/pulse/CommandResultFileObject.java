@@ -32,10 +32,7 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
     {
         long artifactId = Long.parseLong(fileName.getBaseName());
 
-        return objectFactory.buildBean(ArtifactFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, artifactId, pfs}
-        );
+        return objectFactory.buildBean(ArtifactFileObject.class, fileName, artifactId, pfs);
     }
 
     protected FileType doGetType() throws Exception

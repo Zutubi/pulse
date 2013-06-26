@@ -217,9 +217,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
 
         public AbstractPulseFileObject createFile(final FileName fileName)
         {
-            return objectFactory.buildBean(ScmRootFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs});
+            return objectFactory.buildBean(ScmRootFileObject.class, fileName, pfs);
         }
 
         protected FileType doGetType() throws Exception

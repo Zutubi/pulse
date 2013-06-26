@@ -104,7 +104,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     public void analyse()
     {
-        configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
+        configuration = objectFactory.buildBean(ConfigurationUIModel.class, path);
         configuration.analyse();
         type = (CompositeType) configuration.getType();
     }

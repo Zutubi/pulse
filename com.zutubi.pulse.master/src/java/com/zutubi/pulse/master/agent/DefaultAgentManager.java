@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.agent;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
@@ -14,21 +12,15 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
-import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -46,6 +38,14 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
 
 /**
  */
@@ -270,11 +270,11 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         if (agentConfig.isRemote())
         {
-            return objectFactory.buildBean(SlaveAgentService.class, new Class[]{SlaveService.class, AgentConfiguration.class}, new Object[]{slaveProxyFactory.createProxy(agentConfig), agentConfig});
+            return objectFactory.buildBean(SlaveAgentService.class, slaveProxyFactory.createProxy(agentConfig), agentConfig);
         }
         else
         {
-            return objectFactory.buildBean(MasterAgentService.class, new Class[]{AgentConfiguration.class}, new Object[]{agentConfig});
+            return objectFactory.buildBean(MasterAgentService.class, agentConfig);
         }
     }
 

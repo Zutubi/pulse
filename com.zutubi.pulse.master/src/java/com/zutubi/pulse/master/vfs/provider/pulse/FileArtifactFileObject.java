@@ -70,10 +70,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     {
         File newBase = new File(base, fileName.getBaseName());
 
-        return objectFactory.buildBean(FileArtifactFileObject.class,
-                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
-                new Object[]{fileName, newBase, pfs}
-        );
+        return objectFactory.buildBean(FileArtifactFileObject.class, fileName, newBase, pfs);
     }
 
     protected FileType doGetType() throws Exception

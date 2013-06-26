@@ -1,14 +1,14 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoFileObject;
-import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoProvider;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.file.FileInfoProvider;
 import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
@@ -30,10 +30,7 @@ public class WorkingCopyFileInfoFileObject extends FileInfoFileObject
 
         FileInfo child = provider.getFileInfo(relativePath);
 
-        return objectFactory.buildBean(WorkingCopyFileInfoFileObject.class,
-                new Class[]{FileInfo.class, FileName.class, AbstractFileSystem.class},
-                new Object[]{child, fileName, pfs}
-        );
+        return objectFactory.buildBean(WorkingCopyFileInfoFileObject.class, child, fileName, pfs);
     }
 
     protected boolean doIsReadable() throws Exception

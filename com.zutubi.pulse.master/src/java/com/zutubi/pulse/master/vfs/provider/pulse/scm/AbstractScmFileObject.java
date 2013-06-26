@@ -74,9 +74,7 @@ public abstract class AbstractScmFileObject extends AbstractPulseFileObject
         String relativeName = root.getName().getRelativeName(name);
         ScmFile fi = new ScmFile(UriParser.decode(relativeName), name.getType() == FileType.FOLDER);
 
-        return objectFactory.buildBean(ScmFileObject.class,
-                new Class[]{ScmFile.class, FileName.class, AbstractFileSystem.class},
-                new Object[]{fi, name, pfs});
+        return objectFactory.buildBean(ScmFileObject.class, fi, name, pfs);
     }
 
 

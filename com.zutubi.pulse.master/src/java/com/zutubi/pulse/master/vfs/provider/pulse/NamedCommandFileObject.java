@@ -24,10 +24,7 @@ public class NamedCommandFileObject extends AbstractPulseFileObject implements C
     public AbstractPulseFileObject createFile(final FileName fileName)
     {
         String name = fileName.getBaseName();
-        return objectFactory.buildBean(NamedArtifactFileObject.class,
-                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                new Object[]{fileName, name, pfs}
-        );
+        return objectFactory.buildBean(NamedArtifactFileObject.class, fileName, name, pfs);
     }
 
     protected FileType doGetType() throws Exception

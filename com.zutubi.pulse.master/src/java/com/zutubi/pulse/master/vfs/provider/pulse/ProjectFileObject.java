@@ -48,10 +48,7 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         if (nodesDefinitions.containsKey(name))
         {
             Class<? extends AbstractPulseFileObject> clazz = nodesDefinitions.get(name);
-            return objectFactory.buildBean(clazz,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
+            return objectFactory.buildBean(clazz, fileName, pfs);
         }
         return null;
     }

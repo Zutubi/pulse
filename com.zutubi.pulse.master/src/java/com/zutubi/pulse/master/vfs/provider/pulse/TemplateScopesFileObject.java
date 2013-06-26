@@ -28,10 +28,7 @@ public class TemplateScopesFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(FileName fileName)
     {
-        return objectFactory.buildBean(TemplateScopeFileObject.class,
-                                       new Class[]{FileName.class, AbstractFileSystem.class},
-                                       new Object[]{fileName, pfs}
-        );
+        return objectFactory.buildBean(TemplateScopeFileObject.class, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

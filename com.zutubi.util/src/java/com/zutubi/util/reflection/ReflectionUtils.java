@@ -23,6 +23,20 @@ import static java.util.Arrays.asList;
  */
 public class ReflectionUtils
 {
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_BOXED;
+    static
+    {
+        PRIMITIVE_TO_BOXED = new HashMap<Class<?>, Class<?>>();
+        PRIMITIVE_TO_BOXED.put(Boolean.TYPE, Boolean.class);
+        PRIMITIVE_TO_BOXED.put(Byte.TYPE, Byte.class);
+        PRIMITIVE_TO_BOXED.put(Character.TYPE, Character.class);
+        PRIMITIVE_TO_BOXED.put(Double.TYPE, Double.class);
+        PRIMITIVE_TO_BOXED.put(Float.TYPE, Float.class);
+        PRIMITIVE_TO_BOXED.put(Integer.TYPE, Integer.class);
+        PRIMITIVE_TO_BOXED.put(Long.TYPE, Long.class);
+        PRIMITIVE_TO_BOXED.put(Short.TYPE, Short.class);
+    }
+
     /**
      * Returns all superclasses of the given class, up to but not including the
      * stop class.  If the stop class is not an ancestor, or is null, all super
@@ -226,7 +240,8 @@ public class ReflectionUtils
      * types need not be exact matches: subtypes are also accepted.
      *
      * @param method         the method to test
-     * @param parameterTypes candidate parameter types
+     * @param parameterTypes candidate parameter types - any items that are
+     *                       null are not checked
      * @return true if the method could be called with instances of the given
      *         types
      */
@@ -241,7 +256,8 @@ public class ReflectionUtils
      * parameter types need not be exact matches: subtypes are also accepted.
      *
      * @param constructor    the constructor to test
-     * @param parameterTypes candidate parameter types
+     * @param parameterTypes candidate parameter types - any items that are
+     *                       null are not checked
      * @return true if the method could be called with instances of the given
      *         types
      */
@@ -252,14 +268,15 @@ public class ReflectionUtils
 
     private static boolean parameterTypesMatch(Class<?>[] formalTypes, Class<?>... parameterTypes)
     {
-        if(formalTypes.length != parameterTypes.length)
+        if (formalTypes.length != parameterTypes.length)
         {
             return false;
         }
 
         for(int i = 0; i < formalTypes.length; i++)
         {
-            if(!formalTypes[i].isAssignableFrom(parameterTypes[i]))
+            Class<?> parameterType = parameterTypes[i];
+            if(parameterType != null && !formalTypes[i].isAssignableFrom(parameterType) && !boxEquivalents(formalTypes[i], parameterType))
             {
                 return false;
             }
@@ -281,7 +298,7 @@ public class ReflectionUtils
      *                      return type)
      * @return true if the given method returns a compatible type
      */
-    public static boolean returnsType(Method method, Class rawClass, Type... typeArguments)
+    public static boolean returnsType(Method method, Class<?> rawClass, Type... typeArguments)
     {
         if(rawClass.isAssignableFrom(method.getReturnType()))
         {
@@ -297,8 +314,17 @@ public class ReflectionUtils
                 return Arrays.equals(parameterizedType.getActualTypeArguments(), typeArguments);
             }
         }
+        else if (typeArguments.length == 0 && boxEquivalents(rawClass, method.getReturnType()))
+        {
+            return true;
+        }
 
         return false;
+    }
+
+    private static boolean boxEquivalents(Class<?> c1, Class<?> c2)
+    {
+        return PRIMITIVE_TO_BOXED.get(c1) == c2 || PRIMITIVE_TO_BOXED.get(c2) == c1;
     }
 
     /**

@@ -52,6 +52,13 @@ public class WiringObjectFactory implements ObjectFactory
         return bean;
     }
 
+    public <T> T buildBean(Class<? extends T> clazz, Object... args)
+    {
+        T bean = delegate.buildBean(clazz, args);
+        wire(bean);
+        return bean;
+    }
+
     public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args)
     {
         T bean = delegate.buildBean(clazz, argTypes, args);

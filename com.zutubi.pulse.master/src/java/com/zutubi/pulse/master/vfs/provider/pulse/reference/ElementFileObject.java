@@ -1,7 +1,10 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
 import com.google.common.base.Function;
-import com.zutubi.pulse.core.marshal.doc.*;
+import com.zutubi.pulse.core.marshal.doc.ChildNodeDocs;
+import com.zutubi.pulse.core.marshal.doc.ElementDocs;
+import com.zutubi.pulse.core.marshal.doc.ExtensibleDocs;
+import com.zutubi.pulse.core.marshal.doc.NodeDocs;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -46,15 +49,15 @@ public class ElementFileObject extends AbstractReferenceFileObject
 
         if (nodeDocs instanceof ElementDocs)
         {
-            return objectFactory.buildBean(ElementFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, ElementDocs.class}, new Object[]{fileName, getFileSystem(), nodeDocs});
+            return objectFactory.buildBean(ElementFileObject.class, fileName, getFileSystem(), nodeDocs);
         }
         else if (nodeDocs instanceof ExtensibleDocs)
         {
-            return objectFactory.buildBean(ExtensibleFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, ExtensibleDocs.class}, new Object[]{fileName, getFileSystem(), nodeDocs});
+            return objectFactory.buildBean(ExtensibleFileObject.class, fileName, getFileSystem(), nodeDocs);
         }
         else
         {
-            return objectFactory.buildBean(BuiltinElementFileObject.class, new Class[]{FileName.class, AbstractFileSystem.class, BuiltinElementDocs.class}, new Object[]{fileName, getFileSystem(), nodeDocs});
+            return objectFactory.buildBean(BuiltinElementFileObject.class, fileName, getFileSystem(), nodeDocs);
         }
     }
 

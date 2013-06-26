@@ -32,10 +32,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
         long buildId = getBuildId(fileName.getBaseName());
         if (buildId != -1)
         {
-            return objectFactory.buildBean(BuildFileObject.class,
-                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                    new Object[]{fileName, buildId, pfs}
-            );
+            return objectFactory.buildBean(BuildFileObject.class, fileName, buildId, pfs);
         }
         // need an error place holder.
         return null;

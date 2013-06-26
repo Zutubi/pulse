@@ -98,7 +98,7 @@ public class DefaultHostManager implements HostManager
 
     private DefaultHost buildHost(HostState hostState)
     {
-        return objectFactory.buildBean(DefaultHost.class, new Class[]{HostState.class}, new Object[]{hostState});
+        return objectFactory.buildBean(DefaultHost.class, hostState);
     }
 
     private HostState createState(AgentConfiguration agentConfig)
@@ -237,7 +237,7 @@ public class DefaultHostManager implements HostManager
         if (host.isRemote())
         {
             SlaveService slaveService = slaveProxyFactory.createProxy(host.getHostName(), host.getPort());
-            return objectFactory.buildBean(SlaveHostService.class, new Class[]{SlaveService.class}, new Object[]{slaveService});
+            return objectFactory.buildBean(SlaveHostService.class, slaveService);
         }
         else
         {

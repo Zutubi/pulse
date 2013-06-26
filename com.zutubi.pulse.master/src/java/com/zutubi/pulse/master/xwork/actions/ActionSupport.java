@@ -260,9 +260,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         Viewport viewport = new Viewport();
 
-        BuildViewport buildViewport = objectFactory.buildBean(BuildViewport.class,
-                new Class[]{Long.TYPE}, new Object[]{buildId}
-        );
+        BuildViewport buildViewport = objectFactory.buildBean(BuildViewport.class, buildId);
 
         List<BuildResult> builds = buildViewport.getVisibleBuilds();
         viewport.addAll(transform(builds, new Function<BuildResult, Viewport.Data>()

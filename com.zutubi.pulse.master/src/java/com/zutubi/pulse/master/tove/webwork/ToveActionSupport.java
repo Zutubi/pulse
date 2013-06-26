@@ -159,7 +159,7 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     protected void prepare()
     {
         // default handling - render the page.
-        configuration = objectFactory.buildBean(ConfigurationUIModel.class, new Class[]{String.class}, new Object[]{path});
+        configuration = objectFactory.buildBean(ConfigurationUIModel.class, path);
         configuration.analyse();
 
         if (record == null)

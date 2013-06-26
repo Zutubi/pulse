@@ -94,7 +94,7 @@ public class ResultNotifier implements EventListener
             {
                 Set<SubscriptionConfiguration> subscriptionsToNotify = new HashSet<SubscriptionConfiguration>();
                 Set<Long> contactPointsToNotify = new HashSet<Long>();
-                NotifyConditionContext context = objectFactory.buildBean(NotifyConditionContext.class, new Class[]{BuildResult.class}, new Object[]{buildResult});
+                NotifyConditionContext context = objectFactory.buildBean(NotifyConditionContext.class, buildResult);
                 for (SubscriptionConfiguration subscription : configurationProvider.getAll(SubscriptionConfiguration.class))
                 {
                     ContactConfiguration contactPoint = subscription.getContact();

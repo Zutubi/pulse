@@ -29,10 +29,7 @@ public abstract class FileInfoRootFileObject extends AbstractPulseFileObject imp
     {
         FileInfo child = getFileInfo(fileName.getBaseName());
 
-        return objectFactory.buildBean(FileInfoFileObject.class,
-                new Class[]{FileInfo.class, FileName.class, AbstractFileSystem.class},
-                new Object[]{child, fileName, pfs}
-        );
+        return objectFactory.buildBean(FileInfoFileObject.class, child, fileName, pfs);
     }
 
     protected FileType doGetType() throws Exception

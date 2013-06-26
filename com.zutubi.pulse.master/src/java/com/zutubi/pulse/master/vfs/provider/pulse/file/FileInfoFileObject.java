@@ -33,10 +33,7 @@ public class FileInfoFileObject extends AbstractPulseFileObject
 
         FileInfo child = provider.getFileInfo(relativePath);
 
-        return objectFactory.buildBean(FileInfoFileObject.class,
-                new Class[]{FileInfo.class, FileName.class, AbstractFileSystem.class},
-                new Object[]{child, fileName, pfs}
-        );
+        return objectFactory.buildBean(FileInfoFileObject.class, child, fileName, pfs);
     }
 
     protected String[] doListChildren() throws Exception

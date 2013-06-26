@@ -84,12 +84,12 @@ public class CleanupScheduler implements Stoppable
 
     private ProjectCleanupRequest createRequest(Project project)
     {
-        return objectFactory.buildBean(ProjectCleanupRequest.class, new Class[]{Project.class}, new Object[]{project});
+        return objectFactory.buildBean(ProjectCleanupRequest.class, project);
     }
 
     private UserCleanupRequest createRequest(User user)
     {
-        return objectFactory.buildBean(UserCleanupRequest.class, new Class[]{User.class}, new Object[]{user});
+        return objectFactory.buildBean(UserCleanupRequest.class, user);
     }
 
     public void stop(boolean force)
