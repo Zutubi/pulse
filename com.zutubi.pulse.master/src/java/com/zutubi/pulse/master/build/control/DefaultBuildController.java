@@ -21,8 +21,6 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -43,7 +41,6 @@ import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -102,7 +99,6 @@ public class DefaultBuildController implements EventListener, BuildController
     private BuildResult buildResult;
     private AsynchronousDelegatingListener asyncListener;
     private int pendingRecipes = 0;
-    private CallbackService callbackService;
 
     private BuildResult previousHealthy;
     private PulseExecutionContext buildContext;
@@ -125,11 +121,6 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private boolean dependencyInfoRecorded = false;
     
-    /**
-     * A map of the recipe timeout callbacks.
-     */
-    private Map<Long, RecipeTimeoutCallback> timeoutCallbacks = new HashMap<Long, RecipeTimeoutCallback>();
-
     public DefaultBuildController(BuildRequestEvent event)
     {
         this.request = event;
@@ -672,31 +663,12 @@ public class DefaultBuildController implements EventListener, BuildController
                     handleLastCommenced();
                 }
 
-                if (projectConfig.getOptions().getTimeout() != BuildOptionsConfiguration.TIMEOUT_NEVER)
-                {
-                    scheduleTimeout(e.getRecipeId());
-                }
             }
             else if (e instanceof RecipeAssignedEvent)
             {
                 if (!buildResult.commenced())
                 {
                     handleBuildCommenced();
-                }
-            }
-            else if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
-            {
-                try
-                {
-                    RecipeTimeoutCallback callback = timeoutCallbacks.get(e.getRecipeId());
-                    if (callback != null)
-                    {
-                        callbackService.unregisterCallback(callback);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LOG.warning("Unable to unregister timeout trigger: " + ex.getMessage(), ex);
                 }
             }
 
@@ -870,22 +842,6 @@ public class DefaultBuildController implements EventListener, BuildController
         printWriter.println("Unexpected error: " + context + ":");
         exception.printStackTrace(printWriter);
         buildResult.addFeature(level, stringWriter.toString());
-    }
-
-    private void scheduleTimeout(long recipeId)
-    {
-        Date timeoutAt = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
-
-        try
-        {
-            RecipeTimeoutCallback timeoutCallback = new RecipeTimeoutCallback(buildResult.getId(), recipeId);
-            timeoutCallbacks.put(recipeId, timeoutCallback);
-            callbackService.registerCallback(timeoutCallback, timeoutAt);
-        }
-        catch (Exception e)
-        {
-            LOG.severe("Unable to schedule build timeout callback: " + e.getMessage(), e);
-        }
     }
 
     private boolean handleIfFinished(RecipeController controller, boolean collect)
@@ -1208,7 +1164,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
+        return new Class[]{BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class };
     }
 
     public Project getProject()
@@ -1273,11 +1229,6 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setCollector(RecipeResultCollector collector)
     {
         this.collector = collector;
-    }
-
-    public void setCallbackService(CallbackService callbackService)
-    {
-        this.callbackService = callbackService;
     }
 
     public void setScmManager(ScmManager scmManager)
@@ -1345,22 +1296,6 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private class RecipeTimeoutCallback implements Runnable
-    {
-        private long buildResultId;
-        private long recipeId;
-
-        private RecipeTimeoutCallback(long buildResultId, long recipeId)
-        {
-            this.buildResultId = buildResultId;
-            this.recipeId = recipeId;
-        }
-
-        public void run()
-        {
-            eventManager.publish(new RecipeTimeoutEvent(DefaultBuildController.this, buildResultId, recipeId));
-        }
-    }
 
     private static class AssignmentRequestPriorityComparator implements Comparator<RecipeController>
     {

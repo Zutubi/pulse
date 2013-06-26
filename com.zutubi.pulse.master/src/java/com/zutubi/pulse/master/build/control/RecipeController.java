@@ -27,18 +27,18 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
+import com.zutubi.util.Constants;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 import static com.google.common.collect.Collections2.transform;
@@ -75,6 +75,7 @@ public class RecipeController
      */
     private boolean commencedEventReceived = false;
     private boolean finished = false;
+    private RecipeTimeoutCallback timeoutCallback;
 
     private RecipeQueue recipeQueue;
     private AgentService agentService;
@@ -84,6 +85,7 @@ public class RecipeController
     private BuildHookManager buildHookManager;
     private RecipeDispatchService recipeDispatchService;
     private ScmManager scmManager;
+    private CallbackService callbackService;
 
     public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
     {
@@ -279,6 +281,11 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
+        if (projectConfiguration.getOptions().getTimeout() != BuildOptionsConfiguration.TIMEOUT_NEVER)
+        {
+            scheduleTimeout();
+        }
+
         commencedEventReceived = true;
         recipeResult.commence(event.getName(), System.currentTimeMillis());
         if(previousSuccessful != null)
@@ -298,6 +305,20 @@ public class RecipeController
         }
         buildManager.save(recipeResult);
         logger.log(event, recipeResult);
+    }
+
+    private void scheduleTimeout()
+    {
+        Date timeoutAt = new Date(System.currentTimeMillis() + projectConfiguration.getOptions().getTimeout() * Constants.MINUTE);
+        try
+        {
+            timeoutCallback = new RecipeTimeoutCallback(buildResult.getId(), recipeResult.getId());
+            callbackService.registerCallback(timeoutCallback, timeoutAt);
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Unable to schedule build timeout callback: " + e.getMessage(), e);
+        }
     }
 
     private void handleCommandCommenced(CommandCommencedEvent event)
@@ -364,6 +385,18 @@ public class RecipeController
 
     private void complete()
     {
+        if (timeoutCallback != null)
+        {
+            try
+            {
+                callbackService.unregisterCallback(timeoutCallback);
+            }
+            catch (Exception ex)
+            {
+                LOG.warning("Unable to unregister timeout trigger: " + ex.getMessage(), ex);
+            }
+        }
+
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
 
@@ -619,4 +652,25 @@ public class RecipeController
     {
         this.scmManager = scmManager;
     }
-}
+
+    public void setCallbackService(CallbackService callbackService)
+    {
+        this.callbackService = callbackService;
+    }
+
+    private class RecipeTimeoutCallback implements Runnable
+    {
+        private long buildResultId;
+        private long recipeId;
+
+        private RecipeTimeoutCallback(long buildResultId, long recipeId)
+        {
+            this.buildResultId = buildResultId;
+            this.recipeId = recipeId;
+        }
+
+        public void run()
+        {
+            eventManager.publish(new RecipeTimeoutEvent(RecipeController.this, buildResultId, recipeId));
+        }
+    }}

@@ -13,18 +13,15 @@ public class CvsClientFactory implements ScmClientFactory<CvsConfiguration>
 {
     private ObjectFactory objectFactory;
 
-    private static final Class[] CONSTRUCTOR_ARGS = new Class[]{String.class, String.class, String.class, String.class};
-
     public ScmClient createClient(CvsConfiguration config) throws ScmException
     {
         try
         {
-            CvsClient client = objectFactory.buildBean(CvsClient.class, CONSTRUCTOR_ARGS,
-                    new Object[]{config.getRoot(),
+            CvsClient client = objectFactory.buildBean(CvsClient.class,
+                            config.getRoot(),
                             config.getModule(),
                             config.getPassword(),
                             config.getBranch()
-                    }
             );
             client.setFilterPaths(config.getIncludedPaths(), config.getExcludedPaths());
             return client;
