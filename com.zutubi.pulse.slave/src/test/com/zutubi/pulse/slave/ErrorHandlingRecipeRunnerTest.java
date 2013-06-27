@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.servercore.RecipeRunner;
 import com.zutubi.pulse.servercore.services.MasterService;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -35,7 +36,7 @@ public class ErrorHandlingRecipeRunnerTest extends PulseTestCase
         ErrorHandlingRecipeRunner errorHandlingRecipeRunner = new ErrorHandlingRecipeRunner(masterService, "a token", 0, r);
         errorHandlingRecipeRunner.runRecipe(null, null);
 
-        RecipeErrorEvent recipeErrorEvent = new RecipeErrorEvent(null, 0, expectedError);
+        RecipeErrorEvent recipeErrorEvent = new RecipeErrorEvent(null, 0, expectedError, false);
         verify(masterService).handleEvent("a token", recipeErrorEvent);
     }
 }

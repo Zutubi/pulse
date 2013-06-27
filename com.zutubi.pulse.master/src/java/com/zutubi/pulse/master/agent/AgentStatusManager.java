@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.NullaryFunction;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -22,6 +21,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * Manages the transient status of agents.  Uses ping and recipe events to
@@ -170,7 +171,7 @@ public class AgentStatusManager implements EventListener
                     case BUILDING:
                     case RECIPE_ASSIGNED:
                     case RECIPE_DISPATCHED:
-                        publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent status changed to '" + agentPingEvent.getPingStatus().getPrettyString() + "' while recipe in progress"));
+                        publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent status changed to '" + agentPingEvent.getPingStatus().getPrettyString() + "' while recipe in progress", true));
 
                         // So severe that we will not do the usual post
                         // recipe jazz.  This agent is gone proper.
@@ -255,7 +256,7 @@ public class AgentStatusManager implements EventListener
                     // event, stimulated by this error event).  Once that is
                     // done the awaiting ping state will move us the
                     // appropriate next status.
-                    publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent recipe mismatch"));
+                    publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent recipe mismatch", true));
                     publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), agentPingEvent.getRecipeId()));
                 }
                 break;
@@ -341,7 +342,7 @@ public class AgentStatusManager implements EventListener
         long timeout = getAgentOfflineTimeout();
         if (timeSincePing > timeout)
         {
-            publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), message + " (agent: " + agent.getName() + ", recipe: " + agent.getRecipeId() + ", since ping: " + timeSincePing + ", timeout: " + timeout + ")"));
+            publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), message + " (agent: " + agent.getName() + ", recipe: " + agent.getRecipeId() + ", since ping: " + timeSincePing + ", timeout: " + timeout + ")", true));
             return true;
         }
 
@@ -506,7 +507,7 @@ public class AgentStatusManager implements EventListener
                         case RECIPE_ASSIGNED:
                         case RECIPE_DISPATCHED:
                             publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), agent.getRecipeId()));
-                            publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent disabled while recipe in progress"));
+                            publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent disabled while recipe in progress", false));
                             break;
                     }
                     break;
@@ -568,7 +569,7 @@ public class AgentStatusManager implements EventListener
                 case RECIPE_ASSIGNED:
                 case RECIPE_DISPATCHED:
                 case BUILDING:
-                    publishEvent(new RecipeErrorEvent(this, recipeId, "Agent deleted while recipe in progress"));
+                    publishEvent(new RecipeErrorEvent(this, recipeId, "Agent deleted while recipe in progress", false));
                     break;
             }
         }

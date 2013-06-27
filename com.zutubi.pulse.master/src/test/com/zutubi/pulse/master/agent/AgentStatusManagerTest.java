@@ -286,7 +286,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         clearEvents();
         waitForTimeout();
         sendPing(agent, new HostStatus(PingStatus.IDLE, false));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent idle after recipe expected to have commenced (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)"));
+        assertEvents(new RecipeErrorEvent(this, 1000, "Agent idle after recipe expected to have commenced (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)", true));
         sendRecipeCollecting(agent, 1000);
 
         onComplete();
@@ -397,7 +397,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         Agent agent = addAgentAndDispatchRecipe(DEFAULT_AGENT_ID, 1000);
 
         sendPing(agent, createBuildingStatus(2000));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch"));
+        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch", true));
         sendRecipeCollecting(agent, 1000);
 
         // We still go through the normal post-recipe state for recipe 1000.
@@ -416,7 +416,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         Agent agent = addAgentAndDispatchRecipe(DEFAULT_AGENT_ID, 1000);
 
         sendPing(agent, createBuildingStatus(2000));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch"));
+        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch", true));
         sendRecipeCollecting(agent, 1000);
 
         // We still go through the normal post-recipe state for recipe 1000.
@@ -609,7 +609,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendDisableRequest(agent);
         assertEvents(
                 new RecipeTerminateRequestEvent(this, null, 1000),
-                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress")
+                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress", false)
         );
         sendRecipeCollecting(agent, 1000);
         assertEquals(POST_RECIPE, agent.getStatus());
@@ -648,7 +648,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendDisableRequest(agent);
         assertEvents(
                 new RecipeTerminateRequestEvent(this, null, 1000),
-                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress")
+                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress", false)
         );
         sendRecipeCollecting(agent, 1000);
         assertEquals(POST_RECIPE, agent.getStatus());
@@ -783,7 +783,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // The manager should kill off the recipe controller, but ignore the
         // agent as it is now meaningless to us.
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent deleted while recipe in progress"), new AgentOfflineEvent(this, agent));
+        assertEvents(new RecipeErrorEvent(this, 1000, "Agent deleted while recipe in progress", false), new AgentOfflineEvent(this, agent));
         eventManager.publish(new RecipeCollectingEvent(this, 1000));
 
         assertSlaveRemoved(agent);
@@ -892,7 +892,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(VERSION_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'version mismatch' while recipe in progress"),
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'version mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, VERSION_MISMATCH);
@@ -921,7 +921,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(PLUGIN_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress"),
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, PLUGIN_MISMATCH);
@@ -964,7 +964,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(TOKEN_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'token mismatch' while recipe in progress"),
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'token mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, TOKEN_MISMATCH);
@@ -1007,7 +1007,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(INVALID_MASTER, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'invalid master' while recipe in progress"),
+                new RecipeErrorEvent(this, 1000, "Agent status changed to 'invalid master' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, INVALID_MASTER);

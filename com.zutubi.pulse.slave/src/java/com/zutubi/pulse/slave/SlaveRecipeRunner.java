@@ -99,13 +99,13 @@ public class SlaveRecipeRunner implements RecipeRunner
             catch (BuildException e)
             {
                 LOG.warning("A problem occurred while processing a recipe build request. Reason: " + e.getMessage(), e);
-                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage());
+                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage(), false);
                 eventManager.publish(error);
             }
             catch (Exception e)
             {
                 LOG.severe(e);
-                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage());
+                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage(), false);
                 eventManager.publish(error);
             }
             finally

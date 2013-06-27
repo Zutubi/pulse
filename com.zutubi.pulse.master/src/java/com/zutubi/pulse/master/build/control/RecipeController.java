@@ -77,6 +77,8 @@ public class RecipeController
     private boolean finished = false;
     private RecipeTimeoutCallback timeoutCallback;
 
+    private int retryCount;
+
     private RecipeQueue recipeQueue;
     private AgentService agentService;
     private EventManager eventManager;
@@ -87,11 +89,12 @@ public class RecipeController
     private ScmManager scmManager;
     private CallbackService callbackService;
 
-    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
+    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, int retryCount)
     {
         this.projectConfiguration = projectConfiguration;
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
+        this.retryCount = retryCount;
         this.recipeResult = recipeResultNode.getResult();
         this.assignmentRequest = assignmentRequest;
         this.recipeContext = recipeContext;
@@ -117,6 +120,11 @@ public class RecipeController
         {
             handleUnexpectedException(e);
         }
+    }
+
+    public int getRetryCount()
+    {
+        return retryCount;
     }
 
     public RecipeAssignmentRequest getAssignmentRequest()

@@ -21,6 +21,7 @@ import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.RecipeCommencedEvent;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -52,12 +53,14 @@ import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.time.TimeStamps;
 import org.apache.ivy.core.report.ResolveReport;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
@@ -229,49 +232,96 @@ public class DefaultBuildController implements EventListener, BuildController
 
         for (BuildStageConfiguration stageConfig : projectConfig.getStages().values())
         {
-            RecipeResult recipeResult = new RecipeResult(stageConfig.getRecipe());
-            RecipeResultNode stageResult = new RecipeResultNode(stageConfig, recipeResult);
-            buildResult.addStage(stageResult);
-            buildManager.save(stageResult);
-
-            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
-
+            RecipeResultNode stageResult = createResultForStage(stageConfig);
             if (stageConfig.isEnabled())
             {
-                File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
-                recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
-
-                PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
-                recipeContext.push();
-                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
-                recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
-                recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
-
-                RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
-                recipeRequest.setPulseFileSource(pulseFileProvider);
-                recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
-                recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
-                recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
-                List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig, recipeRequest);
-                recipeRequest.addAllResourceRequirements(resourceRequirements);
-
-                RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
-                setRequestPriority(assignmentRequest, stageConfig);
-
-                RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
-                RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector);
-                controllers.add(recipeController);
-                pendingRecipes++;
+                createControllerForStage(stageConfig, stageResult, pulseFileProvider, 0);
             }
             else
             {
+                RecipeResult recipeResult = stageResult.getResult();
                 recipeResult.skip();
                 recipeResult.complete();
                 buildManager.save(recipeResult);
             }
         }
+    }
+
+    private RecipeResultNode createResultForStage(BuildStageConfiguration stageConfig)
+    {
+        RecipeResult recipeResult = new RecipeResult(stageConfig.getRecipe());
+        RecipeResultNode stageResult = new RecipeResultNode(stageConfig, recipeResult);
+        buildResult.addStage(stageResult);
+        buildManager.save(buildResult);
+        return stageResult;
+    }
+
+    private RecipeController createControllerForStage(BuildStageConfiguration stageConfig, RecipeResultNode stageResult, PulseFileProvider pulseFileProvider, int retryCount)
+    {
+        RecipeResult recipeResult = stageResult.getResult();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
+        recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
+
+        PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
+        recipeContext.push();
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
+        recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
+
+        RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
+        recipeRequest.setPulseFileSource(pulseFileProvider);
+        recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
+        recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
+        recipeRequest.addAllProperties(asResourceProperties(request.getProperties()));
+        List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig, recipeRequest);
+        recipeRequest.addAllResourceRequirements(resourceRequirements);
+
+        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+        setRequestPriority(assignmentRequest, stageConfig);
+
+        RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
+        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
+        RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector, 0);
+        controllers.add(recipeController);
+        pendingRecipes++;
+
+        return recipeController;
+    }
+
+    private void retry(RecipeController controller, RecipeErrorEvent errorEvent)
+    {
+        RecipeResultNode stageResult = controller.getResultNode();
+        BuildStageConfiguration stageConfig = projectConfig.getStage(stageResult.getStageName());
+        String message = "Retrying stage '" + stageResult.getStageName() + "' due to problem on agent '" + stageResult.getAgentNameSafe() + "': " + errorEvent.getErrorMessage();
+        buildLogger.status(message);
+        buildResult.addFeature(Feature.Level.INFO, message);
+
+        deleteStage(stageResult);
+
+        stageResult = createResultForStage(stageConfig);
+        RecipeController newController = createControllerForStage(stageConfig, stageResult, getPulseFileSource(), controller.getRetryCount() + 1);
+        executingControllers.add(newController);
+        newController.initialise(controller.getAssignmentRequest().getRequest().getBootstrapper());
+        checkControllerStatus(newController, null);
+    }
+
+    private void deleteStage(RecipeResultNode stageResult)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File recipeOutputDir = paths.getOutputDir(buildResult, stageResult.getResult().getId());
+        try
+        {
+            FileSystemUtils.rmdir(recipeOutputDir);
+        }
+        catch (IOException e)
+        {
+            LOG.warning(e);
+        }
+
+        buildResult.removeStage(stageResult);
+        buildManager.save(buildResult);
     }
 
     private PulseFileProvider getPulseFileSource()
@@ -628,7 +678,7 @@ public class DefaultBuildController implements EventListener, BuildController
         for (RecipeController controller : sortedControllers)
         {
             controller.initialise(bootstrapper);
-            checkControllerStatus(controller);
+            checkControllerStatus(controller, null);
         }
     }
 
@@ -652,6 +702,8 @@ public class DefaultBuildController implements EventListener, BuildController
 
         if (controller != null)
         {
+            RecipeErrorEvent errorEvent = null;
+
             // If we got here we are sure that the event was for one of our
             // recipes.
             if (e instanceof RecipeCommencedEvent)
@@ -671,9 +723,13 @@ public class DefaultBuildController implements EventListener, BuildController
                     handleBuildCommenced();
                 }
             }
+            else if (e instanceof RecipeErrorEvent)
+            {
+                errorEvent = (RecipeErrorEvent) e;
+            }
 
             controller.handleRecipeEvent(e);
-            checkControllerStatus(controller);
+            checkControllerStatus(controller, errorEvent);
         }
     }
 
@@ -866,23 +922,30 @@ public class DefaultBuildController implements EventListener, BuildController
         return false;
     }
 
-    private void checkControllerStatus(RecipeController controller)
+    private void checkControllerStatus(RecipeController controller, RecipeErrorEvent errorEvent)
     {
         if (handleIfFinished(controller, true))
         {
             executingControllers.remove(controller);
-
-            RecipeResult result = controller.getResult();
-            if (result.failed())
+            if (errorEvent != null && errorEvent.isAgentStatusProblem() &&
+                controller.getRetryCount() < projectConfig.getOptions().getStageRetriesOnAgentProblem())
             {
-                buildResult.addFeature(Feature.Level.ERROR, "Recipe " + result.getRecipeNameSafe() + " failed");
+                retry(controller, errorEvent);
             }
-            else if (result.errored())
+            else
             {
-                buildResult.addFeature(Feature.Level.ERROR, "Error executing recipe " + result.getRecipeNameSafe());
-            }
+                RecipeResult result = controller.getResult();
+                if (result.failed())
+                {
+                    buildResult.addFeature(Feature.Level.ERROR, "Recipe " + result.getRecipeNameSafe() + " failed");
+                }
+                else if (result.errored())
+                {
+                    buildResult.addFeature(Feature.Level.ERROR, "Error executing recipe " + result.getRecipeNameSafe());
+                }
 
-            buildManager.save(buildResult);
+                buildManager.save(buildResult);
+            }
 
             if (executingControllers.size() == 0)
             {

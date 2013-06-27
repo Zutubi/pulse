@@ -66,12 +66,12 @@ public class MasterRecipeRunner implements RecipeRunner
         }
         catch (BuildException e)
         {
-            eventManager.publish(new RecipeErrorEvent(this, request.getId(), e.getMessage()));
+            eventManager.publish(new RecipeErrorEvent(this, request.getId(), e.getMessage(), false));
         }
         catch (Exception e)
         {
             LOG.severe(e);
-            eventManager.publish(new RecipeErrorEvent(this, request.getId(), "Unexpected error: " + e.getMessage()));
+            eventManager.publish(new RecipeErrorEvent(this, request.getId(), "Unexpected error: " + e.getMessage(), false));
         }
         finally
         {

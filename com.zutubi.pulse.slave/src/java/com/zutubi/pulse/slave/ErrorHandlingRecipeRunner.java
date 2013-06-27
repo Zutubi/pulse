@@ -52,7 +52,7 @@ public class ErrorHandlingRecipeRunner implements RecipeRunner
 
     private void sendError(String error)
     {
-        RecipeErrorEvent event = new RecipeErrorEvent(null, recipeId, error);
+        RecipeErrorEvent event = new RecipeErrorEvent(null, recipeId, error, false);
 
         try
         {

@@ -203,6 +203,7 @@
                 <ref local="addRunHookTaskOnAgents"/>
                 <ref local="updateNameConflictResolution"/>
                 <ref local="addAutoDisableToCronTrigger"/>
+                <ref local="addStageRetriesOnAgentProblem"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1065,5 +1066,9 @@
 
     <bean id="addAutoDisableToCronTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddAutoPauseToCronTriggerUpgradeTask">
         <property name="buildNumber" value="206003001"/>
+    </bean>
+
+    <bean id="addStageRetriesOnAgentProblem" class="com.zutubi.pulse.master.upgrade.tasks.AddStageRetriesOnAgentProblemUpgrageTask">
+        <property name="buildNumber" value="206003002"/>
     </bean>
 </beans>

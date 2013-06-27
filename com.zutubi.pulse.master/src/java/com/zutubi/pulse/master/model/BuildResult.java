@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.model.*;
@@ -14,6 +13,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  */
@@ -160,6 +161,11 @@ public class BuildResult extends Result implements Iterable<RecipeResultNode>, C
     public void addStage(RecipeResultNode stage)
     {
         stages.add(stage);
+    }
+
+    public void removeStage(RecipeResultNode stage)
+    {
+        stages.remove(stage);
     }
 
     public long getMetaBuildId()

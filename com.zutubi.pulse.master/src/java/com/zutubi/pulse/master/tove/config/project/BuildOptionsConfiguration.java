@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "prompt", "timeout", "stageFailureLimit", "autoClearResponsibility", "idLeader", "logCompressionEnabled"})
+@Form(fieldOrder = {"isolateChangelists", "prompt", "timeout", "stageFailureLimit", "stageRetriesOnAgentProblem", "concurrentBuilds", "priority", "autoClearResponsibility", "idLeader", "logCompressionEnabled"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
@@ -21,6 +21,8 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     private int timeout = TIMEOUT_NEVER;
     private boolean prompt = false;
     private int stageFailureLimit = 0;
+    @Numeric(min = 0)
+    private int stageRetriesOnAgentProblem = 0;
     private boolean autoClearResponsibility = true;
     @Reference
     private ProjectConfiguration idLeader = null;
@@ -78,6 +80,16 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setStageFailureLimit(int stageFailureLimit)
     {
         this.stageFailureLimit = stageFailureLimit;
+    }
+
+    public int getStageRetriesOnAgentProblem()
+    {
+        return stageRetriesOnAgentProblem;
+    }
+
+    public void setStageRetriesOnAgentProblem(int stageRetriesOnAgentProblem)
+    {
+        this.stageRetriesOnAgentProblem = stageRetriesOnAgentProblem;
     }
 
     public boolean isAutoClearResponsibility()

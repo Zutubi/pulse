@@ -1,10 +1,6 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Predicate;
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Iterables.removeIf;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -46,6 +42,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Iterables.removeIf;
 
 /**
  * A recipe queue that runs an independent thread to manage the dispatching
@@ -163,7 +164,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 {
                     if (unsatisfiableTimeout == 0)
                     {
-                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("satisfy.requirements.none", assignmentRequest.getUnfulfilledReason()));
+                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("satisfy.requirements.none", assignmentRequest.getUnfulfilledReason()), false);
                     }
                     else
                     {
@@ -184,7 +185,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         catch (Exception e)
         {
             LOG.error(e);
-            error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("error.enqueue.failed", e.getMessage()));
+            error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), I18N.format("error.enqueue.failed", e.getMessage()), false);
         }
 
         if (error != null)
@@ -415,7 +416,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 {
                     LOG.finest("  request " + recipeId + " timed out");
                     doneRequests.add(request);
-                    eventManager.publish(new RecipeErrorEvent(this, recipeId, I18N.format("recipe.assignment.timeout")));
+                    eventManager.publish(new RecipeErrorEvent(this, recipeId, I18N.format("recipe.assignment.timeout"), false));
                 }
                 else
                 {
@@ -575,7 +576,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         for (RecipeAssignmentRequest request : unfulfillable)
         {
-            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none", request.getUnfulfilledReason())));
+            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), I18N.format("satisfy.requirements.none", request.getUnfulfilledReason()), false));
         }
     }
 

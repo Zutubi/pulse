@@ -101,7 +101,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         ScmManager scmManager = mock(ScmManager.class);
         stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new TestScmClient());
-        recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector);
+        recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector, 0);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -298,7 +298,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private RecipeErrorEvent sendError()
     {
-        RecipeErrorEvent error = new RecipeErrorEvent(this, recipeResult.getId(), "test error message");
+        RecipeErrorEvent error = new RecipeErrorEvent(this, recipeResult.getId(), "test error message", false);
         assertTrue(recipeController.matchesRecipeEvent(error));
         recipeController.handleRecipeEvent(error);
         assertErrorDetailsSaved(error);
