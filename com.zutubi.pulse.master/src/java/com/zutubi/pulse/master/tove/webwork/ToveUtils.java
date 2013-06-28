@@ -560,8 +560,13 @@ public class ToveUtils
 
     private static ActionLink getActionLink(String action, String actionName, Messages messages, File contentRoot)
     {
+        return new ActionLink(action, format(messages, actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL), getActionIconName(actionName, contentRoot));
+    }
+
+    public static String getActionIconName(String actionName, File contentRoot)
+    {
         File iconFile = new File(contentRoot, FileSystemUtils.composeFilename("images", "config", "actions", actionName + ".gif"));
-        return new ActionLink(action, format(messages, actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL), iconFile.exists() ? actionName : "generic");
+        return iconFile.exists() ? actionName : "generic";
     }
 
     public static String format(Messages messages, String key)

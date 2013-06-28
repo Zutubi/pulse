@@ -168,7 +168,6 @@ public class ProjectXmlRpcAcceptanceTest extends AcceptanceTestBase
         assertNotNull(options);
         assertEquals("zutubi.buildOptionsConfig", options.get(SYMBOLIC_NAME_KEY));
         assertEquals(false, options.get("isolateChangelists"));
-        assertEquals(false, options.get("prompt"));
         assertEquals(0, options.get("timeout"));
     }
 }

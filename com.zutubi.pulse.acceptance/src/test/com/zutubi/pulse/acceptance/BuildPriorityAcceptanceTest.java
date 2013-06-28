@@ -4,16 +4,17 @@ import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
-import static com.zutubi.pulse.core.engine.api.ResultState.*;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.zutubi.pulse.core.engine.api.ResultState.*;
+import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Set of acceptance tests that work on testing builds priorities.
@@ -169,8 +170,7 @@ public class BuildPriorityAcceptanceTest extends AcceptanceTestBase
         WaitProject projectA = createProject("A");
         WaitProject projectB = createProject("B");
         WaitProject projectC = createProject("C");
-        projectC.getOptions().setPrompt(true);
-        
+
         insertProjects(projectA, projectB, projectC);
 
         buildRunner.triggerBuild(projectA);

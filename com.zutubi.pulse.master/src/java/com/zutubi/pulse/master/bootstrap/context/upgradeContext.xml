@@ -204,6 +204,8 @@
                 <ref local="updateNameConflictResolution"/>
                 <ref local="addAutoDisableToCronTrigger"/>
                 <ref local="addStageRetriesOnAgentProblem"/>
+                <ref local="addManualTrigger"/>
+                <ref local="removePromptOption"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1070,5 +1072,13 @@
 
     <bean id="addStageRetriesOnAgentProblem" class="com.zutubi.pulse.master.upgrade.tasks.AddStageRetriesOnAgentProblemUpgrageTask">
         <property name="buildNumber" value="206003002"/>
+    </bean>
+
+    <bean id="addManualTrigger" class="com.zutubi.pulse.master.upgrade.tasks.AddManualTriggerUpgradeTask">
+        <property name="buildNumber" value="206003003"/>
+    </bean>
+
+    <bean id="removePromptOption" class="com.zutubi.pulse.master.upgrade.tasks.RemovePromptOptionUpgradeTask">
+        <property name="buildNumber" value="206003004"/>
     </bean>
 </beans>

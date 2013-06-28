@@ -9,10 +9,8 @@ import com.zutubi.pulse.acceptance.utils.DepAntProject;
 import com.zutubi.pulse.acceptance.utils.ProjectConfigurationHelper;
 import com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
-import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
-import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -157,7 +155,6 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.RemoteApi.insertSimpleProject(projectA);
         rpcClient.RemoteApi.insertSimpleProject(projectB);
-        rpcClient.RemoteApi.enableBuildPrompting(projectB);
 
         getBrowser().loginAsAdmin();
 
@@ -182,52 +179,6 @@ public class DependenciesConfigurationAcceptanceTest extends AcceptanceTestBase
         form.waitFor();
         form.waitFor();
         return form.isRebuildCheckboxPresent();
-    }
-
-    public void testRebuildOptionAvailabilityOnProjectHomePage() throws Exception
-    {
-        String upstreamProject1 = random + "-upstream1";
-        String upstreamProject2 = random + "-upstream2";
-        String downstreamIntegrationProject = random + "-downstream-integration";
-        String downstreamMilestoneProject = random + "-downstream-milestone";
-        String downstreamBothProject = random + "-downstream-both";
-
-        rpcClient.RemoteApi.insertSimpleProject(upstreamProject1);
-        rpcClient.RemoteApi.insertSimpleProject(upstreamProject2);
-
-        rpcClient.RemoteApi.insertSimpleProject(downstreamIntegrationProject);
-        addDependency(downstreamIntegrationProject, upstreamProject1);
-
-        rpcClient.RemoteApi.insertSimpleProject(downstreamMilestoneProject);
-        addDependency(downstreamMilestoneProject, upstreamProject1, IvyStatus.STATUS_MILESTONE);
-
-        rpcClient.RemoteApi.insertSimpleProject(downstreamBothProject);
-        addDependency(downstreamBothProject, upstreamProject1);
-        addDependency(downstreamBothProject, upstreamProject2, IvyStatus.STATUS_MILESTONE);
-
-        getBrowser().loginAsAdmin();
-
-        assertFalse(isRebuildActionAvailableOnProjectHomePage(upstreamProject1));
-        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamIntegrationProject));
-        assertFalse(isRebuildActionAvailableOnProjectHomePage(downstreamMilestoneProject));
-        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamBothProject));
-
-        turnOnPromptOption(downstreamMilestoneProject);
-        assertTrue(isRebuildActionAvailableOnProjectHomePage(downstreamMilestoneProject));
-    }
-
-    private boolean isRebuildActionAvailableOnProjectHomePage(String projectName)
-    {
-        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
-        return home.isRebuildActionPresent();
-    }
-
-    private void turnOnPromptOption(String project) throws Exception
-    {
-        String optionsPath = PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, project, Constants.Project.OPTIONS);
-        Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
-        options.put("prompt", true);
-        rpcClient.RemoteApi.saveConfig(optionsPath, options, false);
     }
 
     private void assertDependenciesTableRow(ProjectDependenciesPage page, int rowIndex, String project, String revision, String stages, String transitive)

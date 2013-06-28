@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.*;
 
 import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Analyses a configuration path, extracting information that is used to
@@ -292,13 +291,27 @@ public class ConfigurationUIModel
                 key[0] = PathUtils.getBaseName(path);
             }
 
-            actions = newArrayList(transform(actionNames, new Function<String, ActionLink>()
+            actions = new ArrayList<ActionLink>(actionNames.size());
+            for (String actionName: actionNames)
             {
-                public ActionLink apply(String actionName)
+                List<String> variants = null;
+                if (instance != null)
                 {
-                    return ToveUtils.getActionLink(actionName, parentRecord[0], key[0], messages, systemPaths);
+                    variants = actionManager.getVariants(actionName, instance);
                 }
-            }));
+
+                if (variants == null)
+                {
+                    actions.add(ToveUtils.getActionLink(actionName, parentRecord[0], key[0], messages, systemPaths));
+                }
+                else
+                {
+                    for (String variant: variants)
+                    {
+                        actions.add(new ActionLink(actionName, variant, ToveUtils.getActionIconName(actionName, systemPaths.getContentRoot()), variant));
+                    }
+                }
+            }
         }
         else
         {

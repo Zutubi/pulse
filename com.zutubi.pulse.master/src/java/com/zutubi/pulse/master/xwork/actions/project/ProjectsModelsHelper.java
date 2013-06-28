@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
 import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -21,6 +20,8 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.RecordManager;
 
 import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * A shared helper class that can take a set of projects and groups and output
@@ -157,10 +158,9 @@ public class ProjectsModelsHelper
         {
             for (Project p : projects)
             {
-                boolean prompt = p.getConfig().getOptions().getPrompt();
                 List<BuildResult> builds = getBuilds(p, configuration, buildCache);
                 ProjectHealth health = getHealth(p, builds);
-                ConcreteProjectModel child = new ConcreteProjectModel(model, p, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(p), health, ProjectMonitoring.getMonitoring(p));
+                ConcreteProjectModel child = new ConcreteProjectModel(model, p, builds, loggedInUser, configuration, urls, getAvailableActions(p), health, ProjectMonitoring.getMonitoring(p));
                 model.getRoot().addChild(child);
             }
         }
@@ -184,9 +184,8 @@ public class ProjectsModelsHelper
                         if (project != null)
                         {
                             List<BuildResult> builds = getBuilds(project, configuration, buildCache);
-                            boolean prompt = project.getConfig().getOptions().getPrompt();
                             ProjectHealth health = getHealth(project, builds);
-                            model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, prompt, getAvailableActions(project), health, ProjectMonitoring.getMonitoring(project));
+                            model = new ConcreteProjectModel(group, project, builds, loggedInUser, configuration, urls, getAvailableActions(project), health, ProjectMonitoring.getMonitoring(project));
                         }
                     }
                     else

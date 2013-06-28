@@ -1,9 +1,6 @@
 package com.zutubi.tove.actions;
 
 import com.google.common.base.Predicate;
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.or;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Permission;
@@ -12,15 +9,19 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import static com.zutubi.util.reflection.MethodPredicates.*;
 import com.zutubi.util.reflection.ReflectionUtils;
-import static java.util.Arrays.asList;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.util.reflection.MethodPredicates.*;
+import static java.util.Arrays.asList;
 
 /**
  * Describes a bunch of available actions for a configuration type.
@@ -96,7 +97,7 @@ public class ConfigurationActions
                 Class argumentType = null;
                 if (parameterCount > 0)
                 {
-                    Class param = method.getParameterTypes()[0];
+                    Class<?> param = method.getParameterTypes()[0];
                     if (!param.isAssignableFrom(configurationClass))
                     {
                         continue;
@@ -114,7 +115,7 @@ public class ConfigurationActions
 
                 // ok, we have an action here.
                 String action = methodToAction(methodName);
-                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getCustomiseMethod(action), getPrepareMethod(action, argumentType), method));
+                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getVariantsMethod(action), getPrepareMethod(action, argumentType), method));
             }
         }
     }
@@ -142,9 +143,9 @@ public class ConfigurationActions
         return permissionName;
     }
 
-    private Method getCustomiseMethod(final String action)
+    private Method getVariantsMethod(final String action)
     {
-        return getMethodWithOptionalReturn(action, String.class, "customise");
+        return getMethodWithOptionalReturn(action, List.class, "variantsOf");
     }
 
     private Method getPrepareMethod(final String action, final Class argumentType)
@@ -152,7 +153,7 @@ public class ConfigurationActions
         return getMethodWithOptionalReturn(action, argumentType, "prepare");
     }
 
-    private Method getMethodWithOptionalReturn(String action, final Class optionalReturnType, String prefix)
+    private Method getMethodWithOptionalReturn(String action, final Class<?> optionalReturnType, String prefix)
     {
         final String expectedName = prefix + action.substring(0, 1).toUpperCase() + action.substring(1);
         return find(asList(actionHandlerClass.getMethods()), new Predicate<Method>()
@@ -225,6 +226,7 @@ public class ConfigurationActions
         return instance.isConcrete() && deeplyValid;
     }
 
+    @SuppressWarnings("unchecked")
     List<ConfigurationAction> getActions(Object configurationInstance) throws Exception
     {
         List<ConfigurationAction> actions;
@@ -264,21 +266,22 @@ public class ConfigurationActions
         return actions;
     }
 
-    public String customise(String name, Configuration configurationInstance) throws Exception
+    @SuppressWarnings("unchecked")
+    public List<String> getVariants(String name, Configuration configurationInstance) throws Exception
     {
         ConfigurationAction action = verifyAction(name, configurationInstance);
-        Method customiseMethod = action.getCustomiseMethod();
-        String result = null;
-        if(customiseMethod != null)
+        Method variantsMethod = action.getVariantsMethod();
+        List<String> result = null;
+        if (variantsMethod != null)
         {
             Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
-            if(customiseMethod.getParameterTypes().length == 0)
+            if (variantsMethod.getParameterTypes().length == 0)
             {
-                result = (String) customiseMethod.invoke(handlerInstance);
+                result = (List<String>) variantsMethod.invoke(handlerInstance);
             }
             else
             {
-                result = (String) customiseMethod.invoke(handlerInstance, configurationInstance);
+                result = (List<String>) variantsMethod.invoke(handlerInstance, configurationInstance);
             }
         }
 

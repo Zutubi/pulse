@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
@@ -11,9 +9,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.BrowseViewConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.util.CollectionUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
@@ -89,7 +89,7 @@ public abstract class ProjectsModelTestBase extends PulseTestCase
 
     protected ConcreteProjectModel createConcrete(ProjectsModel group, Project project)
     {
-        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, true, Collections.<String>emptySet(), ProjectHealth.UNKNOWN, ProjectMonitoring.NONE);
+        return new ConcreteProjectModel(group, project, Collections.<BuildResult>emptyList(), null, config, urls, Collections.<String>emptySet(), ProjectHealth.UNKNOWN, ProjectMonitoring.NONE);
     }
 
     protected TemplateProjectModel createTemplates(String label, String projectName, Object... members)

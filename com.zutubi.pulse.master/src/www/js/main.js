@@ -324,7 +324,7 @@ function addToPath(path, template)
     runAjaxRequest(window.baseUrl + '/ajax/config/' + encodeURIPath(path) + '?wizard' + (template ? '=template' : ''));
 }
 
-function actionPath(path, action, fromParent, onDescendants)
+function actionPath(path, action, fromParent, onDescendants, argument)
 {
     var url;
 
@@ -336,6 +336,10 @@ function actionPath(path, action, fromParent, onDescendants)
     if (onDescendants)
     {
         url += '&descendants=true';
+    }
+    if (argument)
+    {
+        url += '&argument=' + encodeURIComponent(argument);
     }
     runAjaxRequest(url);
 }
@@ -537,6 +541,30 @@ function clearResponsibility(projectId)
         url: window.baseUrl + '/ajax/clearResponsibility.action',
         params: { projectId: projectId },
         callback: handleDialogResponse
+    });
+}
+
+function triggerBuild(projectId, triggerHandle)
+{
+    showStatus('Triggering build...', 'working');
+    runAjaxRequest({
+        url: window.baseUrl + '/ajax/manualTrigger.action',
+        params: {
+            projectId: projectId,
+            triggerHandle: triggerHandle
+        },
+        callback: function(options, success, response) {
+            var result;
+            if (success)
+            {
+                result = Ext.util.JSON.decode(response.responseText);
+                showStatus(result.detail, result.success ? 'success' : 'failure');
+            }
+            else
+            {
+                showStatus('Cannot contact server', 'failure');
+            }
+        }
     });
 }
 

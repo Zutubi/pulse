@@ -1,10 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;
-import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
-import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
-import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -12,6 +11,8 @@ import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmFileResolver;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.SecurityUtils;
+import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.annotations.Permission;
@@ -21,7 +22,6 @@ import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -50,7 +50,6 @@ public class ProjectConfigurationActions
     public static final String ACTION_TRIGGER              = "trigger";
     public static final String ACTION_TRIGGER_HOOK         = "triggerHook";
     public static final String ACTION_MARK_CLEAN           = "clean";
-    public static final String ACTION_REBUILD              = "rebuild";
 
     private static final Logger LOG = Logger.getLogger(ProjectConfigurationActions.class);
     
@@ -96,11 +95,6 @@ public class ProjectConfigurationActions
                 if (state.acceptTrigger(false))
                 {
                     result.add(ACTION_TRIGGER);
-                    
-                    if (hasDependencyOfBuildableStatus(instance))
-                    {
-                        result.add(ACTION_REBUILD);
-                    }
                 }
 
                 initialised = state.isInitialised();
@@ -139,45 +133,12 @@ public class ProjectConfigurationActions
         return result;
     }
 
-    private boolean hasDependencyOfBuildableStatus(ProjectConfiguration projectConfig)
-    {
-        if (projectConfig.hasDependencies())
-        {
-            if (projectConfig.getOptions().getPrompt())
-            {
-                // The user can set a status for the build at the prompt.
-                return true;
-            }
-
-            String ourStatus = projectConfig.getDependencies().getStatus();
-            GraphBuilder builder = objectFactory.buildBean(GraphBuilder.class);
-            GraphFilters filters = objectFactory.buildBean(GraphFilters.class);
-            TreeNode<BuildGraphData> upstream = builder.buildUpstreamGraph(projectConfig,
-                    filters.status(ourStatus),
-                    filters.transitive(),
-                    filters.duplicate());
-            return upstream.getChildren().size() > 0;
-        }
-
-        return false;
-    }
-
     private boolean canConvertType(ProjectConfiguration instance)
     {
         // We can only convert types if this project owns the type (i.e. it
         // is not inherited) and it is not overridden.
         String typePath = PathUtils.getPath(instance.getConfigurationPath(), "type");
         return !configurationTemplateManager.existsInTemplateParent(typePath) && !configurationTemplateManager.isOverridden(typePath);
-    }
-
-    public String customiseTrigger(ProjectConfiguration projectConfig)
-    {
-        if (projectConfig.getOptions().getPrompt())
-        {
-            return "editBuildProperties";
-        }
-
-        return null;
     }
 
     @Permission(AccessManager.ACTION_WRITE)
@@ -192,6 +153,18 @@ public class ProjectConfigurationActions
         String user = SecurityUtils.getLoggedInUsername();
         TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(user), ProjectManager.TRIGGER_CATEGORY_MANUAL);
         projectManager.triggerBuild(projectConfig, options, null);
+    }
+
+    public List<String> variantsOfTrigger(ProjectConfiguration projectConfiguration)
+    {
+        List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(projectConfiguration, ManualTriggerConfiguration.class);
+        return Lists.transform(triggers, new Function<ManualTriggerConfiguration, String>()
+        {
+            public String apply(ManualTriggerConfiguration input)
+            {
+                return input.getName();
+            }
+        });
     }
 
     @Permission(ACTION_TRIGGER)

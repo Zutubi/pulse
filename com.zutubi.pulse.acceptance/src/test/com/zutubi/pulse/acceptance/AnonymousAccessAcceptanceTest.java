@@ -216,6 +216,8 @@ public class AnonymousAccessAcceptanceTest extends AcceptanceTestBase
         setAnonymousSignup(false);
 
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(random);
+        rpcClient.RemoteApi.disableBuildPrompting(random);
+
         String permissionsPath = PathUtils.getPath(projectPath, Constants.Project.PERMISSIONS);
         Hashtable<String, Object> acl = rpcClient.RemoteApi.createDefaultConfig(ProjectAclConfiguration.class);
         acl.put("group", ANONYMOUS_GROUP_PATH);

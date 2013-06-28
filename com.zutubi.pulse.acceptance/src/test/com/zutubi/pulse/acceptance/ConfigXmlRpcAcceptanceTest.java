@@ -458,15 +458,12 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         String optionsPath = projectPath + "/options";
         Hashtable<String, Object> options = rpcClient.RemoteApi.getConfig(optionsPath);
-        assertEquals(false, options.get("prompt"));
         assertEquals(0, options.get("timeout"));
 
-        options.put("prompt", true);
         options.put("timeout", 10);
         rpcClient.RemoteApi.saveConfig(projectPath + "/options", options, false);
 
         Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(optionsPath);
-        assertEquals(true, loadedOptions.get("prompt"));
         assertEquals(10, loadedOptions.get("timeout"));
     }
 
@@ -475,12 +472,12 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
-        assertEquals(false, options.get("prompt"));
-        options.put("prompt", true);
+        assertEquals(0, options.get("timeout"));
+        options.put("timeout", 10);
         rpcClient.RemoteApi.saveConfig(projectPath, project, false);
 
         Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(projectPath + "/options");
-        assertEquals(false, loadedOptions.get("prompt"));
+        assertEquals(0, loadedOptions.get("timeout"));
     }
 
     public void testSaveConfigDeep() throws Exception
@@ -488,12 +485,12 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String projectPath = rpcClient.RemoteApi.insertSimpleProject(randomName());
         Hashtable<String, Object> project = rpcClient.RemoteApi.getConfig(projectPath);
         Hashtable<String, Object> options = (Hashtable<String, Object>) project.get("options");
-        assertEquals(false, options.get("prompt"));
-        options.put("prompt", true);
+        assertEquals(0, options.get("timeout"));
+        options.put("timeout", 10);
         rpcClient.RemoteApi.saveConfig(projectPath, project, true);
 
         Hashtable<String, Object> loadedOptions = rpcClient.RemoteApi.getConfig(projectPath + "/options");
-        assertEquals(true, loadedOptions.get("prompt"));
+        assertEquals(10, loadedOptions.get("timeout"));
     }
 
     public void testSaveConfigDeepListItems() throws Exception

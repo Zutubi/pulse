@@ -143,6 +143,7 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
             registerConfigurationType(CronBuildTriggerConfiguration.class);
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
             registerConfigurationType(DependentBuildTriggerConfiguration.class);
+            registerConfigurationType(ManualTriggerConfiguration.class);
 
             registerConfigurationType(TriggerConditionConfiguration.class);
             registerConfigurationType(OutstandingChangesTriggerConditionConfiguration.class);

@@ -1,11 +1,14 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectResponsibility;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -13,12 +16,13 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.UnaryProcedure;
 import flexjson.JSON;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_TRIGGER;
 
 /**
  * JSON-encodable object representing the current state of a concrete project.
@@ -34,13 +38,10 @@ public class ConcreteProjectModel extends ProjectModel
     private String responsibleComment;
     private boolean built;
     private List<ProjectBuildModel> buildRows;
-    private boolean canTrigger;
-    private boolean prompt;
-    private boolean canRebuild;
-    private boolean canViewSource;
     private long projectId;
+    private List<TriggerModel> triggers;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, boolean prompt, Set<String> availableActions, ProjectHealth projectHealth, ProjectMonitoring monitoring)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, final User loggedInUser, final ProjectsSummaryConfiguration configuration, final Urls urls, Set<String> availableActions, ProjectHealth projectHealth, ProjectMonitoring monitoring)
     {
         super(group, project.getName());
 
@@ -70,10 +71,20 @@ public class ConcreteProjectModel extends ProjectModel
             }
         }));
 
-        this.prompt = prompt;
-        canTrigger = availableActions.contains(ACTION_TRIGGER);
-        canRebuild = availableActions.contains(ACTION_REBUILD);
-        canViewSource = availableActions.contains(ACTION_VIEW_SOURCE);
+        if (availableActions.contains(ACTION_TRIGGER))
+        {
+            triggers = Lists.transform(TriggerUtils.getTriggers(project.getConfig(), ManualTriggerConfiguration.class), new Function<ManualTriggerConfiguration, TriggerModel>()
+            {
+                public TriggerModel apply(ManualTriggerConfiguration input)
+                {
+                    return new TriggerModel(input);
+                }
+            });
+        }
+        else
+        {
+            triggers = Collections.emptyList();
+        }
 
         this.health = projectHealth;
         this.monitoring = monitoring;
@@ -125,24 +136,10 @@ public class ConcreteProjectModel extends ProjectModel
         return buildRows;
     }
 
-    public boolean isCanTrigger()
+    @JSON
+    public List<TriggerModel> getTriggers()
     {
-        return canTrigger;
-    }
-
-    public boolean isPrompt()
-    {
-        return prompt;
-    }
-
-    public boolean isCanRebuild()
-    {
-        return canRebuild;
-    }
-
-    public boolean isCanViewSource()
-    {
-        return canViewSource;
+        return triggers;
     }
 
     public ResultState latestState()
@@ -171,4 +168,5 @@ public class ConcreteProjectModel extends ProjectModel
     {
         proc.run(this);
     }
+
 }

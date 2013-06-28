@@ -128,13 +128,14 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
                 }, {
                     xtype: 'xzlinktable',
                     id: this.id + '-actions',
+                    idProperty: 'label',
                     title: 'actions',
                     handlers: {
                         clean: this.markForClean.createDelegate(this),
                         clearResponsibility: clearResponsibility.createDelegate(window, [this.projectId]),
                         takeResponsibility: takeResponsibility.createDelegate(window, [this.projectId]),
-                        trigger: this.triggerBuild.createDelegate(this, [false]),
-                        rebuild: this.triggerBuild.createDelegate(this, [true]),
+                        trigger: this.triggerBuild.createDelegate(this),
+                        triggerWithPrompt: this.triggerBuildWithPrompt.createDelegate(this),
                         viewSource: Zutubi.fs.viewWorkingCopy.createDelegate(window, [this.projectId])
                     }
                 }, {
@@ -242,24 +243,13 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
         });
     },
 
-    triggerBuild: function(rebuild)
+    triggerBuildWithPrompt: function(triggerHandle)
     {
-        if (this.data.prompt)
-        {
-            window.location = window.baseUrl + '/editBuildProperties!input.action?projectId=' + this.projectId + '&rebuild=' + rebuild;
-        }
-        else
-        {
-            showStatus('Triggering build...', 'working');
-            runAjaxRequest({
-                url: window.baseUrl + '/ajax/triggerBuild.action',
-                params: {
-                    projectId: this.projectId,
-                    rebuild: rebuild
-                },
-                callback: this.handleAjaxResponse,
-                scope: this
-            });
-        }
+        window.location = window.baseUrl + '/manualTrigger!input.action?projectId=' + this.projectId + '&triggerHandle=' + triggerHandle;
+    },
+
+    triggerBuild: function(triggerHandle)
+    {
+        triggerBuild(this.projectId, triggerHandle);
     }
 });

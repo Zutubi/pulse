@@ -20,6 +20,7 @@ public interface ProjectManager extends EntityManager<Project>
 {
     String GLOBAL_PROJECT_NAME     = "global project template";
     String TRIGGER_CATEGORY_MANUAL = "manual";
+    String DEFAULT_TRIGGER_NAME    = "trigger build";
 
     @SecureResult
     List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);

@@ -14,10 +14,7 @@ import com.zutubi.util.UnaryFunctionE;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides support for executing actions on configuration instances.  For
@@ -30,6 +27,15 @@ public class ActionManager
     private static final Logger LOG = Logger.getLogger(ActionManager.class);
 
     public static final String I18N_KEY_SUFFIX_FEEDACK = ".feedback";
+    public static final Set<String> COMMON_ACTIONS = new HashSet<String>();
+    static
+    {
+        COMMON_ACTIONS.add(AccessManager.ACTION_VIEW);
+        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_CLONE);
+        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
+        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
+        COMMON_ACTIONS.add(AccessManager.ACTION_DELETE);
+    }
 
     private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<CompositeType, ConfigurationActions>();
     private ObjectFactory objectFactory;
@@ -104,7 +110,7 @@ public class ActionManager
 
     private boolean isSimple(ConfigurationAction action)
     {
-        return !action.hasArgument() && !action.isCustomised();
+        return !action.hasArgument();
     }
 
     public void ensurePermission(String path, String actionName)
@@ -123,13 +129,18 @@ public class ActionManager
         }
     }
 
-    public String getCustomiseName(final String actionName, final Configuration configurationInstance)
+    public List<String> getVariants(final String actionName, final Configuration configurationInstance)
     {
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, String, Exception>()
+        if (COMMON_ACTIONS.contains(actionName))
         {
-            public String process(ConfigurationActions actions) throws Exception
+            return null;
+        }
+
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions,List<String>,Exception>()
+        {
+            public List<String> process(ConfigurationActions actions) throws Exception
             {
-                return actions.customise(actionName, configurationInstance);
+                return actions.getVariants(actionName, configurationInstance);
             }
         });
     }

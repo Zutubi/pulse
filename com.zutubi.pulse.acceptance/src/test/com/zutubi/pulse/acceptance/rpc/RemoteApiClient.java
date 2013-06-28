@@ -40,8 +40,7 @@ import java.util.Vector;
 import static com.google.common.collect.Iterables.find;
 import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import static com.zutubi.pulse.master.model.UserManager.DEVELOPERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.*;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 
@@ -748,11 +747,12 @@ public class RemoteApiClient extends ApiClient
         return hook;
     }
 
-    public void enableBuildPrompting(String projectName) throws Exception
+    public void disableBuildPrompting(String projectName) throws Exception
     {
-        Hashtable<String, Object> config = getConfig(getOptionsPath(projectName));
-        config.put("prompt", Boolean.TRUE);
-        saveConfig(getOptionsPath(projectName), config, false);
+        String triggerPath = PathUtils.getPath(PROJECTS_SCOPE, projectName, EXTENSION_PROJECT_TRIGGERS, ProjectManager.DEFAULT_TRIGGER_NAME);
+        Hashtable<String, Object> config = getConfig(triggerPath);
+        config.put("prompt", Boolean.FALSE);
+        saveConfig(triggerPath, config, false);
     }
 
     private String getOptionsPath(String projectName)

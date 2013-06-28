@@ -177,13 +177,15 @@
             <result name="success" type="velocity">/view-changelist.vm</result>
         </action>
 
-        <action name="editBuildProperties!input" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction" method="doInput">
-            <result name="input" type="velocity">/edit-build-properties.vm</result>
+        <action name="manualTrigger!input" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction" method="doInput">
+            <interceptor-ref name="completeSideEffectStack"/>
+            <result name="input" type="velocity">/manual-trigger.vm</result>
+            <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="editBuildProperties" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction">
+        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
             <interceptor-ref name="completeSideEffectStack"/>
-            <result name="input" type="velocity">/edit-build-properties.vm</result>
+            <result name="input" type="velocity">/manual-trigger.vm</result>
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
             <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
@@ -566,8 +568,10 @@
             <result name="success" type="flexjson">result</result>
         </action>
 
-        <action name="triggerBuild" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildAction">
+        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
             <interceptor-ref name="ajaxSideEffectStack"/>
+            <param name="ajax">true</param>
+            <result name="input" type="flexjson">result</result>
             <result name="success" type="flexjson">result</result>
         </action>
 
@@ -774,6 +778,17 @@
             <result name="success" type="flexjson">options</result>
             <result name="error" type="velocity">error.vm</result>
         </action>
+
+        <action name="trigger" class="com.zutubi.pulse.master.tove.webwork.TriggerAction">
+            <result name="input" type="flexjson">newPanel</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="chain" type="chain">
+                <param name="namespace">/ajax/action</param>
+                <param name="actionName">${customAction}</param>
+                <param name="method">input</param>
+            </result>
+        </action>
     </package>
 
     <package name="helpAjax" namespace="/ajax/help" extends="configAjax">
@@ -807,7 +822,7 @@
     </package>
 
     <package name="actionAjax" namespace="/ajax/action" extends="configAjax">
-        <action name="editBuildProperties" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction">
+        <action name="manualTrigger" class="com.zutubi.pulse.master.xwork.actions.project.ManualTriggerAction">
             <param name="ajax">true</param>
             <result name="input" type="flexjson">newPanel</result>
             <result name="cancel" type="flexjson">configurationResponse</result>

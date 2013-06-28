@@ -13,6 +13,7 @@ import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.*;
+import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions.ACTION_VIEW_SOURCE;
 import static com.zutubi.util.WebUtils.uriComponentEncode;
 
 /**
@@ -349,17 +350,12 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public void triggerBuild()
     {
-        actionsTable.clickLink(ACTION_TRIGGER);
+        actionsTable.clickLink(ProjectManager.DEFAULT_TRIGGER_NAME);
     }
 
     public boolean isTriggerActionPresent()
     {
-        return actionsTable.isLinkPresent(ACTION_TRIGGER);
-    }
-
-    public boolean isRebuildActionPresent()
-    {
-        return actionsTable.isLinkPresent(ACTION_REBUILD);
+        return actionsTable.isLinkPresent(ProjectManager.DEFAULT_TRIGGER_NAME);
     }
 
     public boolean isViewWorkingCopyPresent()

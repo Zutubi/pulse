@@ -116,11 +116,11 @@
             #if($action.action == "delete")
                 #set($onclick = "deletePath('#jss(${path})', true); return false;")
             #else
-                #set($onclick = "actionPath('#jss(${path})', '${action.action}', false, false); return false;")
+                #set($onclick = "actionPath('#jss(${path})', '#jss(${action.action})', false, false, '#jss(${action.argument})'); return false;")
             #end
                     <li>
                         <a href="#" id='#id("action.${action.action}")' class="unadorned" onclick="#html($onclick)">
-                            <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
+                            <img src="${base}/images/config/actions/${action.icon}.gif"/> #html(${action.label})
                         </a>
                     </li>
         #end

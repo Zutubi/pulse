@@ -1021,9 +1021,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // add the pname=pvalue property to the build.
         rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", true, false);
 
-        // edit the build options, setting prompt to true.
-        rpcClient.RemoteApi.enableBuildPrompting(random);
-
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
@@ -1054,9 +1051,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         // add the pname=pvalue property to the build.
         rpcClient.RemoteApi.insertProjectProperty(random, "pname", "pvalue", true, false);
 
-        // edit the build options, setting prompt to true.
-        rpcClient.RemoteApi.enableBuildPrompting(random);
-
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
         home.triggerBuild();
@@ -1085,7 +1079,6 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         getBrowser().loginAsAdmin();
         rpcClient.RemoteApi.ensureProject(random);
-        rpcClient.RemoteApi.enableBuildPrompting(random);
 
         // trigger a build
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
@@ -1892,11 +1885,9 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         return requirement;
     }
 
-    private void triggerSuccessfulBuild(String projectName)
+    private void triggerSuccessfulBuild(String projectName) throws Exception
     {
-        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
-        home.triggerBuild();
-
+        rpcClient.RemoteApi.triggerBuild(projectName);
         waitForBuildOnProjectHomePage(projectName);
     }
 

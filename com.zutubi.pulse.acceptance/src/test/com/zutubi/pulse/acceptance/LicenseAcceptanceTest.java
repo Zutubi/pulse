@@ -441,9 +441,9 @@ public class LicenseAcceptanceTest extends AcceptanceTestBase
     private void assertTriggers(boolean ignored) throws Exception
     {
         rpcClient.RemoteApi.ensureProject(random);
+        rpcClient.RemoteApi.triggerBuild(random);
 
         ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, random);
-        home.triggerBuild();
         home.waitFor();
         if (ignored)
         {

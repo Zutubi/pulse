@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The form that is presented to the user when they manually trigger a build and have
- * the build option prompt enabled.
+ * The form that is presented to the user when they manually trigger a build via a trigger with the
+ * prompt option turned on.
  */
 public class TriggerBuildForm extends SeleniumForm
 {

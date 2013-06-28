@@ -161,7 +161,7 @@ Zutubi.ConcreteProject.prototype = {
     },
 
     getMenuItems: function(menuType, menuArg, id) {
-        var items, encodedName, item;
+        var items, item, encodedName, i, trigger;
 
         if (menuType === 'actions')
         {
@@ -194,32 +194,27 @@ Zutubi.ConcreteProject.prototype = {
                 image: 'pencil.gif'
             }];
 
-            if (this.data.canTrigger)
+            if (this.data.triggers)
             {
-                item = {
-                    id: 'trigger',
-                    image: 'lightning.gif'
-                };
-
-                if (this.data.prompt)
+                for (i = 0; i < this.data.triggers.length; i++)
                 {
-                    item.url = 'editBuildProperties!input.action?projectName=' + encodedName;
-                }
-                else
-                {
-                    item.onclick = this.generateHandler('trigger', this.data.projectId, this.data.name, id);
-                }
+                    trigger = this.data.triggers[i];
+                    item = {
+                        id: trigger.name,
+                        image: 'lightning.gif'
+                    };
 
-                items.push(item);
-            }
+                    if (trigger.prompt)
+                    {
+                        item.url = 'manualTrigger!input.action?projectName=' + encodedName + '&triggerHandle=' + trigger.handle;
+                    }
+                    else
+                    {
+                        item.onclick = 'Zutubi.FloatManager.showHideFloat(\'menus\', \'' + id + '\'); triggerBuild(' + this.data.projectId + ', ' + trigger.handle + '); return false';
+                    }
 
-            if (this.data.canRebuild)
-            {
-                items.push({
-                    id: 'with dependencies',
-                    image: 'lightning.gif',
-                    onclick: this.generateHandler('rebuild', this.data.projectId, this.data.name, id)
-                });
+                    items.push(item);
+                }
             }
 
             if (this.showHideLinks)

@@ -36,6 +36,7 @@ public class GenericAction extends ToveActionSupport
      * it is enabled.
      */
     private boolean descendants = false;
+    private String argument;
     private String customAction;
     private String newPath;
     private ConfigurationPanel newPanel;
@@ -56,9 +57,24 @@ public class GenericAction extends ToveActionSupport
         this.descendants = descendants;
     }
 
+    public String getArgument()
+    {
+        return argument;
+    }
+
+    public void setArgument(String argument)
+    {
+        this.argument = argument;
+    }
+
     public String getCustomAction()
     {
         return customAction;
+    }
+
+    public void setCustomAction(String customAction)
+    {
+        this.customAction = customAction;
     }
 
     public String getNewPath()
@@ -168,7 +184,7 @@ public class GenericAction extends ToveActionSupport
         return SUCCESS;
     }
 
-    private String executeSingleAction(Configuration config)
+    protected String executeSingleAction(Configuration config)
     {
         ConfigurationActions configurationActions = actionManager.getConfigurationActions(configurationType);
         ConfigurationAction configurationAction = configurationActions.getAction(actionName);
@@ -181,12 +197,6 @@ public class GenericAction extends ToveActionSupport
 
         if (isInputSelected())
         {
-            customAction = actionManager.getCustomiseName(actionName, config);
-            if(StringUtils.stringSet(customAction))
-            {
-                return "chain";
-            }
-
             Configuration result = actionManager.prepare(actionName, config);
             if(result != null)
             {

@@ -39,6 +39,8 @@ import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.reports.*;
+import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerConfiguration;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
@@ -64,6 +66,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.google.common.collect.Iterables.*;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.EXTENSION_PROJECT_TRIGGERS;
 
 public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
@@ -331,6 +334,12 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 globalProject.setName(GLOBAL_PROJECT_NAME);
                 globalProject.setDescription("The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
                 globalProject.setPermanent(true);
+
+                Map<String, TriggerConfiguration> triggers = new ConfigurationMap<TriggerConfiguration>();
+                ManualTriggerConfiguration trigger = new ManualTriggerConfiguration();
+                trigger.setName(DEFAULT_TRIGGER_NAME);
+                triggers.put(DEFAULT_TRIGGER_NAME, trigger);
+                globalProject.getExtensions().put(EXTENSION_PROJECT_TRIGGERS, triggers);
 
                 // All users can view all projects by default.
                 GroupConfiguration group = configurationProvider.get(PathUtils.getPath(MasterConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), GroupConfiguration.class);

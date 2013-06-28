@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import flexjson.JSON;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,19 +13,17 @@ public class ProjectHomeModel
 {
     private ProjectResponsibilityModel responsibility;
     private StatusModel status;
-    private List<BuildModel> activity = new LinkedList<BuildModel>();
-    private List<BuildModel> recent = new LinkedList<BuildModel>();
-    private List<ChangelistModel> changes = new LinkedList<ChangelistModel>();
+    private List<BuildModel> activity = new ArrayList<BuildModel>();
+    private List<BuildModel> recent = new ArrayList<BuildModel>();
+    private List<ChangelistModel> changes = new ArrayList<ChangelistModel>();
     private String description;
-    private List<ActionLink> actions = new LinkedList<ActionLink>();
-    private List<ActionLink> links = new LinkedList<ActionLink>();
+    private List<ActionLink> actions = new ArrayList<ActionLink>();
+    private List<ActionLink> links = new ArrayList<ActionLink>();
     private String url;
-    private boolean prompt;
 
-    public ProjectHomeModel(StatusModel status, boolean prompt)
+    public ProjectHomeModel(StatusModel status)
     {
         this.status = status;
-        this.prompt = prompt;
     }
 
     public ProjectResponsibilityModel getResponsibility()
@@ -81,7 +79,7 @@ public class ProjectHomeModel
     {
         actions.add(action);
     }
-    
+
     @JSON
     public List<ActionLink> getLinks()
     {
@@ -101,11 +99,6 @@ public class ProjectHomeModel
     public void setUrl(String url)
     {
         this.url = url;
-    }
-
-    public boolean isPrompt()
-    {
-        return prompt;
     }
 
     public static class StatusModel

@@ -4,6 +4,9 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
+import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
+import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
 import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -12,7 +15,8 @@ import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.pulse.master.tove.model.CheckboxFieldDescriptor;
 import com.zutubi.pulse.master.tove.model.Field;
 import com.zutubi.pulse.master.tove.model.Form;
@@ -20,12 +24,15 @@ import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationPanel;
 import com.zutubi.pulse.master.tove.webwork.ConfigurationResponse;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
+import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.adt.TreeNode;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -39,13 +46,16 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 import static com.zutubi.tove.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.tove.annotations.FieldParameter.SCRIPTS;
 
-public class EditBuildPropertiesAction extends ProjectActionBase
+public class ManualTriggerAction extends ProjectActionBase
 {
-    private static final Logger LOG = Logger.getLogger(EditBuildPropertiesAction.class);
+    private static final Logger LOG = Logger.getLogger(ManualTriggerAction.class);
 
     private static final String SUBMIT_TRIGGER = "trigger";
 
     private static final String PROPERTY_PREFIX = "property.";
+
+    private long triggerHandle;
+    private ManualTriggerConfiguration triggerConfig;
 
     private String formSource;
     private String revision;
@@ -55,6 +65,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String priority;
     private boolean rebuild;
     private boolean ajax;
+    private SimpleResult result;
     private ConfigurationPanel newPanel;
     private ConfigurationResponse configurationResponse;
     private String submitField;
@@ -62,6 +73,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private ActionManager actionManager;
     private ScmManager scmManager;
     private Configuration configuration;
+
+    public long getTriggerHandle()
+    {
+        return triggerHandle;
+    }
+
+    public void setTriggerHandle(long triggerHandle)
+    {
+        this.triggerHandle = triggerHandle;
+    }
 
     public boolean isCancelled()
     {
@@ -147,6 +168,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         this.submitField = submitField;
     }
 
+    public SimpleResult getResult()
+    {
+        return result;
+    }
+
     public ConfigurationPanel getNewPanel()
     {
         return newPanel;
@@ -157,16 +183,54 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return configurationResponse;
     }
 
+    private ManualTriggerConfiguration getTriggerConfig()
+    {
+        if (triggerConfig == null)
+        {
+            Project project = getRequiredProject();
+            List<ManualTriggerConfiguration> manualTriggers = TriggerUtils.getTriggers(project.getConfig(), ManualTriggerConfiguration.class);
+            for (ManualTriggerConfiguration trigger: manualTriggers)
+            {
+                if (trigger.getHandle() == triggerHandle)
+                {
+                    triggerConfig = trigger;
+                    break;
+                }
+            }
+
+            if (triggerConfig == null)
+            {
+                throw new LookupErrorException("Trigger invalid or unspecified");
+            }
+
+        }
+
+        return triggerConfig;
+    }
+
+    private HashMap<String, ResourcePropertyConfiguration> getMergedProperties(ProjectConfiguration project, ManualTriggerConfiguration trigger)
+    {
+        HashMap<String, ResourcePropertyConfiguration> propertyMap = new LinkedHashMap<String, ResourcePropertyConfiguration>();
+        propertyMap.putAll(project.getProperties());
+        propertyMap.putAll(trigger.getProperties());
+        return propertyMap;
+    }
+
     private void renderForm() throws IOException, TemplateException
     {
         Project project = getRequiredProject();
-        properties = new ArrayList<ResourcePropertyConfiguration>(project.getConfig().getProperties().values());
+        ManualTriggerConfiguration triggerConfig = getTriggerConfig();
+        properties = new ArrayList<ResourcePropertyConfiguration>(getMergedProperties(project.getConfig(), triggerConfig).values());
 
-        Form form = new Form("form", "edit.build.properties", (ajax ? "ajax/action/" : "") + "editBuildProperties.action", SUBMIT_TRIGGER);
+        Form form = new Form("form", "edit.build.properties", (ajax ? "ajax/action/" : "") + "manualTrigger.action", SUBMIT_TRIGGER);
         form.setAjax(ajax);
 
         Field field = new Field(FieldType.HIDDEN, "projectName");
         field.setValue(getProjectName());
+        form.add(field);
+
+        field = new Field(FieldType.HIDDEN, "triggerHandle");
+        field.setValue(Long.toString(getTriggerConfig().getHandle()));
         form.add(field);
 
         field = new Field(FieldType.TEXT, "version");
@@ -182,12 +246,12 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         r.put("status", project.getConfig().getDependencies().getStatus());
         form.add(statusFieldDescriptor.instantiate(null, r));
 
-        if (actionManager.getActions(project.getConfig(), false, true).contains(ProjectConfigurationActions.ACTION_REBUILD))
+        if (hasDependencyOfBuildableStatus(project.getConfig()))
         {
             CheckboxFieldDescriptor rebuildFieldDescriptor = new CheckboxFieldDescriptor();
             rebuildFieldDescriptor.setName("rebuild");
             field = rebuildFieldDescriptor.instantiate(null, null);
-            field.setValue(Boolean.toString(rebuild));
+            field.setValue(Boolean.toString(triggerConfig.isRebuildUpstreamDependencies()));
             form.add(field);
         }
 
@@ -220,7 +284,24 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         StringWriter writer = new StringWriter();
         ToveUtils.renderForm(context, form, getClass(), writer, configuration);
         formSource = writer.toString();
-        newPanel = new ConfigurationPanel("ajax/action/edit-build-properties.vm");
+        newPanel = new ConfigurationPanel("ajax/action/manual-trigger.vm");
+    }
+
+    private boolean hasDependencyOfBuildableStatus(ProjectConfiguration projectConfig)
+    {
+        if (projectConfig.hasDependencies())
+        {
+            String ourStatus = projectConfig.getDependencies().getStatus();
+            GraphBuilder builder = objectFactory.buildBean(GraphBuilder.class);
+            GraphFilters filters = objectFactory.buildBean(GraphFilters.class);
+            TreeNode<BuildGraphData> upstream = builder.buildUpstreamGraph(projectConfig,
+                    filters.status(ourStatus),
+                    filters.transitive(),
+                    filters.duplicate());
+            return upstream.getChildren().size() > 0;
+        }
+
+        return false;
     }
 
     private void addLatestAction(Field field, Project project, ProjectConfiguration projectConfig)
@@ -231,7 +312,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             if(capabilities.contains(ScmCapability.REVISIONS))
             {
                 field.addParameter(ACTIONS, Arrays.asList("getlatest"));
-                field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));
+                field.addParameter(SCRIPTS, Arrays.asList("ManualTriggerAction.getlatest"));
             }
         }
         catch (ScmException e)
@@ -249,8 +330,16 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     public String doInput() throws Exception
     {
-        renderForm();
-        return INPUT;
+        ManualTriggerConfiguration triggerConfig = getTriggerConfig();
+        if (triggerConfig.isPrompt())
+        {
+            renderForm();
+            return INPUT;
+        }
+        else
+        {
+            return execute();
+        }
     }
 
     private String getPath()
@@ -267,6 +356,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     {
         String newPath = getPath();
         configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+        result = new SimpleResult(true, "project build requested");
     }
 
     public void doCancel()
@@ -277,34 +367,35 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public String execute() throws IOException, TemplateException
     {
         Project project = getRequiredProject();
+        ManualTriggerConfiguration triggerConfig = getTriggerConfig();
 
         Revision r = null;
-        revision = revision.trim();
-        if (StringUtils.stringSet(revision))
+        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        if (triggerConfig.isPrompt())
         {
-            try
+            revision = revision.trim();
+            if (StringUtils.stringSet(revision))
             {
-                r = withScmClient(project.getConfig(), project.getState(), scmManager, new ScmContextualAction<Revision>()
+                try
                 {
-                    public Revision process(ScmClient client, ScmContext context) throws ScmException
+                    r = withScmClient(project.getConfig(), project.getState(), scmManager, new ScmContextualAction<Revision>()
                     {
-                        return client.parseRevision(context, revision);
-                    }
-                });
+                        public Revision process(ScmClient client, ScmContext context) throws ScmException
+                        {
+                            return client.parseRevision(context, revision);
+                        }
+                    });
+                }
+                catch (ScmException e)
+                {
+                    addFieldError("revision", "Unable to verify revision: " + e.getMessage());
+                    LOG.severe(e);
+                    renderForm();
+                    return INPUT;
+                }
             }
-            catch (ScmException e)
-            {
-                addFieldError("revision", "Unable to verify revision: " + e.getMessage());
-                LOG.severe(e);
-                renderForm();
-                return INPUT;
-            }
-        }
 
-        try
-        {
-            TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
-            options.setProperties(mapProperties(project.getConfig()));
+            options.setProperties(mapProperties(getMergedProperties(project.getConfig(), triggerConfig)));
             options.setStatus(status);
             options.setVersion(version);
             options.setRebuild(rebuild);
@@ -312,7 +403,15 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             {
                 options.setPriority(Integer.valueOf(priority));
             }
-            
+        }
+        else
+        {
+            options.setProperties(triggerConfig.getProperties().values());
+            options.setRebuild(triggerConfig.isRebuildUpstreamDependencies());
+        }
+
+        try
+        {
             projectManager.triggerBuild(project.getConfig(), options, r);
         }
         catch (Exception e)
@@ -326,7 +425,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private List<ResourcePropertyConfiguration> mapProperties(ProjectConfiguration projectConfig)
+    private List<ResourcePropertyConfiguration> mapProperties(Map<String, ResourcePropertyConfiguration> configuredProperties)
     {
         List<ResourcePropertyConfiguration> properties = new LinkedList<ResourcePropertyConfiguration>();
         Map parameters = ActionContext.getContext().getParameters();
@@ -336,8 +435,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             if(name.startsWith(PROPERTY_PREFIX))
             {
                 String propertyName = name.substring(PROPERTY_PREFIX.length());
-                ResourcePropertyConfiguration property = projectConfig.getProperty(propertyName);
-                if(property != null)
+                ResourcePropertyConfiguration property = configuredProperties.get(propertyName);
+                if (property != null)
                 {
                     property = property.copy();
                     Object value = parameters.get(name);

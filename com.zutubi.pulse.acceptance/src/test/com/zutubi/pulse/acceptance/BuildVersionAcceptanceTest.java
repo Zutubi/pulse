@@ -1,18 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.acceptance.forms.admin.TriggerBuildForm;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.engine.api.ResultState;
-import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.RandomUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * A set of acceptance tests for the build version functionality.  This includes
@@ -89,9 +90,6 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
     public void testSpecifyVersionViaManualPrompt() throws Exception
     {
         rpcClient.loginAsAdmin();
-
-        // edit the build options, setting prompt to true.
-        rpcClient.RemoteApi.enableBuildPrompting(projectName);
 
         getBrowser().loginAsAdmin();
 

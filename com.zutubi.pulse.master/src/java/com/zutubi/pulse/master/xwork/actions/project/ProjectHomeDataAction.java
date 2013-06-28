@@ -20,6 +20,8 @@ import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.pulse.master.tove.model.ActionLink;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -100,7 +102,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
             buildMapping.collectArtifactsForBuildId(latestCompletedResult.getId());
         }
 
-        model = new ProjectHomeModel(createStatusModel(latestCompletedResult, urls), projectConfig.getOptions().getPrompt());
+        model = new ProjectHomeModel(createStatusModel(latestCompletedResult, urls));
         addActivity(queued, inProgress, buildMapping);
         addRecent(latestCompleted, buildMapping);
         addChanges();
@@ -226,7 +228,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
     {
         File contentRoot = systemPaths.getContentRoot();
         List<String> availableActions = actionManager.getActions(getProject().getConfig(), false, true);
-        for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN, ACTION_TRIGGER, ACTION_REBUILD))
+        for (String candidateAction: asList(AccessManager.ACTION_WRITE, ACTION_MARK_CLEAN))
         {
             if (availableActions.contains(candidateAction))
             {
@@ -234,8 +236,24 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
         }
 
+        if (availableActions.contains(ACTION_TRIGGER))
+        {
+            addTriggerActions(contentRoot);
+        }
+
         addResponsibilityActions(PROJECT_I18N, contentRoot);
         addViewWorkingCopyAction(PROJECT_I18N, contentRoot);
+    }
+
+    private void addTriggerActions(File contentRoot)
+    {
+        List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(getProject().getConfig(), ManualTriggerConfiguration.class);
+        for (ManualTriggerConfiguration trigger: triggers)
+        {
+            String action = trigger.isPrompt() ? "triggerWithPrompt" : "trigger";
+            ActionLink actionLink = new ActionLink(action, trigger.getName(), ToveUtils.getActionIconName(ACTION_TRIGGER, contentRoot), Long.toString(trigger.getHandle()));
+            model.addAction(actionLink);
+        }
     }
 
     private void addResponsibilityActions(Messages messages, File contentRoot)
@@ -273,6 +291,15 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
         }
     }
+
+//    private void addTriggers()
+//    {
+//        List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(getProject().getConfig(), ManualTriggerConfiguration.class);
+//        for (ManualTriggerConfiguration trigger: triggers)
+//        {
+//            model.addTrigger(new TriggerModel(trigger));
+//        }
+//    }
 
     private void addChanges()
     {

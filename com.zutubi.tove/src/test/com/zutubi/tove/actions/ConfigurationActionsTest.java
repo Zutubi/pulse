@@ -127,42 +127,42 @@ public class ConfigurationActionsTest extends ZutubiTestCase
 
     public void testCustomiseNoArgNoReturn() throws Exception
     {
-        assertCustomiseMethod("noArgNoReturn");
+        assertVariantsMethod("noArgNoReturn");
     }
 
     public void testCustomiseNoArg() throws Exception
     {
-        assertCustomiseMethod("noArg");
+        assertVariantsMethod("noArg");
     }
 
     public void testCustomiseNoReturn() throws Exception
     {
-        assertCustomiseMethod("noReturn");
+        assertVariantsMethod("noReturn");
     }
 
     public void testCustomiseArgAndReturn() throws Exception
     {
-        assertCustomiseMethod("argAndReturn");
+        assertVariantsMethod("argAndReturn");
     }
 
     public void testCustomiseArgWrongType() throws Exception
     {
-        assertNoCustomiseMethod("argWrongType");
+        assertNoVariantsMethod("argWrongType");
     }
 
     public void testCustomiseReturnWrongType() throws Exception
     {
-        assertNoCustomiseMethod("returnWrongType");
+        assertNoVariantsMethod("returnWrongType");
     }
 
-    private void assertCustomiseMethod(String actionName)
+    private void assertVariantsMethod(String actionName)
     {
-        assertNotNull(getCustomiseMethod(actionName));
+        assertNotNull(getVariantsMethod(actionName));
     }
 
-    private void assertNoCustomiseMethod(String actionName)
+    private void assertNoVariantsMethod(String actionName)
     {
-        assertNull(getCustomiseMethod(actionName));
+        assertNull(getVariantsMethod(actionName));
     }
 
     public void testPrepareNoArgNoReturn() throws Exception
@@ -220,10 +220,10 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         assertNull(getPrepareMethod(actionName));
     }
 
-    private Method getCustomiseMethod(String actionName)
+    private Method getVariantsMethod(String actionName)
     {
-        ConfigurationActions ca = new ConfigurationActions(T.class, CustomiseActions.class, objectFactory);
-        return ca.getAction(actionName).getCustomiseMethod();
+        ConfigurationActions ca = new ConfigurationActions(T.class, VariantActions.class, objectFactory);
+        return ca.getAction(actionName).getVariantsMethod();
     }
 
     private Method getPrepareMethod(String actionName)
@@ -354,7 +354,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         }
     }
 
-    public static class CustomiseActions
+    public static class VariantActions
     {
         public void customiseNoArgNoReturn()
         {
@@ -364,9 +364,9 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public String customiseNoArg()
+        public List<String> variantsNoArg()
         {
-            return "customiseNoArg";
+            return Arrays.asList("variantsNoArg");
         }
 
         public void doNoArg(T t, ConfigType c)
@@ -381,16 +381,16 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public String customiseArgAndReturn(T t)
+        public List<String> variantsArgAndReturn(T t)
         {
-            return "customiseArgAndReturn";
+            return Arrays.asList("variantsArgAndReturn");
         }
 
         public void doArgAndReturn(T t, ConfigType c)
         {
         }
 
-        public void customiseArgWrongType(ConfigType t)
+        public void variantsArgWrongType(ConfigType t)
         {
         }
 
@@ -398,7 +398,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public Long customiseReturnWrongType(T t)
+        public Long variantsReturnWrongType(T t)
         {
             return 0L;
         }
