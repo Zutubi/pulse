@@ -122,10 +122,24 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("manualtrigger" "manual triggers" "accept" false)
+            <td>
+                The ability to manually trigger builds is now configurable.  You can add multiple
+                manual triggers with different properties.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("oneshottrigger" "one-shot triggers" "accept" false)
             <td>
                 Cron triggers may be configured to automatically pause after firing, allowing them
                 to be used for one-shot triggering.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("stageretries" "build stage retries" "accept" false)
+            <td>
+                A new build option allows build stages to be retried if they fail due to an apparent
+                agent problem.  Losing one agent will no longer take out a large build.
             </td>
         </tr>
         <tr>

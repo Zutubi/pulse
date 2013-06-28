@@ -356,7 +356,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
 
     public static class VariantActions
     {
-        public void customiseNoArgNoReturn()
+        public void variantsOfNoArgNoReturn()
         {
         }
 
@@ -364,7 +364,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public List<String> variantsNoArg()
+        public List<String> variantsOfNoArg()
         {
             return Arrays.asList("variantsNoArg");
         }
@@ -373,7 +373,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public void customiseNoReturn(T t)
+        public void variantsOfNoReturn(T t)
         {
         }
 
@@ -381,7 +381,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public List<String> variantsArgAndReturn(T t)
+        public List<String> variantsOfArgAndReturn(T t)
         {
             return Arrays.asList("variantsArgAndReturn");
         }
@@ -390,7 +390,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public void variantsArgWrongType(ConfigType t)
+        public void variantsOfArgWrongType(ConfigType t)
         {
         }
 
@@ -398,7 +398,7 @@ public class ConfigurationActionsTest extends ZutubiTestCase
         {
         }
 
-        public Long variantsReturnWrongType(T t)
+        public Long variantsOfReturnWrongType(T t)
         {
             return 0L;
         }
