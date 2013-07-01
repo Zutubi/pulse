@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.google.common.base.Objects;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.TextBox;
 import com.zutubi.pulse.acceptance.components.pulse.project.BuildSummaryTable;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
@@ -35,6 +37,8 @@ import static com.zutubi.util.WebUtils.uriComponentEncode;
  */
 public class ProjectHomePage extends ResponsibilityPage
 {
+    private static final Messages PROJECT_I18N = Messages.getInstance(ProjectConfiguration.class);
+
     private static final String PROPERTY_HEALTH = "health";
     private static final String PROPERTY_STATE = "state";
     private static final String PROPERTY_SUCCESS_RATE = "successRate";
@@ -345,7 +349,20 @@ public class ProjectHomePage extends ResponsibilityPage
     @Override
     protected String getActionId(String actionName)
     {
-        return actionsTable.getLinkId(actionName);
+        return actionsTable.getLinkId(formatAction(actionName));
+    }
+
+    private String formatAction(String actionName)
+    {
+        String key = actionName + ".label";
+        if (PROJECT_I18N.isKeyDefined(key))
+        {
+            return PROJECT_I18N.format(key);
+        }
+        else
+        {
+            return actionName;
+        }
     }
 
     public void triggerBuild()
@@ -355,17 +372,17 @@ public class ProjectHomePage extends ResponsibilityPage
 
     public boolean isTriggerActionPresent()
     {
-        return actionsTable.isLinkPresent(ProjectManager.DEFAULT_TRIGGER_NAME);
+        return isActionPresent(ProjectManager.DEFAULT_TRIGGER_NAME);
     }
 
     public boolean isViewWorkingCopyPresent()
     {
-        return actionsTable.isLinkPresent(ACTION_VIEW_SOURCE);
+        return isActionPresent(ACTION_VIEW_SOURCE);
     }
 
     public PulseFileSystemBrowserWindow viewWorkingCopy()
     {
-        actionsTable.clickLink(ACTION_VIEW_SOURCE);
+        clickAction(ACTION_VIEW_SOURCE);
         return new PulseFileSystemBrowserWindow(browser);
     }
 

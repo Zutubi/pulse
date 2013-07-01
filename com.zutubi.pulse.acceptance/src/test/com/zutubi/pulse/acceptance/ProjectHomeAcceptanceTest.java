@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.util.Condition;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -99,7 +100,7 @@ public class ProjectHomeAcceptanceTest extends AcceptanceTestBase
         assertEquals(0, homePage.getRecentBuildsCount());
         assertEquals(0, homePage.getChangesCount());
         assertFalse(homePage.hasDescription());
-        assertEquals(asList("clean up build directories", "trigger", "take responsibility"), homePage.getActions());
+        assertEquals(asList("clean up build directories", ProjectManager.DEFAULT_TRIGGER_NAME, "take responsibility"), homePage.getActions());
         List<String> links = homePage.getLinks();
         Collections.sort(links);
         assertEquals(asList("build result feed", "configure"), links);

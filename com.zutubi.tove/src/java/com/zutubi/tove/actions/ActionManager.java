@@ -110,7 +110,7 @@ public class ActionManager
 
     private boolean isSimple(ConfigurationAction action)
     {
-        return !action.hasArgument();
+        return !action.hasArgument() && !action.hasVariants();
     }
 
     public void ensurePermission(String path, String actionName)

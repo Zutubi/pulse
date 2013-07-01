@@ -24,18 +24,21 @@ public class TriggerAction extends GenericAction
     @Override
     protected String executeSingleAction(Configuration config)
     {
-        String argument = getArgument();
-        if (StringUtils.stringSet(argument))
+        if (config instanceof ProjectConfiguration)
         {
-            ProjectConfiguration project = (ProjectConfiguration) config;
-            List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(project, ManualTriggerConfiguration.class);
-            for (ManualTriggerConfiguration trigger: triggers)
+            String argument = getArgument();
+            if (StringUtils.stringSet(argument))
             {
-                if (trigger.getName().equals(argument))
+                ProjectConfiguration project = (ProjectConfiguration) config;
+                List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(project, ManualTriggerConfiguration.class);
+                for (ManualTriggerConfiguration trigger: triggers)
                 {
-                    triggerHandle = trigger.getHandle();
-                    setCustomAction("manualTrigger");
-                    return "chain";
+                    if (trigger.getName().equals(argument))
+                    {
+                        triggerHandle = trigger.getHandle();
+                        setCustomAction("manualTrigger");
+                        return "chain";
+                    }
                 }
             }
         }
