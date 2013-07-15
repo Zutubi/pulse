@@ -53,10 +53,10 @@ public class ConfigurationArchiver
         for (String scope : scopeToItems.keys())
         {
             MapType mapType = (MapType) configurationTemplateManager.getType(scope);
-            TypeProperty externalStateProperty = mapType.getTargetType().getExternalStateProperty();
             for (String item : scopeToItems.get(scope))
             {
-                Record record = configurationTemplateManager.getRecord(PathUtils.getPath(scope, item));
+                String path = PathUtils.getPath(scope, item);
+                Record record = configurationTemplateManager.getRecord(path);
                 MutableRecord mutableRecord;
                 if (record instanceof TemplateRecord)
                 {
@@ -67,10 +67,8 @@ public class ConfigurationArchiver
                     mutableRecord = record.copy(true, true);
                 }
 
-                if (externalStateProperty != null)
-                {
-                    mutableRecord.remove(externalStateProperty.getName());
-                }
+                ExternalStateRemovalFunction fn = new ExternalStateRemovalFunction(mapType.getTargetType(), mutableRecord, path);
+                mutableRecord.forEach(fn);
 
                 archive.addItem(scope, item, mutableRecord);
             }
@@ -466,6 +464,27 @@ public class ConfigurationArchiver
             }
 
             scopeRecord.put(name, item);
+        }
+    }
+
+    private class ExternalStateRemovalFunction extends TypeAwareRecordWalkingFunction
+    {
+        public ExternalStateRemovalFunction(ComplexType type, Record record, String path)
+        {
+            super(type, record, path);
+        }
+
+        @Override
+        protected void process(String path, Record record, Type type)
+        {
+            if (type instanceof CompositeType)
+            {
+                TypeProperty externalStateProperty = ((CompositeType) type).getExternalStateProperty();
+                if (externalStateProperty != null)
+                {
+                    ((MutableRecord) record).remove(externalStateProperty.getName());
+                }
+            }
         }
     }
 
