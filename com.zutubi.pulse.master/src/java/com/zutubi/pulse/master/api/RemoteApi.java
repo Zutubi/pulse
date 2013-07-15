@@ -1610,6 +1610,7 @@ public class RemoteApi
      * @throws ToveRuntimeException on error writing to the file
      * @access requires server administration permission
      * @see #importConfig(String, String)
+     * @see #checkConfigArchive(String, String)
      */
     public boolean exportConfig(String token, String filename, boolean append, Vector<String> paths)
     {
@@ -1629,7 +1630,33 @@ public class RemoteApi
     }
 
     /**
-     * Imports archive configuration from into this Pulse instance.  The archive must have been created with a
+     * Checks an archive file to ensure it is valid and could be imported into this Pulse instance, then returns the
+     * configuration paths contained in the archive.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param filename path of the file to check
+     * @return a list of paths within the archive
+     * @throws ToveRuntimeException on error reading from the file
+     * @access requires server administration permission
+     * @see #exportConfig(String, String, boolean, java.util.Vector)
+     * @see #importConfig(String, String)
+     */
+    public Vector<String> checkConfigArchive(String token, String filename)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+            return new Vector<String>(configurationArchiver.checkArchive(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Imports archived configuration into this Pulse instance.  The archive must have been created with a
      * compatible version of Pulse (an earlier or equal version, where there are no upgrades between versions).  If the
      * archive contains items with names that clash with existing configuration the clashes are resolved by appending
      * " (restored)" to the imported name.  When importing projects and agents, if the export contains the original
@@ -1638,25 +1665,24 @@ public class RemoteApi
      *
      * @param token authentication token (see {@link #login})
      * @param filename path of the file to import from
-     * @return true
+     * @return a list of paths that were imported
      * @throws ToveRuntimeException on error reading from the file
      * @access requires server administration permission
      * @see #exportConfig(String, String, boolean, java.util.Vector)
+     * @see #checkConfigArchive(String, String)
      */
-    public boolean importConfig(String token, String filename)
+    public Vector<String> importConfig(String token, String filename)
     {
         tokenManager.loginUser(token);
         try
         {
             accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
-            configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager));
-            return true;
+            return new Vector<String>(configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
         }
         finally
         {
             tokenManager.logoutUser();
         }
-
     }
 
     /**

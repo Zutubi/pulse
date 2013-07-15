@@ -102,6 +102,31 @@ public class ConfigurationArchiver
     }
 
     /**
+     * Checks a given archive file could be imported into this configuration system, and if so return the configuration
+     * paths that it contains.
+     *
+     * @param file the archive file to check
+     * @param versionChecker pluggable verification of the archive version before restoration
+     * @return a list of paths included in the archive file
+     * @throws ToveRuntimeException on error reading from the given file or verifying it can be imported
+     */
+    public List<String> checkArchive(final File file, VersionChecker versionChecker)
+    {
+        final ArchiveRecord archiveRecord = unpackAndVerifyArchive(file, versionChecker);
+        List<String> paths = new ArrayList<String>();
+        for (String scope : archiveRecord.getScopes())
+        {
+            Record scopeRecord = archiveRecord.getScope(scope);
+            for (String item : scopeRecord.nestedKeySet())
+            {
+                paths.add(PathUtils.getPath(scope, item));
+            }
+        }
+
+        return paths;
+    }
+
+    /**
      * Restores all records from an archive file, if version-compatible with this configuration system.  If the records
      * belong to a templated scope, any trees within the archive are restored as trees under the root template in that
      * scope (i.e. if the archive contains the template parent of an item that item will be restored under the restored
@@ -109,15 +134,12 @@ public class ConfigurationArchiver
      *
      * @param file the file to restore from
      * @param versionChecker pluggable verification of the archive version before restoration
+     * @return a list of paths that were restored from the archive
      * @throws ToveRuntimeException on error reading from the given file or restoring the items
      */
-    public void restore(final File file, VersionChecker versionChecker)
+    public List<String> restore(final File file, VersionChecker versionChecker)
     {
-        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-        MutableRecord record = serialiser.deserialise(file);
-        final ArchiveRecord archiveRecord = new ArchiveRecord(record);
-        versionChecker.checkVersion(archiveRecord.getVersion());
-        verifyScopes(file, archiveRecord);
+        final ArchiveRecord archiveRecord = unpackAndVerifyArchive(file, versionChecker);
 
         // References are tricky.  Some may refer to things that are not in the archive, and can be discarded.  But
         // we want to preserve any that refer to other things within the archive.  The tricky part is they use
@@ -128,9 +150,9 @@ public class ConfigurationArchiver
 
         extractReferences(archiveRecord, pathToReferencedHandles, handleToPath);
 
-        configurationTemplateManager.executeInsideTransaction(new NullaryFunction<Void>()
+        return configurationTemplateManager.executeInsideTransaction(new NullaryFunction<List<String>>()
         {
-            public Void process()
+            public List<String> process()
             {
                 List<String> insertedPaths = new ArrayList<String>();
                 for (String scope : archiveRecord.getScopes())
@@ -190,9 +212,19 @@ public class ConfigurationArchiver
                     configurationTemplateManager.raiseInsertEvents(insertedPaths);
                 }
 
-                return null;
+                return insertedPaths;
             }
         });
+    }
+
+    private ArchiveRecord unpackAndVerifyArchive(File file, VersionChecker versionChecker)
+    {
+        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+        MutableRecord record = serialiser.deserialise(file);
+        final ArchiveRecord archiveRecord = new ArchiveRecord(record);
+        versionChecker.checkVersion(archiveRecord.getVersion());
+        verifyScopes(file, archiveRecord);
+        return archiveRecord;
     }
 
     private void ensureItemNameUnique(MapType type, Set<String> existingItems, MutableRecord item)

@@ -48,7 +48,9 @@ public class ExportCommand extends AdminCommand
         Vector<String> paths = new Vector<String>(Arrays.asList(argv).subList(1, argv.length));
         try
         {
+            System.out.println("Exporting " + paths.size() + (paths.size() == 1 ? " entity" : " entities") + " to file '" + argv[0] + "'...");
             xmlRpcClient.execute("RemoteApi.exportConfig", new Vector<Object>(Arrays.asList(adminToken, argv[0], append, paths)));
+            System.out.println("Export complete.");
         }
         catch (XmlRpcException e)
         {

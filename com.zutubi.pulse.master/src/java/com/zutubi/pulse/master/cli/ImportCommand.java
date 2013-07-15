@@ -42,7 +42,14 @@ public class ImportCommand extends AdminCommand
 
         try
         {
-            xmlRpcClient.execute("RemoteApi.importConfig", new Vector<Object>(Arrays.asList(adminToken, argv[0])));
+            System.out.println("Importing from '" + inputFile.getAbsolutePath() + "'...");
+            @SuppressWarnings("unchecked")
+            Vector<String> paths = (Vector<String>) xmlRpcClient.execute("RemoteApi.importConfig", new Vector<Object>(Arrays.asList(adminToken, argv[0])));
+            System.out.println("Imported " + paths.size() + (paths.size() == 1 ? " entity:" : " entities:"));
+            for (String path : paths)
+            {
+                System.out.println("  " + path);
+            }
         }
         catch (XmlRpcException e)
         {
