@@ -250,9 +250,9 @@ public class RemoteApiClient extends ApiClient
         return (Boolean) call("exportConfig", file, append, new Vector<String>(asList(paths)));
     }
 
-    public boolean importConfig(String file) throws Exception
+    public Vector<String> importConfig(String file) throws Exception
     {
-        return (Boolean) call("importConfig", file);
+        return (Vector<String>) call("importConfig", file);
     }
 
     public int getUserCount() throws Exception

@@ -1302,7 +1302,11 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
             assertFalse(rpcClient.RemoteApi.configPathExists(child1Path));
             assertFalse(rpcClient.RemoteApi.configPathExists(child2Path));
 
-            rpcClient.RemoteApi.importConfig(temp.getAbsolutePath());
+            Vector<String> paths = rpcClient.RemoteApi.importConfig(temp.getAbsolutePath());
+            assertEquals(2, paths.size());
+            assertTrue(paths.contains(templatePath));
+            assertTrue(paths.contains(child2Path));
+
             assertTrue(rpcClient.RemoteApi.configPathExists(templatePath));
             assertFalse(rpcClient.RemoteApi.configPathExists(child1Path));
             assertTrue(rpcClient.RemoteApi.configPathExists(child2Path));
