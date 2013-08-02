@@ -3,8 +3,10 @@ package com.zutubi.pulse.master.model;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.SetMultimap;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
@@ -109,7 +111,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
      * configuration.  Handles are used as holding onto instances via
      * references can result in stale data (e.g. CIB-2503).
      */
-    private Map<ProjectConfiguration, List<Long>> configToDownstreamConfigHandles;
+    private SetMultimap<ProjectConfiguration, Long> configToDownstreamConfigHandles;
 
     private ConcurrentMap<Long, ReentrantLock> projectStateLocks = new ConcurrentHashMap<Long, ReentrantLock>();
 
@@ -207,7 +209,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         // changed project via dependency configuration, and refresh them in
         // the caches.  Note this is recursive to handle transitive
         // dependencies.
-        List<Long> downstreamHandles = configToDownstreamConfigHandles.get(oldProjectConfiguration);
+        Set<Long> downstreamHandles = configToDownstreamConfigHandles.get(oldProjectConfiguration);
         if (downstreamHandles != null)
         {
             Iterable<ProjectConfiguration> downstreamConfigs = transform(downstreamHandles, new Function<Long, ProjectConfiguration>()
@@ -809,13 +811,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void refreshDownstreamCache()
     {
-        configToDownstreamConfigHandles = new HashMap<ProjectConfiguration, List<Long>>();
+        configToDownstreamConfigHandles = HashMultimap.create();
 
         for (ProjectConfiguration config: idToConfig.values())
         {
             for (ProjectConfiguration upstream: getDependentProjectConfigs(config))
             {
-                addToDownstreamCache(upstream, config);
+                configToDownstreamConfigHandles.put(upstream, config.getHandle());
             }
         }
     }
@@ -830,18 +832,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 return dependencyConfiguration.getProject();
             }
         }));
-    }
-
-    private void addToDownstreamCache(ProjectConfiguration upstream, ProjectConfiguration config)
-    {
-        List<Long> downstreamConfigs = configToDownstreamConfigHandles.get(upstream);
-        if (downstreamConfigs == null)
-        {
-            downstreamConfigs = new LinkedList<Long>();
-            configToDownstreamConfigHandles.put(upstream, downstreamConfigs);
-        }
-
-        downstreamConfigs.add(config.getHandle());
     }
 
     public void checkProjectLifecycle(ProjectConfiguration projectConfig)
@@ -1416,12 +1406,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         cacheLock.readLock().lock();
         try
         {
-            List<Long> result = configToDownstreamConfigHandles.get(projectConfig);
-            if (result == null)
-            {
-                result = Collections.emptyList();
-            }
-
+            Set<Long> result = configToDownstreamConfigHandles.get(projectConfig);
             return newArrayList(transform(result, new Function<Long, ProjectConfiguration>()
             {
                 public ProjectConfiguration apply(Long handle)
