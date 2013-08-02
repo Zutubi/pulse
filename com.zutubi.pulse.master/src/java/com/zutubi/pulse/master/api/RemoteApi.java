@@ -779,7 +779,11 @@ public class RemoteApi
             // Start with the template parent, overwrite with provided struct,
             // then apply defaults where values are not specified.
             MutableRecord record = templateParent.flatten(false);
-            record.update(type.fromXmlRpc(null, config, false), true, true);
+            MutableRecord providedRecord = type.fromXmlRpc(null, config, false);
+            // CIB-3046: If the user has based their provided record off the parent, it may include suppressed
+            // passwords.  So replace any suppressions with values from the parent.
+            ToveUtils.unsuppressPasswords(record, providedRecord, type, true);
+            record.update(providedRecord, true, true);
             record.update(type.createNewRecord(true), true, false);
             configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
             if (!template)
