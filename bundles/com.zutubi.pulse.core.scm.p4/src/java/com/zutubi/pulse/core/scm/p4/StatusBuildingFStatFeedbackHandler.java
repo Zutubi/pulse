@@ -77,18 +77,22 @@ public class StatusBuildingFStatFeedbackHandler extends AbstractPerforceFStatFee
 
     private void resolveExecutableProperty(FileStatus fs, String type, String headType)
     {
-        if(!type.equals(headType))
+        // CIB-3045: if we are carrying the full file payload, we may well be creating a file that will not be sync'd
+        // by p4.  In this case we cannot rely on p4 to set the executable bit, even though the file type is unchanged
+        // from the latest depot revision (this was found in a case where a file was re-added with the same type).
+        // When the type changes we certainly need to handle it ourselves, as always.
+        if (fs.getPayloadType() == FileStatus.PayloadType.FULL || !type.equals(headType))
         {
-            if(fileIsExecutable(type))
+            if (fileIsExecutable(type))
             {
-                if(!fileIsExecutable(headType))
+                if (!fileIsExecutable(headType))
                 {
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
                 }
             }
             else
             {
-                if(fileIsExecutable(headType))
+                if (fileIsExecutable(headType))
                 {
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "false");
                 }
