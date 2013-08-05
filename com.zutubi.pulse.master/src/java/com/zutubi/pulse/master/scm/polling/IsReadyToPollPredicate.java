@@ -58,4 +58,10 @@ public class IsReadyToPollPredicate implements Predicate<Project>
     {
         this.clock = clock;
     }
+
+    @Override
+    public String toString()
+    {
+        return "IsReadyToPoll";
+    }
 }

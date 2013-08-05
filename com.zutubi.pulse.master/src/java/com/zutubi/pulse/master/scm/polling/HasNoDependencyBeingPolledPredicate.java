@@ -38,4 +38,10 @@ public class HasNoDependencyBeingPolledPredicate implements Predicate<PollingReq
         return !Iterables.any(snapshot.getActivatedRequests(), hasDependencyPredicate) &&
                 !Iterables.any(snapshot.getQueuedRequests(), hasDependencyPredicate);
     }
+
+    @Override
+    public String toString()
+    {
+        return "HasNoDependencyBeingPolled";
+    }
 }

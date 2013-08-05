@@ -18,4 +18,10 @@ public class IsInitialisedPredicate implements Predicate<Project>
         // change history.
         return project.isInitialised() && project.getState() != Project.State.INITIALISE_ON_IDLE;
     }
+
+    @Override
+    public String toString()
+    {
+        return "IsInitialised";
+    }
 }

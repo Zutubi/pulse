@@ -24,4 +24,10 @@ public class IsMonitorablePredicate implements Predicate<Project>
 
         return ((Pollable) scm).isMonitor();
     }
+
+    @Override
+    public String toString()
+    {
+        return "IsMonitorable";
+    }
 }

@@ -711,4 +711,10 @@ public class Project extends Entity implements NamedEntity
     {
         return getState().isInitialised();
     }
+
+    @Override
+    public String toString()
+    {
+        return "project(" + (getName() == null ? "<unnamed>" : getName()) + ", id: " + getId() + ", handle: " + (config == null ? "<unknown>" : config.getHandle() + ")");
+    }
 }

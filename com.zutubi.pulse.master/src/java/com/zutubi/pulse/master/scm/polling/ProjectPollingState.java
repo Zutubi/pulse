@@ -125,4 +125,17 @@ public final class ProjectPollingState
     {
         return latestRevision != null && previous.latestRevision != null && !latestRevision.equals(previous.latestRevision);
     }
+
+    @Override
+    public String toString()
+    {
+        String s =  "pollstate(" + projectId + ": " + latestRevision;
+        if (isInQuietPeriod())
+        {
+            s += ", quiet: " + quietPeriodRevision + " until " + quietPeriodEnd;
+        }
+
+        s += ")";
+        return s;
+    }
 }

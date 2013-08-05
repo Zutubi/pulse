@@ -53,4 +53,10 @@ public class LimitActivePollsPerScmPredicate implements Predicate<PollingRequest
     {
         return projectUidCache.get(project.getId());
     }
+
+    @Override
+    public String toString()
+    {
+        return "LimitActivePolls(" + limit + ")";
+    }
 }

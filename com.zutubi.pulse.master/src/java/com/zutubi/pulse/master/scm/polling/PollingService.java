@@ -27,6 +27,7 @@ import com.zutubi.util.time.SystemClock;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 
 /**
  * Polls the scms for changes.
@@ -119,6 +120,7 @@ public class PollingService implements Stoppable
 
     public void pollForChanges()
     {
+        LOG.finest("Begin poll cycle");
         clearCachesIfNecessary();
 
         PollingRequestListener requestListener = new PollingRequestListener();
@@ -126,24 +128,34 @@ public class PollingService implements Stoppable
 
         queuePollRequests(generateReadyDependencyTrees());
 
+        LOG.finest("Waiting for polling to complete.");
         List<ProjectPollingState> newStates = requestListener.waitForProcessingToComplete();
+        LOG.finest("Polling completed with states:");
         for (ProjectPollingState newState : newStates)
         {
             long projectId = newState.getProjectId();
             ProjectPollingState previousState = states.get(projectId);
+            if (LOG.isLoggable(Level.FINEST))
+            {
+                LOG.finest("    " + newState + (previousState == null ? "" : " (previously: " + previousState + ")"));
+            }
+
             if (previousState != null && newState.changeDetectedSince(previousState))
             {
                 ProjectConfiguration projectConfig = projectManager.getProjectConfig(projectId, true);
                 if (projectConfig != null)
                 {
+                    LOG.finest("        raising change event");
                     eventManager.publish(new ScmChangeEvent(projectConfig, newState.getLatestRevision(), previousState.getLatestRevision()));
                 }
             }
 
             states.put(projectId, newState);
         }
+        LOG.finest("End polling states.");
 
         clearCachesIfNecessary();
+        LOG.finest("End poll cycle");
     }
 
     private void clearCachesIfNecessary()
@@ -179,13 +191,24 @@ public class PollingService implements Stoppable
             identified.addAll(newTree.getProjects());
         }
 
-        return Iterables.filter(trees, new Predicate<DependencyTree>()
+        Iterable<DependencyTree> readyTrees = Iterables.filter(trees, new Predicate<DependencyTree>()
         {
             public boolean apply(DependencyTree dependencyTree)
             {
                 return dependencyTree.isReadyToPoll();
             }
         });
+
+        if (LOG.isLoggable(Level.FINEST))
+        {
+            LOG.finest("Ready dependency trees:");
+            for (DependencyTree tree: readyTrees)
+            {
+                LOG.finest("    " + tree.toString());
+            }
+            LOG.finest("End ready dependency trees.");
+        }
+        return readyTrees;
     }
 
     private void addDependenciesToSet(Project project, DependencyTree tree)
@@ -241,6 +264,12 @@ public class PollingService implements Stoppable
                 requests.add(request);
             }
         }
+
+        if (LOG.isLoggable(Level.FINEST))
+        {
+            LOG.finest("Queuing poll requests: " + requests);
+        }
+
         requestQueue.enqueue(requests.toArray(new PollingRequest[requests.size()]));
     }
 
@@ -385,6 +414,12 @@ public class PollingService implements Stoppable
                             objectFactory.buildBean(IsReadyToPollPredicate.class)
                     )
             );
+        }
+
+        @Override
+        public String toString()
+        {
+            return projects.toString();
         }
     }
 

@@ -57,4 +57,10 @@ public class PollingRequest
     {
         return predicate.apply(this);
     }
+
+    @Override
+    public String toString()
+    {
+        return "poll(" + project + ")";
+    }
 }
