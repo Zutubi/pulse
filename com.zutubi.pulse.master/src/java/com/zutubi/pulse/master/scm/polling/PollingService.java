@@ -359,34 +359,7 @@ public class PollingService implements Stoppable
      */
     private class DependencyTree
     {
-        private Set<Project> projects = new TreeSet<Project>(new Comparator<Project>()
-        {
-            public int compare(Project project1, Project project2)
-            {
-                // Two projects may be in the same dependency tree but have no dependency relationship.  We need an
-                // ordering that makes projects come after any of their upstream dependencies, but also provides a
-                // consistent answer for projects not related by dependencies.
-                if (project1.getConfig().isDependentOn(project2.getConfig()))
-                {
-                    // First project is downstream of second, make it "greater" so it is polled later.
-                    return 1;
-                }
-                else if (project2.getConfig().isDependentOn(project1.getConfig()))
-                {
-                    // Inverse of above.
-                    return -1;
-                }
-                else if (project1.equals(project2))
-                {
-                    return 0;
-                }
-                else
-                {
-                    // No relationship, so the order here is arbitrary but must be consistent.
-                    return project1.getId() > project2.getId() ? 1 : -1;
-                }
-            }
-        });
+        private Set<Project> projects = new HashSet<Project>();
 
         public void add(Project project)
         {
@@ -405,12 +378,38 @@ public class PollingService implements Stoppable
 
         public Iterable<? extends Project> getProjectsToPoll()
         {
-            return Iterables.filter(projects,
+            return Iterables.filter(sortedProjects(),
                     Predicates.and(
                             objectFactory.buildBean(IsInitialisedPredicate.class),
                             objectFactory.buildBean(IsMonitorablePredicate.class)
                     )
             );
+        }
+
+        private List<Project> sortedProjects()
+        {
+            List<Project> sorted = new ArrayList<Project>(projects.size());
+            for (Project project : projects)
+            {
+                addUpstreamThenProject(sorted, project);
+            }
+
+            return sorted;
+        }
+
+        private void addUpstreamThenProject(List<Project> sorted, Project project)
+        {
+            // A simple topological sort: make sure everything upstream of a project (transitively) is added to the
+            // result before that project is.
+            if (!sorted.contains(project))
+            {
+                for (DependencyConfiguration dependency : project.getConfig().getDependencies().getDependencies())
+                {
+                    addUpstreamThenProject(sorted, projectManager.getProject(dependency.getProject().getProjectId(), false));
+                }
+
+                sorted.add(project);
+            }
         }
 
         public boolean isReadyToPoll()

@@ -13,10 +13,8 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.PollableScmConfiguration;
-import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
-import static com.zutubi.pulse.master.model.Project.State.INITIAL;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
 import com.zutubi.pulse.master.scheduling.CallbackService;
@@ -33,15 +31,18 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.time.TestClock;
-import static java.util.Arrays.asList;
 import org.mockito.Matchers;
-import static org.mockito.Matchers.refEq;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.*;
 import java.util.concurrent.*;
+
+import static com.zutubi.pulse.core.test.TestUtils.waitForCondition;
+import static com.zutubi.pulse.master.model.Project.State.INITIAL;
+import static java.util.Arrays.asList;
+import static org.mockito.Matchers.refEq;
+import static org.mockito.Mockito.*;
 
 public class PollingServiceTest extends ZutubiTestCase
 {
@@ -362,17 +363,22 @@ public class PollingServiceTest extends ZutubiTestCase
 
     public void testExtendedDependentTreePollingOccursInDependencyOrder() throws Exception
     {
-        // Test that the extended dependency tree of the form (utilA,utilB) -> (lib) -> (clientA,clientB)
+        // Test that the extended dependency tree of the form:
+        //
+        // utilA ------- clientA -- productA
+        //       > lib <
+        // utilB         clientB
+        //
         // is handled in the correct order.
-
         blockingScmServers = true;
         latestProjectRevision = new Revision(2);
 
         Project utilA = createProject("utilA", true);
         Project utilB = createProject("utilB", true);
         Project lib = createProject("lib", true, dependency(utilA), dependency(utilB));
-        Project clientA = createProject("clientA", true, dependency(lib));
+        Project clientA = createProject("clientA", true, dependency(lib), dependency(utilA));
         Project clientB = createProject("clientB", true, dependency(lib));
+        Project productA = createProject("productA", true, dependency(clientA));
 
         serviceHandle.init();
         serviceHandle.startPolling();
@@ -385,12 +391,14 @@ public class PollingServiceTest extends ZutubiTestCase
         releasePollingProcess(lib);
         waitForPollingInProgress(clientA, clientB);
         releasePollingProcess(clientA, clientB);
+        waitForPollingInProgress(productA);
+        releasePollingProcess(productA);
 
         assertTrue(serviceHandle.waitForPollingComplete());
         assertTrue(serviceHandle.isPollingComplete());
 
         assertScmChanges();
-        assertPolledForChanges(utilA, utilB, lib, clientA, clientB);
+        assertPolledForChanges(utilA, utilB, lib, clientA, clientB, productA);
     }
 
     public void testDependencyTreePolledIfOneProjectIsReadyToCheck() throws ScmException, InterruptedException, ExecutionException

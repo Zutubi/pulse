@@ -142,6 +142,8 @@ public class ProjectTestSupport
         idToProject.put(project.getId(), project);
         nameToProject.put(project.getName(), project);
         allProjects.add(project);
+        // This is to flush out bugs that are only seen with certain orderings of projects.
+        Collections.shuffle(allProjects);
         allConfigs.add(projectConfiguration);
         return project;
     }
