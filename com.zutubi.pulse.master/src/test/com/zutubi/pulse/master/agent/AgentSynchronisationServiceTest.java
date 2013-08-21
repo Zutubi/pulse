@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.agent;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -26,12 +25,8 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.time.TestClock;
-import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -42,6 +37,12 @@ import java.util.Properties;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.collect.Iterables.find;
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.*;
 
 public class AgentSynchronisationServiceTest extends PulseTestCase
 {
@@ -455,7 +456,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
     
     private void publishStatusChange()
     {
-        agent.updateStatus(AgentStatus.SYNCHRONISING);
+        agent.updateStatus(AgentStatus.SYNCHRONISING, System.currentTimeMillis());
         eventManager.publish(new AgentStatusChangeEvent(this, agent, AgentStatus.OFFLINE, AgentStatus.SYNCHRONISING));
     }
 
@@ -489,7 +490,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
             }
         }
 
-        agent.updateStatus(AgentStatus.SYNCHRONISED);
+        agent.updateStatus(AgentStatus.SYNCHRONISED, System.currentTimeMillis());
         return (AgentSynchronisationCompleteEvent) listener.getEventsReceived().remove(0);
     }
 

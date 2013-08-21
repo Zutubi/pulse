@@ -579,7 +579,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
     private void takeOffline(Agent agent)
     {
-        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.OFFLINE, "oops"));
+        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.OFFLINE, "oops"), System.currentTimeMillis());
         agentManager.offline(agent);
         queue.handleEvent(new AgentOfflineEvent(this, agent));
     }
@@ -610,7 +610,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         AgentState agentState = new AgentState();
         agentState.setId(id);
         DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new FakeAgentService(type), new DefaultHost(new HostState()));
-        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, false, null));
+        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, false, null), System.currentTimeMillis());
         agentManager.addAgent(agent);
         agentManager.online(agent);
         queue.handleEvent(new AgentOnlineEvent(this, agent));

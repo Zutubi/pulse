@@ -120,7 +120,7 @@ public class AgentStatusManager implements EventListener
         }
 
         long elapsedMillis = System.currentTimeMillis() - startTime;
-        if (elapsedMillis > 10000)
+        if (elapsedMillis > 5000)
         {
             try
             {
@@ -136,7 +136,7 @@ public class AgentStatusManager implements EventListener
         return result;
     }
 
-    private void handlePing(AgentPingEvent agentPingEvent)
+    private void handlePing(AgentPingEvent agentPingEvent, long timestamp)
     {
         Agent agent = agentsById.get(agentPingEvent.getAgent().getId());
         if (agent == null || !agent.isEnabled() || agent.getStatus().isIgnorePings())
@@ -147,20 +147,20 @@ public class AgentStatusManager implements EventListener
             return;
         }
 
-        checkForAgentBounce(agent, agentPingEvent);
+        checkForAgentBounce(agent, agentPingEvent, timestamp);
 
         AgentStatus oldStatus = agent.getStatus();
 
         switch(agentPingEvent.getPingStatus())
         {
             case BUILDING:
-                handlePingBuilding(agent, agentPingEvent);
+                handlePingBuilding(agent, agentPingEvent, timestamp);
                 break;
             case IDLE:
-                handlePingIdle(agent, agentPingEvent);
+                handlePingIdle(agent, agentPingEvent, timestamp);
                 break;
             case OFFLINE:
-                handlePingOffline(agent, agentPingEvent);
+                handlePingOffline(agent, agentPingEvent, timestamp);
                 break;
             case INVALID_MASTER:
             case TOKEN_MISMATCH:
@@ -176,11 +176,11 @@ public class AgentStatusManager implements EventListener
                         // So severe that we will not do the usual post
                         // recipe jazz.  This agent is gone proper.
                         agentsByRecipeId.remove(agent.getRecipeId());
-                        agent.updateStatus(agentPingEvent);
+                        agent.updateStatus(agentPingEvent, timestamp);
                         break;
 
                     default:
-                        agent.updateStatus(agentPingEvent);
+                        agent.updateStatus(agentPingEvent, timestamp);
                         break;
                 }
                 break;
@@ -190,7 +190,7 @@ public class AgentStatusManager implements EventListener
         if (agent.isDisabling() && agent.getStatus().isAvailable())
         {
             agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
-            agent.updateStatus(AgentStatus.DISABLED);
+            agent.updateStatus(AgentStatus.DISABLED, timestamp);
         }
 
         AgentStatus newStatus = agent.getStatus();
@@ -225,17 +225,17 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void checkForAgentBounce(Agent agent, AgentPingEvent agentPingEvent)
+    private void checkForAgentBounce(Agent agent, AgentPingEvent agentPingEvent, long timestamp)
     {
         if (agent.getStatus().isOnline() && agentPingEvent.isFirst())
         {
             // The agent must have bounced between pings.  Simulate the
             // master seeing this by sending an offline ping.
-            handlePing(new AgentPingEvent(this, agent, PingStatus.OFFLINE));
+            handlePing(new AgentPingEvent(this, agent, PingStatus.OFFLINE), timestamp);
         }
     }
 
-    private void handlePingBuilding(Agent agent, AgentPingEvent agentPingEvent)
+    private void handlePingBuilding(Agent agent, AgentPingEvent agentPingEvent, long timestamp)
     {
         long pingRecipe = agentPingEvent.getRecipeId();
         switch (agent.getStatus())
@@ -246,7 +246,7 @@ public class AgentStatusManager implements EventListener
                 if (pingRecipe == agent.getRecipeId())
                 {
                     // Expected case.
-                    agent.updateStatus(agentPingEvent);
+                    agent.updateStatus(agentPingEvent, timestamp);
                 }
                 else
                 {
@@ -267,7 +267,7 @@ public class AgentStatusManager implements EventListener
                 if (pingRecipe != agent.getRecipeId() || agent.getSecondsSincePing() > getAgentOfflineTimeout())
                 {
                     publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), pingRecipe));
-                    agent.updateStatus(AgentStatus.BUILDING_INVALID, pingRecipe);
+                    agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, pingRecipe);
                 }
                 break;
 
@@ -278,12 +278,12 @@ public class AgentStatusManager implements EventListener
 
             default:
                 publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), pingRecipe));
-                agent.updateStatus(AgentStatus.BUILDING_INVALID, pingRecipe);
+                agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, pingRecipe);
                 break;
         }
     }
 
-    private void handlePingIdle(Agent agent, AgentPingEvent agentPingEvent)
+    private void handlePingIdle(Agent agent, AgentPingEvent agentPingEvent, long timestamp)
     {
         switch (agent.getStatus())
         {
@@ -294,7 +294,7 @@ public class AgentStatusManager implements EventListener
                 break;
 
             case BUILDING_INVALID:
-                agent.updateStatus(agentPingEvent);
+                agent.updateStatus(agentPingEvent, timestamp);
                 break;
 
             case RECIPE_ASSIGNED:
@@ -307,16 +307,16 @@ public class AgentStatusManager implements EventListener
 
             case IDLE:
             case SYNCHRONISED:
-                agent.updateStatus(agentPingEvent);
+                agent.updateStatus(agentPingEvent, timestamp);
                 break;
 
             default:
-                agent.updateStatus(AgentStatus.SYNCHRONISING);
+                agent.updateStatus(AgentStatus.SYNCHRONISING, timestamp);
                 break;
         }
     }
 
-    private void handlePingOffline(Agent agent, AgentPingEvent agentPingEvent)
+    private void handlePingOffline(Agent agent, AgentPingEvent agentPingEvent, long timestamp)
     {
         switch (agent.getStatus())
         {
@@ -326,12 +326,12 @@ public class AgentStatusManager implements EventListener
                 // Don't immediately give up - wait for the timeout.
                 if (checkForStatusTimeout(agent, "Connection to agent lost during recipe execution"))
                 {
-                    agent.updateStatus(agentPingEvent);
+                    agent.updateStatus(agentPingEvent, timestamp);
                 }
                 break;
 
             default:
-                agent.updateStatus(agentPingEvent);
+                agent.updateStatus(agentPingEvent, timestamp);
                 break;
         }
     }
@@ -349,7 +349,7 @@ public class AgentStatusManager implements EventListener
         return false;
     }
 
-    private void handleSynchronisationComplete(AgentSynchronisationCompleteEvent event)
+    private void handleSynchronisationComplete(AgentSynchronisationCompleteEvent event, long timestamp)
     {
         Agent agent = agentsById.get(event.getAgent().getId());
         if (agent != null)
@@ -359,7 +359,7 @@ public class AgentStatusManager implements EventListener
             {
                 if (agent.isDisabling())
                 {
-                    agent.updateStatus(AgentStatus.DISABLED);
+                    agent.updateStatus(AgentStatus.DISABLED, timestamp);
                     agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
                     publishEvent(new AgentOfflineEvent(this, agent));
                 }
@@ -367,11 +367,11 @@ public class AgentStatusManager implements EventListener
                 {
                     if (event.isSuccessful())
                     {
-                        agent.updateStatus(AgentStatus.SYNCHRONISED);
+                        agent.updateStatus(AgentStatus.SYNCHRONISED, timestamp);
                     }
                     else
                     {
-                        agent.updateStatus(AgentStatus.OFFLINE);
+                        agent.updateStatus(AgentStatus.OFFLINE, timestamp);
                         publishEvent(new AgentOfflineEvent(this, agent));
                     }
     
@@ -387,7 +387,7 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeAssigned(RecipeAssignedEvent event)
+    private void handleRecipeAssigned(RecipeAssignedEvent event, long timestamp)
     {
         Agent agent = agentsById.get(event.getAgent().getId());
         if(agent != null)
@@ -397,12 +397,12 @@ public class AgentStatusManager implements EventListener
             {
                 agentsByRecipeId.put(recipeId, agent);
                 publishEvent(new AgentUnavailableEvent(this, agent));
-                updateAgentRecipeStatus(agent, AgentStatus.RECIPE_ASSIGNED, recipeId);
+                updateAgentRecipeStatus(agent, AgentStatus.RECIPE_ASSIGNED, timestamp, recipeId);
             }
         }
     }
 
-    private void handleRecipeDispatched(RecipeDispatchedEvent event)
+    private void handleRecipeDispatched(RecipeDispatchedEvent event, long timestamp)
     {
         Agent agent = agentsById.get(event.getAgent().getId());
         if(agent != null)
@@ -410,7 +410,7 @@ public class AgentStatusManager implements EventListener
             long recipeId = event.getRecipeId();
             if (agent.getStatus() == AgentStatus.RECIPE_ASSIGNED && agent.getRecipeId() == recipeId)
             {
-                updateAgentRecipeStatus(agent, AgentStatus.RECIPE_DISPATCHED, recipeId);
+                updateAgentRecipeStatus(agent, AgentStatus.RECIPE_DISPATCHED, timestamp, recipeId);
             }
             else
             {
@@ -419,29 +419,29 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeCollecting(RecipeEvent event)
+    private void handleRecipeCollecting(RecipeEvent event, long timestamp)
     {
         Agent agent = agentsByRecipeId.get(event.getRecipeId());
         if(agent != null)
         {
-            updateAgentRecipeStatus(agent, AgentStatus.POST_RECIPE, event.getRecipeId());
+            updateAgentRecipeStatus(agent, AgentStatus.POST_RECIPE, timestamp, event.getRecipeId());
         }
     }
 
-    private void handleRecipeCompleted(long recipeId)
+    private void handleRecipeCompleted(long recipeId, long timestamp)
     {
         Agent agent = agentsByRecipeId.remove(recipeId);
         if (agent != null)
         {
             if (agent.isDisabling())
             {
-                updateAgentRecipeStatus(agent, AgentStatus.DISABLED, -1);
+                updateAgentRecipeStatus(agent, AgentStatus.DISABLED, timestamp, -1);
                 agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
                 publishEvent(new AgentOfflineEvent(this, agent));
             }
             else
             {
-                updateAgentRecipeStatus(agent, AgentStatus.AWAITING_PING, recipeId);
+                updateAgentRecipeStatus(agent, AgentStatus.AWAITING_PING, timestamp, recipeId);
 
                 // Request a ping immediately so no time is wasted
                 publishEvent(new AgentPingRequestedEvent(this, agent));
@@ -456,20 +456,20 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void updateAgentRecipeStatus(Agent agent, AgentStatus newStatus, long recipeId)
+    private void updateAgentRecipeStatus(Agent agent, AgentStatus newStatus, long timestamp, long recipeId)
     {
         AgentStatus oldStatus = agent.getStatus();
-        agent.updateStatus(newStatus, recipeId);
+        agent.updateStatus(newStatus, timestamp, recipeId);
         publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
     }
 
-    private void handleDisableRequested(Agent agent)
+    private void handleDisableRequested(Agent agent, long timestamp)
     {
         AgentStatus status = agent.getStatus();
         if (status == AgentStatus.AWAITING_PING)
         {
             // Small optimisation: no need to wait anymore.
-            disableAgent(agent);
+            disableAgent(agent, timestamp);
         }
         else
         {
@@ -482,7 +482,7 @@ public class AgentStatusManager implements EventListener
                         {
                             // Immediate disable
                             publishEvent(new AgentUnavailableEvent(this, agent));
-                            disableAgent(agent);
+                            disableAgent(agent, timestamp);
                         }
                         else
                         {
@@ -492,7 +492,7 @@ public class AgentStatusManager implements EventListener
                     }
                     else
                     {
-                        disableAgent(agent);
+                        disableAgent(agent, timestamp);
                     }
 
                     break;
@@ -515,7 +515,7 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void disableAgent(Agent agent)
+    private void disableAgent(Agent agent, long timestamp)
     {
         AgentStatus oldStatus = agent.getStatus();
         if (agent.isOnline())
@@ -524,11 +524,11 @@ public class AgentStatusManager implements EventListener
         }
 
         agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
-        agent.updateStatus(AgentStatus.DISABLED);
+        agent.updateStatus(AgentStatus.DISABLED, timestamp);
         publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
     }
 
-    private void handleEnableRequested(Agent agent)
+    private void handleEnableRequested(Agent agent, long timestamp)
     {
         switch(agent.getEnableState())
         {
@@ -540,7 +540,7 @@ public class AgentStatusManager implements EventListener
             case DISABLED:
                 AgentStatus oldStatus = agent.getStatus();
                 agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.ENABLED);
-                agent.updateStatus(AgentStatus.INITIAL);
+                agent.updateStatus(AgentStatus.INITIAL, timestamp);
                 publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
 
                 // Request a ping now to save time
@@ -616,7 +616,7 @@ public class AgentStatusManager implements EventListener
         return recipeId;
     }
 
-    private void handleAgentSynchronisationMessagesEnqueued(Agent agent)
+    private void handleAgentSynchronisationMessagesEnqueued(Agent agent, long timestamp)
     {
         Agent existingAgent = agentsById.get(agent.getId());
         if (existingAgent != null)
@@ -624,7 +624,7 @@ public class AgentStatusManager implements EventListener
             AgentStatus currentStatus = existingAgent.getStatus();
             if (currentStatus == AgentStatus.IDLE || currentStatus == AgentStatus.SYNCHRONISED)
             {
-                existingAgent.updateStatus(AgentStatus.SYNCHRONISING);
+                existingAgent.updateStatus(AgentStatus.SYNCHRONISING, timestamp);
                 publishEvent(new AgentStatusChangeEvent(this, existingAgent, currentStatus, AgentStatus.SYNCHRONISING));
             }
         }
@@ -648,45 +648,46 @@ public class AgentStatusManager implements EventListener
             LOG.finer("Agent status manager: handle event: " + safeToString(event));
         }
 
-        long startTime = System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
         agentsLock.lock();
+        long lockedTimestamp = System.currentTimeMillis();
         try
         {
             if(event instanceof AgentPingEvent)
             {
-                handlePing((AgentPingEvent) event);
+                handlePing((AgentPingEvent) event, timestamp);
             }
             else if (event instanceof AgentSynchronisationCompleteEvent)
             {
-                handleSynchronisationComplete((AgentSynchronisationCompleteEvent)event);
+                handleSynchronisationComplete((AgentSynchronisationCompleteEvent)event, timestamp);
             }
             else if(event instanceof RecipeAssignedEvent)
             {
-                handleRecipeAssigned((RecipeAssignedEvent) event);
+                handleRecipeAssigned((RecipeAssignedEvent) event, timestamp);
             }
             else if(event instanceof RecipeDispatchedEvent)
             {
-                handleRecipeDispatched((RecipeDispatchedEvent) event);
+                handleRecipeDispatched((RecipeDispatchedEvent) event, timestamp);
             }
             else if(event instanceof RecipeCollectingEvent)
             {
-                handleRecipeCollecting((RecipeEvent) event);
+                handleRecipeCollecting((RecipeEvent) event, timestamp);
             }
             else if(event instanceof RecipeCollectedEvent)
             {
-                handleRecipeCompleted(((RecipeCollectedEvent) event).getRecipeId());
+                handleRecipeCompleted(((RecipeCollectedEvent) event).getRecipeId(), timestamp);
             }
             else if(event instanceof RecipeAbortedEvent)
             {
-                handleRecipeCompleted(((RecipeAbortedEvent) event).getRecipeId());
+                handleRecipeCompleted(((RecipeAbortedEvent) event).getRecipeId(), timestamp);
             }
             else if(event instanceof AgentDisableRequestedEvent)
             {
-                handleDisableRequested(((AgentEvent) event).getAgent());
+                handleDisableRequested(((AgentEvent) event).getAgent(), timestamp);
             }
             else if(event instanceof AgentEnableRequestedEvent)
             {
-                handleEnableRequested(((AgentEvent) event).getAgent());
+                handleEnableRequested(((AgentEvent) event).getAgent(), timestamp);
             }
             else if(event instanceof AgentAddedEvent)
             {
@@ -702,7 +703,7 @@ public class AgentStatusManager implements EventListener
             }
             else if (event instanceof AgentSynchronisationMessagesEnqueuedEvent)
             {
-                handleAgentSynchronisationMessagesEnqueued(((AgentSynchronisationMessagesEnqueuedEvent) event).getAgent());
+                handleAgentSynchronisationMessagesEnqueued(((AgentSynchronisationMessagesEnqueuedEvent) event).getAgent(), timestamp);
             }
         }
         finally
@@ -714,9 +715,10 @@ public class AgentStatusManager implements EventListener
             }
         }
 
-        // This handler should be fast, as it is synchronous and cannot
-        // steal large amounts of time from the publisher.
-        long elapsedMillis = System.currentTimeMillis() - startTime;
+        // This handler should be fast, as it is synchronous and cannot steal large amounts of time from the publisher.
+        // We don't count time waiting on the lock as we prefer to only see the culprit holding the lock (that does
+        // required other logging where the lock is used).
+        long elapsedMillis = System.currentTimeMillis() - lockedTimestamp;
         if(elapsedMillis > 5000)
         {
             LOG.warning("Processing event '" + event.toString() + "' took more than " + (elapsedMillis / 1000) + " seconds");

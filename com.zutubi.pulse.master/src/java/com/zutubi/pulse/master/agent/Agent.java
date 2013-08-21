@@ -18,9 +18,9 @@ public interface Agent
 
     long getId();
 
-    void updateStatus(AgentPingEvent agentPingEvent);
-    void updateStatus(AgentStatus status);
-    void updateStatus(AgentStatus status, long recipeId);
+    void updateStatus(AgentPingEvent agentPingEvent, long timestamp);
+    void updateStatus(AgentStatus status, long timestamp);
+    void updateStatus(AgentStatus status, long timestamp, long recipeId);
 
     void copyStatus(Agent agent);
 

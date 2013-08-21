@@ -150,24 +150,24 @@ public class DefaultAgent implements Agent
         return status.isAvailable();
     }
 
-    public void updateStatus(AgentPingEvent agentPingEvent)
+    public void updateStatus(AgentPingEvent agentPingEvent, long timestamp)
     {
-        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
+        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), timestamp, agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
     }
 
-    public void updateStatus(AgentStatus status)
+    public void updateStatus(AgentStatus status, long timestamp)
     {
-        updateStatus(status, -1);
+        updateStatus(status, timestamp, -1);
     }
 
-    public void updateStatus(AgentStatus status, long recipeId)
+    public void updateStatus(AgentStatus status, long timestamp, long recipeId)
     {
-        updateStatus(status, recipeId, null);
+        updateStatus(status, timestamp, recipeId, null);
     }
 
-    public synchronized void updateStatus(AgentStatus status, long recipeId, String pingError)
+    public synchronized void updateStatus(AgentStatus status, long timestamp, long recipeId, String pingError)
     {
-        lastPingTime = System.currentTimeMillis();
+        lastPingTime = timestamp;
         if (status.isOnline())
         {
             lastOnlineTime = lastPingTime;
