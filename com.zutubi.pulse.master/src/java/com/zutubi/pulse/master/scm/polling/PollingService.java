@@ -363,11 +363,18 @@ public class PollingService implements Stoppable
         {
             public int compare(Project project1, Project project2)
             {
-                // There is guaranteed to be a dependency relationship one way
-                // or the other, so we never return 0 for different projects.
+                // Two projects may be in the same dependency tree but have no dependency relationship.  We need an
+                // ordering that makes projects come after any of their upstream dependencies, but also provides a
+                // consistent answer for projects not related by dependencies.
                 if (project1.getConfig().isDependentOn(project2.getConfig()))
                 {
+                    // First project is downstream of second, make it "greater" so it is polled later.
                     return 1;
+                }
+                else if (project2.getConfig().isDependentOn(project1.getConfig()))
+                {
+                    // Inverse of above.
+                    return -1;
                 }
                 else if (project1.equals(project2))
                 {
@@ -375,7 +382,8 @@ public class PollingService implements Stoppable
                 }
                 else
                 {
-                    return -1;
+                    // No relationship, so the order here is arbitrary but must be consistent.
+                    return project1.getId() > project2.getId() ? 1 : -1;
                 }
             }
         });
