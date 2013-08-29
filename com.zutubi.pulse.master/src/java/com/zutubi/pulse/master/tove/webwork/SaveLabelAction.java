@@ -188,7 +188,7 @@ public class SaveLabelAction extends SaveAction
         {
             public boolean apply(LabelConfiguration l)
             {
-                return l.getLabel().equals(originalLabel.getLabel());
+                return Objects.equal(l.getLabel(), originalLabel.getLabel());
             }
         })) - 1;
         
