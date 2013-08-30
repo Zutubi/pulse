@@ -1416,6 +1416,25 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("child", childTemplate.getMetaOwner(CollectionType.ORDER_KEY));
     }
 
+    public void testOverrideOrderWithSame()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        List<String> order = Arrays.asList("default2", "default");
+        configurationTemplateManager.setOrder(parentStagesPath, order);
+        configurationTemplateManager.setOrder(childStagesPath, order);
+        assertEquals(Arrays.asList("default2", "default", "childs"), getOrder(childStagesPath));
+        TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord(childStagesPath);
+        assertEquals("global", childTemplate.getMetaOwner(CollectionType.ORDER_KEY));
+    }
+
     public void testInheritedOrderRefersToHidden()
     {
         insertGlobal();

@@ -2413,7 +2413,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      *         collection or the given order contains a key that does not
      *         exist in the collection
      */
-    public void setOrder(final String path, final Collection<String> order)
+    public void setOrder(final String path, final List<String> order)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
@@ -2449,16 +2449,28 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 }
 
                 MutableRecord mutable;
+                List<String> newOrder = order;
                 if(record instanceof TemplateRecord)
                 {
-                    mutable = ((TemplateRecord) record).getMoi().copy(false, true);
+                    TemplateRecord templateRecord = (TemplateRecord) record;
+                    TemplateRecord templateParentRecord = templateRecord.getParent();
+                    if (templateParentRecord != null)
+                    {
+                        List<String> inheritedOrder = CollectionType.getDeclaredOrder(templateParentRecord);
+                        if (inheritedOrder.equals(order))
+                        {
+                            newOrder = null;
+                        }
+                    }
+
+                    mutable = templateRecord.getMoi().copy(false, true);
                 }
                 else
                 {
                     mutable = record.copy(false, true);
                 }
 
-                CollectionType.setOrder(mutable, order);
+                CollectionType.setOrder(mutable, newOrder);
                 recordManager.update(path, mutable);
 
                 refreshCaches();

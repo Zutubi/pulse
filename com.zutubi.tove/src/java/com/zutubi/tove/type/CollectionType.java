@@ -89,7 +89,14 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     public static void setOrder(MutableRecord record, Iterable<String> order)
     {
-        record.putMeta(ORDER_KEY, WebUtils.encodeAndJoin(SEPARATOR, order));
+        if (order == null || !order.iterator().hasNext())
+        {
+            record.removeMeta(ORDER_KEY);
+        }
+        else
+        {
+            record.putMeta(ORDER_KEY, WebUtils.encodeAndJoin(SEPARATOR, order));
+        }
     }
 
     public abstract String getItemKey(String path, Record record);
