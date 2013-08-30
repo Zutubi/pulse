@@ -9,6 +9,7 @@ import com.zutubi.tove.config.ConfigurationScopeInfo;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
+import com.zutubi.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -427,6 +428,7 @@ public class ConfigurationHealthChecker
         if (record instanceof TemplateRecord)
         {
             TemplateRecord templateRecord = (TemplateRecord) record;
+            checkScrubbed(path, type, templateRecord, report);
             // Only check orders where they are defined.  Inherited orders may
             // validly contain references to items not visible at this level.
             checkCollectionOrder(path, templateRecord.getMoi(), report);
@@ -662,7 +664,7 @@ public class ConfigurationHealthChecker
         }
     }
 
-    private void checkScrubbed(String path, CompositeType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
+    private void checkScrubbed(String path, ComplexType type, TemplateRecord templateRecord, ConfigurationHealthReport report)
     {
         TemplateRecord templateParent = templateRecord.getParent();
         if (templateParent != null)
@@ -670,13 +672,29 @@ public class ConfigurationHealthChecker
             TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
 
             Record moi = templateRecord.getMoi();
-            for (String key: moi.simpleKeySet())
+            for (String key: moi.metaKeySet())
             {
-                Object value = moi.get(key);
-                Object inheritedValue = emptyChild.get(key);
-                if (RecordUtils.valuesEqual(value, inheritedValue) && !isExternalStateProperty(type, key))
+                if (!CollectionUtils.contains(TemplateRecord.NO_INHERIT_META_KEYS, key))
                 {
-                    report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
+                    Object value = moi.getMeta(key);
+                    Object inheritedValue = emptyChild.getMeta(key);
+                    if (RecordUtils.valuesEqual(value, inheritedValue))
+                    {
+                        report.addProblem(new NonScrubbedMetaValueProblem(path, I18N.format("meta.value.not.scrubbed", key), key, inheritedValue));
+                    }
+                }
+            }
+
+            if (type instanceof CompositeType)
+            {
+                for (String key: moi.simpleKeySet())
+                {
+                    Object value = moi.get(key);
+                    Object inheritedValue = emptyChild.get(key);
+                    if (RecordUtils.valuesEqual(value, inheritedValue) && !isExternalStateProperty((CompositeType) type, key))
+                    {
+                        report.addProblem(new NonScrubbedSimpleValueProblem(path, I18N.format("simple.value.not.scrubbed", key), key, inheritedValue));
+                    }
                 }
             }
         }
