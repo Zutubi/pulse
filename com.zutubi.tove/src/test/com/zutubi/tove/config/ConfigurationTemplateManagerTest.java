@@ -15,17 +15,19 @@ import com.zutubi.tove.transaction.UserTransaction;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.validation.FakeValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.annotations.Required;
+
+import java.util.*;
+
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-
-import java.util.*;
 
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {
@@ -190,22 +192,47 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
         String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
 
-
-        String collectionPath = getPath(childPath, "cs");
-        Record collectionRecord = configurationTemplateManager.getRecord(collectionPath);
-        assertNotNull(collectionRecord);
-        CollectionType type = configurationTemplateManager.getType(collectionPath, CollectionType.class);
-        assertEquals(ORDER, type.getOrder(collectionRecord));
-        
-        @SuppressWarnings({"unchecked"})
-        Map<String, ConfigC> collectionInstance = (Map<String, ConfigC>) configurationTemplateManager.getInstance(collectionPath);
-        assertEquals(new HashSet<String>(ORDER), collectionInstance.keySet());
+        assertCollectionOrder(ORDER, getPath(childPath, "cs"));
     }
 
-    public void testInsertTemplatedInheritedCollectionExplicitOrderPreserved()
+    public void testInsertTemplatedInheritedCollectionExplicitOrderInParent()
     {
         final List<String> INSERT_ORDER = asList("b", "d", "c", "a", "e");
-        final List<String> EXPLICIT_ORDER = asList("d", "c", "e", "b", "a");
+        final List<String> CHILD_EXPLICIT_ORDER = asList("d", "c", "e", "b", "a");
+        final List<String> ROOT_EXPLICIT_ORDER = asList("c", "a", "b", "e", "d");
+
+        ConfigA root = new ConfigA("root");
+        for (String name: INSERT_ORDER)
+        {
+            root.addC(new ConfigC(name));
+        }
+
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
+        String rootCollectionPath = getPath(rootPath, "cs");
+        configurationTemplateManager.setOrder(rootCollectionPath, ROOT_EXPLICIT_ORDER);
+
+        String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+        String childCollectionPath = getPath(childPath, "cs");
+
+        assertCollectionOrder(ROOT_EXPLICIT_ORDER, rootCollectionPath);
+        assertCollectionOrder(ROOT_EXPLICIT_ORDER, childCollectionPath);
+        TemplateRecord childCollectionRecord = (TemplateRecord) configurationTemplateManager.getRecord(childCollectionPath);
+        assertEquals("root", childCollectionRecord.getMetaOwner(CollectionType.ORDER_KEY));
+
+
+        configurationTemplateManager.setOrder(childCollectionPath, CHILD_EXPLICIT_ORDER);
+
+        assertCollectionOrder(ROOT_EXPLICIT_ORDER, rootCollectionPath);
+        assertCollectionOrder(CHILD_EXPLICIT_ORDER, childCollectionPath);
+        childCollectionRecord = (TemplateRecord) configurationTemplateManager.getRecord(childCollectionPath);
+        assertEquals("child", childCollectionRecord.getMetaOwner(CollectionType.ORDER_KEY));
+    }
+
+    public void testInsertTemplatedInheritedCollectionExplicitOrderInChild()
+    {
+        final List<String> INSERT_ORDER = asList("b", "d", "c", "a", "e");
+        final List<String> CHILD_EXPLICIT_ORDER = asList("d", "c", "e", "b", "a");
+        final List<String> ROOT_EXPLICIT_ORDER = asList("c", "a", "b", "e", "d");
 
         ConfigA root = new ConfigA("root");
         for (String name: INSERT_ORDER)
@@ -215,21 +242,72 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
         String childPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, new ConfigA("child"), rootPath, false);
+        String rootCollectionPath = getPath(rootPath, "cs");
+        String childCollectionPath = getPath(childPath, "cs");
 
-        String collectionPath = getPath(childPath, "cs");
-        configurationTemplateManager.setOrder(collectionPath, EXPLICIT_ORDER);
 
-        
+        configurationTemplateManager.setOrder(childCollectionPath, CHILD_EXPLICIT_ORDER);
+
+        assertCollectionOrder(INSERT_ORDER, rootCollectionPath);
+        assertCollectionOrder(CHILD_EXPLICIT_ORDER, childCollectionPath);
+
+
+        configurationTemplateManager.setOrder(rootCollectionPath, ROOT_EXPLICIT_ORDER);
+
+        assertCollectionOrder(ROOT_EXPLICIT_ORDER, rootCollectionPath);
+        assertCollectionOrder(CHILD_EXPLICIT_ORDER, childCollectionPath);
+    }
+
+    public void testInsertTemplatedInheritedCollectionExplicitOrderScrubbed()
+    {
+        final List<String> INSERT_ORDER = asList("b", "d", "c", "a", "e");
+        final List<String> EXPLICIT_ORDER = asList("d", "c", "e", "b", "a");
+        final List<String> EDITED_EXPLICIT_ORDER = asList("c", "a", "b", "e", "d");
+
+        ConfigA root = new ConfigA("root");
+        for (String name: INSERT_ORDER)
+        {
+            root.addC(new ConfigC(name));
+        }
+
+        String rootPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, root, null, true);
+        String rootCollectionPath = getPath(rootPath, "cs");
+        configurationTemplateManager.setOrder(rootCollectionPath, EXPLICIT_ORDER);
+        assertCollectionOrder(EXPLICIT_ORDER, rootCollectionPath);
+
+        // Insert a child identical to the parent, values (including order) should get scrubbed.
+        TemplateRecord rootTemplateRecord = (TemplateRecord) configurationTemplateManager.getRecord(rootPath);
+        MutableRecord childRecord = rootTemplateRecord.flatten(false);
+        childRecord.put("name", "child");
+        configurationTemplateManager.setParentTemplate(childRecord, rootTemplateRecord.getHandle());
+
+        String childPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, childRecord);
+        String childCollectionPath = getPath(childPath, "cs");
+
+        assertCollectionOrder(EXPLICIT_ORDER, childCollectionPath);
+        TemplateRecord childCollectionRecord = (TemplateRecord) configurationTemplateManager.getRecord(childCollectionPath);
+        assertEquals("root", childCollectionRecord.getMetaOwner(CollectionType.ORDER_KEY));
+
+
+        // If we change the parent's order, the child should inherit they new order.
+        configurationTemplateManager.setOrder(rootCollectionPath, EDITED_EXPLICIT_ORDER);
+
+        assertCollectionOrder(EDITED_EXPLICIT_ORDER, rootCollectionPath);
+        assertCollectionOrder(EDITED_EXPLICIT_ORDER, childCollectionPath);
+    }
+
+    private void assertCollectionOrder(List<String> expectedOrder, String collectionPath)
+    {
         Record collectionRecord = configurationTemplateManager.getRecord(collectionPath);
         assertNotNull(collectionRecord);
         CollectionType type = configurationTemplateManager.getType(collectionPath, CollectionType.class);
-        assertEquals(EXPLICIT_ORDER, type.getOrder(collectionRecord));
-        
+        assertEquals(expectedOrder, type.getOrder(collectionRecord));
+
         @SuppressWarnings({"unchecked"})
         Map<String, ConfigC> collectionInstance = (Map<String, ConfigC>) configurationTemplateManager.getInstance(collectionPath);
-        assertEquals(new HashSet<String>(EXPLICIT_ORDER), collectionInstance.keySet());
+        assertEquals(new HashSet<String>(expectedOrder), collectionInstance.keySet());
     }
-    
+
     public void testInsertTemplatedInvalidScope()
     {
         try

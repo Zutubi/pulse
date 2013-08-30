@@ -24,6 +24,7 @@ import com.zutubi.tove.type.record.events.RecordDeletedEvent;
 import com.zutubi.tove.type.record.events.RecordEvent;
 import com.zutubi.tove.type.record.events.RecordInsertedEvent;
 import com.zutubi.tove.type.record.events.RecordUpdatedEvent;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Sort;
@@ -1759,16 +1760,31 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     void scrubInheritedValues(TemplateRecord templateParent, MutableRecord record, boolean deep)
     {
         ComplexType type = templateParent.getType();
+
+        // We add an empty layer where we are about to add the new
+        // record in case there are any values hidden from the parent
+        // via templating rules (like NoInherit).
+        TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
+        Set<String> dead = new HashSet<String>();
+
+        // Perhaps we could use an iterator to remove, but does Record
+        // specify what happens when removing using a key set iterator?
+        for (String key : record.metaKeySet())
+        {
+            if (!CollectionUtils.contains(TemplateRecord.NO_INHERIT_META_KEYS, key) && RecordUtils.valuesEqual(record.getMeta(key), emptyChild.getMeta(key)))
+            {
+                dead.add(key);
+            }
+        }
+
+        for (String key : dead)
+        {
+            record.removeMeta(key);
+        }
+
         if (type instanceof CompositeType)
         {
-            // We add an empty layer where we are about to add the new
-            // record in case there are any values hidden from the parent
-            // via templating rules (like NoInherit).
-            TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
-            Set<String> dead = new HashSet<String>();
-
-            // Perhaps we could use an iterator to remove, but does Record
-            // specify what happens when removing using a key set iterator?
+            dead.clear();
             for (String key : record.simpleKeySet())
             {
                 if (RecordUtils.valuesEqual(record.get(key), emptyChild.get(key)))
