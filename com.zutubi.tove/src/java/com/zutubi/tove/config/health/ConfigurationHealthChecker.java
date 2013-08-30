@@ -698,9 +698,9 @@ public class ConfigurationHealthChecker
                 {
                     String key = property.getName();
                     Object value = templateRecord.get(key);
-                    if (value == null || !value.equals(ExternalStateInTemplateProblem.NO_EXTERNAL_STATE))
+                    if (value != null && !value.equals(ExternalStateInTemplateProblem.NO_EXTERNAL_STATE))
                     {
-                        report.addProblem(new ExternalStateInTemplateProblem(path, I18N.format("external.state.in.template", key), key));                        
+                        report.addProblem(new ExternalStateInTemplateProblem(path, I18N.format("external.state.in.template", key), key));
                     }
                 }
             }
