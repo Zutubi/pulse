@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.handler;
 
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
+import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
@@ -35,6 +36,13 @@ public class ReferenceAnnotationHandler extends OptionAnnotationHandler
                     LOG.warning("Failed to retrieve dependent property.", e);
                 }
             }
+        }
+        else if (instance == null)
+        {
+            // The option provider needs an instance to define the scope where reference-able instances can be found.
+            // If we don't have one it's because we're adding a new instance, in that case use the parent of the new
+            // instance as the scope.
+            instance = configurationProvider.get(field.getParentPath(), Configuration.class);
         }
 
         super.process(field, optionProvider, instance);

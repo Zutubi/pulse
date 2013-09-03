@@ -144,10 +144,10 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         return instance;
     }
 
-    public Collection<Configuration> getReferencableInstances(CompositeType type, String referencingPath)
+    public Collection<Configuration> getReferencableInstances(CompositeType type, String referenceScopePath)
     {
         Collection<Configuration> instances = new LinkedList<Configuration>();
-        String owningScope = configurationPersistenceManager.getClosestOwningScope(type, referencingPath);
+        String owningScope = configurationPersistenceManager.getClosestOwningScope(type, referenceScopePath);
         // If the owning scope is a templated object, then we can refer to
         // templated instances.  Otherwise, accept only concrete
         // instances.

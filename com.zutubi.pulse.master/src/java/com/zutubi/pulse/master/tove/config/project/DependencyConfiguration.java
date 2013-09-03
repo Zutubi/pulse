@@ -61,7 +61,7 @@ public class DependencyConfiguration extends AbstractConfiguration
     @Required
     private StageType stageType = StageType.ALL_STAGES;
 
-    @Reference(dependentOn = "project", optionProvider = "DependencyStagesOptionProvider")
+    @Reference(dependentOn = "project")
     private List<BuildStageConfiguration> stages = new LinkedList<BuildStageConfiguration>();
 
     public ProjectConfiguration getProject()

@@ -14,6 +14,7 @@ import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,10 +36,35 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         return null;
     }
 
-    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
+    /**
+     * Gets the map of options, which for references maps from handles to names.  The parameters are tweaked vs our
+     * super implementation, hence the documentation here.  See also the {@link com.zutubi.pulse.master.tove.handler.ReferenceAnnotationHandler}
+     * which does the tweaking.
+     *
+     * @param referencedScopeInstance this instance defines where reference-able instances can be found.  In the normal
+     *                                case this is the same instance the reference is coming from.  However, when the
+     *                                reference is dependentOn another field, that field determines the reference-able
+     *                                scope.  (At the time of writing the example is configuration of selected stages in
+     *                                dependencies, the stage options are from the upstream project, not the project
+     *                                defining the dependency.)
+     * @param referencingFieldParentPath this always refers to the parent path for the field we are providing options
+     *                                   for.  This will correspond with the referencedScopeInstance in the normal case,
+     *                                   but will differ in the dependentOn case.
+     * @param property the property defining the field we are providing options for
+     * @return available options for the given property under the given referencingFieldParentPath.  These are instances
+     *         of the right type in the closest owning scope (of that type) of the referencedScopeInstance.
+     */
+    public Map<String, String> getMap(Object referencedScopeInstance, String referencingFieldParentPath, TypeProperty property)
     {
+        if (referencedScopeInstance == null)
+        {
+            // We don't yet know where we are looking for the reference-able instances.
+            return Collections.emptyMap();
+        }
+
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
-        Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
+        Configuration referencedScopeConfiguration = (Configuration) referencedScopeInstance;
+        Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), referencedScopeConfiguration.getConfigurationPath());
         Map<String, String> options = new LinkedHashMap<String, String>();
 
         // Empty option (0 handle == null reference).  This is the initial
@@ -46,7 +72,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         // can be used to ensure a selection is made.
         options.put("0", "");
 
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
+        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(referencingFieldParentPath);
         for (Configuration r : referencable)
         {
             if (configurationSecurityManager.hasPermission(r.getConfigurationPath(), AccessManager.ACTION_VIEW))

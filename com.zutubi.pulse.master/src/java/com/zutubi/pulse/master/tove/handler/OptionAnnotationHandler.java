@@ -20,7 +20,7 @@ import java.util.List;
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
     private ObjectFactory objectFactory;
-    private ConfigurationProvider configurationProvider;
+    protected ConfigurationProvider configurationProvider;
 
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
