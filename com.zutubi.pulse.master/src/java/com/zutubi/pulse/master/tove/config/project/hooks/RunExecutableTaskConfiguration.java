@@ -12,10 +12,12 @@ import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +29,10 @@ import java.util.concurrent.TimeUnit;
 @Form(fieldOrder = {"command", "arguments", "workingDir", "timeoutApplied", "timeout"})
 public class RunExecutableTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
+    private static final Logger LOG = Logger.getLogger(RunExecutableTaskConfiguration.class);
+
+    private static final String PROPERTY_DIRECTORY_WHITELIST = "pulse.hook.command.directory.whitelist";
+
     @Required
     private String command;
     private String arguments;
@@ -93,7 +99,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         {
             List<String> resolvedArguments = context.splitAndResolveVariables(arguments);
             List<String> commandLine = new LinkedList<String>();
-            commandLine.add(command);
+            commandLine.add(verifyCommand());
             commandLine.addAll(resolvedArguments);
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
@@ -129,6 +135,53 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
             {
                 asyncProcess.destroy();
             }
+        }
+    }
+
+    private String verifyCommand() throws IOException
+    {
+        String whitelistString = System.getProperty(PROPERTY_DIRECTORY_WHITELIST);
+        if (whitelistString == null)
+        {
+            return command;
+        }
+        else
+        {
+            // Note that apart from verifying the command is in the whitelist we must also ensure we return an
+            // absolute path, otherwise when the command is run it is subject to a different PATH search which may hit
+            // another exe.  We must also take care that relative paths are not used to escape the whitelist, e.g.
+            //
+            //   /some/whitelisted/dir/../../../bin/foo
+            //
+            // We do this by ensuring the file's parent is in the whitelist, even when constructing the file path based
+            // on a whitelisted directory, and by canonicalising paths before comparing them.
+            String[] whitelist = StringUtils.split(whitelistString, ';');
+            for (String dirName : whitelist)
+            {
+                File directory = new File(dirName);
+                directory = directory.getCanonicalFile();
+                if (directory.isDirectory())
+                {
+                    File commandFile = new File(command);
+                    if (!commandFile.isAbsolute())
+                    {
+                        commandFile = new File(directory, command);
+                    }
+
+                    commandFile = commandFile.getCanonicalFile();
+                    if (commandFile.getParentFile().equals(directory) && commandFile.isFile())
+                    {
+                        LOG.info("Command '" + command + "' found in whitelisted directory '" + dirName + "'");
+                        return commandFile.getAbsolutePath();
+                    }
+                }
+                else
+                {
+                    LOG.warning("Ignoring whitelisted path '" + directory + "': not a directory");
+                }
+            }
+
+            throw new IOException("Unable to locate command '" + command + "' in any whitelisted directory '" + whitelistString + "'");
         }
     }
 }
