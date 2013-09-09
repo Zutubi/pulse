@@ -38,7 +38,8 @@ public class RepositoryAttributes
 
     private void initCache(String path, File dir) throws IOException
     {
-        // load attributes at this path.
+        // CIB-3056: This intentionally only searches the base and its immediate child directories, as that is all we
+        // use.  Walking the entire repository could take a long time for no practical benefit.
         readAttributes(path);
 
         File[] childDirectories = dir.listFiles(DirectoryFileFilter.INSTANCE);
@@ -46,7 +47,7 @@ public class RepositoryAttributes
         {
             for (File childDirectory : childDirectories)
             {
-                initCache(PathUtils.getPath(path, childDirectory.getName()), childDirectory);
+                readAttributes(PathUtils.getPath(path, childDirectory.getName()));
             }
         }
     }
