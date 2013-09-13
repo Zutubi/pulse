@@ -67,10 +67,6 @@ public class NotifyConditionContext
             {
                 lastSuccess = null;
             }
-            else if (lastSuccess.getState() == ResultState.SUCCESS)
-            {
-                lastSuccess = buildResult;
-            }
             else
             {
                 lastSuccess = buildManager.getPreviousBuildResultWithRevision(buildResult, new ResultState[] { ResultState.SUCCESS });
@@ -92,10 +88,6 @@ public class NotifyConditionContext
             if (buildResult == null)
             {
                 lastHealthy = null;
-            }
-            else if (lastHealthy.getState().isHealthy())
-            {
-                lastHealthy = buildResult;
             }
             else
             {
@@ -146,10 +138,6 @@ public class NotifyConditionContext
             {
                 changesSinceLastSuccess = Collections.emptyList();
             }
-            else if (buildResult == getLastSuccess())
-            {
-                changesSinceLastSuccess = getChanges();
-            }
             else
             {
                 BuildResult since = getLastSuccess();
@@ -173,10 +161,6 @@ public class NotifyConditionContext
             {
                 upstreamChangesSinceLastSuccess = Collections.emptyList();
             }
-            else if (buildResult == getLastSuccess())
-            {
-                upstreamChangesSinceLastSuccess = getUpstreamChanges();
-            }
             else
             {
                 upstreamChangesSinceLastSuccess = newArrayList(transform(changelistManager.getUpstreamChangelists(buildResult, getLastSuccess()), new UpstreamChangelist.ToChangelistFunction()));
@@ -196,10 +180,6 @@ public class NotifyConditionContext
             if (buildResult == null)
             {
                 changesSinceLastHealthy = Collections.emptyList();
-            }
-            else if (buildResult == getLastHealthy())
-            {
-                changesSinceLastHealthy = getChanges();
             }
             else
             {
@@ -223,10 +203,6 @@ public class NotifyConditionContext
             if (buildResult == null)
             {
                 upstreamChangesSinceLastHealthy = Collections.emptyList();
-            }
-            else  if (buildResult == getLastHealthy())
-            {
-                upstreamChangesSinceLastHealthy = getUpstreamChanges();
             }
             else
             {
