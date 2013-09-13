@@ -83,9 +83,9 @@ public class SubversionClient implements ScmClient
      * @param e the exception to convert
      * @return the converted form of the exception
      */
-    private ScmException convertException(SVNException e)
+    private ScmException convertException(SVNException e, ExecutionContext executionContext)
     {
-        LOG.error(e);
+        LOG.error(getLoggingPrefix(executionContext) + e.getMessage(), e);
         if (e instanceof SVNCancelException)
         {
             return new ScmCancelledException(e.getMessage(), e);
@@ -177,7 +177,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, null);
         }
     }
 
@@ -356,7 +356,7 @@ public class SubversionClient implements ScmClient
             }
             catch (SVNException e)
             {
-                throw convertException(e);
+                throw convertException(e, context.getEnvironmentContext());
             }
         }
 
@@ -429,7 +429,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context);
         }
         finally
         {
@@ -449,7 +449,7 @@ public class SubversionClient implements ScmClient
                 handler.status("Processing external '" + external.path + "'");
             }
 
-            update(new File(context.getWorkingDir(), FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
+            update(context, new File(context.getWorkingDir(), FileSystemUtils.localiseSeparators(external.path)), convertRevision(revision), client);
 
             if (handler != null)
             {
@@ -468,7 +468,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context.getEnvironmentContext());
         }
 
         return new ByteArrayInputStream(os.toByteArray());
@@ -526,7 +526,7 @@ public class SubversionClient implements ScmClient
             }
             catch (SVNException e)
             {
-                throw convertException(e);
+                throw convertException(e, context);
             }
         }
 
@@ -631,7 +631,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context);
         }
 
         return result;
@@ -711,7 +711,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context.getEnvironmentContext());
         }
     }
 
@@ -739,7 +739,7 @@ public class SubversionClient implements ScmClient
             {
                 return Arrays.asList(new ScmFile(path));
             }
-            throw convertException(e);
+            throw convertException(e, context.getEnvironmentContext());
         }
 
         List<ScmFile> result = new LinkedList<ScmFile>();
@@ -795,7 +795,7 @@ public class SubversionClient implements ScmClient
                 client.setEventHandler(new ChangeEventHandler(handler));
             }
 
-            update(context.getWorkingDir(), svnRevision, client);
+            update(context, context.getWorkingDir(), svnRevision, client);
             updateExternals(context, rev, client, handler);
         }
         catch (ScmCancelledException e)
@@ -832,7 +832,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context);
         }
         finally
         {
@@ -840,7 +840,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    private void update(File workDir, SVNRevision rev, SVNUpdateClient client) throws ScmException
+    private void update(ExecutionContext context, File workDir, SVNRevision rev, SVNUpdateClient client) throws ScmException
     {
         try
         {
@@ -848,7 +848,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context);
         }
     }
 
@@ -921,7 +921,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public void tag(ScmContext scmContent, Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ScmContext scmContext, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         SVNCommitClient commitClient = null;
         SVNCopyClient copyClient = null;
@@ -950,7 +950,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, scmContext.getEnvironmentContext());
         }
         finally
         {
@@ -1018,7 +1018,7 @@ public class SubversionClient implements ScmClient
         }
         catch (SVNException e)
         {
-            throw convertException(e);
+            throw convertException(e, context.getEnvironmentContext());
         }
     }
 
@@ -1048,6 +1048,19 @@ public class SubversionClient implements ScmClient
                 oldSvn.getExternalsMonitoring() != newSvn.getExternalsMonitoring() ||
                 !Objects.equal(oldSvn.getExternalMonitorPaths(), newSvn.getExternalMonitorPaths()) ||
                 oldSvn.getVerifyExternals() != newSvn.getVerifyExternals();
+    }
+
+    private String getLoggingPrefix(ExecutionContext executionContext)
+    {
+        String projectName = executionContext == null ? null : executionContext.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
+        if (projectName == null)
+        {
+            return "";
+        }
+        else
+        {
+            return "Project '" + projectName + "': ";
+        }
     }
 
     private static class ChangeEventHandler implements ISVNEventHandler
@@ -1401,12 +1414,12 @@ public class SubversionClient implements ScmClient
                             }
                             else
                             {
-                                LOG.warning(getWarningPrefix()+ "Ignoring external at URL '" + definition.url.toDecodedString() + "': UID does not match");
+                                LOG.warning(getLoggingPrefix(context) + "Ignoring external at URL '" + definition.url.toDecodedString() + "': UID does not match");
                             }
                         }
                         catch (Exception e)
                         {
-                            LOG.warning(getWarningPrefix()+ "Ignoring external at URL '" + definition.url.toDecodedString() + "'", e);
+                            LOG.warning(getLoggingPrefix(context) + "Ignoring external at URL '" + definition.url.toDecodedString() + "'", e);
                         }
                     }
                     else
@@ -1414,19 +1427,6 @@ public class SubversionClient implements ScmClient
                         addExternal(revision, definition, externals);
                     }
                 }
-            }
-        }
-
-        private String getWarningPrefix()
-        {
-            String projectName = context.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_PROJECT);
-            if (projectName == null)
-            {
-                return "";
-            }
-            else
-            {
-                return "Project '" + projectName + "': ";
             }
         }
 
