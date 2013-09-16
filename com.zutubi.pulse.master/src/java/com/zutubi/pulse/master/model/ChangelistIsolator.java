@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.model;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
@@ -7,10 +9,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static com.zutubi.pulse.master.scm.ScmClientUtils.ScmContextualAction;
 import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
@@ -30,7 +29,6 @@ public class ChangelistIsolator
 
     public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, boolean force) throws ScmException
     {
-        List<Revision> result;
         final Revision latestBuiltRevision;
 
         if (latestRequestedRevisions.containsKey(projectConfig.getHandle()))
@@ -48,7 +46,7 @@ public class ChangelistIsolator
             }
         }
 
-        result = withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<List<Revision>>()
+        List<Revision> allRevisions = withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<List<Revision>>()
         {
             public List<Revision> process(ScmClient client, ScmContext context) throws ScmException
             {
@@ -67,16 +65,23 @@ public class ChangelistIsolator
             }
         });
 
-        if (result.size() > 0)
+        List<Revision> result = new ArrayList<Revision>();
+        if (allRevisions.size() > 0)
         {
+            List<List<Revision>> partitions = Lists.partition(allRevisions, projectConfig.getOptions().getMaxChangesPerBuild());
+            for (List<Revision> partition : partitions)
+            {
+                result.add(Iterables.getLast(partition));
+            }
+
             // Remember the new latest
-            latestRequestedRevisions.put(projectConfig.getHandle(), result.get(result.size() - 1));
+            latestRequestedRevisions.put(projectConfig.getHandle(), Iterables.getLast(result));
         }
         else if (force)
         {
             // Force a build of the latest revision anyway
             assert latestBuiltRevision != null;
-            result = Arrays.asList(latestBuiltRevision);
+            result.add(latestBuiltRevision);
         }
 
         return result;

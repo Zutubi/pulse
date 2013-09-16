@@ -1088,16 +1088,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 try
                 {
                     Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(project.getConfig(), project.getState(), scmManager);
-                    if(capabilities.contains(ScmCapability.REVISIONS))
+                    if (capabilities.contains(ScmCapability.REVISIONS))
                     {
-                            List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, options.isForce());
-                            for(Revision r: revisions)
-                            {
-                                // Note when isolating changelists we never replace existing requests
-                                TriggerOptions copy = new TriggerOptions(options);
-                                options.setReplaceable(false);
-                                requestBuildOfRevision(project, copy, r, requestIds);
-                            }
+                        List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, options.isForce());
+                        for(Revision r: revisions)
+                        {
+                            // Note when isolating changelists we never replace existing requests
+                            TriggerOptions copy = new TriggerOptions(options);
+                            options.setReplaceable(false);
+                            requestBuildOfRevision(project, copy, r, requestIds);
+                        }
                     }
                     else
                     {

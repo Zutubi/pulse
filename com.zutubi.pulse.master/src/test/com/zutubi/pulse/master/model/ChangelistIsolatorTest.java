@@ -117,6 +117,38 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 105);
     }
 
+    public void testNRevisionsNoNewRevisions() throws ScmException
+    {
+        projectConfig.getOptions().setMaxChangesPerBuild(3);
+        returnPreviousRevision(new Revision(55));
+        returnRevisions(55);
+        expectRevisions(false);
+    }
+
+    public void testNRevisionsFewerThanN() throws ScmException
+    {
+        projectConfig.getOptions().setMaxChangesPerBuild(3);
+        returnPreviousRevision(new Revision(55));
+        returnRevisions(55, 56, 57);
+        expectRevisions(false, 57);
+    }
+
+    public void testNRevisionsExactlyN() throws ScmException
+    {
+        projectConfig.getOptions().setMaxChangesPerBuild(3);
+        returnPreviousRevision(new Revision(55));
+        returnRevisions(55, 56, 57, 58);
+        expectRevisions(false, 58);
+    }
+
+    public void testNRevisionsMoreThanN() throws ScmException
+    {
+        projectConfig.getOptions().setMaxChangesPerBuild(3);
+        returnPreviousRevision(new Revision(55));
+        returnRevisions(55, 56, 57, 58, 59, 60, 61, 62);
+        expectRevisions(false, 58, 61, 62);
+    }
+
     private void returnPreviousRevision(Revision revision)
     {
         stub(buildManager.getPreviousRevision(project)).toReturn(revision);

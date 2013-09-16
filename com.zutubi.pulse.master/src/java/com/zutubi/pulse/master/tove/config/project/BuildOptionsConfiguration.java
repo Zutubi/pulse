@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
+import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -11,12 +12,15 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "timeout", "stageFailureLimit", "stageRetriesOnAgentProblem", "concurrentBuilds", "priority", "autoClearResponsibility", "idLeader", "logCompressionEnabled"})
+@Form(fieldOrder = {"isolateChangelists", "maxChangesPerBuild", "timeout", "stageFailureLimit", "stageRetriesOnAgentProblem", "concurrentBuilds", "priority", "autoClearResponsibility", "idLeader", "logCompressionEnabled"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
 
+    @ControllingCheckbox(checkedFields = {"maxChangesPerBuild"})
     private boolean isolateChangelists = false;
+    @Numeric(min = 1)
+    private int maxChangesPerBuild = 1;
     @Numeric(min = 0)
     private int timeout = TIMEOUT_NEVER;
     private int stageFailureLimit = 0;
@@ -49,6 +53,16 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public void setIsolateChangelists(boolean b)
     {
         this.isolateChangelists = b;
+    }
+
+    public int getMaxChangesPerBuild()
+    {
+        return maxChangesPerBuild;
+    }
+
+    public void setMaxChangesPerBuild(int maxChangesPerBuild)
+    {
+        this.maxChangesPerBuild = maxChangesPerBuild;
     }
 
     public int getTimeout()
