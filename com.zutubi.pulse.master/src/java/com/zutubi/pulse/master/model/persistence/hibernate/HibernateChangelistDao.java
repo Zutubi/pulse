@@ -188,8 +188,10 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
     {
         List<PersistentChangelist> results = new ArrayList<PersistentChangelist>(max);
         final int[] offset = { 0 };
+        final int[] limit = { max };
+        int remaining = max;
 
-        while(results.size() < max)
+        while (remaining > 0)
         {
             List<PersistentChangelist> changelists = getHibernateTemplate().execute(new HibernateCallback<List<PersistentChangelist>>()
             {
@@ -197,24 +199,33 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
                 {
                     Query queryObject = changelistQuery.createQuery(session);
                     queryObject.setFirstResult(offset[0]);
-                    queryObject.setMaxResults(max);
+                    queryObject.setMaxResults(limit[0]);
                     SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                     return queryObject.list();
                 }
             });
 
-            if(changelists.size() == 0)
+            if (changelists.size() == 0)
             {
                 break;
             }
 
-            addUnique(results, changelists);
-            offset[0] = offset[0] + max;
+            int added = addUnique(results, changelists);
+            offset[0] = offset[0] + limit[0];
+
+            if (added < remaining / 2)
+            {
+                // We got less than half of what we needed from that query, ramp up the limit to
+                // avoid doing heaps of queries (CIB-3066).
+                limit[0] *= 2;
+            }
+
+            remaining -= added;
         }
 
-        // We can actually get up to max - 1 extra entries if multiple queries
-        // were run, so discard any after max (better than shrinking query max
-        // as we go as then we may execute many queries).
+        // We can get extra entries if multiple queries were run, so discard any after max.  (Note
+        // we don't shrink the query limit as we go - in fact we may even increase it - because we
+        // want to avoid doing many queries.)
         while(results.size() > max)
         {
             results.remove(results.size() - 1);
@@ -222,8 +233,9 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         return results;
     }
 
-    private void addUnique(Collection<PersistentChangelist> lists, Collection<PersistentChangelist> toAdd)
+    private int addUnique(Collection<PersistentChangelist> lists, Collection<PersistentChangelist> toAdd)
     {
+        int added = 0;
         for (PersistentChangelist candidate: toAdd)
         {
             boolean found = false;
@@ -239,7 +251,10 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
             if (!found)
             {
                 lists.add(candidate);
+                added++;
             }
         }
+
+        return added;
     }
 }

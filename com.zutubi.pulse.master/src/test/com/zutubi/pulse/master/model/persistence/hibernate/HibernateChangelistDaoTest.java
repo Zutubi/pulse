@@ -184,6 +184,29 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals("1", changes.get(3).getRevision().getRevisionString());
     }
 
+    public void testLatestByUserOverlapping()
+    {
+        // Some heavy overlapping to test correctness of performance enhancements for CIB-3066.
+        for (int change = 1; change <= 26; change++)
+        {
+            for (long project = 1; project <= 10; project++)
+            {
+                changelistDao.save(createChangelist(project, change, "login1"));
+            }
+        }
+
+        commitAndRefreshTransaction();
+
+        List<PersistentChangelist> changes = changelistDao.findLatestByUser(createUser(), 5);
+        assertEquals(5, changes.size());
+        assertEquals("26", changes.get(0).getRevision().getRevisionString());
+        assertEquals("25", changes.get(1).getRevision().getRevisionString());
+        assertEquals("24", changes.get(2).getRevision().getRevisionString());
+        assertEquals("23", changes.get(3).getRevision().getRevisionString());
+        assertEquals("22", changes.get(4).getRevision().getRevisionString());
+    }
+
+
     private User createUser()
     {
         User user = new User();
