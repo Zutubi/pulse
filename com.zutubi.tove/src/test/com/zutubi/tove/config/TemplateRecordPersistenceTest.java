@@ -446,6 +446,96 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
     }
 
+    public void testSaveRevertingToChildValue()
+    {
+        // Save once overriding a field, and then save the same value to that
+        // field in the parent, ensuring that the field ownership reverts to
+        // the parent.
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        insertChild();
+        assertNotNull(configurationTemplateManager.getRecord("project/child/property"));
+
+        MutableRecord overridingProperty = propertyType.createNewRecord(false);
+        overridingProperty.put("name", "cp");
+        configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertNotNull(childProperty);
+        assertEquals(CHILD_PROJECT, childProperty.getOwner("name"));
+        assertEquals("cp", childProperty.get("name"));
+
+        configurationTemplateManager.saveRecord("project/global/property", overridingProperty);
+
+        childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertNotNull(childProperty);
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals("cp", childProperty.get("name"));
+    }
+
+    public void testSaveRevertingToGrandchildValue()
+    {
+        // Save once overriding a field in a grandchild, and then save the same
+        // value to that field in the grandparent, ensuring that the field
+        // ownership reverts to the grandparent.
+        insertToGrandchild();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        assertNotNull(configurationTemplateManager.getRecord("project/child/property"));
+
+        MutableRecord overridingProperty = propertyType.createNewRecord(false);
+        overridingProperty.put("name", "gp");
+        configurationTemplateManager.saveRecord("project/grandchild/property", overridingProperty);
+
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals("p", childProperty.get("name"));
+        TemplateRecord grandchildProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/grandchild/property");
+        assertEquals(GRANDCHILD_PROJECT, grandchildProperty.getOwner("name"));
+        assertEquals("gp", grandchildProperty.get("name"));
+
+        configurationTemplateManager.saveRecord("project/global/property", overridingProperty);
+
+        childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals("gp", childProperty.get("name"));
+        grandchildProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/grandchild/property");
+        assertEquals(GLOBAL_PROJECT, grandchildProperty.getOwner("name"));
+        assertEquals("gp", grandchildProperty.get("name"));
+    }
+
+    public void testSaveRevertingToGrandchildValueOverrideInChild()
+    {
+        // Save to override a field in a child, then save to override with
+        // another value in the grandchild.  Finally save the grandchild value
+        // in the parent, and make sure the field is still overridden all the
+        // way down.
+        insertToGrandchild();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        assertNotNull(configurationTemplateManager.getRecord("project/child/property"));
+
+        MutableRecord overridingProperty = propertyType.createNewRecord(false);
+        overridingProperty.put("name", "cp");
+        configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+        overridingProperty.put("name", "gp");
+        configurationTemplateManager.saveRecord("project/grandchild/property", overridingProperty);
+
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertEquals(CHILD_PROJECT, childProperty.getOwner("name"));
+        assertEquals("cp", childProperty.get("name"));
+        TemplateRecord grandchildProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/grandchild/property");
+        assertEquals(GRANDCHILD_PROJECT, grandchildProperty.getOwner("name"));
+        assertEquals("gp", grandchildProperty.get("name"));
+
+        configurationTemplateManager.saveRecord("project/global/property", overridingProperty);
+
+        childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertEquals(CHILD_PROJECT, childProperty.getOwner("name"));
+        assertEquals("cp", childProperty.get("name"));
+        grandchildProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/grandchild/property");
+        assertEquals(GRANDCHILD_PROJECT, grandchildProperty.getOwner("name"));
+        assertEquals("gp", grandchildProperty.get("name"));
+    }
+
     public void testSaveOptimisedAway()
     {
         insertGlobal();

@@ -946,7 +946,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * apart from an override at path "myscope/child/some/nested/value", then
      * this method will return true for "myscope/parent".
      *
-     * Hiding a path in a descdent does not constitute an override.
+     * Hiding a path in a descendant does not constitute an override.
      *
      * If the path does not exist or is not in a templated scope, this
      * method will return false.
@@ -1548,13 +1548,13 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 ensureReadOnlyFieldsUnaltered(type, existingRecord, record);
 
-                MutableRecord newRecord = updateRecord(existingRecord, record);
+                MutableRecord newRecord = updateRecord(path, existingRecord, record);
                 boolean updated = true;
                 if (newPath.equals(path))
                 {
                     // Regular update, first check if there are any changes
                     // to apply or if we can elide this save.
-                    if(newRecord.shallowEquals(recordManager.select(path)))
+                    if (newRecord.shallowEquals(recordManager.select(path)))
                     {
                         updated = false;
                     }
@@ -1578,6 +1578,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 if (updated)
                 {
+                    scrubDescendants(newPath);
+
                     refreshCaches();
                     raiseSaveEvents(newPath);
                 }
@@ -1700,7 +1702,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private MutableRecord updateRecord(Record existingRecord, MutableRecord updates)
+    private MutableRecord updateRecord(String path, Record existingRecord, MutableRecord updates)
     {
         MutableRecord newRecord;
         if (existingRecord instanceof TemplateRecord)
@@ -1720,6 +1722,23 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
 
         return newRecord;
+    }
+
+    private void scrubDescendants(String path)
+    {
+        // For all descendants of an updated record, check if they defined
+        // overrides that now match the updated parent, and scrub any such
+        // values so they are recognised as inherited.
+        for (String descendantPath : getDescendantPaths(path, true, false, false))
+        {
+            TemplateRecord templateDescendant = (TemplateRecord) getRecord(descendantPath);
+            MutableRecord newDescendant = templateDescendant.getMoi().copy(false, true);
+            scrubInheritedValues(templateDescendant, newDescendant);
+            if (!newDescendant.shallowEquals(recordManager.select(descendantPath)))
+            {
+                recordManager.update(descendantPath, newDescendant);
+            }
+        }
     }
 
     private void moveDescendants(String path, String newPath)
