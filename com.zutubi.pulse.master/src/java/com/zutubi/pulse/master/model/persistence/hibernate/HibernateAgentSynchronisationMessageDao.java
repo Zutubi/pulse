@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentSynchronisationMessage;
 import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
@@ -10,6 +11,9 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * Hibernate-specific implementation of {@link AgentSynchronisationMessageDao}.
@@ -52,18 +56,19 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
 
     public List<AgentSynchronisationMessage> queryMessages(final AgentState agentState, final AgentSynchronisationMessage.Status status, final String taskType)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<List<AgentSynchronisationMessage>>()
+        // CIB-3065: filtering by status and task type does not have much effect on large result
+        // sizes as these will in practice be dominated by messages in the QUEUED state with the
+        // CLEANUP_DIRECTORY type (at the moment).  Adding this criteria to the query has been
+        // observed to make MySQL do a full table scan.  So just select all messages for the agent
+        // and apply the filtering here.
+        List<AgentSynchronisationMessage> messages = findByAgentState(agentState);
+        return newArrayList(filter(messages, new Predicate<AgentSynchronisationMessage>()
         {
-            public List<AgentSynchronisationMessage> doInHibernate(Session session) throws HibernateException
+            public boolean apply(AgentSynchronisationMessage message)
             {
-                Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState and statusName = :statusName and message.typeName = :typeName order by id asc");
-                queryObject.setEntity("agentState", agentState);
-                queryObject.setString("statusName", status.name());
-                queryObject.setString("typeName", taskType);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
+                return message.getStatus() == status && message.getMessage().getTypeName().equals(taskType);
             }
-        });
+        }));
     }
 
     public int deleteByAgentState(final AgentState agentState)
