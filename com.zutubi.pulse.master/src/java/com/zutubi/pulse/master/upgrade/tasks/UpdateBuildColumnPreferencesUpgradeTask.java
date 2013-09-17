@@ -52,8 +52,7 @@ public class UpdateBuildColumnPreferencesUpgradeTask extends AbstractRecordPrope
             {
                 String columnsString = (String) o;
                 Iterable<String> columns = asList(StringUtils.split(columnsString, ',', true));
-                Iterables.removeIf(columns, Predicates.equalTo(COLUMN_ACTIONS));
-                
+                columns = Iterables.filter(columns, Predicates.not(Predicates.equalTo(COLUMN_ACTIONS)));
                 columns = Iterables.transform(columns, new Function<String, String>()
                 {
                     public String apply(String s)
