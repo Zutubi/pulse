@@ -32,17 +32,19 @@ public class MonitorApi
     }
 
     /**
-     * @internal Retrieves the current status of all projects.
+     * Retrieves the current status of all projects.  This method is designed for regular polling.  On the first call,
+     * pass an empty string as the timestamp.  The returned struct includes a new timestamp that should be passed into
+     * the next call.
      *
      * @param token           authentication token
-     * @param includePersonal if true, also include personal builds in the
-     *                        result
-     * @param lastTimestamp   if not empty, the timestamp from the last status
-     *                        update - this is used to calculate builds that
-     *                        have been completed since that update, so no
-     *                        builds are missed
-     * @return {@xtype RemoteApi.ProjectStatuses} a struct with a timestamp for
-     *         this update and an array of project statuses
+     * @param includePersonal if true, also include personal builds in the result
+     * @param lastTimestamp   if not empty, the timestamp from the last status update - this is used to calculate builds
+     *                        that have been completed since that update, so no builds are missed
+     * @return {@xtype [MonitorApi.ProjectStatuses]} a struct with a timestamp for this update and an array of project
+     *         statuses
+     * @access available to all users, filters returned projects by read access
+     * @see #getStatusForProjects(String, java.util.Vector, boolean, String)
+     * @see #getStatusForMyProjects(String, boolean, String)
      */
     public Hashtable<String, Object> getStatusForAllProjects(String token, boolean includePersonal, String lastTimestamp)
     {
@@ -58,18 +60,19 @@ public class MonitorApi
     }
 
     /**
-     * @internal Retrieves the current status of the logged-in user's
-     * "my projects" set.
+     * Retrieves the current status of the logged-in user's "my projects" set.  This method is designed for regular
+     * polling.  On the first call, pass an empty string as the timestamp.  The returned struct includes a new timestamp
+     * that should be passed into the next call.
      *
      * @param token           authentication token
-     * @param includePersonal if true, also include personal builds in the
-     *                        result
-     * @param lastTimestamp   if not empty, the timestamp from the last status
-     *                        update - this is used to calculate builds that
-     *                        have been completed since that update, so no
-     *                        builds are missed
-     * @return {@xtype RemoteApi.ProjectStatuses} a struct with a timestamp for
-     *         this update and an array of project statuses
+     * @param includePersonal if true, also include personal builds in the result
+     * @param lastTimestamp   if not empty, the timestamp from the last status update - this is used to calculate builds
+     *                        that have been completed since that update, so no builds are missed
+     * @return {@xtype [MonitorApi.ProjectStatuses]} a struct with a timestamp for this update and an array of project
+     *         statuses
+     * @access available to all users
+     * @see #getStatusForAllProjects(String, boolean, String)
+     * @see #getStatusForProjects(String, java.util.Vector, boolean, String)
      */
     public Hashtable<String, Object> getStatusForMyProjects(String token, boolean includePersonal, String lastTimestamp)
     {
@@ -91,18 +94,20 @@ public class MonitorApi
     }
 
     /**
-     * @internal Retrieves the current status of the given project set.
+     * Retrieves the current status of the given project set.  This method is designed for regular polling.  On the
+     * first call, pass an empty string as the timestamp.  The returned struct includes a new timestamp that should be
+     * passed into the next call.
      *
      * @param token           authentication token
      * @param projects        names of projects to get the status of
-     * @param includePersonal if true, also include personal builds in the
-     *                        result
-     * @param lastTimestamp   if not empty, the timestamp from the last status
-     *                        update - this is used to calculate builds that
-     *                        have been completed since that update, so no
-     *                        builds are missed
-     * @return {@xtype RemoteApi.ProjectStatuses} a struct with a timestamp for
-     *         this update and an array of project statuses
+     * @param includePersonal if true, also include personal builds in the result
+     * @param lastTimestamp   if not empty, the timestamp from the last status update - this is used to calculate builds
+     *                        that have been completed since that update, so no builds are missed
+     * @return {@xtype [MonitorApi.ProjectStatuses]} a struct with a timestamp for this update and an array of project
+     *         statuses
+     * @access available to all users, requires read access to the projects
+     * @see #getStatusForAllProjects(String, boolean, String)
+     * @see #getStatusForMyProjects(String, boolean, String)
      */
     public Hashtable<String, Object> getStatusForProjects(String token, Vector<String> projects, boolean includePersonal, String lastTimestamp)
     {
