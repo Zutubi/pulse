@@ -102,7 +102,8 @@ public class TemplateRecord extends AbstractRecord
         }
         else if (value instanceof Record)
         {
-            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (ComplexType) type.getActualPropertyType(key, value), (MutableRecord) value);
+            ComplexType propertyType = type == null ? null : (ComplexType) type.getActualPropertyType(key, value);
+            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), propertyType, (MutableRecord) value);
         }
         else
         {

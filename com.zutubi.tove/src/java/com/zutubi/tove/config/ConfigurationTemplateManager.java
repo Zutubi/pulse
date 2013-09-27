@@ -2275,7 +2275,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * @param path                the path to delete
      * @param checkTemplateParent if true, verify invariants against the
      *                            template parent (in particular, do not allow
-     *                            inherited composited to be deleted)
+     *                            inherited composites to be deleted)
      */
     void delete(final String path, final boolean checkTemplateParent)
     {
