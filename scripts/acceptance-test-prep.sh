@@ -39,6 +39,9 @@ agentPackageName="$(basename ${agentPackage%@(.tar.gz|.zip)})"
 pushd "$acceptDir"
 export PULSE_HOME=
 
+# Clean up stray Firefox processes
+killall firefox || true
+
 # Start up a background agent
 "./$agentPackageName/bin/pulse" start -p 8890 -f agent.config.properties -d agent-data > agent-stdout.txt 2> agent-stderr.txt &
 echo $! > agent.pid
