@@ -21,6 +21,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -602,20 +603,7 @@ public class SeleniumBrowser
     public WebElement waitForElement(final By by, long timeout)
     {
         Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000, 250).ignoring(RuntimeException.class);
-        return wait.until(new ExpectedCondition<WebElement>()
-        {
-            public WebElement apply(WebDriver webDriver)
-            {
-                List<WebElement> elements = webDriver.findElements(by);
-                return elements.isEmpty() ? null : elements.get(0);
-            }
-
-            @Override
-            public String toString()
-            {
-                return "Element '" + by + "' to be present.";
-            }
-        });
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
     public void waitAndClick(By by)
@@ -627,20 +615,7 @@ public class SeleniumBrowser
     public void waitForElementToDisappear(final By by)
     {
         Wait<WebDriver> wait = new WebDriverWait(webDriver, WAITFOR_TIMEOUT/1000, WAITFOR_INTERVAL).ignoring(RuntimeException.class);
-        wait.until(new ExpectedCondition<Boolean>()
-        {
-            public Boolean apply(WebDriver webDriver)
-            {
-                List<WebElement> elements = webDriver.findElements(by);
-                return elements.isEmpty();
-            }
-
-            @Override
-            public String toString()
-            {
-                return "Element '" + by + "' to be *not* present.";
-            }
-        });
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
     }
 
     public void waitForCondition(String condition)
