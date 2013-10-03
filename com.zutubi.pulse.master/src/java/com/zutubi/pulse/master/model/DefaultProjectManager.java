@@ -243,36 +243,39 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         ScmConfiguration oldScm = old.getScm();
         ScmConfiguration newScm = instance.getScm();
-        if (oldScm == null)
+
+        if (newScm == null)
         {
-            if (newScm != null && configurationTemplateManager.isDeeplyValid(instance.getConfigurationPath()))
+            if (oldScm != null)
+            {
+                makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
+            }
+        }
+        else if (configurationTemplateManager.isDeeplyValid(instance.getConfigurationPath()))
+        {
+            if (oldScm == null || !oldScm.getType().equals(newScm.getType()))
             {
                 makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);
             }
-        }
-        else if (newScm == null)
-        {
-            makeStateTransition(instance.getProjectId(), Project.Transition.CLEANUP);
-        }
-        else if (newScm != oldScm)
-        {
-            ScmClient client = null;
-            try
+            else if (newScm != oldScm)
             {
-                client = scmManager.createClient(newScm);
-                if (client.configChangeRequiresClean(oldScm, newScm))
+                ScmClient client = null;
+                try
                 {
-                    makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);
+                    client = scmManager.createClient(newScm);
+                    if (client.configChangeRequiresClean(oldScm, newScm))
+                    {
+                        makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);
+                    }
                 }
-                client.close();
-            }
-            catch (ScmException e)
-            {
-                LOG.severe(e);
-            }
-            finally
-            {
-                IOUtils.close(client);
+                catch (ScmException e)
+                {
+                    LOG.severe(e);
+                }
+                finally
+                {
+                    IOUtils.close(client);
+                }
             }
         }
     }
