@@ -327,7 +327,7 @@ public class SeleniumBrowser
         {
             throw new IllegalStateException("Can not logout when no logout link is available.");
         }
-        click(By.id("logout-text"));
+        waitAndClick(By.id(IDs.ID_LOGOUT));
         createForm(LoginForm.class).waitFor();
     }
 
@@ -603,12 +603,13 @@ public class SeleniumBrowser
     public WebElement waitForElement(final By by, long timeout)
     {
         Wait<WebDriver> wait = new WebDriverWait(webDriver, timeout/1000, 250).ignoring(RuntimeException.class);
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
     public void waitAndClick(By by)
     {
-        waitForElement(by, WAITFOR_TIMEOUT);
+        Wait<WebDriver> wait = new WebDriverWait(webDriver, WAITFOR_TIMEOUT /1000, 250).ignoring(RuntimeException.class);
+        wait.until(ExpectedConditions.elementToBeClickable(by));
         click(by);
     }
 

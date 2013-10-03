@@ -9,7 +9,7 @@ public class IDs
     public static final String ID_LOGIN         = "login";
     public static final String ID_DASHBOARD_TAB = "tab.dashboard";
     public static final String ID_PREFERENCES   = "prefs";
-    public static final String ID_LOGOUT        = "logout";
+    public static final String ID_LOGOUT        = "logout-text";
 
     public static String COLLECTION_TABLE = "config-table";
     public static String LINKS_BOX = "config-links";
