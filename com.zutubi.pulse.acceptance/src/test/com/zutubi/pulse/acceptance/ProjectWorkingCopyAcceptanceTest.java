@@ -40,15 +40,6 @@ public class ProjectWorkingCopyAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
     }
 
-    @Override
-    protected void tearDown() throws Exception
-    {
-        rpcClient.logout();
-        getBrowser().logout();
-
-        super.tearDown();
-    }
-
     public void testWorkingCopyLinkEnabledByIncrementalCheckout() throws Exception
     {
         ProjectConfiguration project = createProject(random);
