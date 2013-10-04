@@ -5,6 +5,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.acceptance.utils.BuildRunner;
 import com.zutubi.pulse.acceptance.utils.WaitProject;
 import com.zutubi.pulse.master.tove.config.LabelConfiguration;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.adt.Pair;
@@ -37,6 +38,8 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         rpcClient.loginAsAdmin();
+        rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
+
         String user = RandomUtils.randomString(10);
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         getBrowser().loginAndWait(user, "");
