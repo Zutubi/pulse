@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
+import com.zutubi.util.logging.Logger;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 /**
@@ -18,6 +19,8 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
  */
 public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
 {
+    public static final Logger LOG = Logger.getLogger(SingleSeleniumBrowserFactory.class);
+
     private static SeleniumBrowser browser;
 
     public synchronized SeleniumBrowser newBrowser()
@@ -44,8 +47,17 @@ public class SingleSeleniumBrowserFactory implements SeleniumBrowserFactory
                     }
                     catch (Exception e)
                     {
-                        // Give it one more shot.
-                        returnToLogin();
+                        try
+                        {
+                            // Give it one more shot.
+                            returnToLogin();
+                        }
+                        catch (Exception ee)
+                        {
+                            LOG.severe("Unable to return to login, forcing new browser session.");
+                            browser.quit();
+                            browser = null;
+                        }
                     }
                 }
                 else
