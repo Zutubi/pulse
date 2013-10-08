@@ -9,6 +9,8 @@ import com.zutubi.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.util.Date;
 
 import static java.util.Collections.nCopies;
 
@@ -26,8 +28,9 @@ public class ProjectLoggerTest extends PulseTestCase
         super.setUp();
         tempDir = createTempDirectory();
 
-        // 19 for the timestamp prefix
-        int lineLength = 21 + TEST_MESSAGE.length() + LINE_SEPARATOR.length();
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
+        int dateLength = format.format(new Date()).length();
+        int lineLength = dateLength + TEST_MESSAGE.length() + LINE_SEPARATOR.length();
         logger = new ProjectLogger(tempDir, lineLength * LINE_LIMIT);
     }
 
