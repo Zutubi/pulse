@@ -17,7 +17,6 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.google.common.collect.Iterables.filter;
@@ -35,7 +34,7 @@ public class ProjectLogger implements InputSupplier<InputStream>
 
     // A static DateTime is safe as loggers are thread safe via mutual
     // exclusion.
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
     static final String NAME_PATTERN = "project.%d.log";
 
     private int sizeLimit;
