@@ -33,7 +33,7 @@ public class Trac11ChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getRevisionURL(FILE_REVISION));
+        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getRevisionURL(null, FILE_REVISION));
     }
 
     public void testGetFileViewURL()

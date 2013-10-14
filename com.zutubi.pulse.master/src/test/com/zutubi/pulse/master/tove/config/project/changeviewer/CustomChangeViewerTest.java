@@ -1,7 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,7 +46,7 @@ public class CustomChangeViewerTest extends PulseTestCase
 
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Revision rev = new Revision("author:branch:" + DATE_STRING);
-        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + convertPulseToFisheyeDate(DATE_STRING) + " ${unknown}", viewer.getRevisionURL(rev));
+        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + convertPulseToFisheyeDate(DATE_STRING) + " ${unknown}", viewer.getRevisionURL(null, rev));
     }
 
     private String convertPulseToFisheyeDate(String dateString) throws ParseException
@@ -96,6 +98,18 @@ public class CustomChangeViewerTest extends PulseTestCase
         viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
         assertEquals("/my/path%2bspecial%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL(getContext(), getFileChange("/my/path+special chars")));
     }
+
+    public void testProjectProperties() throws ScmException
+    {
+        ProjectConfiguration projectConfig = new ProjectConfiguration();
+        projectConfig.getProperties().put("p1", new ResourcePropertyConfiguration("p1", "v1"));
+        ChangeContext context = new ChangeContextImpl(CHANGE_REVISION, projectConfig, mockScmClient, null);
+        viewer.setChangesetURL("change ${p1}");
+        viewer.setFileViewURL("file ${p1}");
+        assertEquals("change v1", viewer.getRevisionURL(projectConfig, new Revision("1")));
+        assertEquals("file v1", viewer.getFileViewURL(context, getFileChange("path")));
+    }
+
 
     private ChangeContext getContext()
     {

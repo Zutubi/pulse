@@ -35,7 +35,7 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getRevisionURL(new Revision("1412")));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getRevisionURL(null, new Revision("1412")));
     }
 
     public void testGetFileViewURL()

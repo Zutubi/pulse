@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
@@ -17,7 +18,7 @@ public abstract class AbstractTracChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public String getRevisionURL(Revision revision)
+    public String getRevisionURL(ProjectConfiguration projectConfiguration, Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "changeset", revision.getRevisionString());
     }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
@@ -19,6 +20,7 @@ public class P4WebChangeViewerTest extends PulseTestCase
     private static final String   FILE_PATH                = "//depot/foo";
     private static final String   SPECIAL_FILE_PATH        = "//depot/foo+bar baz";
 
+    private ProjectConfiguration projectConfiguration;
     private ScmConfiguration scmConfiguration;
     private ScmClient mockScmClient;
     private P4WebChangeViewer viewer;
@@ -38,12 +40,16 @@ public class P4WebChangeViewerTest extends PulseTestCase
                 return "mock";
             }
         };
+
+        projectConfiguration = new ProjectConfiguration("test-project");
+        projectConfiguration.setScm(scmConfiguration);
+
         viewer = new P4WebChangeViewer(BASE, "");
     }
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getRevisionURL(CHANGE_REVISION));
+        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getRevisionURL(null, CHANGE_REVISION));
     }
 
     public void testGetFileViewURL()
@@ -78,7 +84,7 @@ public class P4WebChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        return new ChangeContextImpl(CHANGE_REVISION, scmConfiguration, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, projectConfiguration, mockScmClient, null);
     }
 
     private FileChange getFileChange(String filePath)

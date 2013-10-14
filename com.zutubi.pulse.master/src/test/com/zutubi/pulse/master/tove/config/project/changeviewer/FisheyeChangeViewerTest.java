@@ -22,6 +22,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
     private FisheyeConfiguration viewer;
     private ScmClient mockScmClient;
     private String scmType = "mock";
+    private ProjectConfiguration projectConfiguration;
     private ScmConfiguration scmConfiguration;
 
     protected void setUp() throws Exception
@@ -33,7 +34,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
         stub(mockScmClient.getPreviousRevision((ScmContext) anyObject(), same(FILE_REVISION), eq(true))).toReturn(PREVIOUS_FILE_REVISION);
 
         // it is a bit of work to inject a working configuration provider this way.  Need to find a better way.
-        final ProjectConfiguration project = new ProjectConfiguration();
+        projectConfiguration = new ProjectConfiguration();
         scmConfiguration = new ScmConfiguration()
         {
             public String getType()
@@ -41,20 +42,20 @@ public class FisheyeChangeViewerTest extends PulseTestCase
                 return scmType;
             }
         };
-        project.setScm(scmConfiguration);
+        projectConfiguration.setScm(scmConfiguration);
         viewer = new FisheyeConfiguration(BASE, PATH);
         viewer.setConfigurationProvider(new FakeConfigurationProvider()
         {
             public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
             {
-                return (T)project;
+                return (T) projectConfiguration;
             }
         });
     }
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://fisheye.cinnamonbob.com/changelog/Zutubi/?cs=2508", viewer.getRevisionURL(CHANGE_REVISION));
+        assertEquals("http://fisheye.cinnamonbob.com/changelog/Zutubi/?cs=2508", viewer.getRevisionURL(null, CHANGE_REVISION));
     }
 
     public void testGetFileViewURL()
@@ -92,7 +93,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
 
     private ChangeContext getContext()
     {
-        return new ChangeContextImpl(CHANGE_REVISION, scmConfiguration, mockScmClient, null);
+        return new ChangeContextImpl(CHANGE_REVISION, projectConfiguration, mockScmClient, null);
     }
 
     private FileChange getFileChange()

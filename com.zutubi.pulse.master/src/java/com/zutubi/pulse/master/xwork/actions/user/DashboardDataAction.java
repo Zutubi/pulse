@@ -215,7 +215,7 @@ public class DashboardDataAction extends ActionSupport
                             ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
                             if (p != null && p.getChangeViewer() != null)
                             {
-                                String url = p.getChangeViewer().getRevisionURL(revision);
+                                String url = p.getChangeViewer().getRevisionURL(p, revision);
                                 if(url != null)
                                 {
                                     return url;

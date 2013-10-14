@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.BuildReason;
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -188,7 +189,8 @@ public class ProjectBuildModel
                 }
                 else
                 {
-                    ChangeViewerConfiguration changeViewer = buildResult.getProject().getConfig().getChangeViewer();
+                    ProjectConfiguration projectConfig = buildResult.getProject().getConfig();
+                    ChangeViewerConfiguration changeViewer = projectConfig.getChangeViewer();
                     String revisionString = renderRevisionString(revision);
                     if (changeViewer == null)
                     {
@@ -196,7 +198,7 @@ public class ProjectBuildModel
                     }
                     else
                     {
-                        content = link(revisionString, changeViewer.getRevisionURL(revision));
+                        content = link(revisionString, changeViewer.getRevisionURL(projectConfig, revision));
                     }
                 }
             }

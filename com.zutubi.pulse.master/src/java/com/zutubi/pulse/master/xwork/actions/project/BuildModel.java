@@ -1,18 +1,19 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.security.SecurityUtils;
-import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.webwork.Urls;
 import flexjson.JSON;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * JSON data about a build, sufficient to summarise it.
@@ -50,10 +51,10 @@ public class BuildModel extends ResultModel
 
     public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts)
     {
-        this(buildResult, urls, collectArtifacts, buildResult.getProject().getConfig().getChangeViewer());
+        this(buildResult, urls, collectArtifacts, buildResult.getProject().getConfig());
     }
     
-    public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts, ChangeViewerConfiguration changeViewerConfig)
+    public BuildModel(BuildResult buildResult, Urls urls, boolean collectArtifacts, ProjectConfiguration projectConfig)
     {
         super(buildResult);
         number = buildResult.getNumber();
@@ -64,7 +65,7 @@ public class BuildModel extends ResultModel
         Revision buildRevision = buildResult.getRevision();
         if (buildRevision != null)
         {
-            revision = new RevisionModel(buildRevision, changeViewerConfig);
+            revision = new RevisionModel(buildRevision, projectConfig);
         }
         tests = buildResult.getTestSummary().toString();
         

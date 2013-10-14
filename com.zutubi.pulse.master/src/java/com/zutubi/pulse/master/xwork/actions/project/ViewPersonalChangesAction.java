@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -47,10 +48,11 @@ public class ViewPersonalChangesAction extends BuildActionBase
 
         if (result.getRevision() != null)
         {
-            ChangeViewerConfiguration changeViewer = result.getProject().getConfig().getChangeViewer();
+            ProjectConfiguration projectConfiguration = result.getProject().getConfig();
+            ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
             if (changeViewer != null)
             {
-                changeUrl = changeViewer.getRevisionURL(result.getRevision());
+                changeUrl = changeViewer.getRevisionURL(projectConfiguration, result.getRevision());
             }
         }
 

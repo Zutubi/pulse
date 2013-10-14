@@ -18,7 +18,6 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
@@ -96,7 +95,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         ProjectConfiguration projectConfig = project.getConfig();
         BuildResult latestCompletedResult = latestCompleted.isEmpty() ? null : latestCompleted.get(0);
-        BuildResultToModelFunction buildMapping = new BuildResultToModelFunction(urls, projectConfig.getChangeViewer());
+        BuildResultToModelFunction buildMapping = new BuildResultToModelFunction(urls, projectConfig);
         if (latestCompletedResult != null)
         {
             buildMapping.collectArtifactsForBuildId(latestCompletedResult.getId());
@@ -184,7 +183,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
     {
         ProjectConfiguration projectConfig = getProject().getConfig();
         final List<BuildModel> activity = model.getActivity();
-        activity.addAll(transform(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig.getChangeViewer())));
+        activity.addAll(transform(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig)));
         activity.addAll(transform(inProgress, buildMapping));
     }
 
@@ -292,26 +291,16 @@ public class ProjectHomeDataAction extends ProjectActionBase
         }
     }
 
-//    private void addTriggers()
-//    {
-//        List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(getProject().getConfig(), ManualTriggerConfiguration.class);
-//        for (ManualTriggerConfiguration trigger: triggers)
-//        {
-//            model.addTrigger(new TriggerModel(trigger));
-//        }
-//    }
-
     private void addChanges()
     {
         List<PersistentChangelist> latestChanges = changelistManager.getLatestChangesForProject(getProject(), 10);
-        ProjectConfiguration projectConfiguration = getProject().getConfig();
-        final ChangeViewerConfiguration changeViewer = projectConfiguration.getChangeViewer();
+        final ProjectConfiguration projectConfiguration = getProject().getConfig();
         final Collection<CommitMessageTransformerConfiguration> transformers = projectConfiguration.getCommitMessageTransformers().values();
         model.getChanges().addAll(transform(latestChanges, new Function<PersistentChangelist, ChangelistModel>()
         {
             public ChangelistModel apply(PersistentChangelist persistentChangelist)
             {
-                return new ChangelistModel(persistentChangelist, changeViewer, transformers);
+                return new ChangelistModel(persistentChangelist, projectConfiguration, transformers);
             }
         }));
     }
@@ -324,12 +313,12 @@ public class ProjectHomeDataAction extends ProjectActionBase
     private static class QueuedToBuildModelFunction implements Function<QueuedRequest, BuildModel>
     {
         private String projectName;
-        private ChangeViewerConfiguration changeViewerConfig;
+        private ProjectConfiguration projectConfiguration;
 
-        private QueuedToBuildModelFunction(String projectName, ChangeViewerConfiguration changeViewerConfig)
+        private QueuedToBuildModelFunction(String projectName, ProjectConfiguration projectConfig)
         {
             this.projectName = projectName;
-            this.changeViewerConfig = changeViewerConfig;
+            this.projectConfiguration = projectConfig;
         }
 
         public BuildModel apply(QueuedRequest queuedRequest)
@@ -343,7 +332,7 @@ public class ProjectHomeDataAction extends ProjectActionBase
             }
             else
             {
-                revisionModel = new RevisionModel(revision, changeViewerConfig);
+                revisionModel = new RevisionModel(revision, projectConfiguration);
             }
             
             return new BuildModel(requestEvent.getId(), -1, false, projectName, projectName, "queued", requestEvent.getPrettyQueueTime(), requestEvent.getReason().getSummary(), revisionModel, requestEvent.getStatus(), requestEvent.getVersion());

@@ -1,8 +1,10 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
+import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
@@ -128,9 +130,9 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         }
     }
 
-    public String getRevisionURL(Revision revision)
+    public String getRevisionURL(ProjectConfiguration projectConfiguration, Revision revision)
     {
-        return resolveURL(changesetURL, revision);
+        return resolveURL(changesetURL, projectConfiguration, revision);
     }
 
     public String getFileViewURL(ChangeContext context, FileChange fileChange) throws ScmException
@@ -154,11 +156,11 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return resolveFileURL(fileDiffURL, context, fileChange);
     }
 
-    private String resolveURL(String url, Revision revision)
+    private String resolveURL(String url, ProjectConfiguration projectConfiguration, Revision revision)
     {
         if(StringUtils.stringSet(url))
         {
-            VariableMap references = new HashVariableMap();
+            VariableMap references = getProjectReferences(projectConfiguration);
             references.add(new GenericVariable<String>(PROPERTY_REVISION, revision.getRevisionString()));
 
             Map<String, Object> properties = ChangeViewerUtils.getRevisionProperties(revision);
@@ -199,7 +201,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if (StringUtils.stringSet(url))
         {
-            VariableMap references = new HashVariableMap();
+            VariableMap references = getProjectReferences(context.getProjectConfiguration());
             references.add(new GenericVariable<String>(PROPERTY_PATH, WebUtils.uriPathEncode(fileChange.getPath())));
             references.add(new GenericVariable<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
             references.add(new GenericVariable<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
@@ -242,6 +244,20 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return null;
     }
 
+    private VariableMap getProjectReferences(ProjectConfiguration projectConfiguration)
+    {
+        HashVariableMap references = new HashVariableMap();
+        if (projectConfiguration != null)
+        {
+            for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
+            {
+                references.add(new GenericVariable<String>(property.getName(), property.getValue()));
+            }
+        }
+
+        return references;
+    }
+
     public static void validateChangesetURL(String url)
     {
         VariableMap references = new HashVariableMap();
@@ -253,7 +269,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
         try
         {
-            VariableResolver.resolveVariables(url, references);
+            VariableResolver.resolveVariables(url, references, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT);
         }
         catch (ResolutionException e)
         {

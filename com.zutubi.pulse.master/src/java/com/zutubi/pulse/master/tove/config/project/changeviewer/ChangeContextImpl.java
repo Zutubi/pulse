@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
  * A default implementation of {@link com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeContext
@@ -9,14 +9,14 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 public class ChangeContextImpl implements ChangeContext
 {
     private Revision revision;
-    private ScmConfiguration scmConfiguration;
+    private ProjectConfiguration projectConfiguration;
     private ScmClient scmClient;
     private ScmContext scmContext;
 
-    public ChangeContextImpl(Revision revision, ScmConfiguration scmConfiguration, ScmClient scmClient, ScmContext scmContext)
+    public ChangeContextImpl(Revision revision, ProjectConfiguration projectConfiguration, ScmClient scmClient, ScmContext scmContext)
     {
         this.revision = revision;
-        this.scmConfiguration = scmConfiguration;
+        this.projectConfiguration = projectConfiguration;
         this.scmClient = scmClient;
         this.scmContext = scmContext;
     }
@@ -26,9 +26,9 @@ public class ChangeContextImpl implements ChangeContext
         return revision;
     }
 
-    public ScmConfiguration getScmConfiguration()
+    public ProjectConfiguration getProjectConfiguration()
     {
-        return scmConfiguration;
+        return projectConfiguration;
     }
 
     public ScmClient getScmClient()

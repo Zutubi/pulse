@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.StringUtils;
@@ -25,7 +26,7 @@ public class P4WebChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public String getRevisionURL(Revision revision)
+    public String getRevisionURL(ProjectConfiguration projectConfiguration, Revision revision)
     {
         return StringUtils.join("/", true, true, getBaseURL(), "@md=d@", revision.getRevisionString() + "?ac=10");
     }

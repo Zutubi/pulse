@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.scm.api.*;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
  * Context of a changelist to retrieve information about.  Convenience methods
@@ -15,10 +15,9 @@ public interface ChangeContext
     Revision getRevision();
 
     /**
-     * @return the configuration of the SCM implementation that created the
-     *         changelist
+     * @return the configuration of the project that created the changelist
      */
-    ScmConfiguration getScmConfiguration();
+    ProjectConfiguration getProjectConfiguration();
 
     /**
      * @return a client for the SCM implementation that created the changelist

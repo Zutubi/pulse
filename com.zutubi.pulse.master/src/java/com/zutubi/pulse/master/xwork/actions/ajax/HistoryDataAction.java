@@ -13,7 +13,6 @@ import com.zutubi.pulse.master.xwork.actions.project.BuildModel;
 import com.zutubi.pulse.master.xwork.actions.project.BuildResultToModelFunction;
 import com.zutubi.pulse.master.xwork.actions.project.PagerModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -148,7 +147,7 @@ public class HistoryDataAction extends ActionSupport
         }
         else
         {
-            toModelMapping = new BuildResultToModelFunction(urls, project.getConfig().getChangeViewer());
+            toModelMapping = new BuildResultToModelFunction(urls, project.getConfig());
         }
 
         List<BuildModel> builds = newArrayList(transform(page.getResults(), toModelMapping));

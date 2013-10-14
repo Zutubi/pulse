@@ -10,8 +10,8 @@ import com.zutubi.pulse.master.model.BuildPath;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UpstreamChangelist;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,10 +77,11 @@ public class ViewChangesAction extends BuildActionBase
         if (model != null && model.getChangelist().getRevision() != null)
         {
             Project project = model.getPreferredProject();
-            ChangeViewerConfiguration changeViewer = project.getConfig().getChangeViewer();
+            ProjectConfiguration projectConfig = project.getConfig();
+            ChangeViewerConfiguration changeViewer = projectConfig.getChangeViewer();
             if (changeViewer != null)
             {
-                changeUrl = changeViewer.getRevisionURL(model.getChangelist().getRevision());
+                changeUrl = changeViewer.getRevisionURL(projectConfig, model.getChangelist().getRevision());
             }
         }
     }

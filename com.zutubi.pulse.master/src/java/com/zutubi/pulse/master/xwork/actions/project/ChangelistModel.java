@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
-import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 
 import java.util.Collection;
@@ -20,10 +20,10 @@ public class ChangelistModel
     private DateModel when;
     private ChangelistCommentModel comment;
 
-    public ChangelistModel(PersistentChangelist changelist, ChangeViewerConfiguration changeViewer, Collection<CommitMessageTransformerConfiguration> transformers)
+    public ChangelistModel(PersistentChangelist changelist, ProjectConfiguration projectConfig, Collection<CommitMessageTransformerConfiguration> transformers)
     {
         id = changelist.getId();
-        revision = new RevisionModel(changelist.getRevision(), changeViewer);
+        revision = new RevisionModel(changelist.getRevision(), projectConfig);
         who = changelist.getAuthor();
         when = new DateModel(changelist.getTime());
         comment = new ChangelistCommentModel(new CommitMessageSupport(changelist.getComment(), transformers));

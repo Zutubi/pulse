@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Transient;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -57,11 +58,13 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
      * <p/>
      * Required for capability {@link Capability#VIEW_REVISION}
      *
+     *
+     * @param projectConfiguration
      * @param revision revision of the changelist
      * @return URL for the changelist view
      */
     @Transient
-    public abstract String getRevisionURL(Revision revision);
+    public abstract String getRevisionURL(ProjectConfiguration projectConfiguration, Revision revision);
 
     /**
      * Returns the URL for viewing a file at a given changelist and/or file

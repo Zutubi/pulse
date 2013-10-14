@@ -120,7 +120,8 @@ public class ChangelistDataAction extends ActionSupport
             addBuilds(root, nodeComparator, urls, treeBuilds, 0);
         }
 
-        ChangeViewerConfiguration changeViewer = projectWithChangeViewer == null ? null : projectWithChangeViewer.getConfig().getChangeViewer();
+        ProjectConfiguration projectWithChangeViewerConfig = projectWithChangeViewer == null ? null : projectWithChangeViewer.getConfig();
+        ChangeViewerConfiguration changeViewer = projectWithChangeViewerConfig == null ? null : projectWithChangeViewerConfig.getChangeViewer();
         Collection<CommitMessageTransformerConfiguration> transformers;
         if(contextProject == null)
         {
@@ -131,7 +132,7 @@ public class ChangelistDataAction extends ActionSupport
             transformers = contextProject.getConfig().getCommitMessageTransformers().values();
         }
 
-        ChangelistModel changelistModel = new ChangelistModel(changelist, changeViewer, transformers);
+        ChangelistModel changelistModel = new ChangelistModel(changelist, projectWithChangeViewerConfig, transformers);
         model = new ChangelistViewModel(changelistModel, treeBuilds, new PagerModel(fileCount, FILES_PER_PAGE, startPage));
 
         List<PersistentFileChange> files = changelistManager.getChangelistFiles(changelist, startPage * FILES_PER_PAGE, FILES_PER_PAGE);
@@ -198,7 +199,7 @@ public class ChangelistDataAction extends ActionSupport
         {
             scmClient = scmManager.createClient(scmConfiguration);
             ScmContext scmContext = scmManager.createContext(projectWithViewer.getConfig(), projectWithViewer.getState(), scmClient.getImplicitResource());
-            final ChangeContext context = new ChangeContextImpl(revision, scmConfiguration, scmClient, scmContext);
+            final ChangeContext context = new ChangeContextImpl(revision, projectConfiguration, scmClient, scmContext);
 
             for (PersistentFileChange file: files)
             {
