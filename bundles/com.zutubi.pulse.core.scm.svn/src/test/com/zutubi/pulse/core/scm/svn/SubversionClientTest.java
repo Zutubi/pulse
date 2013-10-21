@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.google.common.base.Predicate;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmFeedbackHandler;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -21,6 +22,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
@@ -397,6 +400,14 @@ public class SubversionClientTest extends PulseTestCase
         RecordingScmFeedbackHandler handler = runRecordedUpdate();
 
         List<String> messages = handler.getStatusMessages();
+        messages = newArrayList(filter(messages, new Predicate<String>()
+        {
+            public boolean apply(String input)
+            {
+                return !input.startsWith("Updating from");
+            }
+        }));
+
         assertEquals(1, messages.size());
         String[] pieces = messages.get(0).split(" +");
         assertEquals(2, pieces.length);

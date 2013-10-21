@@ -739,7 +739,7 @@ public class SubversionClient implements ScmClient
             {
                 return Arrays.asList(new ScmFile(path));
             }
-            throw convertException(e, context.getEnvironmentContext());
+            throw convertException(e, context == null ? null : context.getEnvironmentContext());
         }
 
         List<ScmFile> result = new LinkedList<ScmFile>();
