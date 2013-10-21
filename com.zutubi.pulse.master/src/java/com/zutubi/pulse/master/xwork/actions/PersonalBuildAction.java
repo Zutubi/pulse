@@ -46,6 +46,7 @@ public class PersonalBuildAction extends ActionSupport
     private String project;
     private String patchFormat;
     private String revision;
+    private String reason;
     private String overrides;
     private long number = 0;
     private List<String> responseErrors = new LinkedList<String>();
@@ -64,6 +65,11 @@ public class PersonalBuildAction extends ActionSupport
     public void setRevision(String revision)
     {
         this.revision = revision;
+    }
+
+    public void setReason(String reason)
+    {
+        this.reason = reason;
     }
 
     public void setOverrides(String overrides)
@@ -190,7 +196,7 @@ public class PersonalBuildAction extends ActionSupport
             PatchProperties properties = new PatchProperties(paths.getUserPatchPropertiesFile(user.getId(), buildNumber));
             properties.setPatchFormat(patchFormat);
 
-            long requestId = projectManager.triggerBuild(buildNumber, p, user, convertRevision(p), convertOverrides(), patchFile, patchFormat);
+            long requestId = projectManager.triggerBuild(buildNumber, p, user, convertRevision(p), reason, convertOverrides(), patchFile, patchFormat);
             BuildRequestRegistry.RequestStatus requestStatus = buildRequestRegistry.waitForRequestToBeHandled(requestId, TIMEOUT);
             switch (requestStatus)
             {

@@ -160,7 +160,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     // Personal builds are shielded by their own permission, not the trigger
     // authority.
-    long triggerBuild(long number, Project project, User user, Revision revision, List<ResourcePropertyConfiguration> overrides, File patchFile, String patchFormat) throws PulseException;
+    long triggerBuild(long number, Project project, User user, Revision revision, String reason, List<ResourcePropertyConfiguration> overrides, File patchFile, String patchFormat) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW, parameterType = Project.class)
     long updateAndGetNextBuildNumber(Project project, boolean allocate);

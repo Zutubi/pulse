@@ -477,6 +477,7 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
             Part[] parts = {
                     new StringPart("project", config.getProject()),
                     new StringPart("revision", revision.getRevisionString()),
+                    new StringPart("reason", config.getReason()),
                     new StringPart("overrides", convertOverrides(config.getOverrides())),
                     new StringPart("patchFormat", context.getPatchFormatType()),
                     new FilePart("patch.zip", patchFile),

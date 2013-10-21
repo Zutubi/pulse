@@ -275,8 +275,9 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         User user = new User();
         user.setId(nextId.getAndIncrement());
         BuildRevision revision = new BuildRevision(new Revision(1234), true);
+        TriggerOptions options = new TriggerOptions(new PersonalBuildReason(user.getLogin()), Collections.<ResourcePropertyConfiguration>emptyList());
 
-        BuildRequestEvent request = new PersonalBuildRequestEvent(this, nextId.getAndIncrement(), revision, user, null, null, project.getConfig(), Collections.<ResourcePropertyConfiguration>emptyList());
+        BuildRequestEvent request = new PersonalBuildRequestEvent(this, nextId.getAndIncrement(), revision, user, null, null, project.getConfig(), options);
 
         BuildController controller = mock(BuildController.class);
         doReturn(request.getId()).when(controller).start();

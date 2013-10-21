@@ -20,6 +20,7 @@ public class PersonalBuildConfig extends DevConfig
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
 
     public static final String PROPERTY_REVISION = "revision";
+    public static final String PROPERTY_REASON = "reason";
     public static final String PROPERTY_UPDATE = "update";
     public static final String PROPERTY_PATCH_FILE = "patch.file";
     public static final String PROPERTY_PATCH_TYPE = "patch.format";
@@ -86,6 +87,16 @@ public class PersonalBuildConfig extends DevConfig
     public void setRevision(String revision)
     {
         setProperty(PROPERTY_REVISION, revision);
+    }
+
+    public String getReason()
+    {
+        return getProperty(PROPERTY_REASON);
+    }
+
+    public void setReason(String reason)
+    {
+        setProperty(PROPERTY_REASON, reason);
     }
 
     public String getPatchFile()

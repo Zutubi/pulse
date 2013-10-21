@@ -54,6 +54,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.math.AggregationFunction;
@@ -1128,7 +1129,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return requestIds;
     }
 
-    public long triggerBuild(long number, Project project, User user, Revision revision, List<ResourcePropertyConfiguration> overrides, File patchFile, String patchFormat) throws PulseException
+    public long triggerBuild(long number, Project project, User user, Revision revision, String reason, List<ResourcePropertyConfiguration> overrides, File patchFile, String patchFormat) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
@@ -1139,7 +1140,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         try
         {
             BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
-            return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig, overrides));
+            BuildReason buildReason = StringUtils.stringSet(reason) ? new CustomBuildReason(reason) : new PersonalBuildReason(user.getLogin());
+            return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig, new TriggerOptions(buildReason, overrides)));
         }
         catch (Exception e)
         {

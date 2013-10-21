@@ -35,6 +35,7 @@ public class PersonalBuildClientFactory extends AbstractClientFactory<PersonalBu
 
         addPropertyOption(switchConfig, options, 'r', "project", PersonalBuildConfig.PROPERTY_PROJECT);
         addPropertyOption(switchConfig, options, 'e', "revision", PersonalBuildConfig.PROPERTY_REVISION);
+        addPropertyOption(switchConfig, options, 'a', "reason", PersonalBuildConfig.PROPERTY_REASON);
         addPropertyOption(switchConfig, options, 'f', "file", PersonalBuildConfig.PROPERTY_PATCH_FILE);
         addPropertyOption(switchConfig, options, 't', "patch-type", PersonalBuildConfig.PROPERTY_PATCH_TYPE);
 

@@ -23,7 +23,8 @@ public class PersonalBuildClientFactoryTest extends AbstractDevTestCase
                 "-u", "test.user",
                 "-p", "test.password",
                 "-f", "test.file",
-                "-e", "test.revision"
+                "-e", "test.revision",
+                "-a", "test.reason"
         );
 
         assertStandardOptions(client);
@@ -37,7 +38,8 @@ public class PersonalBuildClientFactoryTest extends AbstractDevTestCase
                 "--user", "test.user",
                 "--password", "test.password",
                 "--file", "test.file",
-                "--revision", "test.revision"
+                "--revision", "test.revision",
+                "--reason", "test.reason"
         );
 
         assertStandardOptions(client);
@@ -51,7 +53,8 @@ public class PersonalBuildClientFactoryTest extends AbstractDevTestCase
                 asPair(PersonalBuildConfig.PROPERTY_PULSE_USER, "test.user"),
                 asPair(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "test.password"),
                 asPair(PersonalBuildConfig.PROPERTY_PATCH_FILE, "test.file"),
-                asPair(PersonalBuildConfig.PROPERTY_REVISION, "test.revision")
+                asPair(PersonalBuildConfig.PROPERTY_REVISION, "test.revision"),
+                asPair(PersonalBuildConfig.PROPERTY_REASON, "test.reason")
         );
     }
 

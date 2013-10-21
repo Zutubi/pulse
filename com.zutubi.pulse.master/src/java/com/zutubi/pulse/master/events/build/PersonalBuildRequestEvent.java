@@ -21,9 +21,9 @@ public class PersonalBuildRequestEvent extends BuildRequestEvent
     private File patch;
     private String patchFormat;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, String patchFormat, ProjectConfiguration projectConfig, List<ResourcePropertyConfiguration> properties)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, File patch, String patchFormat, ProjectConfiguration projectConfig, TriggerOptions options)
     {
-        super(source, revision, projectConfig, new TriggerOptions(new PersonalBuildReason(user.getLogin()), properties));
+        super(source, revision, projectConfig, options);
         this.number = number;
         this.user = user;
         this.patch = patch;
