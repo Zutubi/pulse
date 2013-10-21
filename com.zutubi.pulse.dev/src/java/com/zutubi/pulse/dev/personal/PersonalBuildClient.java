@@ -474,10 +474,16 @@ public class PersonalBuildClient extends AbstractClient<PersonalBuildConfig>
 
         try
         {
+            String reason = config.getReason();
+            if (reason == null)
+            {
+                reason = "";
+            }
+
             Part[] parts = {
                     new StringPart("project", config.getProject()),
                     new StringPart("revision", revision.getRevisionString()),
-                    new StringPart("reason", config.getReason()),
+                    new StringPart("reason", reason),
                     new StringPart("overrides", convertOverrides(config.getOverrides())),
                     new StringPart("patchFormat", context.getPatchFormatType()),
                     new FilePart("patch.zip", patchFile),
