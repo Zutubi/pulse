@@ -40,7 +40,7 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
         rpcClient.RemoteApi.deleteAllConfigs(PathUtils.getPath(MasterConfigurationRegistry.PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT));
 
-        String user = RandomUtils.randomString(10);
+        String user = RandomUtils.insecureRandomString(10);
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         getBrowser().loginAndWait(user, "");
         

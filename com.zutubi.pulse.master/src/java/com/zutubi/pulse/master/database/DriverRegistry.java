@@ -91,7 +91,7 @@ public class DriverRegistry
         {
             if (!FileSystemUtils.isParentOf(driverDir, jar))
             {
-                String uniqueFilename = jar.getName() + RandomUtils.randomString(5);
+                String uniqueFilename = jar.getName() + RandomUtils.insecureRandomString(5);
 
                 FileSystemUtils.copy(driverDir, jar);
                 FileSystemUtils.robustRename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename));

@@ -1026,7 +1026,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
 
     private void runTestForCharacterSupport(char c) throws Exception
     {
-        String projectName = getName() + c + RandomUtils.randomString(5);
+        String projectName = getName() + c + RandomUtils.insecureRandomString(5);
         DepAntProject projectA = projectConfigurations.createDepAntProject(projectName + "A");
         projectA.setOrganisation("org" + c + "name");
         projectA.addArtifact("file", "build/artifactA-" + c + ".jar");

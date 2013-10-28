@@ -277,7 +277,7 @@ public class ConfigurationSystemConcurrencyTest extends AbstractConfigurationSys
     {
         public void doWorkUnit()
         {
-            ConfigA a = new ConfigA(RandomUtils.randomString(20));
+            ConfigA a = new ConfigA(RandomUtils.insecureRandomString(20));
             configurationTemplateManager.insertInstance(NORMAL_SCOPE, a);
         }
     }

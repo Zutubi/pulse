@@ -65,7 +65,7 @@ public class NotificationAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         rpcClient.loginAsAdmin();
-        random = getName() + "-" + RandomUtils.randomString(10);
+        random = getName() + "-" + RandomUtils.insecureRandomString(10);
 
         ensureDefaultEmailSettings();
         server = SimpleSmtpServer.start(DEFAULT_PORT);

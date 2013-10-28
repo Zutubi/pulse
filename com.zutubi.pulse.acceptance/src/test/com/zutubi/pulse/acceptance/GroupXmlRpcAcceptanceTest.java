@@ -1,12 +1,13 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
+
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
 
 public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 {
@@ -46,7 +47,7 @@ public class GroupXmlRpcAcceptanceTest extends AcceptanceTestBase
 
     private void assertGroupNameReadOnly(String groupName) throws Exception
     {
-        String randomName = RandomUtils.randomString(10);
+        String randomName = RandomUtils.insecureRandomString(10);
 
         Hashtable<String, Object> group = assertGroupExists(groupName);
         group.put("name", randomName);

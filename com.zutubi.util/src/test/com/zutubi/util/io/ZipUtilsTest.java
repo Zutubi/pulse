@@ -46,7 +46,7 @@ public class ZipUtilsTest extends ZutubiTestCase
     public void testCompressUncompressLarge() throws IOException
     {
         File f = File.createTempFile(getName(), ".tmp", tmpDir);
-        String random = RandomUtils.randomString(1024);
+        String random = RandomUtils.insecureRandomString(1024);
         byte[] randomBytes = random.getBytes();
         FileOutputStream os = new FileOutputStream(f);
         try

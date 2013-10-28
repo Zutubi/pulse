@@ -67,7 +67,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
 
     public void testRootDisplayName() throws ScmException, FileSystemException
     {
-        String location = RandomUtils.randomString(10);
+        String location = RandomUtils.insecureRandomString(10);
         stub(scmClient.getLocation(Matchers.<ScmContext>anyObject())).toReturn(location);
 
         ScmRootFileObject srfo = resolveRoot();

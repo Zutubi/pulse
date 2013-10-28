@@ -72,7 +72,7 @@ public class ChartUtils
         params.put("width", width);
         params.put("height", height);
 
-        String mapName = "imageMap-" + RandomUtils.randomString(3);
+        String mapName = "imageMap-" + RandomUtils.insecureRandomString(3);
         params.put("imageMap", ChartUtilities.getImageMap(mapName, chartRenderingInfo));
         params.put("imageMapName", mapName);
         return params;

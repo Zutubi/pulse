@@ -25,7 +25,7 @@ public class FormattingWrapperTest extends ZutubiTestCase
 
         TypeRegistry typeRegistry = new TypeRegistry();
         type = typeRegistry.register(Sample.class);
-        value = RandomUtils.randomString(5);
+        value = RandomUtils.insecureRandomString(5);
         objectFactory = new DefaultObjectFactory();
     }
 

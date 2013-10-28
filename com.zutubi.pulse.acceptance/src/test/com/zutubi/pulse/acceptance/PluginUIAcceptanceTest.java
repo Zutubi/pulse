@@ -1,15 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.admin.PluginPage;
 import com.zutubi.pulse.acceptance.pages.admin.PluginsPage;
 import com.zutubi.pulse.acceptance.rpc.RemoteApiClient;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.test.TestUtils;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.RandomUtils;
@@ -20,6 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.google.common.collect.Iterables.any;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.AGENTS_SCOPE;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.ACTION_PING;
 
 /**
  * Tests for the plugin management UI.
@@ -198,7 +199,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
 
     private String getRandomId()
     {
-        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.randomString(10);
+        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.insecureRandomString(10);
     }
 
     private File makeTestPlugin(String id, String name) throws IOException

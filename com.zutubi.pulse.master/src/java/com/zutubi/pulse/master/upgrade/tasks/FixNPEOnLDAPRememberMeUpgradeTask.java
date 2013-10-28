@@ -46,7 +46,7 @@ public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
                 {
                     String path = entry.getKey();
 
-                    String randomPassword = RandomUtils.randomToken(10);
+                    String randomPassword = RandomUtils.secureRandomString(10);
                     
                     String encodedPassword = encoder.encodePassword(randomPassword, null);
 

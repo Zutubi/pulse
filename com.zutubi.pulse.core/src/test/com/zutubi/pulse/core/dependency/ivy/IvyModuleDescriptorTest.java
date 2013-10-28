@@ -157,7 +157,7 @@ public class IvyModuleDescriptorTest extends ZutubiTestCase
 
     private File writeToFile(IvyModuleDescriptor descriptor) throws IOException
     {
-        File ivyFile = new File(tmp, "ivy" + RandomUtils.randomInt() + ".xml");
+        File ivyFile = new File(tmp, "ivy" + RandomUtils.insecureRandomInt() + ".xml");
         XmlModuleDescriptorWriter.write(descriptor.getDescriptor(), ivyFile);
         return ivyFile;
     }

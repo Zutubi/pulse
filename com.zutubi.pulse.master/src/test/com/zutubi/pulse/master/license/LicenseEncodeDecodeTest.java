@@ -41,7 +41,7 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
 
     public void testLongLicenseEncoding() throws LicenseException
     {
-        License l = new License(LicenseType.EVALUATION, RandomUtils.randomString(128), null);
+        License l = new License(LicenseType.EVALUATION, RandomUtils.insecureRandomString(128), null);
         assertEquals(l, decoder.decode(encoder.encode(l)));
     }
 

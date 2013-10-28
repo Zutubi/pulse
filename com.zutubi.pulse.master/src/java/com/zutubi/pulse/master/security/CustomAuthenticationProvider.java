@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.security;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.ldap.LdapManager;
@@ -16,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * A custom implementation of {@link DaoAuthenticationProvider}.
@@ -140,7 +141,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     private void setRandomPassword(UserConfiguration user)
     {
-        userManager.setPassword(user, RandomUtils.randomToken(10));
+        userManager.setPassword(user, RandomUtils.secureRandomString(10));
     }
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException

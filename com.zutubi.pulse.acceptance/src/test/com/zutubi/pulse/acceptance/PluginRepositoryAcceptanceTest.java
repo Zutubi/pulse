@@ -66,7 +66,7 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
         File tmpDir = FileSystemUtils.createTempDir(getName(), ".tmp");
         try
         {
-            String random = RandomUtils.randomString(10);
+            String random = RandomUtils.insecureRandomString(10);
             String id = AcceptanceTestUtils.PLUGIN_ID_TEST + "." + random;
             File pluginJar = AcceptanceTestUtils.createTestPlugin(tmpDir, id, getName() + "-" + random);
             rpcClient.TestApi.installPlugin(pluginJar.getAbsolutePath());

@@ -5,7 +5,6 @@ import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -54,14 +53,14 @@ public class AdminTokenManager
     private void newRandomToken()
     {
         File tokenFile = getAdminTokenFilename(configRoot);
-        adminToken = RandomUtils.randomString(128);
         try
         {
+            adminToken = RandomUtils.secureRandomString(128);
             Files.write(adminToken, tokenFile, Charset.defaultCharset());
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            LOG.severe("Unable to write admin token file: " + e.getMessage(), e);
+            LOG.severe("Unable to create admin token file: " + e.getMessage(), e);
         }
     }
 

@@ -91,7 +91,7 @@ public abstract class AcceptanceTestBase extends PulseTestCase
 
     protected String randomName()
     {
-        return getName() + "-" + RandomUtils.randomString(10);
+        return getName() + "-" + RandomUtils.insecureRandomString(10);
     }
 
     public SeleniumBrowser getBrowser()

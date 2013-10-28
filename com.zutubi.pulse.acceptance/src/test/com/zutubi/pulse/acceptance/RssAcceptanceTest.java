@@ -7,12 +7,13 @@ import com.sun.syndication.io.XmlReader;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction;
 import com.zutubi.util.RandomUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 public class RssAcceptanceTest extends AcceptanceTestBase
 {
@@ -48,7 +49,7 @@ public class RssAcceptanceTest extends AcceptanceTestBase
 
     public void testUnknownProjectId() throws FeedException, IOException
     {
-        long projectId = RandomUtils.randomLong();
+        long projectId = RandomUtils.insecureRandomLong();
 
         SyndFeed feed = readFeed("rss.action?projectId=" + projectId);
         assertThat(feed.getTitle(), equalTo(I18N.format("unknown.project.title", projectId)));
@@ -58,7 +59,7 @@ public class RssAcceptanceTest extends AcceptanceTestBase
 
     public void testUnknownUser() throws FeedException, IOException
     {
-        long userId = RandomUtils.randomLong();
+        long userId = RandomUtils.insecureRandomLong();
 
         SyndFeed feed = readFeed("rss.action?userId=" + userId);
         assertThat(feed.getTitle(), equalTo(I18N.format("unknown.user.title", userId)));
