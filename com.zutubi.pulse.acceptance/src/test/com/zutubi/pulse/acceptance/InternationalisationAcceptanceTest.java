@@ -36,6 +36,6 @@ public class InternationalisationAcceptanceTest extends AcceptanceTestBase
 
     protected String randomName()
     {
-        return I18N + "-" + RandomUtils.randomString(3);
+        return I18N + "-" + RandomUtils.insecureRandomString(3);
     }
 }

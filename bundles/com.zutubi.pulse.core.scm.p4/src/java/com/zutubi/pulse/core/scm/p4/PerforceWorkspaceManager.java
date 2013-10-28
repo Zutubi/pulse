@@ -162,7 +162,7 @@ public class PerforceWorkspaceManager implements ScmClientFactory<PerforceConfig
         // throwaway client in this case.
         if (scmContext.getPersistentContext() == null || getProjectName(scmContext) == null)
         {
-            workspaceName = getWorkspacePrefix() + TEMP_WORKSPACE_TAG + RandomUtils.randomString(10);
+            workspaceName = getWorkspacePrefix() + TEMP_WORKSPACE_TAG + RandomUtils.insecureRandomString(10);
             root = new File(".");
             description = getTemporaryWorkspaceDescription();
             temporary = true;

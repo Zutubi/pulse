@@ -37,7 +37,8 @@ public class DashboardAcceptanceTest extends AcceptanceTestBase
         super.setUp();
 
         rpcClient.loginAsAdmin();
-        String user = RandomUtils.randomString(10);
+
+        String user = RandomUtils.insecureRandomString(10);
         userPath = rpcClient.RemoteApi.insertTrivialUser(user);
         getBrowser().loginAndWait(user, "");
         

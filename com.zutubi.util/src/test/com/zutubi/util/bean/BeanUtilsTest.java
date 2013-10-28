@@ -1,13 +1,13 @@
 package com.zutubi.util.bean;
 
-import com.zutubi.util.junit.ZutubiTestCase;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.junit.ZutubiTestCase;
 
 public class BeanUtilsTest extends ZutubiTestCase
 {
     public void testGetProperty() throws BeanException
     {
-        String value = RandomUtils.randomString(5);
+        String value = RandomUtils.insecureRandomString(5);
 
         Bean target = new Bean();
         target.setProperty(value);
@@ -17,7 +17,7 @@ public class BeanUtilsTest extends ZutubiTestCase
 
     public void testSetProperty() throws BeanException
     {
-        String value = RandomUtils.randomString(5);
+        String value = RandomUtils.insecureRandomString(5);
         Bean target = new Bean();
         BeanUtils.setProperty("property", value, target);
         assertEquals(value, target.getProperty());

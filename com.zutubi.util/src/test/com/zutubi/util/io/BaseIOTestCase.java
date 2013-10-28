@@ -70,11 +70,11 @@ public abstract class BaseIOTestCase extends ZutubiTestCase
 
     protected File createRandomFile() throws IOException
     {
-        String randomName = RandomUtils.randomString(10);
+        String randomName = RandomUtils.insecureRandomString(10);
         File file = new File(tmp, randomName);
         while (file.exists())
         {
-            randomName = RandomUtils.randomString(10);
+            randomName = RandomUtils.insecureRandomString(10);
             file = new File(tmp, randomName);
         }
 

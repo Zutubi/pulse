@@ -33,7 +33,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
         rpcClient.loginAsAdmin();
         
         // create a project.
-        projectName = getName() + "-" + RandomUtils.randomString(10);
+        projectName = getName() + "-" + RandomUtils.insecureRandomString(10);
         rpcClient.RemoteApi.insertSimpleProject(projectName);
 
         repository = new Repository();

@@ -421,10 +421,10 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
 
         // Run two builds, to generate changes between them.
         rpcClient.RemoteApi.runBuild(random, BUILD_TIMEOUT);
-        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", RandomUtils.randomString(10));
-        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it harder", RandomUtils.randomString(10));
-        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-200: higher number", RandomUtils.randomString(10));
-        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-100: lower number", RandomUtils.randomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it", RandomUtils.insecureRandomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-123: fixed it harder", RandomUtils.insecureRandomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-200: higher number", RandomUtils.insecureRandomString(10));
+        editAndCommitFile(ALL_ANT_REPOSITORY, "expected-failures.txt", "CIB-100: lower number", RandomUtils.insecureRandomString(10));
         long buildNumber = rpcClient.RemoteApi.runBuild(random);
 
         getBrowser().loginAsAdmin();

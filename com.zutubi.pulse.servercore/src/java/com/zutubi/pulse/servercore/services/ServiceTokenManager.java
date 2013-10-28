@@ -45,7 +45,7 @@ public class ServiceTokenManager implements TokenManager
         }
         else if(generate)
         {
-            token = RandomUtils.randomToken(TOKEN_LENGTH);
+            token = RandomUtils.secureRandomString(TOKEN_LENGTH);
 
             writeToken();
         }

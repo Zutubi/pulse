@@ -137,7 +137,7 @@ public class FileDeletionService extends BackgroundServiceSupport
         File dest = new File(file.getAbsolutePath() + SUFFIX);
         while (dest.exists())
         {
-            dest = new File(file.getAbsolutePath() + RandomUtils.randomString(i++) + SUFFIX);
+            dest = new File(file.getAbsolutePath() + RandomUtils.insecureRandomString(i++) + SUFFIX);
         }
         return dest;
     }

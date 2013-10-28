@@ -140,7 +140,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     private void setRandomPassword(UserConfiguration user)
     {
-        userManager.setPassword(user, RandomUtils.randomToken(10));
+        userManager.setPassword(user, RandomUtils.secureRandomString(10));
     }
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException

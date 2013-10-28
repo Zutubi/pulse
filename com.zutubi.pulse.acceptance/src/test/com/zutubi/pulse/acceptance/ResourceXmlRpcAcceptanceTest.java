@@ -20,7 +20,7 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
     public void setUp() throws Exception
     {
         super.setUp();
-        random = RandomUtils.randomString(10);
+        random = RandomUtils.insecureRandomString(10);
         rpcClient.loginAsAdmin();
         String agentPath = rpcClient.RemoteApi.ensureAgent("localhost");
         resourcesPath = PathUtils.getPath(agentPath, "resources");
