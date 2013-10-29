@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.mstest;
 
+import com.zutubi.pulse.core.postprocessors.api.NameConflictResolution;
 import com.zutubi.pulse.core.postprocessors.api.TestCaseResult;
 import static com.zutubi.pulse.core.postprocessors.api.TestStatus.*;
 import com.zutubi.pulse.core.postprocessors.api.TestSuiteResult;
@@ -125,5 +126,25 @@ public class MSTestReportPostProcessorTest extends XMLTestPostProcessorTestCase
         assertNotNull(caseResult);
         assertEquals(ERROR, caseResult.getStatus());
         assertEquals("The agent process was stopped while the test was running.", caseResult.getMessage());
+    }
+
+    public void testVS2012Sample() throws IOException
+    {
+        TestSuiteResult expected =
+            buildSuite(null,
+                buildSuite("SmokeTests.PathFindingTests", 292494,
+                    new TestCaseResult("TestMovement_Basic", 73219, PASS),
+                    new TestCaseResult("TestMovement_Choke", 75610, PASS),
+                    new TestCaseResult("TestMovement_Creature", 143665, PASS)),
+                buildSuite("SmokeTests.SinglePlayerlevelTests", 918748,
+                    new TestCaseResult("SinglePlayerlevelPlayers_guy", 288538, PASS),
+                    new TestCaseResult("SinglePlayerlevelPlayers_girl", 357728, FAILURE, "Assert.Fail failed. Failed to trigger the following abilities: fire, \n" +
+                       "   at SmokeTests.SinglePlayerlevelTests.PlayerTestWork(String bio, String[] abilities)\n" +
+                       "   at SmokeTests.SinglePlayerlevelTests.SinglePlayerlevelPlayers_girl()"),
+                    new TestCaseResult("levelTravel_guy", 272482, PASS)
+                )
+            );
+
+        assertEquals(expected, runProcessorAndGetTests(pp, EXTENSION));
     }
 }

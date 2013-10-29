@@ -11,8 +11,7 @@ import com.zutubi.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Post-processor for MSTest TRX reports.
@@ -82,33 +81,45 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
         expectStartTag(ELEMENT_ROOT, reader);
         nextTagOrEnd(reader);
         Map<String, String> idToSuite = new HashMap<String, String>();
-        if (nextSiblingTag(reader, ELEMENT_DEFINITIONS))
-        {
-            nextTagOrEnd(reader);
-            while (nextSiblingTag(reader, ELEMENT_UNIT_TEST))
-            {
-                processDefinition(reader, idToSuite);
-            }
+        Map<String, TestCaseResult> idToCase = new LinkedHashMap<String, TestCaseResult>();
 
-            expectEndTag(ELEMENT_DEFINITIONS, reader);
-            nextTagOrEnd(reader);
+        // Definitions tell us the suite each case belongs to, but may appear after the cases in
+        // the XML.  So we collect all definition and case information first.
+        while (nextSiblingTag(reader, ELEMENT_DEFINITIONS, ELEMENT_RESULTS))
+        {
+            if (isElement(ELEMENT_DEFINITIONS, reader))
+            {
+                nextTagOrEnd(reader);
+                while (nextSiblingTag(reader, ELEMENT_UNIT_TEST))
+                {
+                    processDefinition(reader, idToSuite);
+                }
+
+                expectEndTag(ELEMENT_DEFINITIONS, reader);
+                nextTagOrEnd(reader);
+            }
+            else
+            {
+                nextTagOrEnd(reader);
+                while (nextSiblingTag(reader, ELEMENT_TEST_RESULT))
+                {
+                    processResult(reader, idToCase);
+                }
+
+                expectEndTag(ELEMENT_RESULTS, reader);
+                nextTagOrEnd(reader);
+            }
         }
 
-        if (nextSiblingTag(reader, ELEMENT_RESULTS))
+        // And now we can add suites to cases and to our parent case.
+        for (Map.Entry<String, TestCaseResult> entry : idToCase.entrySet())
         {
-            nextTagOrEnd(reader);
-            while (nextSiblingTag(reader, ELEMENT_TEST_RESULT))
+            String suiteName = idToSuite.get(entry.getKey());
+            if (suiteName != null)
             {
-                processResult(reader, tests, idToSuite);
+                TestSuiteResult suite = addSuite(tests, suiteName);
+                suite.addCase(entry.getValue());
             }
-
-            expectEndTag(ELEMENT_RESULTS, reader);
-            nextTagOrEnd(reader);
-        }
-
-        while (reader.isStartElement())
-        {
-            nextElement(reader);
         }
 
         expectEndTag(ELEMENT_ROOT, reader);
@@ -164,12 +175,12 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
         return suite;
     }
 
-    private void processResult(XMLStreamReader reader, TestSuiteResult parentSuite, Map<String, String> idToSuite) throws XMLStreamException
+    private void processResult(XMLStreamReader reader, Map<String, TestCaseResult> idToCase) throws XMLStreamException
     {
         Map<String, String> attributes = getAttributes(reader);
         String id = attributes.get(ATTRIBUTE_TEST_ID);
         String name = attributes.get(ATTRIBUTE_TEST_NAME);
-        if (!StringUtils.stringSet(id) || !StringUtils.stringSet(name) || !idToSuite.containsKey(id))
+        if (!StringUtils.stringSet(id) || !StringUtils.stringSet(name))
         {
             nextElement(reader);
             return;
@@ -184,7 +195,6 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
         
         nextTagOrEnd(reader);
         
-        TestSuiteResult suite = addSuite(parentSuite, idToSuite.get(id));
         TestCaseResult caseResult = new TestCaseResult(name, getDuration(attributes), outcome.getStatus());
         String defaultMessage = outcome.getDefaultMessage();
         String definedMessage = null;
@@ -216,7 +226,7 @@ public class MSTestReportPostProcessor extends StAXTestReportPostProcessorSuppor
             caseResult.setMessage(message.trim());
         }
 
-        suite.addCase(caseResult);
+        idToCase.put(id, caseResult);
 
         expectEndTag(ELEMENT_TEST_RESULT, reader);
         nextTagOrEnd(reader);
