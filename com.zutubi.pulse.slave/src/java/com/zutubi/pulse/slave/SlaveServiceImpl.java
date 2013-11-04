@@ -38,9 +38,11 @@ import com.zutubi.pulse.slave.command.InstallPluginsCommand;
 import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -256,16 +258,22 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
         updateMaster(master);
+        OutputStream outputStream = null;
         try
         {
             ServerRecipePaths paths = new ServerRecipePaths(context, configurationManager.getUserPaths().getData());
             context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BASE_DIR, paths.getBaseDir().getAbsolutePath());
             workingDir = context.resolveVariables(workingDir);
-            ProcessWrapper.runCommand(commandLine, workingDir, new EventOutputStream(eventManager, false, streamId), timeout, TimeUnit.SECONDS);
+            outputStream = new EventOutputStream(eventManager, false, streamId);
+            ProcessWrapper.runCommand(commandLine, workingDir, outputStream, timeout, TimeUnit.SECONDS);
         }
         catch (Exception e)
         {
             throw new BuildException(e);
+        }
+        finally
+        {
+            IOUtils.close(outputStream);
         }
     }
 
