@@ -1,22 +1,23 @@
 package com.zutubi.pulse.master.agent;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.HostState;
 import com.zutubi.pulse.master.model.persistence.InMemoryEntityDao;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class DefaultHostManagerTest extends PulseTestCase
 {
@@ -66,7 +67,7 @@ public class DefaultHostManagerTest extends PulseTestCase
         assertTrue(host.isRemote());
         assertEquals(TEST_HOST_1, host.getHostName());
         assertEquals(TEST_PORT, host.getPort());
-        assertEquals(getExpectedLocation(TEST_HOST_1, TEST_PORT), host.getLocation());
+        assertEquals(getExpectedLocation(TEST_HOST_1, TEST_PORT, false), host.getLocation());
         assertEquals(HostState.PersistentUpgradeState.NONE, host.getPersistentUpgradeState());
     }
 
@@ -90,8 +91,21 @@ public class DefaultHostManagerTest extends PulseTestCase
         Host newHost = hostManager.agentChanged(config);
 
         assertNotSame(host, newHost);
-        assertEquals(getExpectedLocation(TEST_HOST_2, TEST_PORT), newHost.getLocation());
-        assertNull(hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT)));
+        assertEquals(getExpectedLocation(TEST_HOST_2, TEST_PORT, false), newHost.getLocation());
+        assertNull(hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT, false)));
+    }
+
+    public void testAgentChangedToSsl()
+    {
+        AgentConfiguration config = createRemoteAgent(TEST_NAME_1, TEST_HOST_1, TEST_PORT);
+        Host host = hostManager.agentAdded(config);
+
+        config.setSsl(true);
+        Host newHost = hostManager.agentChanged(config);
+
+        assertNotSame(host, newHost);
+        assertEquals(getExpectedLocation(TEST_HOST_1, TEST_PORT, true), newHost.getLocation());
+        assertNull(hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT, false)));
     }
 
     public void testAgentDeleted()
@@ -101,7 +115,7 @@ public class DefaultHostManagerTest extends PulseTestCase
 
         hostManager.agentDeleted(config);
 
-        assertNull(hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT)));
+        assertNull(hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT, false)));
     }
 
     public void testTwoAgentsDifferentLocations()
@@ -126,6 +140,18 @@ public class DefaultHostManagerTest extends PulseTestCase
         assertSame(host1, host2);
     }
 
+    public void testTwoAgentsSameLocationDifferentSsl()
+    {
+        AgentConfiguration config1 = createRemoteAgent(TEST_NAME_1, TEST_HOST_1, TEST_PORT);
+        AgentConfiguration config2 = createRemoteAgent(TEST_NAME_2, TEST_HOST_1, TEST_PORT);
+        config2.setSsl(true);
+
+        Host host1 = hostManager.agentAdded(config1);
+        Host host2 = hostManager.agentAdded(config2);
+
+        assertNotSame(host1, host2);
+    }
+
     public void testAgentDeletedAnotherAgentSameLocation()
     {
         AgentConfiguration config1 = createRemoteAgent(TEST_NAME_1, TEST_HOST_1, TEST_PORT);
@@ -135,7 +161,7 @@ public class DefaultHostManagerTest extends PulseTestCase
 
         hostManager.agentDeleted(config2);
 
-        assertSame(host, hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT)));
+        assertSame(host, hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT, false)));
     }
 
     public void testAgentChangedNoLongerSameLocation()
@@ -176,7 +202,7 @@ public class DefaultHostManagerTest extends PulseTestCase
 
         hostManager.init(agentManager);
 
-        Host host = hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT));
+        Host host = hostManager.getHostForLocation(getExpectedLocation(TEST_HOST_1, TEST_PORT, false));
         assertNotNull(host);
         
         Host agentHost = hostManager.agentAdded(createRemoteAgent(TEST_NAME_1, TEST_HOST_1, TEST_PORT));
@@ -214,9 +240,9 @@ public class DefaultHostManagerTest extends PulseTestCase
         assertTrue(any(agents, new HasConfig(config2)));
     }
 
-    private String getExpectedLocation(String hostname, int port)
+    private String getExpectedLocation(String hostname, int port, boolean ssl)
     {
-        return hostname + ":" + port;
+        return (ssl ? "https" : "http") + "://" + hostname + ":" + port;
     }
 
     private AgentConfiguration createRemoteAgent(String name, String hostname, int port)
