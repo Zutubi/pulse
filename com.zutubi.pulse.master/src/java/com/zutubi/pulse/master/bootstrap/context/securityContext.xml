@@ -146,7 +146,7 @@ based upon the Spring Security system.
         <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
     </bean>
 
-    <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+    <bean id="rememberMeServices" class="com.zutubi.pulse.master.security.CustomTokenBasedRememberMeServices">
         <property name="userDetailsService" ref="userManager"/>
         <property name="key" value="pulse"/>
     </bean>
