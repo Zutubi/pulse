@@ -9,6 +9,7 @@ import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.AbstractSessionManager;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import java.io.File;
@@ -130,6 +131,12 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
             requestLog.setFilename(new File(logDir, "yyyy_mm_dd.request.log").getAbsolutePath());
             context.setRequestLog(requestLog);
         }
+
+        // Prior to Jetty 8/Servlet 3.0, there isn't a standard way to get HttpOnly+Secure cookies
+        // via configuration only.  But we can dig in a little to turn them on in code.
+        AbstractSessionManager sessionManager = (AbstractSessionManager) context.getServletHandler().getSessionManager();
+        sessionManager.setHttpOnly(true);
+        sessionManager.setSecureCookies(true);
     }
 
     private String[] getRequestLoggingIgnorePaths()
