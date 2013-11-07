@@ -99,7 +99,7 @@ public class DefaultHostManager implements HostManager
 
     private HostState createState(AgentConfiguration agentConfig)
     {
-        HostState newState = agentConfig.isRemote() ? new HostState(agentConfig.getHost(), agentConfig.getPort()) : new HostState();
+        HostState newState = agentConfig.isRemote() ? new HostState(agentConfig.getHost(), agentConfig.getPort(), agentConfig.isSsl()) : new HostState();
         hostStateDao.save(newState);
         return newState;
     }
@@ -232,7 +232,7 @@ public class DefaultHostManager implements HostManager
     {
         if (host.isRemote())
         {
-            SlaveService slaveService = slaveProxyFactory.createProxy(host.getHostName(), host.getPort());
+            SlaveService slaveService = slaveProxyFactory.createProxy(host.getHostName(), host.getPort(), host.isSsl());
             return objectFactory.buildBean(SlaveHostService.class, new Class[]{SlaveService.class}, new Object[]{slaveService});
         }
         else

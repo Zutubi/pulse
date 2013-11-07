@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Configuration for an agent: a service that can execute recipes.
  */
-@Form(fieldOrder = {"name", "remote", "host", "port", "allowPersonalBuilds", "priority", "dataDirectory"})
+@Form(fieldOrder = {"name", "remote", "host", "port", "ssl", "allowPersonalBuilds", "priority", "dataDirectory"})
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
 @Wire
@@ -29,7 +29,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
 {
     @ExternalState
     private long agentStateId;
-    @ControllingCheckbox(checkedFields = {"host", "port"})
+    @ControllingCheckbox(checkedFields = {"host", "port", "ssl"})
     private boolean remote = true;
     @NoInherit
     private String name;
@@ -37,6 +37,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private String host;
     @Numeric(min = 1)
     private int port = 8090;
+    private boolean ssl;
     private boolean allowPersonalBuilds = true;
     @Numeric
     private int priority = 0;
@@ -111,6 +112,16 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public boolean isSsl()
+    {
+        return ssl;
+    }
+
+    public void setSsl(boolean ssl)
+    {
+        this.ssl = ssl;
     }
 
     public boolean getAllowPersonalBuilds()

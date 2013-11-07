@@ -197,6 +197,8 @@
                 <ref local="changedSelectedBuildsConditions"/>
                 <ref local="addOCUnitShortenSuiteNames"/>
                 <ref local="pushDownExternalStateIds"/>
+                <ref local="addHostSsl"/>
+                <ref local="addAgentSsl"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1035,5 +1037,18 @@
 
     <bean id="pushDownExternalStateIds" class="com.zutubi.pulse.master.upgrade.tasks.PushDownExternalStateIdsUpgradeTask">
         <property name="buildNumber" value="205014001"/>
+    </bean>
+
+    <bean id="addHostSsl" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="205030001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.6.13-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="addAgentSsl" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentSslUpgradeTask">
+        <property name="buildNumber" value="205030002"/>
     </bean>
 </beans>

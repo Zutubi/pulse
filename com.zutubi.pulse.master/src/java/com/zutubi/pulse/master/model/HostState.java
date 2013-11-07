@@ -29,6 +29,7 @@ public class HostState extends Entity
     private boolean remote;
     private String hostName;
     private int port;
+    private boolean ssl;
     private PersistentUpgradeState persistentUpgradeState = PersistentUpgradeState.NONE;
 
     public HostState()
@@ -37,11 +38,12 @@ public class HostState extends Entity
         hostName = HostLocationFormatter.LOCATION_MASTER;
     }
 
-    public HostState(String hostName, int port)
+    public HostState(String hostName, int port, boolean ssl)
     {
         remote = true;
         this.hostName = hostName;
         this.port = port;
+        this.ssl = ssl;
     }
 
     public boolean isRemote()
@@ -72,6 +74,16 @@ public class HostState extends Entity
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public boolean isSsl()
+    {
+        return ssl;
+    }
+
+    public void setSsl(boolean ssl)
+    {
+        this.ssl = ssl;
     }
 
     public PersistentUpgradeState getUpgradeState()

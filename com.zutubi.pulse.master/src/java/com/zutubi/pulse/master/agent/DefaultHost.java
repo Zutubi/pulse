@@ -45,6 +45,11 @@ public class DefaultHost implements Host, HostLocation
         return state.getPort();
     }
 
+    public boolean isSsl()
+    {
+        return state.isSsl();
+    }
+
     public String getLocation()
     {
         return HostLocationFormatter.format(this);

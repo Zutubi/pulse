@@ -42,6 +42,14 @@ public interface Host
     int getPort();
 
     /**
+     * Indicates if the host is listening for a secure connection, only valid
+     * for remote hosts.
+     *
+     * @return true if the host uses SSL, false otherwise
+     */
+    boolean isSsl();
+
+    /**
      * The location of the host, which is unique for each host and human-
      * readable.
      *
