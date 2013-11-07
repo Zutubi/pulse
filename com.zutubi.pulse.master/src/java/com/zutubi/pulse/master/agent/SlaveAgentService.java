@@ -97,7 +97,7 @@ public class SlaveAgentService implements AgentService
                                             asPair(PARAM_TEMP_PATTERN, recipeDetails.getProjectTempPattern()),
                                             asPair(PARAM_OUTPUT, Boolean.toString(true)));
 
-            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
+            URL resultUrl = new URL(agentConfig.isSsl() ? "https" : "http", agentConfig.getHost(), agentConfig.getPort(), "/download?" + query);
             URLConnection urlConnection = resultUrl.openConnection();
             urlConnection.setReadTimeout(300000);
             

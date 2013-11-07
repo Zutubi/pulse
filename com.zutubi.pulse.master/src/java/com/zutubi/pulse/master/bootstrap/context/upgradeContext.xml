@@ -207,6 +207,8 @@
                 <ref local="addManualTrigger"/>
                 <ref local="removePromptOption"/>
                 <ref local="addMaxChangesPerBuild"/>
+                <ref local="addHostSsl"/>
+                <ref local="addAgentSsl"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1085,5 +1087,18 @@
 
     <bean id="addMaxChangesPerBuild" class="com.zutubi.pulse.master.upgrade.tasks.AddMaxChangesPerBuildUpgradeTask">
         <property name="buildNumber" value="206008001"/>
+    </bean>
+
+    <bean id="addHostSsl" class="com.zutubi.pulse.master.upgrade.tasks.MigrateSchemaUpgradeTask">
+        <property name="buildNumber" value="206013001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.6.13-patch-01.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="addAgentSsl" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentSslUpgradeTask">
+        <property name="buildNumber" value="206013002"/>
     </bean>
 </beans>

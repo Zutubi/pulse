@@ -25,4 +25,11 @@ public interface HostLocation
      * @return the port number of the remote location
      */
     int getPort();
+
+    /**
+     * Indicates if the remote location is listening for a secure connection.
+     *
+     * @return true if the location uses SSL, false otherwise
+     */
+    boolean isSsl();
 }

@@ -18,7 +18,7 @@ public class HostLocationFormatter
     {
         if (location.isRemote())
         {
-            return (location.getHostName() == null ? "" : location.getHostName()) + ":" + location.getPort();
+            return (location.isSsl() ? "https" : "http") + "://" + (location.getHostName() == null ? "" : location.getHostName()) + ":" + location.getPort();
         }
         else
         {
