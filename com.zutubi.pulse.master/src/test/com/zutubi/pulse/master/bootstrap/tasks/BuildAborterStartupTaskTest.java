@@ -127,7 +127,7 @@ public class BuildAborterStartupTaskTest extends PulseTestCase
     private BuildResult createResult(Project project)
     {
         BuildResult result = new BuildResult(new TriggerBuildReason("test trigger"), project, 1, false);
-        result.setId(RandomUtils.randomInt());
+        result.setId(RandomUtils.insecureRandomInt());
         return result;
     }
 

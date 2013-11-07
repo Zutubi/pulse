@@ -382,7 +382,7 @@ public class FileSystemUtils
         int tries = 0;
         do
         {
-            tmp = new File(base, prefix + RandomUtils.randomString(7 + tries / 10) + suffix);
+            tmp = new File(base, prefix + RandomUtils.insecureRandomString(7 + tries / 10) + suffix);
             tries++;
         }
         while (tmp.exists());

@@ -83,7 +83,7 @@ public class ZipAction extends VFSActionSupport
             return ERROR;
         }
 
-        File temp = new File(tmpRoot, RandomUtils.randomString(7) + ".zip");
+        File temp = new File(tmpRoot, RandomUtils.insecureRandomString(7) + ".zip");
 
         try
         {

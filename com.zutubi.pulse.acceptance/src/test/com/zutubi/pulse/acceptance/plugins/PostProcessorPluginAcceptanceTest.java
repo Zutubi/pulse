@@ -47,7 +47,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
-        String random = RandomUtils.randomString(10);
+        String random = RandomUtils.insecureRandomString(10);
         samplePostProcessorPlugin = AcceptanceTestUtils.createTestPlugin(tmpDir, getName() + "." + random, getName() + " " + random);
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);

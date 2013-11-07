@@ -213,7 +213,7 @@ public class DefaultBuildController implements EventListener, BuildController
      */
     private void activateBuildAuthenticationToken()
     {
-        String token = RandomUtils.randomToken(15);
+        String token = RandomUtils.secureRandomString(15);
         buildContext.setSecurityHash(token);
         repositoryAuthenticationProvider.activate(token);
     }

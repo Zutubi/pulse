@@ -4,7 +4,6 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.util.RandomUtils;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.security.GeneralSecurityException;
 import java.util.Map;
 
 /**
@@ -39,15 +38,7 @@ public class SessionTokenManager
         {
             // First time the token has been requested for the session.
             // Generate a new one.
-            try
-            {
-                token = RandomUtils.secureRandomString(TOKEN_LENGTH);
-            }
-            catch (GeneralSecurityException e)
-            {
-                throw new RuntimeException("Could not generate session token: " + e.getMessage(), e);
-            }
-
+            token = RandomUtils.secureRandomString(TOKEN_LENGTH);
             session.put(TOKEN_NAME, token);
         }
 

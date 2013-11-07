@@ -5,10 +5,10 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import static com.zutubi.util.RandomUtils.randomInt;
-import static org.mockito.Mockito.*;
 
+import static com.zutubi.util.RandomUtils.insecureRandomInt;
 import static java.util.Arrays.asList;
+import static org.mockito.Mockito.*;
 
 public class DefaultBuildManagerTest extends PulseTestCase
 {
@@ -66,7 +66,7 @@ public class DefaultBuildManagerTest extends PulseTestCase
     {
         UserConfiguration config = new UserConfiguration("test", "test");
         User user = new User();
-        user.setId(randomInt());
+        user.setId(insecureRandomInt());
         user.setConfig(config);
         return user;
     }
@@ -74,14 +74,14 @@ public class DefaultBuildManagerTest extends PulseTestCase
     private BuildResult createResult(Project project)
     {
         BuildResult result = new BuildResult(new TriggerBuildReason("test trigger"), project, 1, false);
-        result.setId(randomInt());
+        result.setId(insecureRandomInt());
         return result;
     }
 
     private BuildResult createResult(User user, Project project)
     {
         BuildResult result = new BuildResult(new TriggerBuildReason("test trigger"), user, project, 1);
-        result.setId(randomInt());
+        result.setId(insecureRandomInt());
         return result;
     }
 

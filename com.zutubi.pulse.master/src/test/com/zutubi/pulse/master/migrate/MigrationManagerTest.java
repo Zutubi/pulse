@@ -145,7 +145,7 @@ public class MigrationManagerTest extends PulseTestCase
 
         public void init() throws SQLException, IOException
         {
-            String databaseName = RandomUtils.randomString(6);
+            String databaseName = RandomUtils.insecureRandomString(6);
 
             jdbcProperties = new Properties();
             jdbcProperties.setProperty(DatabaseConfig.JDBC_URL, "jdbc:hsqldb:mem:" + databaseName);

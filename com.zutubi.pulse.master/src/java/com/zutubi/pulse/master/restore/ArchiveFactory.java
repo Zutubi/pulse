@@ -137,10 +137,10 @@ public class ArchiveFactory
 
     private File createNewArchiveBaseDirectory() throws ArchiveException
     {
-        File archiveBase = new File(tmp, RandomUtils.randomString(10));
+        File archiveBase = new File(tmp, RandomUtils.insecureRandomString(10));
         while (archiveBase.exists())
         {
-            archiveBase = new File(tmp, RandomUtils.randomString(10));
+            archiveBase = new File(tmp, RandomUtils.insecureRandomString(10));
         }
 
         if (!archiveBase.mkdirs())

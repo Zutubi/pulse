@@ -199,7 +199,7 @@ public class PluginUIAcceptanceTest extends AcceptanceTestBase
 
     private String getRandomId()
     {
-        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.randomString(10);
+        return AcceptanceTestUtils.PLUGIN_ID_TEST + "." + RandomUtils.insecureRandomString(10);
     }
 
     private File makeTestPlugin(String id, String name) throws IOException

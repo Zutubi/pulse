@@ -611,7 +611,7 @@ public class PersonalBuildAcceptanceTest extends AcceptanceTestBase
     {
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, path);
-        String target = RandomUtils.randomString(10);
+        String target = RandomUtils.insecureRandomString(10);
         FileSystemUtils.createFile(buildFile, "<?xml version=\"1.0\"?>\n" +
                 "<project default=\"" + target + "\">\n" +
                 "    <target name=\"" + target + "\">\n" +

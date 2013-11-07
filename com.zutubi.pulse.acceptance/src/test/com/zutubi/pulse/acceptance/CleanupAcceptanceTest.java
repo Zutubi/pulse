@@ -287,7 +287,7 @@ public class CleanupAcceptanceTest extends AcceptanceTestBase
 
     private String renameProject(String projectName) throws Exception
     {
-        String newProjectName = getName() + "-" + RandomUtils.randomString(10);
+        String newProjectName = getName() + "-" + RandomUtils.insecureRandomString(10);
         Hashtable<String, Object> projectConfig = rpcClient.RemoteApi.getConfig("projects/" + projectName);
         projectConfig.put("name", newProjectName);
         rpcClient.RemoteApi.saveConfig("projects/" + projectName, projectConfig, false);

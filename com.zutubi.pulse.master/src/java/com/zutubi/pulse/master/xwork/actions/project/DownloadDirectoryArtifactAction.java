@@ -84,7 +84,7 @@ public class DownloadDirectoryArtifactAction extends ProjectActionSupport
             tmpRoot.mkdirs();
         }
 
-        File temp = new File(tmpRoot, RandomUtils.randomString(5) + id + ".zip");
+        File temp = new File(tmpRoot, RandomUtils.insecureRandomString(5) + id + ".zip");
 
         try
         {

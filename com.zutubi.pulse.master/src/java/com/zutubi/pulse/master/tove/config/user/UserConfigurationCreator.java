@@ -47,7 +47,7 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
         if(authenticatedViaLdap)
         {
             user.setAuthenticatedViaLdap(true);
-            user.setPassword(passwordEncoder.encodePassword(RandomUtils.randomToken(10), null));
+            user.setPassword(passwordEncoder.encodePassword(RandomUtils.secureRandomString(10), null));
         }
         else
         {

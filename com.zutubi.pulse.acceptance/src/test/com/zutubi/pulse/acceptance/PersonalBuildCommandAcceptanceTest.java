@@ -1,16 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 import com.zutubi.pulse.acceptance.rpc.RpcClient;
 import com.zutubi.pulse.core.ui.api.YesNoResponse;
 import com.zutubi.util.RandomUtils;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 /**
  * @see com.zutubi.pulse.acceptance.PersonalBuildAcceptanceTest
@@ -68,8 +69,8 @@ public class PersonalBuildCommandAcceptanceTest extends DevToolsTestBase
         runPluginSync();
 
         // Now install an extra plugin that requires a restart to remove.
-        String pluginId = getName() + "." + RandomUtils.randomString(10);
-        String pluginName = getName() + " " + RandomUtils.randomString(10);
+        String pluginId = getName() + "." + RandomUtils.insecureRandomString(10);
+        String pluginName = getName() + " " + RandomUtils.insecureRandomString(10);
         File pluginJar = AcceptanceTestUtils.createTestPlugin(tmpDir, pluginId, pluginName);
         assertTrue(pluginJar.renameTo(new File(devPaths.getPluginStorageDir(), pluginJar.getName())));
 
@@ -84,7 +85,7 @@ public class PersonalBuildCommandAcceptanceTest extends DevToolsTestBase
     
     private String setupAndSubmitPersonalBuild() throws Exception
     {
-        String projectName = getName() + RandomUtils.randomString(10);
+        String projectName = getName() + RandomUtils.insecureRandomString(10);
         rpcClient.RemoteApi.insertSimpleProject(projectName);
         File patchFile = copyInputToDirectory("patch", "txt", tmpDir);
 
