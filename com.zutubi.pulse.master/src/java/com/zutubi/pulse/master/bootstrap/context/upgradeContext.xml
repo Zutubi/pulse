@@ -209,6 +209,7 @@
                 <ref local="addMaxChangesPerBuild"/>
                 <ref local="addHostSsl"/>
                 <ref local="addAgentSsl"/>
+                <ref local="renameHostSsl"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1100,5 +1101,14 @@
 
     <bean id="addAgentSsl" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentSslUpgradeTask">
         <property name="buildNumber" value="206013002"/>
+    </bean>
+
+    <bean id="renameHostSsl" class="com.zutubi.pulse.master.upgrade.tasks.RenameHostSslColumnUpgradeTask">
+        <property name="buildNumber" value="206014001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.6.14-partial-mappings.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>
