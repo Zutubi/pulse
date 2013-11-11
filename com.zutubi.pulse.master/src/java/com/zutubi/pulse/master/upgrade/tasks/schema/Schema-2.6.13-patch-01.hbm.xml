@@ -7,7 +7,7 @@
         </id>
 
         <property name="ssl" type="boolean">
-            <column name="SSL" default="false"/>
+            <column name="USE_SSL" default="false"/>
         </property>
     </class>
 </hibernate-mapping>

@@ -6,10 +6,6 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="remote" column="REMOTE" type="boolean"/>
-        <property name="hostName" column="HOST_NAME" type="string" length="255"/>
-        <property name="port" column="PORT" type="int"/>
-        <property name="ssl" column="USE_SSL" type="boolean"/>
-        <property name="persistentUpgradeStateName" column="UPGRADE_STATE" type="string" length="255"/>
+        <property name="ssl" column="SSL" type="boolean"/>
     </class>
 </hibernate-mapping>
