@@ -1100,7 +1100,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             // Note when isolating changelists we never replace existing requests
                             TriggerOptions copy = new TriggerOptions(options);
                             options.setReplaceable(false);
-                            requestBuildOfRevision(project, copy, r, requestIds);
+                            requestBuildOfRevision(project, copy, new BuildRevision(revision, false), requestIds);
                         }
                     }
                     else
@@ -1123,7 +1123,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(project, options, revision, requestIds);
+            requestBuildOfRevision(project, options, new BuildRevision(revision, options.getReason().isUser()), requestIds);
         }
 
         return requestIds;
@@ -1193,15 +1193,15 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(), options)));
     }
 
-    private void requestBuildOfRevision(Project project, TriggerOptions options, Revision revision, List<Long> requestIds)
+    private void requestBuildOfRevision(Project project, TriggerOptions options, BuildRevision revision, List<Long> requestIds)
     {
         try
         {
-            requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(revision, options.getReason().isUser()), options)));
+            requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, revision, options)));
         }
         catch (Exception e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevision().getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 
