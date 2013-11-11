@@ -64,6 +64,7 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.ByteArrayOutputStream;
@@ -82,6 +83,7 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
  */
 public class RemoteApi
 {
+    private static final Logger LOG = Logger.getLogger(RemoteApi.class);
     private static final Messages I18N = Messages.getInstance(RemoteApi.class);
 
     private TransactionContext transactionContext;
@@ -1627,6 +1629,12 @@ public class RemoteApi
             configurationArchiver.archive(new File(filename), mode, Version.getVersion().getBuildNumber(), pathArray);
             return true;
         }
+        catch (RuntimeException e)
+        {
+            // The stack trace is lost by the time we hit the client, so show it here and rethrow.
+            LOG.warning("Export failed: " + e.getMessage(), e);
+            throw e;
+        }
         finally
         {
             tokenManager.logoutUser();
@@ -1652,6 +1660,12 @@ public class RemoteApi
         {
             accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
             return new Vector<String>(configurationArchiver.checkArchive(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
+        }
+        catch (RuntimeException e)
+        {
+            // The stack trace is lost by the time we hit the client, so show it here and rethrow.
+            LOG.warning("Archive check failed: " + e.getMessage(), e);
+            throw e;
         }
         finally
         {
@@ -1682,6 +1696,12 @@ public class RemoteApi
         {
             accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
             return new Vector<String>(configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
+        }
+        catch (RuntimeException e)
+        {
+            // The stack trace is lost by the time we hit the client, so show it here and rethrow.
+            LOG.warning("Import failed: " + e.getMessage(), e);
+            throw e;
         }
         finally
         {
