@@ -47,7 +47,6 @@ import com.zutubi.pulse.master.tove.config.project.reports.ReportGroupConfigurat
 import com.zutubi.pulse.master.tove.config.project.reports.ReportTimeUnit;
 import com.zutubi.pulse.master.tove.format.StateDisplayManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.master.util.TransactionContext;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.ShutdownManager;
@@ -114,7 +113,6 @@ public class RemoteApi
     private StateDisplayManager stateDisplayManager;
     private RecipeQueue recipeQueue;
     private SchedulingController schedulingController;
-    private UpgradeManager upgradeManager;
 
     public RemoteApi()
     {
@@ -1659,7 +1657,7 @@ public class RemoteApi
         try
         {
             accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
-            return new Vector<String>(configurationArchiver.checkArchive(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
+            return new Vector<String>(configurationArchiver.checkArchive(new File(filename), new NoInterveningUpgradesVersionChecker()));
         }
         catch (RuntimeException e)
         {
@@ -1695,7 +1693,7 @@ public class RemoteApi
         try
         {
             accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
-            return new Vector<String>(configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker(upgradeManager)));
+            return new Vector<String>(configurationArchiver.restore(new File(filename), new NoInterveningUpgradesVersionChecker()));
         }
         catch (RuntimeException e)
         {
@@ -5331,10 +5329,5 @@ public class RemoteApi
     public void setSchedulingController(SchedulingController schedulingController)
     {
         this.schedulingController = schedulingController;
-    }
-
-    public void setUpgradeManager(UpgradeManager upgradeManager)
-    {
-        this.upgradeManager = upgradeManager;
     }
 }
