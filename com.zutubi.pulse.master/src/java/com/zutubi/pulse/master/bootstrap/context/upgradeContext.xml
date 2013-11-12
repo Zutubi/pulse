@@ -1054,7 +1054,7 @@
     </bean>
 
     <bean id="renameHostSsl" class="com.zutubi.pulse.master.upgrade.tasks.RenameHostSslColumnUpgradeTask">
-        <property name="buildNumber" value="206031001"/>
+        <property name="buildNumber" value="205031001"/>
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.6.14-partial-mappings.hbm.xml</value>
