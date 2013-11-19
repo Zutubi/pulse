@@ -1074,7 +1074,7 @@
         <property name="buildNumber" value="206003001"/>
     </bean>
 
-    <bean id="addStageRetriesOnAgentProblem" class="com.zutubi.pulse.master.upgrade.tasks.AddMaxChangesPerBuildUpgradeTask">
+    <bean id="addStageRetriesOnAgentProblem" class="com.zutubi.pulse.master.upgrade.tasks.AddStageRetriesOnAgentProblemUpgrageTask">
         <property name="buildNumber" value="206003002"/>
     </bean>
 
