@@ -1100,7 +1100,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                             // Note when isolating changelists we never replace existing requests
                             TriggerOptions copy = new TriggerOptions(options);
                             options.setReplaceable(false);
-                            requestBuildOfRevision(project, copy, new BuildRevision(revision, false), requestIds);
+                            requestBuildOfRevision(project, copy, new BuildRevision(r, false), requestIds);
                         }
                     }
                     else
