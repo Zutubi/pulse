@@ -56,6 +56,7 @@ Zutubi.pulse.project.browse.ProjectDependenciesPanel = Ext.extend(Zutubi.ActiveP
                 id: this.id + '-inner',
                 layout: 'vtable',
                 contentEl: 'center',
+                autoScroll: true,
                 tbar: {
                     id: 'build-toolbar',
                     style: 'margin: 17px 17px 0 17px; padding: 2px 2px 2px 6px',
