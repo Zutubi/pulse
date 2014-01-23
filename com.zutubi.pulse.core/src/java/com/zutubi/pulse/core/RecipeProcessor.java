@@ -87,7 +87,7 @@ public class RecipeProcessor
         {
             runningRecipe = recipeResult.getId();
             long recipeStartTime = recipeResult.getStartTime();
-            eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeStartTime));
+            eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), context.getWorkingDir().getAbsolutePath(), recipeStartTime));
 
             pushRecipeContext(context, request, testResults, customFields, recipeStartTime);
             executeRequest(request);

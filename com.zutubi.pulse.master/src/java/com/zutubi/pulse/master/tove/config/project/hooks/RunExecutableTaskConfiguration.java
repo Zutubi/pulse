@@ -104,13 +104,13 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         commandLine.add(verifyCommand(context.resolveVariables(command), onAgent));
         commandLine.addAll(resolvedArguments);
 
+        String resolvedWorkingDir = StringUtils.stringSet(workingDir) ? context.resolveVariables(workingDir) : null;
         if (resultNode != null && onAgent)
         {
-            executeOnAgent(context, commandLine);
+            executeOnAgent(context, commandLine, resolvedWorkingDir);
         }
         else
         {
-            String resolvedWorkingDir = StringUtils.stringSet(workingDir) ? context.resolveVariables(workingDir) : null;
             if (timeoutApplied)
             {
                 ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);
@@ -122,13 +122,13 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         }
     }
 
-    private void executeOnAgent(ExecutionContext context, List<String> commandLine)
+    private void executeOnAgent(ExecutionContext context, List<String> commandLine, String resolvedWorkingDir)
     {
         long agentHandle = context.getLong(PROPERTY_AGENT_HANDLE, 0);
         Agent agent = agentManager.getAgentByHandle(agentHandle);
         if (agent != null)
         {
-            agent.getService().executeCommand(context, commandLine, workingDir, timeout);
+            agent.getService().executeCommand(context, commandLine, resolvedWorkingDir, timeout);
         }
     }
 

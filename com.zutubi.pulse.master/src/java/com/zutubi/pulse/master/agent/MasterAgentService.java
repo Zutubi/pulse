@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.master.MasterRecipeRunner;
@@ -142,9 +141,6 @@ public class MasterAgentService implements AgentService
 
     public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(context, configurationManager.getUserPaths().getData());
-        context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BASE_DIR, recipePaths.getBaseDir().getAbsolutePath());
-        workingDir = context.resolveVariables(workingDir);
         try
         {
             ProcessWrapper.runCommand(commandLine, workingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);

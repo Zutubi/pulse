@@ -6,18 +6,25 @@ package com.zutubi.pulse.core.events;
 public class RecipeCommencedEvent extends RecipeEvent
 {
     private String name;
+    private String baseDir;
     private long startTime;
 
-    public RecipeCommencedEvent(Object source, long recipeId, String name, long startTime)
+    public RecipeCommencedEvent(Object source, long recipeId, String name, String baseDir, long startTime)
     {
         super(source, recipeId);
         this.name = name;
+        this.baseDir = baseDir;
         this.startTime = startTime;
     }
 
     public String getName()
     {
         return name;
+    }
+
+    public String getBaseDir()
+    {
+        return baseDir;
     }
 
     public long getStartTime()
@@ -46,6 +53,11 @@ public class RecipeCommencedEvent extends RecipeEvent
             return false;
         }
 
+        if ((baseDir != null ? !baseDir.equals(event.baseDir) : event.baseDir != null))
+        {
+            return false;
+        }
+
         return !(name != null ? !name.equals(event.name) : event.name != null);
     }
 
@@ -53,14 +65,13 @@ public class RecipeCommencedEvent extends RecipeEvent
     {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (baseDir != null ? baseDir.hashCode() : 0);
         result = 31 * result + (int) (startTime ^ (startTime >>> 32));
         return result;
     }
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Commenced Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
+        return "Recipe Commenced Event" + ": " + getRecipeId();
     }    
 }

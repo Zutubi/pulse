@@ -6,7 +6,6 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.EventOutputStream;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
@@ -261,9 +260,6 @@ public class SlaveServiceImpl implements SlaveService
         OutputStream outputStream = null;
         try
         {
-            ServerRecipePaths paths = new ServerRecipePaths(context, configurationManager.getUserPaths().getData());
-            context.addString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BASE_DIR, paths.getBaseDir().getAbsolutePath());
-            workingDir = context.resolveVariables(workingDir);
             outputStream = new EventOutputStream(eventManager, false, streamId);
             ProcessWrapper.runCommand(commandLine, workingDir, outputStream, timeout, TimeUnit.SECONDS);
         }
