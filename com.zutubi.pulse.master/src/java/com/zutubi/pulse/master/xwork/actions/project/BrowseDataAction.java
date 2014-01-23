@@ -11,6 +11,10 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Sort;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
 
@@ -19,10 +23,13 @@ import java.util.*;
  */
 public class BrowseDataAction extends ProjectActionSupport
 {
+    public static final String PROPERTY_DISABLE_BROWSE_CONSISTENCY = "pulse.disable.browse.consistency";
+
     private BrowseModel model = new BrowseModel();
 
     private ConfigurationManager configurationManager;
     private TransactionManager pulseTransactionManager;
+    private HibernateTransactionManager transactionManager;
 
     public BrowseModel getModel()
     {
@@ -31,13 +38,42 @@ public class BrowseDataAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        return pulseTransactionManager.runInTransaction(new NullaryFunction<String>()
+        // This Tove transaction gives a consistent view of configuration (nice, potentially not necessary) and avoids
+        // multiple copies of transactional resources (e.g. copy of instance cache structure) which were a performance
+        // issue in Pulse 2.1 days (light testing on 2.6.x suggests this is no longer an issue, and using this outer
+        // transaction may be slower).  The big downside is serialisation: tove transactions currently take a mutex.
+        // Hence we're experimenting with turning it off via a system property.
+        //
+        // An inner Hibernate transaction is used (in assembleModel) so we don't need to create/commit a bunch of
+        // transactions for all the contained manager/dao calls.  There is one commit, and everything should be marked
+        // read only (to avoid costly dirty-checking in Hibernate).
+        if (Boolean.getBoolean(PROPERTY_DISABLE_BROWSE_CONSISTENCY))
         {
-            public String process()
+            return assembleModel();
+        }
+        else
+        {
+            return pulseTransactionManager.runInTransaction(new NullaryFunction<String>()
+            {
+                public String process()
+                {
+                    return assembleModel();
+                }
+            });
+        }
+    }
+
+    private String assembleModel()
+    {
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setReadOnly(true);
+        return template.execute(new TransactionCallback<String>()
+        {
+            public String doInTransaction(TransactionStatus status)
             {
                 User user = getLoggedInUser();
                 model.setProjectsFilter(user == null ? "" : user.getBrowseViewFilter());
-                
+
                 final BrowseViewConfiguration browseConfig = user == null ? new BrowseViewConfiguration() : user.getPreferences().getBrowseView();
                 Set<LabelProjectTuple> collapsed = user == null ? Collections.<LabelProjectTuple>emptySet() : user.getBrowseViewCollapsed();
 
@@ -79,5 +115,10 @@ public class BrowseDataAction extends ProjectActionSupport
     public void setPulseTransactionManager(TransactionManager pulseTransactionManager)
     {
         this.pulseTransactionManager = pulseTransactionManager;
+    }
+
+    public void setTransactionManager(HibernateTransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 }
