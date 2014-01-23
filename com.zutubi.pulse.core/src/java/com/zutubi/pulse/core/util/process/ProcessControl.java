@@ -2,6 +2,9 @@ package com.zutubi.pulse.core.util.process;
 
 import com.google.common.io.CharStreams;
 import com.jezhumble.javasysmon.JavaSysMon;
+import com.jezhumble.javasysmon.OsProcess;
+import com.jezhumble.javasysmon.ProcessInfo;
+import com.jezhumble.javasysmon.ProcessVisitor;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 /**
  * Utilities for controlling external processes.  Includes some
@@ -45,6 +49,7 @@ public class ProcessControl
         if (!initialised)
         {
             javasysmonAvailable = new JavaSysMon().supportedPlatform();
+            LOG.finest("javasysmon is " + (javasysmonAvailable ? "" : "NOT ") + "available");
 
             if (SystemUtils.IS_WINDOWS)
             {
@@ -155,6 +160,7 @@ public class ProcessControl
      */
     public static String destroyProcess(Process p)
     {
+        LOG.finest("destroyProcess(" + p + ")");
         init();
         String method = "Java APIs";
         if (p != null)
@@ -162,23 +168,38 @@ public class ProcessControl
             if (isPidAvailable())
             {
                 int pid = getPid(p);
+                LOG.finest("  pid " + pid);
                 if (pid != 0)
                 {
                     if (taskkillAvailable)
                     {
+                        LOG.finest("  killing with taskkill");
                         method = "taskkill utility";
                         killWithTaskkill(pid);
                     }
                     else if (javasysmonAvailable)
                     {
+                        LOG.finest("  killing with javasysmon");
                         method = "native code";
                         JavaSysMon monitor = new JavaSysMon();
-                        monitor.killProcessTree(pid, false);
+                        monitor.visitProcessTree(pid, new ProcessVisitor()
+                        {
+                            public boolean visit(OsProcess process, int level)
+                            {
+                                ProcessInfo processInfo = process.processInfo();
+                                if (LOG.isLoggable(Level.FINEST))
+                                {
+                                    LOG.finest("    killing process (pid: " + processInfo.getPid() + "; ppid: " +processInfo.getParentPid() + ")");
+                                }
+                                return true;
+                            }
+                        });
                     }
                 }
             }
 
             // Always called, so that any additional cleanup is done.
+            LOG.finest("final destroy");
             p.destroy();
         }
         
@@ -192,6 +213,7 @@ public class ProcessControl
         {
             ProcessBuilder builder = new ProcessBuilder(COMMAND_TASKKILL, FLAG_PID, Integer.toString(pid), FLAG_FORCE, FLAG_TREE);
             builder.redirectErrorStream(true);
+            LOG.finest("running taskkill: " + builder.command());
             process = builder.start();
             process.getOutputStream().close();
             InputStreamReader outputReader = new InputStreamReader(process.getInputStream());
