@@ -659,10 +659,12 @@ public class GitClient implements ScmClient
             List<String> command = new LinkedList<String>();
             command.add(git.getGitCommand());
             command.add(COMMAND_LOG);
-            command.add("-1");
+            command.add(FLAG_CHANGES);
+            command.add(Integer.toString(1));
             command.add(FLAG_AUTHOR);
             command.add("^" + user);
             command.add(FLAG_PRETTY + "=format:%ae");
+            command.add(getRemoteBranchRef());
             ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
             git.runWithHandler(handler, null, false, command.toArray(new String[command.size()]));
 
