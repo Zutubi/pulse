@@ -69,6 +69,7 @@ public class GitConstants
 
     // Command flags.
 
+    public static final String FLAG_AUTHOR = "--author";
     public static final String FLAG_BRANCH = "-b";
     public static final String FLAG_DEPTH = "--depth";
     public static final String FLAG_FORCE = "-f";

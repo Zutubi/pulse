@@ -38,6 +38,7 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -289,6 +290,10 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, event.getBaseDir());
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(event.getStartTime())));
+        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(event.getStartTime()));
+
         if (projectConfiguration.getOptions().getTimeout() != BuildOptionsConfiguration.TIMEOUT_NEVER)
         {
             scheduleTimeout();

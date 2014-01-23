@@ -120,7 +120,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     public void testIgnoresOtherRecipes()
     {
-        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, recipeResult.getId() + 1, "yay", 0)));
+        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, recipeResult.getId() + 1, "yay", "base", 0)));
     }
 
     public void testDispatchRequest()
@@ -165,7 +165,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // A recipe commence event should change the result state, and record
         // the start time.
-        RecipeCommencedEvent event = new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), 10101);
+        RecipeCommencedEvent event = new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), "base", 10101);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
         assertEquals(ResultState.IN_PROGRESS, recipeResult.getState());
