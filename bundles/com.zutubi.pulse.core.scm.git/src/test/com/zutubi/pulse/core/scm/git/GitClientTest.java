@@ -668,6 +668,27 @@ public class GitClientTest extends GitClientTestBase
         assertThat(info, containsString("Edit, add and remove on master"));
     }
 
+    public void testGetEmailLatest() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        String email = client.getEmailAddress(scmContext, "Jason Sankey");
+        assertEquals("jason@zutubi.com", email);
+    }
+
+    public void testGetEmailHistorical() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        String email = client.getEmailAddress(scmContext, "Daniel Ostermeier");
+        assertEquals("daniel@zutubi.com", email);
+    }
+
+    public void testGetEmailUnrecognisedUser() throws ScmException
+    {
+        client.init(scmContext, new ScmFeedbackAdapter());
+        String email = client.getEmailAddress(scmContext, "Who IsThis");
+        assertNull(email);
+    }
+
     private String showTag(final NativeGit nativeGit, final String tagName) throws IOException
     {
         return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()

@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.pulse.core.scm.process.api.ScmLineHandler;
+import com.zutubi.pulse.core.scm.process.api.ScmOutputCapturingHandler;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -15,6 +16,7 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -58,7 +60,7 @@ public class GitClient implements ScmClient
      */
     private static final String TMP_BRANCH_PREFIX = "tmp.";
 
-    private static final Set<ScmCapability> CAPABILITIES = EnumSet.complementOf(EnumSet.of(ScmCapability.EMAIL));
+    private static final Set<ScmCapability> CAPABILITIES = EnumSet.allOf(ScmCapability.class);
 
     private static final Map<String, FileChange.Action> LOG_ACTION_MAPPINGS = new HashMap<String, FileChange.Action>();
 
@@ -649,7 +651,37 @@ public class GitClient implements ScmClient
 
     public String getEmailAddress(ScmContext context, String user) throws ScmException
     {
-        throw new ScmException("Operation not supported");
+        PersistentContext persistentContext = context.getPersistentContext();
+        persistentContext.tryLock(DEFAULT_TIMEOUT, SECONDS);
+        try
+        {
+            NativeGit git = preparePersistentDirectory(context);
+            List<String> command = new LinkedList<String>();
+            command.add(git.getGitCommand());
+            command.add(COMMAND_LOG);
+            command.add("-1");
+            command.add(FLAG_AUTHOR);
+            command.add("^" + user);
+            command.add(FLAG_PRETTY + "=format:%ae");
+            ScmOutputCapturingHandler handler = new ScmOutputCapturingHandler(Charset.defaultCharset());
+            git.runWithHandler(handler, null, false, command.toArray(new String[command.size()]));
+
+            String email = handler.getOutput();
+            if (email != null)
+            {
+                email = email.trim();
+                if (email.length() == 0)
+                {
+                    email = null;
+                }
+            }
+
+            return email;
+        }
+        finally
+        {
+            persistentContext.unlock();
+        }
     }
 
     public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
