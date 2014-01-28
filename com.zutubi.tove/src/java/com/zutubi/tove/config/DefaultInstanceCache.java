@@ -45,13 +45,13 @@ class DefaultInstanceCache implements InstanceCache
 
     public boolean hasInstancesUnder(String path)
     {
-        if(path.length() == 0)
+        if (path.length() == 0)
         {
             return entryState.get(false).size() > 0;
         }
         else
         {
-            return getEntry(path, true, null, false) != null;
+            return walkToEntry(path, true, null, false) != null;
         }
     }
 
@@ -61,7 +61,7 @@ class DefaultInstanceCache implements InstanceCache
         {
             public void run()
             {
-                getEntry(path, true, new UnaryProcedure<Entry>()
+                walkToEntry(path, true, new UnaryProcedure<Entry>()
                 {
                     public void run(Entry entry)
                     {
@@ -74,28 +74,29 @@ class DefaultInstanceCache implements InstanceCache
 
     public boolean isValid(String path, boolean allowIncomplete)
     {
-        DefaultInstanceCache.Entry entry = getEntry(path, allowIncomplete, null, false);
+        DefaultInstanceCache.Entry entry = walkToEntry(path, allowIncomplete, null, false);
         return entry != null && entry.isValid();
     }
 
     public Configuration get(String path, boolean allowIncomplete)
     {
-        Entry entry = getEntry(path, allowIncomplete, null, false);
+        Entry entry = walkToEntry(path, allowIncomplete, null, false);
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f, boolean writable)
+    private Entry walkToEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f, boolean writable)
     {
-        return getEntry(entryState.get(writable), PathUtils.getPathElements(path), 0, allowIncomplete, f);
+        return walkToEntry(entryState.get(writable), PathUtils.getPathElements(path), 0, allowIncomplete, f);
     }
 
-    private Entry getEntry(Entry entry, String[] elements, int index, boolean allowIncomplete, UnaryProcedure<Entry> f)
+    private Entry walkToEntry(Entry entry, String[] elements, int index, boolean allowIncomplete, UnaryProcedure<Entry> f)
     {
-        if(!allowIncomplete && !entry.complete)
+        if (!allowIncomplete && !entry.complete)
         {
             return null;
 
         }
+
         if (f != null)
         {
             f.run(entry);
@@ -107,13 +108,13 @@ class DefaultInstanceCache implements InstanceCache
         }
 
         entry = entry.getChild(elements[index]);
-        return entry == null ? null : getEntry(entry, elements, index + 1, allowIncomplete, f);
+        return entry == null ? null : walkToEntry(entry, elements, index + 1, allowIncomplete, f);
     }
 
     public Collection<Configuration> getAllDescendants(String path, boolean allowIncomplete)
     {
         Collection<Configuration> result = new LinkedList<Configuration>();
-        Entry entry = getEntry(path, allowIncomplete, null, false);
+        Entry entry = walkToEntry(path, allowIncomplete, null, false);
         if (entry != null)
         {
             entry.getAllDescendants(result, allowIncomplete);
@@ -227,7 +228,7 @@ class DefaultInstanceCache implements InstanceCache
             Set<String> result = new HashSet<String>();
             for (String instancePath: instancesReferencing)
             {
-                Entry entry = getEntry(instancePath, true, null, false);
+                Entry entry = walkToEntry(instancePath, true, null, false);
                 for (Map.Entry<String, String> propertyReference: entry.getReferences().entrySet())
                 {
                     if (propertyReference.getValue().equals(path))
@@ -249,12 +250,12 @@ class DefaultInstanceCache implements InstanceCache
             {
                 String propertyPath = PathUtils.getBaseName(fromPropertyPath);
                 String instancePath = PathUtils.getParentPath(fromPropertyPath);
-                Entry entry = getEntry(instancePath, true, null, true);
+                Entry entry = walkToEntry(instancePath, true, null, true);
                 if (entry == null)
                 {
                     propertyPath = PathUtils.getPath(PathUtils.getBaseName(instancePath), propertyPath);
                     instancePath = PathUtils.getParentPath(instancePath);
-                    entry = getEntry(instancePath, true, null, true);
+                    entry = walkToEntry(instancePath, true, null, true);
                 }
 
                 addToReferenceIndex(instancePath, toPath);
@@ -282,7 +283,7 @@ class DefaultInstanceCache implements InstanceCache
         {
             public Boolean process()
             {
-                Entry entry = getEntry(path, true, null, true);
+                Entry entry = walkToEntry(path, true, null, true);
                 if (entry != null && !entry.isDirty())
                 {
                     entry.markDirty();
@@ -369,7 +370,7 @@ class DefaultInstanceCache implements InstanceCache
 
         public void getAllDescendants(Collection<Configuration> result, boolean allowIncomplete)
         {
-            if(instance != null && (complete || allowIncomplete))
+            if (instance != null && (complete || allowIncomplete))
             {
                 result.add(instance);
             }
@@ -383,18 +384,18 @@ class DefaultInstanceCache implements InstanceCache
             }
         }
 
-        public void forAllInstances(Configuration parentInstance, boolean allowIncomplete, String path, InstanceHandler handler)
+        public void forAllInstances(Configuration parentInstance, boolean allowIncomplete, String baseName, InstanceHandler handler)
         {
-            if(instance != null && (complete || allowIncomplete))
+            if (instance != null && (complete || allowIncomplete))
             {
-                handler.handle(instance, path, complete, parentInstance);
+                handler.handle(instance, baseName, complete, parentInstance);
             }
 
             if (children != null)
             {
                 for(Map.Entry<String,Entry> childEntry: children.entrySet())
                 {
-                    childEntry.getValue().forAllInstances(instance, allowIncomplete, PathUtils.getPath(path, childEntry.getKey()), handler);
+                    childEntry.getValue().forAllInstances(instance, allowIncomplete, childEntry.getKey(), handler);
                 }
             }
         }

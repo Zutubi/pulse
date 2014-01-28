@@ -10,6 +10,10 @@ public abstract class AbstractConfiguration implements Configuration
     private Map<String, String> meta = new HashMap<String, String>();
     private String configurationPath;
     private boolean concrete;
+    // This takes advantage of the pseudo-immutability of Configuration instances.  Instances should be constructed and
+    // initialised then never changed afterwards.  Thus they need only be validated once post-initialisation.  At that
+    // point this flag is flipped so we can avoid unnecessary future validation.
+    private boolean validated = false;
     private List<String> instanceErrors = new LinkedList<String>();
     private Map<String, List<String>> fieldErrors = new HashMap<String, List<String>>();
 
@@ -91,6 +95,16 @@ public abstract class AbstractConfiguration implements Configuration
         }
 
         return true;
+    }
+
+    public boolean needsValidation()
+    {
+        return !validated;
+    }
+
+    public void validated()
+    {
+        validated = true;
     }
 
     public List<String> getInstanceErrors()

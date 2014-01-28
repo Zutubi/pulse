@@ -1,12 +1,12 @@
 package com.zutubi.tove.transaction.inmemory;
 
-import com.zutubi.tove.transaction.TransactionResource;
-import com.zutubi.tove.transaction.TransactionManager;
-import com.zutubi.tove.transaction.Transaction;
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.transaction.Transaction;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.transaction.TransactionResource;
 
 /**
- * An implemenation of the {@link TransactionResource} interface that manages
+ * An implementation of the {@link TransactionResource} interface that manages
  * an object in memory.
  *
  * When ever an in memory transaction resource is accessed within the scope

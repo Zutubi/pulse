@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -230,39 +231,48 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
     public void testForAllSingleEntry()
     {
         TestConfiguration foo = new TestConfiguration(1);
+        foo.setConfigurationPath("foo");
         cache.put("foo", foo, true);
-        forAllHelper(new CollectingHandler.Entry(foo, "foo", null));
+        forAllHelper(new CollectingHandler.Entry(foo, null));
     }
 
     public void testForAllNestedEntry()
     {
         TestConfiguration foo = new TestConfiguration(1);
+        foo.setConfigurationPath("foo");
         TestConfiguration fooBar = new TestConfiguration(2);
+        fooBar.setConfigurationPath("foo/bar");
         cache.put("foo", foo, true);
         cache.put("foo/bar", fooBar, true);
-        forAllHelper(new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBar, "foo/bar", foo));
+        forAllHelper(new CollectingHandler.Entry(foo, null), new CollectingHandler.Entry(fooBar, foo));
     }
 
     public void testForAllHoleInPath()
     {
         TestConfiguration foo = new TestConfiguration(1);
+        foo.setConfigurationPath("foo");
         TestConfiguration fooBarBaz = new TestConfiguration(2);
+        fooBarBaz.setConfigurationPath("foo/bar/baz");
         cache.put("foo", foo, true);
         cache.put("foo/bar/baz", fooBarBaz, true);
-        forAllHelper(new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBarBaz, "foo/bar/baz", null));
+        forAllHelper(new CollectingHandler.Entry(foo, null), new CollectingHandler.Entry(fooBarBaz, null));
     }
 
     public void testForAllMultipleRoots()
     {
         TestConfiguration foo = new TestConfiguration(1);
+        foo.setConfigurationPath("foo");
         TestConfiguration fooBar = new TestConfiguration(2);
+        fooBar.setConfigurationPath("foo/bar");
         TestConfiguration baz = new TestConfiguration(3);
+        baz.setConfigurationPath("baz");
         TestConfiguration bazQuux = new TestConfiguration(4);
+        bazQuux.setConfigurationPath("baz/quux");
         cache.put("foo", foo, true);
         cache.put("foo/bar", fooBar, true);
         cache.put("baz", baz, true);
         cache.put("baz/quux", bazQuux, true);
-        forAllHelper(new CollectingHandler.Entry(baz, "baz", null), new CollectingHandler.Entry(bazQuux, "baz/quux", baz), new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBar, "foo/bar", foo));
+        forAllHelper(new CollectingHandler.Entry(baz, null), new CollectingHandler.Entry(bazQuux, baz), new CollectingHandler.Entry(foo, null), new CollectingHandler.Entry(fooBar, foo));
     }
 
     public void testClearDirtyEmpty()
@@ -413,7 +423,7 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
         {
             public int compare(CollectingHandler.Entry o1, CollectingHandler.Entry o2)
             {
-                return stringComp.compare(o1.path, o2.path);
+                return stringComp.compare(o1.instance.getConfigurationPath(), o2.instance.getConfigurationPath());
             }
         });
         int i = 0;
@@ -442,21 +452,19 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
     {
         List<Entry> entries = new LinkedList<Entry>();
 
-        public void handle(Configuration instance, String path, boolean complete, Configuration parentInstance)
+        public void handle(Configuration instance, String baseName, boolean complete, Configuration parentInstance)
         {
-            entries.add(new Entry(instance, path, parentInstance));
+            entries.add(new Entry(instance, parentInstance));
         }
 
         static class Entry
         {
             Configuration instance;
-            String path;
             Configuration parentInstance;
 
-            public Entry(Configuration instance, String path, Configuration parentInstance)
+            public Entry(Configuration instance, Configuration parentInstance)
             {
                 this.instance = instance;
-                this.path = path;
                 this.parentInstance = parentInstance;
             }
 
@@ -472,14 +480,13 @@ public class DefaultInstanceCacheTest extends ZutubiTestCase
                 }
 
                 Entry entry = (Entry) o;
-                return instance.equals(entry.instance) && !(parentInstance != null ? !parentInstance.equals(entry.parentInstance) : entry.parentInstance != null) && path.equals(entry.path);
+                return instance.equals(entry.instance) && Objects.equal(instance.getConfigurationPath(), entry.instance.getConfigurationPath()) && !(parentInstance != null ? !parentInstance.equals(entry.parentInstance) : entry.parentInstance != null);
             }
 
             public int hashCode()
             {
                 int result;
                 result = instance.hashCode();
-                result = 31 * result + path.hashCode();
                 result = 31 * result + (parentInstance != null ? parentInstance.hashCode() : 0);
                 return result;
             }

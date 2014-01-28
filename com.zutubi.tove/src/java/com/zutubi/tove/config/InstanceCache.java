@@ -15,6 +15,13 @@ public interface InstanceCache
 
     boolean isValid(String path, boolean allowIncomplete);
 
+    /**
+     * Retrieves all instances at or under the given path (i.e. descendants in the configuration path sense).
+     *
+     * @param path the path to get instances under
+     * @param allowIncomplete if true, instances marked incomplete may be returned, if false, they may not
+     * @return all instances under the given path
+     */
     Collection<Configuration> getAllDescendants(String path, boolean allowIncomplete);
 
     /**
@@ -94,6 +101,6 @@ public interface InstanceCache
 
     public static interface InstanceHandler
     {
-        void handle(Configuration instance, String path, boolean complete, Configuration parentInstance);
+        void handle(Configuration instance, String baseName, boolean complete, Configuration parentInstance);
     }
 }

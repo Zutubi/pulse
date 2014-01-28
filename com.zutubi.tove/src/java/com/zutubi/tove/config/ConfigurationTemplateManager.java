@@ -888,16 +888,21 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
     {
         instances.forAllInstances(new InstanceCache.InstanceHandler()
         {
-            public void handle(Configuration instance, String path, boolean complete, Configuration parentInstance)
+            public void handle(Configuration instance, String baseName, boolean complete, Configuration parentInstance)
             {
                 CompositeType type = typeRegistry.getType(instance.getClass());
                 if (type != null)
                 {
-                    // Then we have a composite
-                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), complete, true, false, null);
-                    if (!instance.isValid())
+                    // We have a composite, if it has never been validated then do so now and mark it as done.
+                    if (instance.needsValidation())
                     {
-                        instances.markInvalid(path);
+                        validateInstance(type, instance, parentInstance == null ? null : parentInstance.getConfigurationPath(), baseName, complete, true, false, null);
+                        if (!instance.isValid())
+                        {
+                            instances.markInvalid(instance.getConfigurationPath());
+                        }
+
+                        instance.validated();
                     }
                 }
             }
@@ -1548,7 +1553,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 ensureReadOnlyFieldsUnaltered(type, existingRecord, record);
 
-                MutableRecord newRecord = updateRecord(path, existingRecord, record);
+                MutableRecord newRecord = updateRecord(existingRecord, record);
                 boolean updated = true;
                 if (newPath.equals(path))
                 {
@@ -1702,7 +1707,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
     }
 
-    private MutableRecord updateRecord(String path, Record existingRecord, MutableRecord updates)
+    private MutableRecord updateRecord(Record existingRecord, MutableRecord updates)
     {
         MutableRecord newRecord;
         if (existingRecord instanceof TemplateRecord)
@@ -2549,10 +2554,6 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      */
     public Configuration getInstance(String path)
     {
-        if (instances == null)
-        {
-            return null;
-        }
         return instances.get(path, true);
     }
 
@@ -3017,13 +3018,10 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         }
         else
         {
-            if (instances != null)
+            Collection<Configuration> descendants = instances.getAllDescendants(((RecordDeletedEvent) event).getPath(), true);
+            for (Configuration c: descendants)
             {
-                Collection<Configuration> descendants = instances.getAllDescendants(((RecordDeletedEvent) event).getPath(), true);
-                for (Configuration c: descendants)
-                {
-                    markDirty(c.getConfigurationPath());
-                }
+                markDirty(c.getConfigurationPath());
             }
         }
     }

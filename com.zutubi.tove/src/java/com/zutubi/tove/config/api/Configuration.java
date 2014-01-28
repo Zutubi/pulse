@@ -88,6 +88,16 @@ public interface Configuration
     boolean isValid();
 
     /**
+     * @return true if this instance has not yet been validated
+     */
+    boolean needsValidation();
+
+    /**
+     * Mark this instance as validated, so it no longe {@link #needsValidation()}.
+     */
+    void validated();
+
+    /**
      * @return the list of errors associated directly with the instance, not with any particular field.
      * This will return an empty list if there are no instance errors.
      */
