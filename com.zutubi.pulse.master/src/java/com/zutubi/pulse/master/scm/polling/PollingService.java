@@ -218,7 +218,7 @@ public class PollingService implements Stoppable
         // we encounter it, we ignore it and stop following that path.  We pick up all of the
         // necessary nodes because we always look up and downstream of a node the first time we
         // find it.
-        if (!tree.contains(project))
+        if (project != null && !tree.contains(project))
         {
             tree.add(project);
 
