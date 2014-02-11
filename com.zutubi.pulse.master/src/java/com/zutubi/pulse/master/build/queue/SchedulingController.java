@@ -496,7 +496,7 @@ public class SchedulingController
      *
      * @return the currently activated request count.
      */
-    public int getActivedRequestCount()
+    public int getActivatedRequestCount()
     {
         return buildQueue.getActivatedRequestCount();
     }
