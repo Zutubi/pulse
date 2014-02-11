@@ -401,7 +401,7 @@ public class PollingService implements Stoppable
         {
             // A simple topological sort: make sure everything upstream of a project (transitively) is added to the
             // result before that project is.
-            if (!sorted.contains(project))
+            if (sorted != null && !sorted.contains(project))
             {
                 for (DependencyConfiguration dependency : project.getConfig().getDependencies().getDependencies())
                 {
