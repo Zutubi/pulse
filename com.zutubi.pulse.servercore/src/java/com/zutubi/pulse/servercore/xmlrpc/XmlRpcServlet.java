@@ -1,10 +1,6 @@
 package com.zutubi.pulse.servercore.xmlrpc;
 
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.reflection.ReflectionUtils;
-import org.apache.xmlrpc.XmlRpcHandlerMapping;
 import org.apache.xmlrpc.XmlRpcServer;
-import org.apache.xmlrpc.XmlRpcWorker;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,31 +12,12 @@ import java.io.OutputStream;
 
 public class XmlRpcServlet extends HttpServlet
 {
-    private static final Logger LOG = Logger.getLogger(XmlRpcServlet.class);
-
     protected XmlRpcServer xmlrpc = null;
 
     public void init(ServletConfig config) throws ServletException
     {
         super.init(config);
-        xmlrpc = new XmlRpcServer()
-        {
-            protected XmlRpcWorker createWorker()
-            {
-                XmlRpcWorker worker = super.createWorker();
-                try
-                {
-                    // extract the handler mapping - stupid i know, but there are limited options.
-                    XmlRpcHandlerMapping handlerMapping = (XmlRpcHandlerMapping) ReflectionUtils.getFieldValue(worker, "handlerMapping");
-                    return new PulseXmlRpcWorker(handlerMapping);
-                }
-                catch (Exception e)
-                {
-                    LOG.warning(e);
-                    return worker;
-                }
-            }
-        };
+        xmlrpc = new PulseXmlRpcServer();
     }
 
     public void destroy()
