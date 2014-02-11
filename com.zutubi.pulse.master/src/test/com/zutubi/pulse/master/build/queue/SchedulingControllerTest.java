@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
@@ -256,6 +258,40 @@ public class SchedulingControllerTest extends BaseQueueTestCase
 
         assertActivated(requestA);
         assertQueued();
+    }
+
+    public void testCancelQueuedRequestCancelsDownstream()
+    {
+        Project projectA = createProject("a");
+        Project projectB = createProject("b", dependency(projectA));
+        Project projectC = createProject("c", dependency(projectB));
+        Project projectD = createProject("d", dependency(projectC));
+        Project projectE = createProject("e", dependency(projectC));
+
+        BuildRequestEvent requestA = createRequest(projectA);
+        controller.handleBuildRequest(requestA);
+
+        assertActivated(requestA);
+        List<QueuedRequest> queuedRequests = controller.getSnapshot().getQueuedRequests();
+        assertEquals(4, queuedRequests.size());
+        assertRequestQueuedFor(projectB, queuedRequests);
+        QueuedRequest requestC = assertRequestQueuedFor(projectC, queuedRequests);
+        assertRequestQueuedFor(projectD, queuedRequests);
+        assertRequestQueuedFor(projectE, queuedRequests);
+
+        assertTrue(controller.cancelRequest(requestC.getRequest().getId()));
+
+        assertActivated(requestA);
+        queuedRequests = controller.getSnapshot().getQueuedRequests();
+        assertEquals(1, queuedRequests.size());
+        assertRequestQueuedFor(projectB, queuedRequests);
+    }
+
+    private QueuedRequest assertRequestQueuedFor(Project project, List<QueuedRequest> queuedRequests)
+    {
+        Optional<QueuedRequest> found = Iterables.tryFind(queuedRequests, new HasOwnerPredicate<QueuedRequest>(project));
+        assertTrue(found.isPresent());
+        return found.get();
     }
 
     public void testCancelAllRequests()
