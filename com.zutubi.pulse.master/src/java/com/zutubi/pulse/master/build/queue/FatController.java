@@ -158,7 +158,7 @@ public class FatController implements EventListener, Stoppable
             {
                 // Wait for builds to complete
                 LOG.info("Waiting for running builds to complete...");
-                while (schedulingController.getActivedRequestCount() > 0)
+                while (schedulingController.getActivatedRequestCount() > 0)
                 {
                     try
                     {
@@ -227,7 +227,7 @@ public class FatController implements EventListener, Stoppable
         try
         {
             schedulingController.handleBuildCompleted(event);
-            if (schedulingController.getActivedRequestCount() == 0)
+            if (schedulingController.getActivatedRequestCount() == 0)
             {
                 stoppedCondition.signalAll();
             }

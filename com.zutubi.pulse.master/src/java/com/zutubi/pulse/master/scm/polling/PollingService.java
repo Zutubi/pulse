@@ -218,7 +218,7 @@ public class PollingService implements Stoppable
         // we encounter it, we ignore it and stop following that path.  We pick up all of the
         // necessary nodes because we always look up and downstream of a node the first time we
         // find it.
-        if (!tree.contains(project))
+        if (project != null && !tree.contains(project))
         {
             tree.add(project);
 
@@ -401,7 +401,7 @@ public class PollingService implements Stoppable
         {
             // A simple topological sort: make sure everything upstream of a project (transitively) is added to the
             // result before that project is.
-            if (!sorted.contains(project))
+            if (sorted != null && !sorted.contains(project))
             {
                 for (DependencyConfiguration dependency : project.getConfig().getDependencies().getDependencies())
                 {

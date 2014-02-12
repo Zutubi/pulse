@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
@@ -213,7 +214,7 @@ public class SchedulingController
             {
                 public boolean apply(QueuedRequest queuedRequest)
                 {
-                    List<Object> dependsOn = queuedRequest.getDependentOwners();
+                    Set<Object> dependsOn = queuedRequest.getDependentOwners();
                     for (Object owner : dependsOn)
                     {
                         if (rejectedOwners.contains(owner))
@@ -291,7 +292,7 @@ public class SchedulingController
                         new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId()),
                         new HasDependencyOnPredicate(buildQueue, requestToComplete.getOwner())
                 );
-                
+
                 requestsToComplete.addAll(filter(buildQueue.getQueuedRequests(), toCancelPredicate));
             }
             internalCompleteRequests(requestHandler, requestsToComplete);
@@ -438,7 +439,7 @@ public class SchedulingController
             {
                 for (QueuedRequest request : buildQueue.getQueuedRequests())
                 {
-                    cancelledCount += cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()));
+                    cancelledCount += cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()), null);
                 }
             }
             finally
@@ -456,7 +457,7 @@ public class SchedulingController
                 lock.lock();
                 try
                 {
-                    cancelledCount = cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()));
+                    cancelledCount = cancelRequestsForMetaBuild(handlers.get(request.getMetaBuildId()), request.getOwner());
                 }
                 finally
                 {
@@ -468,14 +469,27 @@ public class SchedulingController
         return cancelledCount > 0;
     }
 
-    private int cancelRequestsForMetaBuild(BuildRequestHandler requestHandler)
+    private int cancelRequestsForMetaBuild(BuildRequestHandler requestHandler, NamedEntity ownerOfCancelledRequest)
     {
         if (requestHandler != null)
         {
-            List<RequestHolder> requests = buildQueue.getMetaBuildRequests(requestHandler.getMetaBuildId());
-            Collection<RequestHolder> queuedRequests = filter(requests, Predicates.instanceOf(QueuedRequest.class));
-            internalCompleteRequests(requestHandler, queuedRequests);
-            return queuedRequests.size();
+            List<RequestHolder> requestsToComplete = new LinkedList<RequestHolder>();
+            Predicate<QueuedRequest> toCancelPredicate = new HasMetaIdPredicate<QueuedRequest>(requestHandler.getMetaBuildId());
+            if (ownerOfCancelledRequest != null)
+            {
+                // Only cancel builds downstream of this one (CIB-3101).
+                toCancelPredicate = Predicates.and(
+                        toCancelPredicate,
+                        Predicates.or(
+                                new HasOwnerPredicate<QueuedRequest>(ownerOfCancelledRequest),
+                                new HasDependencyOnPredicate(buildQueue, ownerOfCancelledRequest)
+                        )
+                );
+            }
+
+            requestsToComplete.addAll(filter(buildQueue.getQueuedRequests(), toCancelPredicate));
+            internalCompleteRequests(requestHandler, requestsToComplete);
+            return requestsToComplete.size();
         }
         else
         {
@@ -496,7 +510,7 @@ public class SchedulingController
      *
      * @return the currently activated request count.
      */
-    public int getActivedRequestCount()
+    public int getActivatedRequestCount()
     {
         return buildQueue.getActivatedRequestCount();
     }

@@ -3,9 +3,7 @@ package com.zutubi.pulse.master.build.queue;
 import com.google.common.base.Predicate;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The queued request holds the details of a build request that is
@@ -89,9 +87,15 @@ public class QueuedRequest extends RequestHolder
         return false;
     }
 
-    public List<Object> getDependentOwners()
+    /**
+     * Collects the owners (projects) from all build requests that this request is directly
+     * dependent on.
+     *
+     * @return the set of all owners that this request depends on builds of
+     */
+    public Set<Object> getDependentOwners()
     {
-        List<Object> dependentOwners = new LinkedList<Object>();
+        Set<Object> dependentOwners = new HashSet<Object>();
         for (Predicate predicate : predicates)
         {
             if (predicate instanceof DependencyPredicate)
