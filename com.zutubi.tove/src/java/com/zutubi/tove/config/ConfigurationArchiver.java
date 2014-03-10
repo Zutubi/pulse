@@ -7,6 +7,7 @@ import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
 import java.util.*;
@@ -220,7 +221,7 @@ public class ConfigurationArchiver
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         MutableRecord record = serialiser.deserialise(file);
         final ArchiveRecord archiveRecord = new ArchiveRecord(record);
-        versionChecker.checkVersion(archiveRecord.getVersion());
+//        versionChecker.checkVersion(archiveRecord.getVersion());
         verifyScopes(file, archiveRecord);
         return archiveRecord;
     }
@@ -329,12 +330,12 @@ public class ConfigurationArchiver
                 }
             }
 
+            String toUpdatePath = PathUtils.getParentPath(refererPath);
+            CompositeType type = configurationTemplateManager.getType(toUpdatePath, CompositeType.class);
+            TypeProperty property = type.getProperty(PathUtils.getBaseName(refererPath));
             if (!newRefereeHandles.isEmpty())
             {
-                String toUpdatePath = PathUtils.getParentPath(refererPath);
                 MutableRecord toUpdate = configurationTemplateManager.getRecord(toUpdatePath).copy(false, true);
-                CompositeType type = configurationTemplateManager.getType(toUpdatePath, CompositeType.class);
-                TypeProperty property = type.getProperty(PathUtils.getBaseName(refererPath));
                 if (property.getType() instanceof CollectionType)
                 {
                     toUpdate.put(property.getName(), newRefereeHandles.toArray(new String[newRefereeHandles.size()]));
@@ -345,6 +346,12 @@ public class ConfigurationArchiver
                 }
 
                 configurationTemplateManager.saveRecord(toUpdatePath, toUpdate);
+            }
+            else if (property.getAnnotation(Required.class) != null)
+            {
+                // Rather than just removing the reference, remove the whole record (as it is
+                // invalid without this reference anyway).
+                configurationTemplateManager.delete(toUpdatePath);
             }
         }
     }

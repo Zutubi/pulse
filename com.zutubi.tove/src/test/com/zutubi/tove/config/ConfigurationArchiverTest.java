@@ -9,12 +9,10 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCase
 {
@@ -23,6 +21,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
     private static final String SCOPE_PLAIN = "plain";
     private static final String SCOPE_TEMPLATED = "templated";
+    private static final String SCOPE_GROUPS = "groups";
 
     private static final String NAME_ROOT = "root";
 
@@ -31,6 +30,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
     private File archiveFile;
 
     private String rootPath;
+    private String allUsersPath;
 
     @Override
     public void setUp() throws Exception
@@ -41,12 +41,18 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         configurationArchiver.setConfigurationTemplateManager(configurationTemplateManager);
         configurationArchiver.setConfigurationHealthChecker(configurationHealthChecker);
 
+        CompositeType groupType = typeRegistry.register(ArchiveGroup.class);
+        configurationPersistenceManager.register(SCOPE_GROUPS, new MapType(groupType, typeRegistry));
+
         CompositeType projectType = typeRegistry.register(ArchiveProject.class);
         MapType plainMap = new MapType(projectType, typeRegistry);
         MapType templatedMap = new TemplatedMapType(projectType, typeRegistry);
 
         configurationPersistenceManager.register(SCOPE_PLAIN, plainMap);
         configurationPersistenceManager.register(SCOPE_TEMPLATED, templatedMap);
+
+        MutableRecord allUsers = unstantiate(new ArchiveGroup("all users"));
+        allUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, allUsers);
 
         MutableRecord root = unstantiate(new ArchiveProject(NAME_ROOT));
         configurationTemplateManager.markAsTemplate(root);
@@ -207,6 +213,9 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         downstream.addTrigger(trigger);
         downstream.getDependencies().addProject(upstream);
 
+        ArchiveGroup allUsers = configurationTemplateManager.getInstance(allUsersPath, ArchiveGroup.class);
+        downstream.getPermissions().add(new ArchiveProjectAcl(allUsers));
+
         String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
         downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
 
@@ -215,6 +224,8 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
         assertNull(restoredTrigger.getProject());
         assertEquals(0, restoredDownstream.getDependencies().getProjects().size());
+
+        assertEquals(0, restoredDownstream.getPermissions().size());
     }
 
     public void testReferencesToInsideArchive()
@@ -319,6 +330,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         private ArchiveScm scm;
         private Map<String, ArchiveTrigger> triggers = new ConfigurationMap<ArchiveTrigger>();
         private ArchiveDependencies dependencies = new ArchiveDependencies();
+        private List<ArchiveProjectAcl> permissions = new ConfigurationList<ArchiveProjectAcl>();
 
         public ArchiveProject()
         {
@@ -382,6 +394,16 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void setDependencies(ArchiveDependencies dependencies)
         {
             this.dependencies = dependencies;
+        }
+
+        public List<ArchiveProjectAcl> getPermissions()
+        {
+            return permissions;
+        }
+
+        public void setPermissions(List<ArchiveProjectAcl> permissions)
+        {
+            this.permissions = permissions;
         }
     }
 
@@ -453,6 +475,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         }
     }
 
+
     @SymbolicName("abuildcompletedtrigger")
     public static class ArchiveBuildCompletedTrigger extends ArchiveTrigger
     {
@@ -490,6 +513,43 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         }
     }
 
+    @SymbolicName("aacl")
+    public static class ArchiveProjectAcl extends AbstractConfiguration
+    {
+        @Reference @Required
+        private ArchiveGroup group;
+        private List<String> allowedActions = new LinkedList<String>();
+
+        public ArchiveProjectAcl()
+        {
+        }
+
+        public ArchiveProjectAcl(ArchiveGroup group)
+        {
+            this.group = group;
+        }
+
+        public ArchiveGroup getGroup()
+        {
+            return group;
+        }
+
+        public void setGroup(ArchiveGroup group)
+        {
+            this.group = group;
+        }
+
+        public List<String> getAllowedActions()
+        {
+            return allowedActions;
+        }
+
+        public void setAllowedActions(List<String> allowedActions)
+        {
+            this.allowedActions = allowedActions;
+        }
+    }
+
     @SymbolicName("adependencies")
     public static class ArchiveDependencies extends AbstractConfiguration
     {
@@ -517,6 +577,19 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void checkVersion(String version) throws ToveRuntimeException
         {
             assertEquals(VERSION, version);
+        }
+    }
+
+    @SymbolicName("agroup")
+    public static class ArchiveGroup extends AbstractNamedConfiguration
+    {
+        public ArchiveGroup()
+        {
+        }
+
+        public ArchiveGroup(String name)
+        {
+            super(name);
         }
     }
 }
