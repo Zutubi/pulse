@@ -38,7 +38,9 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         super.setUp();
 
         configurationArchiver = new ConfigurationArchiver();
+        configurationArchiver.setRecordManager(recordManager);
         configurationArchiver.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationArchiver.setConfigurationReferenceManager(configurationReferenceManager);
         configurationArchiver.setConfigurationHealthChecker(configurationHealthChecker);
 
         CompositeType groupType = typeRegistry.register(ArchiveGroup.class);
@@ -54,7 +56,10 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         MutableRecord allUsers = unstantiate(new ArchiveGroup("all users"));
         allUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, allUsers);
 
-        MutableRecord root = unstantiate(new ArchiveProject(NAME_ROOT));
+        ArchiveProject rootProject = new ArchiveProject(NAME_ROOT);
+        rootProject.addPostProcessor(new ArchivePostProcessor("ant.pp"));
+
+        MutableRecord root = unstantiate(rootProject);
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, root);
 
@@ -252,6 +257,22 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertSame(restoredUpstream, restoredDownstream.getDependencies().getProjects().iterator().next());
     }
 
+    public void testReferencesToInsideArchiveViaInheritance()
+    {
+        ArchiveProject root = configurationTemplateManager.getInstance(rootPath, ArchiveProject.class);
+
+        ArchiveProject project = new ArchiveProject("pro");
+        ArchivePostProcessor processor = root.getPostProcessors().get("ant.pp");
+        project.getProcessorRefs().add(processor);
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(1, restoredProject.getProcessorRefs().size());
+        assertEquals(processor.getName(), restoredProject.getProcessorRefs().get(0).getName());
+    }
+
     public void testImportWithIncompatibleTypes()
     {
         ArchiveProject project = new ArchiveProject("p");
@@ -329,6 +350,10 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         private ArchiveOptions options = new ArchiveOptions();
         private ArchiveScm scm;
         private Map<String, ArchiveTrigger> triggers = new ConfigurationMap<ArchiveTrigger>();
+        private Map<String, ArchivePostProcessor> postProcessors = new ConfigurationMap<ArchivePostProcessor>();
+        // Naff but I don't want to replicate recipes just for an internal reference.
+        @Reference
+        private List<ArchivePostProcessor> processorRefs = new ConfigurationList<ArchivePostProcessor>();
         private ArchiveDependencies dependencies = new ArchiveDependencies();
         private List<ArchiveProjectAcl> permissions = new ConfigurationList<ArchiveProjectAcl>();
 
@@ -384,6 +409,31 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void addTrigger(ArchiveTrigger trigger)
         {
             triggers.put(trigger.getName(), trigger);
+        }
+
+        public Map<String, ArchivePostProcessor> getPostProcessors()
+        {
+            return postProcessors;
+        }
+
+        public void setPostProcessors(Map<String, ArchivePostProcessor> postProcessors)
+        {
+            this.postProcessors = postProcessors;
+        }
+
+        public void addPostProcessor(ArchivePostProcessor archivePostProcessor)
+        {
+            postProcessors.put(archivePostProcessor.getName(), archivePostProcessor);
+        }
+
+        public List<ArchivePostProcessor> getProcessorRefs()
+        {
+            return processorRefs;
+        }
+
+        public void setProcessorRefs(List<ArchivePostProcessor> processorRefs)
+        {
+            this.processorRefs = processorRefs;
         }
 
         public ArchiveDependencies getDependencies()
@@ -510,6 +560,19 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void setCascadeRevision(boolean cascadeRevision)
         {
             this.cascadeRevision = cascadeRevision;
+        }
+    }
+
+    @SymbolicName("apostprocessor")
+    public static class ArchivePostProcessor extends AbstractNamedConfiguration
+    {
+        public ArchivePostProcessor()
+        {
+        }
+
+        public ArchivePostProcessor(String name)
+        {
+            super(name);
         }
     }
 

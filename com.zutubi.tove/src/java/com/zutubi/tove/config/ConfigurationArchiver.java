@@ -17,7 +17,9 @@ import java.util.*;
  */
 public class ConfigurationArchiver
 {
+    private RecordManager recordManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationHealthChecker configurationHealthChecker;
 
     /**
@@ -70,6 +72,9 @@ public class ConfigurationArchiver
 
                 ExternalStateRemovalFunction fn = new ExternalStateRemovalFunction(mapType.getTargetType(), mutableRecord, path);
                 mutableRecord.forEach(fn);
+
+                DecanonicaliseReferencesFunction decon = new DecanonicaliseReferencesFunction(mapType.getTargetType(), mutableRecord, path, recordManager, configurationReferenceManager);
+                mutableRecord.forEach(decon);
 
                 archive.addItem(scope, item, mutableRecord);
             }
@@ -221,7 +226,7 @@ public class ConfigurationArchiver
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         MutableRecord record = serialiser.deserialise(file);
         final ArchiveRecord archiveRecord = new ArchiveRecord(record);
-//        versionChecker.checkVersion(archiveRecord.getVersion());
+        versionChecker.checkVersion(archiveRecord.getVersion());
         verifyScopes(file, archiveRecord);
         return archiveRecord;
     }
@@ -356,9 +361,19 @@ public class ConfigurationArchiver
         }
     }
 
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
     }
 
     public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)
