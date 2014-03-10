@@ -1,20 +1,20 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCase
 {
@@ -23,6 +23,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
     private static final String SCOPE_PLAIN = "plain";
     private static final String SCOPE_TEMPLATED = "templated";
+    private static final String SCOPE_GROUPS = "groups";
 
     private static final String NAME_ROOT = "root";
 
@@ -31,6 +32,8 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
     private File archiveFile;
 
     private String rootPath;
+    private String allUsersPath;
+    private String anonUsersPath;
 
     @Override
     public void setUp() throws Exception
@@ -38,8 +41,13 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         super.setUp();
 
         configurationArchiver = new ConfigurationArchiver();
+        configurationArchiver.setRecordManager(recordManager);
         configurationArchiver.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationArchiver.setConfigurationReferenceManager(configurationReferenceManager);
         configurationArchiver.setConfigurationHealthChecker(configurationHealthChecker);
+
+        CompositeType groupType = typeRegistry.register(ArchiveGroup.class);
+        configurationPersistenceManager.register(SCOPE_GROUPS, new MapType(groupType, typeRegistry));
 
         CompositeType projectType = typeRegistry.register(ArchiveProject.class);
         MapType plainMap = new MapType(projectType, typeRegistry);
@@ -48,7 +56,15 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         configurationPersistenceManager.register(SCOPE_PLAIN, plainMap);
         configurationPersistenceManager.register(SCOPE_TEMPLATED, templatedMap);
 
-        MutableRecord root = unstantiate(new ArchiveProject(NAME_ROOT));
+        MutableRecord allUsers = unstantiate(new ArchiveGroup("all users"));
+        allUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, allUsers);
+        MutableRecord anonUsers = unstantiate(new ArchiveGroup("anonymous users"));
+        anonUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, anonUsers);
+
+        ArchiveProject rootProject = new ArchiveProject(NAME_ROOT);
+        rootProject.addPostProcessor(new ArchivePostProcessor("ant.pp"));
+
+        MutableRecord root = unstantiate(rootProject);
         configurationTemplateManager.markAsTemplate(root);
         rootPath = configurationTemplateManager.insertRecord(SCOPE_TEMPLATED, root);
 
@@ -207,6 +223,9 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         downstream.addTrigger(trigger);
         downstream.getDependencies().addProject(upstream);
 
+        ArchiveGroup allUsers = configurationTemplateManager.getInstance(allUsersPath, ArchiveGroup.class);
+        downstream.getPermissions().add(new ArchiveProjectAcl(allUsers));
+
         String downstreamPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, downstream, rootPath, false);
         downstream = configurationTemplateManager.getInstance(downstreamPath, ArchiveProject.class);
 
@@ -215,6 +234,8 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         ArchiveBuildCompletedTrigger restoredTrigger = (ArchiveBuildCompletedTrigger) restoredDownstream.getTriggers().get(trigger.getName());
         assertNull(restoredTrigger.getProject());
         assertEquals(0, restoredDownstream.getDependencies().getProjects().size());
+
+        assertEquals(0, restoredDownstream.getPermissions().size());
     }
 
     public void testReferencesToInsideArchive()
@@ -239,6 +260,78 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertSame(restoredUpstream, restoredTrigger.getProject());
         assertEquals(1, restoredDownstream.getDependencies().getProjects().size());
         assertSame(restoredUpstream, restoredDownstream.getDependencies().getProjects().iterator().next());
+    }
+
+    public void testReferencesToInsideArchiveViaInheritance()
+    {
+        ArchiveProject root = configurationTemplateManager.getInstance(rootPath, ArchiveProject.class);
+
+        ArchiveProject project = new ArchiveProject("pro");
+        ArchivePostProcessor processor = root.getPostProcessors().get("ant.pp");
+        project.getProcessorRefs().add(processor);
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(1, restoredProject.getProcessorRefs().size());
+        assertEquals(processor.getName(), restoredProject.getProcessorRefs().get(0).getName());
+    }
+
+    public void testExplicitOrdersPreserved()
+    {
+        ArchiveProject project = new ArchiveProject("pro");
+        project.addTrigger(new ArchiveScmTrigger("t1"));
+        project.addTrigger(new ArchiveScmTrigger("t2"));
+        project.addTrigger(new ArchiveScmTrigger("t3"));
+        project.addTrigger(new ArchiveScmTrigger("t4"));
+
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        String triggersPath = PathUtils.getPath(projectPath, "triggers");
+        List<String> triggersOrder = shuffleOrder(triggersPath);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(triggersOrder, getOrder(PathUtils.getPath(restoredProject.getConfigurationPath(), "triggers")));
+    }
+
+    public void testInheritedOrdersPreserved()
+    {
+        ArchiveProject root = configurationProvider.deepClone(configurationTemplateManager.getInstance(rootPath, ArchiveProject.class));
+        root.addTrigger(new ArchiveScmTrigger("t1"));
+        root.addTrigger(new ArchiveScmTrigger("t2"));
+        root.addTrigger(new ArchiveScmTrigger("t3"));
+        root.addTrigger(new ArchiveScmTrigger("t4"));
+        configurationTemplateManager.save(root);
+
+        ArchiveProject project = new ArchiveProject("pro");
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        String rootTriggersPath = PathUtils.getPath(rootPath, "triggers");
+        List<String> triggersOrder = shuffleOrder(rootTriggersPath);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(triggersOrder, getOrder(PathUtils.getPath(restoredProject.getConfigurationPath(), "triggers")));
+    }
+
+    private List<String> getOrder(String path)
+    {
+        CollectionType type = configurationTemplateManager.getType(path, CollectionType.class);
+        return type.getOrder(configurationTemplateManager.getRecord(path));
+    }
+
+    private List<String> shuffleOrder(String path)
+    {
+        List<String> order = getOrder(path);
+        Collections.shuffle(order);
+        configurationTemplateManager.setOrder(path, order);
+        return order;
     }
 
     public void testImportWithIncompatibleTypes()
@@ -317,8 +410,14 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         private String description;
         private ArchiveOptions options = new ArchiveOptions();
         private ArchiveScm scm;
+        @Ordered
         private Map<String, ArchiveTrigger> triggers = new ConfigurationMap<ArchiveTrigger>();
+        private Map<String, ArchivePostProcessor> postProcessors = new ConfigurationMap<ArchivePostProcessor>();
+        // Naff but I don't want to replicate recipes just for an internal reference.
+        @Reference
+        private List<ArchivePostProcessor> processorRefs = new ConfigurationList<ArchivePostProcessor>();
         private ArchiveDependencies dependencies = new ArchiveDependencies();
+        private List<ArchiveProjectAcl> permissions = new ConfigurationList<ArchiveProjectAcl>();
 
         public ArchiveProject()
         {
@@ -374,6 +473,31 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
             triggers.put(trigger.getName(), trigger);
         }
 
+        public Map<String, ArchivePostProcessor> getPostProcessors()
+        {
+            return postProcessors;
+        }
+
+        public void setPostProcessors(Map<String, ArchivePostProcessor> postProcessors)
+        {
+            this.postProcessors = postProcessors;
+        }
+
+        public void addPostProcessor(ArchivePostProcessor archivePostProcessor)
+        {
+            postProcessors.put(archivePostProcessor.getName(), archivePostProcessor);
+        }
+
+        public List<ArchivePostProcessor> getProcessorRefs()
+        {
+            return processorRefs;
+        }
+
+        public void setProcessorRefs(List<ArchivePostProcessor> processorRefs)
+        {
+            this.processorRefs = processorRefs;
+        }
+
         public ArchiveDependencies getDependencies()
         {
             return dependencies;
@@ -382,6 +506,16 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void setDependencies(ArchiveDependencies dependencies)
         {
             this.dependencies = dependencies;
+        }
+
+        public List<ArchiveProjectAcl> getPermissions()
+        {
+            return permissions;
+        }
+
+        public void setPermissions(List<ArchiveProjectAcl> permissions)
+        {
+            this.permissions = permissions;
         }
     }
 
@@ -453,6 +587,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         }
     }
 
+
     @SymbolicName("abuildcompletedtrigger")
     public static class ArchiveBuildCompletedTrigger extends ArchiveTrigger
     {
@@ -490,6 +625,56 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         }
     }
 
+    @SymbolicName("apostprocessor")
+    public static class ArchivePostProcessor extends AbstractNamedConfiguration
+    {
+        public ArchivePostProcessor()
+        {
+        }
+
+        public ArchivePostProcessor(String name)
+        {
+            super(name);
+        }
+    }
+
+    @SymbolicName("aacl")
+    public static class ArchiveProjectAcl extends AbstractConfiguration
+    {
+        @Reference @Required
+        private ArchiveGroup group;
+        private List<String> allowedActions = new LinkedList<String>();
+
+        public ArchiveProjectAcl()
+        {
+        }
+
+        public ArchiveProjectAcl(ArchiveGroup group)
+        {
+            this.group = group;
+        }
+
+        public ArchiveGroup getGroup()
+        {
+            return group;
+        }
+
+        public void setGroup(ArchiveGroup group)
+        {
+            this.group = group;
+        }
+
+        public List<String> getAllowedActions()
+        {
+            return allowedActions;
+        }
+
+        public void setAllowedActions(List<String> allowedActions)
+        {
+            this.allowedActions = allowedActions;
+        }
+    }
+
     @SymbolicName("adependencies")
     public static class ArchiveDependencies extends AbstractConfiguration
     {
@@ -517,6 +702,19 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         public void checkVersion(String version) throws ToveRuntimeException
         {
             assertEquals(VERSION, version);
+        }
+    }
+
+    @SymbolicName("agroup")
+    public static class ArchiveGroup extends AbstractNamedConfiguration
+    {
+        public ArchiveGroup()
+        {
+        }
+
+        public ArchiveGroup(String name)
+        {
+            super(name);
         }
     }
 }

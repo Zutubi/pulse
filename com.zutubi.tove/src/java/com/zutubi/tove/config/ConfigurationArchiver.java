@@ -7,6 +7,7 @@ import com.zutubi.tove.config.health.ConfigurationHealthChecker;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
 import java.util.*;
@@ -16,7 +17,9 @@ import java.util.*;
  */
 public class ConfigurationArchiver
 {
+    private RecordManager recordManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationHealthChecker configurationHealthChecker;
 
     /**
@@ -69,6 +72,9 @@ public class ConfigurationArchiver
 
                 ExternalStateRemovalFunction fn = new ExternalStateRemovalFunction(mapType.getTargetType(), mutableRecord, path);
                 mutableRecord.forEach(fn);
+
+                DecanonicaliseReferencesFunction decon = new DecanonicaliseReferencesFunction(mapType.getTargetType(), mutableRecord, path, recordManager, configurationReferenceManager);
+                mutableRecord.forEach(decon);
 
                 archive.addItem(scope, item, mutableRecord);
             }
@@ -329,12 +335,12 @@ public class ConfigurationArchiver
                 }
             }
 
+            String toUpdatePath = PathUtils.getParentPath(refererPath);
+            CompositeType type = configurationTemplateManager.getType(toUpdatePath, CompositeType.class);
+            TypeProperty property = type.getProperty(PathUtils.getBaseName(refererPath));
             if (!newRefereeHandles.isEmpty())
             {
-                String toUpdatePath = PathUtils.getParentPath(refererPath);
                 MutableRecord toUpdate = configurationTemplateManager.getRecord(toUpdatePath).copy(false, true);
-                CompositeType type = configurationTemplateManager.getType(toUpdatePath, CompositeType.class);
-                TypeProperty property = type.getProperty(PathUtils.getBaseName(refererPath));
                 if (property.getType() instanceof CollectionType)
                 {
                     toUpdate.put(property.getName(), newRefereeHandles.toArray(new String[newRefereeHandles.size()]));
@@ -346,12 +352,28 @@ public class ConfigurationArchiver
 
                 configurationTemplateManager.saveRecord(toUpdatePath, toUpdate);
             }
+            else if (property.getAnnotation(Required.class) != null)
+            {
+                // Rather than just removing the reference, remove the whole record (as it is
+                // invalid without this reference anyway).
+                configurationTemplateManager.delete(toUpdatePath);
+            }
         }
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
     }
 
     public void setConfigurationHealthChecker(ConfigurationHealthChecker configurationHealthChecker)

@@ -181,6 +181,7 @@ public class MasterBuildProperties extends BuildProperties
             context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
             for (CommandResult command: recipeResult.getCommandResults())
             {
+                addCommandProperties(context, node, command, configurationManager, includeName);
                 addCompletedCommandProperties(context, node, command, configurationManager, includeName);
             }
         }
