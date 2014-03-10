@@ -312,8 +312,8 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
         project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
 
-        String triggersPath = PathUtils.getPath(projectPath, "triggers");
-        List<String> triggersOrder = shuffleOrder(triggersPath);
+        String rootTriggersPath = PathUtils.getPath(rootPath, "triggers");
+        List<String> triggersOrder = shuffleOrder(rootTriggersPath);
 
         ArchiveProject restoredProject = archiveAndRestore(project);
 
