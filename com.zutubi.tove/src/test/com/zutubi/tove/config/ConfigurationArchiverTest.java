@@ -1,9 +1,11 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.tove.annotations.Ordered;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
+import com.zutubi.tove.type.CollectionType;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
@@ -31,6 +33,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
     private String rootPath;
     private String allUsersPath;
+    private String anonUsersPath;
 
     @Override
     public void setUp() throws Exception
@@ -55,6 +58,8 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
 
         MutableRecord allUsers = unstantiate(new ArchiveGroup("all users"));
         allUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, allUsers);
+        MutableRecord anonUsers = unstantiate(new ArchiveGroup("anonymous users"));
+        anonUsersPath = configurationTemplateManager.insertRecord(SCOPE_GROUPS, anonUsers);
 
         ArchiveProject rootProject = new ArchiveProject(NAME_ROOT);
         rootProject.addPostProcessor(new ArchivePostProcessor("ant.pp"));
@@ -273,6 +278,62 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         assertEquals(processor.getName(), restoredProject.getProcessorRefs().get(0).getName());
     }
 
+    public void testExplicitOrdersPreserved()
+    {
+        ArchiveProject project = new ArchiveProject("pro");
+        project.addTrigger(new ArchiveScmTrigger("t1"));
+        project.addTrigger(new ArchiveScmTrigger("t2"));
+        project.addTrigger(new ArchiveScmTrigger("t3"));
+        project.addTrigger(new ArchiveScmTrigger("t4"));
+
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        String triggersPath = PathUtils.getPath(projectPath, "triggers");
+        List<String> triggersOrder = shuffleOrder(triggersPath);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(triggersOrder, getOrder(PathUtils.getPath(restoredProject.getConfigurationPath(), "triggers")));
+    }
+
+    public void testInheritedOrdersPreserved()
+    {
+        ArchiveProject root = configurationProvider.deepClone(configurationTemplateManager.getInstance(rootPath, ArchiveProject.class));
+        root.addTrigger(new ArchiveScmTrigger("t1"));
+        root.addTrigger(new ArchiveScmTrigger("t2"));
+        root.addTrigger(new ArchiveScmTrigger("t3"));
+        root.addTrigger(new ArchiveScmTrigger("t4"));
+        configurationTemplateManager.save(root);
+
+        ArchiveProject project = new ArchiveProject("pro");
+        String projectPath = configurationTemplateManager.insertTemplatedInstance(SCOPE_TEMPLATED, project, rootPath, false);
+
+        project = configurationTemplateManager.getInstance(projectPath, ArchiveProject.class);
+
+        String triggersPath = PathUtils.getPath(projectPath, "triggers");
+        List<String> triggersOrder = shuffleOrder(triggersPath);
+
+        ArchiveProject restoredProject = archiveAndRestore(project);
+
+        assertEquals(triggersOrder, getOrder(PathUtils.getPath(restoredProject.getConfigurationPath(), "triggers")));
+    }
+
+    private List<String> getOrder(String path)
+    {
+        CollectionType type = configurationTemplateManager.getType(path, CollectionType.class);
+        return type.getOrder(configurationTemplateManager.getRecord(path));
+    }
+
+    private List<String> shuffleOrder(String path)
+    {
+        List<String> order = getOrder(path);
+        Collections.shuffle(order);
+        configurationTemplateManager.setOrder(path, order);
+        return order;
+    }
+
     public void testImportWithIncompatibleTypes()
     {
         ArchiveProject project = new ArchiveProject("p");
@@ -349,6 +410,7 @@ public class ConfigurationArchiverTest extends AbstractConfigurationSystemTestCa
         private String description;
         private ArchiveOptions options = new ArchiveOptions();
         private ArchiveScm scm;
+        @Ordered
         private Map<String, ArchiveTrigger> triggers = new ConfigurationMap<ArchiveTrigger>();
         private Map<String, ArchivePostProcessor> postProcessors = new ConfigurationMap<ArchivePostProcessor>();
         // Naff but I don't want to replicate recipes just for an internal reference.
