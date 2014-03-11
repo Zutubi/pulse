@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class ListType extends CollectionType
 {
-    private static final String META_LIST_KEY = "meta.listKey";
+    public static final String META_LIST_KEY = "meta.listKey";
 
     private HandleAllocator handleAllocator;
 

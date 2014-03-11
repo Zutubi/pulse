@@ -447,6 +447,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationExtensionManager configurationExtensionManager = SpringComponentContext.getBean("configurationExtensionManager");
         ConfigurationStateManager configurationStateManager = SpringComponentContext.getBean("configurationStateManager");
         ConfigurationHealthChecker configurationHealthChecker = SpringComponentContext.getBean("configurationHealthChecker");
+        ConfigurationArchiver configurationArchiver = SpringComponentContext.getBean("configurationArchiver");
 
         recordManager.init();
 
@@ -473,6 +474,7 @@ public class DefaultSetupManager implements SetupManager
         configurationTemplateManager.init();
         
         configurationHealthChecker.setRecordManager(recordManager);
+        configurationArchiver.setRecordManager(recordManager);
 
         LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");
         logConfigurationManager.applyConfig();
