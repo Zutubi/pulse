@@ -18,6 +18,7 @@ import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfigurationActions;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.ListType;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Sort;
@@ -1290,7 +1291,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         String child1Path = rpcClient.RemoteApi.insertSimpleProject(child1, template, false);
         String child2Path = rpcClient.RemoteApi.insertProject(child2, template, false, rpcClient.RemoteApi.getSubversionConfig(Constants.FAIL_ANT_REPOSITORY), rpcClient.RemoteApi.createVersionedConfig("path"));
 
-        Hashtable<String, Object> child2Before = rpcClient.RemoteApi.getConfig(child2Path);
+        Hashtable<String, Object> child2Before = removeListKeys((Hashtable<String, Object>) rpcClient.RemoteApi.getConfig(child2Path));
 
         File temp = FileSystemUtils.createTempFile(getName(), ".tmp", "");
         try
@@ -1312,13 +1313,38 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
             assertTrue(rpcClient.RemoteApi.configPathExists(child2Path));
             assertTrue(rpcClient.RemoteApi.getAllProjectNames().contains(child2));
 
-            Hashtable<String, Object> child2After = rpcClient.RemoteApi.getConfig(child2Path);
+            Hashtable<String, Object> child2After = removeListKeys((Hashtable<String, Object>) rpcClient.RemoteApi.getConfig(child2Path));
             assertEquals(child2Before, child2After);
         }
         finally
         {
             assertTrue(temp.delete());
         }
+    }
+
+    private Hashtable<String, Object> removeListKeys(Hashtable<String, Object> config)
+    {
+        config.remove(ListType.META_LIST_KEY);
+
+        for (Map.Entry<String, Object> entry: config.entrySet())
+        {
+            if (entry.getValue() instanceof Map)
+            {
+                removeListKeys((Hashtable<String, Object>) entry.getValue());
+            }
+            else if (entry.getValue() instanceof Vector)
+            {
+                for (Object item: ((Vector)entry.getValue()))
+                {
+                    if (item instanceof Map)
+                    {
+                        removeListKeys((Hashtable<String, Object>) item);
+                    }
+                }
+            }
+        }
+
+        return config;
     }
 
     private String renameRecipe(String projectPath, String originalName, String newName) throws Exception

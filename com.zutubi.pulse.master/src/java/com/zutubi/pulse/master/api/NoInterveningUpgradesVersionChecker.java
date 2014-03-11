@@ -13,9 +13,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class NoInterveningUpgradesVersionChecker implements ConfigurationArchiver.VersionChecker
 {
+    private static final String DEV_BUILD = "@BUILD_NUMBER@";
+
     public void checkVersion(String version) throws ToveRuntimeException
     {
-        if (version.equals("@BUILD_NUMBER@"))
+        if (version.equals(DEV_BUILD) || Version.getVersion().getBuildNumber().equals(DEV_BUILD))
         {
             // Allow for testing.
             return;
