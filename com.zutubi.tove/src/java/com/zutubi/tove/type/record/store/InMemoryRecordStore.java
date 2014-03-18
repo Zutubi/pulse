@@ -1,6 +1,7 @@
 package com.zutubi.tove.type.record.store;
 
 import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.transaction.inmemory.InMemoryStateWrapper;
 import com.zutubi.tove.transaction.inmemory.InMemoryTransactionResource;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.util.NullaryFunction;
@@ -11,9 +12,9 @@ import java.util.Set;
 public class InMemoryRecordStore implements RecordStore
 {
     private TransactionManager transactionManager;
-    private InMemoryTransactionResource<MutableRecord> state;
+    private InMemoryTransactionResource<RecordHolder> state;
 
-    private MutableRecord base;
+    private RecordHolder holder;
 
     public InMemoryRecordStore()
     {
@@ -26,12 +27,13 @@ public class InMemoryRecordStore implements RecordStore
         {
             throw new IllegalArgumentException();
         }
-        this.base = base;
+
+        holder = new RecordHolder(base);
     }
 
     public void init()
     {
-        state = new InMemoryTransactionResource<MutableRecord>(new MutableRecordStateWrapper(base));
+        state = new InMemoryTransactionResource<RecordHolder>(new TransactionalRecordHolder(holder));
         state.setTransactionManager(transactionManager);
     }
 
@@ -41,9 +43,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public void run()
             {
-                MutableRecord base = state.get(true);
-                isolate(base, PathUtils.getParentPath(path));
-                insert(base, path, record);
+                insert(isolate(path), path, record);
             }
         });
     }
@@ -54,9 +54,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public void run()
             {
-                MutableRecord base = state.get(true);
-                isolate(base, path);
-                update(base, path, record);
+                update(isolate(path), path, record);
             }
         });
     }
@@ -67,22 +65,15 @@ public class InMemoryRecordStore implements RecordStore
         {
             public Record process()
             {
-                MutableRecord base = state.get(true);
-                isolate(base, path);
-                return delete(base, path);
+                return delete(isolate(path), path);
             }
         });
     }
 
     public Record select()
     {
-        MutableRecord root = state.get(false);
-
-        // Copy the root so that we do not need to copy it during the isolation processing.
-        // It is much simpler if we never give out a reference to the root record.
-
         // Ensure the internal integrity by returning an immutable reference to the record.
-        return new ImmutableRecord(root.copy(false, true));
+        return new ImmutableRecord(state.get(false).record);
     }
 
     public Record exportRecords()
@@ -96,7 +87,7 @@ public class InMemoryRecordStore implements RecordStore
         {
             public void run()
             {
-                importRecords(state.get(true), r);
+                importRecords(state.get(true).record, r);
             }
         });
     }
@@ -241,30 +232,64 @@ public class InMemoryRecordStore implements RecordStore
      * Essentially, any existing selected records that have access to the specified path will
      * not see any updates made to that path.
      *
-     * @param path  the path to be isolated
-     * @param root  the base record.
+     * @param path the path to be isolated
+     * @return the new root record
      */
-    private void isolate(MutableRecord root, String path)
+    private MutableRecord isolate(String path)
     {
         String[] pathElements = PathUtils.getPathElements(path);
 
-        MutableRecord parent = root;
+        RecordHolder holder = state.get(true);
+        holder.record = holder.record.copy(false, true);
+        MutableRecord parent = holder.record;
         for (String pathElement : pathElements)
         {
             Record r = (Record) parent.get(pathElement);
             if (r == null)
             {
-                return;
+                return holder.record;
             }
 
             MutableRecord copy = r.copy(false, true);
             parent.put(pathElement, copy);
             parent = copy;
         }
+
+
+        return holder.record;
     }
 
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
+    }
+
+    /**
+     * This simply adds a layer of indirection to the root record, so we don't have to copy the
+     * root record every time we hand it out.  The outside world never sees this holder so we don't
+     * need to copy it when isolating records.
+     */
+    private static class RecordHolder
+    {
+        public MutableRecord record;
+
+        private RecordHolder(MutableRecord record)
+        {
+            this.record = record;
+        }
+    }
+
+    private static class TransactionalRecordHolder extends InMemoryStateWrapper<RecordHolder>
+    {
+        private TransactionalRecordHolder(RecordHolder holder)
+        {
+            super(holder);
+        }
+
+        @Override
+        protected InMemoryStateWrapper<RecordHolder> copy()
+        {
+            return new TransactionalRecordHolder(new RecordHolder(get().record.copy(true, true)));
+        }
     }
 }
