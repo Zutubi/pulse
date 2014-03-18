@@ -17,10 +17,7 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RecordManagerTest extends AbstractTransactionTestCase
 {
@@ -650,6 +647,62 @@ public class RecordManagerTest extends AbstractTransactionTestCase
                 assertEquals("path", recordManager.getPathForHandle(insertedRecord.getHandle()));
             }
         });
+    }
+
+    public void testSelectMatchingPath()
+    {
+        addToBase("a", new MutableRecordImpl());
+        assertNotNull(recordManager.select("a"));
+
+        addToBase("a/b", new MutableRecordImpl());
+        assertNotNull(recordManager.select("a/b"));
+
+        addToBase("b/c/d/e", new MutableRecordImpl());
+        assertNotNull(recordManager.select("b/c/d/e"));
+    }
+
+    public void testSelectMatchingPathInSelectPaths()
+    {
+        addToBase("a/b", new MutableRecordImpl());
+        Set<String> selectedPaths = recordManager.selectAll("a/b").keySet();
+        assertEquals(1, selectedPaths.size());
+        assertTrue(selectedPaths.contains("a/b"));
+    }
+
+    public void testWildCardInSelectPaths()
+    {
+        addToBase("a", new MutableRecordImpl());
+        addToBase("b", new MutableRecordImpl());
+        addToBase("c", new MutableRecordImpl());
+        addToBase("a/1", new MutableRecordImpl());
+        addToBase("b/2", new MutableRecordImpl());
+        addToBase("b/1/d", new MutableRecordImpl());
+        addToBase("b/2/e", new MutableRecordImpl());
+        addToBase("c/1/f", new MutableRecordImpl());
+        addToBase("c/2/g", new MutableRecordImpl());
+
+        assertEquals(3, recordManager.selectAll("*").size());
+        assertEquals(5, recordManager.selectAll("*/*").size());
+        assertEquals(4, recordManager.selectAll("*/*/*").size());
+
+        assertEquals(2, recordManager.selectAll("b/*/*").size());
+        assertEquals(2, recordManager.selectAll("*/1/*").size());
+
+        assertEquals(1, recordManager.selectAll("*/*/g").size());
+    }
+
+    private void addToBase(String path, Record value)
+    {
+        String[] pathElements = PathUtils.getPathElements(path);
+        for (int i = 0; i < pathElements.length; i++)
+        {
+            String pathPart = PathUtils.getPath(0, i, pathElements);
+            if (!recordManager.containsRecord(pathPart))
+            {
+                recordManager.insert(pathPart, new MutableRecordImpl());
+            }
+        }
+        recordManager.insert(path, value);
     }
 
     private void assertEvents(Event... expectedEvents)

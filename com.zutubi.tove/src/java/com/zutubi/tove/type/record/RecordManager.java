@@ -12,6 +12,7 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -103,8 +104,27 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized List<String> getAllPaths(String pattern)
     {
-        RecordQueries queries = new RecordQueries(recordStore.select());
-        return queries.selectPaths(pattern);
+        List<String> paths = new LinkedList<String>();
+        getAllPaths(select(), PathUtils.getPathElements(pattern), 0, "", paths);
+        return paths;
+    }
+
+    private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
+    {
+        if (pathIndex == elements.length)
+        {
+            paths.add(resolvedPath);
+        }
+        else
+        {
+            for (String key : record.nestedKeySet())
+            {
+                if (PathUtils.elementMatches(elements[pathIndex], key))
+                {
+                    getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
+                }
+            }
+        }
     }
 
     /**
@@ -117,8 +137,19 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path, false);
 
-        RecordQueries queries = new RecordQueries(recordStore.select());
-        return queries.select(path);
+        String[] elements = PathUtils.getPathElements(path);
+
+        Record record = select();
+        for (String pathElement : elements)
+        {
+            Object data = record.get(pathElement);
+            if (data == null || !(data instanceof Record))
+            {
+                return null;
+            }
+            record = (Record) data;
+        }
+        return record;
     }
 
     public synchronized Record select()
@@ -138,8 +169,26 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(pattern, false);
 
-        RecordQueries queries = new RecordQueries(recordStore.select());
-        return queries.selectAll(pattern);
+        Map<String, Record> records = new HashMap<String, Record>();
+        selectAll(select(), PathUtils.getPathElements(pattern), 0, "", records);
+        return records;
+    }
+
+    private void selectAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
+    {
+        if (pathIndex == elements.length)
+        {
+            records.put(resolvedPath, record);
+            return;
+        }
+
+        for (String key : record.nestedKeySet())
+        {
+            if (PathUtils.elementMatches(elements[pathIndex], key))
+            {
+                selectAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
+            }
+        }
     }
 
     /**
@@ -284,16 +333,6 @@ public class RecordManager implements HandleAllocator
         return record;
     }
 
-    public void setRecordStore(RecordStore recordStore)
-    {
-        this.recordStore = recordStore;
-    }
-
-    public void setTransactionManager(TransactionManager transactionManager)
-    {
-        this.transactionManager = transactionManager;
-    }
-
     private void allocateHandles(MutableRecord record)
     {
         record.setHandle(allocateHandle());
@@ -374,6 +413,14 @@ public class RecordManager implements HandleAllocator
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+    public void setRecordStore(RecordStore recordStore)
+    {
+        this.recordStore = recordStore;
+    }
+    public void setTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
     }
 
     private interface RecordHandler
