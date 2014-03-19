@@ -1,9 +1,11 @@
 package com.zutubi.tove.transaction;
 
+import com.zutubi.util.logging.Logger;
+
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * The transaction objects allows for operations to be performed against a specific transaction.
@@ -13,6 +15,11 @@ import java.util.HashMap;
  */
 public class Transaction
 {
+    private static final Logger LOG = Logger.getLogger(Transaction.class);
+
+    private static final String PROPERTY_TRANSACTION_TIME_WARNING_MILLIS = "pulse.transaction.time.warning.millis";
+    private static final long DEFAULT_TRANSACTION_TIME_WARNING_MILLIS = 20000;
+
     /**
      * System transaction manager that manages this transaction. 
      */
@@ -32,6 +39,8 @@ public class Transaction
      * The transactions current status.
      */
     private TransactionStatus status = TransactionStatus.INACTIVE;
+
+    private long activateTime;
 
     /**
      * Transaction depth represents the nested depth of the transaction, and is used
@@ -77,15 +86,6 @@ public class Transaction
     }
 
     /**
-     * Modify the transaction associated with the current thread such that the only possible outcome of
-     * the transaction is to roll back the transaction.
-     */
-    public void setRollbackOnly()
-    {
-        this.transactionManager.setRollbackOnly();
-    }
-
-    /**
      * Obtain the status of the transaction associated with the current thread.
      *
      * @return status
@@ -99,6 +99,32 @@ public class Transaction
 
     void setStatus(TransactionStatus status)
     {
+        switch(status)
+        {
+            case ACTIVE:
+            {
+                activateTime = System.currentTimeMillis();
+                break;
+            }
+            case COMMITTED:
+            case ROLLEDBACK:
+            {
+                long elapsedMillis = System.currentTimeMillis() - activateTime;
+                if (elapsedMillis > Long.getLong(PROPERTY_TRANSACTION_TIME_WARNING_MILLIS, DEFAULT_TRANSACTION_TIME_WARNING_MILLIS))
+                {
+                    try
+                    {
+                        // Raise an exception so we get a full stack trace.
+                        throw new RuntimeException("Transaction took more than " + (elapsedMillis / 1000) + " seconds");
+                    }
+                    catch (RuntimeException e)
+                    {
+                        LOG.warning(e.getMessage(), e);
+                    }
+                }
+            }
+        }
+
         this.status = status;
     }
 
@@ -117,14 +143,6 @@ public class Transaction
         {
             getResources().add(resource);
         }
-    }
-
-    public void delistResource(TransactionResource resource)
-    {
-        // can only delist a resource if this transaction is considered active.
-        assertActiveTransaction();
-
-        getResources().remove(resource);
     }
 
     public void registerSynchronisation(Synchronisation sync)

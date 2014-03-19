@@ -22,9 +22,6 @@ public class TransactionManager
     private static final Messages I18N = Messages.getInstance(TransactionManager.class);
     private static final Logger LOG = Logger.getLogger(TransactionManager.class);
 
-    private static final String PROPERTY_TRANSACTION_TIME_WARNING_MILLIS = "pulse.transaction.time.warning.millis";
-    private static final long DEFAULT_TRANSACTION_TIME_WARNING_MILLIS = 20000;
-
     private static final AtomicLong nextTransactionId = new AtomicLong(1);
 
     /**
@@ -36,11 +33,6 @@ public class TransactionManager
      * Lock used to serialise transactions.
      */
     private Lock activeTransaction = new ReentrantLock();
-    private long activeTransactionAcquireTime;
-
-    public TransactionManager()
-    {
-    }
 
     /**
      * Retrieve the transaction associated with the current thread.
@@ -68,7 +60,6 @@ public class TransactionManager
         if (txn == null)
         {
             activeTransaction.lock();
-            activeTransactionAcquireTime = System.currentTimeMillis();
 
             // No transaction in progress, so start one.
             txn = new Transaction(nextTransactionId.getAndIncrement(), this);
@@ -101,7 +92,6 @@ public class TransactionManager
             throw new TransactionException(I18N.format("no.active.transaction"));
         }
 
-        // check the txn depth.
         if (currentTransaction.getDepth() > 0)
         {
             currentTransaction.setDepth(currentTransaction.getDepth() - 1);
@@ -201,20 +191,6 @@ public class TransactionManager
         transactionHolder.set(null);
         activeTransaction.unlock();
 
-        long elapsedMillis = System.currentTimeMillis() - activeTransactionAcquireTime;
-        if (elapsedMillis > Long.getLong(PROPERTY_TRANSACTION_TIME_WARNING_MILLIS, DEFAULT_TRANSACTION_TIME_WARNING_MILLIS))
-        {
-            try
-            {
-                // Raise an exception so we get a full stack trace.
-                throw new RuntimeException("Transaction took more than " + (elapsedMillis / 1000) + " seconds");
-            }
-            catch (RuntimeException e)
-            {
-                LOG.warning(e.getMessage(), e);
-            }
-        }
-
         List<Synchronisation> synchronisations = new LinkedList<Synchronisation>(currentTransaction.getSynchronisations());
         for (Synchronisation synchronisation : synchronisations)
         {
@@ -236,16 +212,6 @@ public class TransactionManager
             throw new TransactionException(I18N.format("no.active.transaction"));
         }
         activeTransaction.setStatus(TransactionStatus.ROLLBACKONLY);
-    }
-
-    /**
-     * Returns true if the transaction associated with the current thread is marked as rollback only.
-     *
-     * @return true if the current threads transaction can only be rolled back
-     */
-    public boolean isRollbackOnly()
-    {
-        return isRollbackOnly(transactionHolder.get());
     }
 
     private boolean isRollbackOnly(Transaction transaction)
