@@ -59,42 +59,29 @@ public class InMemoryTransactionResource<T> implements TransactionResource
      */
     public synchronized T get(boolean writableState)
     {
-        Transaction transaction = transactionManager.getTransaction();
-        if (transaction == null)
+        if (localState.get() == null)
         {
             if (writableState)
             {
-                throw new IllegalStateException(I18N.format("writable.requires.transaction"));
-            }
-            return globalState.get();
-        }
+                Transaction transaction = transactionManager.getTransaction();
+                if (transaction == null)
+                {
+                    throw new IllegalStateException(I18N.format("writable.requires.transaction"));
+                }
 
-        // ensure that we are enlisted with the transaction.
-        transaction.enlistResource(this);
-
-        if (writableState)
-        {
-            if (localState.get() == null)
-            {
-                InMemoryStateWrapper<T> value = globalState.copy();
-                value.setDirty(true);
-                localState.set(value);
+                transaction.enlistResource(this);
+                localState.set(globalState.copy());
+                return localState.get().get();
             }
-            else if (!localState.get().isDirty())
+            else
             {
-                InMemoryStateWrapper<T> value = localState.get().copy();
-                value.setDirty(true);
-                localState.set(value);
+                return globalState.get();
             }
         }
         else
         {
-            if (localState.get() == null)
-            {
-                localState.set(globalState);
-            }
+            return localState.get().get();
         }
-        return localState.get().get();
     }
 
     //---( transactional resource implementation )---
@@ -107,10 +94,10 @@ public class InMemoryTransactionResource<T> implements TransactionResource
     public synchronized void commit()
     {
         // Make any local changes globally available.
-        if (localState.get().isDirty())
+        InMemoryStateWrapper<T> local = localState.get();
+        if (local != null)
         {
-            globalState = localState.get();
-            globalState.setDirty(false);
+            globalState = local;
         }
 
         localState.set(null);

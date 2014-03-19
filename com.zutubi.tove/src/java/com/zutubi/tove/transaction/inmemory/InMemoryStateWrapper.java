@@ -13,12 +13,6 @@ package com.zutubi.tove.transaction.inmemory;
 public abstract class InMemoryStateWrapper<U>
 {
     /**
-     * Indicates whether or not a modifiable copy of the wrapped state has
-     * been requested.
-     */
-    private boolean dirty;
-
-    /**
      * The wrapped state.
      */
     private U state;
@@ -26,16 +20,6 @@ public abstract class InMemoryStateWrapper<U>
     protected InMemoryStateWrapper(U state)
     {
         this.state = state;
-    }
-
-    public boolean isDirty()
-    {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty)
-    {
-        this.dirty = dirty;
     }
 
     public U get()
