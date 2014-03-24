@@ -1,13 +1,12 @@
 package com.zutubi.util;
 
 /**
- * A point in two-dimensional space, where the (left, top) corner is (0, 0)
- * by convention.
+ * A point in two-dimensional space, where the (left, top) corner is (0, 0) by convention.
  */
 public class Point
 {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     /**
      * Creates a new point at given coordinates.
@@ -111,12 +110,8 @@ public class Point
         {
             return false;
         }
-        if (y != point.y)
-        {
-            return false;
-        }
 
-        return true;
+        return y == point.y;
     }
 
     @Override
@@ -125,5 +120,11 @@ public class Point
         int result = x;
         result = 31 * result + y;
         return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "(" + x + "," + y + ")";
     }
 }
