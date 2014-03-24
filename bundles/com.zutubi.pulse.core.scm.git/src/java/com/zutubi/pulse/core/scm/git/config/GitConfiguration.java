@@ -34,7 +34,7 @@ public class GitConfiguration extends PollableScmConfiguration
     @Required
     private String repository;
     @Required
-    private String branch    = "master";
+    private String branch = "master";
     @Required
     @ControllingSelect(dependentFields = "cloneDepth", enableSet = {"SHALLOW"})
     private CloneType cloneType = CloneType.NORMAL;

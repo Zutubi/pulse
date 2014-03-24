@@ -93,17 +93,29 @@ public class NativeGit
         run(handler, getGitCommand(), COMMAND_INIT);
     }
 
-    public void clone(ScmFeedbackHandler handler, String repository, String dir, boolean mirror, int depth) throws ScmException
+    public void clone(ScmFeedbackHandler handler, String repository, String branch, String dir, boolean mirror, int depth) throws ScmException
     {
-        String mirrorFlag = mirror ? FLAG_MIRROR : FLAG_NO_CHECKOUT;
-        if (depth < 0)
+        List<String> commands = new ArrayList<String>();
+        commands.add(getGitCommand());
+        commands.add(COMMAND_CLONE);
+        commands.add(mirror ? FLAG_MIRROR : FLAG_NO_CHECKOUT);
+
+        if (StringUtils.stringSet(branch))
         {
-            run(handler, getGitCommand(), COMMAND_CLONE, mirrorFlag, repository, dir);
+            commands.add(FLAG_SINGLE_BRANCH);
+            commands.add(FLAG_BRANCH);
+            commands.add(branch);
         }
-        else
+
+        if (depth >= 0)
         {
-            run(handler, getGitCommand(), COMMAND_CLONE, mirrorFlag, FLAG_DEPTH, Integer.toString(depth), repository, dir);
+            commands.add(FLAG_DEPTH);
+            commands.add(Integer.toString(depth));
         }
+
+        commands.add(repository);
+        commands.add(dir);
+        run(handler, commands.toArray(new String[commands.size()]));
     }
 
     public void config(ScmFeedbackHandler handler, String name, boolean value) throws ScmException
@@ -305,9 +317,16 @@ public class NativeGit
         run(commands.toArray(new String[commands.size()]));
     }
 
-    public void push(String repository, String refspec) throws ScmException
+    public void push(String repository, boolean force, String refspec) throws ScmException
     {
-        run(getGitCommand(), COMMAND_PUSH, repository, refspec);
+        if (force)
+        {
+            run(getGitCommand(), COMMAND_PUSH, FLAG_FORCE, repository, refspec);
+        }
+        else
+        {
+            run(getGitCommand(), COMMAND_PUSH, repository, refspec);
+        }
     }
 
     public void apply(ScmFeedbackHandler handler, File patch) throws ScmException

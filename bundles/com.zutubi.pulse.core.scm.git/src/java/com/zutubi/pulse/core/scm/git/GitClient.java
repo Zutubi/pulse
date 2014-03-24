@@ -142,7 +142,7 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
-        git.clone(handler, repository, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR, -1);
+        git.clone(handler, repository, null, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR, -1);
         handler.status("Repository cloned.");
     }
 
@@ -206,39 +206,26 @@ public class GitClient implements ScmClient
         }
 
         NativeGit git = new NativeGit(inactivityTimeout, context);
+        git.setWorkingDirectory(workingDir.getParentFile());
 
         switch (cloneType)
         {
             case SHALLOW:
             {
-                // git clone --no-checkout --depth <clone depth> <repository> <dir>
-                git.setWorkingDirectory(workingDir.getParentFile());
-                git.clone(handler, repository, workingDir.getName(), false, cloneDepth);
-                git.setWorkingDirectory(workingDir);
+                // git clone --no-checkout --single-branch --b <branch> --depth <clone depth> <repository> <dir>
+                git.clone(handler, repository, branch, workingDir.getName(), false, cloneDepth);
                 break;
             }
             case SELECTED_BRANCH_ONLY:
             {
-                if (!workingDir.mkdir())
-                {
-                    throw new ScmException("Could not create directory '" + workingDir.getAbsolutePath() + "'");
-                }
-
-                git.setWorkingDirectory(workingDir);
-                // git init
-                // git remote add -f -t <branch> -m <branch> origin <repository>
-                // git merge origin
-                git.init(handler);
-                git.remoteAdd(handler, REMOTE_ORIGIN, repository, branch);
-                git.merge(handler, REMOTE_ORIGIN);
+                // git clone --single-branch --branch <branch>
+                git.clone(handler, repository, branch, workingDir.getName(), false, -1);
                 break;
             }
             case NORMAL:
             {
                 // git clone --no-checkout <repository> <dir>
-                git.setWorkingDirectory(workingDir.getParentFile());
-                git.clone(handler, repository, workingDir.getName(), false, -1);
-                git.setWorkingDirectory(workingDir);
+                git.clone(handler, repository, null, workingDir.getName(), false, -1);
                 break;
             }
             case FULL_MIRROR:
@@ -250,12 +237,13 @@ public class GitClient implements ScmClient
                 }
 
                 git.setWorkingDirectory(workingDir);
-                git.clone(handler, repository, GIT_REPOSITORY_DIRECTORY, true, -1);
+                git.clone(handler, repository, null, GIT_REPOSITORY_DIRECTORY, true, -1);
                 git.config(handler, CONFIG_BARE, false);
                 break;
             }
         }
 
+        git.setWorkingDirectory(workingDir);
         git.checkout(handler, getRemoteBranchRef(), LOCAL_BRANCH_NAME);
 
         // if we are after a specific revision, check it out to a temporary branch.  This also updates
@@ -624,7 +612,7 @@ public class GitClient implements ScmClient
             NativeGit nativeGit = new NativeGit(inactivityTimeout, scmContext.getEnvironmentContext());
             nativeGit.setWorkingDirectory(persistentContext.getPersistentWorkingDir());
             nativeGit.tag(revision, name, "[pulse] applying tag", moveExisting);
-            nativeGit.push("origin", name);
+            nativeGit.push("origin", moveExisting, "refs/tags/" + name);
         }
         finally
         {
@@ -639,6 +627,7 @@ public class GitClient implements ScmClient
         {
             throw new ScmException("Unexpected git revision format: '" + revision + "'");
         }
+
         return new Revision(revision);
     }
 
@@ -741,6 +730,11 @@ public class GitClient implements ScmClient
     public void setCloneType(GitConfiguration.CloneType cloneType)
     {
         this.cloneType = cloneType;
+    }
+
+    public void setCloneDepth(int cloneDepth)
+    {
+        this.cloneDepth = cloneDepth;
     }
 
     public void setProcessSubmodules(boolean processSubmodules)

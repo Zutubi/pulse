@@ -79,6 +79,24 @@ public class GitClientTest extends GitClientTestBase
 
     public void testCheckout() throws ScmException, ParseException
     {
+        checkoutMasterHelper();
+    }
+
+    public void testCheckoutFullMirror() throws ScmException, ParseException
+    {
+        client.setCloneType(GitConfiguration.CloneType.FULL_MIRROR);
+        checkoutMasterHelper();
+    }
+
+    public void testCheckoutShallow() throws ScmException, ParseException
+    {
+        client.setCloneType(GitConfiguration.CloneType.SHALLOW);
+        client.setCloneDepth(4);
+        checkoutMasterHelper();
+    }
+
+    private void checkoutMasterHelper() throws ScmException
+    {
         Revision rev = client.checkout(context, null, handler);
 
         assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
@@ -99,16 +117,12 @@ public class GitClientTest extends GitClientTestBase
         checkoutBranchHelper();
     }
 
-    public void testCheckoutFullMirror() throws ScmException, ParseException
+    public void testCheckoutShallowWithBranch() throws ScmException, ParseException
     {
-        client.setCloneType(GitConfiguration.CloneType.FULL_MIRROR);
-        Revision rev = client.checkout(context, null, handler);
+        client.setCloneType(GitConfiguration.CloneType.SHALLOW);
+        client.setCloneDepth(4);
 
-        assertEquals(REVISION_MASTER_LATEST, rev.getRevisionString());
-
-        assertLatestCheckedOut();
-
-        assertThat(handler.getStatusMessages().size(), greaterThan(0));
+        checkoutBranchHelper();
     }
 
     private void checkoutBranchHelper() throws ScmException
@@ -142,6 +156,13 @@ public class GitClientTest extends GitClientTestBase
     public void testCheckoutToRevisionSelectedBranch() throws ScmException, ParseException
     {
         client.setCloneType(GitConfiguration.CloneType.SELECTED_BRANCH_ONLY);
+        checkoutBranchToRevisionHelper();
+    }
+
+    public void testCheckoutToRevisionShallowWithBranch() throws ScmException, ParseException
+    {
+        client.setCloneType(GitConfiguration.CloneType.SHALLOW);
+        client.setCloneDepth(4);
         checkoutBranchToRevisionHelper();
     }
 
