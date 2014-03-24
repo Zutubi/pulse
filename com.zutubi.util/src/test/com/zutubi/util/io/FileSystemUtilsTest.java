@@ -1506,7 +1506,7 @@ public class FileSystemUtilsTest extends ZutubiTestCase
     {
         if (SystemUtils.IS_WINDOWS)
         {
-            System.setProperty(FileSystemUtils.PROPERTY_RMDIR_COMMAND, "cmd /c rmdir /s /q ${dir}");
+            System.setProperty(FileSystemUtils.PROPERTY_RMDIR_COMMAND, "cmd /c rmdir /s /q $(dir)");
             return Arrays.<LinkMaker>asList(new WindowsJunctionLinkMaker());
         }
         else

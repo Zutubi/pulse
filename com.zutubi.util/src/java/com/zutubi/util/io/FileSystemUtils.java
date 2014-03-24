@@ -33,7 +33,8 @@ public class FileSystemUtils
     private static final int ROBUST_DELAY_MILLIS = Integer.getInteger(PROPERTY_ROBUST_DELAY_MILLIS, 100);
     private static final int ROBUST_RETRIES = Integer.getInteger(PROPERTY_ROBUST_RETRIES, 3);
 
-    private static final String VARIABLE_DIR = "${dir}";
+    private static final String VARIABLE_DIR_OLD = "${dir}";
+    private static final String VARIABLE_DIR = "$(dir)";
 
     public static final String NORMAL_SEPARATOR = "/";
     public static final char NORMAL_SEPARATOR_CHAR = NORMAL_SEPARATOR.charAt(0);
@@ -175,7 +176,7 @@ public class FileSystemUtils
         List<String> command = new LinkedList<String>();
         for (String piece: StringUtils.split(System.getProperty(PROPERTY_RMDIR_COMMAND)))
         {
-            if (VARIABLE_DIR.equals(piece))
+            if (VARIABLE_DIR.equals(piece) || VARIABLE_DIR_OLD.equals(piece))
             {
                 command.add(dir.getAbsolutePath());
             }
@@ -450,8 +451,6 @@ public class FileSystemUtils
     // code snippet taken and adapted from org.apache.commons.vfs.provider.AbstractFileName
     public static String relativePath(File from, File to)
     {
-        char SEPARATOR_CHAR = File.separatorChar;
-
         final String path = to.getPath();
 
         // Calculate the common prefix
@@ -469,39 +468,40 @@ public class FileSystemUtils
         }
 
         final int maxlen = Math.min(basePathLen, pathLen);
-        int pos = 0;
-        for (; pos < maxlen && from.getPath().charAt(pos) == path.charAt(pos); pos++)
+        int index = 0;
+        while (index < maxlen && from.getPath().charAt(index) == path.charAt(index))
         {
+            index++;
         }
 
-        if (pos == basePathLen && pos == pathLen)
+        if (index == basePathLen && index == pathLen)
         {
             // Same names
             return ".";
         }
-        else if (pos == basePathLen && pos < pathLen && path.charAt(pos) == SEPARATOR_CHAR)
+        else if (index == basePathLen && index < pathLen && path.charAt(index) == File.separatorChar)
         {
             // A descendent of the base path
-            return path.substring(pos + 1);
+            return path.substring(index + 1);
         }
 
         // Strip the common prefix off the path
         final StringBuilder builder = new StringBuilder();
-        if (pathLen > 1 && (pos < pathLen || from.getPath().charAt(pos) != SEPARATOR_CHAR))
+        if (pathLen > 1 && (index < pathLen || from.getPath().charAt(index) != File.separatorChar))
         {
             // Not a direct ancestor, need to back up
-            pos = from.getPath().lastIndexOf(SEPARATOR_CHAR, pos);
-            builder.append(path.substring(pos));
+            index = from.getPath().lastIndexOf(File.separatorChar, index);
+            builder.append(path.substring(index));
         }
 
         // Prepend a '../' for each element in the base path past the common
         // prefix
         builder.insert(0, "..");
-        pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
-        while (pos != -1)
+        index = from.getPath().indexOf(File.separatorChar, index + 1);
+        while (index != -1)
         {
             builder.insert(0, "../");
-            pos = from.getPath().indexOf(SEPARATOR_CHAR, pos + 1);
+            index = from.getPath().indexOf(File.separatorChar, index + 1);
         }
         return builder.toString();
     }
@@ -1354,23 +1354,22 @@ public class FileSystemUtils
             {
                 for (String element: StringUtils.split(path, NORMAL_SEPARATOR_CHAR))
                 {
-                    if (element.equals(THIS_DIRECTORY))
+                    if (!element.equals(THIS_DIRECTORY))
                     {
-                        // Skip.
-                    }
-                    else if (element.equals(PARENT_DIRECTORY))
-                    {
-                        result = up(result);
-                    }
-                    else
-                    {
-                        if (result == null)
+                        if (element.equals(PARENT_DIRECTORY))
                         {
-                            result = element;
+                            result = up(result);
                         }
                         else
                         {
-                            result = StringUtils.join(NORMAL_SEPARATOR, true, true, result, element);
+                            if (result == null)
+                            {
+                                result = element;
+                            }
+                            else
+                            {
+                                result = StringUtils.join(NORMAL_SEPARATOR, true, true, result, element);
+                            }
                         }
                     }
                 }
