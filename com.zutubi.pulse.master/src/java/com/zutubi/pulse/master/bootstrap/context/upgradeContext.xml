@@ -210,6 +210,7 @@
                 <ref local="addHostSsl"/>
                 <ref local="addAgentSsl"/>
                 <ref local="renameHostSsl"/>
+                <ref local="addCheckoutSubdir"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1110,5 +1111,9 @@
                 <value>com/zutubi/pulse/master/upgrade/tasks/schema/Schema-2.6.14-partial-mappings.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="addCheckoutSubdir" class="com.zutubi.pulse.master.upgrade.tasks.AddCheckoutSubdirUpgradeTask">
+        <property name="buildNumber" value="206999001"/>
     </bean>
 </beans>

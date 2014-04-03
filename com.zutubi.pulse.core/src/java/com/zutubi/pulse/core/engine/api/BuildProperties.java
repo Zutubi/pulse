@@ -84,6 +84,12 @@ public class BuildProperties
      */
     public static final String PROPERTY_BUILD_VERSION           = "build.version";
     /**
+     * If non-empty this specifies a subdirectory of the base that should be used for the source
+     * code checkout.  (Note the checkout itself may happen in another directory and by copied
+     * here).
+     */
+    public static final String PROPERTY_CHECKOUT_SUBDIR         = "checkout.subdir";
+    /**
      * An internal property used by the master to instruct agents to compress
      * captured artifacts for download.
      */

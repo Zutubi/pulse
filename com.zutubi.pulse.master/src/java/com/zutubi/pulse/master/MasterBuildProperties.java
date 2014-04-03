@@ -94,6 +94,7 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_OWNER, owner);
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SKIP_CHECKOUT, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutType() == CheckoutType.NO_CHECKOUT));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_CHECKOUT_SUBDIR, projectConfig.getBootstrap().getCheckoutSubdir());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BOOTSTRAP, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getCheckoutType() == CheckoutType.INCREMENTAL_CHECKOUT));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && projectConfig.getBootstrap().getBuildType() == BuildType.INCREMENTAL_BUILD));
 

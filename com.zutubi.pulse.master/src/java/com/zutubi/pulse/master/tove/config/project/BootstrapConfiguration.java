@@ -9,11 +9,12 @@ import com.zutubi.validation.annotations.Required;
  * Defines how build stages for a project are bootstrapped.
  */
 @SymbolicName("zutubi.bootstrapConfig")
-@Form(fieldOrder = {"checkoutType", "buildType", "persistentDirPattern", "tempDirPattern"})
+@Form(fieldOrder = {"checkoutType", "checkoutSubdir", "buildType", "persistentDirPattern", "tempDirPattern"})
 public class BootstrapConfiguration extends AbstractConfiguration
 {
     @Required
     private CheckoutType checkoutType = CheckoutType.CLEAN_CHECKOUT;
+    private String checkoutSubdir;
     @Required
     private BuildType buildType = BuildType.CLEAN_BUILD;
     @Required
@@ -29,6 +30,16 @@ public class BootstrapConfiguration extends AbstractConfiguration
     public void setCheckoutType(CheckoutType checkoutType)
     {
         this.checkoutType = checkoutType;
+    }
+
+    public String getCheckoutSubdir()
+    {
+        return checkoutSubdir;
+    }
+
+    public void setCheckoutSubdir(String checkoutSubdir)
+    {
+        this.checkoutSubdir = checkoutSubdir;
     }
 
     public BuildType getBuildType()

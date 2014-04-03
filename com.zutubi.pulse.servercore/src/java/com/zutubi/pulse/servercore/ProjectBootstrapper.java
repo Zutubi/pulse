@@ -38,13 +38,13 @@ public class ProjectBootstrapper extends BootstrapperSupport
         PulseExecutionContext context = (PulseExecutionContext) commandContext.getExecutionContext();
         final RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
 
-        File baseDir = paths.getBaseDir();
-        ensureDirectory(baseDir);
-
         File checkoutDir = paths.getCheckoutDir();
         if (checkoutDir != null)
         {
             String ignoreDirs;
+
+            final String checkoutSubdir = context.getString(NAMESPACE_INTERNAL, PROPERTY_CHECKOUT_SUBDIR);
+            checkoutDir = applySubdir(checkoutDir, checkoutSubdir);
 
             childBootstrapper = selectBootstrapper(checkoutDir);
 
@@ -57,28 +57,28 @@ public class ProjectBootstrapper extends BootstrapperSupport
             }
             finally
             {
-                context.setWorkingDir(baseDir);
+                context.setWorkingDir(paths.getBaseDir());
                 context.pop();
             }
 
-            // If the builds base directory differs from the checkout directory, then we need to copy over
-            // to the base, this implies a CLEAN_UPDATE checkout scheme.
-            if(!baseDir.equals(checkoutDir))
+            File sourceDir = applySubdir(paths.getBaseDir(), checkoutSubdir);
+            ensureDirectory(sourceDir);
+            if (!sourceDir.equals(checkoutDir))
             {
                 writeFeedback("Copying source from " + getNormalisedAbsolutePath(checkoutDir) +
-                        " to " + getNormalisedAbsolutePath(baseDir) + ".  This may take some time.");
+                        " to " + getNormalisedAbsolutePath(sourceDir) + ".  This may take some time.");
                 try
                 {
                     if (StringUtils.stringSet(ignoreDirs))
                     {
                         writeFeedback("Excluding directories with names: '" + ignoreDirs + "'.");
                         String[] excludes = StringUtils.split(ignoreDirs, ',');
-                        ensureEmptyDirectory(baseDir);
-                        recursiveCopy(baseDir, checkoutDir, excludes);
+                        ensureEmptyDirectory(sourceDir);
+                        recursiveCopy(sourceDir, checkoutDir, excludes);
                     }
                     else
                     {
-                        copy(baseDir, checkoutDir);
+                        copy(sourceDir, checkoutDir);
                     }
                 }
                 catch (IOException e)
@@ -86,6 +86,18 @@ public class ProjectBootstrapper extends BootstrapperSupport
                     throw new BuildException(e);
                 }
             }
+        }
+    }
+
+    private File applySubdir(File dir, String subdir)
+    {
+        if (StringUtils.stringSet(subdir))
+        {
+            return new File(dir, subdir);
+        }
+        else
+        {
+            return dir;
         }
     }
 
