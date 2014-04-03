@@ -27,7 +27,7 @@ public class QTestLibReportPostProcessorConfigurationExamples
     {
         DirectoryArtifactConfiguration output = new DirectoryArtifactConfiguration();
         output.setName("test reports");
-        output.setBase("${base.dir}/reports");
+        output.setBase("$(base.dir)/reports");
         output.getInclusions().add("**/*.xml");
         output.setFailIfNotPresent(false);
 

@@ -27,7 +27,7 @@ public class MSTestReportPostProcessorConfigurationExamples
     {
         DirectoryArtifactConfiguration output = new DirectoryArtifactConfiguration();
         output.setName("test reports");
-        output.setBase("${base.dir}/reports");
+        output.setBase("$(base.dir)/reports");
         output.getInclusions().add("**/*.trx");
         output.setFailIfNotPresent(false);
 
