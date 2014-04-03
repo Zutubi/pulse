@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.xwork.interceptor;
 
-import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionSupport;
@@ -8,9 +7,6 @@ import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.http.EOFException;
-import org.springframework.security.access.AccessDeniedException;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * An xwork interceptor implementation that takes some of the commonly raised
@@ -34,14 +30,7 @@ public class ErrorHandlingInterceptor implements Interceptor
         {
             return invocation.invoke();
         }
-        catch(AccessDeniedException e)
-        {
-            LOG.info(e);
-            HttpServletResponse response = ServletActionContext.getResponse();
-            response.sendError(401);
-            return Action.ERROR;
-        }
-        catch(IllegalArgumentException e)
+        catch (IllegalArgumentException e)
         {
             // This exception is used by the config system to prevent against
             // invalid input.
@@ -50,14 +39,14 @@ public class ErrorHandlingInterceptor implements Interceptor
             action.addActionError(e.getMessage());
             return Action.ERROR;
         }
-        catch(LookupErrorException e)
+        catch (LookupErrorException e)
         {
             LOG.info(e);
             ActionSupport action = (ActionSupport) invocation.getAction();
             action.addActionError(e.getMessage());
             return Action.ERROR;
         }
-        catch(EOFException e)
+        catch (EOFException e)
         {
             // Harmless
             return Action.NONE;
