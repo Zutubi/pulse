@@ -7,7 +7,7 @@
 
     <recipe name="ant build">
             <ant name="build">
-                <process processor="${all}"/>
+                <process processor="$(all)"/>
             </ant>
     </recipe>
 </project>

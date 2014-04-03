@@ -77,16 +77,16 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random));
 
-        addDumpEnvTask("${project} ${status}");
+        addDumpEnvTask("$(project) $(status)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
-        assertArgs(PROJECT_NAME, "${status}");
+        assertArgs(PROJECT_NAME, "$(status)");
     }
 
     public void testPostBuildHook() throws Exception
     {
         postBuildHelper();
-        addDumpEnvTask("${project} ${status}");
+        addDumpEnvTask("$(project) $(status)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "success");
@@ -95,7 +95,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     public void testBuildDirProperty() throws Exception
     {
         postBuildHelper();
-        addDumpEnvTask("${build.dir}");
+        addDumpEnvTask("$(build.dir)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
@@ -120,7 +120,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addDumpEnvTask(random, "${project} ${some.property} ${stage.default.a.stage.property}");
+        addDumpEnvTask(random, "$(project) $(some.property) $(stage.default.a.stage.property)");
 
         rpcClient.RemoteApi.runBuild(random);
         assertArgs(random, "some.value", "a.stage.value");
@@ -140,7 +140,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.nextNamedFormElements(asPair("name", random));
 
         selectFromAllTasks();
-        addDumpEnvTask(random, "${some.property}");
+        addDumpEnvTask(random, "$(some.property)");
 
         Hashtable<String, String> properties = new Hashtable<String, String>();
         properties.put("some.property", "trigger.value");
@@ -153,16 +153,16 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     public void testPreStageHook() throws Exception
     {
         preStageHelper();
-        addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
+        addDumpEnvTask("$(project) $(stage) $(recipe) $(status)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
-        assertArgs(PROJECT_NAME, "default", "[default]", "${status}");
+        assertArgs(PROJECT_NAME, "default", "[default]", "$(status)");
     }
 
     public void testPostStageHook() throws Exception
     {
         postStageHelper();
-        addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
+        addDumpEnvTask("$(project) $(stage) $(recipe) $(status)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
@@ -180,7 +180,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
 
         selectFromStageTasks();
 
-        addDumpEnvTask("${project} ${stage} ${agent}");
+        addDumpEnvTask("$(project) $(stage) $(agent)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         assertArgs(PROJECT_NAME, "default", AGENT_NAME);
@@ -189,7 +189,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     public void testStageDirProperty() throws Exception
     {
         postStageHelper();
-        addDumpEnvTask("${stage.dir}");
+        addDumpEnvTask("$(stage.dir)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         List<String> args = getArgs();
@@ -203,7 +203,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     {
         manualHookHelper();
 
-        CompositePage hookPage = addDumpEnvTask("${build.number} ${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("$(build.number) $(project) $(status)");
         int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         triggerHookAndWait(hookPage, buildNumber);
         assertArgs(Long.toString(buildNumber), PROJECT_NAME, "success");
@@ -219,7 +219,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random));
 
-        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("$(project) $(status)");
         triggerHookAndWait(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "success");
     }
@@ -234,7 +234,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.waitFor();
         hookForm.nextNamedFormElements(asPair("name", random), asPair("allowManualTrigger", "false"));
 
-        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("$(project) $(status)");
         assertFalse(hookPage.isActionPresent(BuildHookConfigurationActions.ACTION_TRIGGER));
 
         BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
@@ -246,7 +246,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         int buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         postStageHelper();
-        CompositePage hookPage = addDumpEnvTask("${project} ${stage} ${recipe} ${status}");
+        CompositePage hookPage = addDumpEnvTask("$(project) $(stage) $(recipe) $(status)");
         triggerHookAndWait(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
     }
@@ -291,7 +291,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         hookForm.nextNamedFormElements(asPair("name", random), asPair("runForAll", "false"), asPair("runForStates", "error"));
 
         selectFromAllTasks();
-        addDumpEnvTask("${project}");
+        addDumpEnvTask("$(project)");
 
         rpcClient.RemoteApi.runBuild(PROJECT_NAME);
         // Give the hooks a little time to run.
@@ -302,7 +302,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
     public void testDisable() throws Exception
     {
         postBuildHelper();
-        CompositePage hookPage = addDumpEnvTask("${project} ${status}");
+        CompositePage hookPage = addDumpEnvTask("$(project) $(status)");
         hookPage.clickActionAndWait("disable");
         assertEquals("disabled", hookPage.getStateField("state"));
 
@@ -317,7 +317,7 @@ public class BuildHookAcceptanceTest extends AcceptanceTestBase
         long buildNumber = rpcClient.RemoteApi.runBuild(PROJECT_NAME);
 
         manualHookHelper();
-        addDumpEnvTask("${build.number} ${project} ${status}");
+        addDumpEnvTask("$(build.number) $(project) $(status)");
 
         BuildSummaryPage summaryPage = getBrowser().openAndWaitFor(BuildSummaryPage.class, PROJECT_NAME, buildNumber);
         summaryPage.clickHook(random);

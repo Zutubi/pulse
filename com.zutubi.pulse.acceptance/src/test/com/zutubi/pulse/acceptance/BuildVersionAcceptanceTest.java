@@ -68,7 +68,7 @@ public class BuildVersionAcceptanceTest extends AcceptanceTestBase
 
     public void testSpecifyVariableBuildVersion() throws Exception
     {
-        String buildVersion = "${project}-${build.number}";
+        String buildVersion = "$(project)-$(build.number)";
 
         int buildNumber = rpcClient.RemoteApi.runBuild(projectName, asPair("version", (Object)buildVersion));
         assertEquals(ResultState.SUCCESS, rpcClient.RemoteApi.getBuildStatus(projectName, buildNumber));

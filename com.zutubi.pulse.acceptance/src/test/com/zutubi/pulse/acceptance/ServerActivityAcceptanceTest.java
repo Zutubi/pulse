@@ -384,6 +384,6 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
 
     private String getFileArgument()
     {
-        return "-Dfile=${wait.file}";
+        return "-Dfile=$(wait.file)";
     }
 }

@@ -31,8 +31,10 @@ public class PulseZipUtils
     static final String PROPERTY_ARCHIVE_COMMAND = "pulse.archive.command";
     static final String PROPERTY_UNARCHIVE_COMMAND = "pulse.unarchive.command";
 
-    private static final String VARIABLE_ZIPFILE = "${zipfile}";
-    private static final String VARIABLE_FILES = "${files}";
+    private static final String VARIABLE_ZIPFILE = "$(zipfile)";
+    private static final String VARIABLE_ZIPFILE_OLD = "${zipfile}";
+    private static final String VARIABLE_FILES = "$(files)";
+    private static final String VARIABLE_FILES_OLD = "${files}";
 
     private static boolean useExternalArchiving;
     private static String archiveCommand;
@@ -148,11 +150,11 @@ public class PulseZipUtils
         List<String> command = new LinkedList<String>();
         for(String piece: pieces)
         {
-            if(VARIABLE_ZIPFILE.equals(piece))
+            if (VARIABLE_ZIPFILE.equals(piece) || VARIABLE_ZIPFILE_OLD.equals(piece))
             {
                 command.add(zipFile.getAbsolutePath());
             }
-            else if(VARIABLE_FILES.equals(piece))
+            else if (VARIABLE_FILES.equals(piece) || VARIABLE_FILES_OLD.equals(piece))
             {
                 if(file == null)
                 {
@@ -414,7 +416,7 @@ public class PulseZipUtils
         List<String> command = new LinkedList<String>();
         for(String piece: pieces)
         {
-            if(VARIABLE_ZIPFILE.equals(piece))
+            if (VARIABLE_ZIPFILE.equals(piece) || VARIABLE_ZIPFILE_OLD.equals(piece))
             {
                 command.add(zipFile.getAbsolutePath());
             }

@@ -22,7 +22,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
     private List<DependencyConfiguration> dependencies = new LinkedList<DependencyConfiguration>();
 
     @Required
-    private String version = "${build.number}";
+    private String version = "$(build.number)";
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.ivy.IvyPatternValidator")
     private String retrievalPattern = "lib/[artifact](.[ext])";

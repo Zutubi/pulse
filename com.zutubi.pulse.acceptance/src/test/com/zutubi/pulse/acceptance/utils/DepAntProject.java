@@ -38,7 +38,7 @@ public class DepAntProject extends AntProjectHelper
     {
         AntCommandConfiguration command = (AntCommandConfiguration) super.createDefaultCommand();
         command.setTargets("present not.present create");
-        command.setArgs("-Dcreate.list=\"${" + PROPERTY_CREATE_LIST + "}\" -Dpresent.list=\"${" + PROPERTY_EXPECTED_LIST + "}\" -Dnot.present.list=\"${" + PROPERTY_NOT_EXPECTED_LIST + "}\"");
+        command.setArgs("-Dcreate.list=\"$(" + PROPERTY_CREATE_LIST + ")\" -Dpresent.list=\"$(" + PROPERTY_EXPECTED_LIST + ")\" -Dnot.present.list=\"$(" + PROPERTY_NOT_EXPECTED_LIST + ")\"");
         return command;
     }
 

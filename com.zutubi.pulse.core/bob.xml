@@ -3,7 +3,7 @@
   <recipe name="default">
     <resource name="ant"/>
     <command name="build">
-      <executable exe="${ant.bin}"/>
+      <executable exe="$(ant.bin)"/>
     </command>
   </recipe>
 </project>

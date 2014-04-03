@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Used to mark a configuration type as referenceable - i.e. the instance
  * adds a value (possibly itself) to the scope when loading so that it may be
- * referenced by the ${name} syntax.
+ * referenced by the $(name) syntax.
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

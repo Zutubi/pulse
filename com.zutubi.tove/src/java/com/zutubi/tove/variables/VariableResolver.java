@@ -685,7 +685,7 @@ public class VariableResolver
             }
         }
 
-        return "${" + element.name + "}";
+        return "$(" + element.name + ")";
     }
 
     private static String filter(String value, List<String> filters, ResolutionStrategy resolutionStrategy) throws ResolutionException

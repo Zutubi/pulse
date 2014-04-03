@@ -3,7 +3,7 @@
  <property name="env" value="autobuild"/>
  <property name="BUILD_INFO_PROJECT" value="device"/>
  <property name="MAP_VERSION" value="3_0_1_121_us"/>
- <property name="project.home" value="${base.dir}/release-2.1/device"/>
+ <property name="project.home" value="$(base.dir)/release-2.1/device"/>
  <property name="project.dist" value="/mnt/raid/builds/device/all"/>
  <property name="project.qe.dist" value="/mnt/raid/builds/qe/device"/>
  <property name="production.release" value="production/device-2.1"/>
@@ -31,69 +31,69 @@
 
  <!-- MAKE MACRO -->
  <macro name="make">
- <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
+ <executable name="configure.sh" exe="$(project.home)/configure.sh" args="$(params)"/>
 
- <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="${project.home}/build/${mode}">
- <process processor="${compile.pp}"/>
+ <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="$(project.home)/build/$(mode)">
+ <process processor="$(compile.pp)"/>
  </executable>
  </macro>
 
  <!-- DIST MACRO -->
  <macro name="dist">
- <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
+ <executable name="configure.sh" exe="$(project.home)/configure.sh" args="$(params)"/>
 
- <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="${project.home}/build/${mode}">
- <process processor="${compile.pp}"/>
+ <executable name="make" exe="/usr/bin/make" args="-j 4" working-dir="$(project.home)/build/$(mode)">
+ <process processor="$(compile.pp)"/>
  </executable>
 
- <executable name="dist" exe="/usr/bin/make" args="dist" working-dir="${project.home}/build/${mode}">
- <process processor="${compile.pp}"/>
+ <executable name="dist" exe="/usr/bin/make" args="dist" working-dir="$(project.home)/build/$(mode)">
+ <process processor="$(compile.pp)"/>
  </executable>
 
- <macro-ref macro="${reports}"/>
+ <macro-ref macro="$(reports)"/>
 
  <executable name="copy" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
- <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.dist}</arg>
+ <arg>cp -r $(project.home)/build/$(mode)/dist/app-* $(project.dist)</arg>
  </executable>
  
- <executable name="build-info" exe="${project.home}/src/build_support/BuildInfo.sh">
- <environment name="BUILD_INFO_PLATFORM" value="${device}"/>
- <environment name="BUILD_INFO_PROJECT" value="${BUILD_INFO_PROJECT}"/>
- <environment name="BUILD_INFO_TYPE" value="${type}"/>
- <environment name="BUILD_INFO_DIST" value="${project.home}/build/${mode}/dist"/>
+ <executable name="build-info" exe="$(project.home)/src/build_support/BuildInfo.sh">
+ <environment name="BUILD_INFO_PLATFORM" value="$(device)"/>
+ <environment name="BUILD_INFO_PROJECT" value="$(BUILD_INFO_PROJECT)"/>
+ <environment name="BUILD_INFO_TYPE" value="$(type)"/>
+ <environment name="BUILD_INFO_DIST" value="$(project.home)/build/$(mode)/dist"/>
  </executable>
  </macro>
 
  <!-- COVERITY MACRO -->
  <macro name="coverity">
- <executable name="configure.sh" exe="${project.home}/configure.sh" args="${params}"/>
+ <executable name="configure.sh" exe="$(project.home)/configure.sh" args="$(params)"/>
 
  <executable name="cov-build"
- exe="/home/autobuild/coverity/${coverity.version}/bin/cov-build"
- working-dir="${project.home}/build/${mode}"
- args="--dir /tmp/coverity-${recipe}-${build.number} /usr/bin/make -j 4">
- <process processor="${compile.pp}"/>
+ exe="/home/autobuild/coverity/$(coverity.version)/bin/cov-build"
+ working-dir="$(project.home)/build/$(mode)"
+ args="--dir /tmp/coverity-$(recipe)-$(build.number) /usr/bin/make -j 4">
+ <process processor="$(compile.pp)"/>
  </executable>
 
  <executable working-dir="/home/autobuild/coverity" name="pulse-stage.pl" exe="/home/autobuild/coverity/pulse-stage.pl">
- <environment name="COVERITY_VERSION" value="${coverity.version}"/>
+ <environment name="COVERITY_VERSION" value="$(coverity.version)"/>
  </executable>
  </macro>
 
  <!-- UNIT TEST MACRO -->
  <macro name="unit-test">
- <executable name="map.link" exe="${project.home}/src/build_support/BuildMapSwitch.sh">
- <environment name="MAP_VERSION" value="${MAP_VERSION}"/>
+ <executable name="map.link" exe="$(project.home)/src/build_support/BuildMapSwitch.sh">
+ <environment name="MAP_VERSION" value="$(MAP_VERSION)"/>
  </executable>
 
  <executable name="runtests.sh"
- exe="${project.home}/runtests.sh"
- working-dir="${project.home}" args="-x -r ${project.home}/build/${mode} -o ${project.home}/build/${mode}/test-results">
-     <dir-artifact name="test-results" base="${project.home}/build/${mode}/test-results" fail-if-not-present="false">
+ exe="$(project.home)/runtests.sh"
+ working-dir="$(project.home)" args="-x -r $(project.home)/build/$(mode) -o $(project.home)/build/$(mode)/test-results">
+     <dir-artifact name="test-results" base="$(project.home)/build/$(mode)/test-results" fail-if-not-present="false">
      <include pattern="**/*.xml"/>
-     <process processor="${unittest.pp}"/>
+     <process processor="$(unittest.pp)"/>
      </dir-artifact>
  </executable>
 
@@ -106,33 +106,33 @@
 
  <!-- QE COPY MACRO -->
  <macro name="qe.copy">
- <executable name="mkdir" exe="/bin/mkdir" args="-p ${project.qe.dist}">
+ <executable name="mkdir" exe="/bin/mkdir" args="-p $(project.qe.dist)">
  </executable>
 
  <executable name="copy.dist" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
- <arg>cp -r ${project.home}/build/${mode}/dist/app-* ${project.qe.dist}</arg>
+ <arg>cp -r $(project.home)/build/$(mode)/dist/app-* $(project.qe.dist)</arg>
  </executable>
  </macro>
 
  <!-- START OF MAKE REPORT MACRO -->
 
  <macro name="reports">
- <executable name="make.reports" exe="/usr/bin/make" args="reports" working-dir="${project.home}/build/${mode}">
- <process processor="${compile.pp}"/>
+ <executable name="make.reports" exe="/usr/bin/make" args="reports" working-dir="$(project.home)/build/$(mode)">
+ <process processor="$(compile.pp)"/>
  </executable>
 
  <executable name="copy.reports" exe="/bin/sh">
  <arg>-x</arg>
  <arg>-c</arg>
- <arg>cp -r ${project.home}/build/${mode}/reports ${project.home}/build/${mode}/dist/app-*</arg>
+ <arg>cp -r $(project.home)/build/$(mode)/reports $(project.home)/build/$(mode)/dist/app-*</arg>
  </executable>
  </macro>
 
  <!-- DOXYGEN MACRO -->
  <macro name="gendoc">
- <executable name="gendoc.sh" exe="${project.home}/gendoc.sh" args="-d /mnt/raid/builds/doxygen/device -q"/>
+ <executable name="gendoc.sh" exe="$(project.home)/gendoc.sh" args="-d /mnt/raid/builds/doxygen/device -q"/>
  </macro>
 
  <!-- END OF MACRO SECTION -->
@@ -143,40 +143,40 @@
  <recipe name="cavalier-x86-shared-release">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${make}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(make)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="cavalier-x86-shared-debug">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${make}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(make)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="cavalier-x86-static-release">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <recipe name="cavalier-x86-static-debug">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(make)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <!-- END OF STANDARD CAVALIER X86 BUILD SECTION -->
@@ -187,39 +187,39 @@
  <recipe name="cavalier-x86-shared-release-package">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="cavalier-x86-shared-debug-package">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="cavalier-x86-static-release-packages">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <recipe name="cavalier-x86-static-debug-package">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <!-- END OF STANDARD CAVALIER X86 PACKAGE SECTION -->
@@ -232,37 +232,37 @@
  <recipe name="cavalier-arm-shared-release">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <recipe name="cavalier-arm-shared-debug">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <recipe name="cavalier-arm-static-release">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <recipe name="cavalier-arm-static-debug">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <!-- END OF STANDARD CAVALIER ARM BUILD SECTION -->
@@ -273,37 +273,37 @@
  <recipe name="cavalier-arm-shared-release-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <recipe name="cavalier-arm-shared-debug-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <recipe name="cavalier-arm-static-release-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <recipe name="cavalier-arm-static-debug-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <!-- END OF STANDARD CAVALIER ARM PACKAGE SECTION -->
@@ -314,20 +314,20 @@
  <recipe name="tools-x86-static-release">
  <property name="device" value="toolsx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(make)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="tools-x86-static-debug">
  <property name="device" value="toolsx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${make}"/>
+ <macro-ref macro="$(make)"/>
  </recipe>
 
  <!-- END OF STANDARD TOOLS X86 STATIC BUILD SECTION -->
@@ -338,20 +338,20 @@
  <recipe name="tools-x86-static-release-package">
  <property name="device" value="toolsx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="tools-x86-static-debug-package">
  <property name="device" value="toolsx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
+ <macro-ref macro="$(dist)"/>
  </recipe>
 
  <!-- END OF STANDARD TOOLS X86 STATIC PACKAGE SECTION -->
@@ -362,28 +362,28 @@
  <recipe name="coverity-cavalier-x86-shared-release">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${coverity}"/>
+ <macro-ref macro="$(coverity)"/>
  </recipe>
 
  <recipe name="coverity-cavalier-arm-shared-release">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${coverity}"/>
+ <macro-ref macro="$(coverity)"/>
  </recipe>
 
  <recipe name="coverity-tools-x86-static-release">
  <property name="device" value="toolsx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${coverity}"/>
+ <macro-ref macro="$(coverity)"/>
  </recipe>
 
  <!-- END OF COVERITY BUILD SECTION -->
@@ -394,64 +394,64 @@
  <recipe name="qe-cavalier-x86-shared-release-package">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="qe-cavalier-x86-shared-debug-package">
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="qe-cavalier-arm-shared-release-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <recipe name="qe-cavalier-arm-shared-debug-package">
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <recipe name="qe-tools-x86-static-release-package">
  <property name="device" value="toolsx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="qe-tools-x86-static-debug-package">
  <property name="device" value="toolsx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <!-- END OF QE BUILD SECTION -->
@@ -459,72 +459,72 @@
  <!-- START OF PRODUCTION BUILD SECTION -->
 
  <recipe name="production-cavalier-x86-shared-release-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="cavalierx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="production-cavalier-x86-shared-debug-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="cavalierx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="production-cavalier-arm-shared-release-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="cavalierarm"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type}"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type)"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <recipe name="production-cavalier-arm-shared-debug-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="cavalierarm"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}"/>
- <property name="params" value="-d ${device} -b ${type} -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)"/>
+ <property name="params" value="-d $(device) -b $(type) -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <recipe name="production-tools-x86-static-release-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="toolsx86"/>
  <property name="type" value="release"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
- <macro-ref macro="${unit-test}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
+ <macro-ref macro="$(unit-test)"/>
  </recipe>
 
  <recipe name="production-tools-x86-static-debug-package">
- <property name="project.home" value="${base.dir}/${production.release}"/>
+ <property name="project.home" value="$(base.dir)/$(production.release)"/>
  <property name="device" value="toolsx86"/>
  <property name="type" value="debug"/>
- <property name="mode" value="${device}/${type}-static"/>
- <property name="params" value="-d ${device} -b ${type} -s -D__CNI_QA_TEST__"/>
+ <property name="mode" value="$(device)/$(type)-static"/>
+ <property name="params" value="-d $(device) -b $(type) -s -D__CNI_QA_TEST__"/>
 
- <macro-ref macro="${dist}"/>
- <macro-ref macro="${qe.copy}"/>
+ <macro-ref macro="$(dist)"/>
+ <macro-ref macro="$(qe.copy)"/>
  </recipe>
 
  <!-- END OF PRODUCTION BUILD SECTION -->
@@ -532,7 +532,7 @@
  <!-- START OF DOXYGEN SECTION -->
 
  <recipe name="doxygen">
- <macro-ref macro="${gendoc}"/>
+ <macro-ref macro="$(gendoc)"/>
  </recipe>
 
  <!-- END OF DOXYGEN SECTION -->

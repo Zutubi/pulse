@@ -718,8 +718,8 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectPath = getPath(PROJECTS_SCOPE, projectName);
         String stagePath = getPath(projectPath, "stages", "default");
         rpcClient.RemoteApi.ensureProject(projectName);
-        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(projectResourceName, "${p.version}"));
-        rpcClient.RemoteApi.insertConfig(getPath(stagePath, "requirements"), createRequiredResource(stageResourceName, "${s.version}"));
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(projectResourceName, "$(p.version)"));
+        rpcClient.RemoteApi.insertConfig(getPath(stagePath, "requirements"), createRequiredResource(stageResourceName, "$(s.version)"));
         rpcClient.RemoteApi.insertProjectProperty(projectName, "p.version", "1.0");
         rpcClient.RemoteApi.insertProjectProperty(projectName, "s.version", "1.0");
         rpcClient.RemoteApi.insertConfig(getPath(stagePath, "properties"), rpcClient.RemoteApi.createProperty("s.version", "2.0"));
@@ -749,7 +749,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectPath = getPath(PROJECTS_SCOPE, projectName);
         rpcClient.RemoteApi.ensureProject(projectName);
         rpcClient.RemoteApi.insertConfig(getPath(projectPath, "requirements"), createRequiredResource(resourceName, null));
-        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "properties"), rpcClient.RemoteApi.createProperty("pp", "ref ${rp}", true, false));
+        rpcClient.RemoteApi.insertConfig(getPath(projectPath, "properties"), rpcClient.RemoteApi.createProperty("pp", "ref $(rp)", true, false));
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -762,7 +762,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
         String propertiesPath = getPath(resourcePath, "properties");
         rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referee", "ee", false, false));
-        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referer", "ref ${referee}", true, false));
+        rpcClient.RemoteApi.insertConfig(propertiesPath, rpcClient.RemoteApi.createProperty("referer", "ref $(referee)", true, false));
 
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
@@ -778,7 +778,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
         assignStageToAgent(projectName, DEFAULT_STAGE, MASTER_AGENT_NAME);
-        rpcClient.RemoteApi.insertProjectProperty(projectName, "pp", "ref ${agent}", true, false);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "pp", "ref $(agent)", true, false);
 
         getBrowser().loginAsAdmin();
         triggerSuccessfulBuild(projectName);
@@ -789,7 +789,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random + "-resource";
         String resourcePath = addResource(MASTER_AGENT_NAME, resourceName);
-        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "ref ${agent}", true, false));
+        rpcClient.RemoteApi.insertConfig(getPath(resourcePath, "properties"), rpcClient.RemoteApi.createProperty("rp", "ref $(agent)", true, false));
 
         String projectName = random + "-project";
         rpcClient.RemoteApi.ensureProject(projectName);
@@ -820,7 +820,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
     {
         Hashtable<String, Object> type = rpcClient.RemoteApi.createEmptyConfig(CustomTypeConfiguration.class);
         type.put("pulseFileString", "<?xml version=\"1.0\"?>\n" +
-                "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"${svn.url}\"/></recipe></project>");
+                "<project default-recipe=\"default\"><recipe name=\"default\"><print name=\"mess\" message=\"$(svn.url)\"/></recipe></project>");
         rpcClient.RemoteApi.insertProject(random, GLOBAL_PROJECT_NAME, false, rpcClient.RemoteApi.getSubversionConfig(TRIVIAL_ANT_REPOSITORY), type);
         rpcClient.RemoteApi.runBuild(random);
 
@@ -1455,7 +1455,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         Hashtable<String, Object> bootstrap = rpcClient.RemoteApi.getConfig(bootstrapPath);
         bootstrap.put(Bootstrap.CHECKOUT_TYPE, CheckoutType.INCREMENTAL_CHECKOUT.name());
         bootstrap.put(Bootstrap.BUILD_TYPE, BuildType.INCREMENTAL_BUILD.name());
-        bootstrap.put(Bootstrap.PERSISTENT_DIR_PATTERN, "${data.dir}/customwork/${project}");
+        bootstrap.put(Bootstrap.PERSISTENT_DIR_PATTERN, "$(data.dir)/customwork/$(project)");
         rpcClient.RemoteApi.saveConfig(bootstrapPath, bootstrap, false);
 
         String stagePath = PathUtils.getPath(projectPath, Constants.Project.STAGES, "default");
