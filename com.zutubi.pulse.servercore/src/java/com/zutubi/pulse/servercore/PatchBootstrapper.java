@@ -18,7 +18,8 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_FILE_REPOSITORY;
 
 /**
  * A bootstrapper that applies a patch to a working directory bootstrapped
@@ -26,9 +27,6 @@ import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
  */
 public class PatchBootstrapper extends BootstrapperSupport implements ScmFeedbackHandler
 {
-    private static final String DEFAULT_PATCH_BOOTSTRAP_PREFIX = "personal.patch.prefix.default";
-    private static final String PATCH_BOOTSTRAP_PREFIX = "personal.patch.prefix";
-
     /**
      * It is the working directory created by this delegate bootstrapper
      * that is being patched.
@@ -101,31 +99,6 @@ public class PatchBootstrapper extends BootstrapperSupport implements ScmFeedbac
 
     private File getBaseBuildDir(ExecutionContext context)
     {
-        // check if we need to apply a patch prefix for this bootstrap.
-
-        String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOTSTRAP_PREFIX);
-
-        String projectPrefix = null;
-        String projectName = context.getString(NAMESPACE_INTERNAL, PROPERTY_PROJECT);
-        if (projectName != null)
-        {
-            projectPrefix = System.getProperty(PATCH_BOOTSTRAP_PREFIX + "." + projectName);
-        }
-
-        String prefix = null;
-        if (projectPrefix != null && !projectPrefix.equals(""))
-        {
-            prefix = projectPrefix;
-        }
-        else if (defaultPrefix != null && !defaultPrefix.equals(""))
-        {
-            prefix = defaultPrefix;
-        }
-
-        if (prefix != null)
-        {
-            return new File(context.getWorkingDir(), prefix);
-        }
         return context.getWorkingDir();
     }
 
