@@ -38,7 +38,7 @@ public class CustomProjectValidationPredicateTest extends FileLoaderTestBase
     public void testUnresolvedVariableInName() throws Exception
     {
         ProjectRecipesConfiguration prc = load();
-        assertNotNull(prc.getRecipes().get("with ${project} variable"));
+        assertNotNull(prc.getRecipes().get("with $(project) variable"));
     }
 
     public void testUnresolvedSingleReference() throws Exception
