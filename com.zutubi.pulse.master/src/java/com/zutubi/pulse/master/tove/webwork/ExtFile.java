@@ -5,6 +5,8 @@ import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.util.StringUtils;
 import flexjson.JSON;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +49,21 @@ public class ExtFile
         href = fo.getUrl();
         if (StringUtils.stringSet(href))
         {
-            href = StringUtils.join('/', true, true, baseUrl, href);
+            boolean absolute = false;
+            try
+            {
+                URI uri = new URI(href);
+                absolute = uri.isAbsolute();
+            }
+            catch (URISyntaxException e)
+            {
+                // Treat as relative.
+            }
+
+            if (!absolute)
+            {
+                href = StringUtils.join('/', true, true, baseUrl, href);
+            }
         }
         iconCls = fo.getIconCls();
         extraAttributes = fo.getExtraAttributes();
