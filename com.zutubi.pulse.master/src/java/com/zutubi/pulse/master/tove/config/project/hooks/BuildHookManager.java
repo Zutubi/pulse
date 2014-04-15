@@ -24,6 +24,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -163,17 +164,27 @@ public class BuildHookManager
             }
             catch (Exception e)
             {
-                if (!manual)
+                String message = "Error executing task for hook '" + hook.getName() + "': " + e.getMessage();
+                if (manual)
+                {
+                    OutputStream outputStream = context.getOutputStream();
+                    if (outputStream != null)
+                    {
+                        PrintWriter writer = new PrintWriter(outputStream, true);
+                        writer.println(message);
+                    }
+                }
+                else
                 {
                     Result result = resultNode == null ? buildResult : resultNode.getResult();
-                    result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
+                    result.addFeature(Feature.Level.ERROR, message);
                     if (hook.failOnError())
                     {
                         result.error();
                     }
                 }
 
-                LOG.info("Error executing task for hook '" + hook.getName() + "': " + e.getMessage(), e);
+                LOG.info(message, e);
             }
         }
     }

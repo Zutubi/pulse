@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
+import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.master.agent.Agent;
@@ -22,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_AGENT;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_AGENT_HANDLE;
 
 /**
@@ -126,10 +128,24 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
     {
         long agentHandle = context.getLong(PROPERTY_AGENT_HANDLE, 0);
         Agent agent = agentManager.getAgentByHandle(agentHandle);
-        if (agent != null)
+        if (agent == null)
         {
-            agent.getService().executeCommand(context, commandLine, resolvedWorkingDir, timeout);
+            // If we are manually-triggered from a completed build, the agent handle is not known.
+            // The best we have is the agent name, which should work most of the time (in the
+            // worst case it could refer to a different machine now, but so be it!).
+            String name = context.getString(PROPERTY_AGENT);
+            if (StringUtils.stringSet(name))
+            {
+                agent = agentManager.getAgent(name);
+            }
+
+            if (agent == null)
+            {
+                throw new PulseRuntimeException("Could not execute hook on agent '" + name + "': no such agent exists");
+            }
         }
+
+        agent.getService().executeCommand(context, commandLine, resolvedWorkingDir, timeout);
     }
 
     private String verifyCommand(String command, boolean onAgent) throws IOException
