@@ -5,7 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.Scope;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.tove.variables.api.Variable;
@@ -201,7 +201,7 @@ public class PulseScope implements Scope
             String value = environment.get(envName);
             if(value != null)
             {
-                result = new GenericVariable<String>(name, value);
+                result = new SimpleVariable<String>(name, value);
             }
 
             // Special case PATH to add the prefix
@@ -212,11 +212,11 @@ public class PulseScope implements Scope
                 {
                     if(result == null)
                     {
-                        result = new GenericVariable<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
+                        result = new SimpleVariable<String>(name, pathPrefix.substring(0, pathPrefix.length() - 1));
                     }
                     else if((result.getValue() instanceof String))
                     {
-                        result = new GenericVariable<String>(name, pathPrefix + result.getValue());
+                        result = new SimpleVariable<String>(name, pathPrefix + result.getValue());
                     }
                 }
             }
@@ -397,7 +397,7 @@ public class PulseScope implements Scope
         }
 
         String name = resourceProperty.getName();
-        variables.put(name, new VariableInfo(new GenericVariable<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
+        variables.put(name, new VariableInfo(new SimpleVariable<String>(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
     }
 
     /**
@@ -415,7 +415,7 @@ public class PulseScope implements Scope
             name = name.toUpperCase();
         }
 
-        add(new GenericVariable<String>("env." + name, value));
+        add(new SimpleVariable<String>("env." + name, value));
     }
 
     public PulseScope copyTo(Scope scope)
@@ -437,6 +437,20 @@ public class PulseScope implements Scope
         return copyTo(null);
     }
 
+    @Override
+    public String toString()
+    {
+        String result = parent == null ? "|" : parent.toString();
+        result += " << ";
+        if (StringUtils.stringSet(label))
+        {
+            result += label + ": ";
+        }
+
+        result += variables.values();
+        return result;
+    }
+
     private static class VariableInfo
     {
         private Variable variable;
@@ -453,6 +467,23 @@ public class PulseScope implements Scope
             this.variable = variable;
             this.addToEnvironment = addToEnvironment;
             this.addToPath = addToPath;
+        }
+
+        @Override
+        public String toString()
+        {
+            String result = "(" + variable.toString();
+            if (addToEnvironment)
+            {
+                result += " +env";
+            }
+            if (addToPath)
+            {
+                result += " +path";
+            }
+
+            result += ")";
+            return result;
         }
     }
 }

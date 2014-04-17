@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.core.validation.PulseValidationManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeRegistry;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.junit.IOAssertions;
 import nu.xom.Element;
@@ -65,8 +65,8 @@ public class ToveFileStorerTest extends PulseTestCase
         referenceable2.setName("t2");
 
         scope = new PulseScope();
-        scope.add(new GenericVariable<TrivialConfiguration>(referenceable1.getName(), referenceable1));
-        scope.add(new GenericVariable<TrivialConfiguration>(referenceable2.getName(), referenceable2));
+        scope.add(new SimpleVariable<TrivialConfiguration>(referenceable1.getName(), referenceable1));
+        scope.add(new SimpleVariable<TrivialConfiguration>(referenceable2.getName(), referenceable2));
     }
 
     public void testStoreInt() throws IOException, PulseException

@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.test.EqualityAssertions;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -40,8 +40,8 @@ public class PulseScopeTest extends PulseTestCase
         parent.setLabel(LABEL_PARENT);
         scope = new PulseScope(parent);
         scope.setLabel(LABEL_CHILD);
-        parent.add(new GenericVariable<String>(KEY_PARENT_ONLY, VALUE_PARENT));
-        parent.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_PARENT));
+        parent.add(new SimpleVariable<String>(KEY_PARENT_ONLY, VALUE_PARENT));
+        parent.add(new SimpleVariable<String>(KEY_PARENT_AND_CHILD, VALUE_PARENT));
         parent.add(new ResourceProperty(KEY_PARENT_ONLY_RESOURCE, VALUE_PARENT_RESOURCE, true, true));
         parent.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_PARENT_RESOURCE, true, true));
 
@@ -51,8 +51,8 @@ public class PulseScopeTest extends PulseTestCase
             parent.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
-        scope.add(new GenericVariable<String>(KEY_CHILD_ONLY, VALUE_CHILD));
-        scope.add(new GenericVariable<String>(KEY_PARENT_AND_CHILD, VALUE_CHILD));
+        scope.add(new SimpleVariable<String>(KEY_CHILD_ONLY, VALUE_CHILD));
+        scope.add(new SimpleVariable<String>(KEY_PARENT_AND_CHILD, VALUE_CHILD));
         scope.add(new ResourceProperty(KEY_CHILD_ONLY_RESOURCE, VALUE_CHILD_RESOURCE, true, true));
         scope.add(new ResourceProperty(KEY_PARENT_AND_CHILD_RESOURCE, VALUE_CHILD_RESOURCE, true, true));
 
@@ -92,7 +92,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addUnique(new GenericVariable<String>(KEY_CHILD_ONLY, ""));
+            scope.addUnique(new SimpleVariable<String>(KEY_CHILD_ONLY, ""));
             fail();
         }
         catch(IllegalArgumentException e)
@@ -103,13 +103,13 @@ public class PulseScopeTest extends PulseTestCase
 
     public void testAddUniqueOverride()
     {
-        scope.addUnique(new GenericVariable<String>(KEY_PARENT_ONLY, "override"));
+        scope.addUnique(new SimpleVariable<String>(KEY_PARENT_ONLY, "override"));
         assertEquals("override", scope.getVariableValue(KEY_PARENT_ONLY, String.class));
     }
 
     public void testAddAll()
     {
-        scope.addAll(asList(new GenericVariable<String>("p1", "v1"), new GenericVariable<String>("p2", "v2")));
+        scope.addAll(asList(new SimpleVariable<String>("p1", "v1"), new SimpleVariable<String>("p2", "v2")));
         assertEquals("v1", scope.getVariableValue("p1", String.class));
         assertEquals("v2", scope.getVariableValue("p2", String.class));
     }
@@ -118,7 +118,7 @@ public class PulseScopeTest extends PulseTestCase
     {
         try
         {
-            scope.addAllUnique(asList(new GenericVariable<String>(KEY_CHILD_ONLY, "")));
+            scope.addAllUnique(asList(new SimpleVariable<String>(KEY_CHILD_ONLY, "")));
             fail();
         }
         catch (IllegalArgumentException e)
@@ -130,11 +130,11 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetVariables()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>(VALUE_PARENT, "pv"));
-        parent.add(new GenericVariable<String>("both", "bv"));
+        parent.add(new SimpleVariable<String>(VALUE_PARENT, "pv"));
+        parent.add(new SimpleVariable<String>("both", "bv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>(VALUE_CHILD, "cv"));
-        child.add(new GenericVariable<String>("both", "bv"));
+        child.add(new SimpleVariable<String>(VALUE_CHILD, "cv"));
+        child.add(new SimpleVariable<String>("both", "bv"));
 
         Collection<Variable> variables = child.getVariables();
         assertEquals(3, variables.size());
@@ -150,8 +150,8 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetVariablesOfType()
     {
         PulseScope scope = new PulseScope();
-        scope.add(new GenericVariable<Long>("long", 1L));
-        scope.add(new GenericVariable<String>("string", "s"));
+        scope.add(new SimpleVariable<Long>("long", 1L));
+        scope.add(new SimpleVariable<String>("string", "s"));
 
         Collection<Variable> variables = scope.getVariables(String.class);
         assertEquals(1, variables.size());
@@ -161,12 +161,12 @@ public class PulseScopeTest extends PulseTestCase
     public void testGetVariablesOfTypeOverrideType()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<Long>("long then string", 1L));
-        parent.add(new GenericVariable<String>("string then long", "s"));
+        parent.add(new SimpleVariable<Long>("long then string", 1L));
+        parent.add(new SimpleVariable<String>("string then long", "s"));
 
         PulseScope child = new PulseScope(parent);
-        parent.add(new GenericVariable<String>("long then string", "s"));
-        parent.add(new GenericVariable<Long>("string then long", 1L));
+        child.add(new SimpleVariable<String>("long then string", "s"));
+        child.add(new SimpleVariable<Long>("string then long", 1L));
         
         Collection<Variable> variables = child.getVariables(String.class);
         assertEquals(1, variables.size());
@@ -458,13 +458,13 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopy()
     {
         PulseScope original = new PulseScope();
-        original.add(new GenericVariable<String>("foo", "bar"));
+        original.add(new SimpleVariable<String>("foo", "bar"));
 
         PulseScope copy = original.copy();
         assertEquals("bar", original.getVariableValue("foo", String.class));
         assertEquals("bar", copy.getVariableValue("foo", String.class));
         
-        original.add(new GenericVariable<String>("foo", "baz"));
+        original.add(new SimpleVariable<String>("foo", "baz"));
         assertEquals("baz", original.getVariableValue("foo", String.class));
         assertEquals("bar", copy.getVariableValue("foo", String.class));
     }
@@ -472,7 +472,7 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyWithParent()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("foo", "bar"));
+        parent.add(new SimpleVariable<String>("foo", "bar"));
         PulseScope original = new PulseScope(parent);
 
         PulseScope copy = original.copy();
@@ -480,7 +480,7 @@ public class PulseScopeTest extends PulseTestCase
         assertEquals("bar", original.getVariableValue("foo", String.class));
         assertEquals("bar", copy.getVariableValue("foo", String.class));
 
-        parent.add(new GenericVariable<String>("foo", "baz"));
+        parent.add(new SimpleVariable<String>("foo", "baz"));
         assertEquals("baz", parent.getVariableValue("foo", String.class));
         assertEquals("baz", original.getVariableValue("foo", String.class));
         assertEquals("bar", copy.getVariableValue("foo", String.class));
@@ -496,9 +496,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyTo()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("pp", "pv"));
+        parent.add(new SimpleVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>("cp", "cv"));
+        child.add(new SimpleVariable<String>("cp", "cv"));
 
         PulseScope copy = child.copyTo(parent);
         assertNull(copy.getParent());
@@ -510,9 +510,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToNull()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("pp", "pv"));
+        parent.add(new SimpleVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>("cp", "cv"));
+        child.add(new SimpleVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(null));
     }
@@ -520,9 +520,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToScopeNotInChain()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("pp", "pv"));
+        parent.add(new SimpleVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>("cp", "cv"));
+        child.add(new SimpleVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(new PulseScope()));
     }
@@ -530,9 +530,9 @@ public class PulseScopeTest extends PulseTestCase
     public void testCopyToSelf()
     {
         PulseScope parent = new PulseScope();
-        parent.add(new GenericVariable<String>("pp", "pv"));
+        parent.add(new SimpleVariable<String>("pp", "pv"));
         PulseScope child = new PulseScope(parent);
-        child.add(new GenericVariable<String>("cp", "cv"));
+        child.add(new SimpleVariable<String>("cp", "cv"));
 
         assertFullCopy(child.copyTo(child));
     }

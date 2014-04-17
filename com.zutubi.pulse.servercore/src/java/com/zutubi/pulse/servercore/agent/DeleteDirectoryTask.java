@@ -3,11 +3,10 @@ package com.zutubi.pulse.servercore.agent;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
-import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -68,16 +67,16 @@ public class DeleteDirectoryTask implements SynchronisationTask
 
     private String resolvePattern()
     {
-        VariableMap map = new HashVariableMap();
+        HashVariableMap map = new HashVariableMap();
         for (Map.Entry<String, String> entry: variables.entrySet())
         {
-            map.add(new GenericVariable<String>(entry.getKey(), entry.getValue()));
+            map.add(new SimpleVariable<String>(entry.getKey(), entry.getValue()));
         }
         
-        map.add(new GenericVariable<String>(ServerRecipePaths.PROPERTY_DATA_DIR, configurationManager.getUserPaths().getData().getAbsolutePath()));
+        map.add(new SimpleVariable<String>(ServerRecipePaths.PROPERTY_DATA_DIR, configurationManager.getUserPaths().getData().getAbsolutePath()));
         try
         {
-            map.add(new GenericVariable<String>(ServerRecipePaths.PROPERTY_AGENT_DATA_DIR, VariableResolver.resolveVariables(agentDataDirectoryPattern, map, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT)));
+            map.add(new SimpleVariable<String>(ServerRecipePaths.PROPERTY_AGENT_DATA_DIR, VariableResolver.resolveVariables(agentDataDirectoryPattern, map, VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT)));
             return VariableResolver.resolveVariables(pathPattern, map);
         }
         catch (ResolutionException e)

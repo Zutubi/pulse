@@ -13,11 +13,11 @@ import com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerConf
 import com.zutubi.pulse.master.tove.config.user.ProjectsSummaryConfiguration;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.master.webwork.Urls;
-import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.MutableVariableMap;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.time.TimeStamps;
 import flexjson.JSON;
@@ -311,10 +311,10 @@ public class ProjectBuildModel
 
     private String merge(String template, Pair<String, String>... properties)
     {
-        VariableMap variableMap = new HashVariableMap();
+        MutableVariableMap variableMap = new HashVariableMap();
         for (Pair<String, String> p: properties)
         {
-            variableMap.add(new GenericVariable<String>(p.first, p.second));
+            variableMap.add(new SimpleVariable<String>(p.first, p.second));
         }
 
         try

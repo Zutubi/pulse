@@ -18,7 +18,7 @@ import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.util.adt.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -1235,7 +1235,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeAssigned(Agent agent, int recipeId)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        context.add(BuildProperties.NAMESPACE_INTERNAL, new GenericVariable<String>(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
+        context.add(BuildProperties.NAMESPACE_INTERNAL, new SimpleVariable<String>(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
         eventManager.publish(new RecipeAssignedEvent(this, new RecipeRequest(context), agent));
         assertStatusChanges(agent, IDLE, RECIPE_ASSIGNED);
     }

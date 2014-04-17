@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,22 +22,22 @@ public class MultiScopeStackTest extends PulseTestCase
         super.setUp();
 
         scope1 = stack.getScope(NS1);
-        scope1.add(new GenericVariable<String>("1", "v1 1"));
-        scope1.add(new GenericVariable<String>("1 2", "v1 1 2"));
-        scope1.add(new GenericVariable<String>("1 3", "v1 1 3"));
-        scope1.add(new GenericVariable<String>("1 2 3", "v1 1 2 3"));
+        scope1.add(new SimpleVariable<String>("1", "v1 1"));
+        scope1.add(new SimpleVariable<String>("1 2", "v1 1 2"));
+        scope1.add(new SimpleVariable<String>("1 3", "v1 1 3"));
+        scope1.add(new SimpleVariable<String>("1 2 3", "v1 1 2 3"));
 
         scope2 = stack.getScope(NS2);
-        scope2.add(new GenericVariable<String>("2", "v2 2"));
-        scope2.add(new GenericVariable<String>("1 2", "v2 1 2"));
-        scope2.add(new GenericVariable<String>("2 3", "v2 2 3"));
-        scope2.add(new GenericVariable<String>("1 2 3", "v2 1 2 3"));
+        scope2.add(new SimpleVariable<String>("2", "v2 2"));
+        scope2.add(new SimpleVariable<String>("1 2", "v2 1 2"));
+        scope2.add(new SimpleVariable<String>("2 3", "v2 2 3"));
+        scope2.add(new SimpleVariable<String>("1 2 3", "v2 1 2 3"));
 
         scope3 = stack.getScope(NS3);
-        scope3.add(new GenericVariable<String>("3", "v3 3"));
-        scope3.add(new GenericVariable<String>("1 3", "v3 1 3"));
-        scope3.add(new GenericVariable<String>("2 3", "v3 2 3"));
-        scope3.add(new GenericVariable<String>("1 2 3", "v3 1 2 3"));
+        scope3.add(new SimpleVariable<String>("3", "v3 3"));
+        scope3.add(new SimpleVariable<String>("1 3", "v3 1 3"));
+        scope3.add(new SimpleVariable<String>("2 3", "v3 2 3"));
+        scope3.add(new SimpleVariable<String>("1 2 3", "v3 1 2 3"));
     }
 
     public void testScopeChain()
@@ -112,9 +112,9 @@ public class MultiScopeStackTest extends PulseTestCase
     {
         stack.setLabel("foo");
         stack.push();
-        stack.add(new GenericVariable<String>("a", "av"));
+        stack.add(new SimpleVariable<String>("a", "av"));
         stack.push();
-        stack.add(new GenericVariable<String>("b", "bv"));
+        stack.add(new SimpleVariable<String>("b", "bv"));
         stack.popTo("foo");
 
         assertFalse(stack.containsVariable("a"));
@@ -125,7 +125,7 @@ public class MultiScopeStackTest extends PulseTestCase
     public void testPopToSame()
     {
         stack.push();
-        stack.add(new GenericVariable<String>("a", "av"));
+        stack.add(new SimpleVariable<String>("a", "av"));
         stack.setLabel("foo");
         stack.popTo("foo");
 
@@ -137,9 +137,9 @@ public class MultiScopeStackTest extends PulseTestCase
     {
         stack.setLabel("foo");
         stack.push();
-        stack.add(new GenericVariable<String>("a", "av"));
+        stack.add(new SimpleVariable<String>("a", "av"));
         stack.push();
-        stack.add(new GenericVariable<String>("b", "bv"));
+        stack.add(new SimpleVariable<String>("b", "bv"));
         stack.popTo("non");
 
         assertFalse(stack.containsVariable("a"));
@@ -180,16 +180,16 @@ public class MultiScopeStackTest extends PulseTestCase
     private void pushAndAddProperties()
     {
         stack.push();
-        stack.getScope(NS1).add(new GenericVariable<String>("1", "v1p 1"));
-        stack.getScope(NS1).add(new GenericVariable<String>("p 1", "v1p p 1"));
-        stack.getScope(NS1).add(new GenericVariable<String>("p 1 2", "v1p p 1 2"));
-        stack.getScope(NS1).add(new GenericVariable<String>("p 1 3", "v1p p 1 3"));
-        stack.getScope(NS2).add(new GenericVariable<String>("2", "v2p 2"));
-        stack.getScope(NS2).add(new GenericVariable<String>("p 2", "v2p p 2"));
-        stack.getScope(NS2).add(new GenericVariable<String>("p 1 2", "v2p p 1 2"));
-        stack.getScope(NS3).add(new GenericVariable<String>("3", "v3p 3"));
-        stack.getScope(NS3).add(new GenericVariable<String>("p 3", "v3p p 3"));
-        stack.getScope(NS3).add(new GenericVariable<String>("p 1 3", "v3p p 1 3"));
+        stack.getScope(NS1).add(new SimpleVariable<String>("1", "v1p 1"));
+        stack.getScope(NS1).add(new SimpleVariable<String>("p 1", "v1p p 1"));
+        stack.getScope(NS1).add(new SimpleVariable<String>("p 1 2", "v1p p 1 2"));
+        stack.getScope(NS1).add(new SimpleVariable<String>("p 1 3", "v1p p 1 3"));
+        stack.getScope(NS2).add(new SimpleVariable<String>("2", "v2p 2"));
+        stack.getScope(NS2).add(new SimpleVariable<String>("p 2", "v2p p 2"));
+        stack.getScope(NS2).add(new SimpleVariable<String>("p 1 2", "v2p p 1 2"));
+        stack.getScope(NS3).add(new SimpleVariable<String>("3", "v3p 3"));
+        stack.getScope(NS3).add(new SimpleVariable<String>("p 3", "v3p p 3"));
+        stack.getScope(NS3).add(new SimpleVariable<String>("p 1 3", "v3p p 1 3"));
     }
 
     private void assertPushedProperties(MultiScopeStack stack)
@@ -229,14 +229,14 @@ public class MultiScopeStackTest extends PulseTestCase
 
     private void assertCopyIndependent(MultiScopeStack copy)
     {
-        stack.getScope(NS1).add(new GenericVariable<String>("after copy", "foo"));
-        stack.getScope(NS2).add(new GenericVariable<String>("after copy", "foo"));
-        stack.getScope(NS3).add(new GenericVariable<String>("after copy", "foo"));
+        stack.getScope(NS1).add(new SimpleVariable<String>("after copy", "foo"));
+        stack.getScope(NS2).add(new SimpleVariable<String>("after copy", "foo"));
+        stack.getScope(NS3).add(new SimpleVariable<String>("after copy", "foo"));
         assertNull(copy.getVariable("after copy"));
 
-        copy.getScope(NS1).add(new GenericVariable<String>("in copy", "foo"));
-        copy.getScope(NS2).add(new GenericVariable<String>("in copy", "foo"));
-        copy.getScope(NS3).add(new GenericVariable<String>("in copy", "foo"));
+        copy.getScope(NS1).add(new SimpleVariable<String>("in copy", "foo"));
+        copy.getScope(NS2).add(new SimpleVariable<String>("in copy", "foo"));
+        copy.getScope(NS3).add(new SimpleVariable<String>("in copy", "foo"));
         assertNull(stack.getVariable("in copy"));
     }
 

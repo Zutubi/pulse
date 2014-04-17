@@ -57,6 +57,24 @@ public interface Scope extends VariableMap
     Scope getAncestor(String label);
 
     /**
+     * Add a variable to this map. The key by which this variable will later be
+     * accessible is the name value of the variable.
+     *
+     * If this map already contains a variable of the same name as the
+     * parameter, the old variable instance will be replaced.
+     *
+     * @param variable the variable instance to be added
+     */
+    void add(Variable variable);
+
+    /**
+     * Add all of the variables contained by the given collection to this map.
+     *
+     * @param variables the collection of variables to be added.
+     */
+    void addAll(Collection<? extends Variable> variables);
+
+    /**
      * Adds a variable which must have a unique name directly in this scope
      * (i.e. it may override an ancestor but may not replace a variable in
      * this scope itself).

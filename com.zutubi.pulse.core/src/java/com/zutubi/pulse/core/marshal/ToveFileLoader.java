@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.marshal;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.api.PulseException;
@@ -13,10 +12,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.squeezer.Squeezers;
 import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
-import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 import com.zutubi.tove.variables.api.ResolutionException;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -33,6 +30,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_NON_STRICT;
+import static com.zutubi.tove.variables.VariableResolver.ResolutionStrategy.RESOLVE_STRICT;
 
 /**
  * Loads configuration objects from XML files, using the type properties and
@@ -165,7 +166,7 @@ public class ToveFileLoader
                         {
                             value = type.getProperty(referenceable.valueProperty()).getValue(configuration);
                         }
-                        scope.addUnique(new GenericVariable<Object>(referenceName, value));
+                        scope.addUnique(new SimpleVariable<Object>(referenceName, value));
                     }
                 }
 

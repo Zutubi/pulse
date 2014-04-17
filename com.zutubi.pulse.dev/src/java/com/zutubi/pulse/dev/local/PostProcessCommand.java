@@ -11,8 +11,6 @@ import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.cli.HelpCommand;
 import com.zutubi.pulse.core.engine.ReferenceCollectingProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.engine.marshal.ResourceFileLoader;
@@ -33,7 +31,7 @@ import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.dev.client.ClientException;
 import com.zutubi.pulse.dev.sync.SynchronisePluginsClientFactory;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import org.apache.commons.cli.*;
 
@@ -44,6 +42,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_TEST_RESULTS;
 
 /**
  * A command to run a post-processor manually over a single file.  Used to
@@ -137,7 +138,7 @@ public class PostProcessCommand implements Command
             CommandResult result = new CommandResult("dummy");
             PulseExecutionContext executionContext = new PulseExecutionContext();
             PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
-            executionContext.add(NAMESPACE_INTERNAL, new GenericVariable<PersistentTestSuiteResult>(PROPERTY_TEST_RESULTS, testResults));
+            executionContext.add(NAMESPACE_INTERNAL, new SimpleVariable<PersistentTestSuiteResult>(PROPERTY_TEST_RESULTS, testResults));
 
             PostProcessorContext context = new DefaultPostProcessorContext(artifact, result, Integer.MAX_VALUE, executionContext);
 
@@ -236,7 +237,7 @@ public class PostProcessCommand implements Command
         try
         {
             PulseScope pulseScope = new PulseScope();
-            pulseScope.add(new GenericVariable<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
+            pulseScope.add(new SimpleVariable<ResourceRepository>(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository));
             loader.load(new FileInputStream(f), result, pulseScope, new LocalFileResolver(f.getParentFile()), new DefaultToveFileLoadInterceptor());
             return result;
         }

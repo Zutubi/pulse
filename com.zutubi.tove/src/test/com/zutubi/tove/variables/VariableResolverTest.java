@@ -1,7 +1,7 @@
 package com.zutubi.tove.variables;
 
+import com.zutubi.tove.variables.api.MutableVariableMap;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.junit.ZutubiTestCase;
 
@@ -14,18 +14,18 @@ import static org.hamcrest.Matchers.containsString;
 
 public class VariableResolverTest extends ZutubiTestCase
 {
-    private VariableMap scope = null;
+    private MutableVariableMap scope = null;
 
     public void setUp()
     {
         scope = new HashVariableMap();
-        scope.add(new GenericVariable<String>("foo", "foo"));
-        scope.add(new GenericVariable<String>("bar", "baz"));
-        scope.add(new GenericVariable<String>("a\\b", "slashed"));
-        scope.add(new GenericVariable<String>("empty", ""));
-        scope.add(new GenericVariable<String>("a{b}c", "braced"));
-        scope.add(new GenericVariable<String>("a(b)c", "parened"));
-        scope.add(new GenericVariable<String>("invalid.name", " this/is\\a$badname  "));
+        scope.add(new SimpleVariable<String>("foo", "foo"));
+        scope.add(new SimpleVariable<String>("bar", "baz"));
+        scope.add(new SimpleVariable<String>("a\\b", "slashed"));
+        scope.add(new SimpleVariable<String>("empty", ""));
+        scope.add(new SimpleVariable<String>("a{b}c", "braced"));
+        scope.add(new SimpleVariable<String>("a(b)c", "parened"));
+        scope.add(new SimpleVariable<String>("invalid.name", " this/is\\a$badname  "));
     }
 
     private void errorTest(String input, String expectedError)
@@ -196,7 +196,7 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testNestedVariable() throws Exception
     {
-        scope.add(new GenericVariable<String>("a", "${foo}"));
+        scope.add(new SimpleVariable<String>("a", "${foo}"));
         successTest("${a}", "${foo}");
     }
 
@@ -312,25 +312,25 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testSplitQuotesInVariable() throws Exception
     {
-        scope.add(new GenericVariable<String>("a\"b", "val"));
+        scope.add(new SimpleVariable<String>("a\"b", "val"));
         successSplitTest("odd ${a\"b} ref", "odd", "val", "ref");
     }
 
     public void testSplitParenQuotesInVariable() throws Exception
     {
-        scope.add(new GenericVariable<String>("a\"b", "val"));
+        scope.add(new SimpleVariable<String>("a\"b", "val"));
         successSplitTest("odd $(a\"b) ref", "odd", "val", "ref");
     }
 
     public void testSplitSpaceInVariable() throws Exception
     {
-        scope.add(new GenericVariable<String>("space invader", "val"));
+        scope.add(new SimpleVariable<String>("space invader", "val"));
         successSplitTest("odd ${space invader} ref", "odd", "val", "ref");
     }
 
     public void testSplitParenSpaceInVariable() throws Exception
     {
-        scope.add(new GenericVariable<String>("space invader", "val"));
+        scope.add(new SimpleVariable<String>("space invader", "val"));
         successSplitTest("odd $(space invader) ref", "odd", "val", "ref");
     }
 
@@ -507,7 +507,7 @@ public class VariableResolverTest extends ZutubiTestCase
 
     public void testNormalise() throws Exception
     {
-        scope.add(new GenericVariable<String>("path", "slash/this\\way/and\\that"));
+        scope.add(new SimpleVariable<String>("path", "slash/this\\way/and\\that"));
         successTest("$(path|normalise)", StringUtils.join(File.separator, asList("slash", "this", "way", "and", "that")));
     }
 }

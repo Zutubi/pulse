@@ -1,9 +1,9 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
-import com.zutubi.tove.variables.api.VariableMap;
+import com.zutubi.tove.variables.SimpleVariable;
+import com.zutubi.tove.variables.api.MutableVariableMap;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import static com.zutubi.util.io.FileSystemUtils.encodeFilenameComponent;
@@ -48,16 +48,16 @@ public class AgentRecipeDetails
         setProjectTempPattern(context.getString(NAMESPACE_INTERNAL, PROPERTY_TEMP_PATTERN));
     }
     
-    public VariableMap createPathVariableMap()
+    public MutableVariableMap createPathVariableMap()
     {
-        VariableMap map = new HashVariableMap();
-        map.add(new GenericVariable<String>(PROPERTY_AGENT, encodeFilenameComponent(agent)));
-        map.add(new GenericVariable<String>(PROPERTY_AGENT_HANDLE, Long.toString(agentHandle)));
-        map.add(new GenericVariable<String>(PROPERTY_PROJECT, encodeFilenameComponent(project)));
-        map.add(new GenericVariable<String>(PROPERTY_PROJECT_HANDLE, Long.toString(projectHandle)));
-        map.add(new GenericVariable<String>(PROPERTY_RECIPE_ID, Long.toString(recipeId)));
-        map.add(new GenericVariable<String>(PROPERTY_STAGE, encodeFilenameComponent(stage)));
-        map.add(new GenericVariable<String>(PROPERTY_STAGE_HANDLE, Long.toString(stageHandle)));
+        MutableVariableMap map = new HashVariableMap();
+        map.add(new SimpleVariable<String>(PROPERTY_AGENT, encodeFilenameComponent(agent)));
+        map.add(new SimpleVariable<String>(PROPERTY_AGENT_HANDLE, Long.toString(agentHandle)));
+        map.add(new SimpleVariable<String>(PROPERTY_PROJECT, encodeFilenameComponent(project)));
+        map.add(new SimpleVariable<String>(PROPERTY_PROJECT_HANDLE, Long.toString(projectHandle)));
+        map.add(new SimpleVariable<String>(PROPERTY_RECIPE_ID, Long.toString(recipeId)));
+        map.add(new SimpleVariable<String>(PROPERTY_STAGE, encodeFilenameComponent(stage)));
+        map.add(new SimpleVariable<String>(PROPERTY_STAGE_HANDLE, Long.toString(stageHandle)));
         return map;
     }
 

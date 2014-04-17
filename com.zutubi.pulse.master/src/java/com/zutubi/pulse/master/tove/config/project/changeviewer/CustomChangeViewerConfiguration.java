@@ -8,11 +8,11 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Wire;
-import com.zutubi.tove.variables.GenericVariable;
 import com.zutubi.tove.variables.HashVariableMap;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.MutableVariableMap;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.WebUtils;
 
@@ -160,18 +160,18 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if(StringUtils.stringSet(url))
         {
-            VariableMap references = getProjectReferences(projectConfiguration);
-            references.add(new GenericVariable<String>(PROPERTY_REVISION, revision.getRevisionString()));
+            MutableVariableMap references = getProjectReferences(projectConfiguration);
+            references.add(new SimpleVariable<String>(PROPERTY_REVISION, revision.getRevisionString()));
 
             Map<String, Object> properties = ChangeViewerUtils.getRevisionProperties(revision);
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_AUTHOR))
             {
-                references.add(new GenericVariable<String>(PROPERTY_AUTHOR, (String) properties.get(ChangeViewerUtils.PROPERTY_AUTHOR)));
+                references.add(new SimpleVariable<String>(PROPERTY_AUTHOR, (String) properties.get(ChangeViewerUtils.PROPERTY_AUTHOR)));
             }
 
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_BRANCH))
             {
-                references.add(new GenericVariable<String>(PROPERTY_BRANCH, (String) properties.get(ChangeViewerUtils.PROPERTY_BRANCH)));
+                references.add(new SimpleVariable<String>(PROPERTY_BRANCH, (String) properties.get(ChangeViewerUtils.PROPERTY_BRANCH)));
             }
 
             if (properties.containsKey(ChangeViewerUtils.PROPERTY_DATE))
@@ -179,8 +179,8 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 Date date = (Date) properties.get(ChangeViewerUtils.PROPERTY_DATE);
                 synchronized (PULSE_DATE_FORMAT)
                 {
-                    references.add(new GenericVariable<String>(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
-                    references.add(new GenericVariable<String>(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
+                    references.add(new SimpleVariable<String>(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
+                    references.add(new SimpleVariable<String>(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
                 }
             }
 
@@ -201,12 +201,12 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if (StringUtils.stringSet(url))
         {
-            VariableMap references = getProjectReferences(context.getProjectConfiguration());
-            references.add(new GenericVariable<String>(PROPERTY_PATH, WebUtils.uriPathEncode(fileChange.getPath())));
-            references.add(new GenericVariable<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
-            references.add(new GenericVariable<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
-            references.add(new GenericVariable<String>(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
-            references.add(new GenericVariable<String>(PROPERTY_CHANGE_REVISION, context.getRevision().getRevisionString()));
+            MutableVariableMap references = getProjectReferences(context.getProjectConfiguration());
+            references.add(new SimpleVariable<String>(PROPERTY_PATH, WebUtils.uriPathEncode(fileChange.getPath())));
+            references.add(new SimpleVariable<String>(PROPERTY_PATH_RAW, fileChange.getPath()));
+            references.add(new SimpleVariable<String>(PROPERTY_PATH_FORM, WebUtils.formUrlEncode(fileChange.getPath())));
+            references.add(new SimpleVariable<String>(PROPERTY_REVISION, fileChange.getRevision().getRevisionString()));
+            references.add(new SimpleVariable<String>(PROPERTY_CHANGE_REVISION, context.getRevision().getRevisionString()));
 
             // Quick check to see if there is a chance we need to calculate the
             // previous revision.  May have false positives, but that is OK, we
@@ -216,7 +216,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 Revision previousFileRevision = context.getPreviousFileRevision(fileChange);
                 if (previousFileRevision != null)
                 {
-                    references.add(new GenericVariable<String>(PROPERTY_PREVIOUS_REVISION, previousFileRevision.getRevisionString()));
+                    references.add(new SimpleVariable<String>(PROPERTY_PREVIOUS_REVISION, previousFileRevision.getRevisionString()));
                 }
             }
 
@@ -227,7 +227,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
                 Revision previousChangelistRevision = context.getPreviousChangelistRevision();
                 if (previousChangelistRevision != null)
                 {
-                    references.add(new GenericVariable<String>(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision.getRevisionString()));
+                    references.add(new SimpleVariable<String>(PROPERTY_PREVIOUS_CHANGE_REVISION, previousChangelistRevision.getRevisionString()));
                 }
             }
 
@@ -244,14 +244,14 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return null;
     }
 
-    private VariableMap getProjectReferences(ProjectConfiguration projectConfiguration)
+    private MutableVariableMap getProjectReferences(ProjectConfiguration projectConfiguration)
     {
         HashVariableMap references = new HashVariableMap();
         if (projectConfiguration != null)
         {
             for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
             {
-                references.add(new GenericVariable<String>(property.getName(), property.getValue()));
+                references.add(new SimpleVariable<String>(property.getName(), property.getValue()));
             }
         }
 
@@ -260,12 +260,12 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateChangesetURL(String url)
     {
-        VariableMap references = new HashVariableMap();
-        references.add(new GenericVariable<String>(PROPERTY_REVISION, ""));
-        references.add(new GenericVariable<String>(PROPERTY_AUTHOR, ""));
-        references.add(new GenericVariable<String>(PROPERTY_BRANCH, ""));
-        references.add(new GenericVariable<String>(PROPERTY_TIMESTAMP_FISHEYE, ""));
-        references.add(new GenericVariable<String>(PROPERTY_TIMESTAMP_PULSE, ""));
+        MutableVariableMap references = new HashVariableMap();
+        references.add(new SimpleVariable<String>(PROPERTY_REVISION, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_AUTHOR, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_BRANCH, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_TIMESTAMP_FISHEYE, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_TIMESTAMP_PULSE, ""));
 
         try
         {
@@ -279,10 +279,10 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateFileURL(String url)
     {
-        VariableMap references = new HashVariableMap();
-        references.add(new GenericVariable<String>(PROPERTY_PATH, ""));
-        references.add(new GenericVariable<String>(PROPERTY_REVISION, ""));
-        references.add(new GenericVariable<String>(PROPERTY_PREVIOUS_REVISION, ""));
+        MutableVariableMap references = new HashVariableMap();
+        references.add(new SimpleVariable<String>(PROPERTY_PATH, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_REVISION, ""));
+        references.add(new SimpleVariable<String>(PROPERTY_PREVIOUS_REVISION, ""));
 
         try
         {

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config;
 
 import com.zutubi.pulse.core.PulseExecutionContext;
-import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -34,10 +33,6 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
             if (projectConfig != null)
             {
                 MasterBuildProperties.addProjectProperties(context, projectConfig);
-                for (ResourcePropertyConfiguration property: projectConfig.getProperties().values())
-                {
-                    context.add(property.asResourceProperty());
-                }
             }
         }
 

@@ -272,7 +272,7 @@ public interface ExecutionContext
     /**
      * Convenience method to add a property with the given name and value to
      * the given namespace.  The name and value are wrapped up into a
-     * {@link com.zutubi.tove.variables.GenericVariable} and added.  Any
+     * {@link com.zutubi.tove.variables.SimpleVariable} and added.  Any
      * existing variable of the same name will be replaced.
      *
      * @see #addValue(String, Object)
@@ -287,7 +287,7 @@ public interface ExecutionContext
     /**
      * Convenience method to add a property with the given name and value to
      * the user namespace.  The name and value are wrapped up into a
-     * {@link com.zutubi.tove.variables.GenericVariable} and added.  Any
+     * {@link com.zutubi.tove.variables.SimpleVariable} and added.  Any
      * existing variable of the same name will be replaced.
      *
      * @see #addValue(String, Object)

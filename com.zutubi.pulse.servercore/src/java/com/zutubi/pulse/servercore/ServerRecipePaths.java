@@ -2,10 +2,10 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
-import com.zutubi.tove.variables.GenericVariable;
+import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
+import com.zutubi.tove.variables.api.MutableVariableMap;
 import com.zutubi.tove.variables.api.ResolutionException;
-import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -48,8 +48,8 @@ public class ServerRecipePaths implements RecipePaths
 
     private File getAgentDataDir()
     {
-        VariableMap references = recipeDetails.createPathVariableMap();
-        references.add(new GenericVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
+        MutableVariableMap references = recipeDetails.createPathVariableMap();
+        references.add(new SimpleVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
 
         try
         {
@@ -75,10 +75,10 @@ public class ServerRecipePaths implements RecipePaths
 
     private File resolveDirPattern(String pattern, File defaultDir)
     {
-        VariableMap references = recipeDetails.createPathVariableMap();
-        references.add(new GenericVariable<String>(PROPERTY_AGENT_DATA_DIR, getAgentDataDir().getAbsolutePath()));
-        references.add(new GenericVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
-        references.add(new GenericVariable<String>(PROPERTY_RECIPES_DIR, getRecipesRoot().getAbsolutePath()));
+        MutableVariableMap references = recipeDetails.createPathVariableMap();
+        references.add(new SimpleVariable<String>(PROPERTY_AGENT_DATA_DIR, getAgentDataDir().getAbsolutePath()));
+        references.add(new SimpleVariable<String>(PROPERTY_DATA_DIR, dataDir.getAbsolutePath()));
+        references.add(new SimpleVariable<String>(PROPERTY_RECIPES_DIR, getRecipesRoot().getAbsolutePath()));
 
         try
         {

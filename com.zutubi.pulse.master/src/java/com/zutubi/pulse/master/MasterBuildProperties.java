@@ -34,7 +34,7 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, projectConfiguration.getOrganisation());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, projectConfiguration.getHandle());
 
-        for(ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
+        for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
         {
             context.add(property.asResourceProperty());
         }
