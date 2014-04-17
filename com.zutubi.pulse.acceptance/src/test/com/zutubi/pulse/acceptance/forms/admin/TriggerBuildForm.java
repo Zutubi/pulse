@@ -53,7 +53,7 @@ public class TriggerBuildForm extends SeleniumForm
         }
         for (String propertyName : propertyNames)
         {
-            fieldNames.add("property." + propertyName);
+            fieldNames.add("pproperty." + propertyName);
         }
 
         return fieldNames.toArray(new String[fieldNames.size()]);

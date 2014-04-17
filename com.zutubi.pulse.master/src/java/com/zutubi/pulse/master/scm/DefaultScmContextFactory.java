@@ -109,7 +109,7 @@ public class DefaultScmContextFactory implements MasterScmContextFactory
         PulseExecutionContext environmentContext = new PulseExecutionContext();
         if (projectConfiguration != null)
         {
-            MasterBuildProperties.addProjectProperties(environmentContext, projectConfiguration);
+            MasterBuildProperties.addProjectProperties(environmentContext, projectConfiguration, true);
         }
         if (StringUtils.stringSet(implicitResource))
         {

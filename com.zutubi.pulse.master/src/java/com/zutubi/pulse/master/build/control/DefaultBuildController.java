@@ -103,6 +103,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private AsynchronousDelegatingListener asyncListener;
     private int pendingRecipes = 0;
 
+    private File buildDir;
     private BuildResult previousHealthy;
     private PulseExecutionContext buildContext;
     private BuildHookManager buildHookManager;
@@ -160,25 +161,19 @@ public class DefaultBuildController implements EventListener, BuildController
             previousHealthy = buildManager.getLatestBuildResult(project, true, ResultState.getHealthyStates());
 
             MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-            File buildDir = paths.getBuildDir(buildResult);
+            buildDir = paths.getBuildDir(buildResult);
             buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
 
             buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
             ivy.pushMessageLogger(buildLogger.getMessageLogger());
 
-            buildContext = new PulseExecutionContext();
-            MasterBuildProperties.addProjectProperties(buildContext, projectConfig);
-            MasterBuildProperties.addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
-            buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
-            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_UNZIP_RETRIEVED_ARCHIVES, projectConfig.getDependencies().isUnzipRetrievedArchives());
-            buildContext.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
-            // We resolve the SCM properties on the master as the full context is not available on
-            // the agents.
-            buildContext.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm()));
+            buildContext = newContext();
+            MasterBuildProperties.addProjectProperties(buildContext, projectConfig, true);
             for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
             {
                 buildContext.add(requestProperty);
             }
+
             activateBuildAuthenticationToken();
             controllers = new LinkedList<RecipeController>();
             createControllers();
@@ -202,6 +197,22 @@ public class DefaultBuildController implements EventListener, BuildController
             asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext, e));
         }
         return buildResult.getNumber();
+    }
+
+    private PulseExecutionContext newContext()
+    {
+        // Creates a context with everything that should be shared by the build and recipe
+        // contexts.  Note this excludes resource properties as they need to be added later for
+        // recipes (when we are on the agent) and we want to avoid adding them twice (CIB-3090).
+        PulseExecutionContext context = new PulseExecutionContext();
+        MasterBuildProperties.addBuildProperties(context, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_UNZIP_RETRIEVED_ARCHIVES, projectConfig.getDependencies().isUnzipRetrievedArchives());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
+        // We resolve the SCM properties on the master as the full context is not available on
+        // the agents.
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm()));
+        return context;
     }
 
     /**
@@ -263,14 +274,7 @@ public class DefaultBuildController implements EventListener, BuildController
         File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
         recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-        PulseExecutionContext recipeContext = new PulseExecutionContext(buildContext);
-        recipeContext.push();
-        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stageConfig.getRecipe());
-        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, stageConfig.getName());
-        recipeContext.addValue(NAMESPACE_INTERNAL, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
-
-        RecipeRequest recipeRequest = new RecipeRequest(new PulseExecutionContext(recipeContext));
+        RecipeRequest recipeRequest = new RecipeRequest(newContext());
         recipeRequest.setPulseFileSource(pulseFileProvider);
         recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
         recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
@@ -283,7 +287,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
         RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
         DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
-        RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, recipeContext, previousRecipe, logger, collector, 0);
+        RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, previousRecipe, logger, collector, 0);
         controllers.add(recipeController);
         pendingRecipes++;
 

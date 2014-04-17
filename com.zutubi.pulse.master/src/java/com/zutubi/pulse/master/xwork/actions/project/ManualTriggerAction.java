@@ -28,6 +28,7 @@ import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.pulse.master.xwork.actions.ajax.SimpleResult;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.FieldType;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.PathUtils;
@@ -52,14 +53,14 @@ public class ManualTriggerAction extends ProjectActionBase
 
     private static final String SUBMIT_TRIGGER = "trigger";
 
-    private static final String PROPERTY_PREFIX = "property.";
+    private static final String PROJECT_PROPERTY_PREFIX = "pproperty.";
+    private static final String TRIGGER_PROPERTY_PREFIX = "tproperty.";
 
     private long triggerHandle;
     private ManualTriggerConfiguration triggerConfig;
 
     private String formSource;
     private String revision;
-    private List<ResourcePropertyConfiguration> properties;
     private String status;
     private String version;
     private String priority;
@@ -73,6 +74,7 @@ public class ManualTriggerAction extends ProjectActionBase
     private ActionManager actionManager;
     private ScmManager scmManager;
     private Configuration configuration;
+    private ConfigurationProvider configurationProvider;
 
     public long getTriggerHandle()
     {
@@ -92,11 +94,6 @@ public class ManualTriggerAction extends ProjectActionBase
     public String getFormSource()
     {
         return formSource;
-    }
-
-    public List<ResourcePropertyConfiguration> getProperties()
-    {
-        return properties;
     }
 
     public String getRevision()
@@ -187,25 +184,24 @@ public class ManualTriggerAction extends ProjectActionBase
     {
         if (triggerConfig == null)
         {
-            Project project = getRequiredProject();
-            List<ManualTriggerConfiguration> manualTriggers = TriggerUtils.getTriggers(project.getConfig(), ManualTriggerConfiguration.class);
-            for (ManualTriggerConfiguration trigger: manualTriggers)
-            {
-                if (trigger.getHandle() == triggerHandle)
-                {
-                    triggerConfig = trigger;
-                    break;
-                }
-            }
-
-            if (triggerConfig == null)
-            {
-                throw new LookupErrorException("Trigger invalid or unspecified");
-            }
-
+            triggerConfig = lookupTriggerConfig(getRequiredProject().getConfig());
         }
 
         return triggerConfig;
+    }
+
+    private ManualTriggerConfiguration lookupTriggerConfig(ProjectConfiguration projectConfig)
+    {
+        List<ManualTriggerConfiguration> manualTriggers = TriggerUtils.getTriggers(projectConfig, ManualTriggerConfiguration.class);
+        for (ManualTriggerConfiguration trigger: manualTriggers)
+        {
+            if (trigger.getHandle() == triggerHandle)
+            {
+                return trigger;
+            }
+        }
+
+        throw new LookupErrorException("Trigger invalid or unspecified");
     }
 
     private HashMap<String, ResourcePropertyConfiguration> getMergedProperties(ProjectConfiguration project, ManualTriggerConfiguration trigger)
@@ -220,7 +216,6 @@ public class ManualTriggerAction extends ProjectActionBase
     {
         Project project = getRequiredProject();
         ManualTriggerConfiguration triggerConfig = getTriggerConfig();
-        properties = new ArrayList<ResourcePropertyConfiguration>(getMergedProperties(project.getConfig(), triggerConfig).values());
 
         Form form = new Form("form", "edit.build.properties", (ajax ? "ajax/action/" : "") + "manualTrigger.action", SUBMIT_TRIGGER);
         form.setAjax(ajax);
@@ -266,13 +261,18 @@ public class ManualTriggerAction extends ProjectActionBase
         field.setValue(priority);
         form.add(field);
 
-        for(ResourcePropertyConfiguration property: properties)
+        Map<String, ResourcePropertyConfiguration> triggerProperties = triggerConfig.getProperties();
+        for (ResourcePropertyConfiguration property: project.getConfig().getProperties().values())
         {
-            field = new Field(FieldType.TEXT, PROPERTY_PREFIX + property.getName());
-            field.setLabel(property.getName());
-            field.setValue(property.getValue());
-            field.addParameter("help", property.getDescription());
-            form.add(field);
+            if (!triggerProperties.containsKey(property.getName()))
+            {
+                addPropertyField(form, property, PROJECT_PROPERTY_PREFIX);
+            }
+        }
+
+        for (ResourcePropertyConfiguration property : triggerProperties.values())
+        {
+            addPropertyField(form, property, TRIGGER_PROPERTY_PREFIX);
         }
 
         addSubmit(form, SUBMIT_TRIGGER);
@@ -285,6 +285,15 @@ public class ManualTriggerAction extends ProjectActionBase
         ToveUtils.renderForm(context, form, getClass(), writer, configuration);
         formSource = writer.toString();
         newPanel = new ConfigurationPanel("ajax/action/manual-trigger.vm");
+    }
+
+    private void addPropertyField(Form form, ResourcePropertyConfiguration property, String prefix)
+    {
+        Field field = new Field(FieldType.TEXT, prefix + property.getName());
+        field.setLabel(property.getName());
+        field.setValue(property.getValue());
+        field.addParameter("help", property.getDescription());
+        form.add(field);
     }
 
     private boolean hasDependencyOfBuildableStatus(ProjectConfiguration projectConfig)
@@ -371,6 +380,7 @@ public class ManualTriggerAction extends ProjectActionBase
 
         Revision r = null;
         TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        ProjectConfiguration projectConfig = project.getConfig();
         if (triggerConfig.isPrompt())
         {
             revision = revision.trim();
@@ -378,7 +388,7 @@ public class ManualTriggerAction extends ProjectActionBase
             {
                 try
                 {
-                    r = withScmClient(project.getConfig(), project.getState(), scmManager, new ScmContextualAction<Revision>()
+                    r = withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<Revision>()
                     {
                         public Revision process(ScmClient client, ScmContext context) throws ScmException
                         {
@@ -395,7 +405,14 @@ public class ManualTriggerAction extends ProjectActionBase
                 }
             }
 
-            options.setProperties(mapProperties(getMergedProperties(project.getConfig(), triggerConfig)));
+            // We apply properties to the configuration used for the build so they will be access
+            // and applied in the same way regardless of whether they came from a prompt.  This
+            // maintains property precedence and avoids duplication of the properties in the scope
+            // (which can cause issues like CIB-3090).
+            projectConfig = configurationProvider.deepClone(projectConfig);
+            triggerConfig = lookupTriggerConfig(projectConfig);
+            mapProperties(projectConfig, triggerConfig);
+
             options.setStatus(status);
             options.setVersion(version);
             options.setRebuild(rebuild);
@@ -406,13 +423,14 @@ public class ManualTriggerAction extends ProjectActionBase
         }
         else
         {
-            options.setProperties(triggerConfig.getProperties().values());
             options.setRebuild(triggerConfig.isRebuildUpstreamDependencies());
         }
 
+        options.setProperties(triggerConfig.getProperties().values());
+
         try
         {
-            projectManager.triggerBuild(project.getConfig(), options, r);
+            projectManager.triggerBuild(projectConfig, options, r);
         }
         catch (Exception e)
         {
@@ -425,36 +443,39 @@ public class ManualTriggerAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private List<ResourcePropertyConfiguration> mapProperties(Map<String, ResourcePropertyConfiguration> configuredProperties)
+    private void mapProperties(ProjectConfiguration projectConfig, ManualTriggerConfiguration triggerConfig)
     {
-        List<ResourcePropertyConfiguration> properties = new LinkedList<ResourcePropertyConfiguration>();
         Map parameters = ActionContext.getContext().getParameters();
         for(Object n: parameters.keySet())
         {
             String name = (String) n;
-            if(name.startsWith(PROPERTY_PREFIX))
+            if (name.startsWith(PROJECT_PROPERTY_PREFIX))
             {
-                String propertyName = name.substring(PROPERTY_PREFIX.length());
-                ResourcePropertyConfiguration property = configuredProperties.get(propertyName);
-                if (property != null)
-                {
-                    property = property.copy();
-                    Object value = parameters.get(name);
-                    if(value instanceof String)
-                    {
-                        property.setValue((String) value);
-                    }
-                    else if(value instanceof String[])
-                    {
-                        property.setValue(((String[])value)[0]);
-                    }
-
-                    properties.add(property);
-                }
+                String propertyName = name.substring(PROJECT_PROPERTY_PREFIX.length());
+                updateProperty(projectConfig.getProperty(propertyName), parameters, name);
+            }
+            else if (name.startsWith(TRIGGER_PROPERTY_PREFIX))
+            {
+                String propertyName = name.substring(TRIGGER_PROPERTY_PREFIX.length());
+                updateProperty(triggerConfig.getProperties().get(propertyName), parameters, name);
             }
         }
+    }
 
-        return properties;
+    private void updateProperty(ResourcePropertyConfiguration property, Map parameters, String name)
+    {
+        if (property != null)
+        {
+            Object value = parameters.get(name);
+            if(value instanceof String)
+            {
+                property.setValue((String) value);
+            }
+            else if(value instanceof String[])
+            {
+                property.setValue(((String[])value)[0]);
+            }
+        }
     }
 
     public void setActionManager(ActionManager actionManager)
@@ -470,5 +491,10 @@ public class ManualTriggerAction extends ProjectActionBase
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

@@ -32,7 +32,7 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
             ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
             if (projectConfig != null)
             {
-                MasterBuildProperties.addProjectProperties(context, projectConfig);
+                MasterBuildProperties.addProjectProperties(context, projectConfig, true);
             }
         }
 

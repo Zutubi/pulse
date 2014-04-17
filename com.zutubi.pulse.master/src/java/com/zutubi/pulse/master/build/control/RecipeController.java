@@ -30,6 +30,7 @@ import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.scheduling.CallbackService;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.Constants;
@@ -90,7 +91,7 @@ public class RecipeController
     private ScmManager scmManager;
     private CallbackService callbackService;
 
-    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, PulseExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, int retryCount)
+    public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, int retryCount)
     {
         this.projectConfiguration = projectConfiguration;
         this.buildResult = buildResult;
@@ -98,7 +99,6 @@ public class RecipeController
         this.retryCount = retryCount;
         this.recipeResult = recipeResultNode.getResult();
         this.assignmentRequest = assignmentRequest;
-        this.recipeContext = recipeContext;
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
         this.collector = collector;
@@ -108,6 +108,8 @@ public class RecipeController
     {
         try
         {
+            initialiseContexts();
+
             collector.prepare(buildResult, recipeResultNode.getResult().getId());
             logger.prepare();
             assignmentRequest.getRequest().setBootstrapper(bootstrapper);
@@ -121,6 +123,23 @@ public class RecipeController
         {
             handleUnexpectedException(e);
         }
+    }
+
+    private void initialiseContexts()
+    {
+        PulseExecutionContext agentContext = assignmentRequest.getRequest().getContext();
+        recipeContext = new PulseExecutionContext(agentContext);
+
+        BuildStageConfiguration stageConfig = projectConfiguration.getStage(recipeResultNode.getStageName());
+        // The agent context does not include user-defined properties yet -- they are added once
+        // the agent environment is available.
+        MasterBuildProperties.addProjectProperties(agentContext, projectConfiguration, false);
+        MasterBuildProperties.addProjectProperties(recipeContext, projectConfiguration, true);
+
+        addValueToContexts(agentContext, recipeContext, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+        addValueToContexts(agentContext, recipeContext, PROPERTY_RECIPE, stageConfig.getRecipe());
+        addValueToContexts(agentContext, recipeContext, PROPERTY_STAGE, stageConfig.getName());
+        addValueToContexts(agentContext, recipeContext, PROPERTY_STAGE_HANDLE, stageConfig.getHandle());
     }
 
     public int getRetryCount()

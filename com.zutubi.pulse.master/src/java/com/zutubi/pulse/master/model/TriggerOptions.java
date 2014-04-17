@@ -106,11 +106,6 @@ public class TriggerOptions
         this.properties = properties;
     }
 
-    public void addProperties(Collection<ResourcePropertyConfiguration> properties)
-    {
-        properties.addAll(properties);
-    }
-
     public Collection<ResourcePropertyConfiguration> getProperties()
     {
         return properties;

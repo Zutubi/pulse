@@ -440,14 +440,18 @@ public class PulseScope implements Scope
     @Override
     public String toString()
     {
-        String result = parent == null ? "|" : parent.toString();
-        result += " << ";
+        String result = "";
         if (StringUtils.stringSet(label))
         {
             result += label + ": ";
         }
 
         result += variables.values();
+        if (parent != null)
+        {
+            result += "\n" + parent.toString();
+        }
+
         return result;
     }
 

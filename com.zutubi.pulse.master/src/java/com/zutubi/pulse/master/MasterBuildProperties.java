@@ -28,20 +28,23 @@ public class MasterBuildProperties extends BuildProperties
 {
     private static final Messages I18N = Messages.getInstance(MasterBuildProperties.class);
 
-    public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration)
+    public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration, boolean includeUserDefined)
     {
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfiguration.getName());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, projectConfiguration.getOrganisation());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, projectConfiguration.getHandle());
 
-        for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
+        if (includeUserDefined)
         {
-            context.add(property.asResourceProperty());
-        }
+            for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
+            {
+                context.add(property.asResourceProperty());
+            }
 
-        for (PostProcessorConfiguration postProcessor: projectConfiguration.getPostProcessors().values())
-        {
-            context.addValue(postProcessor.getName(), postProcessor);
+            for (PostProcessorConfiguration postProcessor: projectConfiguration.getPostProcessors().values())
+            {
+                context.addValue(postProcessor.getName(), postProcessor);
+            }
         }
     }
 
@@ -54,7 +57,7 @@ public class MasterBuildProperties extends BuildProperties
         }
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(result.getStamps().getStartTime()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
-        addProjectProperties(context, result.getProject().getConfig());
+        addProjectProperties(context, result.getProject().getConfig(), true);
         addCompletedBuildProperties(context, result, configurationManager);
     }
 

@@ -800,6 +800,30 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         assertEnvironment(projectName, 1, "rp=ref " + MASTER_AGENT_NAME);
     }
 
+    public void testSelfReferencingProperty() throws Exception
+    {
+        // CIB-3090.
+        String projectName = random + "-project";
+        rpcClient.RemoteApi.ensureProject(projectName);
+        rpcClient.RemoteApi.insertProjectProperty(projectName, "prop", "$(prop):project", false, false);
+        rpcClient.RemoteApi.insertOrUpdateStageProperty(projectName, "default", "prop", "$(prop):stage");
+
+        getBrowser().loginAsAdmin();
+
+        // Using a manual trigger with prompt checks that the properties coming from the prompt
+        // behave as expected.
+        ProjectHomePage home = getBrowser().openAndWaitFor(ProjectHomePage.class, projectName);
+        home.triggerBuild();
+
+        TriggerBuildForm form = getBrowser().createForm(TriggerBuildForm.class);
+        form.addProperty("prop");
+        form.waitFor();
+        form.triggerFormElements();
+
+        waitForBuildOnProjectHomePage(projectName);
+        assertEnvironment(projectName, 1, "PULSE_PROP=$(prop):project:stage");
+    }
+
     public void testSuppressedProperty() throws Exception
     {
         String projectName = random + "-project";
@@ -1060,7 +1084,7 @@ public class BuildAcceptanceTest extends AcceptanceTestBase
         form.addProperty("pname");
         form.waitFor();
         // leave the revision blank, update pname to qvalue.
-        form.triggerFormElements(asPair("status",STATUS_INTEGRATION), asPair("property.pname", "qvalue"));
+        form.triggerFormElements(asPair("status",STATUS_INTEGRATION), asPair("pproperty.pname", "qvalue"));
 
         // next page is the project homepage.
         waitForBuildOnProjectHomePage(random);

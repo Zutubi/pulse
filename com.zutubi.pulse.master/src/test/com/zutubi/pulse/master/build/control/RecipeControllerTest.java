@@ -29,6 +29,7 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration;
@@ -47,6 +48,8 @@ import static org.mockito.Mockito.*;
 
 public class RecipeControllerTest extends PulseTestCase
 {
+    private static final String STAGE_NAME = "root stage";
+
     private File recipeDir;
 
     private RecordingRecipeQueue recipeQueue;
@@ -73,12 +76,13 @@ public class RecipeControllerTest extends PulseTestCase
 
         recipeResult = new RecipeResult("root recipe");
         recipeResult.setId(100);
-        stageResult = new RecipeResultNode("root stage", 1, recipeResult);
+        stageResult = new RecipeResultNode(STAGE_NAME, 1, recipeResult);
         stageResult.setId(101);
 
         RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", recipeResult.getId(), recipeResult.getRecipeName()));
         Project project = new Project();
         ProjectConfiguration projectConfig = new ProjectConfiguration();
+        projectConfig.getStages().put(STAGE_NAME, new BuildStageConfiguration(STAGE_NAME));
         projectConfig.setType(new CustomTypeConfiguration());
         project.setConfig(projectConfig);
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
@@ -101,7 +105,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         ScmManager scmManager = mock(ScmManager.class);
         stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new TestScmClient());
-        recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, new PulseExecutionContext(), null, logger, resultCollector, 0);
+        recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, null, logger, resultCollector, 0);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
