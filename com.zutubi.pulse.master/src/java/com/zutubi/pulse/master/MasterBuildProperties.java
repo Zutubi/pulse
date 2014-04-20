@@ -34,16 +34,16 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, projectConfiguration.getOrganisation());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, projectConfiguration.getHandle());
 
+        for (PostProcessorConfiguration postProcessor: projectConfiguration.getPostProcessors().values())
+        {
+            context.addValue(postProcessor.getName(), postProcessor);
+        }
+
         if (includeUserDefined)
         {
             for (ResourcePropertyConfiguration property: projectConfiguration.getProperties().values())
             {
                 context.add(property.asResourceProperty());
-            }
-
-            for (PostProcessorConfiguration postProcessor: projectConfiguration.getPostProcessors().values())
-            {
-                context.addValue(postProcessor.getName(), postProcessor);
             }
         }
     }
