@@ -4,9 +4,10 @@ import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.acceptance.pages.PulseToolbar;
 import com.zutubi.pulse.master.license.LicenseHelper;
 import com.zutubi.pulse.master.license.LicenseType;
-import org.xml.sax.SAXException;
+import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 
-import java.io.IOException;
+import java.util.Hashtable;
 
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
 
@@ -33,51 +34,14 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
-    public void testSetupProcess() throws InterruptedException, IOException, SAXException
+    public void testSetupProcess() throws Exception
     {
-        // first we deal with the pulse home property configuration.
         getBrowser().open(urls.base() + "setup/setupData!input.action");
 
-        // step one. setting the pulse home variable.
         checkSetPulseData();
+        checkPostPulseData();
 
-        _checkPostPulseData();
-
-        // lets also take this opportunity to verify that what was set during the setup wizard
-        // was actually persisted.
-    }
-
-    protected void checkPostPulseData()
-    {
-        getBrowser().open(urls.base());
-        _checkPostPulseData();
-    }
-
-    protected void _checkPostPulseData()
-    {
-        // step two. setting up the database
-        checkSetupDatabase();
-
-        // step three. setting the license details.
-        checkLicenseDetails();
-
-        // step four. creating the administration user.
-        checkCreateAdmin();
-
-        // step five. configuring the server essentials.
-        checkServerSettings();
-
-        getBrowser().waitForElement("welcome.heading", 60000);
-
-        // one complete, we should see the home page, and it should contain the following:
-        getBrowser().waitForTextPresent(":: welcome ::");
-
-        // wait for the toolbar to be rendered before continuing with checking.
-        PulseToolbar toolbar = new PulseToolbar(getBrowser());
-        toolbar.waitFor();
-
-        getBrowser().waitForTextPresent("A. D. Ministrator");
-        assertTrue(getBrowser().isElementIdPresent("logout"));
+        setAdminPreferences();
     }
 
     private void checkSetPulseData()
@@ -92,6 +56,22 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         getBrowser().waitForTextPresent("pulse data directory requires a value");
 
         form.nextFormElements("data");
+    }
+
+    protected void checkPostPulseData()
+    {
+        checkSetupDatabase();
+        checkLicenseDetails();
+        checkCreateAdmin();
+        checkServerSettings();
+
+        getBrowser().waitForTextPresent(":: welcome ::");
+
+        PulseToolbar toolbar = new PulseToolbar(getBrowser());
+        toolbar.waitFor();
+
+        getBrowser().waitForTextPresent("A. D. Ministrator");
+        assertTrue(getBrowser().isElementIdPresent("logout"));
     }
 
     private void checkSetupDatabase()
@@ -132,8 +112,6 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
     private void checkCreateAdmin()
     {
         CreateAdminForm createAdminForm = getBrowser().createForm(CreateAdminForm.class);
-
-        // create admin.
         createAdminForm.waitFor();
         createAdminForm.nextFormElements(
                 ADMIN_CREDENTIALS.getUserName(),
@@ -149,5 +127,21 @@ public class SetupAcceptanceTest extends AcceptanceTestBase
         ServerSettingsForm settingsForm = getBrowser().createForm(ServerSettingsForm.class);
         settingsForm.waitFor();
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
+    }
+
+    private void setAdminPreferences() throws Exception
+    {
+        rpcClient.loginAsAdmin();
+        try
+        {
+            String preferencesPath = PathUtils.getPath(MasterConfigurationRegistry.USERS_SCOPE, ADMIN_CREDENTIALS.getUserName(), "preferences");
+            Hashtable<String, Object> preferences = rpcClient.RemoteApi.getConfig(preferencesPath);
+            preferences.put("refreshInterval", 600);
+            rpcClient.RemoteApi.saveConfig(preferencesPath, preferences, false);
+        }
+        finally
+        {
+            rpcClient.logout();
+        }
     }
 }

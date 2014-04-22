@@ -815,7 +815,12 @@ public class RemoteApiClient extends ApiClient
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
+        @SuppressWarnings("unchecked")
+        Hashtable<String, Object> preferences = (Hashtable<String, Object>) user.get("preferences");
+        preferences.put("refreshInterval", 600);
+
         String path = insertConfig(USERS_SCOPE, user);
+
         Hashtable <String, Object> password = createEmptyConfig(SetPasswordConfiguration.class);
         password.put("password", "");
         password.put("confirmPassword", "");

@@ -186,6 +186,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             SetupAcceptanceTest setup = new SetupAcceptanceTest();
             setup.setUp();
             // we can not run the usual test since that attempts to specify the data directory.
+            setup.getBrowser().open(setup.urls.base());
             setup.checkPostPulseData();
             setup.tearDown();
         }
