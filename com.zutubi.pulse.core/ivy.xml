@@ -29,7 +29,7 @@
         <dependency org="zutubi" name="com.zutubi.tove.annotations" rev="latest.integration" conf="*->@"/>
 
         <!-- Library dependencies -->
-        <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default;src->src"/>
+        <dependency org="zutubi" name="boot" rev="2.1" conf="external,build,release->default;src->src"/>
         <dependency org="zutubi" name="diff" rev="3.0.+" conf="external,build,release->default;src->src"/>
         <dependency org="zutubi" name="events" rev="3.0.+" conf="external,build,release->default;src->src"/>
 

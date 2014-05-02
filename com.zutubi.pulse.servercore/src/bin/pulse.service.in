@@ -1,0 +1,23 @@
+# Systemd config file for pulse.  Edit the ExecStart and ExecStop paths to
+# match your installation directory.  Consider uncommenting the User and Group
+# lines to run as a less-privileged user (this user must have read/write access
+# to the pulse home and data directories).
+
+[Unit]
+Description=__SERVICE_NAME__
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/zutubi-__APP_NAME__
+ExecStart=/usr/local/pulse/bin/pulse start
+ExecStop=/usr/local/pulse/bin/pulse stop
+KillMode=none
+TimeoutStopSec=60
+Restart=on-failure
+RestartPreventExitStatus=1 2 3
+#User=zutubi-pulse
+#Group=zutubi-pulse
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,25 @@
+# Upstart configuration file for pulse.  Consider uncommenting the
+# setuid/setgid stanzas, and editing the value of PULSE_HOME to match your
+# installation directory.  Make sure the user has read/write access to the
+# PULSE_HOME directory (and the data directory you configure during setup).
+
+description "__SERVICE_NAME__"
+
+start on started networking
+stop on runlevel [016]
+
+env PULSE_HOME=/usr/local/pulse
+
+#setuid zutubi-pulse
+#setgid zutubi-pulse
+
+respawn
+respawn limit 10 60
+kill timeout 60
+
+exec $PULSE_HOME/bin/pulse start
+
+pre-stop script
+  $PULSE_HOME/bin/pulse stopservice
+  sleep 5
+end script
