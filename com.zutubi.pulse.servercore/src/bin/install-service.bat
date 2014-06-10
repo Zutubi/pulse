@@ -16,7 +16,7 @@ goto end
 if defined PROGRAMFILES(X86) (set ARCH=amd64) else (set ARCH=x86)
 
 "%PULSE_HOME%\bin\%ARCH%\PulseService" install ^
-  --Startup auto --Jvm auto --StartMode jvm --StopMode jvm ^
+  --Startup auto --Jvm auto --StartMode java --StopMode java ^
   --Classpath="%PULSE_HOME%\lib\boot.jar" ^
   --JvmMx=1024 ++JvmOptions=-XX:MaxPermSize=128m ^
   ++JvmOptions=-Dpulse.home="%PULSE_HOME%" ++JvmOptions=-Djava.awt.headless=true ^
