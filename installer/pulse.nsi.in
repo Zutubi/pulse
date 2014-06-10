@@ -15,7 +15,7 @@
 ;General
 
   ;Name and file
-  Name "Zutubi __SERVICE_NAME__"
+  Name "Zutubi __DISPLAY_NAME__"
   OutFile "..\..\__PACKAGE_NAME__.exe"
 
   ;Default installation folder
@@ -41,7 +41,7 @@
   !insertmacro MUI_PAGE_DIRECTORY
 
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__DISPLAY_NAME__"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
@@ -51,7 +51,7 @@
   !define MUI_FINISHPAGE_RUN_TEXT "Start __SERVICE_NAME__ service"
   !define MUI_FINISHPAGE_RUN_FUNCTION "StartService"
   !define MUI_FINISHPAGE_LINK "Getting Started Guide"
-  !define MUI_FINISHPAGE_LINK_LOCATION "http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide"
+  !define MUI_FINISHPAGE_LINK_LOCATION "http://confluence.zutubi.com/display/pulse0207/Getting+Started+Guide"
   !insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -139,8 +139,8 @@ Section "Pulse" SecMain
   Call EnsureJre
   Call SetJavaHome
   
-  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
-  nsExec::ExecToStack '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -i "$INSTDIR\bin\wrapper.conf"'
+  ExpandEnvStrings $0 %COMSPEC%
+  nsExec::ExecToStack '"$0" /C "$INSTDIR\bin\install-service.bat"'
   Pop $0
 CheckExit:
   StrCmp $0 "0" ServiceOK 0
@@ -152,16 +152,15 @@ ServiceOK:
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Service.lnk" "$INSTDIR\bin\start-service.bat" "" "$INSTDIR\pulse.ico" 0
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Service.lnk" "$INSTDIR\bin\stop-service.bat" "" "$INSTDIR\pulse.ico" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\__SERVICE_NAME__.lnk" "$INSTDIR\bin\__SERVICE_NAME__w.exe" "" "$INSTDIR\pulse.ico" 0
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   !insertmacro MUI_STARTMENU_WRITE_END
 
   ; Record in Windows Add/Remove (and equivalents).
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "DisplayName" "Zutubi __SERVICE_NAME__"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "Publisher" "Zutubi Pty Ltd"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "DisplayVersion" "__VERSION__"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Zutubi__SERVICE_NAME__" "DisplayName" "Zutubi __DISPLAY_NAME__"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Zutubi__SERVICE_NAME__" "Publisher" "Zutubi Pty Ltd"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Zutubi__SERVICE_NAME__" "DisplayVersion" "__VERSION__"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Zutubi__SERVICE_NAME__" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -187,19 +186,19 @@ Section "un.Uninstall"
   Push "PULSE_HOME"
   Call un.DeleteEnvStr
 
-  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
+  ExpandEnvStrings $0 %COMSPEC%
+  nsExec::ExecToStack '"$0" /C "$INSTDIR\bin\uninstall-service.bat"'
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $STARTMENU_FOLDER
   DetailPrint "$STARTMENU_FOLDER"
 
-  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Start Service.lnk"
-  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Service.lnk"
+  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\__SERVICE_NAME__.lnk"
   Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk"
   RMDir "$SMPROGRAMS\$STARTMENU_FOLDER"
 
   RMDir /r "$INSTDIR"
 
   DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ZutubiPulse__SHORT_NAME__"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Zutubi__SERVICE_NAME__"
 
 SectionEnd

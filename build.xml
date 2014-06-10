@@ -292,8 +292,17 @@
             <fileset dir="${package.root.slave}/bin"/>
             <mapper type="glob" from="*.in" to="*"/>
         </move>
+        
+        <move todir="${package.root.slave}/bin">
+            <fileset dir="${package.root.slave}/bin">
+                <include name="**/PulseService*"/>
+            </fileset>
+            <filtermapper>
+                <replacestring from="PulseService" to="PulseAgent"/>
+            </filtermapper>
+        </move>
 
-        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+      <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root.slave}/..">
             <arg line="-r ../${package.name.slave}.zip ${package.name.slave}"/>
         </exec>
@@ -430,6 +439,15 @@
             <mapper type="glob" from="*.in" to="*"/>
         </move>
 
+        <move todir="${package.root.slave}/bin">
+            <fileset dir="${package.root.slave}/bin">
+                <include name="**/PulseService*"/>
+            </fileset>
+            <filtermapper>
+                <replacestring from="PulseService" to="PulseServer"/>
+            </filtermapper>
+        </move>
+      
         <copy todir="${version.root.master}/system/packages">
             <fileset dir="build">
                 <include name="pulse-agent-*"/>

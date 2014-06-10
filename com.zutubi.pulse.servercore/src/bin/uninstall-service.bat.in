@@ -15,7 +15,7 @@ goto end
 
 if defined PROGRAMFILES(X86) (set ARCH=amd64) else (set ARCH=x86)
 
-"%PULSE_HOME%\bin\%ARCH%\PulseService" delete
+"%PULSE_HOME%\bin\%ARCH%\__SERVICE_NAME__" delete
 
 :end
 

@@ -2,7 +2,8 @@
 
 @setlocal
 
-set DEFAULT_PULSE_HOME=%~dp0..
+cd "%~dp0.."
+set DEFAULT_PULSE_HOME=%CD%
 if "%PULSE_HOME%"=="" set PULSE_HOME=%DEFAULT_PULSE_HOME%
 
 if exist "%PULSE_HOME%\bin\common.bat" goto havePulse
@@ -15,7 +16,7 @@ goto end
 
 if defined PROGRAMFILES(X86) (set ARCH=amd64) else (set ARCH=x86)
 
-"%PULSE_HOME%\bin\%ARCH%\PulseService" install ^
+"%PULSE_HOME%\bin\%ARCH%\__SERVICE_NAME__" install ^
   --Startup auto --Jvm auto --StartMode java --StopMode java ^
   --Classpath="%PULSE_HOME%\lib\boot.jar" ^
   --JvmMx=1024 ++JvmOptions=-XX:MaxPermSize=128m ^
