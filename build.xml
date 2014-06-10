@@ -439,8 +439,8 @@
             <mapper type="glob" from="*.in" to="*"/>
         </move>
 
-        <move todir="${package.root.slave}/bin">
-            <fileset dir="${package.root.slave}/bin">
+        <move todir="${package.root.master}/bin">
+            <fileset dir="${package.root.master}/bin">
                 <include name="**/PulseService*"/>
             </fileset>
             <filtermapper>
