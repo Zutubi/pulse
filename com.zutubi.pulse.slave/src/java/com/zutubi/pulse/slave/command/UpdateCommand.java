@@ -218,9 +218,8 @@ public class UpdateCommand implements Runnable
  	 * @param installDir the directory within the current installation
  	 * @param packageDir the corresponding directory in the incoming package
      * @param top        true iff this is the top level directory
-     * @throws java.io.IOException is there is an error comparing files
  	 */
-    private void checkUnversionedComponents(File installDir, File packageDir, boolean top) throws IOException
+    private void checkUnversionedComponents(File installDir, File packageDir, boolean top)
     {
         for (String child : FileSystemUtils.list(packageDir))
         {
@@ -235,23 +234,34 @@ public class UpdateCommand implements Runnable
 
             if (packageFile.isDirectory())
             {
-                if (!installFile.isDirectory())
+                if (installFile.isDirectory())
+                {
+                    checkUnversionedComponents(installFile, packageFile, false);
+                }
+                else
                 {
                     LOG.warning("Existing installation has no directory '" + installFile.getAbsolutePath() + "', incoming package does.");
                 }
-
-                checkUnversionedComponents(installFile, packageFile, false);
             }
             else
             {
-                if (!installFile.isFile())
+                if (installFile.isFile())
+                {
+                    try
+                    {
+                        if (!Files.equal(installFile, packageFile))
+                        {
+                            LOG.warning("Existing installation file '" + installFile.getAbsolutePath() + "', does not match that from incoming package.");
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.warning("Could not compare existing and new versions of file '" + installFile.getAbsolutePath() + "': " + e.getMessage(), e);
+                    }
+                }
+                else
                 {
                     LOG.warning("Existing installation has no file '" + installFile.getAbsolutePath() + "', incoming package does.");
-                }
-
-                if (!Files.equal(installFile, packageFile))
-                {
-                    LOG.warning("Existing installation file '" + installFile.getAbsolutePath() + "', does not match that from incoming package.");
                 }
             }
         }
