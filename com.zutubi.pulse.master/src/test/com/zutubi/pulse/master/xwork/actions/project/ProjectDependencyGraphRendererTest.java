@@ -55,7 +55,7 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
     {
         ProjectDependencyGraph graph = new ProjectDependencyGraph(null, tree);
         Grid<ProjectDependencyData> grid = renderer.renderDownstream(graph);
-        assertEquals(readInputFully("txt"), renderToAscii(grid));
+        assertEquals(normaliseNewlines(readInputFully("txt")), renderToAscii(grid));
     }
 
     private void upstreamTest(TreeNode<DependencyGraphData> tree) throws IOException
