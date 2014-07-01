@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,11 +49,6 @@ public class GitSubmodulesTest extends GitClientTestBase
         git.run(git.getGitCommand(), "commit", "-m", "Added a file");
         git.setWorkingDirectory(repositoryBase);
         String submodulePath = "../" + name;
-        if (SystemUtils.IS_WINDOWS)
-        {
-            // Cygwin-ify.  This means you need to use cygwin git to run this test.
-            submodulePath = SystemUtils.runCommand("cygpath", submoduleDir.getAbsolutePath());
-        }
         git.run(git.getGitCommand(), "submodule", "add", submodulePath, submoduleDir.getName());
     }
 
