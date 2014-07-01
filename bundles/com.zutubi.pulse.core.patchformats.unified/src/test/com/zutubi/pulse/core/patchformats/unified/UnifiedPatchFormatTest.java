@@ -38,7 +38,7 @@ public class UnifiedPatchFormatTest extends PulseTestCase
             }
 
             String patchedContent = Files.toString(file, Charset.defaultCharset());
-            String expectedContent = readInputFully("new", "txt");
+            String expectedContent = readInputFully("new", "txt").replaceAll("\\r\\n", "\n");
             assertEquals(expectedContent, patchedContent);
         }
         finally
