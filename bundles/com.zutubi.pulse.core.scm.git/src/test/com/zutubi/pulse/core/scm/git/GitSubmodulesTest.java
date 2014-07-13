@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,33 +55,42 @@ public class GitSubmodulesTest extends GitClientTestBase
 
     public void testNoSubmoduleProcessing() throws ScmException
     {
-        client.setProcessSubmodules(false);
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            client.setProcessSubmodules(false);
+            client.checkout(context, null, handler);
+            assertThat(handler.getStatusMessages(), not(hasItem(containsString(SUBMODULE_COMMAND_SNIPPET))));
 
-        assertSubmoduleNotUpdated(SUBMODULE1_NAME);
-        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+            assertSubmoduleNotUpdated(SUBMODULE1_NAME);
+            assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+        }
     }
 
     public void testAllSubmoduleProcessing() throws ScmException
     {
-        client.setProcessSubmodules(true);
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            client.setProcessSubmodules(true);
+            client.checkout(context, null, handler);
+            assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
 
-        assertSubmoduleUpdated(SUBMODULE1_NAME);
-        assertSubmoduleUpdated(SUBMODULE2_NAME);
+            assertSubmoduleUpdated(SUBMODULE1_NAME);
+            assertSubmoduleUpdated(SUBMODULE2_NAME);
+        }
     }
 
     public void testSelectedSubmoduleProcessing() throws ScmException
     {
-        client.setProcessSubmodules(true);
-        client.setSubmoduleNames(asList(SUBMODULE1_NAME));
-        client.checkout(context, null, handler);
-        assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            client.setProcessSubmodules(true);
+            client.setSubmoduleNames(asList(SUBMODULE1_NAME));
+            client.checkout(context, null, handler);
+            assertThat(handler.getStatusMessages(), hasItem(containsString(SUBMODULE_COMMAND_SNIPPET)));
 
-        assertSubmoduleUpdated(SUBMODULE1_NAME);
-        assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+            assertSubmoduleUpdated(SUBMODULE1_NAME);
+            assertSubmoduleNotUpdated(SUBMODULE2_NAME);
+        }
     }
 
     private void assertSubmoduleNotUpdated(String name)
