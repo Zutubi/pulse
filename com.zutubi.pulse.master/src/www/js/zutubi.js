@@ -905,7 +905,7 @@ Zutubi.PulseHeader = Ext.extend(Ext.Toolbar, {
         }, this);
 
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
-        this.addItem({xtype: 'xztblink', text:"pulse 2.6", url: window.baseUrl + '/default.action'});
+        this.addItem({xtype: 'xztblink', text:"pulse 2.7", url: window.baseUrl + '/default.action'});
         this.addItem({xtype: 'tbtext', html: '&nbsp;::&nbsp;', tag: 'span'});
 
         if (this.projectName)

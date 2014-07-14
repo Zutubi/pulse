@@ -2,5 +2,5 @@ Bundle-Name: QTestLib Post-Processor
 Bundle-SymbolicName: com.zutubi.pulse.core.postprocessors.qtestlib; singleton:=true
 Bundle-Description: A post-processor for integrating test results from QTestLib XML reports.
 Bundle-Vendor: Zutubi
-Bundle-Version: 2.6.0
-Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.6.0,2.7.0)"
+Bundle-Version: 2.7.0
+Require-Bundle: com.zutubi.pulse.core.commands.core; bundle-version="[2.7.0,2.8.0)"
