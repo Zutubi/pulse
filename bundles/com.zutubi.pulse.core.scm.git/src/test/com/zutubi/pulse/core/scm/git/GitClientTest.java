@@ -641,21 +641,6 @@ public class GitClientTest extends GitClientTestBase
         assertThat(info, containsString("initial commit"));
     }
 
-    public void testMoveExistingTag() throws ScmException, IOException
-    {
-        final String TAG_NAME = "test-tag";
-
-        client.init(scmContext, new ScmFeedbackAdapter());
-        client.tag(scmContext, new Revision(REVISION_INITIAL), TAG_NAME, false);
-        client.tag(scmContext, new Revision(REVISION_MASTER_LATEST), TAG_NAME, true);
-
-        NativeGit nativeGit = new NativeGit();
-        nativeGit.setWorkingDirectory(repositoryBase);
-        String info = IOUtils.inputStreamToString(nativeGit.show(null, TAG_NAME));
-        assertThat(info, containsString(REVISION_MASTER_LATEST));
-        assertThat(info, containsString("Edit, add and remove on master"));
-    }
-
     private void assertLatestCheckedOut()
     {
         assertFiles(workingDir, "a.txt", "b.txt", "d.txt");
