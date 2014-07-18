@@ -20,7 +20,7 @@ public class CommandEventOutputStream extends OutputStream implements Runnable
      * bytes on a write call, those bytes are stored in a buffer.  If we get
      * more, we just send a large event.
      */
-    public static int MINIMUM_SIZE = 10240;
+    public static int MINIMUM_SIZE = Integer.getInteger("pulse.output.event.min.size", 51200);
     /**
      * Flush interval to use to disable auto flushing.
      */
@@ -28,7 +28,7 @@ public class CommandEventOutputStream extends OutputStream implements Runnable
     /**
      * The default auto flush interval. Enables auto flushing.
      */
-    public static final long DEFAULT_AUTO_FLUSH_INTERVAL = 10000;
+    public static final long DEFAULT_AUTO_FLUSH_INTERVAL = Long.getLong("pulse.output.event.flush.interval", 10000);
 
     private byte[] buffer;
     private int offset;
