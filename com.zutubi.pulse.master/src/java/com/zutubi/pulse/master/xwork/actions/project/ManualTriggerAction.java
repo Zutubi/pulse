@@ -405,7 +405,7 @@ public class ManualTriggerAction extends ProjectActionBase
                 }
             }
 
-            // We apply properties to the configuration used for the build so they will be access
+            // We apply properties to the configuration used for the build so they will be accessed
             // and applied in the same way regardless of whether they came from a prompt.  This
             // maintains property precedence and avoids duplication of the properties in the scope
             // (which can cause issues like CIB-3090).

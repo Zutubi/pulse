@@ -10,7 +10,7 @@ import com.zutubi.tove.annotations.SymbolicName;
  * A trigger that fires when a code change is detected in the project's SCM.
  */
 @SymbolicName("zutubi.scmTriggerConfig")
-public class ScmBuildTriggerConfiguration extends TriggerConfiguration
+public class ScmBuildTriggerConfiguration extends FireableTriggerConfiguration
 {
     public Trigger newTrigger()
     {

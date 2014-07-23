@@ -17,7 +17,7 @@ import com.zutubi.validation.annotations.Required;
 @SymbolicName("zutubi.cronTriggerConfig")
 @Form(fieldOrder = {"name", "cron", "pauseAfterFiring"})
 @Wire
-public class CronBuildTriggerConfiguration extends TriggerConfiguration
+public class CronBuildTriggerConfiguration extends FireableTriggerConfiguration
 {
     private static final Logger LOG = Logger.getLogger(CronBuildTriggerConfiguration.class);
 

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 /**
- * Indicates that the build occured because a user manually triggered it.
+ * Indicates that the build occurred because a user manually triggered it.
  */
 public class ManualTriggerBuildReason extends AbstractBuildReason
 {
