@@ -87,7 +87,7 @@ public class SlaveRecipeRunner implements RecipeRunner
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-                if (isLiveLoggingEnabled())
+                if (isLiveLoggingEnabled(context))
                 {
                     outputStream = new EventOutputStream(eventManager, true, request.getId());
                     context.setOutputStream(outputStream);
@@ -116,10 +116,17 @@ public class SlaveRecipeRunner implements RecipeRunner
         }
     }
 
-    private boolean isLiveLoggingEnabled()
+    private boolean isLiveLoggingEnabled(PulseExecutionContext context)
     {
-        String propertyValue = System.getProperty(PROPERTY_LIVE_LOGGING_ENABLED);
-        return propertyValue == null || Boolean.parseBoolean(propertyValue);
+        if (context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_ENABLE_LIVE_LOGS, true))
+        {
+            String propertyValue = System.getProperty(PROPERTY_LIVE_LOGGING_ENABLED);
+            return propertyValue == null || Boolean.parseBoolean(propertyValue);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public void setConfigurationManager(SlaveConfigurationManager configurationManager)

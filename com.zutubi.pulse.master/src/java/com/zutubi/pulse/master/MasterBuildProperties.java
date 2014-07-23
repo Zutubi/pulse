@@ -104,6 +104,7 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, Boolean.toString(true));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSISTENT_WORK_PATTERN, projectConfig.getBootstrap().getPersistentDirPattern());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_TEMP_PATTERN, projectConfig.getBootstrap().getTempDirPattern());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_ENABLE_LIVE_LOGS, Boolean.toString(projectConfig.getOptions().isLiveLogsEnabled()));
     }
 
     public static void addRevisionProperties(ExecutionContext context, BuildResult buildResult)

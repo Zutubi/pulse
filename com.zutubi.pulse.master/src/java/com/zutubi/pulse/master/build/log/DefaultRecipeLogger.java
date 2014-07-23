@@ -19,10 +19,12 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
     static final String POST_RULE = "============================[ command output above ]============================";
 
     private int hookCount = 0;
+    private boolean liveOutputEnabled;
 
-    public DefaultRecipeLogger(LogFile logFile)
+    public DefaultRecipeLogger(LogFile logFile, boolean liveOutputEnabled)
     {
         super(logFile);
+        this.liveOutputEnabled = liveOutputEnabled;
     }
 
     public void log(RecipeAssignedEvent event)
@@ -43,12 +45,22 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
     public void log(CommandCommencedEvent event, CommandResult result)
     {
         logMarker("Command '" + result.getCommandName() + "' commenced", result.getStamps().getStartTime());
-        writePreRule();
+        if (liveOutputEnabled)
+        {
+            writePreRule();
+        }
+        else
+        {
+            logMarker("Live output logging is disabled (see project build options). Output will still be captured as an artifact.");
+        }
     }
 
     public void log(CommandCompletedEvent event, CommandResult result)
     {
-        writePostRule();
+        if (liveOutputEnabled)
+        {
+            writePostRule();
+        }
 
         logMarker("Command '" + result.getCommandName() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
         if (result.getProperties().size() > 0)

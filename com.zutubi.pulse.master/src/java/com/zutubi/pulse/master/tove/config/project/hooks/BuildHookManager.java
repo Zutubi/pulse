@@ -129,7 +129,7 @@ public class BuildHookManager
     private DefaultRecipeLogger createRecipeLogger(BuildResult buildResult, RecipeResultNode recipeResultNode)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResultNode.getResult().getId(), paths));
+        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResultNode.getResult().getId(), paths), true);
         logger.prepare();
         return logger;
     }

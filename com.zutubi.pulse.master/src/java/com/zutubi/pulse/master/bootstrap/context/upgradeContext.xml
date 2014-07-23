@@ -211,6 +211,7 @@
                 <ref local="addAgentSsl"/>
                 <ref local="renameHostSsl"/>
                 <ref local="addCheckoutSubdir"/>
+                <ref local="addLiveLogsEnabled"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1115,5 +1116,10 @@
 
     <bean id="addCheckoutSubdir" class="com.zutubi.pulse.master.upgrade.tasks.AddCheckoutSubdirUpgradeTask">
         <property name="buildNumber" value="206999001"/>
+    </bean>
+
+
+    <bean id="addLiveLogsEnabled" class="com.zutubi.pulse.master.upgrade.tasks.AddLiveLogsEnabledUpgradeTask">
+        <property name="buildNumber" value="207001001"/>
     </bean>
 </beans>

@@ -286,7 +286,7 @@ public class DefaultBuildController implements EventListener, BuildController
         setRequestPriority(assignmentRequest, stageConfig);
 
         RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
-        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths));
+        DefaultRecipeLogger logger = new DefaultRecipeLogger(new RecipeLogFile(buildResult, recipeResult.getId(), paths), projectConfig.getOptions().isLiveLogsEnabled());
         RecipeController recipeController = objectFactory.buildBean(RecipeController.class, projectConfig, buildResult, stageResult, assignmentRequest, previousRecipe, logger, collector, 0);
         controllers.add(recipeController);
         pendingRecipes++;

@@ -31,7 +31,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
         super.setUp();
         tmpDir = createTempDirectory();
         logFile = new File(tmpDir, "file.log");
-        logger = new DefaultRecipeLogger(new LogFile(logFile, true));
+        logger = new DefaultRecipeLogger(new LogFile(logFile, true), true);
         logger.prepare();
     }
 
@@ -197,7 +197,7 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     {
         logger.logMarker("First line");
         logger.close();
-        logger = new DefaultRecipeLogger(new LogFile(logFile, true));
+        logger = new DefaultRecipeLogger(new LogFile(logFile, true), true);
         logger.prepare();
         logger.logMarker("Second line");
 

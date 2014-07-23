@@ -12,7 +12,7 @@ import com.zutubi.validation.annotations.Numeric;
  * Generic build options that don't warrant their own category.
  */
 @SymbolicName("zutubi.buildOptionsConfig")
-@Form(fieldOrder = {"isolateChangelists", "maxChangesPerBuild", "timeout", "stageFailureLimit", "stageRetriesOnAgentProblem", "concurrentBuilds", "priority", "autoClearResponsibility", "idLeader", "logCompressionEnabled"})
+@Form(fieldOrder = {"isolateChangelists", "maxChangesPerBuild", "timeout", "stageFailureLimit", "stageRetriesOnAgentProblem", "concurrentBuilds", "priority", "autoClearResponsibility", "idLeader", "logCompressionEnabled", "liveLogsEnabled"})
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
@@ -30,6 +30,7 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     @Reference
     private ProjectConfiguration idLeader = null;
     private boolean logCompressionEnabled = true;
+    private boolean liveLogsEnabled = true;
 
     private int priority = Undefined.INTEGER;
 
@@ -148,5 +149,15 @@ public class BuildOptionsConfiguration extends AbstractConfiguration
     public int getConcurrentBuilds()
     {
         return concurrentBuilds;
+    }
+
+    public boolean isLiveLogsEnabled()
+    {
+        return liveLogsEnabled;
+    }
+
+    public void setLiveLogsEnabled(boolean liveLogsEnabled)
+    {
+        this.liveLogsEnabled = liveLogsEnabled;
     }
 }

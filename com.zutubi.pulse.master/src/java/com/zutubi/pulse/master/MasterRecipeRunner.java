@@ -58,8 +58,11 @@ public class MasterRecipeRunner implements RecipeRunner
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_PATCH_FORMAT_FACTORY, patchFormatFactory);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
-            outputStream = new EventOutputStream(eventManager, true, request.getId());
-            context.setOutputStream(outputStream);
+            if (context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_ENABLE_LIVE_LOGS, true))
+            {
+                outputStream = new EventOutputStream(eventManager, true, request.getId());
+                context.setOutputStream(outputStream);
+            }
             context.setWorkingDir(recipePaths.getBaseDir());
 
             recipeProcessor.build(request);

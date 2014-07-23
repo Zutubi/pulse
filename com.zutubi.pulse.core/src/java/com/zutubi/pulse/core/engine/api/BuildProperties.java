@@ -99,6 +99,11 @@ public class BuildProperties
      */
     public static final String PROPERTY_DEPENDENCY_DESCRIPTOR   = "dependency.descriptor";
     /**
+     * If true, send command output back to the master as the build runs for
+     * live stage logs.
+     */
+    public static final String PROPERTY_ENABLE_LIVE_LOGS        = "enable.live.logs";
+    /**
      * Set to "true" if the SCM bootstrap for the build is incremental, "false"
      * otherwise.  Different to incremental.build: incremental bootstraps are
      * also used for the "clean update" scheme, for example.
