@@ -1958,6 +1958,7 @@ public class ConfigurationRefactoringManager
                 }
             }
 
+            configurationSecurityManager.ensurePermission(ancestorPath, AccessManager.ACTION_CREATE);
             return ancestorPath;
         }
 
@@ -1988,7 +1989,7 @@ public class ConfigurationRefactoringManager
                 ensurePullUp();
                 return true;
             }
-            catch (IllegalArgumentException e)
+            catch (Exception e)
             {
                 return false;
             }
@@ -2016,8 +2017,7 @@ public class ConfigurationRefactoringManager
             try
             {
                 insertPath = ensurePullUp();
-                configurationSecurityManager.ensurePermission(insertPath, AccessManager.ACTION_CREATE);
-                
+
                 String[] elements = getPathElements(insertPath);
                 final String scope = elements[0];
                 TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
