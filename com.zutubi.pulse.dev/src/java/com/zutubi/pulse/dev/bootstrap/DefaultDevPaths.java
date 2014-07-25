@@ -3,6 +3,7 @@ package com.zutubi.pulse.dev.bootstrap;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 
@@ -131,7 +132,7 @@ public class DefaultDevPaths implements DevPaths
     {
         if(pluginWorkRoot == null)
         {
-            pluginWorkRoot = new File(getSystemRoot(), "tmp");
+            pluginWorkRoot = FileSystemUtils.getSystemTempDir();
             if(!pluginWorkRoot.isDirectory())
             {
                 pluginWorkRoot.mkdirs();
