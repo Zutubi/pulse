@@ -8,7 +8,9 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import static com.google.common.collect.Iterables.transform;
 
@@ -39,7 +41,7 @@ public class CircularDependencyValidator extends FieldValidatorSupport
         // check that there is no way that we can get from the project we are adding to the instance being configured.
         ProjectConfiguration candidate = (ProjectConfiguration) value;
         LinkedList<ProjectConfiguration> circularPath = new LinkedList<ProjectConfiguration>();
-        if (findCircularDependency(instance, candidate, circularPath))
+        if (findCircularDependency(instance, candidate, circularPath, new HashSet<Long>()))
         {
             String path = StringUtils.join("->", transform(circularPath, Configurations.toConfigurationName()));
             addError("circular.error", path);
@@ -52,10 +54,12 @@ public class CircularDependencyValidator extends FieldValidatorSupport
      * @param instance  the project configuration instance that is being configured.
      * @param candidate the candidate target project of the new dependency.
      * @param path      a list used to record the path to a circular dependency if it is detected.
+     * @param seenHandles set of all handles processed in the search, used to protect against
+     *                    already-existing cycles
      *
      * @return true if a circular dependency is located, false otherwise.
      */
-    private boolean findCircularDependency(ProjectConfiguration instance, ProjectConfiguration candidate, LinkedList<ProjectConfiguration> path)
+    private boolean findCircularDependency(ProjectConfiguration instance, ProjectConfiguration candidate, LinkedList<ProjectConfiguration> path, Set<Long> seenHandles)
     {
         if (candidate.hasDependencies())
         {
@@ -69,7 +73,14 @@ public class CircularDependencyValidator extends FieldValidatorSupport
                     return true;
                 }
 
-                if (findCircularDependency(instance, dependencyProject, path))
+                if (seenHandles.contains(dependencyProject.getHandle()))
+                {
+                    return false;
+                }
+
+                seenHandles.add(dependencyProject.getHandle());
+
+                if (findCircularDependency(instance, dependencyProject, path, seenHandles))
                 {
                     path.addFirst(candidate);
                     return true;
