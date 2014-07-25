@@ -8,10 +8,17 @@ import com.zutubi.tove.annotations.SymbolicName;
 /**
  * The trigger configuration for dependent build triggers.
  */
-@Form(fieldOrder = { "name", "propagateStatus", "propagateVersion" })
+@Form(fieldOrder = { "name", "propagateStatus", "propagateVersion", "revisionHandling" })
 @SymbolicName("zutubi.dependentBuildTriggerConfig")
 public class DependentBuildTriggerConfiguration extends TriggerConfiguration
 {
+    public enum RevisionHandling
+    {
+        FLOAT_INDEPENDENTLY,
+        FIX_WITH_UPSTREAM,
+        PROPAGATE_FROM_UPSTREAM,
+    }
+
     /**
      * If true, build requests raised by this trigger will inherit the status
      * of the completed build.
@@ -25,10 +32,9 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
     private boolean propagateVersion;
 
     /**
-     * If true, build requests raised by this trigger will inherit the revision
-     * of the completed build.
+     * Determines how the revision is influenced by the upstream build.
      */
-    private boolean propagateRevision;
+    private RevisionHandling revisionHandling;
 
     public Trigger newTrigger()
     {
@@ -55,13 +61,13 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
         this.propagateVersion = propagateVersion;
     }
 
-    public boolean isPropagateRevision()
+    public RevisionHandling getRevisionHandling()
     {
-        return propagateRevision;
+        return revisionHandling;
     }
 
-    public void setPropagateRevision(boolean propagateRevision)
+    public void setRevisionHandling(RevisionHandling revisionHandling)
     {
-        this.propagateRevision = propagateRevision;
+        this.revisionHandling = revisionHandling;
     }
 }

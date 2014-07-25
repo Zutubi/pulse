@@ -130,7 +130,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new BuildRevision());
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new BuildRevision(new Revision("test"), false));
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(recipeResult.getId()));
         RecipeAssignmentRequest dispatched = recipeQueue.getRequest(recipeResult.getId());

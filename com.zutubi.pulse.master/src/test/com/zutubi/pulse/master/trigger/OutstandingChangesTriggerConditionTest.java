@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.trigger;
 
+import com.google.common.base.Supplier;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.PersistentContextImpl;
@@ -123,7 +124,13 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
         }
         else
         {
-            buildRevision = new BuildRevision();
+            buildRevision = new BuildRevision(new Supplier<Revision>()
+            {
+                public Revision get()
+                {
+                    return latestRevision;
+                }
+            });
         }
         return new SingleBuildRequestEvent(this, project, buildRevision, new TriggerOptions(null, (String) null));
     }

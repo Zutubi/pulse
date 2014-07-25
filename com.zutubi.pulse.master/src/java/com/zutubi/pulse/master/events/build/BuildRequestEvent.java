@@ -36,6 +36,7 @@ public abstract class BuildRequestEvent extends Event implements Comparable
      * request.
      */
     protected List<Project> dependentProjects = new LinkedList<Project>();
+    private List<BuildRevision> dependentRevisions;
 
     /**
      * @param source        the event source

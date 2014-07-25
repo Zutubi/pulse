@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance;
 import com.google.common.io.Files;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumException;
-import com.thoughtworks.selenium.webdriven.WebDriverBackedSelenium;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;

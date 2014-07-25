@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.events.RecordingEventListener;
@@ -9,6 +10,10 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.build.control.BuildController;
 import com.zutubi.pulse.master.build.control.BuildControllerFactory;
@@ -19,6 +24,7 @@ import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
@@ -50,6 +56,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
     protected Scheduler scheduler;
     private BuildManager buildManager;
     protected ProjectManager projectManager;
+    protected ScmManager scmManager;
     protected UserManager userManager;
     protected BuildRequestRegistry buildRequestRegistry;
     protected BuildControllerFactory buildControllerFactory;
@@ -136,6 +143,11 @@ public abstract class BaseQueueTestCase extends PulseTestCase
 
         stub(projectManager.updateAndGetNextBuildNumber((Project) anyObject(), eq(true))).toReturn((long) nextId.getAndIncrement());
 
+        ScmClient scmClient = mock(ScmClient.class);
+        stub(scmClient.getCapabilities(Matchers.<ScmContext>anyObject())).toReturn(new HashSet<ScmCapability>());
+        scmManager = mock(ScmManager.class);
+        stub(scmManager.createClient(Matchers.<ScmConfiguration>anyObject())).toReturn(scmClient);
+
         userManager = mock(UserManager.class);
         stub(userManager.getConcurrentPersonalBuilds(Matchers.<User>anyObject())).toReturn(1);
 
@@ -220,7 +232,13 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         }
         else
         {
-            buildRevision = new BuildRevision();
+            buildRevision = new BuildRevision(new Supplier<Revision>()
+            {
+                public Revision get()
+                {
+                    return new Revision("test");
+                }
+            });
         }
 
         BuildRequestEvent request = new SingleBuildRequestEvent(this, project, buildRevision, options);

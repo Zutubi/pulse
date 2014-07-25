@@ -10,6 +10,8 @@ import com.zutubi.pulse.master.model.DependencyBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RebuildBuildReason;
 import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.scm.LatestScmRevisionSupplier;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.util.UnaryProcedure;
@@ -37,6 +39,8 @@ import java.util.Map;
  */
 public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 {
+    private ScmManager scmManager;
+
     public List<QueuedRequest> prepare(final BuildRequestEvent request)
     {
         if (request.getMetaBuildId() != 0)
@@ -107,13 +111,20 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                         {
                             options.setStatus(upstreamRequest.getRequest().getStatus());
                         }
+
                         if (trigger.isPropagateVersion())
                         {
                             options.setVersion(upstreamRequest.getRequest().getVersion());
                         }
-                        if (trigger.isPropagateRevision())
+
+                        BuildRevision upstreamRevision = upstreamRequest.getRequest().getRevision();
+                        if (trigger.getRevisionHandling() == DependentBuildTriggerConfiguration.RevisionHandling.PROPAGATE_FROM_UPSTREAM)
                         {
-                            newRequest.setRevision(upstreamRequest.getRequest().getRevision());
+                            newRequest.setRevision(upstreamRevision);
+                        }
+                        else if (trigger.getRevisionHandling() == DependentBuildTriggerConfiguration.RevisionHandling.FIX_WITH_UPSTREAM && !upstreamRevision.isInitialised())
+                        {
+                            upstreamRevision.addDependentRevision(newRequest.getRevision());
                         }
                     }
 
@@ -179,13 +190,27 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
                 Project owner = getNodeProject(node);
                 QueuedRequest request = ownerRequests.get(owner);
                 DependentBuildTriggerConfiguration trigger = TriggerUtils.getTrigger(owner.getConfig(), DependentBuildTriggerConfiguration.class);
-                if (trigger != null && trigger.isPropagateRevision())
+                if (trigger != null)
                 {
-                    for (TreeNode<BuildGraphData> child : node.getChildren())
+                    BuildRevision buildRevision = request.getRequest().getRevision();
+                    boolean propagate = trigger.getRevisionHandling() == DependentBuildTriggerConfiguration.RevisionHandling.PROPAGATE_FROM_UPSTREAM;
+                    boolean chain = trigger.getRevisionHandling() == DependentBuildTriggerConfiguration.RevisionHandling.FIX_WITH_UPSTREAM && !buildRevision.isInitialised();
+
+                    if (propagate || chain)
                     {
-                        Project childOwner = getNodeProject(child);
-                        QueuedRequest childRequest = ownerRequests.get(childOwner);
-                        childRequest.getRequest().setRevision(request.getRequest().getRevision());
+                        for (TreeNode<BuildGraphData> child : node.getChildren())
+                        {
+                            Project childOwner = getNodeProject(child);
+                            QueuedRequest childRequest = ownerRequests.get(childOwner);
+                            if (propagate)
+                            {
+                                childRequest.getRequest().setRevision(buildRevision);
+                            }
+                            else
+                            {
+                                childRequest.getRequest().getRevision().addDependentRevision(buildRevision);
+                            }
+                        }
                     }
                 }
             }
@@ -215,7 +240,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
         TriggerOptions options = new TriggerOptions(originalRequest.getOptions());
         options.setReason((upstream) ? new RebuildBuildReason(originalOwner) : new DependencyBuildReason(originalOwner));
         BuildRevision sourceRevision = originalRequest.getRevision();
-        BuildRevision revision = sourceRevision.isUser() ? new BuildRevision(sourceRevision.getRevision(), sourceRevision.isUser()) : new BuildRevision();
+        BuildRevision revision = sourceRevision.isUser() ? new BuildRevision(sourceRevision.getRevision(), sourceRevision.isUser()) : new BuildRevision(new LatestScmRevisionSupplier(owner, scmManager));
         BuildRequestEvent newRequest = new SingleBuildRequestEvent(this, owner, revision, options);
         newRequest.setMetaBuildId(originalRequest.getMetaBuildId());
 
@@ -237,5 +262,10 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
             defaultPredicates.add(new HeadOfOwnerQueuePredicate(buildQueue));
         }
         return new QueuedRequest(request, defaultPredicates);
+    }
+
+    public void setScmManager(ScmManager scmManager)
+    {
+        this.scmManager = scmManager;
     }
 }

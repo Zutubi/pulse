@@ -32,6 +32,7 @@ import static com.zutubi.pulse.core.dependency.ivy.IvyLatestRevisionMatcher.LATE
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.*;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEFAULT_RECIPE;
 import static com.zutubi.pulse.master.tove.config.project.ProjectConfigurationWizard.DEPENDENCY_TRIGGER;
+import static com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration.RevisionHandling.PROPAGATE_FROM_UPSTREAM;
 import static com.zutubi.util.Constants.MEGABYTE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -874,7 +875,7 @@ public class DependenciesAcceptanceTest extends AcceptanceTestBase
         ProjectConfigurationHelper projectB = projectConfigurations.createAntProject(projectBName, Constants.TRIVIAL_ANT_REPOSITORY + "/" + projectBName);
         projectB.addDependency(projectA);
         DependentBuildTriggerConfiguration trigger = projectB.getTrigger(DEPENDENCY_TRIGGER);
-        trigger.setPropagateRevision(true);
+        trigger.setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
         insertProject(projectB);
 
         // test triggering the upstream project.

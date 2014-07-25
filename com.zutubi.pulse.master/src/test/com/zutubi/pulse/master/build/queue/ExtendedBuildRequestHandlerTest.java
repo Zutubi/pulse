@@ -14,6 +14,8 @@ import java.util.List;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration.RevisionHandling.FIX_WITH_UPSTREAM;
+import static com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration.RevisionHandling.PROPAGATE_FROM_UPSTREAM;
 import static org.mockito.Mockito.mock;
 
 public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
@@ -153,7 +155,7 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent clientRequest = toQueue.get(1).getRequest();
         assertNotSame(utilRequest.getRevision(), clientRequest.getRevision());
 
-        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         toQueue = handler.prepare(createRequest(util));
         utilRequest = toQueue.get(0).getRequest();
@@ -167,8 +169,8 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         Project clientA = createProject("clientA", dependency(util));
         Project clientB = createProject("clientB", dependency(util));
 
-        TriggerUtils.getTrigger(clientA.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
-        TriggerUtils.getTrigger(clientB.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(clientA.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
+        TriggerUtils.getTrigger(clientB.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
         BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
@@ -185,8 +187,8 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         Project component = createProject("component", dependency(lib));
         Project client = createProject("client", dependency(component));
 
-        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
-        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         List<QueuedRequest> toQueue = handler.prepare(createRequest(util));
         BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
@@ -209,7 +211,7 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         BuildRequestEvent libRequest = toQueue.get(1).getRequest();
         assertNotSame(utilRequest.getRevision(), libRequest.getRevision());
 
-        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         toQueue = handler.prepare(createRebuildRequest(lib));
         utilRequest = toQueue.get(0).getRequest();
@@ -223,7 +225,7 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         Project libB = createProject("libB");
         Project client = createProject("client", dependency(libA), dependency(libB));
 
-        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(client));
         BuildRequestEvent libARequest = toQueue.get(0).getRequest();
@@ -240,7 +242,7 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
         Project libB = createProject("libB", dependency(libA));
         Project client = createProject("client", dependency(libA), dependency(libB));
 
-        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setPropagateRevision(true);
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(PROPAGATE_FROM_UPSTREAM);
 
         List<QueuedRequest> toQueue = handler.prepare(createRebuildRequest(client));
         BuildRequestEvent libARequest = toQueue.get(0).getRequest();
@@ -249,6 +251,55 @@ public class ExtendedBuildRequestHandlerTest extends BaseQueueTestCase
 
         assertSame(libARequest.getRevision(), libBRequest.getRevision());
         assertSame(clientRequest.getRevision(), libBRequest.getRevision());
+    }
+
+    public void testFixWithUpstreamRevisionChainsRevisions()
+    {
+        Project util = createProject("util");
+        Project client = createProject("client", dependency(util));
+        TriggerUtils.getTrigger(client.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(FIX_WITH_UPSTREAM);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRequest(util, "test source", true, null));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent clientRequest = toQueue.get(1).getRequest();
+        assertNotSame(utilRequest.getRevision(), clientRequest.getRevision());
+        assertEquals(Arrays.asList(clientRequest.getRevision()), utilRequest.getRevision().getDependentRevisions());
+
+        // Do a quick check that initialisation chaining also works.
+        assertFalse(clientRequest.getRevision().isInitialised());
+        utilRequest.getRevision().initialiseRevision();
+        assertTrue(clientRequest.getRevision().isInitialised());
+    }
+
+    public void testFixWithUpstreamRevisionChainsToMultipleDownstream()
+    {
+        Project util = createProject("util");
+        Project clientA = createProject("clientA", dependency(util));
+        Project clientB = createProject("clientB", dependency(util));
+
+        TriggerUtils.getTrigger(clientA.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(FIX_WITH_UPSTREAM);
+        TriggerUtils.getTrigger(clientB.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(FIX_WITH_UPSTREAM);
+
+        List<QueuedRequest> toQueue = handler.prepare(createRequest(util, "test source", true, null));
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        BuildRequestEvent clientARequest = toQueue.get(1).getRequest();
+        BuildRequestEvent clientBRequest = toQueue.get(2).getRequest();
+        assertEquals(Arrays.asList(clientARequest.getRevision(), clientBRequest.getRevision()), utilRequest.getRevision().getDependentRevisions());
+    }
+
+    public void testFixWithUpstreamRevisionViaRebuild()
+    {
+        Project util = createProject("util");
+        Project lib = createProject("lib", dependency(util));
+
+        TriggerUtils.getTrigger(lib.getConfig(), DependentBuildTriggerConfiguration.class).setRevisionHandling(FIX_WITH_UPSTREAM);
+
+        BuildRequestEvent libRequest = createRequest(lib, "test source", true, null);
+        libRequest.getOptions().setRebuild(true);
+        List<QueuedRequest> toQueue = handler.prepare(libRequest);
+        BuildRequestEvent utilRequest = toQueue.get(0).getRequest();
+        libRequest = toQueue.get(1).getRequest();
+        assertEquals(Arrays.asList(libRequest.getRevision()), utilRequest.getRevision().getDependentRevisions());
     }
 
     private void assertRequestMatchesProjects(List<QueuedRequest> requests, List<Project> projects)

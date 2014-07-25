@@ -535,25 +535,6 @@ public class DefaultBuildController implements EventListener, BuildController
         }
     }
 
-    private Revision getLatestRevision()
-    {
-        try
-        {
-            return withScmClient(projectConfig, project.getState(), scmManager, new ScmContextualAction<Revision>()
-            {
-                public Revision process(ScmClient client, ScmContext context) throws ScmException
-                {
-                    boolean supportsRevisions = client.getCapabilities(context).contains(ScmCapability.REVISIONS);
-                    return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
-                }
-            });
-        }
-        catch (ScmException e)
-        {
-            throw new BuildException("Unable to retrieve latest revision: " + e.getMessage(), e);
-        }
-    }
-
     private Bootstrapper createPersonalBuildBootstrapper(final Bootstrapper initialBootstrapper)
     {
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
@@ -780,7 +761,7 @@ public class DefaultBuildController implements EventListener, BuildController
         if (!buildRevision.isInitialised())
         {
             buildLogger.status("Initialising build revision...");
-            buildRevision.setRevision(getLatestRevision());
+            buildRevision.initialiseRevision();
             buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
         }
 

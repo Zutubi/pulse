@@ -33,6 +33,7 @@ import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.master.project.ProjectInitialisationService;
 import com.zutubi.pulse.master.project.events.ProjectDestructionCompletedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
+import com.zutubi.pulse.master.scm.LatestScmRevisionSupplier;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.ConfigurationInjector;
@@ -1139,7 +1140,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
         try
         {
-            BuildRevision buildRevision = revision == null ? new BuildRevision(): new BuildRevision(revision, false);
+            BuildRevision buildRevision = revision == null ? new BuildRevision(new LatestScmRevisionSupplier(project, scmManager)): new BuildRevision(revision, false);
             BuildReason buildReason = StringUtils.stringSet(reason) ? new CustomBuildReason(reason) : new PersonalBuildReason(user.getLogin());
             return requestBuild(new PersonalBuildRequestEvent(this, number, buildRevision, user, patchFile, patchFormat, projectConfig, new TriggerOptions(buildReason, overrides)));
         }
@@ -1190,7 +1191,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     private void requestBuildFloating(Project project, TriggerOptions options, List<Long> requestIds)
     {
-        requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(), options)));
+        requestIds.add(requestBuild(new SingleBuildRequestEvent(this, project, new BuildRevision(new LatestScmRevisionSupplier(project, scmManager)), options)));
     }
 
     private void requestBuildOfRevision(Project project, TriggerOptions options, BuildRevision revision, List<Long> requestIds)
