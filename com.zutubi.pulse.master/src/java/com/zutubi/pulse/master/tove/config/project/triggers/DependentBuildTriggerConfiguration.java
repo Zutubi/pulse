@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.scheduling.NoopTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * The trigger configuration for dependent build triggers.
@@ -34,6 +35,7 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
     /**
      * Determines how the revision is influenced by the upstream build.
      */
+    @Required
     private RevisionHandling revisionHandling;
 
     public Trigger newTrigger()
