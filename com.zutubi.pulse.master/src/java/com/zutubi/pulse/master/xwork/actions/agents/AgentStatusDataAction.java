@@ -45,7 +45,7 @@ public class AgentStatusDataAction extends AgentActionBase
     {
         DefaultAgent agent = (DefaultAgent) getRequiredAgent();
         Host host = agent.getHost();
-        model = new AgentStatusModel(agent.getName(), host.getLocation());
+        model = new AgentStatusModel(agent.getName(), host.getLocation(), accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null));
 
         if (agent.isEnabled())
         {
