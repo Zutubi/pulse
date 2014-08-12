@@ -363,7 +363,7 @@ public class FatController implements EventListener, Stoppable
             // First check we can run (handles eval expiry and illegal upgrades
             // for commercial license) and then ensure we are within our limits.
             License license = LicenseHolder.getLicense();
-            return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
+            return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(true), agentManager.getAgentCount(), userManager.getUserCount());
         }
 
         public Class[] getHandledEvents()

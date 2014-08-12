@@ -84,6 +84,9 @@ public interface BuildManager
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     int getBuildCount(Project project, ResultState[] states);
 
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
+    int getBuildCount(Project[] projects, ResultState[] states);
+
     /**
      * Counts the number of builds that have happened between the given build numbers.
      *
@@ -96,7 +99,8 @@ public interface BuildManager
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     int getBuildCount(Project project, long after, long upTo);
 
-    int getBuildCount(Agent agent, ResultState[] states);
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
+    public int getBuildCountForAgent(Agent agent, Project[] projects, ResultState[] states);
 
     /**
      * Fills out the list in the given history page based on the given

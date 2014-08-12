@@ -67,6 +67,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getBuildCount(Project project, ResultState[] states);
 
+    int getBuildCount(Project[] projects, ResultState[] states);
+
     int getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned);
 
     int getBuildCount(Project project, long after, long upTo);
@@ -101,8 +103,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     BuildResult findLatestByProject(Project project, boolean initialise, ResultState... inStates);
 
-    int getBuildCount(String agent, ResultState[] states);
-    List<BuildResult> findLatestByAgentName(String agent, ResultState[] states, int first, int max);
+    int getBuildCountByAgentName(String agent, Project[] projects, ResultState[] states);
+
+    List<BuildResult> findLatestByAgentName(String agent, Project[] projects, ResultState[] states, int first, int max);
 
     /**
      * Finds the build result that contains the recipe with the given id.

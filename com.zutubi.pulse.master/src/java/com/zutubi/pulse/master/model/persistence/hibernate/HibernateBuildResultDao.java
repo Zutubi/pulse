@@ -271,6 +271,20 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public int getBuildCount(final Project[] projects, final ResultState[] states)
+    {
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
+        {
+            public Integer doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, null, states, false);
+                addProjectsToCriteria(projects, criteria);
+                criteria.setProjection(Projections.rowCount());
+                return (Integer) criteria.uniqueResult();
+            }
+        });
+    }
+
     public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final boolean includePinned)
     {
         return getHibernateTemplate().execute(new HibernateCallback<Integer>()
@@ -559,32 +573,44 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public int getBuildCount(final String agent, final ResultState[] states)
+    public int getBuildCountByAgentName(final String agent, final Project[] projects, final ResultState[] states)
     {
-        Long count = getHibernateTemplate().execute(new HibernateCallback<Long>()
+        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Long doInHibernate(Session session) throws HibernateException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery(
-                        "select count(distinct result) from BuildResult result " +
-                                "  join result.stages stage " +
-                                "where stage.agentName = :agent" +
-                                (states == null ? "" : " and result.stateName in (:states)"));
-
-                queryObject.setString("agent", agent);
-                if (states != null)
+                Long count = getHibernateTemplate().execute(new HibernateCallback<Long>()
                 {
-                    queryObject.setParameterList("states", getStateNames(states));
-                }
+                    public Long doInHibernate(Session session) throws HibernateException
+                    {
+                        Query queryObject = session.createQuery(
+                                "select count(distinct result) from BuildResult result " +
+                                        "  join result.stages stage " +
+                                        "where stage.agentName = :agent" +
+                                        (projects == null ? "" : " and result.project in (:projects)") +
+                                        (states == null ? "" : " and result.stateName in (:states)"));
 
-                return (Long) queryObject.uniqueResult();
+                        queryObject.setString("agent", agent);
+                        if (projects != null)
+                        {
+                            queryObject.setParameterList("projects", projects);
+                        }
+
+                        if (states != null)
+                        {
+                            queryObject.setParameterList("states", getStateNames(states));
+                        }
+
+                        return (Long) queryObject.uniqueResult();
+                    }
+                });
+
+                return count.intValue();
             }
         });
-        
-        return count.intValue();
     }
 
-    public List<BuildResult> findLatestByAgentName(final String agent, final ResultState[] states, final int first, final int max)
+    public List<BuildResult> findLatestByAgentName(final String agent, final Project[] projects, final ResultState[] states, final int first, final int max)
     {
         return getHibernateTemplate().execute(new HibernateCallback<List<BuildResult>>()
         {
@@ -594,10 +620,16 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                         "select distinct result from BuildResult result " +
                         "  join result.stages stage " +
                         "where stage.agentName = :agent " +
+                        (projects == null ? "" : " and result.project in (:projects)") +
                         (states == null ? "" : "and result.stateName in (:states) ") +
                         "order by result.id desc");
 
                 queryObject.setString("agent", agent);
+                if (projects != null)
+                {
+                    queryObject.setParameterList("projects", projects);
+                }
+
                 if (states != null)
                 {
                     queryObject.setParameterList("states", getStateNames(states));

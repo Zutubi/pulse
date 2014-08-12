@@ -25,7 +25,7 @@ public class AddProjectAuthorisation implements Authorisation
             return AUTH;
         }
 
-        if (projectManager.getProjectCount() < license.getSupportedProjects())
+        if (projectManager.getProjectCount(true) < license.getSupportedProjects())
         {
             return AUTH;
         }

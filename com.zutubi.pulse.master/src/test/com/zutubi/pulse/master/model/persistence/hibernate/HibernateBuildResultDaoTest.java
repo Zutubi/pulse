@@ -26,7 +26,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private static long time = 0;
 
     private BuildResultDao buildResultDao;
-    private ProjectDao projectDao;
     private ChangelistDao changelistDao;
     private UserDao userDao;
 
@@ -37,9 +36,15 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         super.setUp();
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
-        projectDao = (ProjectDao) context.getBean("projectDao");
+        ProjectDao projectDao = (ProjectDao) context.getBean("projectDao");
         changelistDao = (ChangelistDao) context.getBean("changelistDao");
         userDao = (UserDao) context.getBean("userDao");
+
+        projectA = new Project();
+        projectDao.save(projectA);
+
+        projectB = new Project();
+        projectDao.save(projectB);
     }
 
     public void testSaveAndLoadArtifactCommand()
@@ -78,11 +83,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         Revision revision = new Revision("42");
 
-        // Need to save the Project as it is *not* cascaded from BuildResult
-        Project project = new Project();
-        projectDao.save(project);
-
-        BuildResult buildResult = new BuildResult(TEST_REASON, project, 11, false);
+        BuildResult buildResult = new BuildResult(TEST_REASON, projectA, 11, false);
         buildResult.commence();
         buildResult.setRevision(revision);
         RecipeResultNode recipeNode = new RecipeResultNode("stage name", 123, recipeResult);
@@ -191,17 +192,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetOldestBuilds()
     {
-        Project p1 = new Project();
-        Project p2 = new Project();
-
-        projectDao.save(p1);
-        projectDao.save(p2);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
-        BuildResult otherP = createCompletedBuild(p2, 1);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
+        BuildResult otherP = createCompletedBuild(projectB, 1);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -211,46 +206,40 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(projectA, null, 1, false);
         assertEquals(1, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
 
-        oldest = buildResultDao.findOldestByProject(p1, null, 3, false);
+        oldest = buildResultDao.findOldestByProject(projectA, null, 3, false);
         assertEquals(3, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
         assertPropertyEquals(r3, oldest.get(2));
 
-        oldest = buildResultDao.findOldestByProject(p1, null, 100, false);
+        oldest = buildResultDao.findOldestByProject(projectA, null, 100, false);
         assertEquals(4, oldest.size());
     }
 
     public void testGetOldestBuildsInitial()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult result = new BuildResult(TEST_REASON, p1, 1, false);
+        BuildResult result = new BuildResult(TEST_REASON, projectA, 1, false);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, ResultState.getCompletedStates(), 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(projectA, ResultState.getCompletedStates(), 1, false);
         assertEquals(0, oldest.size());
     }
 
     public void testGetOldestBuildsInProgress()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult result = new BuildResult(TEST_REASON, p1, 1, false);
+        BuildResult result = new BuildResult(TEST_REASON, projectA, 1, false);
         result.commence(0);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, ResultState.getCompletedStates(), 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(projectA, ResultState.getCompletedStates(), 1, false);
         assertEquals(0, oldest.size());
     }
 
@@ -259,12 +248,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         User u1 = new User();
         userDao.save(u1);
 
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createPersonalBuild(u1, p1, 1);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createPersonalBuild(u1, projectA, 1);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -272,7 +258,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 3, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(projectA, null, 3, false);
         assertEquals(2, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
@@ -283,12 +269,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         User u1 = new User();
         userDao.save(u1);
 
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createPersonalBuild(u1, p1, 1);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createPersonalBuild(u1, projectA, 1);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -296,7 +279,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 3, true);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(projectA, null, 3, true);
         assertEquals(3, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
@@ -305,14 +288,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetPreviousBuildResult()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult resultA = new BuildResult(TEST_REASON, p1, 1, false);
+        BuildResult resultA = new BuildResult(TEST_REASON, projectA, 1, false);
         buildResultDao.save(resultA);
-        BuildResult resultB = new BuildResult(TEST_REASON, p1, 2, false);
+        BuildResult resultB = new BuildResult(TEST_REASON, projectA, 2, false);
         buildResultDao.save(resultB);
-        BuildResult resultC = new BuildResult(TEST_REASON, p1, 3, false);
+        BuildResult resultC = new BuildResult(TEST_REASON, projectA, 3, false);
         buildResultDao.save(resultC);
 
         commitAndRefreshTransaction();
@@ -324,15 +304,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetPreviousBuildResultWithRevision()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-        Project p2 = new Project();
-        projectDao.save(p2);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult other = createCompletedBuild(p2, 1);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
+        BuildResult other = createCompletedBuild(projectB, 1);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -348,12 +323,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetPreviousBuildResultWithRevisionFilterStates()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createFailedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createFailedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -368,13 +340,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetPreviousBuildResultWithRevisionSkipsUserRevision()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createUserRevisionBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createUserRevisionBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult r1 = createUserRevisionBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createUserRevisionBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -399,13 +368,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetPreviousBuildResultWithRevisionSkipsNullRevision()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createNullRevisionBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createNullRevisionBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult r1 = createNullRevisionBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createNullRevisionBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -431,13 +397,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         User u1 = new User();
         userDao.save(u1);
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createPersonalBuild(u1, p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createPersonalBuild(u1, p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult r1 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createPersonalBuild(u1, projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -453,15 +416,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestCompletedSimple()
     {
-        Project p1 = new Project();
-        Project p2 = new Project();
-        projectDao.save(p1);
-        projectDao.save(p2);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p2, 3);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectB, 3);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -470,7 +428,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(projectA, 0, 10);
         assertEquals(3, latestCompleted.size());
         assertPropertyEquals(r3, latestCompleted.get(0));
         assertPropertyEquals(r2, latestCompleted.get(1));
@@ -478,29 +436,23 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestCompletedInitial()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = new BuildResult(TEST_REASON, p1, 2, false);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = new BuildResult(TEST_REASON, projectA, 2, false);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(projectA, 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
 
     public void testGetLatestCompletedInProgress()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = new BuildResult(TEST_REASON, p1, 2, false);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = new BuildResult(TEST_REASON, projectA, 2, false);
         r2.commence();
 
         buildResultDao.save(r1);
@@ -508,20 +460,17 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(projectA, 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
 
     public void testGetLatestCompletedMax()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -530,7 +479,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, 0, 2);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(projectA, 0, 2);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
@@ -538,13 +487,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestCompletedFirst()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createCompletedBuild(projectA, 2);
+        BuildResult r3 = createCompletedBuild(projectA, 3);
+        BuildResult r4 = createCompletedBuild(projectA, 4);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -553,7 +499,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, 1, 4);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(projectA, 1, 4);
         assertEquals(3, latestCompleted.size());
         assertPropertyEquals(r3, latestCompleted.get(0));
         assertPropertyEquals(r2, latestCompleted.get(1));
@@ -562,15 +508,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testDeleteBuildRetainChangelist()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
-        BuildResult result = createCompletedBuild(p, 1);
+        BuildResult result = createCompletedBuild(projectA, 1);
         result.setRevision(new Revision("10"));
         buildResultDao.save(result);
 
         PersistentChangelist list = new PersistentChangelist(new Revision("10"), 0, null, null, Collections.<PersistentFileChange>emptyList());
-        list.setProjectId(p.getId());
+        list.setProjectId(projectA.getId());
         list.setResultId(result.getId());
         changelistDao.save(list);
 
@@ -585,9 +528,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByUser()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         User u2 = new User();
         User u3 = new User();
@@ -595,10 +535,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         userDao.save(u2);
         userDao.save(u3);
 
-        BuildResult r1 = createCompletedBuild(p, 1);
-        BuildResult r2 = createPersonalBuild(u1, p, 1);
-        BuildResult r3 = createPersonalBuild(u2, p, 1);
-        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r3 = createPersonalBuild(u2, projectA, 1);
+        BuildResult r4 = createPersonalBuild(u2, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
         buildResultDao.save(r3);
@@ -622,9 +562,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByUserAndNumber()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         User u2 = new User();
         User u3 = new User();
@@ -632,10 +569,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         userDao.save(u2);
         userDao.save(u3);
 
-        BuildResult r1 = createCompletedBuild(p, 1);
-        BuildResult r2 = createPersonalBuild(u1, p, 1);
-        BuildResult r3 = createPersonalBuild(u2, p, 1);
-        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        BuildResult r1 = createCompletedBuild(projectA, 1);
+        BuildResult r2 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r3 = createPersonalBuild(u2, projectA, 1);
+        BuildResult r4 = createPersonalBuild(u2, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
         buildResultDao.save(r3);
@@ -659,17 +596,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestByUser()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 
-        BuildResult r1 = createPersonalBuild(u1, p, 1);
-        BuildResult r2 = createPersonalBuild(u2, p, 1);
-        BuildResult r3 = createPersonalBuild(u2, p, 2);
+        BuildResult r1 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r2 = createPersonalBuild(u2, projectA, 1);
+        BuildResult r3 = createPersonalBuild(u2, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
         buildResultDao.save(r3);
@@ -688,14 +622,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestByUserStates()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         userDao.save(u1);
 
-        BuildResult r1 = createPersonalBuild(u1, p, 1);
-        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
+        BuildResult r1 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
 
@@ -709,18 +640,15 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetCompletedPersonalBuildCount()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 
-        BuildResult r1 = createPersonalBuild(u1, p, 1);
-        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
-        BuildResult r3 = createPersonalBuild(u2, p, 1);
-        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        BuildResult r1 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, projectA, 2);
+        BuildResult r3 = createPersonalBuild(u2, projectA, 1);
+        BuildResult r4 = createPersonalBuild(u2, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
         buildResultDao.save(r3);
@@ -734,18 +662,15 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetOldestCompletedPersonalBuilds()
     {
-        Project p = new Project();
-        projectDao.save(p);
-
         User u1 = new User();
         User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 
-        BuildResult r1 = createPersonalBuild(u1, p, 1);
-        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
-        BuildResult r3 = createPersonalBuild(u2, p, 1);
-        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        BuildResult r1 = createPersonalBuild(u1, projectA, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, projectA, 2);
+        BuildResult r3 = createPersonalBuild(u2, projectA, 1);
+        BuildResult r4 = createPersonalBuild(u2, projectA, 2);
         buildResultDao.save(r1);
         buildResultDao.save(r2);
         buildResultDao.save(r3);
@@ -773,12 +698,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private void createFindLatestSuccessfulTestData()
     {
-        projectA = new Project();
-        projectDao.save(projectA);
-
-        projectB = new Project();
-        projectDao.save(projectB);
-
         commitAndRefreshTransaction();
 
         // create successful and failed builds.
@@ -812,208 +731,179 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetBuildCountRange()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-        Project p2 = new Project();
-        projectDao.save(p2);
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        buildResultDao.save(createCompletedBuild(projectA, 2));
+        buildResultDao.save(createCompletedBuild(projectA, 3));
+        buildResultDao.save(createCompletedBuild(projectA, 4));
+        buildResultDao.save(createCompletedBuild(projectA, 5));
 
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        buildResultDao.save(createCompletedBuild(p1, 2));
-        buildResultDao.save(createCompletedBuild(p1, 3));
-        buildResultDao.save(createCompletedBuild(p1, 4));
-        buildResultDao.save(createCompletedBuild(p1, 5));
-
-        buildResultDao.save(createCompletedBuild(p2, 1));
-        buildResultDao.save(createCompletedBuild(p2, 2));
-        buildResultDao.save(createCompletedBuild(p2, 3));
+        buildResultDao.save(createCompletedBuild(projectB, 1));
+        buildResultDao.save(createCompletedBuild(projectB, 2));
+        buildResultDao.save(createCompletedBuild(projectB, 3));
 
         commitAndRefreshTransaction();
 
-        assertEquals(0, buildResultDao.getBuildCount(p1, 1, 1));
-        assertEquals(1, buildResultDao.getBuildCount(p1, 0, 1));
-        assertEquals(2, buildResultDao.getBuildCount(p1, 0, 2));
-        assertEquals(3, buildResultDao.getBuildCount(p1, 0, 3));
-        assertEquals(2, buildResultDao.getBuildCount(p1, 1, 3));
-        assertEquals(3, buildResultDao.getBuildCount(p1, 1, 4));
-        assertEquals(4, buildResultDao.getBuildCount(p1, 1, 100));
-        assertEquals(5, buildResultDao.getBuildCount(p1, 0, 100));
+        assertEquals(0, buildResultDao.getBuildCount(projectA, 1, 1));
+        assertEquals(1, buildResultDao.getBuildCount(projectA, 0, 1));
+        assertEquals(2, buildResultDao.getBuildCount(projectA, 0, 2));
+        assertEquals(3, buildResultDao.getBuildCount(projectA, 0, 3));
+        assertEquals(2, buildResultDao.getBuildCount(projectA, 1, 3));
+        assertEquals(3, buildResultDao.getBuildCount(projectA, 1, 4));
+        assertEquals(4, buildResultDao.getBuildCount(projectA, 1, 100));
+        assertEquals(5, buildResultDao.getBuildCount(projectA, 0, 100));
     }
 
     public void testGetBuildCountPinned()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        BuildResult build = createCompletedBuild(p1, 2);
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        BuildResult build = createCompletedBuild(projectA, 2);
         build.setPinned(true);
         buildResultDao.save(build);
-        buildResultDao.save(createCompletedBuild(p1, 3));
-        build = createCompletedBuild(p1, 4);
+        buildResultDao.save(createCompletedBuild(projectA, 3));
+        build = createCompletedBuild(projectA, 4);
         build.setPinned(true);
         buildResultDao.save(build);
-        buildResultDao.save(createCompletedBuild(p1, 5));
+        buildResultDao.save(createCompletedBuild(projectA, 5));
 
-        assertEquals(5, buildResultDao.getBuildCount(p1, null, null, true));
-        assertEquals(3, buildResultDao.getBuildCount(p1, null, null, false));
+        assertEquals(5, buildResultDao.getBuildCount(projectA, null, null, true));
+        assertEquals(3, buildResultDao.getBuildCount(projectA, null, null, false));
     }
 
     public void testQueryBuilds()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        buildResultDao.save(createCompletedBuild(p1, 2));
-        buildResultDao.save(createCompletedBuild(p1, 3));
-        buildResultDao.save(createCompletedBuild(p1, 4));
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        buildResultDao.save(createCompletedBuild(projectA, 2));
+        buildResultDao.save(createCompletedBuild(projectA, 3));
+        buildResultDao.save(createCompletedBuild(projectA, 4));
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> results = buildResultDao.queryBuilds(p1, null, 1, -1, 0, 1, false, false);
+        List<BuildResult> results = buildResultDao.queryBuilds(projectA, null, 1, -1, 0, 1, false, false);
         assertEquals(1, results.size());
         assertEquals(1, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, null, 2, -1, 0, 1, false, false);
+        results = buildResultDao.queryBuilds(projectA, null, 2, -1, 0, 1, false, false);
         assertEquals(1, results.size());
         assertEquals(2, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, null, 3, -1, 0, 1, false, false);
+        results = buildResultDao.queryBuilds(projectA, null, 3, -1, 0, 1, false, false);
         assertEquals(1, results.size());
         assertEquals(3, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, null, 4, -1, 0, 1, false, false);
+        results = buildResultDao.queryBuilds(projectA, null, 4, -1, 0, 1, false, false);
         assertEquals(1, results.size());
         assertEquals(4, results.get(0).getNumber());
     }
 
     public void testQueryBuildsSuccess()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        buildResultDao.save(createCompletedBuild(p1, 2));
-        buildResultDao.save(createFailedBuild(p1, 3));
-        buildResultDao.save(createCompletedBuild(p1, 4));
-        buildResultDao.save(createCompletedBuild(p1, 5));
-        buildResultDao.save(createFailedBuild(p1, 6));
-        buildResultDao.save(createCompletedBuild(p1, 7));
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        buildResultDao.save(createCompletedBuild(projectA, 2));
+        buildResultDao.save(createFailedBuild(projectA, 3));
+        buildResultDao.save(createCompletedBuild(projectA, 4));
+        buildResultDao.save(createCompletedBuild(projectA, 5));
+        buildResultDao.save(createFailedBuild(projectA, 6));
+        buildResultDao.save(createCompletedBuild(projectA, 7));
 
         commitAndRefreshTransaction();
         
-        List<BuildResult> results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 1, 0, 1, true, false);
+        List<BuildResult> results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 1, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(1, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 2, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 2, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(2, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 3, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 3, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(2, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 4, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 4, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(4, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 5, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 5, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(5, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 6, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 6, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(5, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuilds(p1, new ResultState[]{ ResultState.SUCCESS }, -1, 7, 0, 1, true, false);
+        results = buildResultDao.queryBuilds(projectA, new ResultState[]{ ResultState.SUCCESS }, -1, 7, 0, 1, true, false);
         assertEquals(1, results.size());
         assertEquals(7, results.get(0).getNumber());
     }
 
     public void testQueryBuildsWithMessagesWarnings()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
+        addMessageBuild(projectA, Feature.Level.WARNING, 1);
 
-        addMessageBuild(p1, Feature.Level.WARNING, 1);
-
-        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, Feature.Level.WARNING, 1);
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA}, Feature.Level.WARNING, 1);
         assertEquals(1, results.size());
         assertEquals(1, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, Feature.Level.ERROR, 1);
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA}, Feature.Level.ERROR, 1);
         assertEquals(0, results.size());
     }
 
     public void testQueryBuildsWithMessagesErrors()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
+        addMessageBuild(projectA, Feature.Level.ERROR, 1);
 
-        addMessageBuild(p1, Feature.Level.ERROR, 1);
-
-        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, Feature.Level.ERROR, 1);
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA}, Feature.Level.ERROR, 1);
         assertEquals(1, results.size());
         assertEquals(1, results.get(0).getNumber());
 
-        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, Feature.Level.WARNING, 1);
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA}, Feature.Level.WARNING, 1);
         assertEquals(0, results.size());
     }
 
     public void testQueryBuildsWithMessagesMultiple()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
+        addMessageBuild(projectA, Feature.Level.ERROR, 1);
+        addMessageBuild(projectA, Feature.Level.ERROR, 2);
+        addMessageBuild(projectB, Feature.Level.WARNING, 1);
+        addMessageBuild(projectB, Feature.Level.ERROR, 2);
+        addMessageBuild(projectB, Feature.Level.WARNING, 3);
 
-        Project p2 = new Project();
-        projectDao.save(p2);
-
-        addMessageBuild(p1, Feature.Level.ERROR, 1);
-        addMessageBuild(p1, Feature.Level.ERROR, 2);
-        addMessageBuild(p2, Feature.Level.WARNING, 1);
-        addMessageBuild(p2, Feature.Level.ERROR, 2);
-        addMessageBuild(p2, Feature.Level.WARNING, 3);
-
-        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1, p2}, Feature.Level.ERROR, 10);
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA, projectB}, Feature.Level.ERROR, 10);
         assertEquals(3, results.size());
         assertEquals(2, results.get(0).getNumber());
-        assertEquals(p2, results.get(0).getProject());
+        assertEquals(projectB, results.get(0).getProject());
         assertEquals(2, results.get(1).getNumber());
-        assertEquals(p1, results.get(1).getProject());
+        assertEquals(projectA, results.get(1).getProject());
         assertEquals(1, results.get(2).getNumber());
-        assertEquals(p1, results.get(2).getProject());
+        assertEquals(projectA, results.get(2).getProject());
 
-        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1, p2}, Feature.Level.ERROR, 1);
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{projectA, projectB}, Feature.Level.ERROR, 1);
         assertEquals(1, results.size());
         assertEquals(2, results.get(0).getNumber());
-        assertEquals(p2, results.get(0).getProject());
+        assertEquals(projectB, results.get(0).getProject());
 
-        results = buildResultDao.queryBuildsWithMessages(new Project[]{p2}, Feature.Level.WARNING, 10);
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{projectB}, Feature.Level.WARNING, 10);
         assertEquals(2, results.size());
         assertEquals(3, results.get(0).getNumber());
-        assertEquals(p2, results.get(0).getProject());
+        assertEquals(projectB, results.get(0).getProject());
         assertEquals(1, results.get(1).getNumber());
-        assertEquals(p2, results.get(1).getProject());
+        assertEquals(projectB, results.get(1).getProject());
     }
 
     public void testQueryBuildsPinned()
     {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        BuildResult build = createCompletedBuild(p1, 2);
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        BuildResult build = createCompletedBuild(projectA, 2);
         build.setPinned(true);
         buildResultDao.save(build);
-        buildResultDao.save(createCompletedBuild(p1, 3));
-        build = createCompletedBuild(p1, 4);
+        buildResultDao.save(createCompletedBuild(projectA, 3));
+        build = createCompletedBuild(projectA, 4);
         build.setPinned(true);
         buildResultDao.save(build);
-        buildResultDao.save(createCompletedBuild(p1, 5));
+        buildResultDao.save(createCompletedBuild(projectA, 5));
 
-        assertEquals(5, buildResultDao.queryBuilds(new Project[]{p1}, null, null, -1, -1, -1, -1, true, true).size());
-        assertEquals(3, buildResultDao.queryBuilds(new Project[]{p1}, null, null, -1, -1, -1, -1, true, false).size());
+        assertEquals(5, buildResultDao.queryBuilds(new Project[]{projectA}, null, null, -1, -1, -1, -1, true, true).size());
+        assertEquals(3, buildResultDao.queryBuilds(new Project[]{projectA}, null, null, -1, -1, -1, -1, true, false).size());
     }
 
     public void testFindByRecipeId()
@@ -1041,7 +931,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result1.addStage(createResultNode("stage1", 1, "test1", "agent1"));
         result1.addStage(createResultNode("stage2", 2, "test2", "agent2"));
 
-        BuildResult result2 = createCompletedBuild(projectA, 1);
+        BuildResult result2 = createCompletedBuild(projectB, 1);
         result2.setState(ResultState.FAILURE);
         result2.addStage(createResultNode("stage2", 2, "test2", "agent2"));
         result2.addStage(createResultNode("stage3", 3, "test3", "agent3"));
@@ -1055,12 +945,16 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildResultDao.save(result2);
         buildResultDao.save(result3);
 
-        assertEquals(1, buildResultDao.getBuildCount("agent1", null));
-        assertEquals(2, buildResultDao.getBuildCount("agent2", null));
-        assertEquals(1, buildResultDao.getBuildCount("agent2", new ResultState[]{ResultState.SUCCESS}));
-        assertEquals(1, buildResultDao.getBuildCount("agent3", null));
-        assertEquals(1, buildResultDao.getBuildCount("agentx", null));
-        assertEquals(0, buildResultDao.getBuildCount("agent4", null));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent1", null, null));
+        assertEquals(2, buildResultDao.getBuildCountByAgentName("agent2", null, null));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent2", null, new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent2", new Project[]{projectA}, null));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent2", new Project[]{projectA}, new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent2", new Project[]{projectB}, null));
+        assertEquals(0, buildResultDao.getBuildCountByAgentName("agent2", new Project[]{projectB}, new ResultState[]{ResultState.SUCCESS}));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agent3", null, null));
+        assertEquals(1, buildResultDao.getBuildCountByAgentName("agentx", null, null));
+        assertEquals(0, buildResultDao.getBuildCountByAgentName("agent4", null, null));
     }
 
     public void testFindByAgent()
@@ -1069,7 +963,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result1.addStage(createResultNode("stage1", 1, "test1", "agent1"));
         result1.addStage(createResultNode("stage2", 2, "test2", "agent2"));
 
-        BuildResult result2 = createCompletedBuild(projectA, 1);
+        BuildResult result2 = createCompletedBuild(projectB, 1);
         result2.setState(ResultState.FAILURE);
         result2.addStage(createResultNode("stage2", 2, "test2", "agent2"));
         result2.addStage(createResultNode("stage3", 3, "test3", "agent3"));
@@ -1083,25 +977,33 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildResultDao.save(result2);
         buildResultDao.save(result3);
 
-        List<BuildResult> found = buildResultDao.findLatestByAgentName("agent1", null, -1, -1);
+        List<BuildResult> found = buildResultDao.findLatestByAgentName("agent1", null, null, -1, -1);
         assertEquals(asList(result1), found);
 
-        found = buildResultDao.findLatestByAgentName("agent2", null, -1, -1);
+        found = buildResultDao.findLatestByAgentName("agent2", null, null, -1, -1);
         assertEquals(asList(result2, result1), found);
-        found = buildResultDao.findLatestByAgentName("agent2", null, 1, -1);
+        found = buildResultDao.findLatestByAgentName("agent2", null, null, 1, -1);
         assertEquals(asList(result1), found);
-        found = buildResultDao.findLatestByAgentName("agent2", new ResultState[]{ResultState.SUCCESS}, -1, -1);
+        found = buildResultDao.findLatestByAgentName("agent2", null, new ResultState[]{ResultState.SUCCESS}, -1, -1);
         assertEquals(asList(result1), found);
-        found = buildResultDao.findLatestByAgentName("agent2", null, 0, 1);
+        found = buildResultDao.findLatestByAgentName("agent2", new Project[]{projectA}, null, -1, -1);
+        assertEquals(asList(result1), found);
+        found = buildResultDao.findLatestByAgentName("agent2", new Project[]{projectA}, new ResultState[]{ResultState.SUCCESS}, -1, -1);
+        assertEquals(asList(result1), found);
+        found = buildResultDao.findLatestByAgentName("agent2", new Project[]{projectB}, null, -1, -1);
+        assertEquals(asList(result2), found);
+        found = buildResultDao.findLatestByAgentName("agent2", new Project[]{projectB}, new ResultState[]{ResultState.SUCCESS}, -1, -1);
+        assertEquals(0, found.size());
+        found = buildResultDao.findLatestByAgentName("agent2", null, null, 0, 1);
         assertEquals(asList(result2), found);
 
-        found = buildResultDao.findLatestByAgentName("agent3", null, -1, -1);
+        found = buildResultDao.findLatestByAgentName("agent3", null, null, -1, -1);
         assertEquals(asList(result2), found);
 
-        found = buildResultDao.findLatestByAgentName("agentx", null, -1, -1);
+        found = buildResultDao.findLatestByAgentName("agentx", null, null, -1, -1);
         assertEquals(asList(result3), found);
 
-        assertEquals(0, buildResultDao.findLatestByAgentName("agent4", null, -1, -1).size());
+        assertEquals(0, buildResultDao.findLatestByAgentName("agent4", null, null, -1, -1).size());
     }
 
     public void testFindByProjectAndMetabuildId()
@@ -1118,17 +1020,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByAfterBuild()
     {
-        Project project = new Project();
-        projectDao.save(project);
-
-        List<BuildResult> results = save(createCompletedBuild(project, 1),
-                createCompletedBuild(project, 2),
-                createFailedBuild(project, 3),
-                createCompletedBuild(project, 4),
-                createCompletedBuild(project, 5),
-                createFailedBuild(project, 6),
-                createCompletedBuild(project, 7),
-                createCompletedBuild(project, 8));
+        List<BuildResult> results = save(createCompletedBuild(projectA, 1),
+                createCompletedBuild(projectA, 2),
+                createFailedBuild(projectA, 3),
+                createCompletedBuild(projectA, 4),
+                createCompletedBuild(projectA, 5),
+                createFailedBuild(projectA, 6),
+                createCompletedBuild(projectA, 7),
+                createCompletedBuild(projectA, 8));
 
         List<BuildResult> buildResults = buildResultDao.findByAfterBuild(results.get(0).getId(), 1, ResultState.SUCCESS);
         assertEquals(results.get(1), buildResults.get(0));
@@ -1147,11 +1046,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByAfterBoundToSingleProject()
     {
-        Project projectA = new Project();
-        projectDao.save(projectA);
-        Project projectB = new Project();
-        projectDao.save(projectB);
-
         List<BuildResult> results = save(createCompletedBuild(projectA, 1),
                 createCompletedBuild(projectB, 2),
                 createCompletedBuild(projectB, 3));
@@ -1162,17 +1056,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByBeforeBuild()
     {
-        Project project = new Project();
-        projectDao.save(project);
-
-        List<BuildResult> results = save(createCompletedBuild(project, 1),
-                createCompletedBuild(project, 2),
-                createFailedBuild(project, 3),
-                createCompletedBuild(project, 4),
-                createCompletedBuild(project, 5),
-                createFailedBuild(project, 6),
-                createCompletedBuild(project, 7),
-                createCompletedBuild(project, 8));
+        List<BuildResult> results = save(createCompletedBuild(projectA, 1),
+                createCompletedBuild(projectA, 2),
+                createFailedBuild(projectA, 3),
+                createCompletedBuild(projectA, 4),
+                createCompletedBuild(projectA, 5),
+                createFailedBuild(projectA, 6),
+                createCompletedBuild(projectA, 7),
+                createCompletedBuild(projectA, 8));
 
         List<BuildResult> buildResults = buildResultDao.findByBeforeBuild(results.get(7).getId(), 1, ResultState.SUCCESS);
         assertEquals(results.get(6), buildResults.get(0));
@@ -1191,13 +1082,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByLatestBuild()
     {
-        Project project = new Project();
-        projectDao.save(project);
-
-        List<BuildResult> results = save(createCompletedBuild(project, 1),
-                createCompletedBuild(project, 2),
-                createFailedBuild(project, 3),
-                createCompletedBuild(project, 4));
+        List<BuildResult> results = save(createCompletedBuild(projectA, 1),
+                createCompletedBuild(projectA, 2),
+                createFailedBuild(projectA, 3),
+                createCompletedBuild(projectA, 4));
 
         BuildResult buildResult = buildResultDao.findByLatestBuild(results.get(0).getId());
         assertEquals(results.get(3), buildResult);
@@ -1214,57 +1102,52 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         User user = new User();
         userDao.save(user);
 
-        Project p1 = new Project();
-        Project p2 = new Project();
-        projectDao.save(p1);
-        projectDao.save(p2);
-
-        buildResultDao.save(createCompletedBuild(p1, 1));
-        buildResultDao.save(createCompletedBuild(p2, 1));
+        buildResultDao.save(createCompletedBuild(projectA, 1));
+        buildResultDao.save(createCompletedBuild(projectB, 1));
         long timeAfterBuild1 = time;
-        buildResultDao.save(createCompletedBuild(p1, 2));
-        buildResultDao.save(createCompletedBuild(p2, 2));
-        buildResultDao.save(createCompletedBuild(p1, 3));
-        buildResultDao.save(createCompletedBuild(p2, 3));
+        buildResultDao.save(createCompletedBuild(projectA, 2));
+        buildResultDao.save(createCompletedBuild(projectB, 2));
+        buildResultDao.save(createCompletedBuild(projectA, 3));
+        buildResultDao.save(createCompletedBuild(projectB, 3));
         long timeAfterBuild3 = time;
-        buildResultDao.save(createCompletedBuild(p1, 4));
-        buildResultDao.save(createCompletedBuild(p2, 4));
-        buildResultDao.save(createIncompleteBuild(p1, 5));
-        buildResultDao.save(createIncompleteBuild(p2, 5));
+        buildResultDao.save(createCompletedBuild(projectA, 4));
+        buildResultDao.save(createCompletedBuild(projectB, 4));
+        buildResultDao.save(createIncompleteBuild(projectA, 5));
+        buildResultDao.save(createIncompleteBuild(projectB, 5));
 
-        buildResultDao.save(createPersonalBuild(user, p1, 1));
+        buildResultDao.save(createPersonalBuild(user, projectA, 1));
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> results = buildResultDao.findCompletedSince(new Project[]{p1}, -1);
+        List<BuildResult> results = buildResultDao.findCompletedSince(new Project[]{projectA}, -1);
         assertEquals(4, results.size());
-        assertBuild(p1, 4, results.get(0));
-        assertBuild(p1, 3, results.get(1));
-        assertBuild(p1, 2, results.get(2));
-        assertBuild(p1, 1, results.get(3));
+        assertBuild(projectA, 4, results.get(0));
+        assertBuild(projectA, 3, results.get(1));
+        assertBuild(projectA, 2, results.get(2));
+        assertBuild(projectA, 1, results.get(3));
 
-        results = buildResultDao.findCompletedSince(new Project[]{p1, p2}, -1);
+        results = buildResultDao.findCompletedSince(new Project[]{projectA, projectB}, -1);
         assertEquals(8, results.size());
-        assertBuild(p2, 4, results.get(0));
-        assertBuild(p1, 4, results.get(1));
-        assertBuild(p2, 3, results.get(2));
-        assertBuild(p1, 3, results.get(3));
-        assertBuild(p2, 2, results.get(4));
-        assertBuild(p1, 2, results.get(5));
-        assertBuild(p2, 1, results.get(6));
-        assertBuild(p1, 1, results.get(7));
+        assertBuild(projectB, 4, results.get(0));
+        assertBuild(projectA, 4, results.get(1));
+        assertBuild(projectB, 3, results.get(2));
+        assertBuild(projectA, 3, results.get(3));
+        assertBuild(projectB, 2, results.get(4));
+        assertBuild(projectA, 2, results.get(5));
+        assertBuild(projectB, 1, results.get(6));
+        assertBuild(projectA, 1, results.get(7));
 
-        results = buildResultDao.findCompletedSince(new Project[]{p1}, timeAfterBuild1);
+        results = buildResultDao.findCompletedSince(new Project[]{projectA}, timeAfterBuild1);
         assertEquals(3, results.size());
-        assertBuild(p1, 4, results.get(0));
-        assertBuild(p1, 3, results.get(1));
-        assertBuild(p1, 2, results.get(2));
+        assertBuild(projectA, 4, results.get(0));
+        assertBuild(projectA, 3, results.get(1));
+        assertBuild(projectA, 2, results.get(2));
 
-        results = buildResultDao.findCompletedSince(new Project[]{p1}, timeAfterBuild3);
+        results = buildResultDao.findCompletedSince(new Project[]{projectA}, timeAfterBuild3);
         assertEquals(1, results.size());
-        assertBuild(p1, 4, results.get(0));
+        assertBuild(projectA, 4, results.get(0));
 
-        results = buildResultDao.findCompletedSince(new Project[]{p1}, time);
+        results = buildResultDao.findCompletedSince(new Project[]{projectA}, time);
         assertEquals(0, results.size());
     }
 
@@ -1304,9 +1187,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         return result.getStages().get(recipeIndex).getResult().getId();
     }
 
-    private void addMessageBuild(Project p1, Feature.Level level, int number)
+    private void addMessageBuild(Project projectA, Feature.Level level, int number)
     {
-        BuildResult result = createCompletedBuild(p1, number);
+        BuildResult result = createCompletedBuild(projectA, number);
         result.addFeature(level, "a message");
         result.calculateFeatureCounts();
         buildResultDao.save(result);

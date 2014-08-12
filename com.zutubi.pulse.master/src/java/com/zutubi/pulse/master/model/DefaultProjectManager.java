@@ -1035,9 +1035,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         }));
     }
 
-    public int getProjectCount()
+    public int getProjectCount(boolean includeInvalid)
     {
-        return size(filter(getAllProjectConfigs(true), ProjectPredicates.concrete()));
+        return size(getProjects(includeInvalid));
     }
 
     public void abortUnfinishedBuilds(Project project, String message)

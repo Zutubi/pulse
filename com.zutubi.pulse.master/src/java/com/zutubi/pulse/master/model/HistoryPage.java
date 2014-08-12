@@ -8,30 +8,24 @@ import java.util.List;
  */
 public class HistoryPage
 {
-    private Project project;
+    private Project[] projects;
     private Agent agent;
     private int totalBuilds;
     private int first;
     private int max;
     List<BuildResult> results;
 
-    public HistoryPage(Project project, int first, int max)
+    public HistoryPage(Project[] projects, Agent agent, int first, int max)
     {
-        this.project = project;
-        this.first = first;
-        this.max = max;
-    }
-
-    public HistoryPage(Agent agent, int first, int max)
-    {
+        this.projects = projects;
         this.agent = agent;
         this.first = first;
         this.max = max;
     }
 
-    public Project getProject()
+    public Project[] getProjects()
     {
-        return project;
+        return projects;
     }
 
     public Agent getAgent()

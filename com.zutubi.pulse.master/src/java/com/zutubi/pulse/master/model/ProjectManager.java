@@ -76,7 +76,7 @@ public interface ProjectManager extends EntityManager<Project>
      */
     boolean isProjectValid(ProjectConfiguration project);
 
-    int getProjectCount();
+    int getProjectCount(boolean includeInvalid);
 
     void abortUnfinishedBuilds(Project project, String message);
 

@@ -110,29 +110,51 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.getBuildCount(project, states);
     }
 
+    public int getBuildCount(Project[] projects, ResultState[] states)
+    {
+        return buildResultDao.getBuildCount(projects, states);
+    }
+
     public int getBuildCount(Project project, long after, long upTo)
     {
         return buildResultDao.getBuildCount(project, after, upTo);
     }
 
-    public int getBuildCount(Agent agent, ResultState[] states)
+    public int getBuildCountForAgent(Agent agent, Project[] projects, ResultState[] states)
     {
-        return buildResultDao.getBuildCount(agent.getName(), states);
+        return buildResultDao.getBuildCountByAgentName(agent.getName(), projects, states);
     }
 
     public void fillHistoryPage(HistoryPage page, ResultState[] states)
     {
         Agent agent = page.getAgent();
-        if (agent != null)
+        String agentName = agent == null ? null : agent.getName();
+        Project[] projects = page.getProjects();
+
+        // We split out various cases as common ones are more efficient this way.
+        if (agentName == null)
         {
-            page.setTotalBuilds(buildResultDao.getBuildCount(agent.getName(), states));
-            page.setResults(buildResultDao.findLatestByAgentName(agent.getName(), states, page.getFirst(), page.getMax()));
+            if (projects == null || projects.length == 0)
+            {
+                page.setTotalBuilds(buildResultDao.getBuildCount((Project) null, states));
+                page.setResults(buildResultDao.findLatestByProject(null, states, page.getFirst(), page.getMax()));
+            }
+            else if (projects.length == 1)
+            {
+                Project project = projects[0];
+                page.setTotalBuilds(buildResultDao.getBuildCount(project, states));
+                page.setResults(buildResultDao.findLatestByProject(project, states, page.getFirst(), page.getMax()));
+            }
+            else
+            {
+                page.setTotalBuilds(buildResultDao.getBuildCount(projects, states));
+                page.setResults(buildResultDao.queryBuilds(projects, states, -1, -1, page.getFirst(), page.getMax(), true));
+            }
         }
         else
         {
-            Project project = page.getProject();
-            page.setTotalBuilds(buildResultDao.getBuildCount(project, states));
-            page.setResults(buildResultDao.findLatestByProject(project, states, page.getFirst(), page.getMax()));
+            page.setTotalBuilds(buildResultDao.getBuildCountByAgentName(agentName, projects, states));
+            page.setResults(buildResultDao.findLatestByAgentName(agent.getName(), projects, states, page.getFirst(), page.getMax()));
         }
     }
 

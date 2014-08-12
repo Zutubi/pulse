@@ -1773,7 +1773,7 @@ public class RemoteApi
         tokenManager.loginUser(token);
         try
         {
-            return projectManager.getProjectCount();
+            return projectManager.getProjectCount(true);
         }
         finally
         {
