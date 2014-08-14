@@ -118,13 +118,20 @@ public class HistoryDataAction extends ActionSupport
         int totalBuilds;
         Project[] projects = null;
 
-        // This count includes all projects, whether visible to us or not, so we can use it
-        // to determine if there are some projects we cannot view.
-        int totalProjectCount = projectManager.getProjectCount(false);
-        List<Project> visibleProjects = projectManager.getProjects(false);
-        if (visibleProjects.size() < totalProjectCount)
+        if (project == null)
         {
-            projects = visibleProjects.toArray(new Project[visibleProjects.size()]);
+            // This count includes all projects, whether visible to us or not, so we can use it
+            // to determine if there are some projects we cannot view.
+            int totalProjectCount = projectManager.getProjectCount(false);
+            List<Project> visibleProjects = projectManager.getProjects(false);
+            if (visibleProjects.size() < totalProjectCount)
+            {
+                projects = visibleProjects.toArray(new Project[visibleProjects.size()]);
+            }
+        }
+        else
+        {
+            projects = new Project[] { project };
         }
 
         if (agent == null)
