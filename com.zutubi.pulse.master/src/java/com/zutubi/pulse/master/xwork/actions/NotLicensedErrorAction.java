@@ -24,7 +24,7 @@ public class NotLicensedErrorAction extends ActionSupport
         License license = LicenseHolder.getLicense();
         restrictions = new LinkedList<LicenseRestriction>();
         restrictions.add(new LicenseRestriction("agents", license.getSupportedAgents(), agentManager.getAgentCount()));
-        restrictions.add(new LicenseRestriction("projects", license.getSupportedProjects(), projectManager.getProjectCount()));
+        restrictions.add(new LicenseRestriction("projects", license.getSupportedProjects(), projectManager.getProjectCount(true)));
         restrictions.add(new LicenseRestriction("users", license.getSupportedUsers(), userManager.getUserCount()));
 
         return SUCCESS;

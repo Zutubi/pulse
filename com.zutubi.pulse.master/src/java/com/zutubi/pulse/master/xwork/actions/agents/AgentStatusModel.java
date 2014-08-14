@@ -21,9 +21,9 @@ public class AgentStatusModel
     private List<CommentModel> comments = new LinkedList<CommentModel>();
     private List<SynchronisationMessageModel> synchronisationMessages = new LinkedList<SynchronisationMessageModel>();
 
-    public AgentStatusModel(String name, String location)
+    public AgentStatusModel(String name, String location, boolean canViewMessages)
     {
-        info = new AgentModel(name, location);
+        info = new AgentModel(name, location, canViewMessages);
     }
 
     public AgentModel getInfo()
@@ -88,11 +88,13 @@ public class AgentStatusModel
     {
         private String name;
         private String location;
+        private boolean canViewMessages;
 
-        public AgentModel(String name, String location)
+        public AgentModel(String name, String location, boolean canViewMessages)
         {
             this.name = name;
             this.location = location;
+            this.canViewMessages = canViewMessages;
         }
 
         public String getName()
@@ -103,6 +105,11 @@ public class AgentStatusModel
         public String getLocation()
         {
             return location;
+        }
+
+        public boolean getCanViewMessages()
+        {
+            return canViewMessages;
         }
     }
     

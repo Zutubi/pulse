@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.agent.HostService;
 import com.zutubi.pulse.master.xwork.actions.project.PagerModel;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
@@ -40,6 +41,8 @@ public class ServerMessagesDataAction extends AgentActionBase
 
     public String execute()
     {
+        accessManager.ensurePermission(AccessManager.ACTION_ADMINISTER, null);
+
         Agent agent = getAgent();
         List<CustomLogRecord> records;
         if (agent == null)

@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesActionSupport;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.tove.security.AccessManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,18 +29,21 @@ public class SystemStartingAction extends ServerMessagesActionSupport
     @Override
     public String execute() throws Exception
     {
-        errorRecords = Lists.newLinkedList(Iterables.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
+        if (accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null))
         {
-            public boolean apply(CustomLogRecord customLogRecord)
+            errorRecords = Lists.newLinkedList(Iterables.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
             {
-                return isError(customLogRecord);
-            }
-        }));
+                public boolean apply(CustomLogRecord customLogRecord)
+                {
+                    return isError(customLogRecord);
+                }
+            }));
 
-        Collections.reverse(errorRecords);
-        if (errorRecords.size() > MAX_ERRORS)
-        {
-            errorRecords = errorRecords.subList(0, MAX_ERRORS);
+            Collections.reverse(errorRecords);
+            if (errorRecords.size() > MAX_ERRORS)
+            {
+                errorRecords = errorRecords.subList(0, MAX_ERRORS);
+            }
         }
 
         return SUCCESS;

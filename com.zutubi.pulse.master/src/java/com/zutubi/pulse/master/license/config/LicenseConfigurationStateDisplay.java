@@ -110,7 +110,7 @@ public class LicenseConfigurationStateDisplay
         {
             return "unrestricted";
         }
-        return String.format("%d of %d", projectManager.getProjectCount(), license.getSupportedProjects());
+        return String.format("%d of %d", projectManager.getProjectCount(true), license.getSupportedProjects());
     }
 
     public String formatSupportedAgents()

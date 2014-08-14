@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.HistoryPage;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.webwork.Urls;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.master.xwork.actions.project.BuildResultToModelFunction;
 import com.zutubi.pulse.master.xwork.actions.project.PagerModel;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -113,7 +115,45 @@ public class HistoryDataAction extends ActionSupport
             states = ResultState.getCompletedStates();
         }
 
-        int totalBuilds = agent == null ? buildManager.getBuildCount(project, states) : buildManager.getBuildCount(agent, states);
+        int totalBuilds;
+        Project[] projects = null;
+
+        if (project == null)
+        {
+            // This count includes all projects, whether visible to us or not, so we can use it
+            // to determine if there are some projects we cannot view.
+            int totalProjectCount = projectManager.getProjectCount(false);
+            List<Project> visibleProjects = projectManager.getProjects(false);
+            if (visibleProjects.size() < totalProjectCount)
+            {
+                projects = visibleProjects.toArray(new Project[visibleProjects.size()]);
+            }
+        }
+        else
+        {
+            projects = new Project[] { project };
+        }
+
+        if (agent == null)
+        {
+            if (projects == null)
+            {
+                totalBuilds = buildManager.getBuildCount((Project) null, states);
+            }
+            else if (projects.length == 1)
+            {
+                totalBuilds = buildManager.getBuildCount(projects[0], states);
+            }
+            else
+            {
+                totalBuilds = buildManager.getBuildCount(projects, states);
+            }
+        }
+        else
+        {
+            totalBuilds = buildManager.getBuildCountForAgent(agent, projects, states);
+        }
+
         int buildsPerPage = HistoryContext.getBuildsPerPage(getLoggedInUser());
         int pageCount = (totalBuilds + buildsPerPage - 1) / buildsPerPage;
 
@@ -121,23 +161,23 @@ public class HistoryDataAction extends ActionSupport
         {
             startPage = pageCount - 1;
         }
-        
+
         if (startPage < 0)
         {
             startPage = 0;
         }
 
-        HistoryPage page;
-        if (agent == null)
+        HistoryPage page = new HistoryPage(projects, agent, startPage * buildsPerPage, buildsPerPage);
+        if (projects == null || projects.length > 0)
         {
-            page = new HistoryPage(project, startPage * buildsPerPage, buildsPerPage);
+            buildManager.fillHistoryPage(page, states);
         }
         else
         {
-            page = new HistoryPage(agent, startPage * buildsPerPage, buildsPerPage);
+            // Special case this lest the empty array be interpreted as "all projects" by the
+            // underlying query.
+            page.setResults(Collections.<BuildResult>emptyList());
         }
-
-        buildManager.fillHistoryPage(page, states);
 
         Urls urls = new Urls(configurationManager.getSystemConfig().getContextPathNormalised());
         BuildResultToModelFunction toModelMapping;

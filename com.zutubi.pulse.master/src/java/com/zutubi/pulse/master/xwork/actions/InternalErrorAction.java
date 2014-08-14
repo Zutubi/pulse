@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.xwork.actions;
 
 import com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesActionSupport;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.tove.security.AccessManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,11 +21,14 @@ public class InternalErrorAction extends ServerMessagesActionSupport
 
     public String execute() throws Exception
     {
-        records = serverMessagesHandler.takeSnapshot();
-        Collections.reverse(records);
-        if (records.size() > 4)
+        if (accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null))
         {
-            records = records.subList(0, 4);
+            records = serverMessagesHandler.takeSnapshot();
+            Collections.reverse(records);
+            if (records.size() > 4)
+            {
+                records = records.subList(0, 4);
+            }
         }
 
         return SUCCESS;

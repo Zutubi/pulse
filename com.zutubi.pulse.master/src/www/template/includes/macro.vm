@@ -244,7 +244,9 @@
     #openTabs()
         #serverTab("activity" $selected)
         #serverTab("history" $selected)
+#auth("action=ADMINISTER")
         #serverTab("messages" $selected)
+#end
         #serverTab("info" $selected)
     #closeTabs()
 #end
@@ -264,7 +266,9 @@
         #agentTab("status" $selected)
         #agentTab("statistics" $selected)
         #agentTab("history" $selected)
+#auth("action=ADMINISTER")
         #agentTab("messages" $selected)
+#end
         #agentTab("info" $selected)
     #closeTabs()
 #end

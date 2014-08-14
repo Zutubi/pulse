@@ -116,6 +116,16 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
+    public int getBuildCount(Project[] projects, ResultState[] states)
+    {
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    public int getBuildCountByAgentName(String agent, Project[] projects, ResultState[] states)
+    {
+        throw new RuntimeException("Not yet implemented");
+    }
+
     public int getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned)
     {
         throw new RuntimeException("Not yet implemented");
@@ -171,17 +181,7 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
-    public BuildResult findLatestSuccessful()
-    {
-        throw new RuntimeException("Not yet implemented");
-    }
-
-    public int getBuildCount(String agent, ResultState[] states)
-    {
-        throw new RuntimeException("Not yet implemented");
-    }
-
-    public List<BuildResult> findLatestByAgentName(String agent, ResultState[] states, int first, int max)
+    public List<BuildResult> findLatestByAgentName(String agent, Project[] projects, ResultState[] states, int first, int max)
     {
         throw new RuntimeException("Not yet implemented");
     }
