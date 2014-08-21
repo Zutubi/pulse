@@ -1,10 +1,17 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.zutubi.pulse.core.EventOutputStream;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -17,15 +24,26 @@ public abstract class AbstractFileLogger implements OutputLogger
 {
     private final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
-    private LogFile logFile;
+    private final LogFile logFile;
 
-    private byte lastByte = '\n';
+    private final CharsetDecoder outputDecoder;
+    private final char[] decodedOutput;
+    private final CharBuffer decodeBuffer;
+    
+    private boolean needsMarker = true;
+    private boolean inLineEnding = false;
+    private char lastOutputChar = '\0';
 
     protected PrintWriter writer;
 
     public AbstractFileLogger(LogFile logFile)
     {
         this.logFile = logFile;
+        outputDecoder = Charset.defaultCharset().newDecoder();
+        outputDecoder.onMalformedInput(CodingErrorAction.REPLACE);
+        outputDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+        decodedOutput = new char[EventOutputStream.MINIMUM_SIZE];
+        decodeBuffer = CharBuffer.wrap(decodedOutput);
     }
 
     public void openWriter()
@@ -62,30 +80,71 @@ public abstract class AbstractFileLogger implements OutputLogger
         {
             long timestamp = System.currentTimeMillis();
             String marker = getMarker(timestamp);
-            if (lastByte == '\n' || (lastByte == '\r' && output[0] != '\n'))
+
+            final ByteBuffer inBuffer = ByteBuffer.wrap(output, offset, length);
+            CoderResult result;
+            do
             {
-                writer.print(marker);
+                result = outputDecoder.decode(inBuffer, decodeBuffer, true);
+                writeDecoded(marker);
+                
+            }
+            while (result == CoderResult.OVERFLOW);
+        }
+    }
+
+    private void writeDecoded(String marker)
+    {
+        final int length = decodeBuffer.position();
+        for (int i = 0; i < length; i++)
+        {
+            char c = decodedOutput[i];
+            boolean isLineEndChar = c == '\r' || c == '\n';
+            
+            if (inLineEnding)
+            {
+                writer.println();
+                needsMarker = true;
+                inLineEnding = isLineEndChar && c == lastOutputChar;
+            }
+            else if (isLineEndChar)
+            {
+                inLineEnding = true;
             }
 
-            String s = new String(output, offset, length);
-            String markerReplacement = "$1" + marker + "$2";
-            String stamped = s.replaceAll("(\\r\\n?|\\n)(.)", markerReplacement);
-            writer.print(stamped);
-            writer.flush();
-
-            lastByte = output[output.length - 1];
+            if (!isLineEndChar)
+            {
+                inLineEnding = false;
+                if (needsMarker)
+                {
+                    writer.print(marker);
+                    needsMarker = false;
+                }
+                
+                writer.print(c);
+            }
         }
+
+        if (length > 0)
+        {
+            lastOutputChar = decodedOutput[length - 1];
+        }
+        
+        writer.flush();
+        decodeBuffer.clear();
     }
 
     protected void completeOutput()
     {
-        if ((lastByte != '\r' && lastByte != '\n') && writer != null)
+        if ((inLineEnding || (lastOutputChar != '\r' && lastOutputChar != '\n')) && writer != null)
         {
             writer.println();
             writer.flush();
         }
 
-        lastByte = '\n';
+        needsMarker = true;
+        inLineEnding = false;
+        lastOutputChar = '\0';
     }
 
     public void close()

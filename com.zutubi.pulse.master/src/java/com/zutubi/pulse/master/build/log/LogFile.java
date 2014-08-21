@@ -131,7 +131,7 @@ public class LogFile
      */
     public Writer openWriter() throws IOException
     {
-        final FileWriter delegate = prepareWriter();
+        final Writer delegate = prepareWriter();
         return new Writer()
         {
             @Override
@@ -161,7 +161,7 @@ public class LogFile
         };
     }
 
-    private FileWriter prepareWriter() throws IOException
+    private Writer prepareWriter() throws IOException
     {
        data.lock.lock();
         try
@@ -171,7 +171,7 @@ public class LogFile
                 uncompress();
             }
 
-            FileWriter writer = new FileWriter(file, true);
+            Writer writer = new BufferedWriter(new FileWriter(file, true));
             data.openCount++;
             data.dirty = true;
             return writer;
