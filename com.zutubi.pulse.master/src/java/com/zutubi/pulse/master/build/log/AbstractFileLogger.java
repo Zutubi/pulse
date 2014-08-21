@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public abstract class AbstractFileLogger implements OutputLogger
 {
-    private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
+    private final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
     private LogFile logFile;
 
