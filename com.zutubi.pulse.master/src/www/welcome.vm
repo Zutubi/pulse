@@ -87,10 +87,31 @@
             <th class="category" colspan="2">new in 2.7</th>
         </tr>
         <tr>
-            #actionHeader("performance" "performance improvements" "accept" false)
+            #actionHeader("configperformance" "configuration performance improvements" "accept" false)
             <td>
                 Performance tuning of the configuration system should make it a lot snappier,
                 particularly for larger installations and especially for custom projects.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("outputperformance" "log performance improvements" "accept" false)
+            <td>
+                Performance and robustness improvements for real time output logging, reducing the
+                memory footprint and CPU usage of builds with a lot of output.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("deprevisions" "improved dependency revision handling" "accept" false)
+            <td>
+                Revision handling across dependent projects is now more flexible, making it easier
+                to manager dependencies across multiple SCM repositories.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("manualtriggers" "manual triggering" "accept" false)
+            <td>
+                You can now manually fire cron and SCM triggers, to run a build using the trigger's
+                properties and configuration.
             </td>
         </tr>
         <tr>
