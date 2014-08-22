@@ -10,9 +10,9 @@ public class CommandOutputEvent extends RecipeEvent implements OutputEvent
 {
     private byte[] data;
 
-    public CommandOutputEvent(Object source, long recipeId, byte[] data)
+    public CommandOutputEvent(Object source, long buildId, long recipeId, byte[] data)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.data = data;
     }
 

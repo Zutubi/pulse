@@ -8,9 +8,9 @@ public class CommandCommencedEvent extends RecipeEvent
     private String name;
     private long startTime;
 
-    public CommandCommencedEvent(Object source, long recipeId, String name, long startTime)
+    public CommandCommencedEvent(Object source, long buildId, long recipeId, String name, long startTime)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.name = name;
         this.startTime = startTime;
     }
@@ -59,8 +59,6 @@ public class CommandCommencedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Command Commenced Event: ");
-        buff.append(getRecipeId());
-        return buff.toString();
+        return "Command Commenced Event: " + getRecipeId();
     }
 }

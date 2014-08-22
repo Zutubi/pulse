@@ -7,9 +7,9 @@ public class RecipeErrorEvent extends RecipeEvent
     private String errorMessage;
     private boolean agentStatusProblem;
 
-    public RecipeErrorEvent(Object source, long recipeId, String errorMessage, boolean agentStatusProblem)
+    public RecipeErrorEvent(Object source, long buildId, long recipeId, String errorMessage, boolean agentStatusProblem)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.errorMessage = errorMessage;
         this.agentStatusProblem = agentStatusProblem;
     }
@@ -56,8 +56,6 @@ public class RecipeErrorEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuilder builder = new StringBuilder("Recipe Error Event");
-        builder.append(": ").append(getRecipeId()).append(": ").append(errorMessage);
-        return builder.toString();
+        return "Recipe Error Event" + ": " + getRecipeId() + ": " + errorMessage;
     }    
 }

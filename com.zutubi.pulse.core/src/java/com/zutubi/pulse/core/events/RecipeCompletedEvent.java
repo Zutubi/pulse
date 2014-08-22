@@ -12,12 +12,12 @@ public class RecipeCompletedEvent extends RecipeEvent
     private RecipeCompletedEvent()
     {
         // For hessian
-        super(null, 0);
+        super(null, 0, 0);
     }
 
-    public RecipeCompletedEvent(Object source, RecipeResult result)
+    public RecipeCompletedEvent(Object source, long buildId, RecipeResult result)
     {
-        super(source, result.getId());
+        super(source, buildId, result.getId());
         this.result = result;
     }
 
@@ -54,8 +54,6 @@ public class RecipeCompletedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Completed Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
+        return "Recipe Completed Event" + ": " + getRecipeId();
     }    
 }

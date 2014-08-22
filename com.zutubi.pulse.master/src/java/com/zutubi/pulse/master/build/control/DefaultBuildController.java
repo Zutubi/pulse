@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.build.control;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import static com.google.common.collect.Collections2.transform;
 import com.google.common.collect.Iterables;
 import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
@@ -17,6 +18,7 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -32,6 +34,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -42,16 +45,19 @@ import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectBootstrapper;
+import com.zutubi.tove.events.FilteringListener;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
+import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -68,12 +74,6 @@ import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-
-import static com.google.common.collect.Collections2.transform;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
-import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -100,7 +100,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private List<RecipeController> controllers;
     private List<RecipeController> executingControllers = new LinkedList<RecipeController>();
     private BuildResult buildResult;
-    private AsynchronousDelegatingListener asyncListener;
+    private FilteringListener eventListener;
     private int pendingRecipes = 0;
 
     private File buildDir;
@@ -148,7 +148,31 @@ public class DefaultBuildController implements EventListener, BuildController
             return 0;
         }
 
-        asyncListener = new AsynchronousDelegatingListener(this, "Controller for " + buildResult, threadFactory);
+        // We filter events before they get to the async listeners queue so that builds are
+        // independent of each other (if we didn't a stuck build could pile up a queue of events
+        // from every other build, leaking resources).
+        eventListener = new FilteringListener(new Predicate<Event>()
+        {
+            public boolean apply(Event event)
+            {
+                if (event instanceof BuildEvent)
+                {
+                    return ((BuildEvent) event).getBuildResult() == buildResult;
+                }
+                else if (event instanceof RecipeEvent)
+                {
+                    return ((RecipeEvent) event).getBuildId() == buildResult.getId();
+                }
+                else if (event instanceof BuildTerminationRequestEvent)
+                {
+                    return ((BuildTerminationRequestEvent)event).getBuildId() == buildResult.getId();
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }, new AsynchronousDelegatingListener(this, "Controller for " + buildResult, threadFactory));
 
         // now that we have a persistent build result, all errors will be reported against
         // the result and a full cleanup is required.
@@ -186,15 +210,15 @@ public class DefaultBuildController implements EventListener, BuildController
             // our async listener.  Basically, given events could be coming from
             // anywhere, even for different builds, it is much safer to ensure we
             // *only* use that thread after we have registered the listener.
-            eventManager.register(asyncListener);
+            eventManager.register(eventListener);
 
             // handle the event directly, there is no need to expose this event to the wider audience.
-            asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
+            eventListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
         }
         catch (Exception e)
         {
             // handle the event directly, there is no need to expose this event to the wider audience.
-            asyncListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext, e));
+            eventListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext, e));
         }
         return buildResult.getNumber();
     }
@@ -890,7 +914,7 @@ public class DefaultBuildController implements EventListener, BuildController
         if (controller.isFinished())
         {
             // the start of the post recipe execution handling.
-            publishEvent(new RecipeCollectingEvent(this, controller.getResult().getId()));
+            publishEvent(new RecipeCollectingEvent(this, buildResult.getId(), controller.getResult().getId()));
 
             if (collect)
             {
@@ -900,7 +924,7 @@ public class DefaultBuildController implements EventListener, BuildController
             controller.postStage();
 
             // the end of the post recipe execution handling.
-            publishEvent(new RecipeCollectedEvent(this, controller.getResult().getId()));
+            publishEvent(new RecipeCollectedEvent(this, buildResult.getId(), controller.getResult().getId()));
             return true;
         }
 
@@ -1061,13 +1085,14 @@ public class DefaultBuildController implements EventListener, BuildController
             LOG.severe(e);
         }
 
-        eventManager.unregister(asyncListener);
+        eventManager.unregister(eventListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
         buildLogger.close();
 
         // this must be last since we are in fact stopping the thread running this method, we are
         // after all responding to an event on this listener.
+        AsynchronousDelegatingListener asyncListener = (AsynchronousDelegatingListener) eventListener.getDelegate();
         asyncListener.stop(true);
     }
 
@@ -1206,7 +1231,7 @@ public class DefaultBuildController implements EventListener, BuildController
         buildResult.abortUnfinishedRecipes();
         for (RecipeController controller : executingControllers)
         {
-            eventManager.publish(new RecipeAbortedEvent(this, controller.getResult().getId()));
+            eventManager.publish(new RecipeAbortedEvent(this, buildResult.getId(), controller.getResult().getId()));
         }
     }
 

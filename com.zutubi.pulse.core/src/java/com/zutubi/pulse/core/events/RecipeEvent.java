@@ -6,12 +6,22 @@ import com.zutubi.events.Event;
  */
 public class RecipeEvent extends Event
 {
-    private long recipeId;
+    private final long buildId;
+    private final long recipeId;
 
-    public RecipeEvent(Object source, long recipeId)
+    public RecipeEvent(Object source, long buildId, long recipeId)
     {
         super(source);
+        this.buildId = buildId;
         this.recipeId = recipeId;
+    }
+
+    /**
+     * @return id of the build result we belong to, or 0 if the recipe is not part of a larger build
+     */
+    public long getBuildId()
+    {
+        return buildId;
     }
 
     public long getRecipeId()
@@ -19,6 +29,7 @@ public class RecipeEvent extends Event
         return recipeId;
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -30,19 +41,30 @@ public class RecipeEvent extends Event
             return false;
         }
 
-        RecipeEvent event = (RecipeEvent) o;
-        return recipeId == event.recipeId;
+        RecipeEvent that = (RecipeEvent) o;
+
+        if (buildId != that.buildId)
+        {
+            return false;
+        }
+        if (recipeId != that.recipeId)
+        {
+            return false;
+        }
+
+        return true;
     }
 
+    @Override
     public int hashCode()
     {
-        return (int) (recipeId ^ (recipeId >>> 32));
+        int result = (int) (buildId ^ (buildId >>> 32));
+        result = 31 * result + (int) (recipeId ^ (recipeId >>> 32));
+        return result;
     }
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
-    }    
+        return "Recipe Event" + ": " + getRecipeId();
+    }
 }

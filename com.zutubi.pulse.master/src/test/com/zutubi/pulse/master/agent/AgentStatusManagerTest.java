@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -22,14 +23,12 @@ import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.util.adt.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
-
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -286,7 +285,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         clearEvents();
         waitForTimeout();
         sendPing(agent, new HostStatus(PingStatus.IDLE, false));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent idle after recipe expected to have commenced (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)", true));
+        assertEvents(new RecipeErrorEvent(this, 1, 1000, "Agent idle after recipe expected to have commenced (agent: agent 1, recipe: 1000, since ping: 2, timeout: 1)", true));
         sendRecipeCollecting(agent, 1000);
 
         onComplete();
@@ -397,7 +396,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         Agent agent = addAgentAndDispatchRecipe(DEFAULT_AGENT_ID, 1000);
 
         sendPing(agent, createBuildingStatus(2000));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch", true));
+        assertEvents(new RecipeErrorEvent(this, 1, 1000, "Agent recipe mismatch", true));
         sendRecipeCollecting(agent, 1000);
 
         // We still go through the normal post-recipe state for recipe 1000.
@@ -416,7 +415,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         Agent agent = addAgentAndDispatchRecipe(DEFAULT_AGENT_ID, 1000);
 
         sendPing(agent, createBuildingStatus(2000));
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch", true));
+        assertEvents(new RecipeErrorEvent(this, 1, 1000, "Agent recipe mismatch", true));
         sendRecipeCollecting(agent, 1000);
 
         // We still go through the normal post-recipe state for recipe 1000.
@@ -609,7 +608,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendDisableRequest(agent);
         assertEvents(
                 new RecipeTerminateRequestEvent(this, null, 1000),
-                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress", false)
+                new RecipeErrorEvent(this, 1, 1000, "Agent disabled while recipe in progress", false)
         );
         sendRecipeCollecting(agent, 1000);
         assertEquals(POST_RECIPE, agent.getStatus());
@@ -648,7 +647,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendDisableRequest(agent);
         assertEvents(
                 new RecipeTerminateRequestEvent(this, null, 1000),
-                new RecipeErrorEvent(this, 1000, "Agent disabled while recipe in progress", false)
+                new RecipeErrorEvent(this, 1, 1000, "Agent disabled while recipe in progress", false)
         );
         sendRecipeCollecting(agent, 1000);
         assertEquals(POST_RECIPE, agent.getStatus());
@@ -783,8 +782,8 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // The manager should kill off the recipe controller, but ignore the
         // agent as it is now meaningless to us.
-        assertEvents(new RecipeErrorEvent(this, 1000, "Agent deleted while recipe in progress", false), new AgentOfflineEvent(this, agent));
-        eventManager.publish(new RecipeCollectingEvent(this, 1000));
+        assertEvents(new RecipeErrorEvent(this, 1, 1000, "Agent deleted while recipe in progress", false), new AgentOfflineEvent(this, agent));
+        eventManager.publish(new RecipeCollectingEvent(this, 1, 1000));
 
         assertSlaveRemoved(agent);
     }
@@ -892,7 +891,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(VERSION_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'version mismatch' while recipe in progress", true),
+                new RecipeErrorEvent(this, 1, 1000, "Agent status changed to 'version mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, VERSION_MISMATCH);
@@ -921,7 +920,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(PLUGIN_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress", true),
+                new RecipeErrorEvent(this, 1, 1000, "Agent status changed to 'plugin mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, PLUGIN_MISMATCH);
@@ -964,7 +963,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(TOKEN_MISMATCH, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'token mismatch' while recipe in progress", true),
+                new RecipeErrorEvent(this, 1, 1000, "Agent status changed to 'token mismatch' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, TOKEN_MISMATCH);
@@ -1007,7 +1006,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
         assertEquals(INVALID_MASTER, agent.getStatus());
         assertEvents(
-                new RecipeErrorEvent(this, 1000, "Agent status changed to 'invalid master' while recipe in progress", true),
+                new RecipeErrorEvent(this, 1, 1000, "Agent status changed to 'invalid master' while recipe in progress", true),
                 new AgentOfflineEvent(this, agent)
         );
         assertStatusChanges(agent, BUILDING, INVALID_MASTER);
@@ -1242,7 +1241,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     private void sendRecipeDispatched(Agent agent, int recipeId)
     {
-        eventManager.publish(new RecipeDispatchedEvent(this, recipeId, agent));
+        eventManager.publish(new RecipeDispatchedEvent(this, 1, recipeId, agent));
         assertStatusChanges(agent, RECIPE_ASSIGNED, RECIPE_DISPATCHED);
     }
 
@@ -1260,7 +1259,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeCollecting(Agent agent, int recipeId)
     {
         AgentStatus statusBefore = agent.getStatus();
-        eventManager.publish(new RecipeCollectingEvent(this, recipeId));
+        eventManager.publish(new RecipeCollectingEvent(this, 1, recipeId));
         if (statusBefore.isBuilding())
         {
             assertStatusChanges(agent, statusBefore, POST_RECIPE);
@@ -1270,13 +1269,13 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeCollected(Agent agent, int recipeId)
     {
         AgentStatus newStatus = agent.isDisabling() ? DISABLED : AWAITING_PING;
-        eventManager.publish(new RecipeCollectedEvent(this, recipeId));
+        eventManager.publish(new RecipeCollectedEvent(this, 1, recipeId));
         assertStatusChanges(agent, POST_RECIPE, newStatus);
     }
 
     private void sendRecipeAborted(int recipeId)
     {
-        eventManager.publish(new RecipeAbortedEvent(this, recipeId));
+        eventManager.publish(new RecipeAbortedEvent(this, 1, recipeId));
     }
 
     private void sendDisableRequest(Agent agent)

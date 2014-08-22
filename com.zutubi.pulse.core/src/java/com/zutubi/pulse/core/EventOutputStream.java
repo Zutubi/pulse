@@ -35,6 +35,7 @@ public class EventOutputStream extends OutputStream implements Runnable
     private byte[] buffer;
     private int offset;
     private boolean commandEvents;
+    private final long buildId;
     private long id;
     private long autoflushInterval;
 
@@ -46,11 +47,12 @@ public class EventOutputStream extends OutputStream implements Runnable
      *
      * @param eventManager manager used to publish events
      * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link GenericOutputEvent}s
+     * @param buildId id of the build these events are part of (may be 0 for no build)
      * @param id id to use for published events (either the recipe or stream id)
      */
-    public EventOutputStream(EventManager eventManager, boolean commandEvents, long id)
+    public EventOutputStream(EventManager eventManager, boolean commandEvents, long buildId, long id)
     {
-        this(eventManager, commandEvents, id, DEFAULT_AUTO_FLUSH_INTERVAL);
+        this(eventManager, commandEvents, buildId, id, DEFAULT_AUTO_FLUSH_INTERVAL);
     }
 
     /**
@@ -60,16 +62,18 @@ public class EventOutputStream extends OutputStream implements Runnable
      *
      * @param eventManager      manager used to publish events
      * @param commandEvents true to raise {@link CommandOutputEvent}s, false for {@link GenericOutputEvent}s
+     * @param buildId id of the build these events are part of (may be 0 for no build)
      * @param id id to use for published events (either the recipe or stream id)
      * @param autoflushInterval interval, in milliseconds, at which to
      *                          automatically flush any accumulated output
      */
-    public EventOutputStream(EventManager eventManager, boolean commandEvents, long id, long autoflushInterval)
+    public EventOutputStream(EventManager eventManager, boolean commandEvents, long buildId, long id, long autoflushInterval)
     {
         buffer = new byte[MINIMUM_SIZE];
         offset = 0;
 
         this.commandEvents = commandEvents;
+        this.buildId = buildId;
         this.id = id;
         this.autoflushInterval = autoflushInterval;
         this.eventManager = eventManager;
@@ -147,7 +151,7 @@ public class EventOutputStream extends OutputStream implements Runnable
 
     private void sendEvent(byte[] sendBuffer)
     {
-        Event event = commandEvents ? new CommandOutputEvent(this, id, sendBuffer) : new GenericOutputEvent(this, id, sendBuffer);
+        Event event = commandEvents ? new CommandOutputEvent(this, buildId, id, sendBuffer) : new GenericOutputEvent(this, id, sendBuffer);
         eventManager.publish(event);
         offset = 0;
     }

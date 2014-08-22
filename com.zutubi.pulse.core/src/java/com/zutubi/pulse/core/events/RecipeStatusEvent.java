@@ -7,9 +7,9 @@ public class RecipeStatusEvent extends RecipeEvent
 {
     private String message;
 
-    public RecipeStatusEvent(Object source, long recipeId, String message)
+    public RecipeStatusEvent(Object source, long buildId, long recipeId, String message)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.message = message;
     }
 

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.events.*;
@@ -37,14 +38,12 @@ import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.io.FileSystemUtils;
 import org.mockito.Matchers;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
-import static org.mockito.Mockito.*;
 
 public class RecipeControllerTest extends PulseTestCase
 {
@@ -124,7 +123,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     public void testIgnoresOtherRecipes()
     {
-        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, recipeResult.getId() + 1, "yay", "base", 0)));
+        assertFalse(recipeController.matchesRecipeEvent(new RecipeCommencedEvent(this, 1, recipeResult.getId() + 1, "yay", "base", 0)));
     }
 
     public void testDispatchRequest()
@@ -169,7 +168,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // A recipe commence event should change the result state, and record
         // the start time.
-        RecipeCommencedEvent event = new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), "base", 10101);
+        RecipeCommencedEvent event = new RecipeCommencedEvent(this, 1, recipeResult.getId(), recipeResult.getRecipeName(), "base", 10101);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
         assertEquals(ResultState.IN_PROGRESS, recipeResult.getState());
@@ -181,7 +180,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // A command commenced event should result in a new command result
         // with the correct name, state and start time.
-        CommandCommencedEvent event = new CommandCommencedEvent(this, recipeResult.getId(), "test command", 555);
+        CommandCommencedEvent event = new CommandCommencedEvent(this, 1, recipeResult.getId(), "test command", 555);
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
 
@@ -203,7 +202,7 @@ public class RecipeControllerTest extends PulseTestCase
         commandResult.commence();
         commandResult.setOutputDir("dummy");
         commandResult.complete();
-        CommandCompletedEvent event = new CommandCompletedEvent(this, recipeResult.getId(), commandResult);
+        CommandCompletedEvent event = new CommandCompletedEvent(this, 1, recipeResult.getId(), commandResult);
 
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
@@ -225,7 +224,7 @@ public class RecipeControllerTest extends PulseTestCase
         result.setId(recipeResult.getId());
         result.commence(1234);
         result.complete();
-        RecipeCompletedEvent event = new RecipeCompletedEvent(this, result);
+        RecipeCompletedEvent event = new RecipeCompletedEvent(this, 1, result);
 
         assertTrue(recipeController.matchesRecipeEvent(event));
         recipeController.handleRecipeEvent(event);
@@ -302,7 +301,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private RecipeErrorEvent sendError()
     {
-        RecipeErrorEvent error = new RecipeErrorEvent(this, recipeResult.getId(), "test error message", false);
+        RecipeErrorEvent error = new RecipeErrorEvent(this, 1, recipeResult.getId(), "test error message", false);
         assertTrue(recipeController.matchesRecipeEvent(error));
         recipeController.handleRecipeEvent(error);
         assertErrorDetailsSaved(error);

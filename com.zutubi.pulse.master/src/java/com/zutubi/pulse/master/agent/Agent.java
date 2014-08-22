@@ -20,7 +20,7 @@ public interface Agent
 
     void updateStatus(AgentPingEvent agentPingEvent, long timestamp);
     void updateStatus(AgentStatus status, long timestamp);
-    void updateStatus(AgentStatus status, long timestamp, long recipeId);
+    void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId);
 
     void copyStatus(Agent agent);
 
@@ -44,6 +44,7 @@ public interface Agent
      */
     long getLastOnlineTime();
 
+    long getBuildId();
     long getRecipeId();
 
     boolean isOnline();

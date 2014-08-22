@@ -33,10 +33,10 @@ public class ErrorHandlingRecipeRunnerTest extends PulseTestCase
             }
         };
         MasterService masterService = mock(MasterService.class);
-        ErrorHandlingRecipeRunner errorHandlingRecipeRunner = new ErrorHandlingRecipeRunner(masterService, "a token", 0, r);
+        ErrorHandlingRecipeRunner errorHandlingRecipeRunner = new ErrorHandlingRecipeRunner(masterService, "a token", 0, 0, r);
         errorHandlingRecipeRunner.runRecipe(null, null);
 
-        RecipeErrorEvent recipeErrorEvent = new RecipeErrorEvent(null, 0, expectedError, false);
+        RecipeErrorEvent recipeErrorEvent = new RecipeErrorEvent(null, 0, 0, expectedError, false);
         verify(masterService).handleEvent("a token", recipeErrorEvent);
     }
 }

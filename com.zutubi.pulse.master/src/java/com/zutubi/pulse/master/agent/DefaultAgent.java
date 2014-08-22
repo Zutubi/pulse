@@ -22,6 +22,7 @@ public class DefaultAgent implements Agent
     private Host host;
     private long lastPingTime = 0;
     private long lastOnlineTime = 0;
+    private long buildId = 0;
     private long recipeId = -1;
     private AgentService agentService;
     private String pingError = null;
@@ -115,6 +116,11 @@ public class DefaultAgent implements Agent
         return (System.currentTimeMillis() - lastOnlineTime) / 1000;
     }
 
+    public long getBuildId()
+    {
+        return buildId;
+    }
+
     public long getRecipeId()
     {
         return recipeId;
@@ -152,20 +158,20 @@ public class DefaultAgent implements Agent
 
     public void updateStatus(AgentPingEvent agentPingEvent, long timestamp)
     {
-        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), timestamp, agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
+        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), timestamp, buildId, agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
     }
 
     public void updateStatus(AgentStatus status, long timestamp)
     {
-        updateStatus(status, timestamp, -1);
+        updateStatus(status, timestamp, 0, -1);
     }
 
-    public void updateStatus(AgentStatus status, long timestamp, long recipeId)
+    public void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId)
     {
-        updateStatus(status, timestamp, recipeId, null);
+        updateStatus(status, timestamp, buildId, recipeId, null);
     }
 
-    public synchronized void updateStatus(AgentStatus status, long timestamp, long recipeId, String pingError)
+    public synchronized void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, String pingError)
     {
         lastPingTime = timestamp;
         if (status.isOnline())
@@ -173,6 +179,7 @@ public class DefaultAgent implements Agent
             lastOnlineTime = lastPingTime;
         }
         this.status = status;
+        this.buildId = buildId;
         this.recipeId = recipeId;
         this.pingError = pingError;
     }
@@ -183,6 +190,7 @@ public class DefaultAgent implements Agent
         status = existingAgent.status;
         lastPingTime = existingAgent.lastPingTime;
         lastOnlineTime = existingAgent.lastOnlineTime;
+        buildId = existingAgent.buildId;
         recipeId = existingAgent.recipeId;
         pingError = existingAgent.pingError;
     }

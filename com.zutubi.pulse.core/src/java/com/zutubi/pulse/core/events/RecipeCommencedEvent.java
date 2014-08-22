@@ -9,9 +9,9 @@ public class RecipeCommencedEvent extends RecipeEvent
     private String baseDir;
     private long startTime;
 
-    public RecipeCommencedEvent(Object source, long recipeId, String name, String baseDir, long startTime)
+    public RecipeCommencedEvent(Object source, long buildId, long recipeId, String name, String baseDir, long startTime)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.name = name;
         this.baseDir = baseDir;
         this.startTime = startTime;

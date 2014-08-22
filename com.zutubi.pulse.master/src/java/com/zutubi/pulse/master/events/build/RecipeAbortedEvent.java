@@ -8,15 +8,13 @@ import com.zutubi.pulse.core.events.RecipeEvent;
  */
 public class RecipeAbortedEvent extends RecipeEvent
 {
-    public RecipeAbortedEvent(Object source, long recipeId)
+    public RecipeAbortedEvent(Object source, long buildId, long recipeId)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
     }
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Aborted Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
+        return "Recipe Aborted Event" + ": " + getRecipeId();
     }
 }

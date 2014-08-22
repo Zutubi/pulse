@@ -64,6 +64,7 @@ public class MasterBuildProperties extends BuildProperties
     public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildOutputDir, String masterUrl)
     {
         ProjectConfiguration projectConfig = project.getConfig();
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, Long.toString(buildResult.getId()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
         if (buildOutputDir != null)
         {

@@ -4,15 +4,14 @@ import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.EventOutputStream.DISABLE_AUTO_FLUSH;
+import static com.zutubi.pulse.core.EventOutputStream.MINIMUM_SIZE;
 import com.zutubi.pulse.core.events.OutputEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.EventOutputStream.DISABLE_AUTO_FLUSH;
-import static com.zutubi.pulse.core.EventOutputStream.MINIMUM_SIZE;
 
 public class EventOutputStreamTest extends PulseTestCase implements EventListener
 {
@@ -26,7 +25,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
     {
         eventManager = new DefaultEventManager();
         eventManager.register(this);
-        stream = new EventOutputStream(eventManager, true, 0, DISABLE_AUTO_FLUSH);
+        stream = new EventOutputStream(eventManager, true, 0, 0, DISABLE_AUTO_FLUSH);
         receivedEvents = new LinkedList<OutputEvent>();
     }
 
@@ -122,7 +121,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
 
     public void testAutoFlush() throws InterruptedException, IOException
     {
-        stream = new EventOutputStream(eventManager, true, 1, 10);
+        stream = new EventOutputStream(eventManager, true, 0, 1, 10);
         stream.write(getBuffer(1));
 
         Thread.sleep(100);
@@ -132,7 +131,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
 
     public void testAutoFlushAfterFullWrite() throws InterruptedException, IOException
     {
-        stream = new EventOutputStream(eventManager, true, 1, 10);
+        stream = new EventOutputStream(eventManager, true, 0, 1, 10);
         stream.write(getBuffer(MINIMUM_SIZE));
         stream.write(getBuffer(1));
 
@@ -147,7 +146,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
         final int LARGE_WRITE = MINIMUM_SIZE * 5 + 10;
         final int UNDER_MIN_WRITE = MINIMUM_SIZE - 1;
 
-        stream = new EventOutputStream(eventManager, true, 1, 10);
+        stream = new EventOutputStream(eventManager, true, 0, 1, 10);
         stream.write(getBuffer(LARGE_WRITE));
         stream.write(getBuffer(UNDER_MIN_WRITE));
 
@@ -163,7 +162,7 @@ public class EventOutputStreamTest extends PulseTestCase implements EventListene
         final int LARGE_WRITE = MINIMUM_SIZE * 5 + 10;
         final int UNDER_MIN_WRITE = MINIMUM_SIZE - 1;
 
-        stream = new EventOutputStream(eventManager, true, 1, 10);
+        stream = new EventOutputStream(eventManager, true, 0, 1, 10);
         for (int i = 0; i < LARGE_WRITE_COUNT; i++)
         {
             stream.write(getBuffer(LARGE_WRITE));

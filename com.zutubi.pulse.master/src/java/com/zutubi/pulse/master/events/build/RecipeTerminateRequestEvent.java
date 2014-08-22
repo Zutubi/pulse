@@ -30,8 +30,6 @@ public class RecipeTerminateRequestEvent extends Event
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Terminate Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
+        return "Recipe Terminate Event" + ": " + getRecipeId();
     }    
 }

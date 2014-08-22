@@ -21,13 +21,15 @@ public class ErrorHandlingRecipeRunner implements RecipeRunner
 
     private MasterService master;
     private String serviceToken;
+    private long buildId;
     private long recipeId;
     private RecipeRunner delegate;
 
-    public ErrorHandlingRecipeRunner(MasterService master, String serviceToken, long recipeId, RecipeRunner delegate)
+    public ErrorHandlingRecipeRunner(MasterService master, String serviceToken,long buildId, long recipeId, RecipeRunner delegate)
     {
         this.master = master;
         this.serviceToken = serviceToken;
+        this.buildId = buildId;
         this.recipeId = recipeId;
         this.delegate = delegate;
     }
@@ -52,7 +54,7 @@ public class ErrorHandlingRecipeRunner implements RecipeRunner
 
     private void sendError(String error)
     {
-        RecipeErrorEvent event = new RecipeErrorEvent(null, recipeId, error, false);
+        RecipeErrorEvent event = new RecipeErrorEvent(null, buildId, recipeId, error, false);
 
         try
         {

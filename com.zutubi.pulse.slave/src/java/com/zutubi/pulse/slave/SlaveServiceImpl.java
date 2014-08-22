@@ -1,6 +1,8 @@
 package com.zutubi.pulse.slave;
 
 import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.EventOutputStream;
@@ -39,6 +41,7 @@ import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -46,10 +49,6 @@ import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Arrays.asList;
 
 /**
  */
@@ -193,7 +192,7 @@ public class SlaveServiceImpl implements SlaveService
 
         MasterService masterService = updateMaster(master);
         SlaveRecipeRunner delegateRunner = objectFactory.buildBean(SlaveRecipeRunner.class, master);
-        ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getId(), delegateRunner);
+        ErrorHandlingRecipeRunner recipeRunner = new ErrorHandlingRecipeRunner(masterService, serviceTokenManager.getToken(), request.getBuildId(), request.getId(), delegateRunner);
         serverRecipeService.processRecipe(agentHandle, request, recipeRunner);
         return true;
     }
@@ -260,7 +259,7 @@ public class SlaveServiceImpl implements SlaveService
         OutputStream outputStream = null;
         try
         {
-            outputStream = new EventOutputStream(eventManager, false, streamId);
+            outputStream = new EventOutputStream(eventManager, false, 0, streamId);
             ProcessWrapper.runCommand(commandLine, workingDir, outputStream, timeout, TimeUnit.SECONDS);
         }
         catch (Exception e)

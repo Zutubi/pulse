@@ -27,7 +27,7 @@ public class RecipeCleanup
         this.fileSystem = fileSystem;
     }
 
-    public void cleanup(EventManager eventManager, File directoryToClean, long recipeId)
+    public void cleanup(EventManager eventManager, File directoryToClean, long buildId, long recipeId)
     {
         if (!directoryToClean.isDirectory())
         {
@@ -53,17 +53,17 @@ public class RecipeCleanup
             {
                 statusMessage = DELETING_FILE;
             }
-            eventManager.publish(new RecipeStatusEvent(this, recipeId, String.format(statusMessage, node.getName())));
+            eventManager.publish(new RecipeStatusEvent(this, buildId, recipeId, String.format(statusMessage, node.getName())));
             try
             {
                 fileSystem.delete(node);
-                eventManager.publish(new RecipeStatusEvent(this, recipeId, DELETED));
+                eventManager.publish(new RecipeStatusEvent(this, buildId, recipeId, DELETED));
             }
             catch (IOException e)
             {
                 String message = String.format(UNABLE_TO_DELETE_FILE, node.getName(), e.getMessage());
                 LOG.warning(message, e);
-                eventManager.publish(new RecipeStatusEvent(this, recipeId, message));
+                eventManager.publish(new RecipeStatusEvent(this, buildId, recipeId, message));
             }
         }
     }

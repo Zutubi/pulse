@@ -19,6 +19,11 @@ public class FilteringListener implements EventListener
         this.delegate = delegate;
     }
 
+    public EventListener getDelegate()
+    {
+        return delegate;
+    }
+
     public void handleEvent(Event evt)
     {
         if(predicate.apply(evt))

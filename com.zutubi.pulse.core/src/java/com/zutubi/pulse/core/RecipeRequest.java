@@ -1,14 +1,13 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.engine.PulseFileProvider;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A request to execute a specific recipe.  Includes details about how to
@@ -76,6 +75,11 @@ public class RecipeRequest
         return context.getString(NAMESPACE_INTERNAL,PROPERTY_BUILD_NUMBER);
     }
 
+    public long getBuildId()
+    {
+        return context.getLong(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, 0);
+    }
+    
     public long getId()
     {
         return context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);

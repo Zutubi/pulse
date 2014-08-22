@@ -15,12 +15,13 @@ public class RecipeDispatchedEvent extends RecipeEvent
 
     /**
      * @param source   source of the event
+     * @param buildId id of the build the recipe is part of
      * @param recipeId id of the recipe that has been dispatched
      * @param agent    agent the recipe was dispatched to
      */
-    public RecipeDispatchedEvent(Object source, long recipeId, Agent agent)
+    public RecipeDispatchedEvent(Object source, long buildId, long recipeId, Agent agent)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.agent = agent;
     }
 

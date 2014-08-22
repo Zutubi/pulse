@@ -10,15 +10,13 @@ import com.zutubi.pulse.core.events.RecipeEvent;
  */
 public class RecipeCollectingEvent extends RecipeEvent
 {
-    public RecipeCollectingEvent(Object source, long recipeId)
+    public RecipeCollectingEvent(Object source, long buildId, long recipeId)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
     }
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Collecting Event");
-        buff.append(": ").append(getRecipeId());
-        return buff.toString();
+        return "Recipe Collecting Event" + ": " + getRecipeId();
     }
 }

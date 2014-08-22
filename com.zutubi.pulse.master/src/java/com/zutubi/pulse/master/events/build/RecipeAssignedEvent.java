@@ -20,7 +20,7 @@ public class RecipeAssignedEvent extends RecipeEvent
 
     public RecipeAssignedEvent(Object source, RecipeRequest request, Agent agent)
     {
-        super(source, request.getId());
+        super(source, request.getBuildId(), request.getId());
         this.request = request;
         this.agent = agent;
     }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.google.common.io.Files;
 import com.zutubi.events.EventManager;
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -41,9 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipes.
@@ -87,7 +86,7 @@ public class RecipeProcessor
         {
             runningRecipe = recipeResult.getId();
             long recipeStartTime = recipeResult.getStartTime();
-            eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), context.getWorkingDir().getAbsolutePath(), recipeStartTime));
+            eventManager.publish(new RecipeCommencedEvent(this, request.getBuildId(), recipeResult.getId(), recipeResult.getRecipeName(), context.getWorkingDir().getAbsolutePath(), recipeStartTime));
 
             pushRecipeContext(context, request, testResults, customFields, recipeStartTime);
             executeRequest(request);
@@ -104,17 +103,17 @@ public class RecipeProcessor
         finally
         {
             RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
-            storeTestResults(paths, recipeResult, testResults);
-            storeCustomFields(paths, customFields);
+            storeTestResults(paths, request.getBuildId(), recipeResult, testResults);
+            storeCustomFields(paths, request.getBuildId(), customFields);
             
             boolean compress = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false);
             if (compress)
             {
-                compressResults(paths);
+                compressResults(request.getBuildId(), paths);
             }
 
             recipeResult.complete();
-            eventManager.publish(new RecipeCompletedEvent(this, recipeResult));
+            eventManager.publish(new RecipeCompletedEvent(this, request.getBuildId(), recipeResult));
 
             context.pop();
 
@@ -180,16 +179,16 @@ public class RecipeProcessor
         executeRecipe(recipeConfiguration, recipeLoadPredicate, status, context, outputDir);
     }
 
-    private void compressResults(RecipePaths paths)
+    private void compressResults(long buildId, RecipePaths paths)
     {
-        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing recipe artifacts..."));
-        if (zipDir(paths.getOutputDir()))
+        eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Compressing recipe artifacts..."));
+        if (zipDir(buildId, paths.getOutputDir()))
         {
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Artifacts compressed."));
+            eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Artifacts compressed."));
         }
     }
 
-    private boolean zipDir(File dir)
+    private boolean zipDir(long buildId, File dir)
     {
         try
         {
@@ -204,7 +203,7 @@ public class RecipeProcessor
         catch (IOException e)
         {
             LOG.severe(e);
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compression failed: " + e.getMessage() + "."));
+            eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Compression failed: " + e.getMessage() + "."));
             return false;
         }
     }
@@ -225,9 +224,9 @@ public class RecipeProcessor
         }
     }
 
-    private void storeTestResults(RecipePaths paths, RecipeResult recipeResult, PersistentTestSuiteResult testResults)
+    private void storeTestResults(RecipePaths paths, long buildId, RecipeResult recipeResult, PersistentTestSuiteResult testResults)
     {
-        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
+        eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Storing test results..."));
         try
         {
             TestSuitePersister persister = new TestSuitePersister();
@@ -241,14 +240,14 @@ public class RecipeProcessor
             recipeResult.error("Unable to write out test results: " + e.getMessage());
         }
         recipeResult.setTestSummary(testResults.getSummary());
-        eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
+        eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Test results stored."));
     }
 
-    private void storeCustomFields(RecipePaths paths, Map<Pair<FieldScope, String>, String> customFields)
+    private void storeCustomFields(RecipePaths paths, long buildId, Map<Pair<FieldScope, String>, String> customFields)
     {
         if (customFields.size() > 0)
         {
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing custom fields..."));
+            eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Storing custom fields..."));
 
             Map<String, String> buildFields = new HashMap<String, String>();
             Map<String, String> recipeFields = new HashMap<String, String>();
@@ -276,7 +275,7 @@ public class RecipeProcessor
                 resultCustomFields.store(recipeFields);
             }
 
-            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Custom fields stored."));
+            eventManager.publish(new RecipeStatusEvent(this, buildId, runningRecipe, "Custom fields stored."));
         }
     }
 
@@ -420,8 +419,9 @@ public class RecipeProcessor
         runningLock.unlock();
 
         commandResult.commence();
+        long buildId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, 0);
         long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, 0);
-        eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
+        eventManager.publish(new CommandCommencedEvent(this, buildId, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
         DefaultCommandContext commandContext = new DefaultCommandContext(context, commandResult, CommandResult.FEATURE_LIMIT_PER_FILE, postProcessorFactory);
         try
@@ -454,7 +454,7 @@ public class RecipeProcessor
 
             flushOutput(context);
             commandResult.complete();
-            eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
+            eventManager.publish(new CommandCompletedEvent(this, buildId, recipeId, commandResult));
         }
 
         return true;

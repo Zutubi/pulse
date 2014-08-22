@@ -3,6 +3,7 @@ package com.zutubi.pulse.master;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -14,8 +15,6 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * A runnable that wraps execution of a recipe on the master.
@@ -43,6 +42,7 @@ public class MasterRecipeRunner implements RecipeRunner
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
         PulseExecutionContext context = request.getContext();
+        long buildId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, 0);
         File dataDir = configurationManager.getUserPaths().getData();
         ServerRecipePaths recipePaths = new ServerRecipePaths(context, dataDir);
 
@@ -50,7 +50,7 @@ public class MasterRecipeRunner implements RecipeRunner
         context.push();
         try
         {
-            recipeCleanup.cleanup(eventManager, recipePaths.getRecipesRoot(), request.getId());
+            recipeCleanup.cleanup(eventManager, recipePaths.getRecipesRoot(), buildId, request.getId());
 
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
@@ -60,7 +60,7 @@ public class MasterRecipeRunner implements RecipeRunner
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
             if (context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_ENABLE_LIVE_LOGS, true))
             {
-                outputStream = new EventOutputStream(eventManager, true, request.getId());
+                outputStream = new EventOutputStream(eventManager, true, buildId, request.getId());
                 context.setOutputStream(outputStream);
             }
             context.setWorkingDir(recipePaths.getBaseDir());
@@ -69,12 +69,12 @@ public class MasterRecipeRunner implements RecipeRunner
         }
         catch (BuildException e)
         {
-            eventManager.publish(new RecipeErrorEvent(this, request.getId(), e.getMessage(), false));
+            eventManager.publish(new RecipeErrorEvent(this, buildId, request.getId(), e.getMessage(), false));
         }
         catch (Exception e)
         {
             LOG.severe(e);
-            eventManager.publish(new RecipeErrorEvent(this, request.getId(), "Unexpected error: " + e.getMessage(), false));
+            eventManager.publish(new RecipeErrorEvent(this, buildId, request.getId(), "Unexpected error: " + e.getMessage(), false));
         }
         finally
         {

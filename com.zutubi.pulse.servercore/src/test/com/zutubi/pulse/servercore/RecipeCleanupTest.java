@@ -5,11 +5,10 @@ import com.zutubi.pulse.core.events.RecipeStatusEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.io.FileSystem;
 import org.mockito.InOrder;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
-
-import static org.mockito.Mockito.*;
 
 public class RecipeCleanupTest extends PulseTestCase
 {
@@ -33,7 +32,7 @@ public class RecipeCleanupTest extends PulseTestCase
     {
         for (String eventMessage : eventMessages)
         {
-            inOrder.verify(eventManager).publish(new RecipeStatusEvent(this, 42, eventMessage));
+            inOrder.verify(eventManager).publish(new RecipeStatusEvent(this, 0, 42, eventMessage));
         }
 
         verifyNoMoreInteractions(eventManager);
@@ -42,7 +41,7 @@ public class RecipeCleanupTest extends PulseTestCase
     public void testCleanupNoSuchDirectory()
     {
         doReturn(Boolean.FALSE).when(recipeDir).isDirectory();
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
         verify(recipeDir).isDirectory();
         verifyNoMoreInteractions(recipeDir);
     }
@@ -51,7 +50,7 @@ public class RecipeCleanupTest extends PulseTestCase
     {
         doReturn(new File[0]).when(recipeDir).listFiles();
 
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
     }
 
     public void testCleanupOneFile() throws IOException
@@ -61,7 +60,7 @@ public class RecipeCleanupTest extends PulseTestCase
         File[] dirContents = new File[] { file };
         doReturn(dirContents).when(recipeDir).listFiles();
 
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
 
         verify(fileSystem).delete(file);
         verifyEvents(String.format(RecipeCleanup.DELETING_FILE, "filename"), RecipeCleanup.DELETED);
@@ -75,7 +74,7 @@ public class RecipeCleanupTest extends PulseTestCase
         doReturn("filename").when(file).getName();
         doThrow(new IOException("disk error")).when(fileSystem).delete(file);
 
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
         verify(fileSystem).delete(file);
         verifyEvents(String.format(RecipeCleanup.DELETING_FILE, "filename"), String.format(RecipeCleanup.UNABLE_TO_DELETE_FILE, "filename", "disk error"));
     }
@@ -88,7 +87,7 @@ public class RecipeCleanupTest extends PulseTestCase
         doReturn(dirContents).when(recipeDir).listFiles();
         doReturn(true).when(subDir).isDirectory();
         
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
 
         verifyEvents(String.format(RecipeCleanup.DELETING_DIRECTORY, "dirname"), RecipeCleanup.DELETED);
         verify(fileSystem).delete(subDir);
@@ -108,7 +107,7 @@ public class RecipeCleanupTest extends PulseTestCase
         doReturn("dir2").when(subDir2).getName();
         doReturn("a_file").when(file).getName();
 
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
 
         verify(fileSystem).delete(subDir1);
         verify(fileSystem).delete(file);
@@ -123,7 +122,7 @@ public class RecipeCleanupTest extends PulseTestCase
         doReturn(true).when(recipeDir).isDirectory();
         doReturn(null).when(recipeDir).listFiles();
         doReturn("/not/a/good/path").when(recipeDir).getAbsolutePath();
-        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        recipeCleanup.cleanup(eventManager, recipeDir, 0, 42);
     }
 
 }

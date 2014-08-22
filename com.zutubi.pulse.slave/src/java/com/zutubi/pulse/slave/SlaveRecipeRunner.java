@@ -3,6 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.BuildException;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -17,8 +18,6 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Runner for recipes executing on a slave service.
@@ -66,6 +65,7 @@ public class SlaveRecipeRunner implements RecipeRunner
         if (masterProxy != null)
         {
             PulseExecutionContext context = request.getContext();
+            long buildId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, 0);
             AgentRecipeDetails details = new AgentRecipeDetails(context);
             File dataDir = configurationManager.getUserPaths().getData();
             ServerRecipePaths processorPaths = new ServerRecipePaths(context, dataDir);
@@ -79,7 +79,7 @@ public class SlaveRecipeRunner implements RecipeRunner
             OutputStream outputStream = null;
             try
             {
-                recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
+                recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), buildId, request.getId());
 
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
@@ -89,7 +89,7 @@ public class SlaveRecipeRunner implements RecipeRunner
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
                 if (isLiveLoggingEnabled(context))
                 {
-                    outputStream = new EventOutputStream(eventManager, true, request.getId());
+                    outputStream = new EventOutputStream(eventManager, true, buildId, request.getId());
                     context.setOutputStream(outputStream);
                 }
                 context.setWorkingDir(processorPaths.getBaseDir());
@@ -99,13 +99,13 @@ public class SlaveRecipeRunner implements RecipeRunner
             catch (BuildException e)
             {
                 LOG.warning("A problem occurred while processing a recipe build request. Reason: " + e.getMessage(), e);
-                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), e.getMessage(), false);
+                RecipeErrorEvent error = new RecipeErrorEvent(null, buildId, request.getId(), e.getMessage(), false);
                 eventManager.publish(error);
             }
             catch (Exception e)
             {
                 LOG.severe(e);
-                RecipeErrorEvent error = new RecipeErrorEvent(null, request.getId(), "Unexpected error: " + e.getMessage(), false);
+                RecipeErrorEvent error = new RecipeErrorEvent(null, buildId, request.getId(), "Unexpected error: " + e.getMessage(), false);
                 eventManager.publish(error);
             }
             finally

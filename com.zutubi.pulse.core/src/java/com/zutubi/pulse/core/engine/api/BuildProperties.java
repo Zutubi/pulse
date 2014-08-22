@@ -53,7 +53,11 @@ public class BuildProperties
      */
     public static final String PROPERTY_BUILD_DIRECTORY         = "build.dir";
     /**
-     * The build's unique identifying number.
+     * The build result's id, unique across all builds.
+     */
+    public static final String PROPERTY_BUILD_ID                = "build.id";
+    /**
+     * The build's identifying number, unique (and increasing) within a project.
      */
     public static final String PROPERTY_BUILD_NUMBER            = "build.number";
     /**

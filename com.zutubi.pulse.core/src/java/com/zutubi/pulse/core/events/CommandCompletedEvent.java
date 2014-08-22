@@ -8,9 +8,9 @@ public class CommandCompletedEvent extends RecipeEvent
 {
     private CommandResult result;
 
-    public CommandCompletedEvent(Object source, long recipeId, CommandResult result)
+    public CommandCompletedEvent(Object source, long buildId, long recipeId, CommandResult result)
     {
-        super(source, recipeId);
+        super(source, buildId, recipeId);
         this.result = result;
     }
 
@@ -21,8 +21,6 @@ public class CommandCompletedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Command Completed Event: ");
-        buff.append(getRecipeId());
-        return buff.toString();
+        return "Command Completed Event: " + getRecipeId();
     }
 }
