@@ -36,7 +36,7 @@ public class DependentBuildTriggerConfiguration extends TriggerConfiguration
      * Determines how the revision is influenced by the upstream build.
      */
     @Required
-    private RevisionHandling revisionHandling;
+    private RevisionHandling revisionHandling = RevisionHandling.FLOAT_INDEPENDENTLY;
 
     public Trigger newTrigger()
     {
