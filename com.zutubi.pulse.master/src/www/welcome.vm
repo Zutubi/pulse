@@ -104,7 +104,7 @@
             #actionHeader("deprevisions" "improved dependency revision handling" "accept" false)
             <td>
                 Revision handling across dependent projects is now more flexible, making it easier
-                to manager dependencies across multiple SCM repositories.
+                to manage dependencies across multiple SCM repositories.
             </td>
         </tr>
         <tr>
