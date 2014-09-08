@@ -213,6 +213,7 @@
                 <ref local="addCheckoutSubdir"/>
                 <ref local="addLiveLogsEnabled"/>
                 <ref local="dependentBuildTriggerRevisionHandling"/>
+                <ref local="addRunBuildHookTaskOnAgents"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1126,4 +1127,9 @@
     <bean id="dependentBuildTriggerRevisionHandling" class="com.zutubi.pulse.master.upgrade.tasks.DependentBuildTriggerRevisionHandlingUpgradeTask">
         <property name="buildNumber" value="207001002"/>
     </bean>
+
+    <bean id="addRunBuildHookTaskOnAgents" class="com.zutubi.pulse.master.upgrade.tasks.AddRunBuildHookTaskOnAgentsUpgradeTask">
+        <property name="buildNumber" value="207002001"/>
+    </bean>
+
 </beans>

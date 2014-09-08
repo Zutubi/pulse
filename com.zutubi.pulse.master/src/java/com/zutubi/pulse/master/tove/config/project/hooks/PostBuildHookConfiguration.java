@@ -14,16 +14,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A post build hookis run when a build completes.
+ * A post build hook is run when a build completes.
  */
 @SymbolicName("zutubi.postBuildHookConfig")
-@Form(fieldOrder = {"name", "runForAll", "runForStates", "failOnError", "runForPersonal", "allowManualTrigger"})
+@Form(fieldOrder = {"name", "runForAll", "runForStates", "failOnError", "runForPersonal", "runTaskOnAgents", "allowManualTrigger"})
 public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 {
     @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();
+    private boolean runTaskOnAgents;
 
     public boolean isRunForAll()
     {
@@ -43,6 +44,22 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
     public void setRunForStates(List<ResultState> runForStates)
     {
         this.runForStates = runForStates;
+    }
+
+    public boolean isRunTaskOnAgents()
+    {
+        return runTaskOnAgents;
+    }
+
+    public void setRunTaskOnAgents(boolean runTaskOnAgents)
+    {
+        this.runTaskOnAgents = runTaskOnAgents;
+    }
+
+    @Override
+    public boolean runsOnAgent()
+    {
+        return runTaskOnAgents;
     }
 
     public boolean triggeredBy(BuildEvent event)
