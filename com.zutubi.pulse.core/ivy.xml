@@ -51,7 +51,7 @@
         <dependency org="nu.xom" name="nu.xom" rev="20111125" conf="external,build,release->default;src->src"/>
         <dependency org="com.thoughtworks.xstream" name="com.thoughtworks.xstream" rev="1.4.2" conf="external,build,release->default;src->src"/>
         <dependency org="thoughtworks" name="javasysmon" rev="0.3.4" conf="external,build,release->default;src->src"/>
-        <dependency org="sun" name="jna" rev="3.5.2" conf="external,build,release->default;src->src"/>
+        <dependency org="sun" name="jna" rev="4.1.0" conf="external,build,release->default;src->src"/>
         <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default;src->src"/>
         <dependency org="eclipse" name="equinox-bundles" rev="3.3_2" conf="build->default;src->src"/>
 
