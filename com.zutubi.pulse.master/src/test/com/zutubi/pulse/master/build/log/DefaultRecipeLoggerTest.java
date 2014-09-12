@@ -74,10 +74,10 @@ public class DefaultRecipeLoggerTest extends PulseTestCase
     
     private void newlineOnBoundaryHelper(String lineEnding) throws IOException
     {
-        logger.log(("line 1" + lineEnding).getBytes());
-        logger.log("line 2".getBytes());
+        logger.log(("line 1" + lineEnding + "line 2" + lineEnding).getBytes());
+        logger.log(("line 3" + lineEnding + "line 4").getBytes());
 
-        assertLines(2);
+        assertLines(4);
     }
 
     public void testNewlineStraddlesBoundary() throws IOException

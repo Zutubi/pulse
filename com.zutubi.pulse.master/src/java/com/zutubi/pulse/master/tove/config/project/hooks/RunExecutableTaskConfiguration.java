@@ -107,9 +107,9 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         commandLine.addAll(resolvedArguments);
 
         String resolvedWorkingDir = StringUtils.stringSet(workingDir) ? context.resolveVariables(workingDir) : null;
-        if (resultNode != null && onAgent)
+        if (onAgent)
         {
-            executeOnAgent(context, commandLine, resolvedWorkingDir);
+            executeOnAgent(context, buildResult, resultNode, commandLine, resolvedWorkingDir);
         }
         else
         {
@@ -124,24 +124,46 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         }
     }
 
-    private void executeOnAgent(ExecutionContext context, List<String> commandLine, String resolvedWorkingDir)
+    private void executeOnAgent(ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, List<String> commandLine, String resolvedWorkingDir)
     {
-        long agentHandle = context.getLong(PROPERTY_AGENT_HANDLE, 0);
-        Agent agent = agentManager.getAgentByHandle(agentHandle);
-        if (agent == null)
+        Agent agent = null;
+        if (resultNode == null)
         {
-            // If we are manually-triggered from a completed build, the agent handle is not known.
-            // The best we have is the agent name, which should work most of the time (in the
-            // worst case it could refer to a different machine now, but so be it!).
-            String name = context.getString(PROPERTY_AGENT);
-            if (StringUtils.stringSet(name))
+            // Post-build hook, we find an agent from the build result.
+            for (RecipeResultNode candidateStage : buildResult.getStages())
             {
-                agent = agentManager.getAgent(name);
+                agent = agentManager.getAgent(candidateStage.getAgentNameSafe());
+                if (agent != null)
+                {
+                    break;
+                }
             }
 
             if (agent == null)
             {
-                throw new PulseRuntimeException("Could not execute hook on agent '" + name + "': no such agent exists");
+                throw new PulseRuntimeException("Could not execute hook on agent: build did not run on any current agents.");
+            }
+        }
+        else
+        {
+            // Stage hook, look up the agent for this stage.
+            long agentHandle = context.getLong(PROPERTY_AGENT_HANDLE, 0);
+            agent = agentManager.getAgentByHandle(agentHandle);
+            if (agent == null)
+            {
+                // If we are manually-triggered from a completed build, the agent handle is not known.
+                // The best we have is the agent name, which should work most of the time (in the
+                // worst case it could refer to a different machine now, but so be it!).
+                String name = context.getString(PROPERTY_AGENT);
+                if (StringUtils.stringSet(name))
+                {
+                    agent = agentManager.getAgent(name);
+                }
+
+                if (agent == null)
+                {
+                    throw new PulseRuntimeException("Could not execute hook on agent '" + name + "': no such agent exists");
+                }
             }
         }
 

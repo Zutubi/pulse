@@ -32,7 +32,9 @@ public abstract class AbstractFileLogger implements OutputLogger
     
     private boolean needsMarker = true;
     private boolean inLineEnding = false;
-    private char lastOutputChar = '\0';
+    // This is the last line ending character within a chunk, or the last character of the chunk
+    // (when between chunks).
+    private char lastEndingChar = '\0';
 
     protected PrintWriter writer;
 
@@ -105,7 +107,7 @@ public abstract class AbstractFileLogger implements OutputLogger
             {
                 writer.println();
                 needsMarker = true;
-                inLineEnding = isLineEndChar && c == lastOutputChar;
+                inLineEnding = isLineEndChar && c == lastEndingChar;
             }
             else if (isLineEndChar)
             {
@@ -123,11 +125,15 @@ public abstract class AbstractFileLogger implements OutputLogger
                 
                 writer.print(c);
             }
+            else
+            {
+                lastEndingChar = c;
+            }
         }
 
         if (length > 0)
         {
-            lastOutputChar = decodedOutput[length - 1];
+            lastEndingChar = decodedOutput[length - 1];
         }
         
         writer.flush();
@@ -136,7 +142,7 @@ public abstract class AbstractFileLogger implements OutputLogger
 
     protected void completeOutput()
     {
-        if ((inLineEnding || (lastOutputChar != '\r' && lastOutputChar != '\n')) && writer != null)
+        if ((inLineEnding || (lastEndingChar != '\r' && lastEndingChar != '\n')) && writer != null)
         {
             writer.println();
             writer.flush();
@@ -144,7 +150,7 @@ public abstract class AbstractFileLogger implements OutputLogger
 
         needsMarker = true;
         inLineEnding = false;
-        lastOutputChar = '\0';
+        lastEndingChar = '\0';
     }
 
     public void close()
