@@ -1,5 +1,6 @@
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 d724b1708149ec8eac0d7f6ad44161d00c66c1b2
+fakeparent
 Dev1 (Name Middle Lastname)
 1257427193
 Don't crash in QStateMachine when event transition listens to
@@ -16,6 +17,7 @@ M	src/corelib/statemachine/qstatemachine.cpp
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 ec13cf30f10dabce37af3ce9d6763066e8cf4cc4
+fakeparent
 Dev3 (Name Lastname, lastname includes norwegian characters. Special norwegian characters are æ.ø,å)
 1257416608
 Removed the FBO stacking behaviour and the test attached to it.
@@ -31,6 +33,7 @@ M	tests/auto/qgl/tst_qgl.cpp
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 a12b1538df45268f2a66ec55856ffeeb131eb751
+fakeparent
 Dev5 (Name Middle Last)
 1257412771
 Fixed soft-light composition mode in raster and OpenGL1.
@@ -48,6 +51,7 @@ M	src/opengl/util/fragmentprograms_p.h
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 b91f1a2f749586014e8b28c6766015ff6ba62ee7
+fakeparent
 Dev7 (Name Last)
 1257403565
 Modify QGLShader and QGLShaderProgram in response to API review
@@ -66,6 +70,7 @@ M	src/opengl/qwindowsurface_gl.cpp
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 23572588c4b0c759c14a6c1687e5bd86461e31e8
+fakeparent
 Dev9 (Name)
 1257365581
 Fixed some debug and some minor optims to QPaintBuffer
@@ -77,6 +82,7 @@ M	src/gui/painting/qpaintbuffer_p.h
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 1a71e4b7960ba27fe6d47815da9337020085ac16
+fakeparent
 Dev11 (Name)
 1257365581
 Made QPen== catch QPen(Qt::NoPen) == QPen(QBrush(Qt::NoBrush))
@@ -90,6 +96,7 @@ M	src/gui/painting/qpen.cpp
 
 #5d7bf160-ce21-11de-8a39-0800200c9a66
 391441b2ce2be527db0829798631436670df0965
+fakeparent
 Dev13 (Name)
 1257365580
 Added some helpful info to QBrush and QPen's QDebug operators

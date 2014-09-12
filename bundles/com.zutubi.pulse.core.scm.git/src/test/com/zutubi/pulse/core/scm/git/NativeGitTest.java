@@ -228,40 +228,40 @@ public class NativeGitTest extends PulseTestCase
                 "391441b2ce2be527db0829798631436670df0965"
                 ),
                 revisions);
-        }
+    }
 
-        private List<GitLogEntry> parseLog() throws IOException, GitException
+    private List<GitLogEntry> parseLog() throws IOException, GitException
+    {
+        NativeGit.LogOutputHandler handler = new NativeGit.LogOutputHandler();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getInput("txt")));
+        String line;
+        while ((line = reader.readLine()) != null)
         {
-            NativeGit.LogOutputHandler handler = new NativeGit.LogOutputHandler();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getInput("txt")));
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                handler.handleStdout(line);
-            }
-
-            return handler.getEntries();
+            handler.handleStdout(line);
         }
 
-        private void assertStandardLogEntries(List<GitLogEntry> entries)
-        {
-            assertEquals(2, entries.size());
+        return handler.getEntries();
+    }
 
-            GitLogEntry entry = entries.get(0);
-            assertEquals("c3bb01f6713e2625d4cc70e6d689feabf88731b4", entry.getId());
-            assertEquals("Alan User", entry.getAuthor());
-            assertEquals("Revert \"Some change\"\nThis reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.", entry.getComment());
-            assertEquals(1257227193000L, entry.getDate().getTime());
-            assertSingleFileEntry(entry, "configure.exe");
+    private void assertStandardLogEntries(List<GitLogEntry> entries)
+    {
+        assertEquals(2, entries.size());
 
-            entry = entries.get(1);
-            assertEquals("406d8ef682af938172aa5f196774666f83811289", entry.getId());
-            assertEquals("Alan User", entry.getAuthor());
-            assertEquals("Revert \"Another Change\"\n" +
-                    "This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.", entry.getComment());
-            assertEquals(1257327193000L, entry.getDate().getTime());
-            assertSingleFileEntry(entry, "tools/configure/configureapp.cpp");
-        }
+        GitLogEntry entry = entries.get(0);
+        assertEquals("c3bb01f6713e2625d4cc70e6d689feabf88731b4", entry.getId());
+        assertEquals("Alan User", entry.getAuthor());
+        assertEquals("Revert \"Some change\"\nThis reverts commit dcfef78f9a8be49b71512d47e3bbe076c2beb4c8.", entry.getComment());
+        assertEquals(1257227193000L, entry.getDate().getTime());
+        assertSingleFileEntry(entry, "configure.exe");
+
+        entry = entries.get(1);
+        assertEquals("406d8ef682af938172aa5f196774666f83811289", entry.getId());
+        assertEquals("Alan User", entry.getAuthor());
+        assertEquals("Revert \"Another Change\"\n" +
+                "This reverts commit 0d29f576e6a64b61f56b3087fd72b2d21ca65f7f.", entry.getComment());
+        assertEquals(1257327193000L, entry.getDate().getTime());
+        assertSingleFileEntry(entry, "tools/configure/configureapp.cpp");
+    }
 
     private void assertSingleFileEntry(GitLogEntry entry, String path)
     {
