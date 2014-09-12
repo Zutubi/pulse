@@ -20,6 +20,10 @@ class GitLogEntry
      */
     private String id = "";
     /**
+     * Parent commit ids (merge commits have multiple parents).
+     */
+    private String[] parents = new String[0];
+    /**
      * The author of the this commit.
      */
     private String author = "";
@@ -48,6 +52,16 @@ class GitLogEntry
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    public String[] getParents()
+    {
+        return parents;
+    }
+
+    public void setParents(String[] parents)
+    {
+        this.parents = parents;
     }
 
     public String getAuthor()

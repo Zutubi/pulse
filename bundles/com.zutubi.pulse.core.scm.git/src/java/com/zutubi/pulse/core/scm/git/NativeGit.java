@@ -234,7 +234,7 @@ public class NativeGit
         command.add(COMMAND_LOG);
         command.add(FLAG_NAME_STATUS);
         command.add(FLAG_SHOW_MERGE_FILES);
-        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%an%n%ct%n%s%n%b%n" + LOG_SENTINAL);
+        command.add(FLAG_PRETTY + "=format:" + LOG_SENTINAL + "%n%H%n%P%n%an%n%ct%n%s%n%b%n" + LOG_SENTINAL);
         command.add(FLAG_REVERSE);
         return command;
     }
@@ -536,6 +536,8 @@ public class NativeGit
                         raw.add(str = i.next());
                         logEntry.setId(str);
                         raw.add(str = i.next());
+                        logEntry.setParents(str.split("\\s+"));
+                        raw.add(str = i.next());
                         logEntry.setAuthor(str);
                         raw.add(str = i.next());
                         logEntry.setDateString(str);
@@ -582,10 +584,12 @@ public class NativeGit
                         }
 
                         logEntry.setRaw(raw);
-                        if (!logEntryHasFiles || logEntry.getFiles().size() > 0)
+                        if (logEntry.getParents().length > 1 || !logEntryHasFiles || logEntry.getFiles().size() > 0)
                         {
-                            // Either the log entry has no files, in which case none were filtered, or
-                            // it has some files, not all of which were filtered.
+                            // Either the log entry:
+                            //   - is a merge (we never filter these, it makes change determination too hard);
+                            //   - has no files, in which case none were filtered; or
+                            //   - has some files, not all of which were filtered.
                             entries.add(logEntry);
                         }
                     }
