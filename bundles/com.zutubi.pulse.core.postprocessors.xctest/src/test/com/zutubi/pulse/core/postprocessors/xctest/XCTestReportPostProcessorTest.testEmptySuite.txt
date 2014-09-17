@@ -1,0 +1,3 @@
+Test Suite 'All tests' started at 2014-09-17 04:33:41 +0000
+Test Suite 'All tests' failed at 2014-09-17 04:33:41 +0000.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds

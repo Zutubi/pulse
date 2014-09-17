@@ -1,0 +1,409 @@
+Test Suite 'All tests' started at 2014-09-17 04:33:41 +0000
+Test Suite 'POZKitTests.xctest' started at 2014-09-17 04:33:41 +0000
+Test Suite 'NSDataUtilityTest' started at 2014-09-17 04:33:41 +0000
+Test Case '-[NSDataUtilityTest testMd5]' started.
+Test Case '-[NSDataUtilityTest testMd5]' passed (0.002 seconds).
+Test Case '-[NSDataUtilityTest testSha1]' started.
+Test Case '-[NSDataUtilityTest testSha1]' passed (0.000 seconds).
+Test Case '-[NSDataUtilityTest testSha256]' started.
+Test Case '-[NSDataUtilityTest testSha256]' passed (0.000 seconds).
+Test Suite 'NSDataUtilityTest' passed at 2014-09-17 04:33:41 +0000.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.004) seconds
+Test Suite 'NSStringUtilityTest' started at 2014-09-17 04:33:41 +0000
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixCaseInsensitive]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixCaseInsensitive]' passed (0.005 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixEmptyPrefix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixEmptyPrefix]' passed (0.001 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixEmptyString]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixEmptyString]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixMatchingPrefix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixMatchingPrefix]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixNonMatchingPrefix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixNonMatchingPrefix]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixRegex]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingPrefixRegex]' passed (0.006 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixCaseInsensitive]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixCaseInsensitive]' passed (0.001 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixEmptyString]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixEmptyString]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixEmptySuffix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixEmptySuffix]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixMatchingSuffix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixMatchingSuffix]' passed (0.000 seconds).
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixNonMatchingSuffix]' started.
+Test Case '-[NSStringUtilityTest testStringByDeletingSuffixNonMatchingSuffix]' passed (0.000 seconds).
+Test Suite 'NSStringUtilityTest' passed at 2014-09-17 04:33:41 +0000.
+	 Executed 11 tests, with 0 failures (0 unexpected) in 0.015 (0.025) seconds
+Test Suite 'NSURLUtilityTest' started at 2014-09-17 04:33:41 +0000
+Test Case '-[NSURLUtilityTest testIsUserStringURL]' started.
+Test Case '-[NSURLUtilityTest testIsUserStringURL]' passed (0.002 seconds).
+Test Suite 'NSURLUtilityTest' passed at 2014-09-17 04:33:41 +0000.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'POZBookmarkTest' started at 2014-09-17 04:33:41 +0000
+Test Case '-[POZBookmarkTest testAddBookmarks]' started.
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/POZBookmarkTest.m:69: error: -[POZBookmarkTest testAddBookmarks] : failed: caught "An error", "Bad error"
+(
+	0   CoreFoundation                      0x00007fff8e49025c __exceptionPreprocess + 172
+	1   libobjc.A.dylib                     0x00007fff8eca1e75 objc_exception_throw + 43
+	2   CoreFoundation                      0x00007fff8e49010c +[NSException raise:format:] + 204
+	3   POZKitTests                         0x00000001005d3261 -[POZBookmarkTest testAddBookmarks] + 97
+	4   CoreFoundation                      0x00007fff8e37b9ac __invoking___ + 140
+	5   CoreFoundation                      0x00007fff8e37b814 -[NSInvocation invoke] + 308
+	6   XCTest                              0x0000000100679941 -[XCTestCase invokeTest] + 253
+	7   XCTest                              0x0000000100679b42 -[XCTestCase performTest:] + 150
+	8   XCTest                              0x0000000100682730 -[XCTest run] + 257
+	9   XCTest                              0x00000001006788bb -[XCTestSuite performTest:] + 379
+	10  XCTest                              0x0000000100682730 -[XCTest run] + 257
+	11  XCTest                              0x00000001006788bb -[XCTestSuite performTest:] + 379
+	12  XCTest                              0x0000000100682730 -[XCTest run] + 257
+	13  XCTest                              0x00000001006788bb -[XCTestSuite performTest:] + 379
+	14  XCTest                              0x0000000100682730 -[XCTest run] + 257
+	15  XCTest                              0x00000001006758cc __25-[XCTestDriver _runSuite]_block_invoke + 56
+	16  XCTest                              0x000000010068139d -[XCTestObservationCenter _observeTestExecutionForBlock:] + 162
+	17  XCTest                              0x0000000100675800 -[XCTestDriver _runSuite] + 269
+	18  XCTest                              0x00000001006763e9 -[XCTestDriver _checkForTestManager] + 678
+	19  XCTest                              0x00000001006855d0 +[XCTestProbe runTests:] + 182
+	20  xctest                              0x0000000100001256 xctest + 4694
+	21  xctest                              0x00000001000015d6 xctest + 5590
+	22  xctest                              0x0000000100000ed3 xctest + 3795
+	23  libdyld.dylib                       0x00007fff8d5735fd start + 1
+)
+Test Case '-[POZBookmarkTest testAddBookmarks]' failed (0.149 seconds).
+Test Case '-[POZBookmarkTest testDeleteBookmarks]' started.
+Test Case '-[POZBookmarkTest testDeleteBookmarks]' passed (0.013 seconds).
+Test Case '-[POZBookmarkTest testFindByUrl]' started.
+Test Case '-[POZBookmarkTest testFindByUrl]' passed (0.003 seconds).
+Test Case '-[POZBookmarkTest testReorderBookmarks]' started.
+Test Case '-[POZBookmarkTest testReorderBookmarks]' passed (0.005 seconds).
+Test Case '-[POZBookmarkTest testRollback]' started.
+Test Case '-[POZBookmarkTest testRollback]' passed (0.004 seconds).
+Test Suite 'POZBookmarkTest' failed at 2014-09-17 04:33:42 +0000.
+	 Executed 5 tests, with 1 failure (1 unexpected) in 0.175 (0.178) seconds
+Test Suite 'POZHtmlRecipeParserTest' started at 2014-09-17 04:33:42 +0000
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesAsiaAuthenticthaitomyumsoup]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesAsiaAuthenticthaitomyumsoup]' passed (0.046 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuBarbecuedchickentikkaskewers]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuBarbecuedchickentikkaskewers]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuBarbecuedchickentikkaskewersPhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuBarbecuedchickentikkaskewersPhone]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuQuickchickencurry]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComAuQuickchickencurry]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComPassoverapplecake]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComPassoverapplecake]' passed (0.032 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComPassoverapplecakePhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesComPassoverapplecakePhone]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesCoUkQuickandeasybrownies]' started.
+Test Case '-[POZHtmlRecipeParserTest testAllrecipesCoUkQuickandeasybrownies]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAuLifestyleYahooComLemonandsultanapuddings]' started.
+Test Case '-[POZHtmlRecipeParserTest testAuLifestyleYahooComLemonandsultanapuddings]' passed (0.020 seconds).
+Test Case '-[POZHtmlRecipeParserTest testAuTvYahooComSpicedlambwithcauliflowertwoways]' started.
+Test Case '-[POZHtmlRecipeParserTest testAuTvYahooComSpicedlambwithcauliflowertwoways]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkRhubarbcrumble]' started.
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkRhubarbcrumble]' passed (0.016 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkRhubarbcrumblePhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkRhubarbcrumblePhone]' passed (0.014 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkSalmonandbroccolitarts]' started.
+Test Case '-[POZHtmlRecipeParserTest testBbcCoUkSalmonandbroccolitarts]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBbcgoodfoodComButtermilkscones]' started.
+Test Case '-[POZHtmlRecipeParserTest testBbcgoodfoodComButtermilkscones]' passed (0.032 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBbcgoodfoodComMustardstuffedchicken]' started.
+Test Case '-[POZHtmlRecipeParserTest testBbcgoodfoodComMustardstuffedchicken]' passed (0.029 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBestrecipesComAuBananapancakes]' started.
+Test Case '-[POZHtmlRecipeParserTest testBestrecipesComAuBananapancakes]' passed (0.016 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBestrecipesComAuSimpleAsparagusAndCamembert]' started.
+Test Case '-[POZHtmlRecipeParserTest testBestrecipesComAuSimpleAsparagusAndCamembert]' passed (0.016 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBettycrockerComBananabread]' started.
+Test Case '-[POZHtmlRecipeParserTest testBettycrockerComBananabread]' passed (0.020 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBlogPlentyofzestComConfitleekhearts]' started.
+Test Case '-[POZHtmlRecipeParserTest testBlogPlentyofzestComConfitleekhearts]' passed (0.013 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBlogPlentyofzestComEarlgreyandlavendercustardtart]' started.
+Test Case '-[POZHtmlRecipeParserTest testBlogPlentyofzestComEarlgreyandlavendercustardtart]' passed (0.014 seconds).
+Test Case '-[POZHtmlRecipeParserTest testBonappetitComVinegarbraisedchickenandonions]' started.
+Test Case '-[POZHtmlRecipeParserTest testBonappetitComVinegarbraisedchickenandonions]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testChannel4ComBlackenedtunasalad]' started.
+Test Case '-[POZHtmlRecipeParserTest testChannel4ComBlackenedtunasalad]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testChowComFreshspinachdip]' started.
+Test Case '-[POZHtmlRecipeParserTest testChowComFreshspinachdip]' passed (0.016 seconds).
+Test Case '-[POZHtmlRecipeParserTest testChowComMushroomandcarrotbulgur]' started.
+Test Case '-[POZHtmlRecipeParserTest testChowComMushroomandcarrotbulgur]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testCookiemonstercookingComMushroomquesadillaswithtomatoandcornsalsa]' started.
+Test Case '-[POZHtmlRecipeParserTest testCookiemonstercookingComMushroomquesadillaswithtomatoandcornsalsa]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testCurtisstoneComGrilledtbonesteakswithchimichurrisauce]' started.
+Test Case '-[POZHtmlRecipeParserTest testCurtisstoneComGrilledtbonesteakswithchimichurrisauce]' passed (0.022 seconds).
+Test Case '-[POZHtmlRecipeParserTest testCurtisstoneComHeartychickennoodlesoup]' started.
+Test Case '-[POZHtmlRecipeParserTest testCurtisstoneComHeartychickennoodlesoup]' passed (0.023 seconds).
+Test Case '-[POZHtmlRecipeParserTest testDeliaonlineComBoeufbourguignoneasy]' started.
+Test Case '-[POZHtmlRecipeParserTest testDeliaonlineComBoeufbourguignoneasy]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testDeliaonlineComTheultimatecarrotcake]' started.
+Test Case '-[POZHtmlRecipeParserTest testDeliaonlineComTheultimatecarrotcake]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEatingwellComOldfashionedgingerbread]' started.
+Test Case '-[POZHtmlRecipeParserTest testEatingwellComOldfashionedgingerbread]' passed (0.020 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEatingwellComOldfashionedgingerbreadPhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testEatingwellComOldfashionedgingerbreadPhone]' passed (0.011 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComFavabeanswithredonionandmint]' started.
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComFavabeanswithredonionandmint]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComFrysbrownies]' started.
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComFrysbrownies]' passed (0.020 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComMangotartwithcoconutcrust]' started.
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComMangotartwithcoconutcrust]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComPerfectpearsalad]' started.
+Test Case '-[POZHtmlRecipeParserTest testEpicuriousComPerfectpearsalad]' passed (0.015 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFinecookingComPlumgalettewithlemoncrust]' started.
+Test Case '-[POZHtmlRecipeParserTest testFinecookingComPlumgalettewithlemoncrust]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodandwineComRoastchickenpanzanella]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodandwineComRoastchickenpanzanella]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodandwineComRoastchickenpanzanellaPhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodandwineComRoastchickenpanzanellaPhone]' passed (0.013 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodComOldfashionedbakedeggcustardtartwithnutmeg]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodComOldfashionedbakedeggcustardtartwithnutmeg]' passed (0.023 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodComTodieforcrockpotroast]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodComTodieforcrockpotroast]' passed (0.022 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComCinfulpeachcobbler]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComCinfulpeachcobbler]' passed (0.027 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComSteakpizzaiola]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComSteakpizzaiola]' passed (0.035 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComSteakpizzaiolaPhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkComSteakpizzaiolaPhone]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkCoUkBeattyschocolatecake]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodnetworkCoUkBeattyschocolatecake]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoodNinemsnComAuAsianchickenandprawnlongsoup]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoodNinemsnComAuAsianchickenandprawnlongsoup]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testFoxComNotyourgrandmaslemonmeringue]' started.
+Test Case '-[POZHtmlRecipeParserTest testFoxComNotyourgrandmaslemonmeringue]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGoodfoodComAuBarbecuebeeffilletwithcurrybutter]' started.
+Test Case '-[POZHtmlRecipeParserTest testGoodfoodComAuBarbecuebeeffilletwithcurrybutter]' passed (0.025 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuBoeufbourguignon]' started.
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuBoeufbourguignon]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuCrabandcornomelette]' started.
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuCrabandcornomelette]' passed (0.017 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuEtonmess]' started.
+Test Case '-[POZHtmlRecipeParserTest testGourmettravellerComAuEtonmess]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGrouprecipesComBittersweetchocolatetartlets]' started.
+Test Case '-[POZHtmlRecipeParserTest testGrouprecipesComBittersweetchocolatetartlets]' passed (0.026 seconds).
+Test Case '-[POZHtmlRecipeParserTest testGrouprecipesComOldfashionedspongetoffee]' started.
+Test Case '-[POZHtmlRecipeParserTest testGrouprecipesComOldfashionedspongetoffee]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testJamieoliverComBestroastlegoflamb]' started.
+Test Case '-[POZHtmlRecipeParserTest testJamieoliverComBestroastlegoflamb]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testMarthastewartComSearedsirloinsteakwithonionrelish]' started.
+Test Case '-[POZHtmlRecipeParserTest testMarthastewartComSearedsirloinsteakwithonionrelish]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testMyrecipesComChickenandlemonpotstickerswithsoyscalliondippingsauce]' started.
+Test Case '-[POZHtmlRecipeParserTest testMyrecipesComChickenandlemonpotstickerswithsoyscalliondippingsauce]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testMyRecipesComChocolatepuddings]' started.
+Test Case '-[POZHtmlRecipeParserTest testMyRecipesComChocolatepuddings]' passed (0.016 seconds).
+Test Case '-[POZHtmlRecipeParserTest testNigellaComGoujonsofsolewithdillmayonnaise]' started.
+Test Case '-[POZHtmlRecipeParserTest testNigellaComGoujonsofsolewithdillmayonnaise]' passed (0.014 seconds).
+Test Case '-[POZHtmlRecipeParserTest testNigellaComInstantchocolatemousse]' started.
+Test Case '-[POZHtmlRecipeParserTest testNigellaComInstantchocolatemousse]' passed (0.013 seconds).
+Test Case '-[POZHtmlRecipeParserTest testRachaelrayshowComButternutandapplegalette]' started.
+Test Case '-[POZHtmlRecipeParserTest testRachaelrayshowComButternutandapplegalette]' passed (0.015 seconds).
+Test Case '-[POZHtmlRecipeParserTest testRachaelrayshowComSouffléfrittatawithleeks]' started.
+Test Case '-[POZHtmlRecipeParserTest testRachaelrayshowComSouffléfrittatawithleeks]' passed (0.015 seconds).
+Test Case '-[POZHtmlRecipeParserTest testSimplyrecipesComCarneasada]' started.
+Test Case '-[POZHtmlRecipeParserTest testSimplyrecipesComCarneasada]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComBroiledorgrilledpollosabroso]' started.
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComBroiledorgrilledpollosabroso]' passed (0.124 seconds).
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComBruschettawithtomatoandbasil]' started.
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComBruschettawithtomatoandbasil]' passed (0.033 seconds).
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComLoadedphillycheesesteakbakedpotato]' started.
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComLoadedphillycheesesteakbakedpotato]' passed (0.048 seconds).
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComSkinnycranberryswirlcheesecakesquares]' started.
+Test Case '-[POZHtmlRecipeParserTest testSkinnytasteComSkinnycranberryswirlcheesecakesquares]' passed (0.063 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuCinnamonteacake]' started.
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuCinnamonteacake]' passed (0.030 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuCinnamonteacakePhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuCinnamonteacakePhone]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespicepork]' started.
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespicepork]' passed (0.026 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespiceporkandgreens]' started.
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespiceporkandgreens]' passed (0.026 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespiceporkPhone]' started.
+Test Case '-[POZHtmlRecipeParserTest testTasteComAuFivespiceporkPhone]' passed (0.018 seconds).
+Test Case '-[POZHtmlRecipeParserTest testTenplayAuSaladofbutterpoachedlobster]' started.
+Test Case '-[POZHtmlRecipeParserTest testTenplayAuSaladofbutterpoachedlobster]' passed (0.019 seconds).
+Test Case '-[POZHtmlRecipeParserTest testUktvCoUkChocolatehazelnutandcarameltart]' started.
+Test Case '-[POZHtmlRecipeParserTest testUktvCoUkChocolatehazelnutandcarameltart]' passed (0.021 seconds).
+Test Case '-[POZHtmlRecipeParserTest testWilliamssonomaComStirfriedtofuwithmushroomsandgreens]' started.
+Test Case '-[POZHtmlRecipeParserTest testWilliamssonomaComStirfriedtofuwithmushroomsandgreens]' passed (0.031 seconds).
+Test Suite 'POZHtmlRecipeParserTest' passed at 2014-09-17 04:33:43 +0000.
+	 Executed 72 tests, with 0 failures (0 unexpected) in 1.627 (1.661) seconds
+Test Suite 'POZRecipeArchiverTest' started at 2014-09-17 04:33:43 +0000
+Test Case '-[POZRecipeArchiverTest testEmptyRecipe]' started.
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:111: error: -[POZRecipeArchiverTest testEmptyRecipe] : failed - Un-archiving failed with error: Error Domain=POZErr Code=0 "Could not unpack recipe archive" UserInfo=0x1003cfa10 {NSLocalizedDescription=Could not unpack recipe archive}
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:142: error: -[POZRecipeArchiverTest testEmptyRecipe] : (((NSUInteger)1) equal to ([recipes count])) failed: ("1") is not equal to ("0")
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:144: error: -[POZRecipeArchiverTest testEmptyRecipe] : (([restoredRecipe isEqualToRecipe:_emptyRecipe logDifference:YES]) is true) failed - Expected:
+{
+  "name" : "Nothing Here",
+  "photoShas" : [
+
+  ],
+  "preparationTime" : -1,
+  "cookTime" : -1,
+  "totalTime" : -1,
+  "ingredientGroups" : [
+
+  ],
+  "tags" : [
+
+  ]
+}
+Got:
+(null)
+
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:145: error: -[POZRecipeArchiverTest testEmptyRecipe] : (([restoredRecipe.name hasPrefix:_emptyRecipe.name]) is true) failed
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:154: error: -[POZRecipeArchiverTest testEmptyRecipe] : ((savedRecipe) != nil) failed
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/archive/POZRecipeArchiverTest.m:155: error: -[POZRecipeArchiverTest testEmptyRecipe] : (([savedRecipe isEqualToRecipe:_emptyRecipe logDifference:YES]) is true) failed - Expected:
+{
+  "name" : "Nothing Here",
+  "photoShas" : [
+
+  ],
+  "preparationTime" : -1,
+  "cookTime" : -1,
+  "totalTime" : -1,
+  "ingredientGroups" : [
+
+  ],
+  "tags" : [
+
+  ]
+}
+Got:
+(null)
+
+Test Case '-[POZRecipeArchiverTest testEmptyRecipe]' failed (0.028 seconds).
+Test Case '-[POZRecipeArchiverTest testMultipleRecipes]' started.
+Test Case '-[POZRecipeArchiverTest testMultipleRecipes]' passed (0.036 seconds).
+Test Case '-[POZRecipeArchiverTest testSimpleArchive]' started.
+Test Case '-[POZRecipeArchiverTest testSimpleArchive]' passed (0.031 seconds).
+Test Case '-[POZRecipeArchiverTest testTagCreation]' started.
+Test Case '-[POZRecipeArchiverTest testTagCreation]' passed (0.024 seconds).
+Test Suite 'POZRecipeArchiverTest' failed at 2014-09-17 04:33:43 +0000.
+	 Executed 4 tests, with 6 failures (0 unexpected) in 0.119 (0.121) seconds
+Test Suite 'POZRecipeCleanerTest' started at 2014-09-17 04:33:43 +0000
+Test Case '-[POZRecipeCleanerTest testCleanAsciiIngredients]' started.
+Test Case '-[POZRecipeCleanerTest testCleanAsciiIngredients]' passed (0.001 seconds).
+Test Case '-[POZRecipeCleanerTest testCleanName]' started.
+Test Case '-[POZRecipeCleanerTest testCleanName]' passed (0.008 seconds).
+Test Suite 'POZRecipeCleanerTest' passed at 2014-09-17 04:33:43 +0000.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.009 (0.011) seconds
+Test Suite 'POZRecipeQueryTest' started at 2014-09-17 04:33:43 +0000
+Test Case '-[POZRecipeQueryTest testFetchAllChanged]' started.
+Test Case '-[POZRecipeQueryTest testFetchAllChanged]' passed (0.014 seconds).
+Test Case '-[POZRecipeQueryTest testFetchAllDeleted]' started.
+Test Case '-[POZRecipeQueryTest testFetchAllDeleted]' passed (0.013 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringAndTag]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringAndTag]' passed (0.012 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringDifferentComponents]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringDifferentComponents]' passed (0.012 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringIngredient]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringIngredient]' passed (0.011 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringName]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringName]' passed (0.010 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringSource]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringSource]' passed (0.011 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByStringTag]' started.
+Test Case '-[POZRecipeQueryTest testFetchByStringTag]' passed (0.011 seconds).
+Test Case '-[POZRecipeQueryTest testFetchByTag]' started.
+Test Case '-[POZRecipeQueryTest testFetchByTag]' passed (0.010 seconds).
+Test Case '-[POZRecipeQueryTest testFetchTagByName]' started.
+Test Case '-[POZRecipeQueryTest testFetchTagByName]' passed (0.010 seconds).
+Test Suite 'POZRecipeQueryTest' passed at 2014-09-17 04:33:43 +0000.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.112 (0.117) seconds
+Test Suite 'POZRecipeStoreUpgraderTest' started at 2014-09-17 04:33:43 +0000
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom1_1]' started.
+2014-09-17 14:33:44.093 xctest[11665:303] Upgrading to model POZKit 3
+2014-09-17 14:33:44.233 xctest[11665:303] Upgrading to model POZKit 4
+2014-09-17 14:33:44.383 xctest[11665:303] Upgrading to model POZKit 5
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom1_1]' passed (0.542 seconds).
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom2_1]' started.
+2014-09-17 14:33:44.657 xctest[11665:303] Upgrading to model POZKit 4
+2014-09-17 14:33:44.810 xctest[11665:303] Upgrading to model POZKit 5
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom2_1]' passed (0.436 seconds).
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom2_2]' started.
+2014-09-17 14:33:45.088 xctest[11665:303] Upgrading to model POZKit 5
+Test Case '-[POZRecipeStoreUpgraderTest testUpgradeFrom2_2]' passed (0.294 seconds).
+Test Suite 'POZRecipeStoreUpgraderTest' passed at 2014-09-17 04:33:45 +0000.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 1.272 (1.274) seconds
+Test Suite 'POZRecipeTest' started at 2014-09-17 04:33:45 +0000
+Test Case '-[POZRecipeTest testAddPhoto]' started.
+Test Case '-[POZRecipeTest testAddPhoto]' passed (0.013 seconds).
+Test Case '-[POZRecipeTest testAddPhotoChildContext]' started.
+Test Case '-[POZRecipeTest testAddPhotoChildContext]' passed (0.014 seconds).
+Test Case '-[POZRecipeTest testAddPhotoThatAlreadyExistsInRecipe]' started.
+Test Case '-[POZRecipeTest testAddPhotoThatAlreadyExistsInRecipe]' passed (0.014 seconds).
+Test Case '-[POZRecipeTest testDefaultImage]' started.
+Test Case '-[POZRecipeTest testDefaultImage]' passed (0.021 seconds).
+Test Case '-[POZRecipeTest testDeleteAllSynced]' started.
+Test Case '-[POZRecipeTest testDeleteAllSynced]' passed (0.011 seconds).
+Test Case '-[POZRecipeTest testDeleteRecipe]' started.
+Test Case '-[POZRecipeTest testDeleteRecipe]' passed (0.011 seconds).
+Test Case '-[POZRecipeTest testDeleteRecipeChildContext]' started.
+Test Case '-[POZRecipeTest testDeleteRecipeChildContext]' passed (0.013 seconds).
+Test Case '-[POZRecipeTest testDeleteRecipeThatHasBeenSynced]' started.
+Test Case '-[POZRecipeTest testDeleteRecipeThatHasBeenSynced]' passed (0.012 seconds).
+Test Case '-[POZRecipeTest testDeleteTag]' started.
+Test Case '-[POZRecipeTest testDeleteTag]' passed (0.009 seconds).
+Test Case '-[POZRecipeTest testInsertTrivalRecipe]' started.
+Test Case '-[POZRecipeTest testInsertTrivalRecipe]' passed (0.007 seconds).
+Test Case '-[POZRecipeTest testInsertTrivalRecipeChildContext]' started.
+Test Case '-[POZRecipeTest testInsertTrivalRecipeChildContext]' passed (0.007 seconds).
+Test Case '-[POZRecipeTest testIsolationOfChildContext]' started.
+Test Case '-[POZRecipeTest testIsolationOfChildContext]' passed (0.011 seconds).
+Test Case '-[POZRecipeTest testPhotoGarbageCollection]' started.
+Test Case '-[POZRecipeTest testPhotoGarbageCollection]' passed (0.023 seconds).
+Test Case '-[POZRecipeTest testRecipeChangeObserver]' started.
+Test Case '-[POZRecipeTest testRecipeChangeObserver]' passed (0.009 seconds).
+Test Case '-[POZRecipeTest testRecipeModificationFlags]' started.
+Test Case '-[POZRecipeTest testRecipeModificationFlags]' passed (0.012 seconds).
+Test Case '-[POZRecipeTest testRemovePhoto]' started.
+Test Case '-[POZRecipeTest testRemovePhoto]' passed (0.011 seconds).
+Test Case '-[POZRecipeTest testRemovePhotoChildContext]' started.
+Test Case '-[POZRecipeTest testRemovePhotoChildContext]' passed (0.013 seconds).
+Test Case '-[POZRecipeTest testRemoveUncommittedPhoto]' started.
+Test Case '-[POZRecipeTest testRemoveUncommittedPhoto]' passed (0.011 seconds).
+Test Case '-[POZRecipeTest testTagForName]' started.
+Test Case '-[POZRecipeTest testTagForName]' passed (0.006 seconds).
+Test Case '-[POZRecipeTest testUncommittedPhotoAdd]' started.
+Test Case '-[POZRecipeTest testUncommittedPhotoAdd]' passed (0.012 seconds).
+Test Case '-[POZRecipeTest testUncommittedPhotoRemove]' started.
+Test Case '-[POZRecipeTest testUncommittedPhotoRemove]' passed (0.013 seconds).
+Test Case '-[POZRecipeTest testValidateRecipeName]' started.
+Test Case '-[POZRecipeTest testValidateRecipeName]' passed (0.006 seconds).
+Test Suite 'POZRecipeTest' passed at 2014-09-17 04:33:45 +0000.
+	 Executed 22 tests, with 0 failures (0 unexpected) in 0.259 (0.269) seconds
+Test Suite 'POZTimeTest' started at 2014-09-17 04:33:45 +0000
+Test Case '-[POZTimeTest testDurationParseDays]' started.
+Test Case '-[POZTimeTest testDurationParseDays]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseFractions]' started.
+Test Case '-[POZTimeTest testDurationParseFractions]' passed (0.001 seconds).
+Test Case '-[POZTimeTest testDurationParseInvalid]' started.
+Test Case '-[POZTimeTest testDurationParseInvalid]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseLeadingJunk]' started.
+Test Case '-[POZTimeTest testDurationParseLeadingJunk]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseMonths]' started.
+Test Case '-[POZTimeTest testDurationParseMonths]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseNegative]' started.
+Test Case '-[POZTimeTest testDurationParseNegative]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseRecipeTypical]' started.
+Test Case '-[POZTimeTest testDurationParseRecipeTypical]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseSeconds]' started.
+Test Case '-[POZTimeTest testDurationParseSeconds]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseTrailingJunk]' started.
+Test Case '-[POZTimeTest testDurationParseTrailingJunk]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testDurationParseYears]' started.
+Test Case '-[POZTimeTest testDurationParseYears]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testLapsedRounding]' started.
+Test Case '-[POZTimeTest testLapsedRounding]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testTimeFormatLong]' started.
+Test Case '-[POZTimeTest testTimeFormatLong]' passed (0.000 seconds).
+Test Case '-[POZTimeTest testTimeFormatMedium]' started.
+/Users/jsankey/repo/pozest/POZKit/POZKitTests/utility/POZTimeTest.m:32: error: -[POZTimeTest testTimeFormatMedium] : ((@"58 mins") equal to (POZTimeFormat(59, POZTimeLabelStyleMedium))) failed: ("58 mins") is not equal to ("59 mins")
+Test Case '-[POZTimeTest testTimeFormatMedium]' failed (0.001 seconds).
+Test Case '-[POZTimeTest testTimeFormatShort]' started.
+Test Case '-[POZTimeTest testTimeFormatShort]' passed (0.000 seconds).
+Test Suite 'POZTimeTest' failed at 2014-09-17 04:33:45 +0000.
+	 Executed 14 tests, with 1 failure (0 unexpected) in 0.006 (0.012) seconds
+Test Suite 'POZKitTests.xctest' failed at 2014-09-17 04:33:45 +0000.
+	 Executed 147 tests, with 8 failures (1 unexpected) in 3.599 (3.679) seconds
+Test Suite 'All tests' failed at 2014-09-17 04:33:45 +0000.
+	 Executed 147 tests, with 8 failures (1 unexpected) in 3.599 (3.681) seconds

@@ -101,6 +101,13 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("xctest" "xctest post-processor" "accept" false)
+            <td>
+                A new post-processor plugin has been added to parse test logs from XCTest, the
+                preferred test framework in newer versions of Xcode.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("deprevisions" "improved dependency revision handling" "accept" false)
             <td>
                 Revision handling across dependent projects is now more flexible, making it easier

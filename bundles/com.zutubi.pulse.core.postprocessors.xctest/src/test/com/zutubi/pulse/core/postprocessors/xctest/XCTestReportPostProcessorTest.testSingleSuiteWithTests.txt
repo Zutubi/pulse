@@ -1,0 +1,9 @@
+Test Suite 'NSDataUtilityTest' started at 2014-09-17 04:33:41 +0000
+Test Case '-[NSDataUtilityTest testMd5]' started.
+Test Case '-[NSDataUtilityTest testMd5]' passed (0.002 seconds).
+Test Case '-[NSDataUtilityTest testSha1]' started.
+Test Case '-[NSDataUtilityTest testSha1]' passed (0.000 seconds).
+Test Case '-[NSDataUtilityTest testSha256]' started.
+Test Case '-[NSDataUtilityTest testSha256]' passed (0.000 seconds).
+Test Suite 'NSDataUtilityTest' passed at 2014-09-17 04:33:41 +0000.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.004) seconds
