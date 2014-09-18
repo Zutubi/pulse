@@ -93,12 +93,6 @@
         <property name="interceptorNames" ref="securityInterceptors"/>
     </bean>
 
-    <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
-        <property name="target">
-            <bean class="com.zutubi.pulse.master.model.DefaultResourceManager"/>
-        </property>
-        <property name="interceptorNames" ref="transactionInterceptors"/>
-    </bean>
 
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
@@ -130,6 +124,8 @@
     <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider"/>
 
     <bean id="hostPingService" class="com.zutubi.pulse.master.agent.HostPingService" init-method="init"/>
+
+    <bean id="resourceManager" class="com.zutubi.pulse.master.model.DefaultResourceManager"/>
 
     <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" init-method="init"/>
 
