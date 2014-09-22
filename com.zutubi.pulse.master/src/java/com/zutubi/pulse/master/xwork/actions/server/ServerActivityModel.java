@@ -191,13 +191,12 @@ public class ServerActivityModel
 
     public static class ActiveBuildModel extends BuildModel
     {
-        private boolean cancelPermitted;
         private boolean hidden;
 
         public ActiveBuildModel(BuildResult buildResult, Urls urls, boolean cancelPermitted)
         {
             super(buildResult, urls, false);
-            this.cancelPermitted = cancelPermitted;
+            setCancelPermitted(cancelPermitted);
             hidden = false;
         }
 
@@ -205,11 +204,6 @@ public class ServerActivityModel
         {
             super(0, 0, personal, null, null, null, null, null, null, null, null);
             hidden = true;
-        }
-
-        public boolean isCancelPermitted()
-        {
-            return cancelPermitted;
         }
 
         public boolean isHidden()

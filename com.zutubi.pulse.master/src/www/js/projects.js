@@ -228,7 +228,7 @@ Zutubi.ConcreteProject.prototype = {
         }
         else
         {
-            items = getBuildMenuItems('browse/projects/' + encodeURIComponent(this.data.name) + '/builds/' + menuArg + '/');
+            items = getBuildMenuLinks('browse/projects/' + encodeURIComponent(this.data.name) + '/builds/' + menuArg + '/');
         }
 
         return items;

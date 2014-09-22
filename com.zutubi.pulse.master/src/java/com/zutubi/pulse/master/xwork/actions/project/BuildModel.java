@@ -32,6 +32,7 @@ public class BuildModel extends ResultModel
     private String maturity;
     private String version;
     private boolean pinned;
+    private boolean cancelPermitted;
     private List<BuildStageModel> stages = new LinkedList<BuildStageModel>();
     private CommentSummaryModel comments;
 
@@ -155,6 +156,16 @@ public class BuildModel extends ResultModel
         this.pinned = pinned;
     }
 
+    public boolean isCancelPermitted()
+    {
+        return cancelPermitted;
+    }
+
+    public void setCancelPermitted(boolean cancelPermitted)
+    {
+        this.cancelPermitted = cancelPermitted;
+    }
+
     public CommentSummaryModel getComments()
     {
         return comments;
@@ -176,5 +187,4 @@ public class BuildModel extends ResultModel
             }
         }, null);
     }
-
 }

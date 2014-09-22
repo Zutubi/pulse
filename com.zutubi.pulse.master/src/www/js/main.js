@@ -646,76 +646,74 @@ function handleCancelResponse(options, success, response)
 
 function cancelQueuedBuild(id)
 {
-    var url, params;
+    var url, params, confirm, status;
     url = window.baseUrl + '/ajax/cancelQueuedBuild.action';
     params = { id: id };
 
     if (id === -1)
     {
-        window.dialogBox = Ext.Msg.show({
-            title: 'Confirm',
-            msg: 'Are you sure you want to cancel all queued builds?',
-            fn: function(btn, text) {
-                    window.dialogBox = null;
-                    if (btn === 'yes')
-                    {
-                        showStatus('Cancelling all queued builds...', 'working');
-                        runAjaxRequest({
-                            url: url,
-                            params: params,
-                            callback: handleCancelResponse
-                        });
-                    }
-            },
-            width: 400,
-            buttons: Ext.Msg.YESNO
-        });
+        confirm = 'all queued builds';
+        status = 'queued builds';
     }
     else
     {
-        showStatus('Cancelling queued build...', 'working');
-        runAjaxRequest({
-            url: url,
-            params: { id: id },
-            callback: handleCancelResponse
-        });
+        confirm = 'this build';
+        status = 'queued build';
     }
+
+    window.dialogBox = Ext.Msg.show({
+        title: 'Confirm',
+        msg: 'Are you sure you want to cancel ' + confirm + '?',
+        fn: function(btn, text) {
+                window.dialogBox = null;
+                if (btn === 'yes')
+                {
+                    showStatus('Cancelling ' + status + '...', 'working');
+                    runAjaxRequest({
+                        url: url,
+                        params: params,
+                        callback: handleCancelResponse
+                    });
+                }
+        },
+        width: 400,
+        buttons: Ext.Msg.YESNO
+    });
 }
 
 function cancelBuild(id, kill)
 {
-    var url, params;
+    var url, params, confirm, status;
     url = window.baseUrl + '/ajax/cancelBuild.action';
     params = { buildId: id, kill: kill };
 
     if (id === -1)
     {
-        window.dialogBox = Ext.Msg.show({
-            title: 'Confirm',
-            msg: 'Are you sure you want to terminate all running builds?',
-            fn: function(btn, text) {
-                    window.dialogBox = null;
-                    if (btn === 'yes')
-                    {
-                        showStatus('Terminating all builds...', 'working');
-                        runAjaxRequest({
-                            url: url,
-                            params: params,
-                            callback: handleCancelResponse
-                        });
-                    }
-            },
-            width: 400,
-            buttons: Ext.Msg.YESNO
-        });
+        confirm = 'all running builds';
+        status = 'all builds';
     }
     else
     {
-        showStatus('Requesting build termination...', 'working');
-        runAjaxRequest({
-            url: url,
-            params: params,
-            callback: handleCancelResponse
-        });
+        confirm = 'this build';
+        status = 'build';
     }
+
+    window.dialogBox = Ext.Msg.show({
+        title: 'Confirm',
+        msg: 'Are you sure you want to terminate ' + confirm + '?',
+        fn: function(btn, text) {
+                window.dialogBox = null;
+                if (btn === 'yes')
+                {
+                    showStatus('Terminating ' + status + '...', 'working');
+                    runAjaxRequest({
+                        url: url,
+                        params: params,
+                        callback: handleCancelResponse
+                    });
+                }
+        },
+        width: 400,
+        buttons: Ext.Msg.YESNO
+    });
 }

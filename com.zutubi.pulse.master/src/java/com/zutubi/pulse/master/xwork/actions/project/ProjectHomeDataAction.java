@@ -18,6 +18,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.ManualTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
@@ -185,6 +186,14 @@ public class ProjectHomeDataAction extends ProjectActionBase
         final List<BuildModel> activity = model.getActivity();
         activity.addAll(transform(queued, new QueuedToBuildModelFunction(projectConfig.getName(), projectConfig)));
         activity.addAll(transform(inProgress, buildMapping));
+
+        if (accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, projectConfig))
+        {
+            for (BuildModel buildModel : model.getActivity())
+            {
+                buildModel.setCancelPermitted(true);
+            }
+        }
     }
 
     private void addRecent(List<BuildResult> completed, BuildResultToModelFunction buildMapping)

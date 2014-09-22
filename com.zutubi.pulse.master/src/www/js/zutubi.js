@@ -19,7 +19,7 @@ function getBuildMenuItem(buildLink, itemId, image)
     };
 }
 
-function getBuildMenuItems(buildLink)
+function getBuildMenuLinks(buildLink)
 {
     return [
         getBuildMenuItem(buildLink, 'summary', 'information.gif'),
@@ -28,6 +28,22 @@ function getBuildMenuItems(buildLink)
         getBuildMenuItem(buildLink, 'changes', 'page_code.gif'),
         getBuildMenuItem(buildLink, 'artifacts', 'folder_page.gif')
     ];
+}
+
+function getBuildMenuItems(buildModel)
+{
+    var items, onclick;
+    items = getBuildMenuLinks(buildModel.link);
+    if (buildModel.cancelPermitted)
+    {
+        items.push({
+            id: 'cancel',
+            image: 'cancel.gif',
+            onclick: 'cancelBuild(' + buildModel.id + ', false); return false'
+        });
+    }
+
+    return items;
 }
 
 function getCommentsTooltip(model)

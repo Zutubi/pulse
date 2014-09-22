@@ -292,12 +292,12 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
         ),
         
         buildId: function(number, build) {
-            var commentsTip;
+            var commentsTip, pending;
             if (number > 0)
             {
                 if (build.link)
                 {
-                    Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build.link]));
+                    Zutubi.MenuManager.registerMenu('bactions-' + build.id, getBuildMenuItems.createDelegate(this, [build]));
                     commentsTip = getCommentsTooltip(build);
                     return Zutubi.pulse.project.renderers.ID_TEMPLATE.apply({
                         number: number,
@@ -313,7 +313,13 @@ window.Zutubi.pulse.project = window.Zutubi.pulse.project || {
             }
             else
             {
-                return '[pending]';
+                pending = '[pending]';
+                if (build.cancelPermitted)
+                {
+                    pending += ' <a href="#" class="unadorned" onclick="cancelQueuedBuild(' + build.id + '); return false"><img src="' + window.baseUrl + '/images/cancel.gif" alt="cancel"/></a>';
+                }
+
+                return pending;
             }
         },
         
