@@ -130,9 +130,16 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("agentclean" "clean agent directories" "accept" false)
+            <td>
+                A new action makes it easy to clean the build directories on a specific
+                agent.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("scmupgrades" "scm upgrades" "accept" false)
             <td>
-                Upgrades to SCM plugins support the latest Subversion (1.8) and Git (2.0)
+                Upgrades to SCM plugins support the latest Subversion (1.8) and Git (2.x)
                 versions. Git partial clone support has been revamped as part of the upgrade.
             </td>
         </tr>
