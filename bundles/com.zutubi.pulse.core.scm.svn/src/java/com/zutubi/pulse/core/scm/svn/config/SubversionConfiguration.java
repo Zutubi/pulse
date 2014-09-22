@@ -15,13 +15,20 @@ import java.util.List;
 /**
  * Subversion SCM configuration.
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "cleanOnUpdateFailure", "useExport", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "includedPaths", "excludedPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "cleanOnUpdateFailure", "useExport", "showChangedPaths", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "includedPaths", "excludedPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration implements Validateable
 {
     private static final Messages I18N = Messages.getInstance(SubversionConfiguration.class);
-    
+
+    public enum ChangedPaths
+    {
+        NEVER,
+        UPDATE_ONLY,
+        ALWAYS,
+    }
+
     /**
      * Describes if and how svn:externals will be monitored.
      */
@@ -56,9 +63,11 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     private String keyfilePassphrase;
 
     @Wizard.Ignore
-    private boolean cleanOnUpdateFailure = true;
-    @Wizard.Ignore
     private boolean useExport;
+    @Wizard.Ignore @Required
+    private ChangedPaths showChangedPaths = ChangedPaths.ALWAYS;
+    @Wizard.Ignore
+    private boolean cleanOnUpdateFailure = true;
     @Wizard.Ignore
     @ControllingSelect(dependentFields = {"externalMonitorPaths"}, enableSet = {"MONITOR_SELECTED"})
     private ExternalsMonitoring externalsMonitoring = ExternalsMonitoring.DO_NOT_MONITOR;
@@ -129,6 +138,16 @@ public class SubversionConfiguration extends PollableScmConfiguration implements
     public void setKeyfilePassphrase(String keyfilePassphrase)
     {
         this.keyfilePassphrase = keyfilePassphrase;
+    }
+
+    public ChangedPaths getShowChangedPaths()
+    {
+        return showChangedPaths;
+    }
+
+    public void setShowChangedPaths(ChangedPaths showChangedPaths)
+    {
+        this.showChangedPaths = showChangedPaths;
     }
 
     public boolean isCleanOnUpdateFailure()

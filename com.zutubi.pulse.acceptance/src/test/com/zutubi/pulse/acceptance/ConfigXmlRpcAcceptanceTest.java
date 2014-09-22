@@ -730,7 +730,7 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         {
             rpcClient.RemoteApi.waitForAgentStatus(agentName, AgentStatus.IDLE, AGENT_STATUS_TIMEOUT);
             Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
-            assertEquals(asList(ACTION_DISABLE, ACTION_PING, ACTION_GC), new LinkedList<String>(actions));
+            assertEquals(asList(ACTION_DISABLE, ACTION_PING, ACTION_CLEAN), new LinkedList<String>(actions));
         }
         finally
         {
