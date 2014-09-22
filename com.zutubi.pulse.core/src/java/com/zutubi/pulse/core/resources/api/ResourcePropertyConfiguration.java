@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
+import com.zutubi.tove.annotations.TextArea;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 
 @Form(fieldOrder = { "name", "value", "description", "addToEnvironment", "addToPath" })
@@ -11,6 +12,7 @@ import com.zutubi.tove.config.api.AbstractNamedConfiguration;
 @SymbolicName("zutubi.resourceProperty")
 public class ResourcePropertyConfiguration extends AbstractNamedConfiguration
 {
+    @TextArea(autoSize = true)
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;

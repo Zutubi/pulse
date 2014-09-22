@@ -44,4 +44,12 @@ public @interface TextArea
      */
     public int cols() default DEFAULT_cols;
 
+    public static boolean DEFAULT_autoSize = false;
+
+    /**
+     * @return true to set the number of rows automatically based on the default width and current
+     *         field value, this is useful for simple text fields that may have large values
+     */
+    public boolean autoSize() default DEFAULT_autoSize;
+
 }

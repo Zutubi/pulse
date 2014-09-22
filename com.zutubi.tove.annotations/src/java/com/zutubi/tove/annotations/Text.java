@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
 
 /**
  * The text annotation allows you to mark a property for display as a simple form text field.
- *
  */
 @Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface Text
