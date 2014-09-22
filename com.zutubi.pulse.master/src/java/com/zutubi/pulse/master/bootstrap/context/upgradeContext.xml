@@ -214,6 +214,7 @@
                 <ref local="addLiveLogsEnabled"/>
                 <ref local="dependentBuildTriggerRevisionHandling"/>
                 <ref local="addRunBuildHookTaskOnAgents"/>
+                <ref local="addSubversionShowChangedPaths"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1132,4 +1133,7 @@
         <property name="buildNumber" value="207002001"/>
     </bean>
 
+    <bean id="addSubversionShowChangedPaths" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionShowChangedPathsUpgradeTask">
+        <property name="buildNumber" value="207002002"/>
+    </bean>
 </beans>

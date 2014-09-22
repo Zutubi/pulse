@@ -49,6 +49,7 @@ public class SubversionClient implements ScmClient
 
     private boolean cleanOnUpdateFailure = true;
     private boolean useExport = false;
+    private SubversionConfiguration.ChangedPaths showChangedPaths = SubversionConfiguration.ChangedPaths.ALWAYS;
     /**
      * If true, we will monitor all externals by recursively scanning for
      * svn:externals properties.  We also recurse to find externals defined
@@ -271,6 +272,11 @@ public class SubversionClient implements ScmClient
         this.useExport = useExport;
     }
 
+    public void setShowChangedPaths(SubversionConfiguration.ChangedPaths showChangedPaths)
+    {
+        this.showChangedPaths = showChangedPaths;
+    }
+
     public void setMonitorAllExternals(boolean monitorAllExternals)
     {
         this.monitorAllExternals = monitorAllExternals;
@@ -407,7 +413,8 @@ public class SubversionClient implements ScmClient
         if (handler != null)
         {
             handler.status("Checking out " + repository.getLocation().toString() + " at revision " + svnRevision);
-            updateClient.setEventHandler(new ChangeEventHandler(handler));
+            // FIXME files
+            updateClient.setEventHandler(new ChangeEventHandler(handler, showChangedPaths == SubversionConfiguration.ChangedPaths.ALWAYS));
         }
 
         try
@@ -792,7 +799,7 @@ public class SubversionClient implements ScmClient
             if (handler != null)
             {
                 handler.status("Updating from " + repository.getLocation().toString() + " at revision " + svnRevision);
-                client.setEventHandler(new ChangeEventHandler(handler));
+                client.setEventHandler(new ChangeEventHandler(handler, showChangedPaths != SubversionConfiguration.ChangedPaths.NEVER));
             }
 
             update(context, context.getWorkingDir(), svnRevision, client);
@@ -1077,10 +1084,12 @@ public class SubversionClient implements ScmClient
         private static final String FORMAT_LABELS = "%s%s%s  ";
 
         private ScmFeedbackHandler handler;
+        private boolean showPaths;
 
-        public ChangeEventHandler(ScmFeedbackHandler handler)
+        public ChangeEventHandler(ScmFeedbackHandler handler, boolean showPaths)
         {
             this.handler = handler;
+            this.showPaths = showPaths;
         }
 
         public void handleEvent(SVNEvent event, double progress)
@@ -1096,7 +1105,7 @@ public class SubversionClient implements ScmClient
                         handler.status("External at revision " + event.getRevision());
                     }
                 }
-                else
+                else if (showPaths)
                 {
                     String pathChangeLabel;
                     String propertiesChangeLabel = LABEL_NONE;
