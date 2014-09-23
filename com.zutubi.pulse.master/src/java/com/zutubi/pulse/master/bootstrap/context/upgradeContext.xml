@@ -215,6 +215,7 @@
                 <ref local="dependentBuildTriggerRevisionHandling"/>
                 <ref local="addRunBuildHookTaskOnAgents"/>
                 <ref local="addSubversionShowChangedPaths"/>
+                <ref local="addXcodeWorkspace"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1135,5 +1136,9 @@
 
     <bean id="addSubversionShowChangedPaths" class="com.zutubi.pulse.master.upgrade.tasks.AddSubversionShowChangedPathsUpgradeTask">
         <property name="buildNumber" value="207002002"/>
+    </bean>
+
+    <bean id="addXcodeWorkspace" class="com.zutubi.pulse.master.upgrade.tasks.AddXcodeWorkspaceUpgradeTask">
+        <property name="buildNumber" value="207002003"/>
     </bean>
 </beans>

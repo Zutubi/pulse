@@ -26,18 +26,15 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
         assertTrue(result.failed());
         List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(3, features.size());
-        assertEquals("buffer line\n" +
-                     "some warning: here\n" +
+        assertEquals("clang: warning: here\n" +
                      "buffer line\n" +
                      "buffer line\n" +
                      "buffer line", features.get(0).getSummary());
-        assertEquals("buffer line\n" +
-                     "Uncaught exception: Blah\n" +
+        assertEquals("Uncaught exception: Blah\n" +
                      "buffer line\n" +
                      "buffer line\n" +
                      "buffer line", features.get(1).getSummary());
-        assertEquals("buffer line\n" +
-                     "There was an Assertion failure\n" +
+        assertEquals("There was an Assertion failure\n" +
                      "buffer line\n" +
                      "buffer line\n" +
                      "buffer line", features.get(2).getSummary());
@@ -52,7 +49,7 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
         assertTrue(result.failed());
         List<PersistentFeature> features = artifact.getFeatures();
         assertEquals(3, features.size());
-        assertEquals("some warning: here", features.get(0).getSummary());
+        assertEquals("clang: warning: here", features.get(0).getSummary());
         assertEquals("Uncaught exception: Blah", features.get(1).getSummary());
         assertEquals("There was an Assertion failure", features.get(2).getSummary());
     }
@@ -80,8 +77,7 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
         CommandResult result = createAndProcessArtifact(getName(), pp);
         assertTrue(result.failed());
         List<PersistentFeature> features = artifact.getFeatures();
-        assertEquals(2, features.size());
+        assertEquals(1, features.size());
         assertEquals("/Users/joe/pulse/data/agents/macbuild1/recipes/42598404/base/products/ngs/src/client/ios/interact/../ngslib/ngslib/NGSMenuFieldConfig.h:10:9: fatal error: 'NGSMenuEntry.h' file not found", features.get(0).getSummary());
-        assertEquals("1 error generated.", features.get(1).getSummary());
     }
 }

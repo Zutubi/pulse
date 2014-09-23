@@ -101,6 +101,20 @@
             </td>
         </tr>
         <tr>
+            #actionHeader("xcode" "xcode command updates" "accept" false)
+            <td>
+                The Xcode command has been updated to include fields for modern projects that use
+                workspaces and schemes, and to post-process output from the clang/llvm toolchain.
+            </td>
+        </tr>
+        <tr>
+            #actionHeader("clang" "clang output post-processor" "accept" false)
+            <td>
+                A new post-processor plugin has been added to parse output from clang and related
+                tools (e.g. lld) to find common error and warning messages.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("xctest" "xctest post-processor" "accept" false)
             <td>
                 A new post-processor plugin has been added to parse test logs from XCTest, the

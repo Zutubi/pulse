@@ -24,6 +24,7 @@ public class ClangPostProcessorTest extends PostProcessorTestCase
     {
         TestPostProcessorContext context = runProcessor(pp);
         assertThat(context.getFeatures(), hasOrderedErrors(
+                "clang: fatal error: i made this up",
                 "main.c:3:10: error: initializing 'float' with an expression of incompatible type 'char [6]'",
                 "main.c:8:10: error: expected ';' at end of declaration"
         ));

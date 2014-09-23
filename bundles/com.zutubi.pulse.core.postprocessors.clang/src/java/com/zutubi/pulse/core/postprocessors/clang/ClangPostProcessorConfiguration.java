@@ -13,20 +13,14 @@ public class ClangPostProcessorConfiguration extends RegexPostProcessorConfigura
     public ClangPostProcessorConfiguration()
     {
         addErrorRegexes(
-                "^.+:[0-9]+:[0-9]+: error:",
-                "^.+:[0-9]+: error:",
-                "^clang: error:",
-                "^clang: fatal error:",
-                "^ld: error:",
-                "^ld: fatal error:",
+                "^.+:[0-9]+:([0-9]+:)?( fatal)? error:",
+                "^\\w+:( fatal)? error:",
                 "^Undefined symbols for architecture",
                 "^ld: symbol\\(s\\) not found for architecture"
         );
         addWarningRegexes(
-                "^.+:[0-9]+:[0-9]+: warning:",
-                "^.+:[0-9]+: warning:",
-                "^clang: warning:",
-                "^ld: warning:"
+                "^.+:[0-9]+:([0-9]+:)? warning:",
+                "^\\w+: warning:"
         );
 
         setFailOnError(false);

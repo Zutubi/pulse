@@ -12,12 +12,12 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
 {
     private static final String[] ERROR_REGEXES = new String[]
     {
-            "[\\d]+: error:",
-            "[\\d]+: fatal error:",
-            "[\\d]+ errors? generated",
+            "^.+:[0-9]+:([0-9]+:)?( fatal)? error:",
+            "^\\w+:( fatal)? error:",
+            "^Undefined symbols for architecture",
+            "^ld: symbol\\(s\\) not found for architecture",
             "Assertion failure",
             "No such file or directory",
-            "Undefined symbols",
             "Uncaught exception:",
             "\\[BEROR\\]",
             "BUILD FAILED"
@@ -25,7 +25,8 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
 
     private static final String[] WARNING_REGEXES = new String[]
     {
-            "warning:",
+            "^.+:[0-9]+:([0-9]+:)? warning:",
+            "^\\w+: warning:",
             "\\[WARN\\]"
     };
 
@@ -34,7 +35,7 @@ public class XCodePostProcessorConfiguration extends RegexPostProcessorConfigura
         addErrorRegexes(ERROR_REGEXES);
         addWarningRegexes(WARNING_REGEXES);
 
-        setLeadingContext(1);
+        setLeadingContext(0);
         setTrailingContext(3);
     }
 

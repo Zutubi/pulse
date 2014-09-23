@@ -4,8 +4,10 @@ import com.zutubi.pulse.core.commands.core.NamedArgumentCommandConfiguration;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.StringList;
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wizard;
 import com.zutubi.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,14 +15,20 @@ import java.util.List;
  * Configuration for instances of {@link XCodeCommand}.
  */
 @SymbolicName("zutubi.xcodeCommandConfig")
-@Form(fieldOrder = {"name", "workingDir", "project", "config", "target", "buildaction", "settings", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
+@Form(fieldOrder = {"name", "workingDir", "workspace", "scheme", "project", "target", "config", "destinations", "arch", "sdk", "buildaction", "settings", "args", "extraArguments", "postProcessors", "exe", "inputFile", "outputFile", "force"})
 public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
 {
+    private String workspace;
+    private String scheme;
+    private String project;
     private String target;
     private String config;
-    private String project;
-    private String buildaction;
     @StringList
+    private List<String> destinations;
+    private String arch;
+    private String sdk;
+    private String buildaction;
+    @Wizard.Ignore @StringList
     private List<String> settings;
 
     public XCodeCommandConfiguration()
@@ -31,9 +39,24 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
     protected List<NamedArgument> getNamedArguments()
     {
         List<NamedArgument> result = new LinkedList<NamedArgument>();
+        if (StringUtils.stringSet(workspace))
+        {
+            result.add(new NamedArgument("workspace", workspace, "-workspace"));
+        }
+
+        if (StringUtils.stringSet(scheme))
+        {
+            result.add(new NamedArgument("scheme", scheme, "-scheme"));
+        }
+
         if (StringUtils.stringSet(project))
         {
             result.add(new NamedArgument("project", project, "-project"));
+        }
+
+        if (StringUtils.stringSet(target))
+        {
+            result.add(new NamedArgument("target", target, "-target"));
         }
 
         if (StringUtils.stringSet(config))
@@ -41,9 +64,26 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
             result.add(new NamedArgument("configuration", config, "-configuration"));
         }
 
-        if (StringUtils.stringSet(target))
+        if (destinations != null && destinations.size() > 0)
         {
-            result.add(new NamedArgument("target", target, "-target"));
+            List<String> args = new ArrayList<String>();
+            for (String destination: destinations)
+            {
+                args.add("-destination");
+                args.add(destination);
+            }
+
+            result.add(new NamedArgument("destinations", StringUtils.unsplit(args), args));
+        }
+
+        if (StringUtils.stringSet(arch))
+        {
+            result.add(new NamedArgument("architecture", arch, "-arch"));
+        }
+
+        if (StringUtils.stringSet(sdk))
+        {
+            result.add(new NamedArgument("sdk", sdk, "-sdk"));
         }
 
         if (StringUtils.stringSet(buildaction))
@@ -57,6 +97,36 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
         }
 
         return result;
+    }
+
+    public String getWorkspace()
+    {
+        return workspace;
+    }
+
+    public void setWorkspace(String workspace)
+    {
+        this.workspace = workspace;
+    }
+
+    public String getScheme()
+    {
+        return scheme;
+    }
+
+    public void setScheme(String scheme)
+    {
+        this.scheme = scheme;
+    }
+
+    public String getProject()
+    {
+        return project;
+    }
+
+    public void setProject(String project)
+    {
+        this.project = project;
     }
 
     public String getTarget()
@@ -79,14 +149,34 @@ public class XCodeCommandConfiguration extends NamedArgumentCommandConfiguration
         this.config = config;
     }
 
-    public String getProject()
+    public List<String> getDestinations()
     {
-        return project;
+        return destinations;
     }
 
-    public void setProject(String project)
+    public void setDestinations(List<String> destinations)
     {
-        this.project = project;
+        this.destinations = destinations;
+    }
+
+    public String getArch()
+    {
+        return arch;
+    }
+
+    public void setArch(String arch)
+    {
+        this.arch = arch;
+    }
+
+    public String getSdk()
+    {
+        return sdk;
+    }
+
+    public void setSdk(String sdk)
+    {
+        this.sdk = sdk;
     }
 
     public String getBuildaction()

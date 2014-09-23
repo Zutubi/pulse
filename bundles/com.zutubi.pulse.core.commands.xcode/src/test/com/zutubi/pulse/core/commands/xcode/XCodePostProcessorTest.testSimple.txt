@@ -8,7 +8,7 @@ buffer line
 buffer line
 buffer line
 buffer line
-some warning: here
+clang: warning: here
 buffer line
 buffer line
 buffer line

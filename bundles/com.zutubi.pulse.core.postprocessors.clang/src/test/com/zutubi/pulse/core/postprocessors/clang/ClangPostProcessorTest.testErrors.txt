@@ -1,3 +1,4 @@
+clang: fatal error: i made this up
 main.c:3:10: error: initializing 'float' with an expression of incompatible type 'char [6]'
    float f = "what?";
          ^   ~~~~~~~
