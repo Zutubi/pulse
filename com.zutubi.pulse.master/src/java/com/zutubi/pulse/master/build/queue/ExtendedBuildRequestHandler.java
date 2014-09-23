@@ -239,8 +239,7 @@ public class ExtendedBuildRequestHandler extends BaseBuildRequestHandler
 
         TriggerOptions options = new TriggerOptions(originalRequest.getOptions());
         options.setReason((upstream) ? new RebuildBuildReason(originalOwner) : new DependencyBuildReason(originalOwner));
-        BuildRevision sourceRevision = originalRequest.getRevision();
-        BuildRevision revision = sourceRevision.isUser() ? new BuildRevision(sourceRevision.getRevision(), sourceRevision.isUser()) : new BuildRevision(new LatestScmRevisionSupplier(owner, scmManager));
+        BuildRevision revision = new BuildRevision(new LatestScmRevisionSupplier(owner, scmManager));
         BuildRequestEvent newRequest = new SingleBuildRequestEvent(this, owner, revision, options);
         newRequest.setMetaBuildId(originalRequest.getMetaBuildId());
 
