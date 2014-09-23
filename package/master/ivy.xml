@@ -35,6 +35,7 @@
         <dependency org="zutubi" name="com.zutubi.pulse.core.platforms.java" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boostregression" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boosttest" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.clang" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.nunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>

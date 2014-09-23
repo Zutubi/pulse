@@ -1,0 +1,8 @@
+main.c:3:10: error: initializing 'float' with an expression of incompatible type 'char [6]'
+   float f = "what?";
+         ^   ~~~~~~~
+main.c:8:10: error: expected ';' at end of declaration
+    int r
+         ^
+         ;
+2 errors generated.

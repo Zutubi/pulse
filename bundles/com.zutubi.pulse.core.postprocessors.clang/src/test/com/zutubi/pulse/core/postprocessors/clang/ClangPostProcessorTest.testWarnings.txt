@@ -1,0 +1,8 @@
+main.c:3:5: warning: implicitly declaring library function 'printf' with type 'int (const char *, ...)'
+    printf("done");
+    ^
+main.c:3:5: note: please include the header <stdio.h> or explicitly provide a declaration for 'printf'
+main.c:8:5: warning: implicit declaration of function 'foo' is invalid in C99 [-Wimplicit-function-declaration]
+    foo();
+    ^
+2 warnings generated.
