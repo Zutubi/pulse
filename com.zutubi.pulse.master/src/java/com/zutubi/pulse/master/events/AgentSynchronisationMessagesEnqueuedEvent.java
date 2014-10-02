@@ -14,11 +14,11 @@ public class AgentSynchronisationMessagesEnqueuedEvent extends AgentEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Agent Synchronisation Messages Enqueued Event");
+        StringBuilder builder = new StringBuilder("Agent Synchronisation Messages Enqueued Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getConfig().getName());
+            builder.append(": ").append(getAgent().getName());
         }
-        return buff.toString();
+        return builder.toString();
     }
 }

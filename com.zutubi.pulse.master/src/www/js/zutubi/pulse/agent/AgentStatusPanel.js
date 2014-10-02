@@ -147,7 +147,7 @@ Zutubi.pulse.agent.AgentStatusPanel = Ext.extend(Zutubi.ActivePanel, {
                         disable: agentAction.createDelegate(window, [this.agentId, 'disable']),
                         disableNow: agentAction.createDelegate(window, [this.agentId, 'disableNow']),
                         enable: agentAction.createDelegate(window, [this.agentId, 'enable']),
-                        gc: agentAction.createDelegate(window, [this.agentId, 'gc']),
+                        clean: agentAction.createDelegate(window, [this.agentId, 'clean']),
                         ping: agentAction.createDelegate(window, [this.agentId, 'ping']),
                         retryUpgrade: agentAction.createDelegate(window, [this.agentId, 'retryUpgrade'])
                     },
