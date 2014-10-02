@@ -235,11 +235,24 @@ Zutubi.pulse.project.browse.ProjectHomePanel = Ext.extend(Zutubi.ActivePanel, {
     
     markForClean: function()
     {
-        showStatus('Cleaning up build directories...', 'working');
-        runAjaxRequest({
-            url: window.baseUrl + '/ajax/config/projects/' + encodeURIComponent(this.data.status.name) + '?clean=clean',
-            callback: this.handleAjaxResponse,
-            scope: this
+        var panel = this;
+        window.dialogBox = Ext.Msg.show({
+            title: 'Confirm',
+            msg: 'Are you sure you want to delete all build directories for this project?',
+            fn: function(btn, text) {
+                    window.dialogBox = null;
+                    if (btn === 'yes')
+                    {
+                        showStatus('Cleaning up build directories...', 'working');
+                        runAjaxRequest({
+                            url: window.baseUrl + '/ajax/config/projects/' + encodeURIComponent(panel.data.status.name) + '?clean=clean',
+                            callback: panel.handleAjaxResponse,
+                            scope: panel
+                        });
+                    }
+            },
+            width: 400,
+            buttons: Ext.Msg.YESNO
         });
     },
 
