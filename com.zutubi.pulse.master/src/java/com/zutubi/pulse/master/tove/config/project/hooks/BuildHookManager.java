@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.tove.config.project.hooks;
 
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.model.Result;
@@ -17,6 +18,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao;
+import com.zutubi.pulse.master.security.SecurityUtils;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.UnaryProcedure;
@@ -36,6 +38,8 @@ import java.util.concurrent.ThreadFactory;
 public class BuildHookManager
 {
     private static final Logger LOG = Logger.getLogger(BuildHookManager.class);
+
+    private static final String PROPERTY_TRIGGER_USER = "hook.trigger.user";
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -70,6 +74,7 @@ public class BuildHookManager
         if (hook.canManuallyTriggerFor(result))
         {
             accessManager.ensurePermission(ProjectConfigurationActions.ACTION_TRIGGER_HOOK, result);
+            final String username = SecurityUtils.getLoggedInUsername();
 
             HibernateBuildResultDao.initialise(result);
             executor.execute(new Runnable()
@@ -78,6 +83,8 @@ public class BuildHookManager
                 {
                     final PulseExecutionContext context = new PulseExecutionContext();
                     MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
+                    context.addString(BuildProperties.NAMESPACE_INTERNAL, PROPERTY_TRIGGER_USER, username);
+
                     if (hook.appliesTo(result))
                     {
                         HookLogger buildLogger = createBuildLogger(result);
