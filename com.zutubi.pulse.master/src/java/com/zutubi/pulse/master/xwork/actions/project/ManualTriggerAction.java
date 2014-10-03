@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
 import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
 import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
-import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.master.model.NamedManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
@@ -379,7 +379,7 @@ public class ManualTriggerAction extends ProjectActionBase
         ManualTriggerConfiguration triggerConfig = getTriggerConfig();
 
         Revision r = null;
-        TriggerOptions options = new TriggerOptions(new ManualTriggerBuildReason(getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
+        TriggerOptions options = new TriggerOptions(new NamedManualTriggerBuildReason(triggerConfig.getName(), getPrinciple()), ProjectManager.TRIGGER_CATEGORY_MANUAL);
         ProjectConfiguration projectConfig = project.getConfig();
         if (triggerConfig.isPrompt())
         {

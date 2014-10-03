@@ -87,6 +87,10 @@
             <property name="username" type="string" column="DETAILS" length="255"/>
         </subclass>
 
+        <subclass name="com.zutubi.pulse.master.model.NamedManualTriggerBuildReason" discriminator-value="NAMED_MANUAL_TRIGGER" lazy="false">
+            <property name="names" type="string" column="DETAILS" length="255"/>
+        </subclass>
+
         <subclass name="com.zutubi.pulse.master.model.PersonalBuildReason" discriminator-value="PERSONAL" lazy="false">
             <property name="user" type="string" column="LOCAL_USER" length="255"/>
         </subclass>

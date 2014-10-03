@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.triggers;
 
-import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.master.model.BuildReason;
+import com.zutubi.pulse.master.model.NamedManualTriggerBuildReason;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
@@ -34,7 +35,7 @@ public class FireableTriggerConfigurationActions extends TriggerConfigurationAct
         ProjectConfiguration projectConfiguration = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
         if (projectConfiguration != null)
         {
-            ManualTriggerBuildReason reason = new ManualTriggerBuildReason(SecurityUtils.getLoggedInUsername());
+            BuildReason reason = new NamedManualTriggerBuildReason(config.getName(), SecurityUtils.getLoggedInUsername());
             TriggerOptions options = new TriggerOptions(reason, ProjectManager.TRIGGER_CATEGORY_MANUAL);
             options.setProperties(config.getProperties().values());
             projectManager.triggerBuild(projectConfiguration, options, null);
