@@ -1,8 +1,6 @@
 package com.zutubi.pulse.slave;
 
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.EventOutputStream;
@@ -39,9 +37,9 @@ import com.zutubi.pulse.slave.command.InstallPluginsCommand;
 import com.zutubi.pulse.slave.command.SyncPluginsCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -49,6 +47,10 @@ import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -148,7 +150,7 @@ public class SlaveServiceImpl implements SlaveService
             firstStatus = false;
         }
 
-        return new HostStatus(serverRecipeService.getBuildingRecipes(), first);
+        return new HostStatus(serverRecipeService.getBuildingRecipes(), FileSystemUtils.getFreeDiskSpace(configurationManager.getDiskSpacePath()), first);
     }
 
     private boolean checkForPluginSync(String masterUrl, List<PluginInfo> masterPlugins)

@@ -14,7 +14,6 @@ import com.zutubi.pulse.master.tove.config.admin.AgentPingConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.NullaryFunction;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -22,6 +21,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * Manages the transient status of agents.  Uses ping and recipe events to
@@ -266,7 +267,7 @@ public class AgentStatusManager implements EventListener
                 if (pingRecipe != agent.getRecipeId() || agent.getSecondsSincePing() > getAgentOfflineTimeout())
                 {
                     publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), pingRecipe));
-                    agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, 0, pingRecipe);
+                    agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, 0, pingRecipe, agentPingEvent.getFreeDiskSpace());
                 }
                 break;
 
@@ -277,7 +278,7 @@ public class AgentStatusManager implements EventListener
 
             default:
                 publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), pingRecipe));
-                agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, 0, pingRecipe);
+                agent.updateStatus(AgentStatus.BUILDING_INVALID, timestamp, 0, pingRecipe, agentPingEvent.getFreeDiskSpace());
                 break;
         }
     }
@@ -458,7 +459,7 @@ public class AgentStatusManager implements EventListener
     private void updateAgentRecipeStatus(Agent agent, AgentStatus newStatus, long timestamp, long buildId, long recipeId)
     {
         AgentStatus oldStatus = agent.getStatus();
-        agent.updateStatus(newStatus, timestamp, buildId, recipeId);
+        agent.updateStatus(newStatus, timestamp, buildId, recipeId, 0);
         publishEvent(new AgentStatusChangeEvent(this, agent, oldStatus, agent.getStatus()));
     }
 

@@ -30,6 +30,10 @@ public class AgentStatusDataAction extends AgentActionBase
 {
     private static final Messages I18N = Messages.getInstance(AgentStatusDataAction.class);
 
+    private static final long KIBIBYTE = 1024;
+    private static final long MEBIBYTE = 1024 * KIBIBYTE;
+    private static final long GIBIBYTE = 1024 * MEBIBYTE;
+
     private AgentStatusModel model;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
@@ -116,6 +120,8 @@ public class AgentStatusDataAction extends AgentActionBase
                         }
                     }
                 }
+
+                model.addStatus(I18N.format("free.disk.space"), formatFreeDiskSpace(agent.getFreeDiskSpace()));
             }
         }
         else
@@ -146,6 +152,30 @@ public class AgentStatusDataAction extends AgentActionBase
         model.addSynchronisationMessages(synchronisationMessages);
 
         return SUCCESS;
+    }
+
+    private String formatFreeDiskSpace(long freeDiskSpace)
+    {
+        if (freeDiskSpace <= 0)
+        {
+            return I18N.format("free.disk.space.unknown");
+        }
+        else if (freeDiskSpace < KIBIBYTE)
+        {
+            return String.format("%d bytes", freeDiskSpace);
+        }
+        else if (freeDiskSpace < MEBIBYTE)
+        {
+            return String.format("%.02f KiB", (double)freeDiskSpace / KIBIBYTE);
+        }
+        else if (freeDiskSpace < GIBIBYTE)
+        {
+            return String.format("%.02f MiB", (double)freeDiskSpace / MEBIBYTE);
+        }
+        else
+        {
+            return String.format("%.02f GiB", (double)freeDiskSpace / GIBIBYTE);
+        }
     }
 
     private void addAgentStatus(AgentStatus status, String prettyStatus)

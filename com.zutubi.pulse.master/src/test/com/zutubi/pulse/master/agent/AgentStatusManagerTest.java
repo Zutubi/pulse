@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.master.agent.AgentStatus.*;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.AgentState;
@@ -23,12 +22,14 @@ import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.util.adt.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
+
+import static com.zutubi.pulse.master.agent.AgentStatus.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
@@ -1211,12 +1212,12 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     private HostStatus createBuildingStatus(long agentId, long recipeId)
     {
-        return new HostStatus(ImmutableMap.of(agentIdToHandle(agentId), recipeId), false);
+        return new HostStatus(ImmutableMap.of(agentIdToHandle(agentId), recipeId), -1, false);
     }
     
     private void sendPing(Agent agent, HostStatus status)
     {
-        eventManager.publish(new AgentPingEvent(this, agent, status.getStatus(), status.getRecipeId(agent.getConfig().getHandle()), status.isFirst(), status.getMessage()));
+        eventManager.publish(new AgentPingEvent(this, agent, status.getStatus(), status.getRecipeId(agent.getConfig().getHandle()), 0, status.isFirst(), status.getMessage()));
     }
 
     private void sendSynchronisationComplete(Agent agent, boolean successful)

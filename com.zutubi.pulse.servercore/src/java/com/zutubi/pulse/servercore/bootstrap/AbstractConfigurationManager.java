@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.bootstrap;
 
 import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.config.PropertiesConfig;
 
 import java.io.File;
@@ -13,6 +14,8 @@ import java.util.Map;
  */
 public abstract class AbstractConfigurationManager implements ConfigurationManager
 {
+    private static final String PROPERTY_DISK_SPACE_PATH = "pulse.disk.space.path";
+
     private SystemPaths systemPaths = null;
     protected EnvConfig envConfig;
 
@@ -40,6 +43,19 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
             systemPaths = new DefaultSystemPaths(pulseHome, versionHome);
         }
         return systemPaths;
+    }
+
+    public File getDiskSpacePath()
+    {
+        String path = System.getProperty(PROPERTY_DISK_SPACE_PATH);
+        if (StringUtils.stringSet(path))
+        {
+            return new File(path);
+        }
+        else
+        {
+            return getUserPaths().getData();
+        }
     }
 
     public Map<String, String> getCoreProperties()

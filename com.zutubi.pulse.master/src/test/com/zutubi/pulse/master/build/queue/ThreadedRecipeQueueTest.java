@@ -610,7 +610,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
         AgentState agentState = new AgentState();
         agentState.setId(id);
         DefaultAgent agent = new DefaultAgent(agentConfig, agentState, new FakeAgentService(type), new DefaultHost(new HostState()));
-        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, false, null), System.currentTimeMillis());
+        agent.updateStatus(new AgentPingEvent(this, agent, PingStatus.IDLE, 0, 0, false, null), System.currentTimeMillis());
         agentManager.addAgent(agent);
         agentManager.online(agent);
         queue.handleEvent(new AgentOnlineEvent(this, agent));

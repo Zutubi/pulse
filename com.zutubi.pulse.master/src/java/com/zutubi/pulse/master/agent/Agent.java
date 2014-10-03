@@ -20,7 +20,7 @@ public interface Agent
 
     void updateStatus(AgentPingEvent agentPingEvent, long timestamp);
     void updateStatus(AgentStatus status, long timestamp);
-    void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId);
+    void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, long freeDiskSpace);
 
     void copyStatus(Agent agent);
 
@@ -47,6 +47,8 @@ public interface Agent
     long getBuildId();
     long getRecipeId();
 
+    long getFreeDiskSpace();
+
     boolean isOnline();
     boolean isEnabled();
     boolean isDisabling();
@@ -57,4 +59,5 @@ public interface Agent
     List<Comment> getComments();
     
     void setAgentState(AgentState agentState);
+
 }

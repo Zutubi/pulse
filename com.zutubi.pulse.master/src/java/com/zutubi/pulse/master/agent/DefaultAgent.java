@@ -24,6 +24,7 @@ public class DefaultAgent implements Agent
     private long lastOnlineTime = 0;
     private long buildId = 0;
     private long recipeId = -1;
+    private long freeDiskSpace = -1;
     private AgentService agentService;
     private String pingError = null;
 
@@ -126,6 +127,11 @@ public class DefaultAgent implements Agent
         return recipeId;
     }
 
+    public long getFreeDiskSpace()
+    {
+        return freeDiskSpace;
+    }
+
     public String getPingError()
     {
         return pingError;
@@ -158,20 +164,20 @@ public class DefaultAgent implements Agent
 
     public void updateStatus(AgentPingEvent agentPingEvent, long timestamp)
     {
-        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), timestamp, buildId, agentPingEvent.getRecipeId(), agentPingEvent.getMessage());
+        updateStatus(AgentStatus.valueOf(agentPingEvent.getPingStatus().toString()), timestamp, buildId, agentPingEvent.getRecipeId(), agentPingEvent.getFreeDiskSpace(), agentPingEvent.getMessage());
     }
 
     public void updateStatus(AgentStatus status, long timestamp)
     {
-        updateStatus(status, timestamp, 0, -1);
+        updateStatus(status, timestamp, 0, -1, -1);
     }
 
-    public void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId)
+    public void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, long freeDiskSpace)
     {
-        updateStatus(status, timestamp, buildId, recipeId, null);
+        updateStatus(status, timestamp, buildId, recipeId, freeDiskSpace, null);
     }
 
-    public synchronized void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, String pingError)
+    public synchronized void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, long freeDiskSpace, String pingError)
     {
         lastPingTime = timestamp;
         if (status.isOnline())
@@ -181,6 +187,10 @@ public class DefaultAgent implements Agent
         this.status = status;
         this.buildId = buildId;
         this.recipeId = recipeId;
+        if (freeDiskSpace > 0)
+        {
+            this.freeDiskSpace = freeDiskSpace;
+        }
         this.pingError = pingError;
     }
 
@@ -192,6 +202,7 @@ public class DefaultAgent implements Agent
         lastOnlineTime = existingAgent.lastOnlineTime;
         buildId = existingAgent.buildId;
         recipeId = existingAgent.recipeId;
+        freeDiskSpace = existingAgent.freeDiskSpace;
         pingError = existingAgent.pingError;
     }
 

@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.bootstrap;
 
 import com.zutubi.pulse.core.util.config.EnvConfig;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -20,6 +21,12 @@ public interface ConfigurationManager
     SystemConfiguration getSystemConfig();
     UserPaths getUserPaths();
     SystemPaths getSystemPaths();
+
+    /**
+     * @return the path to use to determine free disk space on the server (the
+     *         default is the data directory, but the user may override it)
+     */
+    File getDiskSpacePath();
 
     /**
      * Returns a set of key-value pairs for all of the "core" pulse properties,

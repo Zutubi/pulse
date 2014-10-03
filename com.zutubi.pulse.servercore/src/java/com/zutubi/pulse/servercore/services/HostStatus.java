@@ -1,12 +1,13 @@
 package com.zutubi.pulse.servercore.services;
 
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.any;
 
 /**
  * Encapsulates the state of a host.
@@ -29,6 +30,11 @@ public class HostStatus
      */
     private Map<Long, Long> agentHandleToRecipeId = new HashMap<Long, Long>();
     /**
+     * Amount of free disk space on the volume where the agent's data directory is, in bytes.
+     * May be 0 if the free space could not be determined.
+     */
+    private long freeDiskSpace;
+    /**
      * If true, this is the first status request the agent has answered since
      * it booted.  Used to detect agent bounces between pings (CIB-1141).
      */
@@ -38,10 +44,11 @@ public class HostStatus
      */
     private String message = null;
 
-    public HostStatus(Map<Long, Long> agentHandleToRecipeId, boolean first)
+    public HostStatus(Map<Long, Long> agentHandleToRecipeId, long freeDiskSpace, boolean first)
     {
         this.status = any(agentHandleToRecipeId.values(), not(equalTo(NO_RECIPE))) ? PingStatus.BUILDING : PingStatus.IDLE;
         this.agentHandleToRecipeId = agentHandleToRecipeId;
+        this.freeDiskSpace = freeDiskSpace;
         this.first = first;
     }
 
@@ -89,6 +96,11 @@ public class HostStatus
         }
 
         return recipeId;
+    }
+
+    public long getFreeDiskSpace()
+    {
+        return freeDiskSpace;
     }
 
     public boolean isFirst()

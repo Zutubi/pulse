@@ -46,7 +46,7 @@ public class HostStatusManager implements EventListener, Stoppable
                 if (agent.isEnabled())
                 {
                     long agentHandle = agent.getConfig().getHandle();
-                    AgentPingEvent agentPingEvent = new AgentPingEvent(this, agent, hostStatus.getStatus(agentHandle), hostStatus.getRecipeId(agentHandle), hostStatus.isFirst(), hostStatus.getMessage());
+                    AgentPingEvent agentPingEvent = new AgentPingEvent(this, agent, hostStatus.getStatus(agentHandle), hostStatus.getRecipeId(agentHandle), hostStatus.getFreeDiskSpace(), hostStatus.isFirst(), hostStatus.getMessage());
                     eventManager.publish(agentPingEvent);
                 }
             }

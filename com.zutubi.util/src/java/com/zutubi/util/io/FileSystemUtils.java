@@ -1521,4 +1521,16 @@ public class FileSystemUtils
         
         return matchingFiles[0];
     }
+
+    public static long getFreeDiskSpace(File file)
+    {
+        long freeSpace = 0;
+        while (file != null && freeSpace == 0)
+        {
+            freeSpace = file.getFreeSpace();
+            file = file.getParentFile();
+        }
+
+        return freeSpace;
+    }
 }

@@ -11,6 +11,7 @@ import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.services.HostStatus;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
+import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class MasterHostService implements HostService
 
     public HostStatus getStatus(String masterLocation)
     {
-        return new HostStatus(serverRecipeService.getBuildingRecipes(), false);
+        return new HostStatus(serverRecipeService.getBuildingRecipes(), FileSystemUtils.getFreeDiskSpace(configurationManager.getDiskSpacePath()), false);
     }
 
     public ServerInfoModel getSystemInfo(boolean includeDetailed)

@@ -5002,6 +5002,8 @@ public class RemoteApi
      *     ping succeeded)</li>
      * <li>lastOnlineTime: time the agent was last online, in milliseconds since the epoch
      *     converted to a string (zero if the agent has not been online).</li>
+     * <li>freeDiskSpace: free disk space in bytes on the volume containing the agent data directory,
+     *     converted to a string (zero if the free space is not known).</li>
      * </ul>
      *
      *
@@ -5028,6 +5030,7 @@ public class RemoteApi
             }
 
             result.put("lastOnlineTime", Long.toString(agent.getLastOnlineTime()));
+            result.put("freeDiskSpace", Long.toString(agent.getFreeDiskSpace()));
             return result;
         }
         finally
