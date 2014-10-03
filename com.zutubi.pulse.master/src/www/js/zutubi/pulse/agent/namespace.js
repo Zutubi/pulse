@@ -74,7 +74,8 @@ window.Zutubi.pulse.agent = window.Zutubi.pulse.agent || {
         agentStatus: function(status, agent) {
             var statusType;
 
-            if (status === 'synchronising' ||
+            if (status === 'low disk space' ||
+                status === 'synchronising' ||
                 status === 'synchronised' ||
                 status.indexOf('host upgrading') >= 0)
             {

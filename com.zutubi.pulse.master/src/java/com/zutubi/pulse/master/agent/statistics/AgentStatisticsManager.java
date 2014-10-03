@@ -179,6 +179,7 @@ public class AgentStatisticsManager implements EventListener
                currentStats.setSynchronisingTime(currentStats.getSynchronisingTime() + duration);
                break;
             case IDLE:
+            case LOW_DISK_SPACE:
                 currentStats.setIdleTime(currentStats.getIdleTime() + duration);
                 break;
             case AWAITING_PING:

@@ -112,7 +112,7 @@ public class WorkingCopyStageFileObject extends FileInfoRootFileObject implement
     {
         AgentRecipeDetails details = new AgentRecipeDetails();
         details.setAgent(agentConfig.getName());
-        details.setAgentDataPattern(agentConfig.getDataDirectory());
+        details.setAgentDataPattern(agentConfig.getStorage().getDataDirectory());
         details.setAgentHandle(agentConfig.getHandle());
 
         details.setIncremental(!buildResult.isPersonal() && projectConfig.getBootstrap().getBuildType() == BuildType.INCREMENTAL_BUILD);

@@ -4879,6 +4879,7 @@ public class RemoteApi
      * <li>idle</li>
      * <li>initial</li>
      * <li>invalid master</li>
+     * <li>low disk space</li>
      * <li>offline</li>
      * <li>post recipe</li>
      * <li>recipe assigned</li>

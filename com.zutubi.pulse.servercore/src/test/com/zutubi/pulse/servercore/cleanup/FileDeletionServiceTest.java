@@ -70,7 +70,7 @@ public class FileDeletionServiceTest extends PulseTestCase
     {
         File file = createNewFile("file.txt");
 
-        assertTrue(deletionService.delete(file, false).get());
+        assertTrue(deletionService.delete(file, false, false).get());
 
         assertFalse(file.exists());
     }
@@ -79,7 +79,7 @@ public class FileDeletionServiceTest extends PulseTestCase
     {
         File dir = createNewDir("dir");
 
-        assertTrue(deletionService.delete(dir, false).get());
+        assertTrue(deletionService.delete(dir, false, false).get());
 
         assertFalse(dir.exists());
     }
@@ -89,7 +89,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         File dir = createNewDir("dir");
         File file = createNewFile("dir.dead");
 
-        assertTrue(deletionService.delete(dir, false).get());
+        assertTrue(deletionService.delete(dir, false, false).get());
         assertFalse(dir.exists());
         assertTrue(file.exists());
     }
@@ -100,7 +100,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         File nested = createNewDir(dir, "nested");
         File file = createNewFile(dir, "file.txt");
 
-        assertTrue(deletionService.delete(dir, false).get());
+        assertTrue(deletionService.delete(dir, false, false).get());
         assertFalse(dir.exists());
         assertFalse(nested.exists());
         assertFalse(file.exists());
@@ -108,14 +108,14 @@ public class FileDeletionServiceTest extends PulseTestCase
 
     public void testNonExistantFile() throws ExecutionException, InterruptedException
     {
-        assertTrue(deletionService.delete(new File("does not exist"), false).get());
+        assertTrue(deletionService.delete(new File("does not exist"), false, false).get());
     }
 
     public void testNullFile()
     {
         try
         {
-            deletionService.delete(null, false);
+            deletionService.delete(null, false, false);
             fail("Expected exception");
         }
         catch (IllegalArgumentException e)
@@ -131,8 +131,8 @@ public class FileDeletionServiceTest extends PulseTestCase
         File f1 = createNewFile("1");
         File f2 = createNewFile("2");
         
-        deletionService.delete(f1, false);
-        deletionService.delete(f2, false);
+        deletionService.delete(f1, false, false);
+        deletionService.delete(f2, false, false);
         
         assertFalse(f1.exists());
         assertFalse(f2.exists());
@@ -155,7 +155,7 @@ public class FileDeletionServiceTest extends PulseTestCase
         // is not nuked on restart.
         File f1 = createNewFile("1");
 
-        Future<Boolean> future = deletionService.delete(f1, false);
+        Future<Boolean> future = deletionService.delete(f1, false, false);
         assertTrue(future.get());
         deletionService.stop(true);
         
@@ -185,12 +185,12 @@ public class FileDeletionServiceTest extends PulseTestCase
         assertTrue(notDead.exists());
     }
     
-    public void testOutsideOfData() throws IOException, ExecutionException, InterruptedException
+    public void testOutsideOfDataDisallowed() throws IOException, ExecutionException, InterruptedException
     {
         File dir = FileSystemUtils.createTempDir(getName(), null);
         try
         {
-            Future<Boolean> future = deletionService.delete(dir, false);
+            Future<Boolean> future = deletionService.delete(dir, false, false);
             assertEquals(Boolean.TRUE, future.get());
             assertTrue(dir.isDirectory());
         }
@@ -200,6 +200,21 @@ public class FileDeletionServiceTest extends PulseTestCase
         }
     }
     
+    public void testOutsideOfDataAllowed() throws IOException, ExecutionException, InterruptedException
+    {
+        File dir = FileSystemUtils.createTempDir(getName(), null);
+        try
+        {
+            Future<Boolean> future = deletionService.delete(dir, false, true);
+            assertEquals(Boolean.TRUE, future.get());
+            waitForFileToBeDeleted(dir);
+        }
+        finally
+        {
+            removeDirectory(dir);
+        }
+    }
+
     private void waitForFileToBeDeleted(File file)
     {
         long start = System.currentTimeMillis();

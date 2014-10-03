@@ -125,7 +125,7 @@ public class AgentConfigurationActions
 
             for (String directory: Arrays.asList("recipes", "work"))
             {
-                DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(config.getDataDirectory(), "$(agent.data.dir)/" + directory, variables);
+                DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(config.getStorage().getDataDirectory(), "$(agent.data.dir)/" + directory, config.getStorage().isOutsideCleanupAllowed(), variables);
                 SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
                 propertiesDescriptionPairs.add(asPair(message.getArguments(), "clean up " + directory + " directory"));
             }

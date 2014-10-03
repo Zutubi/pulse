@@ -425,9 +425,9 @@ public class LogFile
         data.lock.lock();
         try
         {
-            deletionService.delete(file, false);
-            deletionService.delete(getZipFile(), false);
-            deletionService.delete(getTailFile(), false);
+            deletionService.delete(file, false, false);
+            deletionService.delete(getZipFile(), false, false);
+            deletionService.delete(getTailFile(), false, false);
         }
         finally
         {

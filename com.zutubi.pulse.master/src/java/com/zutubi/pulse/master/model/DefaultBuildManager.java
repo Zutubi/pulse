@@ -747,7 +747,7 @@ public class DefaultBuildManager implements BuildManager
     {
         if (file != null && file.exists())
         {
-            fileDeletionService.delete(file, false);
+            fileDeletionService.delete(file, false, false);
         }
     }
 

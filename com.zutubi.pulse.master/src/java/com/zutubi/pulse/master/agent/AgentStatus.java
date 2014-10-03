@@ -73,6 +73,10 @@ public enum AgentStatus
      */
     BUILDING_INVALID(true, false, true, false),
     /**
+     * The agent is online and not busy but does not have enough free disk space to take on a build.
+     */
+    LOW_DISK_SPACE(true, false, false, false),
+    /**
      * The agent is online and ready to accept recipe requests.
      */
     IDLE(true, true, false, false);

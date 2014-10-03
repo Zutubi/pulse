@@ -25,6 +25,7 @@ public class DeleteDirectoryTask implements SynchronisationTask
     
     private String agentDataDirectoryPattern;
     private String pathPattern;
+    private boolean deleteOutsideDataAllowed;
     private Map<String, String> variables;
     private transient ConfigurationManager configurationManager;
     private transient FileDeletionService fileDeletionService;
@@ -35,20 +36,20 @@ public class DeleteDirectoryTask implements SynchronisationTask
 
     /**
      * Creates a task to delete a directory.
-     *
-     * @param agentDataDirectoryPattern pattern specifying the location of the
+     *  @param agentDataDirectoryPattern pattern specifying the location of the
      *                                  agent data directory
      * @param pathPattern pattern specifying the directory to delete; may
      *                    include references to variables passed to this
      *                    constructor and/or $(data.dir), which is provided on
      *                    the agent before resolving the variables
+     * @param deleteOutsideDataAllowed
      * @param variables   variables used to resolve the path patterns (excludes
-     *                    the data directory, which is known on the agent side)
      */
-    public DeleteDirectoryTask(String agentDataDirectoryPattern, String pathPattern, Map<String, String> variables)
+    public DeleteDirectoryTask(String agentDataDirectoryPattern, String pathPattern, boolean deleteOutsideDataAllowed, Map<String, String> variables)
     {
         this.agentDataDirectoryPattern = agentDataDirectoryPattern;
         this.pathPattern = pathPattern;
+        this.deleteOutsideDataAllowed = deleteOutsideDataAllowed;
         this.variables = variables;
     }
 
@@ -60,7 +61,7 @@ public class DeleteDirectoryTask implements SynchronisationTask
             File dir = new File(path);
             if (dir.exists())
             {
-                fileDeletionService.delete(dir, true);
+                fileDeletionService.delete(dir, true, deleteOutsideDataAllowed);
             }
         }
     }

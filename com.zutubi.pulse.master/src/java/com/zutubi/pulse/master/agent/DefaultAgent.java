@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.Comment;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentStorageConfiguration;
 
 import java.util.Collections;
 import java.util.List;
@@ -169,7 +170,7 @@ public class DefaultAgent implements Agent
 
     public void updateStatus(AgentStatus status, long timestamp)
     {
-        updateStatus(status, timestamp, 0, -1, -1);
+        updateStatus(status, timestamp, 0, -1, 0);
     }
 
     public void updateStatus(AgentStatus status, long timestamp, long buildId, long recipeId, long freeDiskSpace)
@@ -191,7 +192,19 @@ public class DefaultAgent implements Agent
         {
             this.freeDiskSpace = freeDiskSpace;
         }
+
         this.pingError = pingError;
+
+        if (status == AgentStatus.IDLE && diskSpaceThresholdReached())
+        {
+            this.status = AgentStatus.LOW_DISK_SPACE;
+        }
+    }
+
+    private boolean diskSpaceThresholdReached()
+    {
+        AgentStorageConfiguration storage = agentConfig.getStorage();
+        return storage.isDiskSpaceThresholdEnabled() && freeDiskSpace > 0 && freeDiskSpace < storage.getDiskSpaceThresholdMib() * 1024 * 1024;
     }
 
     public synchronized void copyStatus(Agent agent)

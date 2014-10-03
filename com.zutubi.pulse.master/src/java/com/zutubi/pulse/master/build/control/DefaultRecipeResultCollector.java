@@ -56,7 +56,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         AgentRecipeDetails details = new AgentRecipeDetails();
         details.setAgentHandle(agent.getHandle());
         details.setAgent(agent.getName());
-        details.setAgentDataPattern(agent.getDataDirectory());
+        details.setAgentDataPattern(agent.getStorage().getDataDirectory());
         details.setProjectHandle(projectConfig.getHandle());
         details.setProject(projectConfig.getName());
         details.setProjectPersistentPattern(projectConfig.getBootstrap().getPersistentDirPattern());

@@ -241,7 +241,7 @@ public class RecipeController
         addValueToContexts(agentContext, recipeContext, PROPERTY_BUILD_VERSION, buildResult.getVersion());
         addValueToContexts(agentContext, recipeContext, PROPERTY_AGENT, agent.getConfig().getName());
         addValueToContexts(agentContext, recipeContext, PROPERTY_AGENT_HANDLE, agent.getConfig().getHandle());
-        addValueToContexts(agentContext, recipeContext, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getDataDirectory());
+        addValueToContexts(agentContext, recipeContext, PROPERTY_AGENT_DATA_PATTERN, agent.getConfig().getStorage().getDataDirectory());
         addValueToContexts(agentContext, recipeContext, PROPERTY_HOST_ID, agent.getHost().getId());
 
         scmProperties = getScmProperties(agentContext);

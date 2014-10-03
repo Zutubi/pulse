@@ -76,14 +76,14 @@ public class FileDeletionService extends BackgroundServiceSupport
      *         exists, false otherwise.
      * @throws com.zutubi.pulse.core.api.PulseRuntimeException on error
      */
-    public Future<Boolean> delete(File file, boolean requireAtomic)
+    public Future<Boolean> delete(File file, boolean requireAtomic, boolean deleteOutsideDataAllowed)
     {
         if (file == null)
         {
             throw new IllegalArgumentException(I18N.format("delete.null.exception"));
         }
 
-        if (!file.exists() || !allowedToDelete(file))
+        if (!file.exists() || !allowedToDelete(file, deleteOutsideDataAllowed))
         {
             return Futures.immediateFuture(true);
         }
@@ -109,11 +109,11 @@ public class FileDeletionService extends BackgroundServiceSupport
         return indexAndScheduleDeletion(file);
     }
 
-    private boolean allowedToDelete(File file)
+    private boolean allowedToDelete(File file, boolean deleteOutsideDataAllowed)
     {
         try
         {
-            return Boolean.getBoolean(PROPERTY_DELETE_OUTSIDE_DATA) || FileSystemUtils.isParentOf(dataDir, file);
+            return deleteOutsideDataAllowed || Boolean.getBoolean(PROPERTY_DELETE_OUTSIDE_DATA) || FileSystemUtils.isParentOf(dataDir, file);
         }
         catch (IOException e)
         {

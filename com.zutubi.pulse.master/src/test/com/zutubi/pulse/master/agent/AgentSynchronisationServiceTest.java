@@ -439,7 +439,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
 
     private AgentSynchronisationMessage enqueueNewMessage()
     {
-        SynchronisationMessage message = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("blah", "baz", Collections.<String, String>emptyMap()));
+        SynchronisationMessage message = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("blah", "baz", false, Collections.<String, String>emptyMap()));
         AgentSynchronisationMessage agentMessage = new AgentSynchronisationMessage(agentState, message, "desc");
         agentMessage.setId(nextId.getAndIncrement());
         messageDao.save(agentMessage);

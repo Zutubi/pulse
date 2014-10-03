@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Configuration for an agent: a service that can execute recipes.
  */
-@Form(fieldOrder = {"name", "remote", "host", "port", "ssl", "allowPersonalBuilds", "priority", "dataDirectory"})
+@Form(fieldOrder = {"name", "remote", "host", "port", "ssl", "allowPersonalBuilds", "priority"})
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
 @Wire
@@ -41,8 +41,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private boolean allowPersonalBuilds = true;
     @Numeric
     private int priority = 0;
-    @Wizard.Ignore
-    private String dataDirectory = "$(data.dir)/agents/$(agent.handle)";
+    private AgentStorageConfiguration storage = new AgentStorageConfiguration();
     private Map<String, ResourceConfiguration> resources;
     @Ordered
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
@@ -144,14 +143,14 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
         this.priority = priority;
     }
 
-    public String getDataDirectory()
+    public AgentStorageConfiguration getStorage()
     {
-        return dataDirectory;
+        return storage;
     }
 
-    public void setDataDirectory(String dataDirectory)
+    public void setStorage(AgentStorageConfiguration storage)
     {
-        this.dataDirectory = dataDirectory;
+        this.storage = storage;
     }
 
     public long getAgentStateId()

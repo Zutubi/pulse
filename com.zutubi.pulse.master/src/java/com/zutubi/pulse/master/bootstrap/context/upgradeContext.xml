@@ -216,6 +216,8 @@
                 <ref local="addRunBuildHookTaskOnAgents"/>
                 <ref local="addSubversionShowChangedPaths"/>
                 <ref local="addXcodeWorkspace"/>
+                <ref local="addAgentStorageConfiguration"/>
+                <ref local="populateAgentStorageConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1140,5 +1142,13 @@
 
     <bean id="addXcodeWorkspace" class="com.zutubi.pulse.master.upgrade.tasks.AddXcodeWorkspaceUpgradeTask">
         <property name="buildNumber" value="207002003"/>
+    </bean>
+
+    <bean id="addAgentStorageConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentStorageConfigurationUpgradeTask">
+        <property name="buildNumber" value="207002004"/>
+    </bean>
+
+    <bean id="populateAgentStorageConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.PopulateAgentStorageConfigurationUpgradeTask">
+        <property name="buildNumber" value="207002005"/>
     </bean>
 </beans>

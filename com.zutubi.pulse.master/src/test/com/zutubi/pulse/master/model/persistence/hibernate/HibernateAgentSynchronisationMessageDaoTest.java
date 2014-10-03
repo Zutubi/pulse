@@ -76,7 +76,7 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
         agentStateDao.save(agentState1);
         agentStateDao.save(agentState2);
 
-        SynchronisationMessage deleteMessage = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo", "bar", Collections.<String, String>emptyMap()));
+        SynchronisationMessage deleteMessage = synchronisationTaskFactory.toMessage(new DeleteDirectoryTask("foo", "bar", false, Collections.<String, String>emptyMap()));
         SynchronisationMessage renameMessage = synchronisationTaskFactory.toMessage(new RenameDirectoryTask("foo", "bar"));
 
         AgentSynchronisationMessage message1QueuedDeleteA = new AgentSynchronisationMessage(agentState1, deleteMessage, "desc A");
@@ -153,6 +153,6 @@ public class HibernateAgentSynchronisationMessageDaoTest extends MasterPersisten
 
     private DeleteDirectoryTask newTask()
     {
-        return new DeleteDirectoryTask("foo", "bar", Collections.<String, String>emptyMap());
+        return new DeleteDirectoryTask("foo", "bar", false, Collections.<String, String>emptyMap());
     }
 }

@@ -102,7 +102,7 @@ public class WorkDirectoryCleanupService extends BackgroundServiceSupport
                     details.setStage(stageConfig.getName());
                     details.setStageHandle(stageConfig.getHandle());
 
-                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getDataDirectory(), workDirPattern, getVariables(details));
+                    DeleteDirectoryTask deleteTask = new DeleteDirectoryTask(agentConfig.getStorage().getDataDirectory(), workDirPattern, agentConfig.getStorage().isOutsideCleanupAllowed(), getVariables(details));
                     SynchronisationMessage message = synchronisationTaskFactory.toMessage(deleteTask);
                     propertiesDescriptionPairs.add(asPair(message.getArguments(), I18N.format("cleanup.stage.directory", details.getProject(), details.getStage())));
                 }

@@ -187,13 +187,14 @@ public class AgentStatusManager implements EventListener
         }
 
         // Catch-all for disable-on-idle.
-        if (agent.isDisabling() && agent.getStatus().isAvailable())
+        AgentStatus newStatus = agent.getStatus();
+        if (agent.isDisabling() && (newStatus == AgentStatus.IDLE || newStatus == AgentStatus.LOW_DISK_SPACE))
         {
             agentPersistentStatusManager.setEnableState(agent, AgentState.EnableState.DISABLED);
             agent.updateStatus(AgentStatus.DISABLED, timestamp);
         }
 
-        AgentStatus newStatus = agent.getStatus();
+        newStatus = agent.getStatus();
         if (newStatus.isOnline())
         {
             if (!oldStatus.isOnline())
@@ -306,6 +307,7 @@ public class AgentStatusManager implements EventListener
                 break;
 
             case IDLE:
+            case LOW_DISK_SPACE:
             case SYNCHRONISED:
                 agent.updateStatus(agentPingEvent, timestamp);
                 break;
@@ -478,7 +480,7 @@ public class AgentStatusManager implements EventListener
                 case ENABLED:
                     if (status.isOnline())
                     {
-                        if (status.isAvailable())
+                        if (status == AgentStatus.IDLE || status == AgentStatus.LOW_DISK_SPACE)
                         {
                             // Immediate disable
                             publishEvent(new AgentUnavailableEvent(this, agent));
@@ -622,7 +624,7 @@ public class AgentStatusManager implements EventListener
         if (existingAgent != null)
         {
             AgentStatus currentStatus = existingAgent.getStatus();
-            if (currentStatus == AgentStatus.IDLE || currentStatus == AgentStatus.SYNCHRONISED)
+            if (currentStatus == AgentStatus.IDLE || currentStatus == AgentStatus.LOW_DISK_SPACE || currentStatus == AgentStatus.SYNCHRONISED)
             {
                 existingAgent.updateStatus(AgentStatus.SYNCHRONISING, timestamp);
                 publishEvent(new AgentStatusChangeEvent(this, existingAgent, currentStatus, AgentStatus.SYNCHRONISING));

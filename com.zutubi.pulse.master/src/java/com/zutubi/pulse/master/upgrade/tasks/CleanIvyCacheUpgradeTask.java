@@ -28,7 +28,7 @@ public class CleanIvyCacheUpgradeTask extends AbstractUpgradeTask implements Con
         File cacheBase = new File(data.getData(), "cache");
 
         // this could take a while so schedule it in the background.
-        fileDeletionService.delete(cacheBase, false);
+        fileDeletionService.delete(cacheBase, false, false);
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
