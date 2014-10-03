@@ -9,5 +9,12 @@ public interface BuildReason extends Cloneable
 
     String getSummary();
 
+    /**
+     * @return the name of the configured trigger that fired to cause the build when there is one
+     *         and it is known, null otherwise (e.g. remote API trigger, indirect trigger via
+     *         dependencies)
+     */
+    String getTriggerName();
+
     Object clone() throws CloneNotSupportedException;
 }

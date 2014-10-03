@@ -22,7 +22,7 @@ public class RebuildBuildReason extends AbstractBuildReason
 
     public String getSummary()
     {
-        return "build with dependencies of "+ source;
+        return "build with dependencies of " + source;
     }
 
     // for hibernate only.

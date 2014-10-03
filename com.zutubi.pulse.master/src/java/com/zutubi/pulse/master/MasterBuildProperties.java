@@ -14,6 +14,7 @@ import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildType;
 import com.zutubi.pulse.master.tove.config.project.CheckoutType;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.util.StringUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -73,9 +74,10 @@ public class MasterBuildProperties extends BuildProperties
 
         BuildReason buildReason = buildResult.getReason();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REASON, buildReason.getSummary());
-        if(buildReason instanceof TriggerBuildReason)
+        String triggerName = buildReason.getTriggerName();
+        if (StringUtils.stringSet(triggerName))
         {
-            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TRIGGER, triggerName);
         }
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_LOCAL_BUILD, Boolean.toString(false));

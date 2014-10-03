@@ -28,6 +28,11 @@ public class NamedManualTriggerBuildReason extends AbstractBuildReason
         return "'" + triggerName + "' fired by " + (username != null ? username : "anonymous");
     }
 
+    public String getTriggerName()
+    {
+        return triggerName;
+    }
+
     /**
      * @return the user and trigger names safely combined into one field, so they can be stored in
      *         one database column (like all other build reasons are)

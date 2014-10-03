@@ -17,4 +17,9 @@ public abstract class AbstractBuildReason extends Entity implements BuildReason,
     {
         return super.clone();
     }
+
+    public String getTriggerName()
+    {
+        return null;
+    }
 }
