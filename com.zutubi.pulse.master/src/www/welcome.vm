@@ -87,6 +87,13 @@
             <th class="category" colspan="2">new in 2.7</th>
         </tr>
         <tr>
+            #actionHeader("agentstorage" "agent storage management" "accept" false)
+            <td>
+                New agent storage management options allow you to avoid spurious build failures
+                due to low disk space, and easily clean up directories on a specific agent.
+            </td>
+        </tr>
+        <tr>
             #actionHeader("configperformance" "configuration performance improvements" "accept" false)
             <td>
                 Performance tuning of the configuration system should make it a lot snappier,
@@ -141,13 +148,6 @@
                 Support for running as a service has improved on all platforms, now using
                 Apache Commons Daemon on Windows and with systemd and upstart integration on
                 Linux.
-            </td>
-        </tr>
-        <tr>
-            #actionHeader("agentclean" "clean agent directories" "accept" false)
-            <td>
-                A new action makes it easy to clean the build directories on a specific
-                agent.
             </td>
         </tr>
         <tr>
