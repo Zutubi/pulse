@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
+import com.zutubi.tove.annotations.Classification;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -12,6 +13,7 @@ import java.util.LinkedList;
  * The configuration that controls the embedded artifact repository.
  */
 @SymbolicName("zutubi.repositoryConfig")
+@Classification(single = "repository")
 public class RepositoryConfiguration extends AbstractConfiguration
 {
     /**

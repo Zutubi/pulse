@@ -2001,6 +2001,12 @@ table.template-actions
     width: 20px;
 }
 
+.x-tree-node-collapsed .config-repository-icon, .x-tree-node-expanded .config-repository-icon, .x-tree-node-leaf .config-repository-icon
+{
+    background-image: url(../images/database.gif);
+    width: 20px;
+}
+
 .x-tree-node-collapsed .config-contacts-icon, .x-tree-node-expanded .config-contacts-icon, .x-tree-node-leaf .config-contacts-icon
 {
     background-image: url(../images/folder_email.gif);
