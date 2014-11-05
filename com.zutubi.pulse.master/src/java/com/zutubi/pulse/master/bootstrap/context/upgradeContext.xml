@@ -1145,10 +1145,10 @@
     </bean>
 
     <bean id="addAgentStorageConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddAgentStorageConfigurationUpgradeTask">
-        <property name="buildNumber" value="207002004"/>
+        <property name="buildNumber" value="207003001"/>
     </bean>
 
     <bean id="populateAgentStorageConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.PopulateAgentStorageConfigurationUpgradeTask">
-        <property name="buildNumber" value="207002005"/>
+        <property name="buildNumber" value="207003002"/>
     </bean>
 </beans>
