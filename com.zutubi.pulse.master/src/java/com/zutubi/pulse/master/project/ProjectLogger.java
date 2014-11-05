@@ -1,9 +1,8 @@
 package com.zutubi.pulse.master.project;
 
 import com.google.common.base.Function;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.master.project.events.ProjectEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCommencedEvent;
 import com.zutubi.pulse.master.project.events.ProjectInitialisationCompletedEvent;
@@ -28,7 +27,7 @@ import static java.util.Arrays.asList;
  * indefinitely, log files are rotated out when they hit a limit, and only two
  * files (including the current one) are kept.
  */
-public class ProjectLogger implements InputSupplier<InputStream>
+public class ProjectLogger extends ByteSource
 {
     private static final Logger LOG = Logger.getLogger(ProjectLogger.class);
 
@@ -110,15 +109,16 @@ public class ProjectLogger implements InputSupplier<InputStream>
         return tail.getTail();
     }
 
-    public synchronized InputStream getInput() throws IOException
+    public synchronized InputStream openStream() throws IOException
     {
         final Iterable<File> files = filter(asList(lastFile, currentFile), new IsFilePredicate());
-        return ByteStreams.join(transform(files, new Function<File, InputSupplier<FileInputStream>>() {
-            public InputSupplier<FileInputStream> apply(File input)
+        return ByteSource.concat(transform(files, new Function<File, ByteSource>()
+        {
+            public ByteSource apply(File input)
             {
-                return Files.newInputStreamSupplier(input);
+                return Files.asByteSource(input);
             }
-        })).getInput();
+        })).openStream();
     }
 
     private void write(String message)

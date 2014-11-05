@@ -1,7 +1,5 @@
 package com.zutubi.pulse.master.build.log;
 
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
@@ -127,7 +125,7 @@ public class LogFileTest extends PulseTestCase
         writeLines(TEST_CONTENT);
         assertFalse(logFile.isCompressed());
         LogFile other = new LogFile(file, COMPRESS_THRESHOLD, TAIL_LIMIT, true);
-        InputStream in = other.openInputStream();
+        InputStream in = other.openStream();
 
         writeCompressed();
         assertFalse(logFile.isCompressed());
@@ -139,19 +137,12 @@ public class LogFileTest extends PulseTestCase
     public void testOpenSecondWriterOnCompressedWhileReaderOpen() throws IOException
     {
         String compressedContent = writeCompressed();
-        final InputStream is = logFile.openInputStream();
         assertTrue(logFile.isCompressed());
 
         Writer writer = logFile.openWriter();
         assertFalse(logFile.isCompressed());
 
-        assertEquals(compressedContent, CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
-        {
-            public InputStream getInput() throws IOException
-            {
-                return is;
-            }
-        }, Charset.defaultCharset())));
+        assertEquals(compressedContent, logFile.asCharSource(Charset.defaultCharset()).read());
 
         assertFalse(logFile.isCompressed());
 
@@ -193,14 +184,7 @@ public class LogFileTest extends PulseTestCase
 
     private String getContents() throws IOException
     {
-        String content = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
-        {
-            public InputStream getInput() throws IOException
-            {
-                return logFile.openInputStream();
-            }
-        }, Charset.defaultCharset()));
-
+        String content = logFile.asCharSource(Charset.defaultCharset()).read();
         return content.replace("\r\n", "\n");
     }
 

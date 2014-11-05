@@ -1,8 +1,7 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.google.common.base.Predicate;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
+import com.google.common.io.ByteSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,9 +59,10 @@ public class ScmUtils
      */
     public static String retrieveContent(final ScmClient client, final ScmContext context, final String path, final Revision revision) throws ScmException, IOException
     {
-        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        return new ByteSource()
         {
-            public InputStream getInput() throws IOException
+            @Override
+            public InputStream openStream() throws IOException
             {
                 try
                 {
@@ -73,6 +73,6 @@ public class ScmUtils
                     throw new IOException(e);
                 }
             }
-        }, Charset.defaultCharset()));
+        }.asCharSource(Charset.defaultCharset()).read();
     }
 }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.engine;
 
+import com.google.common.io.ByteSource;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.marshal.FileResolver;
@@ -37,14 +38,21 @@ public class ExternalPulseFileProvider implements PulseFileProvider
 
     public String getFileContent(final FileResolver resolver) throws Exception
     {
-        final InputStream stream = resolver.resolve(path);
-        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        return new ByteSource()
         {
-            public InputStream getInput() throws IOException
+            @Override
+            public InputStream openStream() throws IOException
             {
-                return stream;
+                try
+                {
+                    return resolver.resolve(path);
+                }
+                catch (Exception e)
+                {
+                    throw new IOException(e);
+                }
             }
-        }, Charset.defaultCharset()));
+        }.asCharSource(Charset.defaultCharset()).read();
     }
 
     public File getImportRoot()

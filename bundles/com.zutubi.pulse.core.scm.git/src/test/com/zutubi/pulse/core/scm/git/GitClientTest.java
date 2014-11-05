@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.google.common.base.Predicate;
-import com.google.common.io.CharStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -712,9 +711,10 @@ public class GitClientTest extends GitClientTestBase
 
     private String showTag(final NativeGit nativeGit, final String tagName) throws IOException
     {
-        return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        return new ByteSource()
         {
-            public InputStream getInput() throws IOException
+            @Override
+            public InputStream openStream() throws IOException
             {
                 try
                 {
@@ -725,7 +725,7 @@ public class GitClientTest extends GitClientTestBase
                     throw new IOException(e);
                 }
             }
-        }, Charset.defaultCharset()));
+        }.asCharSource(Charset.defaultCharset()).read();
     }
 
     private void assertLatestCheckedOut()

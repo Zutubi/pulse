@@ -1,7 +1,5 @@
 package com.zutubi.util.junit;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.util.io.FileSystemUtils;
@@ -194,7 +192,7 @@ public abstract class ZutubiTestCase extends TestCase
      */
     public String readInputFully(String name, String extension) throws IOException
     {
-        return CharStreams.toString(Resources.newReaderSupplier(getInputURL(name, extension), Charset.defaultCharset()));
+        return Resources.toString(getInputURL(name, extension), Charset.defaultCharset());
     }
 
     /**
@@ -230,7 +228,7 @@ public abstract class ZutubiTestCase extends TestCase
     public File copyInputToDirectory(String name, String extension, File directory) throws IOException
     {
         File destinationFile = new File(directory, name + "." + extension);
-        ByteStreams.copy(Resources.newInputStreamSupplier(getInputURL(name, extension)), Files.newOutputStreamSupplier(destinationFile));
+        Resources.asByteSource(getInputURL(name, extension)).copyTo(Files.asByteSink(destinationFile));
         return destinationFile;
     }
 

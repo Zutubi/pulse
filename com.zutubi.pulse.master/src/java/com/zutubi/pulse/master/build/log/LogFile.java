@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.build.log;
 
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.zutubi.pulse.servercore.cleanup.FileDeletionService;
 import com.zutubi.util.adt.CircularBuffer;
@@ -37,7 +38,7 @@ import java.util.zip.GZIPInputStream;
  * removed.  For efficient tailing, when compressing the implementation keeps a
  * .tail file with the last 100 lines of the file in uncompressed form.
  */
-public class LogFile
+public class LogFile extends ByteSource
 {
     private static final Logger LOG = Logger.getLogger(LogFile.class);
 
@@ -277,7 +278,7 @@ public class LogFile
      * @return a stream that may be used to read the file contents
      * @throws IOException on error
      */
-    public InputStream openInputStream() throws IOException
+    public InputStream openStream() throws IOException
     {
         final InputStream delegate = prepareInputStream();
         return new InputStream()

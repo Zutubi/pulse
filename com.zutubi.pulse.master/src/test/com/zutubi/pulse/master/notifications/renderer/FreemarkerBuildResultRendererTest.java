@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.notifications.renderer;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -561,7 +560,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             StringWriter writer = new StringWriter();
             renderer.render(result, dataMap, type, writer);
             String got = removeCR(replaceTimestamps(writer.getBuffer().toString()));
-            final String raw = CharStreams.toString(Resources.newReaderSupplier(getInputURL(expectedName, extension), Charset.defaultCharset()));
+            final String raw = Resources.asCharSource(getInputURL(expectedName, extension), Charset.defaultCharset()).read();
             String expected = removeCR(replaceTimestamps(raw));
             assertEquals(expected, got);
         }

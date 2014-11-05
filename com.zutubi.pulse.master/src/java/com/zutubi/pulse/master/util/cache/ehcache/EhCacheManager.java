@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.util.cache.ehcache;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
@@ -28,7 +27,7 @@ public class EhCacheManager implements com.zutubi.pulse.master.util.cache.CacheM
 
     public void init() throws IOException
     {
-        String configContent = CharStreams.toString(Resources.newReaderSupplier(getClass().getResource(CONFIG_FILE), Charset.defaultCharset()));
+        String configContent = Resources.asCharSource(getClass().getResource(CONFIG_FILE), Charset.defaultCharset()).read();
         configContent = configContent.replace(TEMP_DIR_TOKEN, systemPaths.getTmpRoot().getAbsolutePath());
 
         InputStream stream = null;

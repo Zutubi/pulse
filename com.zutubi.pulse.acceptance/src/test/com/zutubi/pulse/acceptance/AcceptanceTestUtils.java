@@ -1,9 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
-import com.google.common.io.CharStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import com.sun.org.apache.bcel.internal.classfile.*;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.core.util.PulseZipUtils;
@@ -301,13 +300,14 @@ public class AcceptanceTestUtils
         {
             get = httpGet(contentUri, credentials);
             final GetMethod finalGet = get;
-            return CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+            return new ByteSource()
             {
-                public InputStream getInput() throws IOException
+                @Override
+                public InputStream openStream() throws IOException
                 {
                     return finalGet.getResponseBodyAsStream();
                 }
-            }, Charset.defaultCharset()));
+            }.asCharSource(Charset.defaultCharset()).read();
         }
         finally
         {

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.core.marshal;
 
-import com.google.common.io.CharStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.tove.type.record.PathUtils;
 
@@ -40,9 +39,10 @@ public class LocalFileResolverTest extends PulseTestCase
     {
         File f = new File(tempDir, FILENAME);
         Files.write(CONTENT_SIMPLE, f, Charset.defaultCharset());
-        final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        final String resolvedContent = new ByteSource()
         {
-            public InputStream getInput() throws IOException
+            @Override
+            public InputStream openStream() throws IOException
             {
                 try
                 {
@@ -53,7 +53,7 @@ public class LocalFileResolverTest extends PulseTestCase
                     throw new RuntimeException(e);
                 }
             }
-        }, Charset.defaultCharset()));
+        }.asCharSource(Charset.defaultCharset()).read();
 
         assertEquals(CONTENT_SIMPLE, resolvedContent);
     }
@@ -64,9 +64,10 @@ public class LocalFileResolverTest extends PulseTestCase
         assertTrue(dir.mkdir());
         File nested = new File(dir, FILENAME);
         Files.write(CONTENT_NESTED, nested, Charset.defaultCharset());
-        final String resolvedContent = CharStreams.toString(CharStreams.newReaderSupplier(new InputSupplier<InputStream>()
+        final String resolvedContent = new ByteSource()
         {
-            public InputStream getInput() throws IOException
+            @Override
+            public InputStream openStream() throws IOException
             {
                 try
                 {
@@ -77,7 +78,7 @@ public class LocalFileResolverTest extends PulseTestCase
                     throw new RuntimeException(e);
                 }
             }
-        }, Charset.defaultCharset()));
+        }.asCharSource(Charset.defaultCharset()).read();
 
         assertEquals(CONTENT_NESTED, resolvedContent);
     }

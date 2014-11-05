@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.plugins;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.plugins.osgi.Equinox;
@@ -834,7 +833,7 @@ public class PluginManager
                 throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
             }
 
-            ByteStreams.copy(Resources.newInputStreamSupplier(source.toURL()), Files.newOutputStreamSupplier(tmpFile));
+            Resources.asByteSource(source.toURL()).copyTo(Files.asByteSink(tmpFile));
 
             // 'commit' the downloaded file by renaming it
             FileSystemUtils.rename(tmpFile, dest, true);

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.postprocessors.ocunit;
 
 import com.google.common.base.Function;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.PulseExecutionContext;
@@ -46,11 +45,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
     private StoredFileArtifact prepareArtifact(String name) throws IOException
     {
         File tmpFile = new File(tmpDir, name + ".txt");
-        ByteStreams.copy(
-                Resources.newInputStreamSupplier(this.getClass().getResource("OCUnitReportPostProcessorTest." + name + ".txt")),
-                Files.newOutputStreamSupplier(tmpFile)
-        );
-
+        Resources.asByteSource(this.getClass().getResource("OCUnitReportPostProcessorTest." + name + ".txt")).copyTo(Files.asByteSink(tmpFile));
         return new StoredFileArtifact( name + ".txt");
     }
 

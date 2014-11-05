@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.commands.nant;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.commands.api.OutputProducingCommandSupport;
@@ -21,7 +20,7 @@ public class NAntCommandTest extends OutputProducingCommandTestCase
         if (SystemUtils.IS_WINDOWS)
         {
             File destinationFile = new File(baseDir, "default.build");
-            ByteStreams.copy(Resources.newInputStreamSupplier(getInputURL(getName(), EXTENSION_XML)), Files.newOutputStreamSupplier(destinationFile));
+            Resources.asByteSource(getInputURL(getName(), EXTENSION_XML)).copyTo(Files.asByteSink(destinationFile));
 
             TestCommandContext context = runCommand(new NamedArgumentCommand(new NAntCommandConfiguration()));
             assertEquals(ResultState.SUCCESS, context.getResultState());

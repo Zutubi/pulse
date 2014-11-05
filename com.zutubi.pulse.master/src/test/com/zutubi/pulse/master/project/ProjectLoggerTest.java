@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.project;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
@@ -111,7 +110,7 @@ public class ProjectLoggerTest extends PulseTestCase
 
     public void testRawWithNoLogMessages() throws IOException
     {
-        assertEquals("", CharStreams.toString(CharStreams.newReaderSupplier(logger, Charset.defaultCharset())));
+        assertEquals("", logger.asCharSource(Charset.defaultCharset()).read());
     }
 
     public void testRaw() throws IOException
@@ -141,7 +140,7 @@ public class ProjectLoggerTest extends PulseTestCase
             logMessage(TEST_MESSAGE);
         }
 
-        String raw = CharStreams.toString(CharStreams.newReaderSupplier(logger, Charset.defaultCharset()));
+        String raw = logger.asCharSource(Charset.defaultCharset()).read();
         assertEquals(expected, wipeTimestamps(raw));
     }
 

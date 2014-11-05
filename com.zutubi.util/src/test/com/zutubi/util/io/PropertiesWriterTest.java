@@ -1,6 +1,5 @@
 package com.zutubi.util.io;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.util.junit.ZutubiTestCase;
@@ -23,11 +22,7 @@ public class PropertiesWriterTest extends ZutubiTestCase
         // copy contents of original file into the temporary directory.
         config = new File(tmpDir, "tmp.config.properties");
         assertTrue(config.createNewFile());
-
-        ByteStreams.copy(
-                Resources.newInputStreamSupplier(getClass().getResource(getClass().getSimpleName() + "." + getName() + ".original.properties")),
-                Files.newOutputStreamSupplier(config)
-        );
+        Resources.asByteSource(getClass().getResource(getClass().getSimpleName() + "." + getName() + ".original.properties")).copyTo(Files.asByteSink(config));
     }
 
     protected void tearDown() throws Exception

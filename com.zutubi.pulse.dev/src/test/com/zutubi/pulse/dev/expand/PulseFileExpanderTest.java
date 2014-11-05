@@ -1,6 +1,5 @@
 package com.zutubi.pulse.dev.expand;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.NoopCommandConfiguration;
 import com.zutubi.pulse.core.NoopPostProcessorConfiguration;
@@ -191,7 +190,7 @@ public class PulseFileExpanderTest extends PulseTestCase
 
     private String getExpectedOutput()  throws IOException
     {
-        return CharStreams.toString(Resources.newReaderSupplier(getInputURL("out.xml"), Charset.defaultCharset()));
+        return Resources.asCharSource(getInputURL("out.xml"), Charset.defaultCharset()).read();
     }
 
 }

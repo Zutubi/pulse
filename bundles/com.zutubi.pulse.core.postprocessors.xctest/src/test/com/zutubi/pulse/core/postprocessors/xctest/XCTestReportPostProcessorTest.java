@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.postprocessors.xctest;
 
-import com.google.common.base.Function;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.PulseExecutionContext;
@@ -17,10 +15,7 @@ import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
-import static com.google.common.collect.Lists.transform;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 public class XCTestReportPostProcessorTest extends PulseTestCase
@@ -48,11 +43,7 @@ public class XCTestReportPostProcessorTest extends PulseTestCase
     private StoredFileArtifact prepareArtifact(String name) throws IOException
     {
         File tmpFile = new File(tmpDir, name + ".txt");
-        ByteStreams.copy(
-                Resources.newInputStreamSupplier(this.getClass().getResource("XCTestReportPostProcessorTest." + name + ".txt")),
-                Files.newOutputStreamSupplier(tmpFile)
-        );
-
+        Resources.asByteSource(this.getClass().getResource("XCTestReportPostProcessorTest." + name + ".txt")).copyTo(Files.asByteSink(tmpFile));
         return new StoredFileArtifact( name + ".txt");
     }
 

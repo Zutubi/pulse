@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
@@ -65,14 +65,22 @@ public class DatabaseArchive extends AbstractArchiveableComponent implements Fee
             }
 
             // Export the schema as part of the data export.
-            for (Resource resource : resources)
+            for (final Resource resource : resources)
             {
                 File file = new File(base, resource.getFilename());
                 if (!file.createNewFile())
                 {
                     throw new ArchiveException("Failed to create new file: " + file.getCanonicalPath());
                 }
-                ByteStreams.copy(resource.getInputStream(), Files.newOutputStreamSupplier(file));
+
+                new ByteSource()
+                {
+                    @Override
+                    public InputStream openStream() throws IOException
+                    {
+                        return resource.getInputStream();
+                    }
+                }.copyTo(Files.asByteSink(file));
             }
 
             File export = new File(base, EXPORT_FILENAME);

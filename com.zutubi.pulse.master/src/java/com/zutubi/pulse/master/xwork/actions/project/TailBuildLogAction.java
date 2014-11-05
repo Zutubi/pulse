@@ -160,7 +160,7 @@ public class TailBuildLogAction extends StageActionBase
     {
         try
         {
-            inputStream = logFile.openInputStream();
+            inputStream = logFile.openStream();
         }
         catch (IOException e)
         {

@@ -56,7 +56,7 @@ public class NotificationAttachment
             {
                 public InputStream getInputStream() throws IOException
                 {
-                    return new AutoCloseInputStream(logFile.openInputStream());
+                    return new AutoCloseInputStream(logFile.openStream());
                 }
 
                 public OutputStream getOutputStream() throws IOException

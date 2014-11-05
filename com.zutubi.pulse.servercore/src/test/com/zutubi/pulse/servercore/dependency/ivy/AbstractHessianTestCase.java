@@ -1,6 +1,5 @@
 package com.zutubi.pulse.servercore.dependency.ivy;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptorParser;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
@@ -56,6 +55,6 @@ public class AbstractHessianTestCase extends PulseTestCase
 
     protected String readDescriptor(String resourceName) throws IOException
     {
-        return CharStreams.toString(Resources.newReaderSupplier(ModuleDescriptorSerialiserTest.class.getResource(resourceName), Charset.defaultCharset()));
+        return Resources.asCharSource(ModuleDescriptorSerialiserTest.class.getResource(resourceName), Charset.defaultCharset()).read();
     }
 }

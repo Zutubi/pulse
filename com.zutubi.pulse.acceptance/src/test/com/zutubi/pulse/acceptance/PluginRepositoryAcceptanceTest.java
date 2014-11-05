@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
 import com.zutubi.pulse.core.plugins.repository.PluginRepository;
@@ -14,6 +14,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 
@@ -84,10 +85,17 @@ public class PluginRepositoryAcceptanceTest extends AcceptanceTestBase
     {
         File jar = new File(tmpDir, id + "-" + version + "-downloaded.jar");
         URI uri = repository.getPluginLocation(new PluginInfo(id, version, PluginRepository.Scope.CORE));
-        GetMethod getMethod = AcceptanceTestUtils.httpGet(uri.toString(), null);
+        final GetMethod getMethod = AcceptanceTestUtils.httpGet(uri.toString(), null);
         try
         {
-            ByteStreams.copy(getMethod.getResponseBodyAsStream(), Files.newOutputStreamSupplier(jar));
+            new ByteSource()
+            {
+                @Override
+                public InputStream openStream() throws IOException
+                {
+                    return getMethod.getResponseBodyAsStream();
+                }
+            }.copyTo(Files.asByteSink(jar));
             return jar;
         }
         finally

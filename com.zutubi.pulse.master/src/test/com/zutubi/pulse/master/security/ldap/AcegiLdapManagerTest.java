@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.security.ldap;
 
-import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.admin.LDAPConfiguration;
@@ -45,7 +44,7 @@ public class AcegiLdapManagerTest extends AbstractLdapTestUnit
         config = createBaseConfiguration();
 
         final URL ldifUrl = AcegiLdapManagerTest.class.getResource("AcegiLdapManagerTest.ldif");
-        String ldif = CharStreams.toString(Resources.newReaderSupplier(ldifUrl, Charset.defaultCharset()));
+        String ldif = Resources.asCharSource(ldifUrl, Charset.defaultCharset()).read();
         DSAnnotationProcessor.injectEntries(service, ldif);
 
         UserManager userManager = mock(UserManager.class);
