@@ -331,7 +331,7 @@ public class NativeGit
 
     public void apply(ScmFeedbackHandler handler, File patch) throws ScmException
     {
-        run(handler, getGitCommand(), COMMAND_APPLY, FLAG_VERBOSE, patch.getAbsolutePath());
+        run(handler, getGitCommand(), COMMAND_APPLY, FLAG_VERBOSE, FLAG_IGNORE_SPACE_CHANGE, patch.getAbsolutePath());
     }
 
     public List<String> getConfig(String name) throws ScmException

@@ -97,7 +97,8 @@ public class GitConstants
     public static final String FLAG_RECURSIVE = "--recursive";
     public static final String FLAG_SKIP = "--skip";
     public static final String FLAG_SINGLE_BRANCH = "--single-branch";
-
+    public static final String FLAG_IGNORE_SPACE_CHANGE = "--ignore-space-change";
+    
     public static final String FLAG_SEPARATOR = "--";
 
     // Non-flag command arguments (subcommands).
