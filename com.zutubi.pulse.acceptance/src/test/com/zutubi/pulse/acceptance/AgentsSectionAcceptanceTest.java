@@ -18,6 +18,8 @@ import com.zutubi.util.io.FileSystemUtils;
 import static java.util.Arrays.asList;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Acceptance test for basic agents section functionality.
@@ -63,7 +65,9 @@ public class AgentsSectionAcceptanceTest extends AcceptanceTestBase
         agentsPage.refreshUntilStatus(AGENT, OFFLINE.getPrettyString());
 
         long agentId = rpcClient.TestApi.getAgentId(AGENT);
-        assertEquals(asList(ACTION_DISABLE, ACTION_PING), agentsPage.getAgentSummaryTable().getActions(agentId));
+        final List<String> actions = agentsPage.getAgentSummaryTable().getActions(agentId);
+        Collections.sort(actions);
+        assertEquals(asList(ACTION_CLEAN, ACTION_DISABLE, ACTION_PING), actions);
     }
 
     public void testDisableEnable() throws Exception

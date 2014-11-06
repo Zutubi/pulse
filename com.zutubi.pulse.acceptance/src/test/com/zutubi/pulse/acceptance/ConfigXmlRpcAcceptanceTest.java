@@ -1,13 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Function;
+import static com.google.common.collect.Iterables.transform;
 import com.google.common.collect.Lists;
+import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentStatus;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
+import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
 import com.zutubi.pulse.master.tove.config.project.BootstrapConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -20,22 +23,18 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.ListType;
 import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.Condition;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
-
-import java.io.File;
-import java.util.*;
-
-import static com.google.common.collect.Iterables.transform;
-import static com.zutubi.pulse.acceptance.rpc.RemoteApiClient.SYMBOLIC_NAME_KEY;
-import static com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions.*;
-import static com.zutubi.tove.type.record.PathUtils.WILDCARD_ANY_ELEMENT;
-import static com.zutubi.tove.type.record.PathUtils.getPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -729,8 +728,9 @@ public class ConfigXmlRpcAcceptanceTest extends AcceptanceTestBase
         try
         {
             rpcClient.RemoteApi.waitForAgentStatus(agentName, AgentStatus.IDLE, AGENT_STATUS_TIMEOUT);
-            Vector<String> actions = rpcClient.RemoteApi.getConfigActions(path);
-            assertEquals(asList(ACTION_DISABLE, ACTION_PING, ACTION_CLEAN), new LinkedList<String>(actions));
+            List<String> actions = rpcClient.RemoteApi.getConfigActions(path);
+            Collections.sort(actions);
+            assertEquals(asList(ACTION_CLEAN, ACTION_DISABLE, ACTION_PING), actions);
         }
         finally
         {
