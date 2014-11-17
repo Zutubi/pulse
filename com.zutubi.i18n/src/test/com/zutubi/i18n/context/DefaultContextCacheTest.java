@@ -1,13 +1,12 @@
 package com.zutubi.i18n.context;
 
+import com.zutubi.i18n.bundle.BaseResourceBundle;
 import com.zutubi.util.junit.ZutubiTestCase;
 
-import java.util.ResourceBundle;
-import java.util.Locale;
-import java.util.List;
 import java.util.Arrays;
-
-import com.zutubi.i18n.bundle.BaseResourceBundle;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * <class-comment/>
@@ -24,7 +23,7 @@ public class DefaultContextCacheTest extends ZutubiTestCase
         super.setUp();
 
         cache = new DefaultContextCache();
-        context = new IdContext("sample");
+        context = new ClassContext(DefaultContextCacheTest.class);
         locale = Locale.getDefault();
         bundles = Arrays.asList((ResourceBundle) new BaseResourceBundle(locale));
     }
