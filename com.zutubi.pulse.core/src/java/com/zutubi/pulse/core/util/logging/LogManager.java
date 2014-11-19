@@ -83,7 +83,7 @@ public class LogManager
         {
             String loggerName = loggerNames.nextElement();
             Logger l = java.util.logging.LogManager.getLogManager().getLogger(loggerName);
-            // Note that on OpenJDK platforms, there is no guarentee that a logger will exist.  The logger instance
+            // Note that on OpenJDK platforms, there is no guarantee that a logger will exist.  The logger instance
             // may have been garbage collected.  Hence we need this != null check.
             if (l != null)
             {

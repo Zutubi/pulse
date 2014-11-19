@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.Sort;
-import org.mortbay.util.Credential;
 
 import java.util.Comparator;
 
@@ -38,6 +38,6 @@ public class Prioritiser implements Comparator<Agent>
 
     private String getAgentHash(Agent agent)
     {
-        return Credential.MD5.digest(agent.getName() + request.getBuild().getProject().getName());
+        return SecurityUtils.md5Digest(agent.getName() + request.getBuild().getProject().getName());
     }
 }

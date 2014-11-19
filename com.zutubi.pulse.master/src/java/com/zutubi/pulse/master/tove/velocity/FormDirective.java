@@ -15,7 +15,7 @@ import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.parser.node.Node;
-import org.mortbay.http.EOFException;
+import org.eclipse.jetty.io.EofException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -140,7 +140,7 @@ public class FormDirective extends ToveDirective
 
             return true;
         }
-        catch (EOFException e)
+        catch (EofException e)
         {
             // Client end probably closed the connection, don't clutter logs.
             return true;

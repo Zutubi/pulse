@@ -1,9 +1,10 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpHandler;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.handler.NotFoundHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerList;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,40 +19,23 @@ public class ArtifactRepositoryConfigurationHandler implements ContextConfigurat
      */
     private File base;
 
-    private HttpHandler securityHandler;
+    private Handler securityHandler;
 
-    public void configure(HttpContext context) throws IOException
+    public void configure(ContextHandler context) throws IOException
     {
-        context.setResourceBase(base.getCanonicalPath());
-        context.addHandler(securityHandler);
+        HandlerCollection handlers = new HandlerList();
+        handlers.addHandler(securityHandler);
 
-        // the resource handler does all of the file system work.
-        context.addHandler(new CreateRepositoryDirectoryHandler());
+        // FIXME: we need to subclass to support PUT/DELETE the resource handler does all of the file system work.
         ResourceHandler handler = new ResourceHandler();
-        handler.setAllowedMethods(new String[]{HttpRequest.__GET,
-                HttpRequest.__HEAD,
-                HttpRequest.__DELETE,
-                HttpRequest.__OPTIONS,
-                HttpRequest.__PUT
-        });
-        handler.setDirAllowed(true);
-        context.addHandler(handler);
+        handler.setDirectoriesListed(true);
+        handlers.addHandler(handler);
 
         // boilerplate handler for invalid requests.
-        context.addHandler(new NotFoundHandler());
+        handlers.addHandler(new DefaultHandler());
 
-        // start the context if the server into which we are adding it has already been started.
-        if (context.getHttpServer().isStarted())
-        {
-            try
-            {
-                context.start();
-            }
-            catch (Exception e)
-            {
-                throw new IOException("Failed to start repository context.");
-            }
-        }
+        context.setResourceBase(base.getCanonicalPath());
+        context.setHandler(handlers);
     }
 
     public void setBase(File base)
@@ -59,7 +43,7 @@ public class ArtifactRepositoryConfigurationHandler implements ContextConfigurat
         this.base = base;
     }
 
-    public void setSecurityHandler(HttpHandler securityHandler)
+    public void setSecurityHandler(Handler securityHandler)
     {
         this.securityHandler = securityHandler;
     }

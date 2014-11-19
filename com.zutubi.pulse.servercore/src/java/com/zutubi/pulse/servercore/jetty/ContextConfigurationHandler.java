@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import org.mortbay.http.HttpContext;
+import org.eclipse.jetty.server.handler.ContextHandler;
 
 import java.io.IOException;
 
@@ -10,5 +10,5 @@ import java.io.IOException;
  */
 public interface ContextConfigurationHandler
 {
-    void configure(HttpContext context) throws IOException;
+    void configure(ContextHandler context) throws IOException;
 }

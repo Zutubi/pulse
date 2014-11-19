@@ -4,33 +4,32 @@ import com.zutubi.pulse.master.security.AnonymousActor;
 import com.zutubi.pulse.master.security.HttpInvocation;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.handler.AbstractHttpHandler;
-import org.mortbay.jetty.servlet.ServletHttpRequest;
-import org.mortbay.jetty.servlet.ServletHttpResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * An implementation of the {@link org.mortbay.http.HttpHandler} interface
- * that delegates a security check to the access manager.  If the request is
- * denied and the user is anonymous, then a basic authentication  response
- * will be sent out.  If the user is authenticated but denied, then the
- * resource will be forbidden.
+ * An implementation of the {@link org.eclipse.jetty.server.handler.HandlerWrapper} interface that
+ * delegates a security check to the access manager.  If the request is denied and the user is
+ * anonymous, then a basic authentication response will be sent out.  If the user is authenticated
+ * but denied, then the resource will be forbidden.
  */
-public class SecurityHandler extends AbstractHttpHandler
+public class SecurityHandler extends HandlerWrapper
 {
     private AccessManager accessManager;
 
     private AuthenticationEntryPoint basicEntryPoint;
 
-    public void handle(final String pathInContext, final String pathParams, final HttpRequest httpRequest, final HttpResponse httpResponse) throws IOException
+    @Override
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
     {
-        HttpInvocation invocation = new HttpInvocation(httpRequest, httpResponse, pathInContext, accessManager.getActor());
+        HttpInvocation invocation = new HttpInvocation(request, accessManager.getActor());
 
         if (!accessManager.hasPermission(invocation.getMethod(), invocation))
         {
@@ -38,9 +37,6 @@ public class SecurityHandler extends AbstractHttpHandler
             {
                 // the user is anonymous and they obviously do not have the permissions to access
                 // this resource, so send them a challenge.  This will trigger the basic authentication.
-
-                ServletHttpRequest request = (ServletHttpRequest) httpRequest.getWrapper();
-                ServletHttpResponse response = (ServletHttpResponse) httpResponse.getWrapper();
                 try
                 {
                     // commence the basic authentication response.
@@ -50,17 +46,20 @@ public class SecurityHandler extends AbstractHttpHandler
                 {
                     throw new IOException(e.getMessage());
                 }
-                httpRequest.setHandled(true);
+                baseRequest.setHandled(true);
+                return;
             }
             else
             {
                 // The user has been authenticated but still does not have the permissions to access
                 // this resource.  Send them packing.
-                httpResponse.sendError(HttpResponse.__403_Forbidden);
-                httpRequest.setHandled(true);
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                baseRequest.setHandled(true);
+                return;
             }
         }
-        // The user has permissions to access this resource.
+
+        getHandler().handle(target, baseRequest, request, response);
     }
 
     private boolean isAnonymousActor(Actor actor)

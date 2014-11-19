@@ -1,34 +1,25 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import org.mortbay.http.handler.AbstractHttpHandler;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.HttpException;
-import org.mortbay.http.HttpHandler;
-import org.mortbay.jetty.servlet.ServletHttpRequest;
-import org.mortbay.jetty.servlet.ServletHttpResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
- * An implementation of a handler that delegates the handling to a delegate
- * handler.  This handler also allows for {@link javax.servlet.Filter}s to be
- * configured around the handler.
+ * A HandlerWrapper that applies {@link javax.servlet.Filter}s around the nested handler.
  */
-public class FilteringHandler extends AbstractHttpHandler
+public class FilteringHandler extends HandlerWrapper
 {
     private List<Filter> filters = new LinkedList<Filter>();
 
-    private HttpHandler delegate;
-
-    public void handle(final String pathInContext, final String pathParams, final HttpRequest httpRequest, final HttpResponse httpResponse) throws HttpException, IOException
+    @Override
+    public void handle(final String target, final Request baseRequest, final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException
     {
-        ServletHttpRequest request = (ServletHttpRequest) httpRequest.getWrapper();
-        ServletHttpResponse response = (ServletHttpResponse) httpResponse.getWrapper();
-
         try
         {
             FilterChain chain = new FilterChain()
@@ -46,7 +37,7 @@ public class FilteringHandler extends AbstractHttpHandler
                     else
                     {
                         // all of the filters have been applied, now we call the delegate.
-                        delegate.handle(pathInContext, pathParams, httpRequest,  httpResponse);
+                        getHandler().handle(target, baseRequest, request, response);
                     }
                 }
             };
@@ -66,10 +57,5 @@ public class FilteringHandler extends AbstractHttpHandler
     public void addFilter(Filter filter)
     {
         filters.add(filter);
-    }
-
-    public void setDelegate(HttpHandler delegate)
-    {
-        this.delegate = delegate;
     }
 }

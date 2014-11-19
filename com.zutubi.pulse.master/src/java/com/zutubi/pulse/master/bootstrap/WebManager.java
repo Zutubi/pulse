@@ -11,7 +11,6 @@ import com.zutubi.pulse.master.security.SecurityManager;
  */
 public class WebManager
 {
-    public static final String WEBAPP_PULSE = "pulse";
     public static final String REPOSITORY_PATH = "/repository";
 
     private boolean mainDeployed = false;

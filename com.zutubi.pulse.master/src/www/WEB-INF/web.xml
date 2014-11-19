@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app
-   xmlns="http://java.sun.com/xml/ns/j2ee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-   version="2.4">
-
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
     <display-name>Pulse</display-name>
     <description>Pulse Web UI</description>
 
@@ -92,7 +90,7 @@
 
     <servlet>
       <servlet-name>default</servlet-name>
-      <servlet-class>org.mortbay.jetty.servlet.Default</servlet-class>
+      <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
       <init-param>
         <param-name>acceptRanges</param-name>
         <param-value>true</param-value>
@@ -341,7 +339,12 @@
     </servlet-mapping>
 
     <session-config>
-      <session-timeout>30</session-timeout>
+        <session-timeout>30</session-timeout>
+
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
     </session-config>
 
     <!--

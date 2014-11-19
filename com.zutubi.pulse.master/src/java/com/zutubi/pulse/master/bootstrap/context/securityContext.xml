@@ -282,7 +282,7 @@ based upon the Spring Security system.
                 <ref local="anonymousAuthenticationFilter"/>
             </list>
         </property>
-        <property name="delegate" ref="securityDelegateHandler"/>
+        <property name="handler" ref="securityDelegateHandler"/>
     </bean>
 
     <bean name="securityDelegateHandler" class="com.zutubi.pulse.master.jetty.SecurityHandler">

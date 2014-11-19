@@ -38,7 +38,6 @@
         <dependency org="net.sourceforge.ehcache" name="net.sf.ehcache" rev="1.6.2" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.commons" name="org.apache.commons.pool" rev="1.2.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.hibernate" name="org.hibernate" rev="3.3.1.GA" conf="external,build,release->default;src->src"/>
-        <dependency org="org.slf4j" name="org.slf4j" rev="1.5.3" conf="external,build,release->jdk;src->src"/>
         <dependency org="org.hsqldb" name="org.hsqldb" rev="1.8.0.10" conf="external,build,release->default;src->src"/>
         <dependency org="org.igniterealtime" name="org.jivesoftware.smackx" rev="2.2.1" conf="external,build,release->default;src->src"/>
         <dependency org="com.opensymphony.quartz" name="org.quartz" rev="1.6.6" conf="external,build,release->default;src->src"/>

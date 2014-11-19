@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.security;
 
-import org.mortbay.http.HttpOnlyCookie;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import javax.servlet.http.Cookie;
@@ -23,9 +22,10 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
     protected void setCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response)
     {
         String cookieValue = encodeCookie(tokens);
-        Cookie cookie = new HttpOnlyCookie(getCookieName(), cookieValue);
+        Cookie cookie = new Cookie(getCookieName(), cookieValue);
         cookie.setMaxAge(maxAge);
         cookie.setPath(getCookiePath(request));
+        cookie.setHttpOnly(request.isSecure());
         cookie.setSecure(request.isSecure());
         response.addCookie(cookie);
     }

@@ -3,21 +3,21 @@ package com.zutubi.pulse.master.security;
 import com.google.common.collect.Sets;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
-import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
 import com.zutubi.tove.type.record.PathUtils;
-import static org.mockito.Mockito.*;
-import static org.mortbay.http.HttpRequest.__GET;
-import static org.mortbay.http.HttpRequest.__PUT;
+import org.eclipse.jetty.http.HttpMethod;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.PROJECTS_SCOPE;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
+import static org.mockito.Mockito.*;
 
 public class RepositoryAuthorityProviderTest extends PulseTestCase
 {
@@ -51,20 +51,20 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     public void testPathWithoutOrg()
     {
         ProjectConfiguration project = newProject(null, "project");
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "project/ivy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(HttpMethod.PUT.asString(), "project/ivy.xml"));
         verify(delegateProvider, times(1)).getAllowedAuthorities(ACTION_WRITE, project);
     }
 
     public void testPathWithMismatchingOrg()
     {
         newProject("orgA", "project");
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "orgB/project/ivy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(HttpMethod.PUT.asString(), "orgB/project/ivy.xml"));
         verify(delegateProvider, times(0)).getAllowedAuthorities(eq(ACTION_WRITE), (ProjectConfiguration) anyObject());
     }
 
     public void testPathWithNoMatches()
     {
-        provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
+        provider.getAllowedAuthorities(null, newInvocation(HttpMethod.PUT.asString(), "org/project/ivy.xml"));
         verify(delegateProvider, times(0)).getAllowedAuthorities(eq(ACTION_WRITE), (ProjectConfiguration) anyObject());
     }
 
@@ -73,7 +73,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         ProjectConfiguration project = newProject("org", "project");
         stub(delegateProvider.getAllowedAuthorities(ACTION_WRITE, project)).toReturn(Sets.newHashSet("write"));
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(HttpMethod.PUT.asString(), "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("write"));
 
@@ -85,7 +85,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
         ProjectConfiguration project = newProject("org", "project");
         stub(delegateProvider.getAllowedAuthorities(ACTION_VIEW, project)).toReturn(Sets.newHashSet("read"));
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ivy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(HttpMethod.GET.asString(), "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("read"));
 
@@ -96,7 +96,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     {
         addDefaultWriteGroup("writers");
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__PUT, "org/project/ivy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(HttpMethod.PUT.asString(), "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("group:writers"));
     }
@@ -105,7 +105,7 @@ public class RepositoryAuthorityProviderTest extends PulseTestCase
     {
         addDefaultReadGroup("readers");
 
-        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(__GET, "org/project/ivy.xml"));
+        Set<String> allowedAuthorities = provider.getAllowedAuthorities(null, newInvocation(HttpMethod.GET.asString(), "org/project/ivy.xml"));
         assertEquals(1, allowedAuthorities.size());
         assertTrue(allowedAuthorities.contains("group:readers"));
     }

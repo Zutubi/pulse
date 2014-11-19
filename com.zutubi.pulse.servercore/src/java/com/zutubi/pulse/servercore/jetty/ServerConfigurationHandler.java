@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 
 import java.io.IOException;
 

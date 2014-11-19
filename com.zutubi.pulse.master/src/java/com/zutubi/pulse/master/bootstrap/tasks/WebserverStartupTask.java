@@ -1,18 +1,16 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.pulse.servercore.jetty.PulseWebappConfigurationHandler;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.jetty.Server;
-import org.mortbay.util.MultiException;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.MultiException;
 
 import java.net.BindException;
-import java.util.List;
 
 public class WebserverStartupTask implements StartupTask
 {
@@ -25,7 +23,7 @@ public class WebserverStartupTask implements StartupTask
         SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/master/bootstrap/context/webserverContext.xml");
 
         JettyServerManager jettyServerManager = SpringComponentContext.getBean("jettyServerManager");
-        Server server = jettyServerManager.getServer(WebManager.WEBAPP_PULSE);
+        Server server = jettyServerManager.getServer();
         if (server != null && server.isStarted())
         {
             return;
@@ -40,12 +38,12 @@ public class WebserverStartupTask implements StartupTask
 
         try
         {
-            server = jettyServerManager.configureServer(WebManager.WEBAPP_PULSE, webapp);
-            jettyServerManager.configureContext(WebManager.WEBAPP_PULSE, config.getContextPath(), webapp);
+            server = jettyServerManager.configureServer(webapp);
+            jettyServerManager.configureContext(config.getContextPath(), webapp);
             
             server.start();
         }
-        catch(MultiException e)
+        catch (MultiException e)
         {
             handleMultiException(config, e);
 
@@ -63,7 +61,7 @@ public class WebserverStartupTask implements StartupTask
 
     private void handleMultiException(SystemConfiguration config, MultiException e)
     {
-        for(Exception nested: (List<Exception>)e.getExceptions())
+        for (Throwable nested: e.getThrowables())
         {
             if (nested instanceof BindException)
             {

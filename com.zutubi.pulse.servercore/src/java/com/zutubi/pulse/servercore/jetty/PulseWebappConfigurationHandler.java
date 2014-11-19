@@ -5,12 +5,14 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
-import org.mortbay.http.NCSARequestLog;
-import org.mortbay.http.SocketListener;
-import org.mortbay.http.SslListener;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.AbstractSessionManager;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +21,7 @@ import java.net.UnknownHostException;
 /**
  * The configuration handler for the main Pulse web application.
  */
-public class PulseWebappConfigurationHandler implements ServerConfigurationHandler, WebappConfigurationHandler
+public class PulseWebappConfigurationHandler implements ServerConfigurationHandler, ContextConfigurationHandler
 {
     private static final String[] LOGGING_IGNORE_PATHS = new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"};
     private static final String PROPERTY_IDLE_TIMEOUT = "pulse.jetty.idle.timeout";
@@ -48,42 +50,43 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
             for (String host : StringUtils.split(bindAddress, ',', true))
             {
                 host = host.trim();
-                addListener(server, config, host);
+                addConnector(server, config, host);
             }
         }
         else
         {
-            addListener(server, config, bindAddress);
+            addConnector(server, config, bindAddress);
         }
+
+        QueuedThreadPool threadPool = (QueuedThreadPool) server.getThreadPool();
+        threadPool.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, threadPool.getMinThreads()));
+        threadPool.setMaxThreads(Integer.getInteger(PROPERTY_MAX_THREADS, threadPool.getMaxThreads()));
     }
 
-    private void addListener(Server server, SystemConfiguration config, String host) throws UnknownHostException
+    private void addConnector(Server server, SystemConfiguration config, String host) throws UnknownHostException
     {
-        SocketListener listener;
-
+        ServerConnector connector;
         if (config.isSslEnabled())
         {
-            SslListener sslListener = new SslListener();
-            sslListener.setPassword(config.getSslPassword());
-            sslListener.setKeyPassword(config.getSslKeyPassword());
+            SslContextFactory sslContextFactory = new SslContextFactory();
             if (config.getSslKeystore() != null)
             {
-                sslListener.setKeystore(config.getSslKeystore());
+                sslContextFactory.setKeyStorePath(config.getSslKeystore());
             }
+            sslContextFactory.setKeyStorePassword(config.getSslPassword());
+            sslContextFactory.setKeyManagerPassword(config.getSslKeyPassword());
 
-            listener = sslListener;
+            connector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()));
         }
         else
         {
-            listener = new SocketListener();
+            connector = new ServerConnector(server, new HttpConnectionFactory(new HttpConfiguration()));
         }
 
-        listener.setHost(host);
-        listener.setPort(config.getServerPort());
-        listener.setMaxIdleTimeMs(getIdleTimeout());
-        listener.setMinThreads(Integer.getInteger(PROPERTY_MIN_THREADS, listener.getMinThreads()));
-        listener.setMaxThreads(Integer.getInteger(PROPERTY_MAX_THREADS, listener.getMaxThreads()));
-        server.addListener(listener);
+        connector.setHost(host);
+        connector.setPort(config.getServerPort());
+        connector.setIdleTimeout(getIdleTimeout());
+        server.addConnector(connector);
     }
 
     private int getIdleTimeout()
@@ -106,20 +109,23 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         }
     }
 
-    public void configure(WebApplicationContext context) throws IOException
+    public void configure(ContextHandler context) throws IOException
     {
         SystemConfiguration config = configurationManager.getSystemConfig();
-
-        context.setWAR(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
         context.setContextPath(config.getContextPath());
-        context.setDefaultsDescriptor(null);
 
-        if(!tmpDir.exists() && !tmpDir.mkdirs())
+        if (!tmpDir.exists() && !tmpDir.mkdirs())
         {
             throw new IOException("Failed to create " + tmpDir.getCanonicalPath());
         }
 
         context.setAttribute("javax.servlet.context.tempdir", tmpDir);
+
+        HandlerCollection handlers = new HandlerCollection();
+
+        WebAppContext webApp = new WebAppContext(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath(), null);
+        webApp.setDefaultsDescriptor(null);
+        handlers.addHandler(webApp);
 
         if (isRequestLoggingEnabled())
         {
@@ -129,14 +135,13 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
             requestLog.setIgnorePaths(getRequestLoggingIgnorePaths());
             requestLog.setRetainDays(getDaysLogsRetained());
             requestLog.setFilename(new File(logDir, "yyyy_mm_dd.request.log").getAbsolutePath());
-            context.setRequestLog(requestLog);
+
+            RequestLogHandler logHandler = new RequestLogHandler();
+            logHandler.setRequestLog(requestLog);
+            handlers.addHandler(logHandler);
         }
 
-        // Prior to Jetty 8/Servlet 3.0, there isn't a standard way to get HttpOnly+Secure cookies
-        // via configuration only.  But we can dig in a little to turn them on in code.
-        AbstractSessionManager sessionManager = (AbstractSessionManager) context.getServletHandler().getSessionManager();
-        sessionManager.setHttpOnly(true);
-        sessionManager.setSecureCookies(true);
+        context.setHandler(handlers);
     }
 
     private String[] getRequestLoggingIgnorePaths()

@@ -1,118 +1,91 @@
 package com.zutubi.pulse.servercore.jetty;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
+import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
-import static java.util.Arrays.asList;
-import org.mortbay.http.HttpContext;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
- * The jetty server manager is responsible for managing the lifecycles of
- * jetty server instances.
+ * The jetty server manager is responsible for managing the lifecycle of Jetty.
  */
 public class JettyServerManager implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(JettyServerManager.class);
 
-    /**
-     * Cache of all the created servers keyed by their names.
-     */
-    private final Map<String, Server> servers = new HashMap<String, Server>();
+    private Server server;
+    private ContextHandlerCollection contexts = new ContextHandlerCollection();
     private boolean stopped = false;
     
-    /**
-     * Configure a server using the provided handler to configure the instance.  If the named server does
-     * not already exist, a new one is created.
-     *
-     * @param name    a key that can be used with {@link JettyServerManager#getServer} to retrieve
-     *                the server instance
-     * @param handler a configuration handler responsible for configuring the server instance
-     * @return the newly configured server instance
-     * @throws IOException on configuration error.
-     */
-    public synchronized Server configureServer(String name, ServerConfigurationHandler handler) throws IOException
+    public synchronized Server configureServer(ServerConfigurationHandler handler) throws IOException
     {
-        if (!servers.containsKey(name))
-        {
-            Server server = new Server();
-            servers.put(name, server);
-        }
-        Server server = servers.get(name);
+        server = new Server();
         handler.configure(server);
+        server.setHandler(contexts);
         return server;
     }
 
-    public synchronized HttpContext configureContext(final String serverName, final String contextPath, ContextConfigurationHandler handler) throws IOException
+    public synchronized ContextHandler configureContext(final String contextPath, ContextConfigurationHandler handler) throws IOException
     {
-        Server server = ensureServerAvailable(serverName);
-        if (!isContextAvailable(serverName, contextPath))
+        if (!isContextAvailable(contextPath))
         {
-            throw new IllegalArgumentException("Context '"+contextPath+"' has already been configured.");
+            throw new IllegalArgumentException("Context '" + contextPath + "' has already been configured.");
         }
 
-        HttpContext context = server.getContext(contextPath);
+        ContextHandler context = new ContextHandler(contextPath);
         handler.configure(context);
+        contexts.addHandler(context);
+        startContextIfServerStarted(contextPath, context);
         return context;
     }
 
-    public synchronized WebApplicationContext configureContext(String serverName, String contextPath, WebappConfigurationHandler handler) throws IOException
+    public ContextHandler getContextHandler(final String contextPath)
     {
-        Server server = ensureServerAvailable(serverName);
-        if (!isContextAvailable(serverName, contextPath))
+        Handler[] handlers = contexts.getHandlers();
+        if (handlers == null)
         {
-            throw new IllegalArgumentException("Context '"+contextPath+"' has already been configured.");
+            return null;
         }
 
-        WebApplicationContext context = new WebApplicationContext();
-        handler.configure(context);
-        server.addContext(context);
-        return context;
-    }
-
-    private Server ensureServerAvailable(String serverName)
-    {
-        Server server = getServer(serverName);
-        if (server == null)
+        return (ContextHandler) Iterables.tryFind(asList(handlers), new Predicate<Handler>()
         {
-            throw new IllegalArgumentException("Unknown jetty server '" + serverName + "'");
-        }
-        return server;
-    }
-
-    public synchronized boolean isContextAvailable(final String serverName, final String contextPath)
-    {
-        Server server = getServer(serverName);
-        if (server == null)
-        {
-            throw new IllegalArgumentException("Unknown jetty server '" + serverName + "'");
-        }
-
-        // A context is available if it is not yet taken
-        return !any(asList(server.getContexts()), new Predicate<HttpContext>()
-        {
-            public boolean apply(HttpContext httpContext)
+            public boolean apply(Handler handler)
             {
-                return httpContext.getContextPath().compareTo(contextPath) == 0;
+                return ((ContextHandler) handler).getContextPath().equals(contextPath);
             }
-        });
+        }).orNull();
     }
 
-    /**
-     * Retrieve a previously created jetty server instance.
-     *
-     * @param name the name of the instance to be retrieved
-     * @return the server instance, or null if it does not exist.
-     */
-    public synchronized Server getServer(String name)
+    public synchronized boolean isContextAvailable(final String contextPath)
     {
-        return servers.get(name);
+        return getContextHandler(contextPath) == null;
+    }
+
+    private void startContextIfServerStarted(String contextPath, ContextHandler context) throws IOException
+    {
+        if (server.isStarted())
+        {
+            try
+            {
+                context.start();
+            }
+            catch (Exception e)
+            {
+                throw new IOException("Failed to start context '" + contextPath + "': " + e.getMessage(), e);
+            }
+        }
+    }
+
+    public synchronized Server getServer()
+    {
+        return server;
     }
 
     public synchronized void stop(boolean force)
@@ -120,20 +93,16 @@ public class JettyServerManager implements Stoppable
         if (!stopped)
         {
             stopped = true;
-            for (Map.Entry<String, Server> entry : servers.entrySet())
+            try
             {
-                try
+                if (server.isStarted())
                 {
-                    Server server = entry.getValue();
-                    if (server.isStarted())
-                    {
-                        server.stop(!force);
-                    }
+                    server.stop();
                 }
-                catch (InterruptedException e)
-                {
-                    LOG.severe("Error while stopping Jetty(" + entry.getKey() + ")", e);
-                }
+            }
+            catch (Exception e)
+            {
+                LOG.severe("Error while stopping Jetty", e);
             }
         }
     }

@@ -1,10 +1,12 @@
 package com.zutubi.pulse.acceptance.support;
 
 import com.zutubi.pulse.core.test.TestUtils;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.handler.ProxyHandler;
-import org.mortbay.jetty.Server;
-import org.mortbay.util.InetAddrPort;
+import org.eclipse.jetty.proxy.ConnectHandler;
+import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -40,13 +42,19 @@ public class ProxyServer
      */
     public synchronized void start() throws IOException, InterruptedException
     {
-        HttpContext context = new HttpContext();
-        context.setContextPath("/");
-        context.addHandler(new ProxyHandler());
-
         server = new Server();
-        server.addListener(new InetAddrPort(port));
-        server.addContext(context);
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(port);
+        server.addConnector(connector);
+
+        // Setup proxy handler to handle CONNECT methods
+        ConnectHandler proxy = new ConnectHandler();
+        server.setHandler(proxy);
+
+        // Setup proxy servlet
+        ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
+        ServletHolder proxyServlet = new ServletHolder(ProxyServlet.class);
+        context.addServlet(proxyServlet, "/*");
 
         executor.submit(new Runnable()
         {
@@ -71,9 +79,9 @@ public class ProxyServer
      *
      * @throws InterruptedException if interrupted while stopping
      */
-    public synchronized void stop() throws InterruptedException
+    public synchronized void stop() throws Exception
     {
-        server.stop(true);
+        server.stop();
         executor.shutdown();
     }
 }

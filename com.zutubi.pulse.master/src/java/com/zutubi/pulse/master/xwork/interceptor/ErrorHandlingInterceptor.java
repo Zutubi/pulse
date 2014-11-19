@@ -6,7 +6,7 @@ import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.http.EOFException;
+import org.eclipse.jetty.io.EofException;
 
 /**
  * An xwork interceptor implementation that takes some of the commonly raised
@@ -46,7 +46,7 @@ public class ErrorHandlingInterceptor implements Interceptor
             action.addActionError(e.getMessage());
             return Action.ERROR;
         }
-        catch (EOFException e)
+        catch (EofException e)
         {
             // Harmless
             return Action.NONE;

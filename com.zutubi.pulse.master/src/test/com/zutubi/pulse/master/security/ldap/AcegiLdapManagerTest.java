@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(transports = {@CreateTransport(protocol = "LDAP", port = 1055)})
 @CreateDS(partitions = {
-        @CreatePartition(name = "zutubi", suffix = "dc=ldap-test,dc=zutubi,dc=com")
+@CreatePartition(name = "zutubi", suffix = "dc=ldap-test,dc=zutubi,dc=com")
 })
 public class AcegiLdapManagerTest extends AbstractLdapTestUnit
 {

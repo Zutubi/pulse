@@ -3,12 +3,11 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.master.security.api.ApiPreAuthenticatedProcessingFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static org.mortbay.http.HttpResponse.*;
 
 /**
  * A general bucket for user access and authentication related acceptance
@@ -24,7 +23,7 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.triggerBuild(random);
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
-        assertEquals(__200_OK, httpGet(getBuildArtifactUrl(random), token));
+        assertEquals(HttpStatus.OK_200, httpGet(getBuildArtifactUrl(random), token));
     }
 
     public void testApiTokenBecomesInvalidOnApiLogout() throws Exception
@@ -38,7 +37,7 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
 
         rpcClient.logout();
 
-        assertEquals(__401_Unauthorized, httpGet(path, token));
+        assertEquals(HttpStatus.UNAUTHORIZED_401, httpGet(path, token));
     }
 
     public void testApiTokenForNonAdminUser() throws Exception
@@ -51,7 +50,7 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
         rpcClient.logout();
 
         String token = loginRegularUser();
-        assertEquals(__200_OK, httpGet(path, token));
+        assertEquals(HttpStatus.OK_200, httpGet(path, token));
     }
 
     // sanity check to ensure that we can not access the builds env.txt file without
@@ -64,15 +63,15 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
         rpcClient.RemoteApi.triggerBuild(random);
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
 
-        assertEquals(__401_Unauthorized, httpGet(getBuildArtifactUrl(random), null));
+        assertEquals(HttpStatus.UNAUTHORIZED_401, httpGet(getBuildArtifactUrl(random), null));
     }
 
     public void testAdminAjaxAccess() throws Exception
     {
         String adminAjaxUrl = baseUrl + "/ajax/admin/allPlugins.action";
-        assertEquals(__403_Forbidden, httpGet(adminAjaxUrl, null));
-        assertEquals(__403_Forbidden, httpGet(adminAjaxUrl, loginRegularUser()));
-        assertEquals(__200_OK, httpGet(adminAjaxUrl, rpcClient.loginAsAdmin()));
+        assertEquals(HttpStatus.FORBIDDEN_403, httpGet(adminAjaxUrl, null));
+        assertEquals(HttpStatus.FORBIDDEN_403, httpGet(adminAjaxUrl, loginRegularUser()));
+        assertEquals(HttpStatus.OK_200, httpGet(adminAjaxUrl, rpcClient.loginAsAdmin()));
     }
 
     private String loginRegularUser() throws Exception
@@ -106,10 +105,10 @@ public class AccessAcceptanceTest extends AcceptanceTestBase
             client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
             client.executeMethod(get);
 
-            if (get.getStatusCode() == __200_OK && get.getPath().contains("login"))
+            if (get.getStatusCode() == HttpStatus.OK_200 && get.getPath().contains("login"))
             {
                 // we have been redirected to the login page
-                return __401_Unauthorized;
+                return HttpStatus.UNAUTHORIZED_401;
             }
             return get.getStatusCode();
         }

@@ -14,7 +14,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.parser.node.Node;
-import org.mortbay.http.EOFException;
+import org.eclipse.jetty.io.EofException;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -84,7 +84,7 @@ public class TableDirective extends ToveDirective
             template.process(context, writer);
             return true;
         }
-        catch (EOFException e)
+        catch (EofException e)
         {
             // Client end probably closed the connection, don't clutter logs.
             return true;

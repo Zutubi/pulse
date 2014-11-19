@@ -3,24 +3,25 @@ package com.zutubi.pulse.master.security;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import static com.zutubi.pulse.master.bootstrap.WebManager.REPOSITORY_PATH;
 import com.zutubi.pulse.master.model.Role;
 import com.zutubi.pulse.master.tove.config.admin.RepositoryConfiguration;
 import com.zutubi.pulse.master.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 import com.zutubi.tove.config.ConfigurationProvider;
-import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
-import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
-import static java.util.Arrays.asList;
-import org.mortbay.http.HttpRequest;
+import org.eclipse.jetty.http.HttpMethod;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.zutubi.pulse.master.bootstrap.WebManager.REPOSITORY_PATH;
+import static com.zutubi.tove.security.AccessManager.ACTION_VIEW;
+import static com.zutubi.tove.security.AccessManager.ACTION_WRITE;
+import static java.util.Arrays.asList;
 
 /**
  * The repository authority provider determines the authorities that
@@ -38,11 +39,11 @@ public class RepositoryAuthorityProvider implements AuthorityProvider<HttpInvoca
     private static Set<String> NOT_ALLOWED = new HashSet<String>();
 
     private static final List<String> WRITE_METHODS = asList(
-            HttpRequest.__PUT
+            HttpMethod.PUT.asString()
     );
 
     private static final List<String> READ_METHODS = asList(
-            HttpRequest.__GET, HttpRequest.__HEAD
+            HttpMethod.GET.asString(), HttpMethod.HEAD.asString()
     );
 
     private RepositoryAttributes repositoryAttributes;

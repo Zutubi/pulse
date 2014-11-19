@@ -1,25 +1,25 @@
 package com.zutubi.pulse.acceptance;
 
-import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
-import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
 import com.zutubi.pulse.acceptance.utils.Repository;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
-import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
-import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import static org.mortbay.http.HttpResponse.*;
 
 import java.io.File;
 import java.io.IOException;
-import static java.util.Arrays.asList;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.ADMIN_CREDENTIALS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.READ_ACCESS;
+import static com.zutubi.pulse.acceptance.Constants.Settings.Repository.WRITE_ACCESS;
+import static com.zutubi.pulse.master.model.UserManager.ALL_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.model.UserManager.ANONYMOUS_USERS_GROUP_NAME;
+import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.GROUPS_SCOPE;
+import static java.util.Arrays.asList;
 
 public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 {
@@ -58,8 +58,8 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
     public void testProject_AdminAccess() throws IOException
     {
         ensurePathExists(projectName);
-        assertEquals(__200_OK, httpGet(projectName, ADMIN_CREDENTIALS));
-        assertEquals(__201_Created, httpPut(projectName + "/file.txt", ADMIN_CREDENTIALS));
+        assertEquals(HttpStatus.SC_OK, httpGet(projectName, ADMIN_CREDENTIALS));
+        assertEquals(HttpStatus.SC_CREATED, httpPut(projectName + "/file.txt", ADMIN_CREDENTIALS));
     }
 
     public void testProject_UserAccess() throws Exception
@@ -67,23 +67,23 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
         Credentials credentials = createRandomUserCredentials();
 
         ensurePathExists(projectName);
-        assertEquals(__200_OK, httpGet(projectName, credentials));
-        assertEquals(__403_Forbidden, httpPut(projectName + "/file.txt", credentials));
+        assertEquals(HttpStatus.SC_OK, httpGet(projectName, credentials));
+        assertEquals(HttpStatus.SC_FORBIDDEN, httpPut(projectName + "/file.txt", credentials));
     }
 
     public void testProject_AnonymousAccess() throws IOException
     {
         ensurePathExists(projectName);
-        assertEquals(__200_OK, httpGet(projectName, null));
-        assertEquals(__401_Unauthorized, httpPut(projectName + "/file.txt", null));
+        assertEquals(HttpStatus.SC_OK, httpGet(projectName, null));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpPut(projectName + "/file.txt", null));
     }
 
     public void testDefault_AdminAccess() throws IOException
     {
         String path = "some/" + randomName() + "/path";
         ensurePathExists(path);
-        assertEquals(__200_OK, httpGet(path, ADMIN_CREDENTIALS));
-        assertEquals(__201_Created, httpPut(path + "/file.txt", ADMIN_CREDENTIALS));
+        assertEquals(HttpStatus.SC_OK, httpGet(path, ADMIN_CREDENTIALS));
+        assertEquals(HttpStatus.SC_CREATED, httpPut(path + "/file.txt", ADMIN_CREDENTIALS));
     }
 
     public void testDefault_UserAccess() throws Exception
@@ -92,15 +92,15 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
 
         String path = "some/" + randomName() + "/path";
         ensurePathExists(path);
-        assertEquals(__403_Forbidden, httpGet(path, credentials));
-        assertEquals(__403_Forbidden, httpPut(path + "/file.txt", credentials));
+        assertEquals(HttpStatus.SC_FORBIDDEN, httpGet(path, credentials));
+        assertEquals(HttpStatus.SC_FORBIDDEN, httpPut(path + "/file.txt", credentials));
 
         // give users default read write access.
         addReadAccess(getGroupPath(ALL_USERS_GROUP_NAME));
         addWriteAccess(getGroupPath(ALL_USERS_GROUP_NAME));
 
-        assertEquals(__200_OK, httpGet(path, credentials));
-        assertEquals(__201_Created, httpPut(path + "/file.txt", credentials));
+        assertEquals(HttpStatus.SC_OK, httpGet(path, credentials));
+        assertEquals(HttpStatus.SC_CREATED, httpPut(path + "/file.txt", credentials));
     }
 
     private String getGroupPath(String name)
@@ -112,14 +112,14 @@ public class RepositoryPermissionsAcceptanceTest extends AcceptanceTestBase
     {
         String path = "some/" + randomName() + "/path";
         ensurePathExists(path);
-        assertEquals(__401_Unauthorized, httpGet(path, null));
-        assertEquals(__401_Unauthorized, httpPut(path + "/file.txt", null));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpGet(path, null));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpPut(path + "/file.txt", null));
 
         // give anonymous users default read access.
         addReadAccess(getGroupPath(ANONYMOUS_USERS_GROUP_NAME));
 
-        assertEquals(__200_OK, httpGet(path, null));
-        assertEquals(__401_Unauthorized, httpPut(path + "/file.txt", null));
+        assertEquals(HttpStatus.SC_OK, httpGet(path, null));
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, httpPut(path + "/file.txt", null));
     }
 
     private void addReadAccess(String... groupPaths) throws Exception

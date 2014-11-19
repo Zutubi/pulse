@@ -6,11 +6,10 @@ import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.pulse.servercore.jetty.PulseWebappConfigurationHandler;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.jetty.Server;
-import org.mortbay.util.MultiException;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.MultiException;
 
 import java.net.BindException;
-import java.util.List;
 
 /**
  * Start the slave web application.
@@ -18,7 +17,6 @@ import java.util.List;
 public class SlaveJettyStartupTask implements StartupTask
 {
     private static final Logger LOG = Logger.getLogger(SlaveJettyStartupTask.class);
-    private static final String WEBAPP_PULSE = "pulse";
 
     private JettyServerManager jettyServerManager;
     private ConfigurationManager configurationManager;
@@ -34,8 +32,8 @@ public class SlaveJettyStartupTask implements StartupTask
 
         try
         {
-            Server server = jettyServerManager.configureServer(WEBAPP_PULSE, webapp);
-            jettyServerManager.configureContext(WEBAPP_PULSE, config.getContextPath(), webapp);
+            Server server = jettyServerManager.configureServer(webapp);
+            jettyServerManager.configureContext(config.getContextPath(), webapp);
 
             server.start();
         }
@@ -57,7 +55,7 @@ public class SlaveJettyStartupTask implements StartupTask
 
     private void handleMultiException(SystemConfiguration config, MultiException e)
     {
-        for(Exception nested: (List<Exception>)e.getExceptions())
+        for (Throwable nested: e.getThrowables())
         {
             if (nested instanceof BindException)
             {

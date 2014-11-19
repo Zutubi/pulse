@@ -5,7 +5,7 @@ import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.http.EOFException;
+import org.eclipse.jetty.io.EofException;
 
 /**
  */
@@ -27,7 +27,7 @@ public class ConfigErrorHandlingInterceptor implements Interceptor
         {
             return invocation.invoke();
         }
-        catch(EOFException e)
+        catch(EofException e)
         {
             // Harmless
             return Action.NONE;

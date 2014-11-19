@@ -1,13 +1,13 @@
 package com.zutubi.pulse.master.security;
 
-import com.zutubi.pulse.master.bootstrap.WebManager;
 import com.zutubi.pulse.master.spring.web.context.SpringSecurityFilter;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.util.logging.Logger;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.WebApplicationHandler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * The Pulse Security Manager is responsible for enabling and
@@ -28,7 +28,7 @@ public class PulseSecurityManager implements SecurityManager
      */
     public void secure()
     {
-        WebApplicationHandler handler = getHandler();
+        WebAppContext handler = getHandler();
         if (handler == null)
         {
             throw new RuntimeException("Can not enable web security before the web app is fully deployed.");
@@ -36,9 +36,9 @@ public class PulseSecurityManager implements SecurityManager
         enableWebUISecurity(handler);
     }
 
-    private void enableWebUISecurity(WebApplicationHandler handler)
+    private void enableWebUISecurity(WebAppContext handler)
     {
-        FilterHolder holder = handler.getFilter(SECURITY_FILTER_NAME);
+        FilterHolder holder = handler.getServletHandler().getFilter(SECURITY_FILTER_NAME);
         try
         {
             SpringSecurityFilter filter = (SpringSecurityFilter) holder.getFilter();
@@ -50,13 +50,14 @@ public class PulseSecurityManager implements SecurityManager
         }
     }
 
-    private WebApplicationHandler getHandler()
+    private WebAppContext getHandler()
     {
-        Server server = jettyServerManager.getServer(WebManager.WEBAPP_PULSE);
+        Server server = jettyServerManager.getServer();
         if (server.isStarted())
         {
             String contextPath = configurationManager.getSystemConfig().getContextPath();
-            return ((WebApplicationHandler) server.getContext(contextPath).getHandlers()[0]);
+            ContextHandler contextHandler = jettyServerManager.getContextHandler(contextPath);
+            return contextHandler.getChildHandlerByClass(WebAppContext.class);
         }
         return null;
     }
