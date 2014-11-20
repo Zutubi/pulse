@@ -59,7 +59,7 @@ public class SecurityHandler extends HandlerWrapper
             }
         }
 
-        getHandler().handle(target, baseRequest, request, response);
+       super.handle(target, baseRequest, request, response);
     }
 
     private boolean isAnonymousActor(Actor actor)

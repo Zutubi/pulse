@@ -268,7 +268,7 @@ based upon the Spring Security system.
     more standard approach to configuration.  NOTE: just because it is not using the default web app does
     not mean it should not use the same support.
     -->
-    <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.servercore.jetty.FilteringHandler">
+    <bean name="artifactRepositorySecurityHandler" class="com.zutubi.pulse.master.jetty.FilteringHandler">
         <property name="filters">
             <list>
                 <!-- IMPORTANT NOTE:

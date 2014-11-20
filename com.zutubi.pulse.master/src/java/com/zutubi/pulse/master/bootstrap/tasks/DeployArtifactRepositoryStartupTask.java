@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
 import com.zutubi.pulse.master.bootstrap.WebManager;
+import com.zutubi.pulse.master.jetty.ArtifactRepositoryConfigurationHandler;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
-import com.zutubi.pulse.servercore.jetty.ArtifactRepositoryConfigurationHandler;
 import com.zutubi.pulse.servercore.jetty.JettyServerManager;
 import com.zutubi.util.StringUtils;
 import org.eclipse.jetty.server.Handler;
