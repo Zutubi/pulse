@@ -25,7 +25,7 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
         Cookie cookie = new Cookie(getCookieName(), cookieValue);
         cookie.setMaxAge(maxAge);
         cookie.setPath(getCookiePath(request));
-        cookie.setHttpOnly(request.isSecure());
+        cookie.setHttpOnly(true);
         cookie.setSecure(request.isSecure());
         response.addCookie(cookie);
     }
