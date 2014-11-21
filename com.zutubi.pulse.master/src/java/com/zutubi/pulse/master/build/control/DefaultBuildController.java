@@ -191,16 +191,16 @@ public class DefaultBuildController implements EventListener, BuildController
             buildLogger = new DefaultBuildLogger(new BuildLogFile(buildResult, paths));
             ivy.pushMessageLogger(buildLogger.getMessageLogger());
 
-            buildContext = newContext();
+            String authToken = activateBuildAuthenticationToken();
+            buildContext = newContext(authToken);
             MasterBuildProperties.addProjectProperties(buildContext, projectConfig, true);
             for (ResourceProperty requestProperty : asResourceProperties(request.getProperties()))
             {
                 buildContext.add(requestProperty);
             }
 
-            activateBuildAuthenticationToken();
             controllers = new LinkedList<RecipeController>();
-            createControllers();
+            createControllers(authToken);
 
             buildResult.queue();
             buildManager.save(buildResult);
@@ -223,7 +223,7 @@ public class DefaultBuildController implements EventListener, BuildController
         return buildResult.getNumber();
     }
 
-    private PulseExecutionContext newContext()
+    private PulseExecutionContext newContext(String authToken)
     {
         // Creates a context with everything that should be shared by the build and recipe
         // contexts.  Note this excludes resource properties as they need to be added later for
@@ -236,6 +236,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // We resolve the SCM properties on the master as the full context is not available on
         // the agents.
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm()));
+        context.setSecurityHash(authToken);
         return context;
     }
 
@@ -244,11 +245,11 @@ public class DefaultBuildController implements EventListener, BuildController
      * access the internal pulse artifact repository.  This token will be valid for the duration of the
      * build.
      */
-    private void activateBuildAuthenticationToken()
+    private String activateBuildAuthenticationToken()
     {
         String token = RandomUtils.secureRandomString(15);
-        buildContext.setSecurityHash(token);
         repositoryAuthenticationProvider.activate(token);
+        return token;
     }
 
     /**
@@ -261,7 +262,7 @@ public class DefaultBuildController implements EventListener, BuildController
         repositoryAuthenticationProvider.deactivate(token);
     }
 
-    private void createControllers()
+    private void createControllers(String authToken)
     {
         PulseFileProvider pulseFileProvider = getPulseFileSource();
 
@@ -270,7 +271,7 @@ public class DefaultBuildController implements EventListener, BuildController
             RecipeResultNode stageResult = createResultForStage(stageConfig);
             if (stageConfig.isEnabled())
             {
-                createControllerForStage(stageConfig, stageResult, pulseFileProvider, 0);
+                createControllerForStage(stageConfig, stageResult, pulseFileProvider, authToken);
             }
             else
             {
@@ -291,14 +292,14 @@ public class DefaultBuildController implements EventListener, BuildController
         return stageResult;
     }
 
-    private RecipeController createControllerForStage(BuildStageConfiguration stageConfig, RecipeResultNode stageResult, PulseFileProvider pulseFileProvider, int retryCount)
+    private RecipeController createControllerForStage(BuildStageConfiguration stageConfig, RecipeResultNode stageResult, PulseFileProvider pulseFileProvider, String authToken)
     {
         RecipeResult recipeResult = stageResult.getResult();
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
         recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-        RecipeRequest recipeRequest = new RecipeRequest(newContext());
+        RecipeRequest recipeRequest = new RecipeRequest(newContext(authToken));
         recipeRequest.setPulseFileSource(pulseFileProvider);
         recipeRequest.addAllProperties(asResourceProperties(projectConfig.getProperties().values()));
         recipeRequest.addAllProperties(asResourceProperties(stageConfig.getProperties().values()));
@@ -329,7 +330,7 @@ public class DefaultBuildController implements EventListener, BuildController
         deleteStage(stageResult);
 
         stageResult = createResultForStage(stageConfig);
-        RecipeController newController = createControllerForStage(stageConfig, stageResult, getPulseFileSource(), controller.getRetryCount() + 1);
+        RecipeController newController = createControllerForStage(stageConfig, stageResult, getPulseFileSource(), controller.getAssignmentRequest().getRequest().getContext().getSecurityHash());
         executingControllers.add(newController);
         newController.initialise(controller.getAssignmentRequest().getRequest().getBootstrapper());
         checkControllerStatus(newController, null);
