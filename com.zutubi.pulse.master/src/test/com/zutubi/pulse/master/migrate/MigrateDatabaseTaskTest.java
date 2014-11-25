@@ -19,22 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- *
- *
- */
 public class MigrateDatabaseTaskTest extends PulseTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     public void testMigrate() throws IOException, SQLException, ParsingException, TransferException, TaskException
     {
         Properties sourceDatabase = getDatabaseProperties("testdb1");

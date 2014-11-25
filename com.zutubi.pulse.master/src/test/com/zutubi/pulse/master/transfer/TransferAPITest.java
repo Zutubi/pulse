@@ -16,29 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- *
- *
- */
 public class TransferAPITest extends ZutubiTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-    }
-
-    protected void tearDown() throws Exception
-    {
-/*
-        // cleanup the database.
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
-        ((BasicDataSource)dataSource).close();
-*/
-
-        super.tearDown();
-    }
-
     public void testSimpleDumpAndRestore() throws IOException, SQLException, ParsingException, TransferException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

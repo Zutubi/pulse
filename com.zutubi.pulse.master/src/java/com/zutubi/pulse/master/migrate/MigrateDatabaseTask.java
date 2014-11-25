@@ -3,15 +3,15 @@ package com.zutubi.pulse.master.migrate;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import com.zutubi.pulse.master.util.monitor.AbstractTask;
-import com.zutubi.pulse.master.util.monitor.FeedbackAware;
-import com.zutubi.pulse.master.util.monitor.TaskException;
-import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.master.transfer.Table;
 import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferListener;
 import com.zutubi.pulse.master.transfer.jdbc.HibernateUniqueKeyTable;
+import com.zutubi.pulse.master.util.monitor.AbstractTask;
+import com.zutubi.pulse.master.util.monitor.FeedbackAware;
+import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;
@@ -69,9 +69,11 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
             DataSource target = targetDatabaseConfig.createDataSource();
 
             MutableConfiguration sourceConfiguration = hibernateConfiguration.copy();
+            sourceConfiguration.buildMappings();
             sourceConfiguration.setHibernateDialect(sourceJdbcProperties);
 
             MutableConfiguration targetConfiguration = hibernateConfiguration.copy();
+            targetConfiguration.buildMappings();
             targetConfiguration.setHibernateDialect(targetJdbcProperties);
 
             TransferAPI transfer = new TransferAPI();

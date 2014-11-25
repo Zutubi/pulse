@@ -53,6 +53,8 @@ public class HibernateUtils
         hibernateProperties.put(Environment.DIALECT, inferHibernateDialect(jdbcProperties));
         configuration.setProperties(hibernateProperties);
 
+        configuration.buildMappings();
+
         return configuration;
     }
 
