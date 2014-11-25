@@ -50,7 +50,7 @@ based upon the Spring Security system.
     <bean id="repositoryAuthenticationProvider" class="com.zutubi.pulse.master.security.RepositoryAuthenticationProvider"/>
 
     <bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
-        <security:filter-chain-map path-type="ant">
+        <security:filter-chain-map request-matcher="ant">
             <security:filter-chain pattern="/js/**"         filters="none" />
             <security:filter-chain pattern="/css/**"        filters="none" />
             <security:filter-chain pattern="/images/**"     filters="none" />
@@ -224,7 +224,7 @@ based upon the Spring Security system.
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <property name="securityMetadataSource">
-            <security:filter-security-metadata-source path-type="ant" lowercase-comparisons="true">
+            <security:filter-security-metadata-source request-matcher="ant" lowercase-comparisons="true">
                 <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/signup*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/logout.action" access="IS_AUTHENTICATED_ANONYMOUSLY" />

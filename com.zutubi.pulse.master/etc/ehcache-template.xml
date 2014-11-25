@@ -39,7 +39,6 @@
         diskExpiryThreadIntervalSeconds- The number of seconds between runs of the disk expiry thread. The default value
                                          is 120 seconds.
         -->
-<!-- FIXME upup may need to move or add <cache> config to mappings?? -->
 
     <defaultCache
             maxElementsInMemory="10000"
@@ -68,6 +67,11 @@
            overflowToDisk="true"/>
 
     <!-- Hibernate entities and associations -->
+    <cache name="com.zutubi.pulse.master.model.AgentState"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.master.model.User"
            maxElementsInMemory="1000"
            eternal="true"
