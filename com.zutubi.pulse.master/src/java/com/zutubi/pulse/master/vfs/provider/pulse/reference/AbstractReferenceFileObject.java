@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.vfs.provider.pulse.reference;
 
 import com.google.common.base.Function;
+import com.google.common.io.PatternFilenameFilter;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.io.FileSystemUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -15,6 +15,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Iterables.concat;
@@ -27,9 +28,11 @@ import static java.util.Arrays.asList;
  */
 public abstract class AbstractReferenceFileObject extends AbstractPulseFileObject
 {
+    private static final Pattern PATTERN_SUFFIX_VELOCITY = Pattern.compile(".*\\.vm");
+    private static final String SUFFIX_VELOCITY = ".vm";
+
     private String[] staticChildren;
     private SystemPaths systemPaths;
-    private static final String SUFFIX_VELOCITY = ".vm";
 
     /**
      * Creates a new reference file object.
@@ -75,7 +78,7 @@ public abstract class AbstractReferenceFileObject extends AbstractPulseFileObjec
             File candidateDir = new File(staticRoot, getStaticPath());
             if (candidateDir.isDirectory())
             {
-                String[] templates = candidateDir.list(new SuffixFileFilter(SUFFIX_VELOCITY));
+                String[] templates = candidateDir.list(new PatternFilenameFilter(PATTERN_SUFFIX_VELOCITY));
                 staticChildren = transform(asList(templates), new Function<String, String>()
                 {
                     public String apply(String s)

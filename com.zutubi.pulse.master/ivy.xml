@@ -32,7 +32,6 @@
         <!-- External dependencies -->
         <dependency org="org.apache.commons" name="org.apache.commons.dbcp" rev="1.3.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.commons" name="org.apache.commons.fileupload" rev="1.2.2" conf="external,build,release->default;src->src"/>
-        <dependency org="org.apache.commons" name="org.apache.commons.io" rev="1.4.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.velocity" name="org.apache.velocity" rev="1.3.1" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.velocity" name="org.apache.velocity.tools.views" rev="1.1.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.commons" name="org.apache.commons.pool" rev="1.2.0" conf="external,build,release->default;src->src"/>
@@ -44,9 +43,6 @@
 
         <dependency org="com.opensymphony.sitemesh" name="com.opensymphony.sitemesh" rev="2.2.1" conf="external,build,release->default;src->src"/>
         <dependency org="com.opensymphony.webwork" name="com.opensymphony.webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
-
-        <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
-        <dependency org="javax.portlet" name="javax.portlet" rev="2.0.0" conf="external,build,release->default;src->src"/>
 
         <dependency org="com.uwyn" name="com.uwyn.jhighlight" rev="1.0.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.aop" rev="4.1.2.RELEASE" conf="external,build,release->default;src->src"/>

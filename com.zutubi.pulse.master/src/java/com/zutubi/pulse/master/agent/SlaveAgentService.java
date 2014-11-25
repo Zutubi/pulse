@@ -19,7 +19,6 @@ import com.zutubi.util.WebUtils;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -217,7 +216,7 @@ public class SlaveAgentService implements AgentService
         OutputStream outputStream = context.getOutputStream();
         if (outputStream == null)
         {
-            outputStream = new NullOutputStream();
+            outputStream = ByteStreams.nullOutputStream();
         }
 
         long streamId = slaveOutputListener.registerStream(outputStream);
