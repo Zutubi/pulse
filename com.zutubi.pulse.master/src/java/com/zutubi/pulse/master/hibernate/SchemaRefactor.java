@@ -3,10 +3,12 @@ package com.zutubi.pulse.master.hibernate;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.SchemaCustomisations;
 import com.zutubi.util.logging.Logger;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.internal.StandardServiceRegistryImpl;
 import org.hibernate.cfg.Environment;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.connection.ConnectionProviderFactory;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Table;
@@ -38,6 +40,8 @@ public class SchemaRefactor
         connectionProperties = new Properties();
         connectionProperties.putAll(dialect.getDefaultProperties());
         connectionProperties.putAll(props);
+        Environment.verifyProperties( connectionProperties );
+  		ConfigurationHelper.resolvePlaceHolders(connectionProperties);
 
         defaultCatalog = config.getProperty(Environment.DEFAULT_CATALOG);
         defaultSchema = config.getProperty(Environment.DEFAULT_SCHEMA);
@@ -650,12 +654,12 @@ public class SchemaRefactor
 
     protected Object executeWithConnection(Callback c) throws SQLException
     {
-        ConnectionProvider connectionProvider = null;
+        StandardServiceRegistryImpl serviceRegistry = null;
         Connection connection = null;
         try
         {
-            connectionProvider = ConnectionProviderFactory.newConnectionProvider(connectionProperties);
-            connection = connectionProvider.getConnection();
+            serviceRegistry = (StandardServiceRegistryImpl) new StandardServiceRegistryBuilder().applySettings(connectionProperties).build();
+            connection = serviceRegistry.getService(ConnectionProvider.class).getConnection();
 
             conditionalBuildMappings();
             
@@ -663,10 +667,10 @@ public class SchemaRefactor
         }
         finally
         {
-            JDBCUtils.close(connection);
-            if (connectionProvider != null)
+            if (serviceRegistry != null)
             {
-                connectionProvider.close();
+                serviceRegistry.getService(ConnectionProvider.class).closeConnection(connection);
+                serviceRegistry.destroy();
             }
         }
     }

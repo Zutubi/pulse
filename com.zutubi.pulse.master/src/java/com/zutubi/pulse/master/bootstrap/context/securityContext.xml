@@ -7,8 +7,8 @@ based upon the Spring Security system.
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:security="http://www.springframework.org/schema/security"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.4.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
     <!-- do not trigger an init from here. We need the spring context to be completely loaded before
      doing so otherwise the DelegatingFilterProxy will be unable to locate the defined beans.
@@ -34,7 +34,7 @@ based upon the Spring Security system.
     </security:authentication-manager>
 
     <bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <property name="preAuthenticatedUserDetailsService"><ref local="preAuthenticationUserDetailsService"/></property>
+        <property name="preAuthenticatedUserDetailsService" ref="preAuthenticationUserDetailsService"/>
     </bean>
 
     <bean id="preAuthenticationUserDetailsService" class="com.zutubi.pulse.master.security.api.ApiAuthenticationUserDetailsService">
@@ -44,7 +44,7 @@ based upon the Spring Security system.
     <bean id="customAuthenticationProvider" class="com.zutubi.pulse.master.security.CustomAuthenticationProvider">
         <property name="userManager" ref="userManager"/>
         <property name="passwordEncoder" ref="passwordEncoder"/>
-        <property name="ldapManager"><ref local="ldapManager"/></property>
+        <property name="ldapManager" ref="ldapManager"/>
     </bean>
 
     <bean id="repositoryAuthenticationProvider" class="com.zutubi.pulse.master.security.RepositoryAuthenticationProvider"/>
@@ -68,7 +68,7 @@ based upon the Spring Security system.
     SecurityContext in the HTTP session, hence the use of the HttpSessionSecurityContextRepository bean.     
     -->
     <bean id="securityContextFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter" >
-        <property name="securityContextRepository"><ref local="securityContextRepository"/></property>
+        <property name="securityContextRepository" ref="securityContextRepository"/>
     </bean>
     <bean id="securityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
 
@@ -81,11 +81,11 @@ based upon the Spring Security system.
     sent to 'filterProcessesUrl', and uses the 'authenticationManager' to handle the actual authentication.
     -->
     <bean id="formLoginAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
-        <property name="authenticationManager"><ref local="authenticationManager"/></property>
+        <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationSuccessHandler">
             <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
                 <property name="defaultTargetUrl" value="/"/>
-                <property name="requestCache"><ref local="requestCache"/></property>
+                <property name="requestCache" ref="requestCache"/>
             </bean>
         </property>
         <property name="authenticationFailureHandler">
@@ -93,7 +93,7 @@ based upon the Spring Security system.
                 <property name="defaultFailureUrl" value="/login!input.action?error=true"/>
             </bean>
         </property>
-        <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
+        <property name="rememberMeServices" ref="rememberMeServices"/>
     </bean>
 
     <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
@@ -101,13 +101,13 @@ based upon the Spring Security system.
         <constructor-arg>
             <list>
                 <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
-                <ref local="rememberMeServices"/>
+                <ref bean="rememberMeServices"/>
             </list>
         </constructor-arg>
     </bean>
 
     <bean id="requestCacheFilter" class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter">
-        <property name="requestCache"><ref local="requestCache"/></property>
+        <property name="requestCache" ref="requestCache"/>
     </bean>
     
     <!--
@@ -117,7 +117,7 @@ based upon the Spring Security system.
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
         <!-- We override the default details class to aid in detecting HTTP basic authentication. -->
-        <property name="authenticationDetailsSource"><ref local="basicProcessingAuthenticationDetailsSource"/></property>
+        <property name="authenticationDetailsSource" ref="basicProcessingAuthenticationDetailsSource"/>
     </bean>
 
     <bean id="basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
@@ -133,8 +133,8 @@ based upon the Spring Security system.
       RemoteApi.login request.
      -->
     <bean id="apiPreAuthenticatedProcessingFilter" class="com.zutubi.pulse.master.security.api.ApiPreAuthenticatedProcessingFilter">
-        <property name="authenticationManager"><ref local="authenticationManager"/></property>
-        <property name="eventManager"><ref bean="eventManager"/></property>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="eventManager" ref="eventManager"/>
     </bean>
 
     <!--
@@ -145,8 +145,8 @@ based upon the Spring Security system.
     c) FilterChainProxy
     -->
     <bean id="rememberMeProcessingFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
-        <property name="authenticationManager"><ref local="authenticationManager"/></property>
-        <property name="rememberMeServices"><ref local="rememberMeServices"/></property>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="rememberMeServices" ref="rememberMeServices"/>
     </bean>
 
     <bean id="rememberMeServices" class="com.zutubi.pulse.master.security.CustomTokenBasedRememberMeServices">
@@ -179,22 +179,22 @@ based upon the Spring Security system.
     -->
     <bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
         <!-- This endpoint defines where a user is directed when authentication is required. -->
-        <property name="authenticationEntryPoint"><ref local="loginUrlAuthenticationEntryPoint"/></property>
-        <property name="requestCache"><ref local="requestCache"/></property>
+        <property name="authenticationEntryPoint" ref="loginUrlAuthenticationEntryPoint"/>
+        <property name="requestCache" ref="requestCache"/>
     </bean>
 
     <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
         <property name="loginFormUrl" value="/login!input.action"/>
-        <property name="portResolver"><ref local="portResolver"/></property>
-        <property name="portMapper"><ref local="portMapper"/></property>
+        <property name="portResolver" ref="portResolver"/>
+        <property name="portMapper" ref="portMapper"/>
     </bean>
 
     <bean id="requestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache">
-        <property name="portResolver"><ref local="portResolver"/></property>
+        <property name="portResolver" ref="portResolver"/>
     </bean>
 
     <bean id="portResolver" class="org.springframework.security.web.PortResolverImpl">
-        <property name="portMapper"><ref local="portMapper"/></property>
+        <property name="portMapper" ref="portMapper"/>
     </bean>
 
     <bean id="portMapper" class="org.springframework.security.web.PortMapperImpl">
@@ -221,8 +221,8 @@ based upon the Spring Security system.
     first, with LEAST SPECIFIC (ie a/.*) expressions last
     -->
     <bean id="filterInvocationInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
-        <property name="authenticationManager"><ref local="authenticationManager"/></property>
-        <property name="accessDecisionManager"><ref local="httpRequestAccessDecisionManager"/></property>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <property name="securityMetadataSource">
             <security:filter-security-metadata-source path-type="ant" lowercase-comparisons="true">
                 <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
@@ -277,9 +277,9 @@ based upon the Spring Security system.
                  the context itself), the SecurityContextHolder needs to be cleared manually.
                  This is usually handled by the httpSessionContextIntegrationFilter.
                  -->
-                <ref local="clearContextFilter"/>
-                <ref local="basicAuthenticationFilter"/>
-                <ref local="anonymousAuthenticationFilter"/>
+                <ref bean="clearContextFilter"/>
+                <ref bean="basicAuthenticationFilter"/>
+                <ref bean="anonymousAuthenticationFilter"/>
             </list>
         </property>
         <property name="handler" ref="securityDelegateHandler"/>

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.util.hibernate;
 
 import com.zutubi.util.time.TimeStamps;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
@@ -69,10 +69,10 @@ public class TimeStampsType implements CompositeUserType
             throws HibernateException, SQLException
     {
 
-        Long queueTime = (Long) LONG.nullSafeGet(rs, names[0]);
-        Long startTime = (Long) LONG.nullSafeGet(rs, names[1]);
-        Long endTime = (Long) LONG.nullSafeGet(rs, names[2]);
-        Long estimatedRunningTime = (Long) LONG.nullSafeGet(rs, names[3]);
+        Long queueTime = (Long) LONG.nullSafeGet(rs, names[0], session);
+        Long startTime = (Long) LONG.nullSafeGet(rs, names[1], session);
+        Long endTime = (Long) LONG.nullSafeGet(rs, names[2], session);
+        Long estimatedRunningTime = (Long) LONG.nullSafeGet(rs, names[3], session);
 
         return new TimeStamps((queueTime != null) ? queueTime : -1, (startTime != null) ? startTime : -1, (endTime != null) ? endTime : -1, (estimatedRunningTime != null) ? estimatedRunningTime : -1);
     }
@@ -85,17 +85,17 @@ public class TimeStampsType implements CompositeUserType
         {
             TimeStamps stamps = (TimeStamps) value;
 
-            LONG.nullSafeSet(st, stamps.getQueueTime(), index);
-            LONG.nullSafeSet(st, stamps.getStartTime(), index + 1);
-            LONG.nullSafeSet(st, stamps.getEndTime(), index + 2);
-            LONG.nullSafeSet(st, stamps.getEstimatedRunningTime(), index + 3);
+            LONG.nullSafeSet(st, stamps.getQueueTime(), index, session);
+            LONG.nullSafeSet(st, stamps.getStartTime(), index + 1, session);
+            LONG.nullSafeSet(st, stamps.getEndTime(), index + 2, session);
+            LONG.nullSafeSet(st, stamps.getEstimatedRunningTime(), index + 3, session);
         }
         else
         {
-            LONG.nullSafeSet(st, null, index);
-            LONG.nullSafeSet(st, null, index + 1);
-            LONG.nullSafeSet(st, null, index + 2);
-            LONG.nullSafeSet(st, null, index + 3);
+            LONG.nullSafeSet(st, null, index, session);
+            LONG.nullSafeSet(st, null, index + 1, session);
+            LONG.nullSafeSet(st, null, index + 2, session);
+            LONG.nullSafeSet(st, null, index + 3, session);
         }
     }
 

@@ -356,6 +356,12 @@
 
     <target name="module-post-dist"/>
 
+    <target name="deps" depends="init">
+        <dirname property="current.dir" file="ivy.xml"/>
+        <ivy:resolve file="ivy.xml" conf="${distconf}"/>
+        <ivy:report todir="${report.dir}/deps" conf="${distconf}" graph="false"/>
+    </target>
+
     <target name="common-dist">
         <dirname property="current.dir" file="ivy.xml"/>
         <ivy:resolve file="ivy.xml" conf="${distconf}"/>

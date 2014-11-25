@@ -6,8 +6,7 @@ import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 import java.util.List;
 
@@ -30,7 +29,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
             {
                 Query queryObject = session.createQuery("from Project project where responsibility.user = :user");
                 queryObject.setEntity("user", user);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });

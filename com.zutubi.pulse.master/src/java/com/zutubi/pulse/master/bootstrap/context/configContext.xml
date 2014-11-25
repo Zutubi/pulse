@@ -52,7 +52,7 @@
 
     <bean id="formDescriptorFactory" class="com.zutubi.pulse.master.tove.model.FormDescriptorFactory" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"/>
-    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory" autowire="no"/>
 
     <!-- Security system -->
     <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager"/>

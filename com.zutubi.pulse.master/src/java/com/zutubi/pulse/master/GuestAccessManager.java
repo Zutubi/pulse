@@ -16,6 +16,7 @@ import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.memory.UserAttribute;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
@@ -33,11 +34,9 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
 
     public synchronized void init()
     {
-        UserAttribute userAttribute = anonymousAuthenticationFilter.getUserAttribute();
         UserAttribute newAttribute = new UserAttribute();
-
-        newAttribute.setPassword(userAttribute.getPassword());
-        newAttribute.addAuthority(new GrantedAuthorityImpl(Role.ANONYMOUS));
+        newAttribute.setPassword((String) anonymousAuthenticationFilter.getPrincipal());
+        newAttribute.addAuthority(new SimpleGrantedAuthority(Role.ANONYMOUS));
         if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
             BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(GROUPS_SCOPE, ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);

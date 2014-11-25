@@ -1,5 +1,9 @@
 package com.zutubi.pulse.master.scheduling;
 
+import org.quartz.ScheduleBuilder;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.TriggerBuilder;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,15 +18,19 @@ public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
         return Arrays.asList(SimpleTrigger.TYPE);
     }
 
-    protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
+    @Override
+    protected TriggerBuilder createTriggerBuilder(Trigger trigger) throws SchedulingException
     {
         SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
-        return new org.quartz.SimpleTrigger(
-                simpleTrigger.getName(),
-                simpleTrigger.getGroup(),
-                simpleTrigger.getStartTime(),
-                null,
-                simpleTrigger.getRepeatCount(),
-                simpleTrigger.getInterval());
+        return super.createTriggerBuilder(trigger)
+                .startAt(simpleTrigger.getStartTime());
+    }
+
+    protected ScheduleBuilder createScheduleBuilder(Trigger trigger) throws SchedulingException
+    {
+        SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
+        return SimpleScheduleBuilder.simpleSchedule().
+                withRepeatCount(simpleTrigger.getRepeatCount()).
+                withIntervalInMilliseconds(simpleTrigger.getInterval());
     }
 }

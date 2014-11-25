@@ -321,7 +321,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public int getUserCount()
     {
-        return userDao.count();
+        return (int) userDao.count();
     }
 
     /**

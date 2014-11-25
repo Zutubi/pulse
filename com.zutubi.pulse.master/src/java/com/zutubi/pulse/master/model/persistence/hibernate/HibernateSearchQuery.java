@@ -8,9 +8,8 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -192,7 +191,7 @@ public class HibernateSearchQuery<T> implements Serializable
      */
     public long count()
     {
-        return (Integer)getHibernateTemplate().execute(new HibernateCallback()
+        return (Long) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -230,8 +229,6 @@ public class HibernateSearchQuery<T> implements Serializable
         {
             criteria.setProjection(projection);
         }
-
-        SessionFactoryUtils.applyTransactionTimeout(criteria, sessionFactory);
     }
 
     protected HibernateTemplate getHibernateTemplate()

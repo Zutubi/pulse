@@ -4,7 +4,8 @@ import com.zutubi.i18n.Messages;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
@@ -64,22 +65,27 @@ public class MutableConfiguration extends Configuration
     {
         return new Mapping()
         {
+            public IdentifierGeneratorFactory getIdentifierGeneratorFactory()
+            {
+                return null;
+            }
+
             public Type getIdentifierType(String persistentClass) throws MappingException
             {
-                PersistentClass pc = ((PersistentClass) classes.get(persistentClass));
+                PersistentClass pc = classes.get(persistentClass);
                 if (pc == null)
                 {
-                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
+                    throw new MappingException(I18N.format("unknown.persistent.class", persistentClass));
                 }
                 return pc.getIdentifier().getType();
             }
 
             public String getIdentifierPropertyName(String persistentClass) throws MappingException
             {
-                final PersistentClass pc = (PersistentClass) classes.get(persistentClass);
+                final PersistentClass pc = classes.get(persistentClass);
                 if (pc == null)
                 {
-                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
+                    throw new MappingException(I18N.format("unknown.persistent.class", persistentClass));
                 }
                 if (!pc.hasIdentifierProperty()) return null;
                 return pc.getIdentifierProperty().getName();
@@ -87,10 +93,10 @@ public class MutableConfiguration extends Configuration
 
             public Type getReferencedPropertyType(String persistentClass, String propertyName) throws MappingException
             {
-                final PersistentClass pc = (PersistentClass) classes.get(persistentClass);
+                final PersistentClass pc = classes.get(persistentClass);
                 if (pc == null)
                 {
-                    throw new MappingException(I18N.format("unknown.persistent.class", pc));
+                    throw new MappingException(I18N.format("unknown.persistent.class", persistentClass));
                 }
                 Property prop = pc.getReferencedProperty(propertyName);
                 if (prop == null)

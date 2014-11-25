@@ -15,10 +15,8 @@ import org.hibernate.*;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -54,9 +52,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.user = null and model.stamps.endTime > :since order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setLong("since", since.getTime());
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -72,9 +67,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 queryObject.setEntity("project", project);
                 queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -90,9 +82,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 queryObject.setEntity("project", result.getProject());
                 queryObject.setLong("number", result.getNumber());
                 queryObject.setMaxResults(1);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return (BuildResult) queryObject.uniqueResult();
             }
         });
@@ -125,8 +114,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 criteria.setFirstResult(first);
                 criteria.setMaxResults(max);
                 criteria.addOrder(Order.desc("number"));
-                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
-
                 return criteria.list();
             }
         });
@@ -196,14 +183,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         List<BuildResult> results = getHibernateTemplate().execute(new HibernateCallback<List<BuildResult>>()
         {
-            public List<BuildResult> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<BuildResult> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project.id = :project and model.number = :number");
                 queryObject.setLong("project", projectId);
                 queryObject.setParameter("number", number);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -224,14 +208,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         List<BuildResult> results = (List) getHibernateTemplate().execute(new HibernateCallback<List<BuildResult>>()
         {
-            public List<BuildResult> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<BuildResult> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.number = :number");
                 queryObject.setEntity("user", user);
                 queryObject.setParameter("number", number);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -258,38 +239,38 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return findAnyType(id, RecipeResult.class);
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states)
+    public long getBuildCount(final Project project, final ResultState[] states)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
+        return getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
                 criteria.setProjection(Projections.rowCount());
-                return (Integer) criteria.uniqueResult();
+                return (Long) criteria.uniqueResult();
             }
         });
     }
 
-    public int getBuildCount(final Project[] projects, final ResultState[] states)
+    public long getBuildCount(final Project[] projects, final ResultState[] states)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
+        return getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, null, states, false);
                 addProjectsToCriteria(projects, criteria);
                 criteria.setProjection(Projections.rowCount());
-                return (Integer) criteria.uniqueResult();
+                return (Long) criteria.uniqueResult();
             }
         });
     }
 
-    public int getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final boolean includePinned)
+    public long getBuildCount(final Project project, final ResultState[] states, final String[] statuses, final boolean includePinned)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
+        return getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, states, false);
                 if (!includePinned)
@@ -298,22 +279,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 }
                 addStatusesToCriteria(statuses, criteria);
                 criteria.setProjection(Projections.rowCount());
-                return (Integer) criteria.uniqueResult();
+                return (Long) criteria.uniqueResult();
             }
         });
     }
 
-    public int getBuildCount(final Project project, final long after, final long upTo)
+    public long getBuildCount(final Project project, final long after, final long upTo)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
+        return getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Criteria criteria = getBuildResultCriteria(session, project, null, false);
                 criteria.add(Restrictions.gt("number", after));
                 criteria.add(Restrictions.le("number", upTo));
                 criteria.setProjection(Projections.rowCount());
-                return (Integer) criteria.uniqueResult();
+                return (Long) criteria.uniqueResult();
             }
         });
     }
@@ -472,7 +453,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Query queryObject = session.createQuery("select count (*) from BuildResult model where model.user = :user and model.stateName in (:stateNames)");
                 queryObject.setEntity("user", user);
                 queryObject.setParameterList("stateNames", getStateNames(ResultState.getCompletedStates()));
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return (Long) queryObject.uniqueResult();
             }
         }));
@@ -496,7 +476,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     {
                         queryObject.setMaxResults(max);
                     }
-                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                     return queryObject.list();
                 }
             });
@@ -527,7 +506,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                         "WHERE artifact.id = :id");
                 queryObject.setLong("id", artifactId);
                 queryObject.setMaxResults(1);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return (CommandResult) queryObject.uniqueResult();
             }
         });
@@ -567,7 +545,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             {
                 Query queryObject = session.createQuery("select result from BuildResult result join result.stages stage where stage = :node");
                 queryObject.setEntity("node", node);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return (BuildResult) queryObject.uniqueResult();
             }
         });
@@ -665,7 +642,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 }
                 criteria.addOrder(Order.desc("id"));
                 criteria.setMaxResults(maxResults);
-                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return criteria.list();
             }
         });
@@ -687,7 +663,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 }
                 criteria.addOrder(Order.asc("id"));
                 criteria.setMaxResults(maxResults);
-                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return criteria.list();
             }
         });
@@ -707,7 +682,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 }
                 criteria.addOrder(Order.desc("id"));
                 criteria.setMaxResults(1);
-                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
                 return (BuildResult) criteria.uniqueResult();
             }
         });
@@ -748,8 +722,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         }
 
         addStatesToCriteria(states, criteria);
-
-        SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
         return criteria;
     }
 

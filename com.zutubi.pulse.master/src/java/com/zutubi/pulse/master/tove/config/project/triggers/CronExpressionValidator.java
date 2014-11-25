@@ -2,8 +2,10 @@ package com.zutubi.pulse.master.tove.config.project.triggers;
 
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;
-import org.quartz.CronTrigger;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.calendar.BaseCalendar;
+import org.quartz.spi.OperableTrigger;
 
 /**
  */
@@ -17,7 +19,10 @@ public class CronExpressionValidator extends StringFieldValidatorSupport
         }
         try
         {
-            new CronTrigger("triggerName", null, expression).computeFirstFireTime(new BaseCalendar());
+            OperableTrigger trigger = (OperableTrigger) TriggerBuilder.newTrigger()
+                    .withSchedule(CronScheduleBuilder.cronSchedule(expression))
+                    .build();
+            trigger.computeFirstFireTime(new BaseCalendar());
         }
         catch (Exception e)
         {

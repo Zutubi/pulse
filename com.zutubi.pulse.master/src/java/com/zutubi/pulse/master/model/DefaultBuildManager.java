@@ -107,17 +107,17 @@ public class DefaultBuildManager implements BuildManager
 
     public int getBuildCount(Project project, ResultState[] states)
     {
-        return buildResultDao.getBuildCount(project, states);
+        return (int) buildResultDao.getBuildCount(project, states);
     }
 
     public int getBuildCount(Project[] projects, ResultState[] states)
     {
-        return buildResultDao.getBuildCount(projects, states);
+        return (int) buildResultDao.getBuildCount(projects, states);
     }
 
     public int getBuildCount(Project project, long after, long upTo)
     {
-        return buildResultDao.getBuildCount(project, after, upTo);
+        return (int) buildResultDao.getBuildCount(project, after, upTo);
     }
 
     public int getBuildCountForAgent(Agent agent, Project[] projects, ResultState[] states)
@@ -136,18 +136,18 @@ public class DefaultBuildManager implements BuildManager
         {
             if (projects == null || projects.length == 0)
             {
-                page.setTotalBuilds(buildResultDao.getBuildCount((Project) null, states));
+                page.setTotalBuilds((int) buildResultDao.getBuildCount((Project) null, states));
                 page.setResults(buildResultDao.findLatestByProject(null, states, page.getFirst(), page.getMax()));
             }
             else if (projects.length == 1)
             {
                 Project project = projects[0];
-                page.setTotalBuilds(buildResultDao.getBuildCount(project, states));
+                page.setTotalBuilds((int) buildResultDao.getBuildCount(project, states));
                 page.setResults(buildResultDao.findLatestByProject(project, states, page.getFirst(), page.getMax()));
             }
             else
             {
-                page.setTotalBuilds(buildResultDao.getBuildCount(projects, states));
+                page.setTotalBuilds((int) buildResultDao.getBuildCount(projects, states));
                 page.setResults(buildResultDao.queryBuilds(projects, states, -1, -1, page.getFirst(), page.getMax(), true));
             }
         }

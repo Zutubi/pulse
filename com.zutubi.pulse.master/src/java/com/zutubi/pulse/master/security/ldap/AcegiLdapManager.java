@@ -278,7 +278,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private List<UserGroupConfiguration> getLdapGroups(Collection<GrantedAuthority> ldapAuthorities)
+    private List<UserGroupConfiguration> getLdapGroups(Collection<? extends GrantedAuthority> ldapAuthorities)
     {
         List<UserGroupConfiguration> groups = new LinkedList<UserGroupConfiguration>();
         for (GrantedAuthority authority : ldapAuthorities)

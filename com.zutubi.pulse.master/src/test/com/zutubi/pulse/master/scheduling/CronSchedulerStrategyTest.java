@@ -2,10 +2,8 @@ package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.pulse.master.scheduling.quartz.TriggerAdapter;
 import com.zutubi.util.bean.WiringObjectFactory;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
+import org.quartz.*;
+import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
@@ -30,7 +28,7 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
         quartzScheduler = schedFact.getScheduler();
         quartzScheduler.setJobFactory(new JobFactory()
         {
-            public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
+            public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException
             {
                 QuartzTaskCallbackJob job = new QuartzTaskCallbackJob();
                 job.setTriggerHandler(triggerHandler);
@@ -81,14 +79,15 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
         {
             String name = trigger.getName();
             String group = trigger.getGroup();
-            org.quartz.Trigger t = quartzScheduler.getTrigger(name, group);
+            TriggerKey triggerKey = TriggerKey.triggerKey(name, group);
+            org.quartz.Trigger t = quartzScheduler.getTrigger(triggerKey);
             if (t != null)
             {
                 // if the quartz trigger is currently paused, then we should not trigger since this
                 // is not what quartz itself would do. Remember, we are just trying to imitate quartz
                 // in a controlled fashion.
-                int state = quartzScheduler.getTriggerState(name, group);
-                if (state == org.quartz.Trigger.STATE_PAUSED)
+                org.quartz.Trigger.TriggerState state = quartzScheduler.getTriggerState(triggerKey);
+                if (state == org.quartz.Trigger.TriggerState.PAUSED)
                 {
                     return;
                 }
@@ -98,16 +97,17 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
                 final boolean[] triggered = new boolean[]{false};
                 TriggerAdapter globalTriggerListener = new TriggerAdapter()
                 {
-                    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
+                    @Override
+                    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, org.quartz.Trigger.CompletedExecutionInstruction triggerInstructionCode)
                     {
                         triggered[0] = true;
                     }
                 };
                 
-                quartzScheduler.addGlobalTriggerListener(globalTriggerListener);
+                quartzScheduler.getListenerManager().addTriggerListener(globalTriggerListener);
 
                 // manually trigger the quartz callback job with the triggers details.
-                quartzScheduler.triggerJob(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP, t.getJobDataMap());
+                quartzScheduler.triggerJob(JobKey.jobKey(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP), t.getJobDataMap());
 
                 while (!triggered[0])
                 {

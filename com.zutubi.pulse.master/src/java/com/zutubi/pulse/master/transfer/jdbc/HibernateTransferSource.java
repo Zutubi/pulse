@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.transfer.TransferException;
 import com.zutubi.pulse.master.transfer.TransferSource;
 import com.zutubi.pulse.master.transfer.TransferTarget;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
 

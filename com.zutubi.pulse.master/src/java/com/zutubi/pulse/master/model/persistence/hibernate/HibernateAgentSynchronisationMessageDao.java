@@ -7,8 +7,7 @@ import com.zutubi.pulse.master.model.persistence.AgentSynchronisationMessageDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
             {
                 Query queryObject = session.createQuery("from AgentSynchronisationMessage where agentState = :agentState order by id asc");
                 queryObject.setEntity("agentState", agentState);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -48,7 +46,6 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
             {
                 Query queryObject = session.createQuery("from AgentSynchronisationMessage where statusName = :statusName");
                 queryObject.setString("statusName", status.name());
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -79,7 +76,6 @@ public class HibernateAgentSynchronisationMessageDao extends HibernateEntityDao<
             {
                 Query queryObject = session.createQuery("delete from AgentSynchronisationMessage where agentState = :agentState");
                 queryObject.setEntity("agentState", agentState);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.executeUpdate();
             }
         });

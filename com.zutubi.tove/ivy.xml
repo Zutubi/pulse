@@ -29,8 +29,8 @@
 
         <!-- external libraries -->
         <dependency org="nu.xom" name="nu.xom" rev="20111125" conf="build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.0.5.RELEASE" conf="build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.acls" rev="3.0.5.RELEASE" conf="build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.ldap" rev="1.3.0.RELEASE" conf="build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.2.5.RELEASE" conf="build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.acl" rev="3.2.5.RELEASE" conf="build,release->default;src->src"/>
+        <dependency org="org.springframework.ldap" name="org.springframework.ldap.core" rev="2.0.2.RELEASE" conf="build,release->default;src->src"/>
     </dependencies>
 </ivy-module>

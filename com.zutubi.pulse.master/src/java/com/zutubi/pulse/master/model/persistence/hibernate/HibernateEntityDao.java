@@ -3,12 +3,12 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.persistence.EntityDao;
 import com.zutubi.util.logging.Logger;
-import org.hibernate.*;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         return findAnyType(id, type);
     }
 
-    protected <T> T findAnyType(long id, Class<T> type)
+    protected <U> U findAnyType(long id, Class<U> type)
     {
         try
         {
@@ -71,18 +71,12 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         getHibernateTemplate().refresh(entity);
     }
 
-    public int count()
+    public long count()
     {
-        return getHibernateTemplate().execute(new HibernateCallback<Integer>()
-        {
-            public Integer doInHibernate(Session session) throws HibernateException
-            {
-                Criteria criteria = session.createCriteria(persistentClass());
-                criteria.setProjection(Projections.rowCount());
-                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
-                return (Integer) criteria.uniqueResult();
-            }
-        });
+        return (Long) getSessionFactory().getCurrentSession()
+                .createCriteria(persistentClass())
+                .setProjection(Projections.rowCount())
+                .uniqueResult();
     }
 
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
@@ -98,24 +92,18 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     @SuppressWarnings({"unchecked"})
     public <U> List<U> findByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final int maxResults, final boolean cachable)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<List<U>>()
+        Session session = getSessionFactory().getCurrentSession();
+        Query queryObject = session.getNamedQuery(queryName);
+        if (propertyName != null)
         {
-            public List<U> doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.getNamedQuery(queryName);
-                if (propertyName != null)
-                {
-                    queryObject.setParameter(propertyName, propertyValue);
-                }
-                if (maxResults > 0)
-                {
-                    queryObject.setMaxResults(maxResults);
-                }
-                queryObject.setCacheable(cachable);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
-            }
-        });
+            queryObject.setParameter(propertyName, propertyValue);
+        }
+        if (maxResults > 0)
+        {
+            queryObject.setMaxResults(maxResults);
+        }
+        queryObject.setCacheable(cachable);
+        return queryObject.list();
     }
 
     public final Object findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
@@ -136,24 +124,18 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
     @SuppressWarnings({"unchecked"})
     public final <U> U findUniqueByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final String secondPropertyName, final Object secondPropertyValue, final boolean cachable)
     {
-        return getHibernateTemplate().execute(new HibernateCallback<U>()
+        Session session = getSessionFactory().getCurrentSession();
+        Query queryObject = session.getNamedQuery(queryName);
+        if (propertyName != null)
         {
-            public U doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.getNamedQuery(queryName);
-                if (propertyName != null)
-                {
-                    queryObject.setParameter(propertyName, propertyValue);
-                }
-                if (secondPropertyName != null)
-                {
-                    queryObject.setParameter(secondPropertyName, secondPropertyValue);
-                }
-                queryObject.setCacheable(cachable);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return (U) queryObject.uniqueResult();
-            }
-        });
+            queryObject.setParameter(propertyName, propertyValue);
+        }
+        if (secondPropertyName != null)
+        {
+            queryObject.setParameter(secondPropertyName, secondPropertyValue);
+        }
+        queryObject.setCacheable(cachable);
+        return (U) queryObject.uniqueResult();
     }
 
     /**

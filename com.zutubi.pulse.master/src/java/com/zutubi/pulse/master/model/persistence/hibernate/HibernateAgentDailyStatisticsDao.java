@@ -6,8 +6,7 @@ import com.zutubi.util.logging.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,7 +33,6 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
             {
                 Query queryObject = session.createQuery("from AgentDailyStatistics where agentId = :agentId");
                 queryObject.setLong("agentId", agentId);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -49,7 +47,6 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
                 Query queryObject = session.createQuery("from AgentDailyStatistics where agentId = :agentId and dayStamp = :dayStamp");
                 queryObject.setLong("agentId", agentId);
                 queryObject.setLong("dayStamp", dayStamp);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -78,11 +75,10 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
     {
         return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException, SQLException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("delete from AgentDailyStatistics where dayStamp < :dayStamp");
                 queryObject.setLong("dayStamp", dayStamp);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.executeUpdate();
             }
         });
@@ -92,11 +88,10 @@ public class HibernateAgentDailyStatisticsDao extends HibernateEntityDao<AgentDa
     {
         return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException, SQLException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("delete from AgentDailyStatistics where agentId not in (:agentIds)");
                 queryObject.setParameterList("agentIds", agentIds);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.executeUpdate();
             }
         });

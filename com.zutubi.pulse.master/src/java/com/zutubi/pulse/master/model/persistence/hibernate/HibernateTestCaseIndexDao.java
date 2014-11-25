@@ -5,8 +5,7 @@ import com.zutubi.pulse.master.model.persistence.TestCaseIndexDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 import java.util.List;
 
@@ -30,9 +29,6 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
                 Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId and model.name like :suite");
                 queryObject.setParameter("stageNameId", stageNameId);
                 queryObject.setParameter("suite", suite + "%");
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -47,8 +43,6 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
             {
                 Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId");
                 queryObject.setParameter("stageNameId", stageNameId);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -62,8 +56,6 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
             {
                 Query queryObject = session.createQuery("delete from TestCaseIndex model where model.projectId = :projectId");
                 queryObject.setParameter("projectId", projectId);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.executeUpdate();
             }
         });

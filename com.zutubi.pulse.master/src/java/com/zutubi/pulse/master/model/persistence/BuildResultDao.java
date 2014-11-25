@@ -65,13 +65,13 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     RecipeResult findRecipeResult(long id);
 
-    int getBuildCount(Project project, ResultState[] states);
+    long getBuildCount(Project project, ResultState[] states);
 
-    int getBuildCount(Project[] projects, ResultState[] states);
+    long getBuildCount(Project[] projects, ResultState[] states);
 
-    int getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned);
+    long getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned);
 
-    int getBuildCount(Project project, long after, long upTo);
+    long getBuildCount(Project project, long after, long upTo);
 
     List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 

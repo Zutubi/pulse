@@ -21,7 +21,7 @@ public class HibernateUniqueKeyTable
     {
         Table table = new Table("hibernate_unique_key");
         Column column = new Column("next_hi");
-        SimpleValue value = new SimpleValue(table);
+        SimpleValue value = new SimpleValue(null, table);
         value.setTypeName(int.class.getName());
         column.setValue(value);
         column.setSqlTypeCode(Types.INTEGER);

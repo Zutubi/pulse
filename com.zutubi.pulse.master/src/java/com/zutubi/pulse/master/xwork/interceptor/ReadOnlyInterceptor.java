@@ -5,7 +5,6 @@ import com.opensymphony.xwork.interceptor.Interceptor;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * An interceptor to wrap a read-only transaction around a request.  Used to
@@ -25,7 +24,7 @@ public class ReadOnlyInterceptor implements Interceptor
 
     public String intercept(ActionInvocation invocation) throws Exception
     {
-        Session session = SessionFactoryUtils.getSession(sessionFactory, false);
+        Session session = sessionFactory.getCurrentSession();
         session.setFlushMode(FlushMode.MANUAL);
         return invocation.invoke();
     }

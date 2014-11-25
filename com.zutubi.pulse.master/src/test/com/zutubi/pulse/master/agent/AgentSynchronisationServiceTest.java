@@ -561,7 +561,7 @@ public class AgentSynchronisationServiceTest extends PulseTestCase
         {
         }
 
-        public int count()
+        public long count()
         {
             return messages.size();
         }

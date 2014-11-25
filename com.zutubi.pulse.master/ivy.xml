@@ -35,12 +35,12 @@
         <dependency org="org.apache.commons" name="org.apache.commons.io" rev="1.4.0" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.velocity" name="org.apache.velocity" rev="1.3.1" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.velocity" name="org.apache.velocity.tools.views" rev="1.1.0" conf="external,build,release->default;src->src"/>
-        <dependency org="net.sourceforge.ehcache" name="net.sf.ehcache" rev="1.6.2" conf="external,build,release->default;src->src"/>
         <dependency org="org.apache.commons" name="org.apache.commons.pool" rev="1.2.0" conf="external,build,release->default;src->src"/>
-        <dependency org="org.hibernate" name="org.hibernate" rev="3.3.1.GA" conf="external,build,release->default;src->src"/>
+        <dependency org="org.hibernate" name="org.hibernate.core" rev="4.3.7.Final" conf="external,build,release->default;src->src"/>
+        <dependency org="org.hibernate" name="org.hibernate.ehcache" rev="4.3.7.Final" conf="external,build,release->default;src->src"/>
         <dependency org="org.hsqldb" name="org.hsqldb" rev="1.8.0.10" conf="external,build,release->default;src->src"/>
         <dependency org="org.igniterealtime" name="org.jivesoftware.smackx" rev="2.2.1" conf="external,build,release->default;src->src"/>
-        <dependency org="com.opensymphony.quartz" name="org.quartz" rev="1.6.6" conf="external,build,release->default;src->src"/>
+        <dependency org="org.quartzscheduler" name="org.quartzscheduler" rev="2.2.1" conf="external,build,release->default;src->src"/>
 
         <dependency org="com.opensymphony.sitemesh" name="com.opensymphony.sitemesh" rev="2.2.1" conf="external,build,release->default;src->src"/>
         <dependency org="com.opensymphony.webwork" name="com.opensymphony.webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
@@ -49,16 +49,16 @@
         <dependency org="javax.portlet" name="javax.portlet" rev="2.0.0" conf="external,build,release->default;src->src"/>
 
         <dependency org="com.uwyn" name="com.uwyn.jhighlight" rev="1.0.0" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.aop" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.jdbc" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.orm" rev="3.0.5.RELEASE"  conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.transaction" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework" name="org.springframework.web" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.acls" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.ldap" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.web" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
-        <dependency org="org.springframework.security" name="org.springframework.security.config" rev="3.0.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.aop" rev="4.1.2.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.jdbc" rev="4.1.2.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.orm" rev="4.1.2.RELEASE"  conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.tx" rev="4.1.2.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework" name="org.springframework.web" rev="4.1.2.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.acl" rev="3.2.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.config" rev="3.2.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.core" rev="3.2.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.ldap" rev="3.2.5.RELEASE" conf="external,build,release->default;src->src"/>
+        <dependency org="org.springframework.security" name="org.springframework.security.web" rev="3.2.5.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="com.sun.syndication" name="com.sun.syndication" rev="0.8.0" conf="external,build,release->default;src->src"/>
         <dependency org="com.sun.syndication" name="com.sun.syndication.content" rev="20060508" conf="external,build,release->default;src->src"/>
         <dependency org="javax.transaction" name="javax.transaction" rev="1.1.0" conf="external,build,release->default;src->src"/>

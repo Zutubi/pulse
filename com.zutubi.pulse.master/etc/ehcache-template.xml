@@ -39,6 +39,7 @@
         diskExpiryThreadIntervalSeconds- The number of seconds between runs of the disk expiry thread. The default value
                                          is 120 seconds.
         -->
+<!-- FIXME upup may need to move or add <cache> config to mappings?? -->
 
     <defaultCache
             maxElementsInMemory="10000"

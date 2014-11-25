@@ -8,7 +8,8 @@
 #
 hibernate.show_sql=false
 hibernate.query.use_query_cache=true
-hibernate.cache.provider_class=com.zutubi.pulse.master.hibernate.EhCacheProvider
+# FIXME upup: how do we configure this to use pulse's temp dir?
+hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
 
 #
 # Connection specific properties. Any custom jdbc connection properties can

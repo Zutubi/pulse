@@ -22,7 +22,7 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;

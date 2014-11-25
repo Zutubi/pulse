@@ -11,7 +11,7 @@ import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Sort;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;

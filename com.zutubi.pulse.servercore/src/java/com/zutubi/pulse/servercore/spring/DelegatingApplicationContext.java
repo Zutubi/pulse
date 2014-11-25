@@ -7,6 +7,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.*;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -62,6 +63,11 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
         return delegate.getBean(requiredType);
     }
 
+    public String getApplicationName()
+    {
+        return delegate.getApplicationName();
+    }
+
     public String getDisplayName()
     {
         return delegate.getDisplayName();
@@ -113,17 +119,22 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
 
     public String[] getBeanNamesForType(Class type, boolean includePrototypes, boolean includeFactoryBeans)
     {
-        return delegate.getBeanNamesForType(type, includePrototypes,  includeFactoryBeans);
+        return delegate.getBeanNamesForType(type, includePrototypes, includeFactoryBeans);
     }
 
-    public Map getBeansOfType(Class type) throws BeansException
+    public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException
     {
         return delegate.getBeansOfType(type);
     }
 
-    public Map getBeansOfType(Class type, boolean includePrototypes, boolean includeFactoryBeans) throws BeansException
+    public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includePrototypes, boolean includeFactoryBeans) throws BeansException
     {
         return delegate.getBeansOfType(type, includePrototypes, includeFactoryBeans);
+    }
+
+    public String[] getBeanNamesForAnnotation(Class<? extends Annotation> aClass)
+    {
+        throw new RuntimeException("Not yet implemented");
     }
 
     public boolean containsBean(String name)
@@ -141,7 +152,7 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
         return delegate.getBean(name);
     }
 
-    public Object getBean(String name, Class requiredType) throws BeansException
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException
     {
         return delegate.getBean(name, requiredType);
     }
@@ -216,6 +227,16 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
         delegate.setParent(context);
     }
 
+    public ConfigurableEnvironment getEnvironment()
+    {
+        return delegate.getEnvironment();
+    }
+
+    public void setEnvironment(ConfigurableEnvironment configurableEnvironment)
+    {
+        delegate.setEnvironment(configurableEnvironment);
+    }
+
     public void closeAll()
     {
         ConfigurableApplicationContext parent = (ConfigurableApplicationContext) delegate.getParent();
@@ -269,6 +290,11 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     public Object getBean(String s, Object... objects) throws BeansException
     {
         return delegate.getBean(s, objects);
+    }
+
+    public <T> T getBean(Class<T> aClass, Object... objects) throws BeansException
+    {
+        return delegate.getBean(aClass, objects);
     }
 
     public boolean isPrototype(String s) throws NoSuchBeanDefinitionException

@@ -47,7 +47,7 @@ public class InMemoryEntityDao<T extends Entity> implements EntityDao<T>
         return deleteAll(findByPredicate(p));
     }
 
-    public int count()
+    public long count()
     {
         return entities.size();
     }

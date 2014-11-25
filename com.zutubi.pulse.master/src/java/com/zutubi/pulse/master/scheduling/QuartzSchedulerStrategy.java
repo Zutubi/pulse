@@ -2,9 +2,7 @@ package com.zutubi.pulse.master.scheduling;
 
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 
 import static com.zutubi.pulse.master.scheduling.QuartzTaskCallbackJob.SOURCE_PROP;
 
@@ -25,15 +23,15 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     protected static final String CALLBACK_JOB_GROUP = "cron.trigger.job.group";
 
-    private Scheduler quartzScheduler;
+    private org.quartz.Scheduler quartzScheduler;
     private ObjectFactory objectFactory;
 
-    public void setQuartzScheduler(Scheduler quartzScheduler)
+    public void setQuartzScheduler(org.quartz.Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
     }
 
-    public Scheduler getQuartzScheduler()
+    public org.quartz.Scheduler getQuartzScheduler()
     {
         return quartzScheduler;
     }
@@ -43,12 +41,13 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         try
         {
             // if trigger is not scheduled, then schedule it first before pausing.
-            org.quartz.Trigger t = getQuartzScheduler().getTrigger(trigger.getName(), trigger.getGroup());
+            TriggerKey triggerKey = new TriggerKey(trigger.getName(), trigger.getGroup());
+            org.quartz.Trigger t = getQuartzScheduler().getTrigger(triggerKey);
             if (t == null)
             {
                 schedule(trigger);
             }
-            getQuartzScheduler().pauseTrigger(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().pauseTrigger(triggerKey);
         }
         catch (SchedulerException e)
         {
@@ -60,7 +59,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().resumeTrigger(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().resumeTrigger(new TriggerKey(trigger.getName(), trigger.getGroup()));
         }
         catch (SchedulerException e)
         {
@@ -87,7 +86,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().unscheduleJob(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().unscheduleJob(new TriggerKey(trigger.getName(), trigger.getGroup()));
         }
         catch (SchedulerException e)
         {
@@ -97,12 +96,15 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     protected void ensureCallbackRegistered() throws SchedulerException
     {
-        JobDetail existingJob = getQuartzScheduler().getJobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
+        JobKey jobKey = new JobKey(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
+        JobDetail existingJob = getQuartzScheduler().getJobDetail(jobKey);
         if (existingJob == null)
         {
             // register the job detail once only.
-            JobDetail detail = new JobDetail(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP, QuartzTaskCallbackJob.class);
-            detail.setDurability(true); // will stay around after the trigger has gone.
+            JobDetail detail = JobBuilder.newJob(QuartzTaskCallbackJob.class)
+                    .withIdentity(jobKey)
+                    .storeDurably()
+                    .build();
             getQuartzScheduler().addJob(detail, true);
         }
     }
@@ -123,13 +125,9 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            // the quartz trigger equivalent...
-            org.quartz.Trigger quartzTrigger = createTrigger(trigger);
-
-            // the callback job
             ensureCallbackRegistered();
-            quartzTrigger.setJobName(CALLBACK_JOB_NAME);
-            quartzTrigger.setJobGroup(CALLBACK_JOB_GROUP);
+
+            org.quartz.Trigger quartzTrigger = createTriggerBuilder(trigger).build();
 
             QuartzTaskCallbackTriggerSource source = objectFactory.buildBean(QuartzTaskCallbackTriggerSource.class, trigger);
             quartzTrigger.getJobDataMap().put(SOURCE_PROP, source);
@@ -152,5 +150,13 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         this.objectFactory = objectFactory;
     }
 
-    protected abstract org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException;
+    protected TriggerBuilder createTriggerBuilder(Trigger trigger) throws SchedulingException
+    {
+        return TriggerBuilder.newTrigger()
+                .withIdentity(trigger.getName(), trigger.getGroup())
+                .withSchedule(createScheduleBuilder(trigger))
+                .forJob(CALLBACK_JOB_NAME, CALLBACK_JOB_GROUP);
+    }
+
+    protected abstract ScheduleBuilder createScheduleBuilder(Trigger trigger) throws SchedulingException;
 }

@@ -29,7 +29,7 @@ This context requires:
 
     <bean id="configurationInjector" class="com.zutubi.pulse.master.tove.config.ConfigurationInjector" autowire="byName"/>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="mappingResources" ref="hibernateMappings"/>
         <property name="hibernateProperties"><ref local="hibernateProperties"/></property>
         <property name="dataSource" ref="dataSource"/><property name="entityInterceptor"><ref local="configurationInjector"/>
@@ -41,16 +41,16 @@ This context requires:
         <property name="propertyPath" value="hibernateProperties"/>
     </bean>
 
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <util:map id="defaultTransactionAttributes">
-        <entry key="find*" value="PROPAGATION_REQUIRED, readOnly"/>
-        <entry key="get*" value="PROPAGATION_REQUIRED, readOnly"/>
-        <entry key="query*" value="PROPAGATION_REQUIRED, readOnly"/>
-        <entry key="*" value="PROPAGATION_REQUIRED"/>
-    </util:map>
+    <util:properties id="defaultTransactionAttributes">
+        <prop key="find*">PROPAGATION_REQUIRED, readOnly</prop>
+        <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
+        <prop key="query*">PROPAGATION_REQUIRED, readOnly</prop>
+        <prop key="*">PROPAGATION_REQUIRED</prop>
+    </util:properties>
 
     <bean id="artifactDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>

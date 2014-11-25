@@ -40,5 +40,5 @@ public interface EntityDao<T extends Entity>
 
     void refresh(T entity);
 
-    int count();
+    long count();
 }

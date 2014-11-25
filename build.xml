@@ -102,6 +102,12 @@
         </junitreport>
     </target>
 
+    <target name="deps.all" depends="init"
+            description="Reports all dependencies.">
+        <set-package-deps module="master"/>
+        <subant inheritall="false" target="deps" buildpathref="build.path.master"/>
+    </target>
+
     <target name="dist.all" depends="init"
             description="Publishes built artifacts to the Subversion repository, assuming they are already built.">
         <set-package-deps module="master"/>

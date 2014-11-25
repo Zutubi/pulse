@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.scheduling.quartz;
 
 import org.quartz.JobExecutionContext;
+import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 
 /**
@@ -14,12 +15,9 @@ public class TriggerAdapter implements TriggerListener
         return "TriggerAdapter";
     }
 
-    /**
-     * @see TriggerListener#triggerComplete(org.quartz.Trigger, org.quartz.JobExecutionContext, int)
-     */
-    public void triggerComplete(org.quartz.Trigger trigger, JobExecutionContext context, int triggerInstructionCode)
+    public void triggerComplete(Trigger trigger, JobExecutionContext context, Trigger.CompletedExecutionInstruction triggerInstructionCode)
     {
-
+        throw new RuntimeException("Not yet implemented");
     }
 
     /**

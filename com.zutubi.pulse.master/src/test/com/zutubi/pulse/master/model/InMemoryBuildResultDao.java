@@ -111,12 +111,12 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
-    public int getBuildCount(Project project, ResultState[] states)
+    public long getBuildCount(Project project, ResultState[] states)
     {
         throw new RuntimeException("Not yet implemented");
     }
 
-    public int getBuildCount(Project[] projects, ResultState[] states)
+    public long getBuildCount(Project[] projects, ResultState[] states)
     {
         throw new RuntimeException("Not yet implemented");
     }
@@ -126,12 +126,12 @@ public class InMemoryBuildResultDao extends InMemoryEntityDao<BuildResult> imple
         throw new RuntimeException("Not yet implemented");
     }
 
-    public int getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned)
+    public long getBuildCount(Project project, ResultState[] states, String[] statuses, boolean includePinned)
     {
         throw new RuntimeException("Not yet implemented");
     }
 
-    public int getBuildCount(Project project, long after, long upTo)
+    public long getBuildCount(Project project, long after, long upTo)
     {
         throw new RuntimeException("Not yet implemented");
     }

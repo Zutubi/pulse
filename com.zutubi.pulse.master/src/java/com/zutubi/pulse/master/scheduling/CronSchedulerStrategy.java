@@ -1,5 +1,9 @@
 package com.zutubi.pulse.master.scheduling;
 
+import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.ScheduleBuilder;
+
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -14,17 +18,13 @@ public class CronSchedulerStrategy extends QuartzSchedulerStrategy
         return Arrays.asList(CronTrigger.TYPE);
     }
 
-    protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
+    protected ScheduleBuilder createScheduleBuilder(Trigger trigger) throws SchedulingException
     {
         CronTrigger cronTrigger = (CronTrigger) trigger;
         try
         {
-            org.quartz.CronTrigger quartzTrigger = new org.quartz.CronTrigger(
-                    cronTrigger.getName(),
-                    cronTrigger.getGroup(),
-                    cronTrigger.getCron());
-            quartzTrigger.setMisfireInstruction(org.quartz.CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING);
-            return quartzTrigger;
+            return CronScheduleBuilder.cronSchedule(new CronExpression(cronTrigger.getCron()))
+                    .withMisfireHandlingInstructionDoNothing();
         }
         catch (ParseException e)
         {

@@ -8,10 +8,8 @@ import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -106,9 +104,6 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
             {
                 Query queryObject = session.createQuery("from PersistentChangelist model where model.hash = :hash");
                 queryObject.setParameter("hash", changelist.getHash());
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
                 return queryObject.list();
             }
         });
@@ -130,11 +125,10 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
     {
         return toInt(getHibernateTemplate().execute(new HibernateCallback<Long>()
         {
-            public Long doInHibernate(Session session) throws HibernateException, SQLException
+            public Long doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("select count(change) from PersistentChangelist model join model.changes as change where model = :changelist");
                 queryObject.setEntity("changelist", changelist);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return (Long) queryObject.uniqueResult();
             }
         }));
@@ -144,12 +138,11 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
     {
         return getHibernateTemplate().execute(new HibernateCallback<List<PersistentFileChange>>()
         {
-            public List<PersistentFileChange> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<PersistentFileChange> doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createFilter(changelist.getChanges(), "order by ordinal");
                 queryObject.setFirstResult(offset);
                 queryObject.setMaxResults(max);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -173,7 +166,6 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
             {
                 Query queryObject = session.createQuery(queryString);
                 queryObject.setParameter("resultId", id);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }
         });
@@ -200,7 +192,6 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
                     Query queryObject = changelistQuery.createQuery(session);
                     queryObject.setFirstResult(offset[0]);
                     queryObject.setMaxResults(limit[0]);
-                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                     return queryObject.list();
                 }
             });

@@ -2,7 +2,8 @@ package com.zutubi.pulse.master.transfer.jdbc;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.Mapping;
+import org.hibernate.engine.spi.Mapping;
+import org.hibernate.id.factory.IdentifierGeneratorFactory;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.type.Type;
@@ -18,6 +19,11 @@ public class HibernateMapping implements Mapping
     public HibernateMapping(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public IdentifierGeneratorFactory getIdentifierGeneratorFactory()
+    {
+        return null;
     }
 
     public Type getIdentifierType(String persistentClass) throws MappingException

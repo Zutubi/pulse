@@ -3,10 +3,13 @@ package com.zutubi.pulse.master.xwork.interceptor;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
+import com.zutubi.pulse.core.api.PulseRuntimeException;
+import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.orm.hibernate4.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,9 +62,23 @@ public class HibernateSessionInterceptor implements Interceptor
             }
             else
             {
-                Session session = SessionFactoryUtils.getSession(sessionFactory, true);
+                Session session = openSession();
                 TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
             }
+        }
+    }
+
+    protected Session openSession()
+    {
+        try
+        {
+            Session session = sessionFactory.openSession();
+            session.setFlushMode(FlushMode.MANUAL);
+            return session;
+        }
+        catch (HibernateException ex)
+        {
+            throw new PulseRuntimeException("Could not open Hibernate Session", ex);
         }
     }
 
@@ -88,7 +105,7 @@ public class HibernateSessionInterceptor implements Interceptor
             else
             {
                 SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager.unbindResource(sessionFactory);
-                SessionFactoryUtils.releaseSession(sessionHolder.getSession(), sessionFactory);
+                SessionFactoryUtils.closeSession(sessionHolder.getSession());
             }
         }
     }

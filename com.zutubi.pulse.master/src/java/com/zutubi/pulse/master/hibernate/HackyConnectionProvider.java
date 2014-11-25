@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.hibernate;
 
 import org.hibernate.HibernateException;
-import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -48,12 +48,18 @@ public class HackyConnectionProvider implements ConnectionProvider
         conn.close();
     }
 
-    public void close()
-    {
-    }
-
     public boolean supportsAggressiveRelease()
     {
         return true;
+    }
+
+    public boolean isUnwrappableAs(Class aClass)
+    {
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    public <T> T unwrap(Class<T> aClass)
+    {
+        throw new RuntimeException("Not yet implemented");
     }
 }

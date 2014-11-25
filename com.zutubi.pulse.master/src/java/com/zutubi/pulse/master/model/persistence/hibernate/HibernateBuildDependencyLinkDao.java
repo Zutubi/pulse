@@ -5,8 +5,7 @@ import com.zutubi.pulse.master.model.persistence.BuildDependencyLinkDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate4.HibernateCallback;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -27,7 +26,7 @@ public class HibernateBuildDependencyLinkDao extends HibernateEntityDao<BuildDep
     {
         return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
         {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException
             {
                 Query query = session.createQuery("from BuildDependencyLink where downstreamBuildId = :build or upstreamBuildId = :build");
                 query.setLong("build", buildId);
@@ -40,7 +39,7 @@ public class HibernateBuildDependencyLinkDao extends HibernateEntityDao<BuildDep
     {
         return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
         {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException
             {
                 Query query = session.createQuery("from BuildDependencyLink where downstreamBuildId = :build");
                 query.setLong("build", buildId);
@@ -53,7 +52,7 @@ public class HibernateBuildDependencyLinkDao extends HibernateEntityDao<BuildDep
     {
         return getHibernateTemplate().execute(new HibernateCallback<List<BuildDependencyLink>>()
         {
-            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException, SQLException
+            public List<BuildDependencyLink> doInHibernate(Session session) throws HibernateException
             {
                 Query query = session.createQuery("from BuildDependencyLink where upstreamBuildId = :build");
                 query.setLong("build", buildId);
@@ -66,11 +65,10 @@ public class HibernateBuildDependencyLinkDao extends HibernateEntityDao<BuildDep
     {
         return getHibernateTemplate().execute(new HibernateCallback<Integer>()
         {
-            public Integer doInHibernate(Session session) throws HibernateException, SQLException
+            public Integer doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("delete from BuildDependencyLink where upstreamBuildId = :build or downstreamBuildId = :build");
                 queryObject.setLong("build", buildId);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.executeUpdate();
             }
         });
