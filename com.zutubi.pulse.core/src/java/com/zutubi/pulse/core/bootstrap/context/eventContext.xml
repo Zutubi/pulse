@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<!--
-The event subsystem context contains the event manager and related event configurations.
-
-This context exports:
-
-    eventManager: the systems event manager.
-
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="eventManager" class="com.zutubi.events.DefaultEventManager">
         <constructor-arg index="0" ref="eventDispatcher"/>
     </bean>
 
     <bean id="eventDispatcher" class="com.zutubi.events.SynchronousDispatcher"/>
-
 </beans>

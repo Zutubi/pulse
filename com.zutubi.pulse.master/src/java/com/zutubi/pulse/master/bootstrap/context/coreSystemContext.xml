@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
@@ -19,7 +19,7 @@
     when other requirements become available.
     -->
     <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
-        <property name="objectFactory"><ref local="objectFactory"/></property>
+        <property name="objectFactory" ref="objectFactory"/>
     </bean>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>

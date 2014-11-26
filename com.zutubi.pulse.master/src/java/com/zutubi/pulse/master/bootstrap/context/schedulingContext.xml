@@ -22,11 +22,11 @@ This context requires:
 <!-- do not autowire, quartz scheduler attempts lookup tables in the database that do not exist. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="configLocation" value="classpath:com/zutubi/pulse/master/bootstrap/quartz/quartz.properties"/>
-        <property name="taskExecutor"><ref local="taskExecutor"/></property>
+        <property name="taskExecutor" ref="taskExecutor"/>
         <property name="jobFactory" ref="quartzJobFactory"/>
     </bean>
 
@@ -43,19 +43,17 @@ This context requires:
     <bean id="schedulerTarget" class="com.zutubi.pulse.master.scheduling.DefaultScheduler" autowire="byName">
         <property name="strategies">
             <list>
-                <ref local="cronSchedulerStrategy"/>
-                <ref local="simpleSchedulerStrategy"/>
-                <ref local="eventSchedulerStrategy"/>
-                <ref local="noopSchedulerStrategy"/>
+                <ref bean="cronSchedulerStrategy"/>
+                <ref bean="simpleSchedulerStrategy"/>
+                <ref bean="eventSchedulerStrategy"/>
+                <ref bean="noopSchedulerStrategy"/>
             </list>
         </property>
     </bean>
 
     <bean id="scheduler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="schedulerTarget"/>
-        </property>
+        <property name="target" ref="schedulerTarget"/>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -86,9 +84,7 @@ This context requires:
      -->
     <bean id="triggerHandler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="triggerHandlerTarget"/>
-        </property>
+        <property name="target" ref="triggerHandlerTarget"/>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -106,9 +102,7 @@ This context requires:
      -->
     <bean id="quartzTaskCallbackJob" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
-        <property name="target">
-            <ref local="quartzTaskCallbackJobTarget"/>
-        </property>
+        <property name="target" ref="quartzTaskCallbackJobTarget"/>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
@@ -121,7 +115,6 @@ This context requires:
     </bean>
 
     <bean id="callbackService" class="com.zutubi.pulse.master.scheduling.CallbackService">
-        <property name="scheduler"><ref local="scheduler"/></property>
+        <property name="scheduler" ref="scheduler"/>
     </bean>
-
 </beans>

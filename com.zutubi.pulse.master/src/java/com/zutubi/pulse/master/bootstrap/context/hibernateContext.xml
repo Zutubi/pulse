@@ -18,8 +18,8 @@ This context requires:
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
 
     <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml"/>
 
@@ -31,9 +31,9 @@ This context requires:
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="mappingResources" ref="hibernateMappings"/>
-        <property name="hibernateProperties"><ref local="hibernateProperties"/></property>
-        <property name="dataSource" ref="dataSource"/><property name="entityInterceptor"><ref local="configurationInjector"/>
-        </property>
+        <property name="hibernateProperties" ref="hibernateProperties"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="entityInterceptor" ref="configurationInjector"/>
     </bean>
 
     <bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
@@ -146,9 +146,7 @@ This context requires:
         <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
             <bean class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentSynchronisationMessageDao">
-                <property name="sessionFactory">
-                    <ref local="sessionFactory"/>
-                </property>
+                <property name="sessionFactory" ref="sessionFactory"/>
             </bean>
         </property>
         <property name="transactionAttributes">
@@ -201,5 +199,4 @@ This context requires:
     <bean id="queries" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateSearchQueries">
         <property name="objectFactory" ref="objectFactory"/>
     </bean>
-
 </beans>

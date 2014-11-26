@@ -292,7 +292,4 @@ based upon the Spring Security system.
 
     <!-- This filter is responsible for clearing the security context when each request is complete. -->
     <bean id="clearContextFilter" class="com.zutubi.pulse.master.security.BasicClearContextFilter"/>
-
-
-
 </beans>

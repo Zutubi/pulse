@@ -10,7 +10,7 @@ This context exports:
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 
@@ -19,7 +19,7 @@ This context exports:
     <bean id="webManager" class="com.zutubi.pulse.master.bootstrap.WebManager"/>
 
     <bean id="tokenManager" class="com.zutubi.pulse.master.bootstrap.StartupTokenManager">
-        <property name="adminTokenManager"><ref local="adminTokenManager"/></property>
+        <property name="adminTokenManager" ref="adminTokenManager"/>
     </bean>
 
     <!-- Token manager required for scripted access to the remote api. -->
@@ -28,5 +28,4 @@ This context exports:
     </bean>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-    
 </beans>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
+       default-autowire="byName">
     
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
@@ -11,18 +13,10 @@
     </bean>
 
     <bean id="logConfigurationManager" class="com.zutubi.pulse.servercore.util.logging.LogConfigurationManager" init-method="init">
-        <property name="logConfiguration">
-            <ref local="logConfiguration"/>
-        </property>
-        <property name="systemPaths">
-            <ref local="systemPaths"/>
-        </property>
-        <property name="logManager">
-            <ref local="logManager"/>
-        </property>
-        <property name="eventManager">
-            <ref bean="eventManager"/>
-        </property>
+        <property name="logConfiguration" ref="logConfiguration"/>
+        <property name="systemPaths" ref="systemPaths"/>
+        <property name="logManager" ref="logManager"/>
+        <property name="eventManager" ref="eventManager"/>
     </bean>
 
     <bean id="logConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
@@ -38,9 +32,9 @@
     <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
         <property name="factories">
             <map>
-                <entry key="FileHandler"><ref local="fileHandlerFactory"/></entry>
-                <entry key="ConsoleHandler"><ref local="consoleHandlerFactory"/></entry>
-                <entry key="MemoryHandler"><ref local="memoryHandlerFactory"/></entry>
+                <entry key="FileHandler" value-ref="fileHandlerFactory"/>
+                <entry key="ConsoleHandler" value-ref="consoleHandlerFactory"/>
+                <entry key="MemoryHandler" value-ref="memoryHandlerFactory"/>
             </map>
         </property>
     </bean>
@@ -103,7 +97,7 @@
     </bean>
 
     <bean id="hessianModuleDescriptorSupportInitialiser" class="com.zutubi.pulse.servercore.dependency.ivy.HessianModuleDescriptorSupportInitialiser" init-method="init">
-        <property name="customSerialiserFactory"><ref bean="customSerialiserFactory"/></property>
+        <property name="customSerialiserFactory" ref="customSerialiserFactory"/>
     </bean>
 
     <bean id="ivyManager" class="com.zutubi.pulse.core.dependency.ivy.IvyManager" init-method="init">

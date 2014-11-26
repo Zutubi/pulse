@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
        default-autowire="byName">
 
     <!-- Validation system -->
     <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager">
         <property name="providers">
             <list>
-                <ref local="configurationValidatorProvider"/>
+                <ref bean="configurationValidatorProvider"/>
             </list>
         </property>
     </bean>
@@ -18,8 +18,8 @@
     <bean id="configurationValidatorProvider" class="com.zutubi.tove.config.ConfigurationValidatorProvider">
         <property name="delegates">
             <list>
-                <ref local="annotationValidatorProvider"/>
-                <ref local="reflectionValidatorProvider"/>
+                <ref bean="annotationValidatorProvider"/>
+                <ref bean="reflectionValidatorProvider"/>
             </list>
         </property>
     </bean>

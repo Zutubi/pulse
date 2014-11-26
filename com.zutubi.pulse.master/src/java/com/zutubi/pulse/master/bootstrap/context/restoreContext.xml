@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
        default-autowire="byName">
 
     <bean id="restoreManager" class="com.zutubi.pulse.master.restore.DefaultRestoreManager">
@@ -9,10 +9,10 @@
         <property name="paths" value="#{configurationManager.userPaths}"/>
         <property name="restorableComponents">
             <list>
-                <ref local="recordsArchive"/>
-                <ref local="databaseArchive"/>
-                <ref local="dataDirectoryArchive"/>
-                <ref local="artifactArchive"/>
+                <ref bean="recordsArchive"/>
+                <ref bean="databaseArchive"/>
+                <ref bean="dataDirectoryArchive"/>
+                <ref bean="artifactArchive"/>
             </list>
         </property>
     </bean>
@@ -22,8 +22,8 @@
         <property name="tmpDirectory" value="#{systemPaths.tmpRoot}"/>
         <property name="backupableComponents">
             <list>
-                <ref local="recordsArchive"/>
-                <ref local="dataDirectoryArchive"/>
+                <ref bean="recordsArchive"/>
+                <ref bean="dataDirectoryArchive"/>
             </list>
         </property>
     </bean>
@@ -42,5 +42,4 @@
         <property name="userPaths" value="#{configurationManager.userPaths}"/>
         <property name="systemConfiguration" value="#{configurationManager.systemConfig}"/>
     </bean>
-
 </beans>

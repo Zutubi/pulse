@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="fileDeletionService" class="com.zutubi.pulse.servercore.cleanup.FileDeletionService" init-method="init">
         <property name="configurationManager" ref="configurationManager"/>
@@ -11,5 +11,4 @@
     <bean id="emailService" class="com.zutubi.pulse.master.notifications.email.DefaultEmailService" init-method="init">
         <property name="threadFactory" ref="threadFactory"/>
     </bean>
-    
 </beans>

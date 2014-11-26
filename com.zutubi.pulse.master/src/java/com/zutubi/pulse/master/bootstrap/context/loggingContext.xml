@@ -19,7 +19,7 @@ This context requires:
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
        default-autowire="byName">
 
     <!--
@@ -29,8 +29,8 @@ This context requires:
     Leave it here for now until a solution presents itself.
     -->
     <bean id="logConfigurationManager" class="com.zutubi.pulse.master.logging.MasterLogConfigurationManager" init-method="init">
-        <property name="logConfiguration"><ref local="logConfiguration"/></property>
-        <property name="logManager"><ref local="logManager"/></property>
+        <property name="logConfiguration" ref="logConfiguration"/>
+        <property name="logManager" ref="logManager"/>
         <property name="eventManager" ref="eventManager"/>
         <property name="systemPaths" ref="systemPaths"/>
     </bean>
@@ -40,9 +40,9 @@ This context requires:
     <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
         <property name="factories">
             <map>
-                <entry key="FileHandler"><ref local="fileHandlerFactory"/></entry>
-                <entry key="ConsoleHandler"><ref local="consoleHandlerFactory"/></entry>
-                <entry key="MemoryHandler"><ref local="memoryHandlerFactory"/></entry>
+                <entry key="FileHandler" value-ref="fileHandlerFactory"/>
+                <entry key="ConsoleHandler" value-ref="consoleHandlerFactory"/>
+                <entry key="MemoryHandler" value-ref="memoryHandlerFactory"/>
             </map>
         </property>
     </bean>

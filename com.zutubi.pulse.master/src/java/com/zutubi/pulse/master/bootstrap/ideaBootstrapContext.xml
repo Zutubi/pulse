@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<!--
-
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
@@ -29,7 +27,7 @@
     </bean>
 
     <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager">
-        <property name="developmentSystemPaths"><ref local="systemPaths"/></property>
+        <property name="developmentSystemPaths" ref="systemPaths"/>
     </bean>
 
     <bean id="systemPaths" class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
