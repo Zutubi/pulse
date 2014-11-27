@@ -40,7 +40,7 @@
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
-    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory" autowire="no"/>
 
     <bean id="threadFactory" class="com.zutubi.pulse.master.security.PulseThreadFactory"/>
 </beans>

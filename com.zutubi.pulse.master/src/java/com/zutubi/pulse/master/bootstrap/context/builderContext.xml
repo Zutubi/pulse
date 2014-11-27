@@ -6,10 +6,10 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd"
        default-autowire="byName">
 
-    <util:map id="defaultTransactionAttributes">
-        <entry key="get*" value="PROPAGATION_REQUIRED, readOnly"/>
-        <entry key="*" value="PROPAGATION_REQUIRED"/>
-    </util:map>
+    <util:properties id="defaultTransactionAttributes">
+        <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
+        <prop key="*">PROPAGATION_REQUIRED</prop>
+    </util:properties>
 
     <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
         <property name="transactionManager" ref="transactionManager"/>

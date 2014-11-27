@@ -9,7 +9,7 @@
 
     <util:properties id="defaultTransactionAttributes">
         <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
-        <prop key="*">PROPAGATION_REQUIRED"</prop>
+        <prop key="*">PROPAGATION_REQUIRED</prop>
     </util:properties>
 
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
