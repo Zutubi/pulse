@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.tove.config.group.UserGroupConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.security.Actor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
@@ -85,7 +85,7 @@ public class Principle implements Actor, UserDetails
             authorities = new LinkedList<GrantedAuthority>();
             for(String authority: authoritySet)
             {
-                authorities.add(new GrantedAuthorityImpl(authority));
+                authorities.add(new SimpleGrantedAuthority(authority));
             }
         }
         return authorities;

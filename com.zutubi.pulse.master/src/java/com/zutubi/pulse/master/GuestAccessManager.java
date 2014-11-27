@@ -15,7 +15,6 @@ import com.zutubi.tove.events.ConfigurationEventSystemStartedEvent;
 import com.zutubi.tove.events.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.memory.UserAttribute;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
@@ -44,7 +43,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
             {
                 for(String authority: group.getGrantedAuthorities())
                 {
-                    newAttribute.addAuthority(new GrantedAuthorityImpl(authority));
+                    newAttribute.addAuthority(new SimpleGrantedAuthority(authority));
                 }
             }
         }

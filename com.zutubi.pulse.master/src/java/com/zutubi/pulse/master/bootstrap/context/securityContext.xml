@@ -68,12 +68,19 @@ based upon the Spring Security system.
     SecurityContext in the HTTP session, hence the use of the HttpSessionSecurityContextRepository bean.     
     -->
     <bean id="securityContextFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter" >
-        <property name="securityContextRepository" ref="securityContextRepository"/>
+        <constructor-arg ref="securityContextRepository"/>
     </bean>
     <bean id="securityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
 
     <bean id="sessionManagementFilter" class="org.springframework.security.web.session.SessionManagementFilter" >
         <constructor-arg ref="securityContextRepository" />
+        <!-- For servlet 3.1+ session fixation protection is supported by changing the id of sessions in the request
+             directly. This is the default with simple spring security config, but as we are taking full control we
+             *should* set it up explicitly here.  However, this messes with our AJAX requests as they can come in
+             with the old session id, so for now we disable session id changes altogether. -->
+        <constructor-arg>
+            <bean class="org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy"/>
+        </constructor-arg>
     </bean>
 
     <!--
@@ -107,25 +114,23 @@ based upon the Spring Security system.
     </bean>
 
     <bean id="requestCacheFilter" class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter">
-        <property name="requestCache" ref="requestCache"/>
+        <constructor-arg ref="requestCache"/>
     </bean>
     
     <!--
     This filter provides support for processing basic authentication credentials presented in HTTP headers.
     -->
     <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+        <constructor-arg ref="authenticationManager"/>
+        <constructor-arg ref="basicAuthenticationEntryPoint"/>
         <!-- We override the default details class to aid in detecting HTTP basic authentication. -->
-        <property name="authenticationDetailsSource" ref="basicProcessingAuthenticationDetailsSource"/>
+        <property name="authenticationDetailsSource">
+            <bean class="com.zutubi.pulse.master.security.BasicAuthenticationDetailsSource"/>
+        </property>
     </bean>
 
     <bean id="basicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
         <property name="realmName" value="Pulse"/>
-    </bean>
-
-    <bean id="basicProcessingAuthenticationDetailsSource" class="org.springframework.security.authentication.AuthenticationDetailsSourceImpl">
-        <property name="clazz" value="com.zutubi.pulse.master.security.BasicAuthenticationDetails"/>
     </bean>
 
     <!--
@@ -145,17 +150,17 @@ based upon the Spring Security system.
     c) FilterChainProxy
     -->
     <bean id="rememberMeProcessingFilter" class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="rememberMeServices" ref="rememberMeServices"/>
+        <constructor-arg ref="authenticationManager"/>
+        <constructor-arg ref="rememberMeServices"/>
     </bean>
 
-    <bean id="rememberMeServices" class="com.zutubi.pulse.master.security.CustomTokenBasedRememberMeServices">
-        <property name="userDetailsService" ref="userManager"/>
-        <property name="key" value="pulse"/>
+    <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+        <constructor-arg value="pulse"/>
+        <constructor-arg ref="userManager"/>
     </bean>
 
     <bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
-        <property name="key" value="pulse"/>
+        <constructor-arg value="pulse"/>
     </bean>
 
     <!--
@@ -164,12 +169,19 @@ based upon the Spring Security system.
     held there.
     -->
     <bean id="anonymousAuthenticationFilter" class="org.springframework.security.web.authentication.AnonymousAuthenticationFilter">
-        <property name="key" value="foobar"/>
-        <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
+        <constructor-arg name="key" value="pulse-anon"/>
+        <constructor-arg name="principal" value="anonymous"/>
+        <constructor-arg name="authorities">
+            <list>
+                <bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+                    <constructor-arg value="ROLE_ANONYMOUS"/>
+                </bean>
+            </list>
+        </constructor-arg>
     </bean>
 
     <bean id="anonymousAuthenticationProvider" class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
-        <property name="key" value="foobar"/>
+        <constructor-arg value="pulse-anon"/>
     </bean>
 
     <!--
@@ -179,12 +191,12 @@ based upon the Spring Security system.
     -->
     <bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
         <!-- This endpoint defines where a user is directed when authentication is required. -->
-        <property name="authenticationEntryPoint" ref="loginUrlAuthenticationEntryPoint"/>
-        <property name="requestCache" ref="requestCache"/>
+        <constructor-arg ref="loginUrlAuthenticationEntryPoint"/>
+        <constructor-arg ref="requestCache"/>
     </bean>
 
     <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-        <property name="loginFormUrl" value="/login!input.action"/>
+        <constructor-arg value="/login!input.action"/>
         <property name="portResolver" ref="portResolver"/>
         <property name="portMapper" ref="portMapper"/>
     </bean>
@@ -209,9 +221,9 @@ based upon the Spring Security system.
     </bean>
 
     <bean id="ajaxExceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint">
+        <constructor-arg>
             <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
-        </property>
+        </constructor-arg>
     </bean>
 
     <!--
@@ -251,15 +263,15 @@ based upon the Spring Security system.
     </bean>
 
     <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-        <property name="allowIfAllAbstainDecisions" value="false"/>
-        <property name="decisionVoters">
+        <constructor-arg>
             <list>
                 <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter">
                     <property name="rolePrefix" value=""/>
                 </bean>
                 <bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter"/>
             </list>
-        </property>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions" value="false"/>
     </bean>
 
     <!-- ===================================================================================== -->

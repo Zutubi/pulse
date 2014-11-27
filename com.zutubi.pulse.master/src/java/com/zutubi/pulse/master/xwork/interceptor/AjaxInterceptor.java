@@ -21,7 +21,7 @@ public class AjaxInterceptor extends AroundInterceptor
     {
         HttpServletResponse response = ServletActionContext.getResponse();
 
-        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.setHeader("Cache-Control", "no-store, no-cache, max-age=0, must-revalidate");
         response.setDateHeader("Expires", 0);
         response.setHeader("Pragma", "no-cache");
     }
