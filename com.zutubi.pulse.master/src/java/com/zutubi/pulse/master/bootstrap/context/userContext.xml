@@ -7,15 +7,15 @@
 
     <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
 
-    <util:map id="defaultTransactionAttributes">
-        <entry key="get*" value="PROPAGATION_REQUIRED, readOnly"/>
-        <entry key="*" value="PROPAGATION_REQUIRED"/>
-    </util:map>
+    <util:properties id="defaultTransactionAttributes">
+        <prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
+        <prop key="*">PROPAGATION_REQUIRED"</prop>
+    </util:properties>
 
     <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
-            <bean class="com.zutubi.pulse.master.model.DefaultUserManager" autowire="byName"/>
+            <bean class="com.zutubi.pulse.master.model.DefaultUserManager"/>
         </property>
         <property name="transactionAttributes" ref="defaultTransactionAttributes"/>
     </bean>
