@@ -40,7 +40,7 @@ public class Equinox implements OSGiFramework
 
     public void start(File internalPluginDir) throws Exception
     {
-        context = EclipseStarter.startup(new String[]{"-clean"}, null);
+        context = EclipseStarter.startup(new String[0], null);
 
         frameworkWiring = context.getBundle().adapt(FrameworkWiring.class);
         if (frameworkWiring == null)

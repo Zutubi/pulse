@@ -10,10 +10,4 @@ public interface OSGiFramework
      * will run as well as various other system settings.
      */
     static final String OSGI_CONFIGURATION_AREA = "osgi.configuration.area";
-
-    /**
-     * When set to true, this property indicates that the path identified by the OSGI_CONFIGURATION_AREA
-     * is read only. 
-     */
-    static final String OSGI_CONFIGURATION_AREA_READONLY = OSGI_CONFIGURATION_AREA + ".readOnly";
 }

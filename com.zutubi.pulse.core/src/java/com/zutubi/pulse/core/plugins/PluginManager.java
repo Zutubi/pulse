@@ -91,7 +91,6 @@ public class PluginManager
         //  - install and startup the internal plugins.
         equinox = new Equinox();
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
-        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA_READONLY, Boolean.FALSE.toString());
         equinox.start(paths.getInternalPluginStorageDir());
 
         // Step 3: scan the various directories and update the registry accordingly.
