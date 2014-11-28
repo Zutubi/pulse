@@ -1,8 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import junit.framework.TestSuite;
-
 import static com.zutubi.pulse.acceptance.AcceptanceTestUtils.addClassToSuite;
+import junit.framework.TestSuite;
 
 public class DevAcceptanceTestSuite
 {
@@ -28,7 +27,6 @@ public class DevAcceptanceTestSuite
 
         addClassToSuite(suite, RssAcceptanceTest.class);
         addClassToSuite(suite, HibernateStatisticsAcceptanceTest.class);
-        addClassToSuite(suite, QuartzStatisticsAcceptanceTest.class);
 
         //---( web ui acceptance tests )---
         addClassToSuite(suite, AgentsSectionAcceptanceTest.class);
