@@ -4,12 +4,14 @@ import com.google.common.io.Files;
 import com.zutubi.pulse.acceptance.components.pulse.server.ActiveBuildsTable;
 import com.zutubi.pulse.acceptance.components.pulse.server.QueuedBuildsTable;
 import com.zutubi.pulse.acceptance.components.table.ContentTable;
+import com.zutubi.pulse.acceptance.pages.MessageDialog;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ProjectManager;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.Condition;
 import com.zutubi.util.adt.Pair;
 import com.zutubi.util.io.FileSystemUtils;
@@ -20,8 +22,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
-
-import static com.zutubi.util.CollectionUtils.asPair;
 
 /**
  * Acceptance tests for the server/activity page.
@@ -183,8 +183,10 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         createAndTriggerProjectBuild(random, true);
 
         ServerActivityPage activityPage = getBrowser().openAndWaitFor(ServerActivityPage.class);
-        activityPage.getActive().clickCancel(0);
-
+        MessageDialog confirmDialog = activityPage.getActive().clickCancel(0);
+        confirmDialog.waitFor();
+        confirmDialog.clickAffirm();
+        
         rpcClient.RemoteApi.waitForBuildToComplete(random, 1);
         getBrowser().openAndWaitFor(BuildSummaryPage.class, random, 1L);
         getBrowser().waitForTextPresent("Forceful termination requested by 'admin'");
@@ -237,8 +239,10 @@ public class ServerActivityAcceptanceTest extends AcceptanceTestBase
         QueuedBuildsTable queued = activityPage.getQueued();
         assertEquals(1, queued.getRowCount());
 
-        queued.clickCancel(0);
-
+        MessageDialog confirmDialog = queued.clickCancel(0);
+        confirmDialog.waitFor();
+        confirmDialog.clickAffirm();
+        
         waitForQueueCount(activityPage, queued, 0);
         waitForBuildToComplete(random, 1);
     }

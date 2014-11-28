@@ -1,23 +1,22 @@
 package com.zutubi.pulse.acceptance;
 
 import com.google.common.base.Objects;
-import com.zutubi.pulse.acceptance.pages.browse.*;
-import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.acceptance.rpc.RpcClient;
-import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.Condition;
-
-import java.util.Hashtable;
-
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.DEFAULT_RECIPE_NAME;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.RECIPES;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.COMMANDS;
 import static com.zutubi.pulse.acceptance.Constants.Project.MultiRecipeType.Recipe.DEFAULT_COMMAND;
 import static com.zutubi.pulse.acceptance.Constants.Project.TYPE;
+import com.zutubi.pulse.acceptance.pages.browse.*;
+import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
+import com.zutubi.pulse.acceptance.rpc.RpcClient;
+import com.zutubi.pulse.core.test.TestUtils;
 import static com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry.USERS_SCOPE;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.Condition;
+
+import java.util.Hashtable;
 
 /**
  * Acceptance tests for taking/clearing responsibility for a build.
@@ -85,7 +84,7 @@ public class BuildResponsibilityAcceptanceTest extends AcceptanceTestBase
         TakeResponsibilityDialog dialog = new TakeResponsibilityDialog(getBrowser());
         dialog.waitFor();
         dialog.typeInput(TEST_COMMENT);
-        dialog.clickOk();
+        dialog.clickAffirm();
 
         awaitAndAssertSelfResponsible(page);
     }

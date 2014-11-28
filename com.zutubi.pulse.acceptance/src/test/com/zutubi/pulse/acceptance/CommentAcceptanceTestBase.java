@@ -8,12 +8,11 @@ import com.zutubi.pulse.acceptance.utils.UserConfigurations;
 import com.zutubi.pulse.core.test.TestUtils;
 import com.zutubi.pulse.master.model.CommentContainer;
 import com.zutubi.util.Condition;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.Hashtable;
 import java.util.Vector;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 
 /**
  * Helper base class for tests of comment pages.
@@ -57,7 +56,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         AddCommentDialog dialog = new AddCommentDialog(getBrowser());
         dialog.waitFor();
         dialog.typeInput(TEST_COMMENT);
-        dialog.clickOk();
+        dialog.clickAffirm();
 
         page.waitForComments(SeleniumBrowser.WAITFOR_TIMEOUT);
         getBrowser().waitForTextPresent(TEST_COMMENT);
@@ -72,7 +71,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
 
         AddCommentDialog dialog = new AddCommentDialog(getBrowser());
         dialog.waitFor();
-        dialog.clickCancel();
+        dialog.clickDecline();
         assertFalse(dialog.isVisible());
         assertFalse(page.isCommentsPresent());
     }
@@ -99,7 +98,7 @@ public abstract class CommentAcceptanceTestBase extends AcceptanceTestBase
         assertTrue(page.isCommentDeleteLinkPresent(commentId));
         ConfirmDialog confirmDialog = page.clickDeleteComment(commentId);
         confirmDialog.waitFor();
-        confirmDialog.clickOk();
+        confirmDialog.clickAffirm();
         TestUtils.waitForCondition(new Condition()
         {
             public boolean satisfied()

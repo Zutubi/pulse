@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance.components.pulse.server;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.ContentTable;
+import com.zutubi.pulse.acceptance.pages.MessageDialog;
+import com.zutubi.pulse.acceptance.pages.YesNoDialog;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import org.openqa.selenium.By;
 
@@ -92,11 +94,13 @@ public class ActiveBuildsTable extends ContentTable
      * Clicks the cancel link for the build at the given index.
      * 
      * @param index zero-based index of the build to cancel
+     * @return the dialog popped to confirm deletion
      */
-    public void clickCancel(int index)
+    public MessageDialog clickCancel(int index)
     {
         Long id = (Long) browser.evaluateScript("return " + getComponentJS() + ".data[" + index + "].id;");
         browser.click(By.id("cancel-" + id + "-button"));
+        return new YesNoDialog(browser);
     }
 
     private Map<String, String> parseDetails(String details)

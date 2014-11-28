@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance.components.pulse.server;
 
 import com.zutubi.pulse.acceptance.SeleniumBrowser;
 import com.zutubi.pulse.acceptance.components.table.SummaryTable;
+import com.zutubi.pulse.acceptance.pages.MessageDialog;
+import com.zutubi.pulse.acceptance.pages.YesNoDialog;
 import org.openqa.selenium.By;
 
 import java.util.Map;
@@ -24,13 +26,15 @@ public class QueuedBuildsTable extends SummaryTable
 
     /**
      * Clicks the cancel link for the build request at the given index.
-     * 
+     *
      * @param index zero-based index of the build request
+     * @return the confirm dialog that pops up
      */
-    public void clickCancel(int index)
+    public MessageDialog clickCancel(int index)
     {
         long id = (Long) browser.evaluateScript("return " + getComponentJS() + ".data[" + index + "].id;");
-        browser.click(By.id("cancel-" + id + "-button"));        
+        browser.click(By.id("cancel-" + id + "-button"));
+        return new YesNoDialog(browser);
     }
 
     /**
