@@ -6,22 +6,6 @@
     <display-name>Pulse</display-name>
     <description>Pulse Web UI</description>
 
-    <!--
-    This filter must be placed before any filter that replies upon knowing the security/user related information.
-
-    This filter is placed at the start of the chain so that a Context can be setup in the SecurityContextHolder at the
-    beginning of a web request, and any changes to the Context can be copied to the HttpSession when the web request
-    ends (ready for use with the next web request).
-    -->
-    <filter>
-        <filter-name>securityContext</filter-name>
-        <filter-class>org.springframework.security.web.context.SecurityContextPersistenceFilter</filter-class>
-        <init-param>
-            <param-name>forceEagerSessionCreation</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
-
     <filter>
         <filter-name>security</filter-name>
         <filter-class>com.zutubi.pulse.master.spring.web.context.SpringSecurityFilter</filter-class>
@@ -53,11 +37,6 @@
             <param-value>default.action</param-value>
         </init-param>
     </filter>
-
-    <filter-mapping>
-        <filter-name>securityContext</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
     <filter-mapping>
         <filter-name>security</filter-name>
