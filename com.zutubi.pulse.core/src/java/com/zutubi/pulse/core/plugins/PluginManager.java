@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.IJobManager;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class PluginManager
         //  - install and startup the internal plugins.
         equinox = new Equinox();
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
-        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA_READONLY, Boolean.TRUE.toString());
+        equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA_READONLY, Boolean.FALSE.toString());
         equinox.start(paths.getInternalPluginStorageDir());
 
         // Step 3: scan the various directories and update the registry accordingly.
@@ -460,7 +460,7 @@ public class PluginManager
         // activate this plugin within osgi.
         try
         {
-            plugin.associateBundle(equinox.activate(plugin.getSource()), equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
+            plugin.associateBundle(equinox.activate(plugin.getSource()));
             plugin.setState(Plugin.State.ENABLED);
         }
         catch (Exception e)
@@ -490,7 +490,7 @@ public class PluginManager
             {
                 Bundle bundle = equinox.install(plugin.getSource());
                 bundles.add(bundle);
-                plugin.associateBundle(bundle, equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
+                plugin.associateBundle(bundle);
             }
             catch (BundleException e)
             {
@@ -723,7 +723,8 @@ public class PluginManager
     public synchronized List<Plugin> getDependentPlugins(LocalPlugin plugin)
     {
         List<Plugin> dependents = new LinkedList<Plugin>();
-        if (plugin.getBundleDescription() != null)
+        Bundle bundle = plugin.getBundle();
+        if (bundle != null && bundle.adapt(BundleWiring.class) != null)
         {
             dependents.addAll(getDependentPlugins(plugin, plugins));
         }
@@ -732,30 +733,31 @@ public class PluginManager
 
     public synchronized List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)
     {
-        BundleDescription description = plugin.getBundleDescription();
-        if (description == null)
+        BundleWiring wiring = plugin.getBundle().adapt(BundleWiring.class);
+        if (wiring == null)
         {
             // It is the bundles description that tells us about the bundles requirements.
             // No description == no requirement information.  The plugin does have requirements,
-            // but to get at them, we would need to read the raw bundle description outselves.
+            // but to get at them, we would need to read the raw bundle description ourselves.
             return new LinkedList<PluginDependency>();
         }
 
-        BundleSpecification[] requiredBundles = description.getRequiredBundles();
-        return newArrayList(transform(asList(requiredBundles), new Function<BundleSpecification, PluginDependency>()
+        List<BundleWire> requiredWires = wiring.getRequiredWires(null);
+        return newArrayList(filter(transform(requiredWires, new Function<BundleWire, PluginDependency>()
         {
-            public PluginDependency apply(BundleSpecification bundleSpecification)
+            public PluginDependency apply(BundleWire bundleWire)
             {
-                return new PluginDependency(bundleSpecification.getName(),
-                                            convertVersionRange(bundleSpecification.getVersionRange()),
-                                            getPlugin(bundleSpecification.getName()));
+                PluginVersion version = convertVersion(bundleWire.getProvider().getVersion());
+                String symbolicName = bundleWire.getProvider().getSymbolicName();
+                return new PluginDependency(symbolicName, version, getPlugin(symbolicName));
+            }
+        }), new Predicate<PluginDependency>()
+        {
+            public boolean apply(PluginDependency dependency)
+            {
+                return !dependency.getId().startsWith("org.eclipse");
             }
         }));
-    }
-
-    private PluginVersionRange convertVersionRange(org.eclipse.osgi.service.resolver.VersionRange versionRange)
-    {
-        return new PluginVersionRange(convertVersion(versionRange.getMinimum()), versionRange.getIncludeMinimum(), convertVersion(versionRange.getMaximum()), versionRange.getIncludeMaximum());
     }
 
     private PluginVersion convertVersion(org.osgi.framework.Version version)
@@ -928,7 +930,7 @@ public class PluginManager
         {
             public boolean apply(LocalPlugin plugin)
             {
-                return plugin.getBundleDescription() == null;
+                return plugin.getBundle() == null || plugin.getBundle().adapt(BundleWiring.class) == null;
             }
         });
 
@@ -949,20 +951,23 @@ public class PluginManager
     private Set<LocalPlugin> getDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins)
     {
         Set<LocalPlugin> result = new HashSet<LocalPlugin>();
-        BundleDescription description = plugin.getBundleDescription();
-        BundleDescription[] required = description.getDependents();
-        if (required != null)
+        BundleWiring wiring = plugin.getBundle().adapt(BundleWiring.class);
+        if (wiring != null)
         {
-            for (BundleDescription r : required)
+            List<BundleWire> providedWires = wiring.getProvidedWires(null);
+            if (providedWires != null)
             {
-                LocalPlugin p = findPlugin(r.getSymbolicName(), plugins);
-                if (p != null)
+                for (BundleWire w : providedWires)
                 {
-                    result.add(p);
+                    LocalPlugin p = findPlugin(w.getRequirer().getSymbolicName(), plugins);
+                    if (p != null)
+                    {
+                        result.add(p);
+                    }
                 }
             }
         }
-        
+
         return result;
     }
 

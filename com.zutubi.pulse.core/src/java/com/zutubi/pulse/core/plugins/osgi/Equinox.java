@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.plugins.osgi;
 
 import com.google.common.base.Function;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.plugins.util.DependencySort;
 import com.zutubi.pulse.core.plugins.util.PluginFileFilter;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -10,21 +9,19 @@ import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.IJobManager;
-import org.eclipse.osgi.internal.baseadaptor.StateManager;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.framework.wiring.FrameworkWiring;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * Wraps the Equinox framework and low-level plugins (such as the extension
@@ -34,10 +31,7 @@ public class Equinox implements OSGiFramework
 {
     // embedded equinox resources.
     private BundleContext context;
-    private ServiceReference packageAdminRef;
-    private PackageAdmin packageAdmin;
-    private ServiceReference platformAdminRef;
-    private StateManager stateManager;
+    private FrameworkWiring frameworkWiring;
     private ServiceReference jobManagerRef;
     private IJobManager jobManager;
 
@@ -48,26 +42,10 @@ public class Equinox implements OSGiFramework
     {
         context = EclipseStarter.startup(new String[]{"-clean"}, null);
 
-        packageAdminRef = context.getServiceReference(PackageAdmin.class.getName());
-        if (packageAdminRef != null)
+        frameworkWiring = context.getBundle().adapt(FrameworkWiring.class);
+        if (frameworkWiring == null)
         {
-            packageAdmin = (PackageAdmin) context.getService(packageAdminRef);
-        }
-
-        if (packageAdmin == null)
-        {
-            throw new RuntimeException("Could not access package admin service");
-        }
-
-        platformAdminRef = context.getServiceReference(PlatformAdmin.class.getName());
-        if (platformAdminRef != null)
-        {
-            stateManager = (StateManager) context.getService(platformAdminRef);
-        }
-
-        if (stateManager == null)
-        {
-            throw new RuntimeException("Could not access state manager service");
+            throw new RuntimeException("Could not access framework wiring service");
         }
 
         startInternalPlugins(internalPluginDir);
@@ -103,16 +81,6 @@ public class Equinox implements OSGiFramework
 
     public void stop() throws Exception
     {
-        if (packageAdminRef != null)
-        {
-            context.ungetService(packageAdminRef);
-        }
-
-        if (platformAdminRef != null)
-        {
-            context.ungetService(platformAdminRef);
-        }
-        
         if (jobManagerRef != null)
         {
             context.ungetService(jobManagerRef);
@@ -137,22 +105,25 @@ public class Equinox implements OSGiFramework
 
     public int getBundleCount(String id)
     {
-        return stateManager.getSystemState().getBundles(id).length;
-    }
-
-    public BundleDescription getBundleDescription(String symbolicName, String version)
-    {
-        return stateManager.getSystemState().getBundle(symbolicName, new org.osgi.framework.Version(version));
+        int count = 0;
+        for (Bundle bundle : context.getBundles())
+        {
+            if (bundle.getSymbolicName().equals(id))
+            {
+                count++;
+            }
+        }
+        return count;
     }
 
     public boolean resolveBundles()
     {
-        return packageAdmin.resolveBundles(null);
+        return frameworkWiring.resolveBundles(Collections.<Bundle>emptyList());
     }
 
     public boolean resolveBundles(Bundle... bundles)
     {
-        return packageAdmin.resolveBundles(bundles);
+        return frameworkWiring.resolveBundles(Arrays.asList(bundles));
     }
 
     private String getBundleLocation(File pluginFile)
@@ -214,17 +185,19 @@ public class Equinox implements OSGiFramework
         public Set<Bundle> apply(Bundle bundle)
         {
             Set<Bundle> result = new HashSet<Bundle>();
-            BundleDescription description = stateManager.getSystemState().getBundle(bundle.getBundleId());
-    
-            BundleDescription[] required = description.getDependents();
-            if (required != null)
+            BundleWiring wiring = bundle.adapt(BundleWiring.class);
+            if (wiring != null)
             {
-                for (final BundleDescription r : required)
+                List<BundleWire> providedWires = wiring.getProvidedWires(null);
+                if (providedWires != null)
                 {
-                    Bundle dependent = find(bundles, new BundleSymbolicNamePredicate(r.getSymbolicName()), null);
-                    if (dependent != null)
+                    for (final BundleWire p : providedWires)
                     {
-                        result.add(dependent);
+                        Bundle dependent = find(bundles, new BundleSymbolicNamePredicate(p.getRequirer().getSymbolicName()), null);
+                        if (dependent != null)
+                        {
+                            result.add(dependent);
+                        }
                     }
                 }
             }

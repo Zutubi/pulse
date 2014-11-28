@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.plugins;
 import com.google.common.base.Objects;
 import com.zutubi.util.StringUtils;
 import org.eclipse.osgi.framework.util.Headers;
-import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
@@ -33,8 +32,6 @@ public abstract class LocalPlugin implements Plugin
     protected PluginManager manager;
 
     private Bundle bundle;
-
-    private BundleDescription bundleDescription;
 
     private List<String> errorMessages = new LinkedList<String>();
 
@@ -329,22 +326,14 @@ public abstract class LocalPlugin implements Plugin
         return bundle;
     }
 
-    public BundleDescription getBundleDescription()
-    {
-        return bundleDescription;
-    }
-
     /**
-     * Links this plugin with a successfully installed Equinox bundle and
-     * related description.
+     * Links this plugin with a successfully installed Equinox bundle.
      * 
      * @param bundle            the bundle to link with
-     * @param bundleDescription information about the bundle from the framework
      */
-    public void associateBundle(Bundle bundle, BundleDescription bundleDescription)
+    public void associateBundle(Bundle bundle)
     {
         this.bundle = bundle;
-        this.bundleDescription = bundleDescription;
     }
 
     /**
@@ -356,7 +345,6 @@ public abstract class LocalPlugin implements Plugin
     public void disassociateBundle(String errorMessage)
     {
         bundle = null;
-        bundleDescription = null;
         pluginState = State.ERROR;
         addErrorMessage(errorMessage);
     }

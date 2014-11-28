@@ -49,7 +49,7 @@
                 <tr>
                     <th>#wwtext("name=plugin.providing")</th>
                     <th>#wwtext("name=plugin.id")</th>
-                    <th>#wwtext("name=plugin.version.range")</th>
+                    <th>#wwtext("name=plugin.version")</th>
                 </tr>
     #foreach($required in $requiredPlugins)
                 <tr>
@@ -62,7 +62,7 @@
         #end
                     </td>
                     <td>$!webwork.htmlEncode($required.id)</td>
-                    <td>$required.versionRange</td>
+                    <td>$required.version</td>
                 </tr>
     #end
             </table>

@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.plugins;
 import com.google.common.io.Files;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.ZipUtils;
-import org.eclipse.osgi.service.resolver.BundleDescription;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -519,8 +518,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
 
         startupPluginCore();
 
-        BundleDescription description = manager.equinox.getBundleDescription(PRODUCER_ID, "1.0.0");
-        assertNotNull(description);
+        assertEquals(1, manager.equinox.getBundleCount(PRODUCER_ID));
     }
 
     public void testLoadPrepackagedPlugins() throws Exception
@@ -808,7 +806,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         List<PluginDependency> pluginDependencies = consumer.getRequiredPlugins();
         assertEquals(1, pluginDependencies.size());
         assertEquals(PRODUCER_ID, pluginDependencies.get(0).getId());
-        assertEquals("[1.0.0, 2.0.0)", pluginDependencies.get(0).getVersionRange().toString());
+        assertEquals("1.0.0", pluginDependencies.get(0).getVersion().toString());
         assertEquals(producer, pluginDependencies.get(0).getSupplier());
     }
 
