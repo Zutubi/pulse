@@ -27,6 +27,7 @@ public class PulseXmlRpcServer extends XmlRpcServer
 
     private final Stack<XmlRpcWorker> pool;
     private int nbrWorkers;
+    private int maxThreads = -1;
 
     public PulseXmlRpcServer()
     {
@@ -48,6 +49,16 @@ public class PulseXmlRpcServer extends XmlRpcServer
                 pool.push(worker);
             }
         }
+    }
+
+    public int getMaxThreads()
+    {
+        if (maxThreads == -1)
+        {
+            maxThreads = Integer.getInteger("pulse.xmlrpc.max.threads", 100);
+        }
+
+        return maxThreads;
     }
 
     protected XmlRpcWorker getWorker()
