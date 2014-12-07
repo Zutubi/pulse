@@ -166,9 +166,9 @@ public class DefaultEmailService extends BackgroundServiceSupport implements Ema
                     handleError(reuseSession, retriesExhausted, e);
                 }
             }
-            catch (MessagingException e)
+            catch (Throwable t)
             {
-                handleError(reuseSession, retriesExhausted, e);
+                handleError(reuseSession, retriesExhausted, t);
             }
             finally
             {
@@ -186,7 +186,7 @@ public class DefaultEmailService extends BackgroundServiceSupport implements Ema
             return addresses == null ? EMPTY_ADDRESSES : addresses;
         }
 
-        private void handleError(boolean reuseSession, boolean retriesExhausted, MessagingException e) throws MessagingException
+        private void handleError(boolean reuseSession, boolean retriesExhausted, Throwable t) throws MessagingException
         {
             if (reuseSession)
             {
@@ -195,7 +195,9 @@ public class DefaultEmailService extends BackgroundServiceSupport implements Ema
 
             if (retriesExhausted)
             {
-                throw new MessagingException(e.getMessage(), e);
+                MessagingException messagingException = new MessagingException(t.getMessage());
+                messagingException.initCause(t);
+                throw messagingException;
             }
         }
 
