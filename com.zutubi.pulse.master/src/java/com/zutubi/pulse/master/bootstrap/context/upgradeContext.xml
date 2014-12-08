@@ -218,6 +218,7 @@
                 <ref local="addXcodeWorkspace"/>
                 <ref local="addAgentStorageConfiguration"/>
                 <ref local="populateAgentStorageConfiguration"/>
+                <ref local="addGitShallowMasterClones"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1150,5 +1151,9 @@
 
     <bean id="populateAgentStorageConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.PopulateAgentStorageConfigurationUpgradeTask">
         <property name="buildNumber" value="207003002"/>
+    </bean>
+
+    <bean id="addGitShallowMasterClones" class="com.zutubi.pulse.master.upgrade.tasks.AddGitMasterCloneDepthUpgradeTask">
+        <property name="buildNumber" value="207006001"/>
     </bean>
 </beans>

@@ -93,18 +93,20 @@ public class GitClient implements ScmClient
     private int inactivityTimeout;
     private GitConfiguration.CloneType cloneType;
     private int cloneDepth;
+    private int masterCloneDepth;
     private List<String> includedPaths = new LinkedList<String>();
     private List<String> excludedPaths = new LinkedList<String>();
     private boolean processSubmodules;
     private List<String> submoduleNames = Collections.emptyList();
 
-    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, int cloneDepth, boolean processSubmodules, List<String> submoduleNames)
+    public GitClient(String repository, String branch, int inactivityTimeout, GitConfiguration.CloneType cloneType, int cloneDepth, int masterCloneDepth, boolean processSubmodules, List<String> submoduleNames)
     {
         this.repository = repository;
         this.branch = branch;
         this.inactivityTimeout = inactivityTimeout;
         this.cloneType = cloneType;
         this.cloneDepth = cloneDepth;
+        this.masterCloneDepth = masterCloneDepth;
         this.processSubmodules = processSubmodules;
         this.submoduleNames = submoduleNames;
     }
@@ -142,7 +144,8 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         // git clone -n <repository> dir
         handler.status("Initialising clone of git repository '" + repository + "'...");
-        git.clone(handler, repository, null, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR, -1);
+        int depth = cloneType == GitConfiguration.CloneType.SHALLOW && masterCloneDepth > 0 ? masterCloneDepth: -1;
+        git.clone(handler, repository, null, workingDir.getName(), cloneType == GitConfiguration.CloneType.FULL_MIRROR, depth);
         handler.status("Repository cloned.");
     }
 
@@ -683,6 +686,7 @@ public class GitClient implements ScmClient
                 !Objects.equal(oldGit.getBranch(), newGit.getBranch()) ||
                 oldGit.getCloneType() != newGit.getCloneType() ||
                 oldGit.getCloneDepth() != newGit.getCloneDepth() ||
+                oldGit.getMasterCloneDepth() != newGit.getMasterCloneDepth() ||
                 oldGit.getSubmoduleProcessing() != newGit.getSubmoduleProcessing() ||
                 !Objects.equal(oldGit.getSelectedSubmodules(), newGit.getSelectedSubmodules());
     }

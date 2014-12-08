@@ -11,9 +11,10 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.gitConfig")
 @ConfigurationCheck("GitConfigurationCheckHandler")
-@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "cloneDepth", "submoduleProcessing", "selectedSubmodules",
-                    "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval",
-                    "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
+@Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "cloneDepth", "masterCloneDepth",
+                    "submoduleProcessing", "selectedSubmodules", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds",
+                    "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths",
+                    "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
     public enum CloneType
@@ -36,10 +37,12 @@ public class GitConfiguration extends PollableScmConfiguration
     @Required
     private String branch = "master";
     @Required
-    @ControllingSelect(dependentFields = "cloneDepth", enableSet = {"SHALLOW"})
+    @ControllingSelect(dependentFields = {"cloneDepth", "masterCloneDepth"}, enableSet = {"SHALLOW"})
     private CloneType cloneType = CloneType.NORMAL;
     @Min(0)
     private int cloneDepth = 32;
+    @Min(0)
+    private int masterCloneDepth = 0;
     @Required
     @ControllingSelect(dependentFields = "selectedSubmodules", enableSet = {"UPDATE_SELECTED"})
     private SubmoduleProcessing submoduleProcessing = SubmoduleProcessing.NONE;
@@ -94,6 +97,16 @@ public class GitConfiguration extends PollableScmConfiguration
     public void setCloneDepth(int cloneDepth)
     {
         this.cloneDepth = cloneDepth;
+    }
+
+    public int getMasterCloneDepth()
+    {
+        return masterCloneDepth;
+    }
+
+    public void setMasterCloneDepth(int masterCloneDepth)
+    {
+        this.masterCloneDepth = masterCloneDepth;
     }
 
     public SubmoduleProcessing getSubmoduleProcessing()
