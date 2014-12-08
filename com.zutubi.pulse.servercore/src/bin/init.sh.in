@@ -127,6 +127,30 @@ stop() {
         com.zutubi.pulse.command.PulseDaemon
 }
 
+status() {
+    if [ -f "$PULSE_PIDFILE" ]
+    then
+        if [ -r "$PULSE_PIDFILE" ]
+        then
+            pid=`cat "$PULSE_PIDFILE"`
+            if kill -0 "$pid" > /dev/null 2&>1
+            then
+                echo "$APP_LONG_NAME is running (pid: $pid)"
+                exit 0
+            else
+                echo "$APP_LONG_NAME is not running (unclean shutdown, stale pid file: $PULSE_PIDFILE)"
+                exit 1
+            fi
+        else
+            echo "Cannot read pid file $PULSE_PIDFILE."
+            exit 1
+        fi
+    else
+        echo "$APP_LONG_NAME is not running."
+        exit 1
+    fi
+}
+
 case "$1" in
     start)
         start
@@ -135,13 +159,17 @@ case "$1" in
     stop)
         stop
         ;;
-    
+
+    status)
+        status
+        ;;
+
     restart)
         stop
         start
         ;;
     *)
-        echo "Usage: $0 { start |stop | restart }"
+        echo "Usage: $0 { start | status | stop | restart }"
         exit 1;;
 esac
 
