@@ -219,6 +219,7 @@
                 <ref local="addAgentStorageConfiguration"/>
                 <ref local="populateAgentStorageConfiguration"/>
                 <ref local="addGitShallowMasterClones"/>
+                <ref local="removeAgentDataDirectory"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1155,5 +1156,9 @@
 
     <bean id="addGitShallowMasterClones" class="com.zutubi.pulse.master.upgrade.tasks.AddGitMasterCloneDepthUpgradeTask">
         <property name="buildNumber" value="207006001"/>
+    </bean>
+
+    <bean id="removeAgentDataDirectory" class="com.zutubi.pulse.master.upgrade.tasks.RemoveAgentDataDirectoryUpgradeTask">
+        <property name="buildNumber" value="207007001"/>
     </bean>
 </beans>
