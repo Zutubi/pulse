@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.xwork.actions.upgrade;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 
 /**
- * <class-comment/>
+ * Action to continue server startup after an upgrade.
  */
 public class PostUpgradeAction extends UpgradeActionSupport
 {
@@ -11,7 +11,14 @@ public class PostUpgradeAction extends UpgradeActionSupport
 
     public String execute() throws Exception
     {
-        setupManager.requestUpgradeComplete(true);
+        runOnce(new Runnable()
+        {
+            public void run()
+            {
+                setupManager.requestUpgradeComplete(true);
+            }
+        }, getClass().getName());
+
         return SUCCESS;
     }
 

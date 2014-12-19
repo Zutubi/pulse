@@ -7,7 +7,7 @@ import com.zutubi.util.Constants;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * Action that starts and monitors the upgrade process.
  */
 public class ExecuteUpgradeAction extends UpgradeActionSupport
 {
@@ -23,18 +23,18 @@ public class ExecuteUpgradeAction extends UpgradeActionSupport
 
     public String execute()
     {
-        // check if the upgrade is in progress... if a user refreshes the browser on the
-        // execute action, we do not want the upgrade starting again.
-        Monitor progress = getMonitor();
-
-        if (!progress.isStarted())
+        runOnce(new Runnable()
         {
-            upgradeManager.executeUpgrade();
-        }
-        
+            public void run()
+            {
+                upgradeManager.executeUpgrade();
+            }
+        }, getClass().getName());
+
         // CIB-1028: Initial upgrade page status shows 100%
         // Wait for the upgrade process to start before we return. Why? To prevent the possibility
         // of the upgrade status page being rendered BEFORE the upgrade system is properly initialised.
+        Monitor progress = getMonitor();
         while (!progress.isStarted())
         {
             try
@@ -47,7 +47,6 @@ public class ExecuteUpgradeAction extends UpgradeActionSupport
             }
         }
 
-        // go to the progress monitor screen.
         return SUCCESS;
     }
 }
