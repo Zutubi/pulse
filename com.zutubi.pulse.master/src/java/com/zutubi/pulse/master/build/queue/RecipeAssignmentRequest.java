@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.resources.ResourceRequirement;
 import com.zutubi.pulse.master.agent.Agent;
@@ -26,7 +25,6 @@ public class RecipeAssignmentRequest
     private Project project;
     private AgentRequirements hostRequirements;
     private List<ResourceRequirement> resourceRequirements;
-    private BuildRevision revision;
     private RecipeRequest request;
     private BuildResult build;
     private long queueTime;
@@ -47,12 +45,11 @@ public class RecipeAssignmentRequest
      */
     private long timeout = UNDEFINED;
 
-    public RecipeAssignmentRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
+    public RecipeAssignmentRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, RecipeRequest request, BuildResult build)
     {
         this.project = project;
         this.hostRequirements = hostRequirements;
         this.resourceRequirements = resourceRequirements;
-        this.revision = revision;
         this.request = request;
         this.build = build;
     }
@@ -85,11 +82,6 @@ public class RecipeAssignmentRequest
     public RecipeRequest getRequest()
     {
         return request;
-    }
-
-    public BuildRevision getRevision()
-    {
-        return revision;
     }
 
     public BuildResult getBuild()

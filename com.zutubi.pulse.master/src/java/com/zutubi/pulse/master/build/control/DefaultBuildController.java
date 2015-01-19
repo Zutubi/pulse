@@ -9,7 +9,10 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
@@ -278,7 +281,7 @@ public class DefaultBuildController implements EventListener, BuildController
         List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig, recipeRequest);
         recipeRequest.addAllResourceRequirements(resourceRequirements);
 
-        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, recipeRequest, buildResult);
         setRequestPriority(assignmentRequest, stageConfig);
 
         RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
@@ -661,7 +664,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void initialiseControllers()
     {
-        Bootstrapper bootstrapper = new ProjectBootstrapper(projectConfig.getName(), request.getRevision());
+        Bootstrapper bootstrapper = new ProjectBootstrapper(projectConfig.getName());
         if (request.isPersonal())
         {
             bootstrapper = createPersonalBuildBootstrapper(bootstrapper);
@@ -765,7 +768,7 @@ public class DefaultBuildController implements EventListener, BuildController
     }
 
     /**
-     * Called when the first recipe for this build is dispatched.  It is at
+     * Called when the first recipe for this build is assigned.  It is at
      * this point that the build is said to have commenced.
      */
     private void handleBuildCommenced()

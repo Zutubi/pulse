@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.build.control;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.Feature;
@@ -83,7 +82,7 @@ public class RecipeControllerTest extends PulseTestCase
         project.setConfig(projectConfig);
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
         build.setRevision(new Revision(1));
-        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(new Revision("0"), false), recipeRequest, null);
+        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()
@@ -126,7 +125,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new BuildRevision());
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project");
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(recipeResult.getId()));
         RecipeAssignmentRequest dispatched = recipeQueue.getRequest(recipeResult.getId());

@@ -1,15 +1,12 @@
 package com.zutubi.pulse.master.build.queue;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.master.build.queue.graph.BuildGraphData;
 import com.zutubi.pulse.master.build.queue.graph.GraphBuilder;
 import com.zutubi.pulse.master.build.queue.graph.GraphFilters;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
-import com.zutubi.pulse.master.model.DependencyBuildReason;
-import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.master.model.RebuildBuildReason;
-import com.zutubi.pulse.master.model.TriggerOptions;
+import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.project.triggers.DependentBuildTriggerConfiguration;
 import com.zutubi.pulse.master.tove.config.project.triggers.TriggerUtils;
 import com.zutubi.util.UnaryProcedure;

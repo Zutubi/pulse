@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.*;

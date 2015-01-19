@@ -1,12 +1,12 @@
 package com.zutubi.pulse.master.build.queue;
 
 import com.google.common.base.Function;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.events.build.BuildCommencingEvent;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
+import com.zutubi.pulse.master.model.BuildRevision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.Sequence;
 import com.zutubi.pulse.master.model.SequenceManager;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.scm.api.Revision;
 

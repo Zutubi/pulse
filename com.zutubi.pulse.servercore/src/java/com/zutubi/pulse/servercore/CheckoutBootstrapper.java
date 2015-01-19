@@ -1,6 +1,5 @@
 package com.zutubi.pulse.servercore;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -16,9 +15,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 {
     private static final Logger LOG = Logger.getLogger(CheckoutBootstrapper.class);
 
-    public CheckoutBootstrapper(String project, BuildRevision revision)
+    public CheckoutBootstrapper(String project)
     {
-        super(project, revision);
+        super(project);
     }
 
     public ScmClient doBootstrap(ExecutionContext executionContext)
@@ -28,7 +27,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
         try
         {
             scm = createScmClient(executionContext);
-            scm.checkout(executionContext, revision.getRevision(), this);
+            scm.checkout(executionContext, getRevision(executionContext), this);
             return scm;
         }
         catch (ScmException e)

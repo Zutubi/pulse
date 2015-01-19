@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.trigger;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.scm.PersistentContextImpl;
 import com.zutubi.pulse.core.scm.ScmContextImpl;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.events.build.SingleBuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildRevision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.TriggerOptions;
 import com.zutubi.pulse.master.scm.ScmManager;

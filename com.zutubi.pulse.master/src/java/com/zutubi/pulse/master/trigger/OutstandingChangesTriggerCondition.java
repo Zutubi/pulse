@@ -1,12 +1,11 @@
 package com.zutubi.pulse.master.trigger;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.master.build.queue.FatController;
 import com.zutubi.pulse.master.events.build.BuildRequestEvent;
 import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildRevision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
@@ -14,6 +13,8 @@ import com.zutubi.pulse.master.tove.config.project.triggers.OutstandingChangesTr
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
+
+import static com.google.common.collect.Iterables.find;
 
 /**
  * A trigger condition that checks if there will be any new changes in a build

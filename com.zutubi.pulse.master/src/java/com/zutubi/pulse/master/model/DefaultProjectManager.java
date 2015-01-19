@@ -11,7 +11,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.api.PulseException;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.scm.api.Revision;
