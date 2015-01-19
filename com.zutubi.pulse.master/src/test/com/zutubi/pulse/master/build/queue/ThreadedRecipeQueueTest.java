@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.build.queue;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;

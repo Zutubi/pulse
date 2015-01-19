@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.NamedEntity;
 import com.zutubi.pulse.master.model.*;
 
