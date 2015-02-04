@@ -68,6 +68,6 @@ public class AnyCapableAgentRequirementsTest extends PulseTestCase
 
     private RecipeAssignmentRequest createRequest(ResourceRequirement... resourceRequirements)
     {
-        return new RecipeAssignmentRequest(null, null, Arrays.asList(resourceRequirements), null, null, null);
+        return new RecipeAssignmentRequest(null, null, Arrays.asList(resourceRequirements), null, null);
     }
 }

@@ -311,7 +311,7 @@ public class DefaultBuildController implements EventListener, BuildController
         List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig, recipeRequest);
         recipeRequest.addAllResourceRequirements(resourceRequirements);
 
-        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, recipeRequest, buildResult);
         setRequestPriority(assignmentRequest, stageConfig);
 
         RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
@@ -779,7 +779,7 @@ public class DefaultBuildController implements EventListener, BuildController
     }
 
     /**
-     * Called when the first recipe for this build is dispatched.  It is at
+     * Called when the first recipe for this build is assigned.  It is at
      * this point that the build is said to have commenced.
      */
     private void handleBuildCommenced()

@@ -648,7 +648,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         BuildRevision revision = new BuildRevision(new Revision("1"), false);
 
-        return new RecipeAssignmentRequest(project, requirements, null, revision, request, result);
+        return new RecipeAssignmentRequest(project, requirements, null, request, result);
     }
 
     private RecipeAssignmentRequest createAssignmentRequest(int type)
@@ -912,8 +912,7 @@ public class ThreadedRecipeQueueTest extends ZutubiTestCase implements com.zutub
 
         public boolean isFulfilledBy(RecipeAssignmentRequest request, AgentService service)
         {
-            return (((FakeAgentService) service).getType() == type) &&
-                    Long.valueOf(request.getRevision().getRevision().getRevisionString()) >= 0;
+            return (((FakeAgentService) service).getType() == type);
         }
 
         public String getSummary()
