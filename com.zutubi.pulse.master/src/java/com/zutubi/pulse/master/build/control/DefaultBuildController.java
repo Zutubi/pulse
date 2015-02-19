@@ -3,14 +3,16 @@ package com.zutubi.pulse.master.build.control;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import static com.google.common.collect.Collections2.transform;
 import com.google.common.collect.Iterables;
 import com.zutubi.events.AsynchronousDelegatingListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.dependency.RepositoryAttributes;
 import com.zutubi.pulse.core.dependency.ivy.IvyClient;
 import com.zutubi.pulse.core.dependency.ivy.IvyConfiguration;
@@ -18,7 +20,6 @@ import com.zutubi.pulse.core.dependency.ivy.IvyManager;
 import com.zutubi.pulse.core.dependency.ivy.IvyModuleDescriptor;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.api.Feature;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.engine.api.ResultState;
@@ -34,7 +35,6 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.MasterBuildProperties;
-import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.build.log.BuildLogFile;
@@ -45,7 +45,6 @@ import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
-import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -57,7 +56,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.api.VariableMap;
 import com.zutubi.util.*;
-import static com.zutubi.util.StringUtils.safeToString;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -74,6 +72,12 @@ import java.util.*;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static com.google.common.collect.Collections2.transform;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
+import static com.zutubi.pulse.master.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.master.scm.ScmClientUtils.*;
+import static com.zutubi.util.StringUtils.safeToString;
 
 /**
  * The DefaultBuildController is responsible for executing and coordinating a single
@@ -307,7 +311,7 @@ public class DefaultBuildController implements EventListener, BuildController
         List<ResourceRequirement> resourceRequirements = getResourceRequirements(stageConfig, recipeRequest);
         recipeRequest.addAllResourceRequirements(resourceRequirements);
 
-        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+        RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stageConfig), resourceRequirements, recipeRequest, buildResult);
         setRequestPriority(assignmentRequest, stageConfig);
 
         RecipeResultNode previousRecipe = previousHealthy == null ? null : previousHealthy.findResultNodeByHandle(stageConfig.getHandle());
@@ -671,7 +675,7 @@ public class DefaultBuildController implements EventListener, BuildController
 
     private void initialiseControllers()
     {
-        Bootstrapper bootstrapper = new ProjectBootstrapper(projectConfig.getName(), request.getRevision());
+        Bootstrapper bootstrapper = new ProjectBootstrapper(projectConfig.getName());
         if (request.isPersonal())
         {
             bootstrapper = createPersonalBuildBootstrapper(bootstrapper);
@@ -775,7 +779,7 @@ public class DefaultBuildController implements EventListener, BuildController
     }
 
     /**
-     * Called when the first recipe for this build is dispatched.  It is at
+     * Called when the first recipe for this build is assigned.  It is at
      * this point that the build is said to have commenced.
      */
     private void handleBuildCommenced()

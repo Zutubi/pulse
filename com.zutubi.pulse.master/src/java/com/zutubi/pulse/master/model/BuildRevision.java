@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.master.model;
 
 import com.google.common.base.Supplier;
 import com.zutubi.pulse.core.scm.api.Revision;
@@ -131,8 +131,6 @@ public class BuildRevision
         }
 
         this.revision = revisionSupplier.get();
-        // We need to null this out as it can't be transferred to agents.
-        revisionSupplier = null;
         for (BuildRevision downstream : dependentRevisions)
         {
             if (!downstream.isInitialised())

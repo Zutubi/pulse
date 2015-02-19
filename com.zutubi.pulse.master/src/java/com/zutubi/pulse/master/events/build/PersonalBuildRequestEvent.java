@@ -1,13 +1,10 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.NamedEntity;
-import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
-import java.util.List;
 
 import static com.zutubi.pulse.core.dependency.ivy.IvyStatus.STATUS_INTEGRATION;
 

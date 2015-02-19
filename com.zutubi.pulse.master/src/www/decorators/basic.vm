@@ -47,7 +47,7 @@
         </table>
     </div>
     <div id="south" style="border-top: none">
-        <strong>:: pulse ($version_number #$build_number) ::</strong> copyright &copy; 2005-2014 zutubi pty ltd
+        <strong>:: pulse ($version_number #$build_number) ::</strong> copyright &copy; 2005-2015 zutubi pty ltd
     </div>
 </body>
 </html>

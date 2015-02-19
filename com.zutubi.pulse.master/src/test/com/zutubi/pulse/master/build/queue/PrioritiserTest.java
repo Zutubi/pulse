@@ -5,10 +5,11 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.*;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 public class PrioritiserTest extends PulseTestCase
 {
@@ -21,7 +22,7 @@ public class PrioritiserTest extends PulseTestCase
         BuildResult buildResult = mock(BuildResult.class);
         stub(buildResult.getProject()).toReturn(project);
 
-        RecipeAssignmentRequest request = new RecipeAssignmentRequest(project, null, null, null, null, buildResult);
+        RecipeAssignmentRequest request = new RecipeAssignmentRequest(project, null, null, null, buildResult);
         prioritiser = new Prioritiser(request);
     }
 

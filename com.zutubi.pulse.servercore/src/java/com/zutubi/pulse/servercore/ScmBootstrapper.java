@@ -2,13 +2,10 @@ package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.BootstrapCommand;
 import com.zutubi.pulse.core.BootstrapperSupport;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.commands.api.CommandContext;
 import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
@@ -22,6 +19,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_OUTPUT_DIR;
+
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  */
@@ -30,13 +30,17 @@ public abstract class ScmBootstrapper extends BootstrapperSupport implements Scm
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
     protected String project;
-    protected BuildRevision revision;
     protected transient PrintWriter filesWriter;
 
-    public ScmBootstrapper(String project, BuildRevision revision)
+    public ScmBootstrapper(String project)
     {
         this.project = project;
-        this.revision = revision;
+    }
+
+    protected Revision getRevision(ExecutionContext executionContext)
+    {
+        String revisionString = executionContext.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_BUILD_REVISION);
+        return new Revision(revisionString);
     }
 
     public void doBootstrap(CommandContext commandContext)

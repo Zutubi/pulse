@@ -1,7 +1,6 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.core.commands.api.CommandContext;
@@ -24,13 +23,11 @@ import static com.zutubi.util.io.FileSystemUtils.*;
 public class ProjectBootstrapper extends BootstrapperSupport
 {
     private final String projectName;
-    private final BuildRevision revision;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectBootstrapper(String projectName, BuildRevision revision)
+    public ProjectBootstrapper(String projectName)
     {
         this.projectName = projectName;
-        this.revision = revision;
     }
 
     public void doBootstrap(final CommandContext commandContext) throws BuildException
@@ -115,11 +112,11 @@ public class ProjectBootstrapper extends BootstrapperSupport
         ensureDirectory(localDir);
         if (FileSystemUtils.list(localDir).length == 0)
         {
-            return new CheckoutBootstrapper(projectName, revision);
+            return new CheckoutBootstrapper(projectName);
         }
         else // else we can update.
         {
-            return new UpdateBootstrapper(projectName, revision);
+            return new UpdateBootstrapper(projectName);
         }
     }
 
