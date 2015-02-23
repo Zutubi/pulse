@@ -15,14 +15,14 @@ public class MavenCommandTest extends ExecutableCommandTestCase
     public void testNoBuildFileNoTargets() throws Exception
     {
         MavenCommandConfiguration command = new MavenCommandConfiguration();
-        successRun(command, "BUILD SUCCESSFUL", "Total time", "_Apache_", "v. 1.0.2");
+        successRun(command, "BUILD SUCCESSFUL", "Total time", "_Apache_", "v. 1.1");
     }
 
     public void testDefaultTarget() throws Exception
     {
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
-        successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.0.2");
+        successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.1");
     }
 
     public void testExtractVersion() throws Exception
@@ -38,7 +38,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mytest");
-        successRun(command, "BUILD SUCCESSFUL", "test target", "_Apache_", "v. 1.0.2");
+        successRun(command, "BUILD SUCCESSFUL", "test target", "_Apache_", "v. 1.1");
     }
 
     public void testRunMultipleTargets() throws Exception
@@ -46,7 +46,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         copyMavenFile("basic");
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mybuild mytest");
-        successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
+        successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.1");
     }
 
     public void testMissingTarget() throws Exception
@@ -72,7 +72,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mybuild");
         command.setArgs("-X");
-        successRun(command, "Loading plugin", "'maven-j2ee-plugin-1.5.1'", "build target", "_Apache_", "v. 1.0.2");
+        successRun(command, "Loading plugin", "'maven-ejb-plugin", "build target", "_Apache_", "v. 1.1");
     }
 
     private File copyMavenFile(String name) throws IOException
