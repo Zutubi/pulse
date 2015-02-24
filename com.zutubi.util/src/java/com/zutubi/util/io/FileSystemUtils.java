@@ -913,6 +913,17 @@ public class FileSystemUtils
     }
 
     /**
+     * Converts all line endings to single newline characters.
+     *
+     * @param s string to normalise
+     * @return a string equivalent to s but with all line separators converted to single newline characters
+     */
+    public static String normaliseNewlines(String s)
+    {
+        return s.replaceAll("\\r\\n", "\n").replaceAll("\\r", "\n");
+    }
+
+    /**
      * This method returns true if the specified file is the root of a file system.
      *
      * @param f file to test

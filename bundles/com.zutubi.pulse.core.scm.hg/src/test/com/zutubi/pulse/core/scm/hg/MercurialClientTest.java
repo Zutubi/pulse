@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.hg.config.MercurialConfiguration;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -467,12 +468,7 @@ public class MercurialClientTest extends MercurialTestBase
         File file = new File(baseDir, path);
         assertTrue(file.isFile());
         String content = Files.toString(file, Charset.defaultCharset());
-        assertEquals(normaliseLineEndings(expected), normaliseLineEndings(content));
-    }
-
-    private String normaliseLineEndings(String s)
-    {
-        return s.replaceAll("\\r\\n", "\n");
+        assertEquals(FileSystemUtils.normaliseNewlines(expected), FileSystemUtils.normaliseNewlines(content));
     }
 
     private void assertMercurialDir(File workingDir)

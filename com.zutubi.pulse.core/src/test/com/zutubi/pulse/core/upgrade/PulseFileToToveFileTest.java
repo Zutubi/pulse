@@ -1,9 +1,12 @@
 package com.zutubi.pulse.core.upgrade;
 
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.io.FileSystemUtils;
 import nu.xom.ParsingException;
 
 import java.io.IOException;
+
+import static com.zutubi.util.io.FileSystemUtils.normaliseNewlines;
 
 public class PulseFileToToveFileTest extends PulseTestCase
 {
@@ -67,8 +70,8 @@ public class PulseFileToToveFileTest extends PulseTestCase
         }
         else
         {
-            out = normaliseLineEndings(out);
-            expected = normaliseLineEndings(expected);
+            out = normaliseNewlines(out);
+            expected = normaliseNewlines(expected);
         }
         assertEquals(expected, out);
     }
@@ -78,8 +81,4 @@ public class PulseFileToToveFileTest extends PulseTestCase
         return out.replaceAll("\\s+", "");
     }
 
-    private String normaliseLineEndings(String s)
-    {
-        return s.replaceAll("\\r\\n", "\n");
-    }
 }

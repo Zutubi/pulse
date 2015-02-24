@@ -11,9 +11,11 @@ import com.zutubi.util.Point;
 import com.zutubi.util.adt.Grid;
 import com.zutubi.util.adt.GridCell;
 import com.zutubi.util.adt.TreeNode;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.IOException;
 
+import static com.zutubi.util.io.FileSystemUtils.normaliseNewlines;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 
@@ -63,11 +65,6 @@ public class ProjectDependencyGraphRendererTest extends PulseTestCase
         ProjectDependencyGraph graph = new ProjectDependencyGraph(tree, null);
         Grid<ProjectDependencyData> grid = renderer.renderUpstream(graph);
         assertEquals(normaliseNewlines(readInputFully("txt")), renderToAscii(grid));
-    }
-
-    private String normaliseNewlines(String s)
-    {
-        return s.replaceAll("\\r\\n", "\n");
     }
 
     private TreeNode<DependencyGraphData> getSimpleTree()

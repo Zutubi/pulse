@@ -60,13 +60,7 @@ public class LocalBuildAcceptanceTest extends DevToolsTestBase
     {
         File commandOutput = new File(tmpDir, FileSystemUtils.composeFilename(DEFAULT_OUTPUT_DIRECTORY, "00000001-hello", OUTPUT_NAME, OUTPUT_FILE));
         assertTrue(commandOutput.exists());
-        String output = normaliseLineEndings(Files.toString(commandOutput, Charset.defaultCharset()));
+        String output = FileSystemUtils.normaliseNewlines(Files.toString(commandOutput, Charset.defaultCharset()));
         assertEquals("Hello, Pulse!\n", output);
     }
-
-    private String normaliseLineEndings(String s)
-    {
-        return s.replaceAll("\\r\\n", "\n");
-    }
-
 }

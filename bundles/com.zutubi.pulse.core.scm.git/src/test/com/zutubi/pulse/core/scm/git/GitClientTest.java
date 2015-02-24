@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.git.config.GitConfiguration;
 import com.zutubi.util.Sort;
+import com.zutubi.util.io.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.List;
 import static com.google.common.collect.Iterables.find;
 import static com.zutubi.pulse.core.scm.git.GitConstants.*;
 import static com.zutubi.pulse.core.test.api.Matchers.matchesRegex;
+import static com.zutubi.util.io.FileSystemUtils.normaliseNewlines;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -400,7 +402,7 @@ public class GitClientTest extends GitClientTestBase
     private void updateToRevisionHelper() throws ScmException, IOException
     {
         client.checkout(context, null, handler);
-        assertEquals(CONTENT_A_TXT, Files.toString(new File(workingDir, "a.txt"), Charset.defaultCharset()));
+        assertEquals(CONTENT_A_TXT, normaliseNewlines(Files.toString(new File(workingDir, "a.txt"), Charset.defaultCharset())));
 
         Revision rev = client.update(context, new Revision(REVISION_MASTER_INTERMEDIATE), handler);
         assertEquals(REVISION_MASTER_INTERMEDIATE, rev.getRevisionString());
