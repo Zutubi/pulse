@@ -1,13 +1,14 @@
 package com.zutubi.util;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.any;
 import com.zutubi.util.junit.ZutubiTestCase;
-import static java.util.Arrays.asList;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+
+import static com.google.common.collect.Iterables.any;
+import static java.util.Arrays.asList;
 
 /**
  * NOTE: cygwin is requried on the path for windows machines.
@@ -25,7 +26,7 @@ public class SystemUtilsTest extends ZutubiTestCase
 
         if (SystemUtils.IS_WINDOWS)
         {
-            list = "dir";
+            list = "cmd";
         }
         else
         {
@@ -48,7 +49,7 @@ public class SystemUtilsTest extends ZutubiTestCase
     {
         if(SystemUtils.IS_WINDOWS)
         {
-            assertNotNull(SystemUtils.findInPath("DiR"));
+            assertNotNull(SystemUtils.findInPath("CmD"));
         }
     }
 
