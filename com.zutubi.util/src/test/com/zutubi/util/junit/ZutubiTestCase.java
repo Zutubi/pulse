@@ -262,7 +262,7 @@ public abstract class ZutubiTestCase extends TestCase
         
         // add some retries because windows 7 is still not brown enough, particularly when a virus scanner is active.
         int retryCount = 0;
-        while (retryCount < 3)
+        while (retryCount < 6)
         {
             try
             {
