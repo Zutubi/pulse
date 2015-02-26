@@ -190,7 +190,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.event
                 String resourceName = owningResource.getName();
                 for (ResourceRequirementConfiguration requirement : configurationProvider.getAll(ResourceRequirementConfiguration.class))
                 {
-                    if (requirement.getResource().equals(resourceName) && requirement.getVersion().equals(oldValue))
+                    if (Objects.equals(requirement.getResource(), resourceName) && Objects.equals(requirement.getVersion(), oldValue))
                     {
                         ResourceRequirementConfiguration clone = configurationProvider.deepClone(requirement);
                         clone.setVersion(newValue);
