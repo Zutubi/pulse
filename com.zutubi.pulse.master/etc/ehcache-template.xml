@@ -68,7 +68,7 @@
 
     <!-- Hibernate entities and associations -->
     <cache name="com.zutubi.pulse.master.model.User"
-           maxElementsInMemory="1000"
+           maxElementsInMemory="5000"
            eternal="true"
            overflowToDisk="false"/>
 
@@ -78,7 +78,7 @@
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.master.model.ProjectGroup"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
@@ -88,7 +88,7 @@
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.master.model.Project"
-           maxElementsInMemory="5000"
+           maxElementsInMemory="15000"
            eternal="true"
            overflowToDisk="false"/>
 </ehcache>
