@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.tove.wizard;
 
 import com.google.common.base.Predicate;
-import static com.google.common.collect.Iterables.find;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import static com.zutubi.pulse.master.tove.wizard.WizardTransition.*;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CompositeType;
@@ -15,6 +13,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+
+import static com.google.common.collect.Iterables.find;
+import static com.zutubi.pulse.master.tove.wizard.WizardTransition.*;
 
 /**
  *
@@ -231,7 +232,10 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public void doFinish()
     {
-        completedStates.push(currentState);
+        if (currentState != null)
+        {
+            completedStates.push(currentState);
+        }
         currentState = null;
     }
 
