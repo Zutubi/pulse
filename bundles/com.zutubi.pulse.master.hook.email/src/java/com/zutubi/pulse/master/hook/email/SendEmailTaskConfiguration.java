@@ -36,6 +36,7 @@ import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
@@ -59,6 +60,8 @@ import static java.util.Arrays.asList;
 @Wire
 public class SendEmailTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
+    public static final Logger LOG = Logger.getLogger(SendEmailTaskConfiguration.class);
+
     @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
     @ControllingCheckbox(checkedFields = "logLineLimit")
@@ -345,6 +348,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
                 catch (ScmException e)
                 {
                     // Oh well, fall back to guess.
+                    LOG.info("Failed to lookup email for user '" + scmLogin + "': " + e.getMessage(), e);
                 }
             }
 

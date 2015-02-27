@@ -2071,7 +2071,7 @@ public class ConfigurationRefactoringManager
                 // If any descendant had an internal reference to something
                 // defined in the pulled up path it will need to be
                 // canonicalised.
-                node = node.getChild(PathUtils.getElement(path, 1));
+                node = node.findNodeById(PathUtils.getElement(path, 1));
                 final CompositeType templateOwnerType = (CompositeType) configurationTemplateManager.getType(node.getPath());
                 node.forEachDescendant(new Function<TemplateNode, Boolean>()
                 {

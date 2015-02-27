@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.tove.config.project;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.marshal.FileResolver;
 import com.zutubi.pulse.core.marshal.RelativeFileResolver;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
@@ -14,8 +15,11 @@ import com.zutubi.pulse.master.tove.handler.ListOptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.TypeProperty;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.concurrent.ConcurrentUtils;
+import org.apache.commons.io.input.NullInputStream;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,13 +61,32 @@ public class BuildStageRecipeOptionProvider extends ListOptionProvider
                     ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(stages, ProjectConfiguration.class);
                     if (projectConfig != null)
                     {
+                        PulseFileProvider pulseFileProvider = projectConfig.getType().getPulseFile();
+                        PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
+
+                        FileResolver resolver;
                         Project project = projectManager.getProject(projectConfig.getProjectId(), false);
                         if (project != null)
                         {
-                            PulseFileProvider pulseFileProvider = projectConfig.getType().getPulseFile();
-                            PulseFileLoader pulseFileLoader = fileLoaderFactory.createLoader();
-                            ScmFileResolver resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
-                            return pulseFileLoader.loadAvailableRecipes(pulseFileProvider.getFileContent(resolver), new RelativeFileResolver(pulseFileProvider.getPath(), resolver));
+                            resolver = new ScmFileResolver(project, Revision.HEAD, scmManager);
+                        }
+                        else
+                        {
+                            // Could be a template project, in this case don't support file loading (this still supports
+                            // pulse files defined inside configuration, just not versioned projects).
+                            resolver = new FileResolver()
+                            {
+                                public InputStream resolve(String path) throws Exception
+                                {
+                                    return new NullInputStream(0);
+                                }
+                            };
+                        }
+
+                        String fileContent = pulseFileProvider.getFileContent(resolver);
+                        if (StringUtils.stringSet(fileContent))
+                        {
+                            return pulseFileLoader.loadAvailableRecipes(fileContent, new RelativeFileResolver(pulseFileProvider.getPath(), resolver));
                         }
                     }
 

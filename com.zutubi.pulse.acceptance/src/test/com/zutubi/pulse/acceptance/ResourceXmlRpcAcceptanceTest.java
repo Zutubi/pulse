@@ -36,8 +36,8 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         String resourceName = random;
         String resourceName2 = random + "2";
-        String resourcePath = insertResource(resourceName);
-        insertResource(resourceName2);
+        String resourcePath = insertResource(resourceName, null);
+        insertResource(resourceName2, null);
 
         String projectPath = rpcClient.RemoteApi.insertTrivialProject(random, false);
         String requirementPath = insertRequirement(projectPath, resourceName, null);
@@ -60,8 +60,8 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
         String resourceName2 = random + "2";
         String versionName = "v1";
         String versionName2 = "v2";
-        insertResource(resourceName);
-        insertResource(resourceName2);
+        String resourcePath = insertResource(resourceName, versionName);
+        insertResource(resourceName2, versionName);
         String versionPath = insertVersion(resourceName, versionName);
         insertVersion(resourceName, versionName2);
         insertVersion(resourceName2, versionName);
@@ -75,6 +75,9 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
         String editedVersion = "v1-edited";
         version.put("value", editedVersion);
         rpcClient.RemoteApi.saveConfig(versionPath, version, false);
+
+        Hashtable<String, Object> resource = rpcClient.RemoteApi.getConfig(resourcePath);
+        assertEquals(editedVersion, resource.get("defaultVersion"));
 
         Hashtable<String, Object> requirement = rpcClient.RemoteApi.getConfig(requirementPath);
         assertEquals(editedVersion, requirement.get("version"));
@@ -91,10 +94,11 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
         return rpcClient.RemoteApi.insertConfig(PathUtils.getPath(resourcesPath, resourceName, "versions"), version);
     }
 
-    private String insertResource(String resourceName) throws Exception
+    private String insertResource(String resourceName, String defaultVersion) throws Exception
     {
         Hashtable<String, Object> resource = rpcClient.RemoteApi.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", resourceName);
+        resource.put("defaultVersion", defaultVersion);
         return rpcClient.RemoteApi.insertConfig(resourcesPath, resource);
     }
 
