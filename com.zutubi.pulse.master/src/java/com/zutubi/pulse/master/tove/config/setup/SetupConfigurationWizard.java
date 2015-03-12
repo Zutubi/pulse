@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.setup;
 
+import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.model.Role;
@@ -89,7 +90,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             User user = new User();
             user.setConfig(adminUser);
             SecurityUtils.loginAs(new Principle(user, Collections.<UserGroupConfiguration>emptyList()));
-
+            SecurityUtils.saveAuthenticationInSession(ActionContext.getContext().getSession());
             try
             {
                 // ensure that this runs in a separate thread so that the
