@@ -221,6 +221,8 @@ public class DefaultBuildController implements EventListener, BuildController
         }
         catch (Exception e)
         {
+            LOG.warning("Could not start build controller for '" + buildResult + "':" + e.getMessage(), e);
+
             // handle the event directly, there is no need to expose this event to the wider audience.
             eventListener.handleEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext, e));
         }
