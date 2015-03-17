@@ -98,7 +98,10 @@ public class ResourceXmlRpcAcceptanceTest extends AcceptanceTestBase
     {
         Hashtable<String, Object> resource = rpcClient.RemoteApi.createDefaultConfig(ResourceConfiguration.class);
         resource.put("name", resourceName);
-        resource.put("defaultVersion", defaultVersion);
+        if (defaultVersion != null)
+        {
+            resource.put("defaultVersion", defaultVersion);
+        }
         return rpcClient.RemoteApi.insertConfig(resourcesPath, resource);
     }
 
