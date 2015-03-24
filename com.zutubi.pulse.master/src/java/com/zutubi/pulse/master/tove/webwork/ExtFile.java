@@ -23,28 +23,21 @@ public class ExtFile
     private String baseName;
     private String text;
     private String href;
-    private boolean leaf;
+    private boolean hasChildren;
     private String cls;
-    private String iconCls;
+    private String spriteCssClass;
     private Map<String, Object> extraAttributes;
     /**
      * A list of children, if this is not a leaf.  Note that this may be left
      * empty for trees that are loaded dynamically.
      */
-    private List<ExtFile> children;
-
-    public ExtFile(String baseName, String text, boolean leaf)
-    {
-        this.baseName = baseName;
-        this.text = text;
-        this.leaf = leaf;
-    }
+    private List<ExtFile> items;
 
     public ExtFile(FileObjectWrapper fo,  String baseUrl)
     {
         baseName = fo.getBaseName();
         text = fo.getName();
-        leaf = !fo.isContainer();
+        hasChildren = fo.isContainer();
         cls = fo.getCls();
         href = fo.getUrl();
         if (StringUtils.stringSet(href))
@@ -65,7 +58,7 @@ public class ExtFile
                 href = StringUtils.join('/', true, true, baseUrl, href);
             }
         }
-        iconCls = fo.getIconCls();
+        spriteCssClass = fo.getIconCls();
         extraAttributes = fo.getExtraAttributes();
         if (extraAttributes == null)
         {
@@ -83,9 +76,9 @@ public class ExtFile
         return TextUtils.htmlEncode(text);
     }
 
-    public boolean isLeaf()
+    public boolean getHasChildren()
     {
-        return leaf;
+        return hasChildren;
     }
 
     public String getCls()
@@ -93,9 +86,9 @@ public class ExtFile
         return cls;
     }
 
-    public String getIconCls()
+    public String getSpriteCssClass()
     {
-        return iconCls;
+        return spriteCssClass;
     }
 
     public String getHref()
@@ -110,18 +103,18 @@ public class ExtFile
     }
 
     @JSON
-    public List<ExtFile> getChildren()
+    public List<ExtFile> getItems()
     {
-        return children;
+        return items;
     }
 
     public void addChildren(ExtFile... toAdd)
     {
-        if (children == null)
+        if (items == null)
         {
-            children = new LinkedList<ExtFile>();
+            items = new LinkedList<ExtFile>();
         }
 
-        this.children.addAll(asList(toAdd));
+        this.items.addAll(asList(toAdd));
     }
 }

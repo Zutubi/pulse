@@ -8,6 +8,7 @@
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
         <pattern>/file/*</pattern>
+        <pattern>/nimda/*</pattern>
         <!--
             Decorated artifact view: potentially too big for sitemesh parsing, and our JavaScript layout
             messes with anchors:

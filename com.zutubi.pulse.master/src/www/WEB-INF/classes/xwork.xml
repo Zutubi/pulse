@@ -303,6 +303,14 @@
         </action>
     </package>
 
+    <package name="nimda" namespace="/nimda" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="nimda" class="com.zutubi.pulse.master.tove.webwork.NimdaAction">
+            <result name="success" type="velocity">nimda.vm</result>
+        </action>
+    </package>
+
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 

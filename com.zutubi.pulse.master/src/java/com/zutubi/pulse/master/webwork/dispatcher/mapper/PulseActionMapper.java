@@ -112,6 +112,10 @@ public class PulseActionMapper implements ActionMapper
         {
             mapping = getAdminMapping(path, request);
         }
+        else if("/nimda".equals(namespace))
+        {
+            mapping = new ActionMapping("nimda", namespace, null, new HashMap());
+        }
 
         if(mapping == null)
         {

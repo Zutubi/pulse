@@ -59,7 +59,7 @@ public class LsAction extends VFSActionSupport
     private ExtFile[] listing;
 
     /**
-     * Show files indicates whether or not the listing should include files. The default value is false.
+     * Show files indicates whether or not the listing should include files.
      */
     private boolean showFiles = true;
 
@@ -227,7 +227,7 @@ public class LsAction extends VFSActionSupport
                 public ExtFile apply(FileObject child)
                 {
                     ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
-                    if (!extFile.isLeaf() && currentDepth < depth)
+                    if (extFile.getHasChildren() && currentDepth < depth)
                     {
                         try
                         {

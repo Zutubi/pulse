@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <link href="${base}/css/reset.css" rel="stylesheet"/>
+
+    <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.material.min.css" rel="stylesheet"/>
+    <link href="${base}/css/nimda.css" rel="stylesheet"/>
+
+    <script src="${base}/js/kendo/jquery.min.js"></script>
+    <script src="${base}/js/kendo/kendo.all.min.js"></script>
+
+    <title>Pulse Nimda</title>
+</head>
+<body style="height: 100%">
+    <div id="navbar" style="position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #abcdef;">
+        Nav
+    </div>
+
+    <div id="content" style="position: fixed;
+    top: 50px;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    background-color: #F63;
+    overflow: auto;">
+        <div id="outer-split" style="height: 100%; width: 100%">
+            <div id="left-pane">
+                <div id="hierarchy-tree" class="pane-content">
+                </div>
+                <div id="config-tree" class="pane-content">
+                </div>
+            </div>
+            <div id="center-pane">
+                <div class="pane-content">
+                    <p>Main pane.</p>
+                </div>
+            </div>
+            <div id="right-pane">
+                <div class="pane-content">
+                    <p>Help pane.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" style="position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background-color: #abcdef;">
+        footer bar
+    </div>
+
+<script>
+    $(document).ready(function () {
+        $("#outer-split").kendoSplitter({
+            panes: [
+                { collapsible: true, size: "220px" },
+                { collapsible: false },
+                { collapsible: true, size: "220px" }
+            ]
+        });
+
+        $("#left-pane").kendoSplitter({
+            orientation: "vertical",
+            panes: [
+                { collapsible: true, size: "50%" },
+                { collapsible: true, size: "50%" }
+            ]
+        });
+
+        var templateSource = new kendo.data.HierarchicalDataSource({
+            transport: {
+                read: {
+                    url: "${base}/ajax/template/projects?ls",
+                    data: {
+                        depth: 3
+                    },
+                    dataType: "json"
+                }
+            },
+            schema: {
+                model: {
+                    children: 'items'
+                }
+            }
+        });
+
+        $("#config-tree").kendoTreeView({
+
+        });
+
+        var configTree = $("#config-tree").getKendoTreeView();
+
+        $("#hierarchy-tree").kendoTreeView({
+            dataSource: templateSource,
+            select: function(e) {
+                console.dir(e.sender);
+                configTree.setDataSource(new kendo.data.HierarchicalDataSource({
+                    transport: {
+                        read: {
+                            url: "${base}/ajax/config/projects/" + this.dataItem(e.node).baseName + "?ls",
+                            data: {
+                                depth: 3,
+                            },
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        model: {
+                            children: 'items'
+                        }
+                    }
+                }));
+            }
+        });
+    });
+</script>
+</body>
+</html>
