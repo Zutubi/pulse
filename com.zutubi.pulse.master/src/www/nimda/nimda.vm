@@ -4,7 +4,7 @@
     <link href="${base}/css/reset.css" rel="stylesheet"/>
 
     <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
-    <link href="${base}/css/kendo/kendo.material.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.default.min.css" rel="stylesheet"/>
     <link href="${base}/css/nimda.css" rel="stylesheet"/>
 
     <script src="${base}/js/kendo/jquery.min.js"></script>
@@ -12,23 +12,12 @@
 
     <title>Pulse Nimda</title>
 </head>
-<body style="height: 100%">
-    <div id="navbar" style="position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background-color: #abcdef;">
+<body>
+    <div id="navbar">
         Nav
     </div>
 
-    <div id="content" style="position: fixed;
-    top: 50px;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    background-color: #F63;
-    overflow: auto;">
+    <div id="content">
         <div id="outer-split" style="height: 100%; width: 100%">
             <div id="left-pane">
                 <div id="hierarchy-tree" class="pane-content">
@@ -49,12 +38,7 @@
         </div>
     </div>
 
-    <div id="footer" style="position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 20px;
-    background-color: #abcdef;">
+    <div id="footer">
         footer bar
     </div>
 

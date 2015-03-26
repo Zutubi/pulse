@@ -56,7 +56,7 @@ public class LsAction extends VFSActionSupport
     /**
      * The results of the ls action.
      */
-    private ExtFile[] listing;
+    private KendoFile[] listing;
 
     /**
      * Show files indicates whether or not the listing should include files.
@@ -134,7 +134,7 @@ public class LsAction extends VFSActionSupport
         this.depth = depth;
     }
 
-    public ExtFile[] getListing()
+    public KendoFile[] getListing()
     {
         return listing;
     }
@@ -213,25 +213,25 @@ public class LsAction extends VFSActionSupport
         return SUCCESS;
     }
 
-    private ExtFile[] listChildren(final FileObject fileObject, final FileFilterSelector selector, final int currentDepth) throws FileSystemException
+    private KendoFile[] listChildren(final FileObject fileObject, final FileFilterSelector selector, final int currentDepth) throws FileSystemException
     {
-        ExtFile[] extFiles = null;
+        KendoFile[] kendoFiles = null;
         FileObject[] children = fileObject.findFiles(selector);
         if (children != null)
         {
             sortChildren(fileObject, children);
 
             final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
-            extFiles = transform(asList(children), new Function<FileObject, ExtFile>()
+            kendoFiles = transform(asList(children), new Function<FileObject, KendoFile>()
             {
-                public ExtFile apply(FileObject child)
+                public KendoFile apply(FileObject child)
                 {
-                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
-                    if (extFile.getHasChildren() && currentDepth < depth)
+                    KendoFile kendoFile = new KendoFile(new FileObjectWrapper(child, fileObject), baseUrl);
+                    if (kendoFile.getHasChildren() && currentDepth < depth)
                     {
                         try
                         {
-                            extFile.addChildren(listChildren(child, selector, currentDepth + 1));
+                            kendoFile.addChildren(listChildren(child, selector, currentDepth + 1));
                         }
                         catch (FileSystemException e)
                         {
@@ -239,12 +239,12 @@ public class LsAction extends VFSActionSupport
                         }
                     }
 
-                    return extFile;
+                    return kendoFile;
                 }
-            }).toArray(new ExtFile[children.length]);
+            }).toArray(new KendoFile[children.length]);
         }
 
-        return extFiles;
+        return kendoFiles;
     }
 
     private void sortChildren(FileObject fileObject, FileObject[] children)

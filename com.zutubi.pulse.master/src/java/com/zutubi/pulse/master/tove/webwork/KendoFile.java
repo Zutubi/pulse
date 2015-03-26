@@ -15,10 +15,10 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 
 /**
- * Data structure used to send the details of a single file to the Ext tree
- * in the UI.  Used for trivial conversion from Java->JSON->Ext.TreeNode.
+ * Data structure used to send the details of a single file to the Kendo tree in the UI.  Used for
+ * trivial conversion from Java->JSON->Kendo tree node.
  */
-public class ExtFile
+public class KendoFile
 {
     private String baseName;
     private String text;
@@ -31,9 +31,9 @@ public class ExtFile
      * A list of children, if this is not a leaf.  Note that this may be left
      * empty for trees that are loaded dynamically.
      */
-    private List<ExtFile> items;
+    private List<KendoFile> items;
 
-    public ExtFile(FileObjectWrapper fo,  String baseUrl)
+    public KendoFile(FileObjectWrapper fo, String baseUrl)
     {
         baseName = fo.getBaseName();
         text = fo.getName();
@@ -103,16 +103,16 @@ public class ExtFile
     }
 
     @JSON
-    public List<ExtFile> getItems()
+    public List<KendoFile> getItems()
     {
         return items;
     }
 
-    public void addChildren(ExtFile... toAdd)
+    public void addChildren(KendoFile... toAdd)
     {
         if (items == null)
         {
-            items = new LinkedList<ExtFile>();
+            items = new LinkedList<KendoFile>();
         }
 
         this.items.addAll(asList(toAdd));
