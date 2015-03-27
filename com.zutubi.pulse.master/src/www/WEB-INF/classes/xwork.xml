@@ -306,7 +306,7 @@
     <package name="nimda" namespace="/nimda" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="nimda" class="com.zutubi.pulse.master.tove.webwork.NimdaAction">
+        <action name="nimda" class="com.zutubi.pulse.master.tove.nimda.NimdaAction">
             <result name="success" type="velocity">nimda.vm</result>
         </action>
     </package>
@@ -712,7 +712,7 @@
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
@@ -836,7 +836,7 @@
     <package name="templateAjax" namespace="/ajax/template" extends="default">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="ls" class="com.zutubi.pulse.master.tove.webwork.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
             <param name="basePath">templates</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="flexjson">

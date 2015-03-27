@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.tove.webwork;
+package com.zutubi.pulse.master.tove.nimda;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -39,7 +39,7 @@ import static java.util.Arrays.asList;
  */
 public class LsAction extends VFSActionSupport
 {
-    private String fs ="pulse";
+    private String fs = "pulse";
     private String prefix;
 
     /**
@@ -56,10 +56,10 @@ public class LsAction extends VFSActionSupport
     /**
      * The results of the ls action.
      */
-    private ExtFile[] listing;
+    private FileModel[] listing;
 
     /**
-     * Show files indicates whether or not the listing should include files. The default value is false.
+     * Show files indicates whether or not the listing should include files.
      */
     private boolean showFiles = true;
 
@@ -134,7 +134,7 @@ public class LsAction extends VFSActionSupport
         this.depth = depth;
     }
 
-    public ExtFile[] getListing()
+    public FileModel[] getListing()
     {
         return listing;
     }
@@ -213,25 +213,25 @@ public class LsAction extends VFSActionSupport
         return SUCCESS;
     }
 
-    private ExtFile[] listChildren(final FileObject fileObject, final FileFilterSelector selector, final int currentDepth) throws FileSystemException
+    private FileModel[] listChildren(final FileObject fileObject, final FileFilterSelector selector, final int currentDepth) throws FileSystemException
     {
-        ExtFile[] extFiles = null;
+        FileModel[] fileModels = null;
         FileObject[] children = fileObject.findFiles(selector);
         if (children != null)
         {
             sortChildren(fileObject, children);
 
             final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
-            extFiles = transform(asList(children), new Function<FileObject, ExtFile>()
+            fileModels = transform(asList(children), new Function<FileObject, FileModel>()
             {
-                public ExtFile apply(FileObject child)
+                public FileModel apply(FileObject child)
                 {
-                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
-                    if (!extFile.isLeaf() && currentDepth < depth)
+                    FileModel fileModel = new FileModel(new FileObjectWrapper(child, fileObject), baseUrl);
+                    if (fileModel.getHasChildren() && currentDepth < depth)
                     {
                         try
                         {
-                            extFile.addChildren(listChildren(child, selector, currentDepth + 1));
+                            fileModel.addChildren(listChildren(child, selector, currentDepth + 1));
                         }
                         catch (FileSystemException e)
                         {
@@ -239,12 +239,12 @@ public class LsAction extends VFSActionSupport
                         }
                     }
 
-                    return extFile;
+                    return fileModel;
                 }
-            }).toArray(new ExtFile[children.length]);
+            }).toArray(new FileModel[children.length]);
         }
 
-        return extFiles;
+        return fileModels;
     }
 
     private void sortChildren(FileObject fileObject, FileObject[] children)

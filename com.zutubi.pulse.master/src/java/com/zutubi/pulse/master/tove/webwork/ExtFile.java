@@ -15,29 +15,36 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 
 /**
- * Data structure used to send the details of a single file to the Kendo tree in the UI.  Used for
- * trivial conversion from Java->JSON->Kendo tree node.
+ * Data structure used to send the details of a single file to the Ext tree
+ * in the UI.  Used for trivial conversion from Java->JSON->Ext.TreeNode.
  */
-public class KendoFile
+public class ExtFile
 {
     private String baseName;
     private String text;
     private String href;
-    private boolean hasChildren;
+    private boolean leaf;
     private String cls;
-    private String spriteCssClass;
+    private String iconCls;
     private Map<String, Object> extraAttributes;
     /**
      * A list of children, if this is not a leaf.  Note that this may be left
      * empty for trees that are loaded dynamically.
      */
-    private List<KendoFile> items;
+    private List<ExtFile> children;
 
-    public KendoFile(FileObjectWrapper fo, String baseUrl)
+    public ExtFile(String baseName, String text, boolean leaf)
+    {
+        this.baseName = baseName;
+        this.text = text;
+        this.leaf = leaf;
+    }
+
+    public ExtFile(FileObjectWrapper fo,  String baseUrl)
     {
         baseName = fo.getBaseName();
         text = fo.getName();
-        hasChildren = fo.isContainer();
+        leaf = !fo.isContainer();
         cls = fo.getCls();
         href = fo.getUrl();
         if (StringUtils.stringSet(href))
@@ -58,7 +65,7 @@ public class KendoFile
                 href = StringUtils.join('/', true, true, baseUrl, href);
             }
         }
-        spriteCssClass = fo.getIconCls();
+        iconCls = fo.getIconCls();
         extraAttributes = fo.getExtraAttributes();
         if (extraAttributes == null)
         {
@@ -76,9 +83,9 @@ public class KendoFile
         return TextUtils.htmlEncode(text);
     }
 
-    public boolean getHasChildren()
+    public boolean isLeaf()
     {
-        return hasChildren;
+        return leaf;
     }
 
     public String getCls()
@@ -86,9 +93,9 @@ public class KendoFile
         return cls;
     }
 
-    public String getSpriteCssClass()
+    public String getIconCls()
     {
-        return spriteCssClass;
+        return iconCls;
     }
 
     public String getHref()
@@ -103,18 +110,18 @@ public class KendoFile
     }
 
     @JSON
-    public List<KendoFile> getItems()
+    public List<ExtFile> getChildren()
     {
-        return items;
+        return children;
     }
 
-    public void addChildren(KendoFile... toAdd)
+    public void addChildren(ExtFile... toAdd)
     {
-        if (items == null)
+        if (children == null)
         {
-            items = new LinkedList<KendoFile>();
+            children = new LinkedList<ExtFile>();
         }
 
-        this.items.addAll(asList(toAdd));
+        this.children.addAll(asList(toAdd));
     }
 }
