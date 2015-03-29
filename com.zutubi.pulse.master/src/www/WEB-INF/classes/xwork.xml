@@ -850,6 +850,27 @@
         </action>
     </package>
 
+    <package name="nimdaAjax" namespace="/ajax/nimda" extends="default">
+        <default-interceptor-ref name="ajaxConfigStack"/>
+
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
+            <param name="basePath">config</param>
+            <result name="success" type="flexjson">listing</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+        </action>
+
+        <action name="detail" class="com.zutubi.pulse.master.tove.nimda.ConfigDetailAction">
+            <result name="success" type="flexjson">model</result>
+            <result name="error" type="flexjson">
+                <param name="deep">true</param>
+                <param name="location">result</param>
+            </result>
+        </action>
+    </package>
+
     <package name="adminAjax" namespace="/ajax/admin" extends="admin">
         <default-interceptor-ref name="ajaxSideEffectStack"/>
 

@@ -78,7 +78,14 @@
         });
 
         $("#config-tree").kendoTreeView({
-
+            select: function(e) {
+                jQuery.ajax("${base}/ajax/nimda/detail/projects/" + this.dataItem(e.node).baseName, {
+                    dataType: "json",
+                    success: function(data) {
+                        console.log(data);
+                    }
+                });
+            }
         });
 
         var configTree = $("#config-tree").getKendoTreeView();
@@ -86,11 +93,10 @@
         $("#hierarchy-tree").kendoTreeView({
             dataSource: templateSource,
             select: function(e) {
-                console.dir(e.sender);
                 configTree.setDataSource(new kendo.data.HierarchicalDataSource({
                     transport: {
                         read: {
-                            url: "${base}/ajax/config/projects/" + this.dataItem(e.node).baseName + "?ls",
+                            url: "${base}/ajax/nimda/ls/projects/" + this.dataItem(e.node).baseName,
                             data: {
                                 depth: 3,
                             },

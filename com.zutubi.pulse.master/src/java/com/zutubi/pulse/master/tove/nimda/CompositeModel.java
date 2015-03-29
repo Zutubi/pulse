@@ -5,17 +5,16 @@ import com.zutubi.pulse.master.tove.model.Form;
 /**
  * Data model for rendering a composite type in the admin UI.
  */
-public class CompositeModel
+public class CompositeModel extends NimdaModel
 {
-    private String path;
     private String displayName;
     private String introduction;
 
     private Form form;
 
-    public String getPath()
+    public CompositeModel(String path)
     {
-        return path;
+        super(path);
     }
 
     public String getDisplayName()

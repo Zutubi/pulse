@@ -238,6 +238,11 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
+        <url-pattern>/ajax/nimda/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
         <url-pattern>/ajax/help/*</url-pattern>
     </servlet-mapping>
 
