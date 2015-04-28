@@ -25,7 +25,7 @@ function updateButtons()
         width: 360,
         validateOnBlur: false
     };
-    <#include "${parameters.type}.ftl"/>
+    <#include "${field.type}.ftl"/>
 </script>
 </#list>
 
@@ -51,8 +51,8 @@ Ext.onReady(function()
 
 <#list form.fields as field>
     <#assign parameters=field.parameters>
-    <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
-    ${form.name}.findById('${parameters.id?js_string}').markInvalid('<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>');
+    <#if fieldErrors?exists && fieldErrors[field.name]?exists>
+    ${form.name}.findById('${field.id?js_string}').markInvalid('<#list fieldErrors[field.name] as error>${error?i18n?js_string}<br/></#list>');
     </#if>
 </#list>
 

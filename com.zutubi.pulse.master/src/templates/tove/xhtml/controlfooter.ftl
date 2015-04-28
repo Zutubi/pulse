@@ -23,7 +23,7 @@ ${form.name}.items.last().on('render', function(field)
 </#if>
     addFieldAnnotations(${form.name}, field, ${parameters.required?default(false)?string}, ${parameters.noOverride?exists?string}, '${parameters.inheritedFrom!?js_string}', '${parameters.overriddenOwner!?js_string}', overriddenValue);
 
-<#assign helpkey>${parameters.name}.help</#assign>
+<#assign helpkey>${field.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
     addFieldHelp(${form.name}, field, '${helpmsg?js_string}');

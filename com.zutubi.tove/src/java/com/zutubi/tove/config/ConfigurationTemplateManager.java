@@ -485,7 +485,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                 Type expectedType;
                 if (type instanceof CollectionType)
                 {
-                    newPath = PathUtils.getPath(newPath, ((CollectionType)type).getItemKey(null, record));
+                    newPath = PathUtils.getPath(newPath, ((CollectionType) type).getItemKey(null, record));
                     expectedType = type.getTargetType();
                 }
                 else
@@ -1515,7 +1515,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
                 }
 
-                if(existingRecord.isCollection())
+                if (existingRecord.isCollection())
                 {
                     throw new IllegalArgumentException("Illegal path '" + path + "': attempt to save a collection");
                 }
@@ -1528,15 +1528,15 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
 
                 String newPath = path;
                 String parentPath = PathUtils.getParentPath(path);
-                if(parentPath != null)
+                if (parentPath != null)
                 {
                     ComplexType parentType = configurationPersistenceManager.getType(parentPath);
-                    if(parentType instanceof CollectionType)
+                    if (parentType instanceof CollectionType)
                     {
                         String oldKey = PathUtils.getBaseName(path);
                         CollectionType collectionType = (CollectionType) parentType;
                         String newKey = collectionType.getItemKey(path, record);
-                        if(!newKey.equals(oldKey))
+                        if (!newKey.equals(oldKey))
                         {
                             // References to the key in the parent record
                             // (e.g. in a declared order) need to be updated.
@@ -1936,7 +1936,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     if (!concreteOnly || node.isConcrete())
                     {
                         String descendantPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
-                        if(includeHidden || pathExists(descendantPath))
+                        if (includeHidden || pathExists(descendantPath))
                         {
                             result.add(descendantPath);
                         }
@@ -2745,6 +2745,13 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return templateHierarchiesState.get(false).keySet();
     }
 
+    /**
+     * Gets the hierarchy for a templated scope.
+     *
+     * @param scope scope to get the hirerarchy for
+     * @return the hierarchy details
+     * @throws IllegalArgumentException if the scope does not exist or is not templated
+     */
     public TemplateHierarchy getTemplateHierarchy(String scope)
     {
         ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
@@ -2835,6 +2842,15 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return typeClass.cast(type);
     }
 
+    /**
+     * Gets the type of configuration at the given path. Only complex types (composites and
+     * collections) are addressable in this way. The path may refer to a composite property that is
+     * not yet defined, in which case the type of the property (which may be abstract) is returned.
+     *
+     * @param path path to get the type of
+     * @return the type of configuration at the given path
+     * @throws IllegalArgumentException if the path is not valid or refers to a simple field
+     */
     public ComplexType getType(String path)
     {
         String[] pathElements = PathUtils.getPathElements(path);

@@ -18,7 +18,7 @@ ${form.name}.items.last().on('browse', function(field)
         return start + path;
     }
 
-    var projectPath = findProjectPath('${field.parameters.path?js_string}');
+    var projectPath = findProjectPath('${field.parameters.id?js_string}');
 
 <#assign title = "${field.name}" + ".popup.title"/>
     var browser = new Zutubi.fs.WorkingCopyFileSystemBrowser({

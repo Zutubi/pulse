@@ -675,7 +675,7 @@
 #macro(fileArtifactMessageSummary $build $recipe $command $fileArtifact $level $showHeader)
     #if($fileArtifact.hasMessages($level))
         #if($showHeader)
-    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
+    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.id")
         #end
         <ul>
         #set($trimmedFileArtifactFeatures = false)
@@ -1194,7 +1194,7 @@
         <p class="config-check-result" id="check.result" style="display: none">
         </p>
         <div class="config-container">
-            #checkform("path=$path" "symbolicName=$type.symbolicName" "mainFormName=$formName" "checkFormName=checkform" "namespace=$namespace")
+            #checkform("id=$id" "symbolicName=$type.symbolicName" "mainFormName=$formName" "checkFormName=checkform" "namespace=$namespace")
         </div>
         <script type="text/javascript">
             ## Used for Selenium testing

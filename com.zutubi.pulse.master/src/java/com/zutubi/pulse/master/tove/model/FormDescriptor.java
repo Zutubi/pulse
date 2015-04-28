@@ -100,8 +100,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
 
     public void setActions(String... actions)
     {
-        this.actions.clear();
-        this.actions.addAll(Arrays.asList(actions));
+        setActions(Arrays.asList(actions));
     }
 
     public void setActions(List<String> actions)

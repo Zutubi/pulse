@@ -27,7 +27,7 @@
 <p>
     where &lt;name&gt; is the name of the entity being referred to.  The latter form is preferred,
     as it supports more functionality (see below for details).  Referenced entities may be simple
-    <a href="#" onclick="selectNode('$path/project/property'); return false">property</a> values:
+    <a href="#" onclick="selectNode('$id/project/property'); return false">property</a> values:
 </p>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;
 &lt;project&gt;
@@ -190,8 +190,8 @@
 <p>
     To reduce repetition in your pulse files, you can use <b>macros</b>.  Macros allow you to define
     a fragment of XML which can be reused throughput the rest of the file.  To define a macro, use
-    the <a href="#" onclick="selectNode('$path/project/macro'); return false">macro</a> element.
-    You can reference a macro with the <a href="#" onclick="selectNode('$path/project/macro'); return false">macro-ref</a>
+    the <a href="#" onclick="selectNode('$id/project/macro'); return false">macro</a> element.
+    You can reference a macro with the <a href="#" onclick="selectNode('$id/project/macro'); return false">macro-ref</a>
     element.  A simple example is show below:
 </p>
 <div class="example-snippet">&lt;?xml version="1.0"?&gt;

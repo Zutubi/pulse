@@ -32,8 +32,8 @@ width of its contents.  Floating it works, but hurts other things.
         readOnly: ${form.readOnly?string},
         defaultSubmitValue: '${form.defaultSubmit?js_string}',
         formName: '${form.name?js_string}',
-<#if form.parameters.path?exists>
-        path: '${form.parameters.path?js_string}',
+<#if form.parameters.id?exists>
+        path: '${form.parameters.id?js_string}',
 </#if>
         waitMsgTarget: 'nested-layout',
         border: false,

@@ -22,9 +22,9 @@ public class AdminUserConfiguration extends AbstractConfiguration implements Val
     private String name;
     @Email
     private String emailAddress;
-    @Password(showPassword = true)
+    @Password
     private String password;
-    @Password(showPassword = true)
+    @Password
     private String confirm;
 
     public String getLogin()

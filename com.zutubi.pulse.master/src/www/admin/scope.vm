@@ -17,8 +17,8 @@
 
         var Layout = function()
         {
-#if($path)
-            var path = '#jss($path)';
+#if($id)
+            var path = '#jss($id)';
 #else
             var path = '';
 #end

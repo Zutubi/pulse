@@ -2,14 +2,14 @@
 
 (function()
 {
-<#if parameters.value?exists && parameters.value == "true">
+<#if field.value?exists && field.value == "true">
     fc.checked = true;
 </#if>
     fc.width = 14;
     fc.boxLabel = '';
     fc.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fc.id };
 
-    ${form.name}.add(new Ext.form.Hidden({name: '${parameters.name}__default', value: 'false'}));
+    ${form.name}.add(new Ext.form.Hidden({name: '${field.name}__default', value: 'false'}));
 
     var checkbox = new Ext.form.Checkbox(fc);
     ${form.name}.add(checkbox);

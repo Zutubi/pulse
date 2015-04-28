@@ -27,7 +27,7 @@
     <tr>
         <td class="content leftmost">
             <img src="$base/images/page.gif" alt='$action.getText("file")'/>
-            #html($fileArtifact.path)
+            #html($fileArtifact.id)
         </td>
         <td class="content rightmost fit-width">
             #if($action.fileArtifactAvailable($fileArtifact))

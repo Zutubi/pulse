@@ -17,9 +17,9 @@
         <div class="config-panel">
             <h3 class="config-header">#i18n("key=database.type.setup")</h3>
             <div class="config-container">
-                #pform("path=$path" "formName=mainform" "action=setup/setupDatabaseType.action" "namespace=setup")
+                #pform("id=$id" "formName=mainform" "action=setup/setupDatabaseType.action" "namespace=setup")
             </div>
-            #checkForm($path $type "mainform" "setupconfig")
+            #checkForm($id $type "mainform" "setupconfig")
         </div>
     </div>
 </body>

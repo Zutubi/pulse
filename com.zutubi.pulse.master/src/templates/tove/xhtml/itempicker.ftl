@@ -75,7 +75,7 @@
             window.actionInProgress = true;
             picker.clear();
             Ext.Ajax.request({
-                url: window.baseUrl + '/ajax/config/' + encodeURIPath('${path?js_string}') + '?dependentOptions',
+                url: window.baseUrl + '/ajax/config/' + encodeURIPath('${id?js_string}') + '?dependentOptions',
                 method: 'POST',
                 params: {field:'${parameters.name}', dependency:dependentField.getValue()},
                 success: function(result, request){

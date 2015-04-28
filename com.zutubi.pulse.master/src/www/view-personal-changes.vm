@@ -19,12 +19,12 @@
         <tr><th colspan="2" class="two-heading leftmost rightmost">#wwtext("name=patch.changes")</th></tr>
 #if($fileStatuses.size() > 0)
         <tr>
-            <th class="content leftmost">#wwtext("name=patch.path")</th>
+            <th class="content leftmost">#wwtext("name=patch.id")</th>
             <th class="content rightmost">#wwtext("name=patch.status")</th>
         </tr>
     #foreach($fileStatus in $fileStatuses)
         <tr>
-            <td class="content leftmost">$!webwork.htmlEncode($fileStatus.path)</td>
+            <td class="content leftmost">$!webwork.htmlEncode($fileStatus.id)</td>
             <td class="content rightmost">$!webwork.htmlEncode($fileStatus.state.toString().toLowerCase())</td>
         </tr>
     #end

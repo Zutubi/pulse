@@ -47,9 +47,9 @@
         <h3 class="config-header">#i18n("key=database.type.migrate")</h3>
 
         <div class="config-container">
-            #pform("path=$path" "formName=mainform" "action=migrate/preview.action" "namespace=migrate")
+            #pform("id=$id" "formName=mainform" "action=migrate/preview.action" "namespace=migrate")
         </div>
-        #checkForm($path $type "mainform" "setupconfig")
+        #checkForm($id $type "mainform" "setupconfig")
     </div>
 
 </div>

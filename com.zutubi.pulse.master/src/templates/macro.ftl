@@ -71,7 +71,7 @@ with context.
 [#macro fileArtifactMessages artifact level context]
     [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
   - ${renderer.wrapString("${context}", "    ")}
-    ${renderer.wrapString("${artifact.path}", "    ")}
+    ${renderer.wrapString("${artifact.id}", "    ")}
         [#list artifact.getFeatures(level) as feature]
             [#if !renderer.featureLimitReached(buildMessageCount)]
     * ${renderer.wrapString(feature.summary, "      ")}
@@ -541,7 +541,7 @@ list.
 ----------------------------------------------------------------------------]
 [#macro fileArtifactMessagesHTML result command artifact level]
     [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
-<li class="header">artifact :: ${artifact.path?html}
+<li class="header">artifact :: ${artifact.id?html}
     <ul>
         [#list artifact.getFeatures(level) as feature]
             [#if !renderer.featureLimitReached(buildMessageCount)]

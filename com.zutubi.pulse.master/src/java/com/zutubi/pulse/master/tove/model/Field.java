@@ -1,70 +1,56 @@
 package com.zutubi.pulse.master.tove.model;
 
 /**
- *
- *
+ * A single field in a form. Fields have a few common properties defined directly, plus additional
+ * type-specific ones defined in the parameters map.
  */
 public class Field extends AbstractParameterised
 {
+    private final String type;
+    private final String name;
+    private final String id;
+    private String label;
+    private Object value;
+
     public Field(String type, String name)
     {
-        setType(type);
-        setName(name);
-        setId("zfid." + name);
-    }
-
-    public String getName()
-    {
-        return (String) getParameter("name");
-    }
-
-    private Field setName(String name)
-    {
-        addParameter("name", name);
-        return this;
+        this.type = type;
+        this.name = name;
+        this.id = "zfid." + name;
     }
 
     public String getType()
     {
-        return (String) getParameter("type");
+        return type;
     }
 
-    private Field setType(String type)
+    public String getName()
     {
-        addParameter("type", type);
-        return this;
-    }
-
-    public String getLabel()
-    {
-        return (String) getParameter("label");
-    }
-
-    public Field setLabel(String label)
-    {
-        addParameter("label", label);
-        return this;
-    }
-
-    public Object getValue()
-    {
-        return getParameter("value");
-    }
-
-    public Field setValue(Object value)
-    {
-        addParameter("value", value);
-        return this;
+        return name;
     }
 
     public String getId()
     {
-        return (String) getParameter("id");
+        return id;
     }
 
-    private Field setId(String id)
+    public String getLabel()
     {
-        addParameter("id", id);
-        return this;
+        return label;
+    }
+
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
+
+    public Object getValue()
+    {
+        return value;
+    }
+
+    public void setValue(Object value)
+    {
+        this.value = value;
     }
 }

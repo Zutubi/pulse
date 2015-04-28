@@ -28,7 +28,7 @@
 <h2>child elements</h2>
 <p>
 #if($docs.children.size() > 0)
-    #macro(childLink)<a href='#' onclick='selectNode("$path/$child.name"); return false;'>$child.name</a>#end
+    #macro(childLink)<a href='#' onclick='selectNode("$id/$child.name"); return false;'>$child.name</a>#end
     <table class="content">
         <tr>
             <th>name</th>

@@ -102,8 +102,8 @@
 <body>
     #buildTabs($buildResult "tests")
 
-#if($path)
-    #set($pathComponent = "-$path")
+#if($id)
+    #set($pathComponent = "-$id")
 #else
     #set($pathComponent = "")
 #end

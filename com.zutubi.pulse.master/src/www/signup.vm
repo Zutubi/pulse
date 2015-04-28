@@ -5,6 +5,6 @@
 
 <body>
     <h1 id="signup">:: signup ::</h1>
-    #pform("path=$path" "action=signup.action")
+    #pform("id=$id" "action=signup.action")
 </body>
 </html>

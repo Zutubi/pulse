@@ -1,7 +1,7 @@
 <div class="config-panel">
     <h3 class="config-header">#i18n("key=license.request.evaluation")</h3>
     <div class="config-container">
-        #pform("formName=requestForm" "path=$path" "action=ajax/requestLicense.action" "ajax=true")
+        #pform("formName=requestForm" "id=$id" "action=ajax/requestLicense.action" "ajax=true")
     </div>
 </div>
 <script type="text/javascript">

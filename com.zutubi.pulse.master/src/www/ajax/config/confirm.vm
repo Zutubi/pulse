@@ -32,15 +32,15 @@
     #wwtext("name=confirm.${label}.blurb")
 </p>
 
-<table id='#id("delete:$path")' class="form">
+<table id='#id("delete:$id")' class="form">
     <tr>
-        <th class="content">#wwtext("name=affected.path")</th>
+        <th class="content">#wwtext("name=affected.id")</th>
         <th class="content">#wwtext("name=action")</th>
     </tr>
     #showTask($task "")
     <tr>
         <td class="submit" colspan="2">
-    #set($prefix = "runAjaxRequest('$base/ajax/config/' + encodeURIPath('#jss($path)') + '?delete=")
+    #set($prefix = "runAjaxRequest('$base/ajax/config/' + encodeURIPath('#jss($id)') + '?delete=")
     #if($direct)
         #set($cancelAction = "canceldirect")
     #else

@@ -12,7 +12,7 @@
     <meta http-equiv="Expires" content="0"/>
     <meta http-equiv="Cache-Control" content="no-cache"/>
     <link href="$base/css/main.css?#version()" rel="stylesheet" type="text/css" media="screen"/>
-    <title>#wwtext("name=artifact") $!webwork.htmlEncode($fileArtifact.path)</title>
+    <title>#wwtext("name=artifact") $!webwork.htmlEncode($fileArtifact.id)</title>
 </head>
 <body>
 #breadcrumbs()
@@ -29,7 +29,7 @@
 #end
     
     <table class="decorated" id="decorated">
-        <tr><th class="heading" style="text-align: left; font-weight: bold;" colspan="2">$!webwork.htmlEncode($fileArtifact.path)</th></tr>
+        <tr><th class="heading" style="text-align: left; font-weight: bold;" colspan="2">$!webwork.htmlEncode($fileArtifact.id)</th></tr>
     ## WARNING: this iterator cannot be reused!
     ## Apologies for the outrageous formatting, but it saves a lot of space for larger artifacts
     #foreach($line in $readerIterator)#if($action.notNull($action.getLineLevel($velocityCount)))#set($lineClass = $action.getLineLevel($velocityCount).toString().toLowerCase().charAt(0))#else#set($lineClass = false)#end<tr><th#if($lineClass) class="$lineClass"#end>#if($lineClass)<a name="$velocityCount">#end$velocityCount#if($lineClass)</a>#end</th><td#if($lineClass) class="$lineClass"#end>$line</td></tr>#end

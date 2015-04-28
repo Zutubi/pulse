@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
+import flexjson.JSON;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ public abstract class AbstractParameterised implements Parameterised
         this.parameters.putAll(parameters);
     }
 
+    @JSON
     public Map<String, Object> getParameters()
     {
         return this.parameters;

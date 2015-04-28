@@ -29,25 +29,25 @@
         <tr>
             <th class="category" colspan="2">configure</th>
         </tr>
-#auth("path=projects" "action=create")
+#auth("id=projects" "action=create")
         <tr>
             #actionHeader("add.projects" "add new projects" "add" "$urls.adminProjects()")
             <td>using the add project wizard (administration &gt; projects tab)</td>
         </tr>
 #end
-#auth("path=users" "action=create")
+#auth("id=users" "action=create")
         <tr>
             #actionHeader("add.users" "add new users" "add" "$urls.adminUsers()")
             <td>at the users view (administration &gt; users tab)</td>
         </tr>
 #end
-#auth("path=agents" "action=create")
+#auth("id=agents" "action=create")
         <tr>
             #actionHeader("add.agents" "add new agents" "add" "$urls.adminAgents()")
             <td>using the add agent wizard (administration &gt; agents tab)</td>
         </tr>
 #end
-#auth("path=settings" "action=write")
+#auth("id=settings" "action=write")
         <tr>
             #actionHeader("configure.settings" "configure server settings" "pencil" "$urls.adminSettings()")
             <td>at the server settings view (administration &gt; settings tab)</td>

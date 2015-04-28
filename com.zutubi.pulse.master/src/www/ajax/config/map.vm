@@ -1,6 +1,6 @@
 #set($config = $action.configuration)
 
-<h2 id='#id("map:path:$config.path")'>#html($config.displayName)</h2>
+<h2 id='#id("map:id:$config.id")'>#html($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>
@@ -9,9 +9,9 @@
         #renderState($config)
     #end
 
-    #table("path=$config.path")
+    #table("id=$config.id")
 </p>
 
 <script type="text/javascript">
-    detailPanel.setHelp('#jss(${path})', 'type');
+    detailPanel.setHelp('#jss(${id})', 'type');
 </script>

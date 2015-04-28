@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.tove.model.Form;
 /**
  * Data model for rendering a composite type in the admin UI.
  */
-public class CompositeModel extends NimdaModel
+public class CompositeModel extends ConfigDetailModel
 {
     private String displayName;
     private String introduction;

@@ -98,8 +98,8 @@
                     });
 
                     root.expand(false, false, function() {
-#if($path)
-                        selectNode('$path');
+#if($id)
+                        selectNode('$id');
 #else
                         selectNode('reference');
 #end

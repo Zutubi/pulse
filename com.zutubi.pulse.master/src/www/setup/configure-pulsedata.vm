@@ -27,7 +27,7 @@
         <div class="config-panel">
             <h3 class="config-header">#i18n("key=data.setup")</h3>
             <div class="config-container">
-                #pform("path=$path" "action=setup/setupData.action" "namespace=setup")
+                #pform("id=$id" "action=setup/setupData.action" "namespace=setup")
             </div>
         </div>
 

@@ -227,7 +227,8 @@ public class ConfigurationPersistenceManager
      * Retrieve the type definition for the specified path.
      *
      * @param path the path to retrieve the type of
-     * @return the type definition, or null if none exists.
+     * @return the type definition
+     * @throws IllegalArgumentException if the path is not valid or refers to a simple field
      */
     ComplexType getType(String path)
     {

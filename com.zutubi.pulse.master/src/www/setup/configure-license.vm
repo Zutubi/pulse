@@ -20,7 +20,7 @@
         <div class="config-panel">
             <h3 class="config-header">#i18n("key=license.setup")</h3>
             <div class="config-container">
-                #pform("path=$path" "action=setup/setupLicense.action" "namespace=setup")
+                #pform("id=$id" "action=setup/setupLicense.action" "namespace=setup")
             </div>
         </div>
         #wwaction("namespace=/ajax" "name=requestLicense!input" "executeResult=true" "flush=true")

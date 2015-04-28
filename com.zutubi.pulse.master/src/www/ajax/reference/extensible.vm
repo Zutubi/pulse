@@ -11,7 +11,7 @@
         </tr>
     #foreach($entry in $docs.extensions.entrySet())
         <tr>
-            <td class="nowrap">&lt;<a href='#' onclick='selectNode("$path/$entry.key"); return false;'>$entry.key</a>&gt;</td>
+            <td class="nowrap">&lt;<a href='#' onclick='selectNode("$id/$entry.key"); return false;'>$entry.key</a>&gt;</td>
             <td>$entry.value.brief</td>
         </tr>
     #end

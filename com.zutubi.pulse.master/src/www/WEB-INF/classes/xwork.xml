@@ -712,7 +712,7 @@
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.ConfigLsAction">
             <interceptor-ref name="ajaxConfigStack"/>
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
@@ -836,7 +836,7 @@
     <package name="templateAjax" namespace="/ajax/template" extends="default">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.ConfigLsAction">
             <param name="basePath">templates</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="flexjson">
@@ -853,7 +853,7 @@
     <package name="nimdaAjax" namespace="/ajax/nimda" extends="default">
         <default-interceptor-ref name="ajaxConfigStack"/>
 
-        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.tove.nimda.ConfigLsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="flexjson">

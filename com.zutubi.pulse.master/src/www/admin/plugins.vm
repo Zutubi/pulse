@@ -9,8 +9,8 @@
         var detailPanel = new Zutubi.DetailPanel();
 
         Ext.onReady(function() {
-    #if($path)
-            var path = '$path';
+    #if($id)
+            var path = '$id';
     #else
             var path = 'plugins';
     #end

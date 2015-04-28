@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.tove.model;
 
 import com.zutubi.tove.annotations.FieldType;
+import flexjson.JSON;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,18 +9,17 @@ import java.util.List;
 
 /**
  *
- *
  */
 public class Form extends AbstractParameterised
 {
-    private static final String PARAMETER_NAME = "name";
-    private static final String PARAMETER_ID = "id";
-    private static final String PARAMETER_ACTION = "action";
-    private static final String PARAMETER_DISPLAY_MODE = "displayMode";
-    private static final String PARAMETER_READ_ONLY = "readOnly";
-    private static final String PARAMETER_AJAX = "ajax";
-    private static final String PARAMETER_FILE_UPLOAD = "fileUpload";
-    private static final String PARAMETER_DEFAULT_SUBMIT = "defaultSubmit";
+    private final String name;
+    private final String id;
+    private String action;
+    private String defaultSubmit;
+    private boolean displayMode;
+    private boolean readOnly;
+    private boolean ajax;
+    private boolean fileUpload;
 
     /**
      * Ordered list of fields that make up this form.
@@ -32,90 +32,80 @@ public class Form extends AbstractParameterised
 
     public Form(String name, String id, String action, String defaultSubmit)
     {
-        setName(name);
-        setId(id);
-        setAction(action);
-        setDefaultSubmit(defaultSubmit);
+        this.name = name;
+        this.id = id;
+        this.action = action;
+        this.defaultSubmit = defaultSubmit;
     }
 
     public String getName()
     {
-        return (String) getParameter(PARAMETER_NAME);
-    }
-
-    private void setName(String name)
-    {
-        addParameter(PARAMETER_NAME, name);
+        return name;
     }
 
     public String getId()
     {
-        return (String) getParameter(PARAMETER_ID);
-    }
-
-    private void setId(String id)
-    {
-        addParameter(PARAMETER_ID, id);
+        return id;
     }
 
     public String getAction()
     {
-        return (String) getParameter(PARAMETER_ACTION);
+        return action;
     }
 
     public void setAction(String action)
     {
-        addParameter(PARAMETER_ACTION, action);
+        this.action = action;
     }
 
     public String getDefaultSubmit()
     {
-        return (String) getParameter(PARAMETER_DEFAULT_SUBMIT);
+        return defaultSubmit;
     }
 
     public void setDefaultSubmit(String defaultSubmit)
     {
-        addParameter(PARAMETER_DEFAULT_SUBMIT, defaultSubmit);
+        this.defaultSubmit = defaultSubmit;
     }
 
     public boolean isDisplayMode()
     {
-        return getParameter(PARAMETER_DISPLAY_MODE, false);
+        return displayMode;
     }
 
     public void setDisplayMode(boolean displayMode)
     {
-        addParameter(PARAMETER_DISPLAY_MODE, displayMode);
+        this.displayMode = displayMode;
     }
 
     public boolean isReadOnly()
     {
-        return getParameter(PARAMETER_READ_ONLY, false);
+        return readOnly;
     }
 
     public void setReadOnly(boolean readOnly)
     {
-        addParameter(PARAMETER_READ_ONLY, readOnly);
+        this.readOnly = readOnly;
     }
 
     public boolean isAjax()
     {
-        return getParameter(PARAMETER_AJAX, true);
+        return ajax;
     }
 
     public void setAjax(boolean ajax)
     {
-        addParameter(PARAMETER_AJAX, ajax);
+        this.ajax = ajax;
     }
 
     public boolean isFileUpload()
     {
-        return getParameter(PARAMETER_FILE_UPLOAD, false);
+        return fileUpload;
     }
 
     public void setFileUpload(boolean fileUpload)
     {
-        addParameter(PARAMETER_FILE_UPLOAD, fileUpload);
+        this.fileUpload = fileUpload;
     }
 
     public void add(Field field)
@@ -130,11 +120,13 @@ public class Form extends AbstractParameterised
         }
     }
 
+    @JSON
     public List<Field> getFields()
     {
         return Collections.unmodifiableList(fields);
     }
 
+    @JSON
     public List<Field> getSubmitFields()
     {
         return Collections.unmodifiableList(submitFields);

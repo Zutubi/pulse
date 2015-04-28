@@ -20,9 +20,8 @@ import static java.util.Arrays.asList;
  */
 public class FileModel
 {
-    private String baseName;
+    private String path;
     private String text;
-    private String href;
     private boolean hasChildren;
     private String cls;
     private String spriteCssClass;
@@ -33,42 +32,19 @@ public class FileModel
      */
     private List<FileModel> items;
 
-    public FileModel(FileObjectWrapper fo, String baseUrl)
+    public FileModel(String path, String text, boolean hasChildren, String cls, String spriteCssClass)
     {
-        baseName = fo.getBaseName();
-        text = fo.getName();
-        hasChildren = fo.isContainer();
-        cls = fo.getCls();
-        href = fo.getUrl();
-        if (StringUtils.stringSet(href))
-        {
-            boolean absolute = false;
-            try
-            {
-                URI uri = new URI(href);
-                absolute = uri.isAbsolute();
-            }
-            catch (URISyntaxException e)
-            {
-                // Treat as relative.
-            }
-
-            if (!absolute)
-            {
-                href = StringUtils.join('/', true, true, baseUrl, href);
-            }
-        }
-        spriteCssClass = fo.getIconCls();
-        extraAttributes = fo.getExtraAttributes();
-        if (extraAttributes == null)
-        {
-            extraAttributes = new HashMap<String, Object>();
-        }
+        this.path = path;
+        this.text = text;
+        this.hasChildren = hasChildren;
+        this.cls = cls;
+        this.spriteCssClass = spriteCssClass;
+        extraAttributes = new HashMap<String, Object>();
     }
 
-    public String getBaseName()
+    public String getPath()
     {
-        return baseName;
+        return path;
     }
 
     public String getText()
@@ -89,11 +65,6 @@ public class FileModel
     public String getSpriteCssClass()
     {
         return spriteCssClass;
-    }
-
-    public String getHref()
-    {
-        return href;
     }
 
     @JSON

@@ -6,6 +6,7 @@ import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import flexjson.JSONSerializer;
+import flexjson.Transformer;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStreamWriter;
@@ -31,6 +32,7 @@ public class FlexJsonResult extends WebWorkResultSupport
 
         JSONSerializer serializer = new JSONSerializer();
         serializer.exclude("*.class");
+        serializer.exclude("items");
         Object o = stack.findValue(finalLocation);
         String json = deep ? serializer.deepSerialize(o) : serializer.serialize(o);
         Writer writer = new OutputStreamWriter(response.getOutputStream(), Charsets.UTF_8);
@@ -38,5 +40,5 @@ public class FlexJsonResult extends WebWorkResultSupport
         response.setContentType("application/json"); // opera does not like this...
         writer.flush();
     }
-
 }
+

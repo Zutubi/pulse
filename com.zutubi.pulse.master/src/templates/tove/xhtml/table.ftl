@@ -56,11 +56,11 @@
         <#else>
             <#if !table.isLastVisible(row)>
                 <#assign actionId = "down:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'down', true, false); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.id?js_string?html}', 'down', true, false); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
             </#if>
             <#if !table.isFirstVisible(row)>
                 <#assign actionId = "up:${row.baseName}"/>
-            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path?js_string?html}', 'up', true, false); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.id?js_string?html}', 'up', true, false); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
             </#if>
         </#if>
         </td>
@@ -100,11 +100,11 @@
                 <#else>
                     <#assign clickAction = "select"/>
                 </#if>
-                onclick="${clickAction}Path('${row.path?js_string?html}'); return false">
+                onclick="${clickAction}Path('${row.id?js_string?html}'); return false">
             <#elseif actionLink.action == "delete">
-                onclick="deletePath('${row.path?js_string?html}', false); return false;">
+                onclick="deletePath('${row.id?js_string?html}', false); return false;">
             <#else>
-                onclick="actionPath('${row.path?js_string?html}', '${actionLink.action}', true, false); return false;">
+                onclick="actionPath('${row.id?js_string?html}', '${actionLink.action}', true, false); return false;">
             </#if>
             <#if actionLink.icon?exists>
                 <img alt="${actionLink.label?html}" src="${base}/images/config/actions/${actionLink.icon}.gif"/>
@@ -122,7 +122,7 @@
 <#if table.addAllowed>
     <tr>
         <td colspan="${table.width}">
-            <a id="map:add" class="unadorned" href="#" onclick="addToPath('${path?js_string?html}'); return false;">
+            <a id="map:add" class="unadorned" href="#" onclick="addToPath('${id?js_string?html}'); return false;">
                 <img alt="add" src="${base}/images/config/actions/add.gif"/>
                 ${"add.label"?i18n}
             </a>

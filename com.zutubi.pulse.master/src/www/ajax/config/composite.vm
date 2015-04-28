@@ -1,5 +1,5 @@
 #set($config = $action.configuration)
-#set($path = $config.path)
+#set($path = $config.id)
 
 #macro(renderform)
     <div class="config-panel">
@@ -10,7 +10,7 @@
         </h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-container">
-            #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=ajax/config")
+            #pform("id=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=ajax/config")
         </div>
         #standardFormEvents("mainform")
     #if($config.configurationCheckAvailable && $config.writable)
@@ -72,7 +72,7 @@
             <div class="config-container">
             <ul class="config-errors">
         #foreach($error in $config.nestedPropertyErrors)
-                <li>#displayname("path=${path}/${error.first}") : #html($error.second)</li>
+                <li>#displayname("id=${path}/${error.first}") : #html($error.second)</li>
         #end
             </ul>
             </div>
@@ -85,7 +85,7 @@
                 #renderform()
     #end
     #if ($config.collapsedCollection)
-        #table("path=$config.path/$config.collapsedCollection")
+        #table("id=$config.id/$config.collapsedCollection")
     #end
         </td>
         
@@ -158,7 +158,7 @@
                 <ul class="config-links">
             #foreach($prop in $config.nestedProperties)
                 #set($onclick = "selectPath('#jss(${path})/${prop}'); return false;")
-                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("path=${path}/${prop}")</a></li>
+                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="#html($onclick)">#displayname("id=${path}/${prop}")</a></li>
             #end
                 </ul>
         #end

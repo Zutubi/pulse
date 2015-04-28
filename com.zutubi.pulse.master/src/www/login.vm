@@ -9,7 +9,7 @@
     <div class="config-panel" style="width: 400px">
         <h3 class="config-header">login</h3>
         <div class="config-container">
-            #pform("path=$path" "action=j_spring_security_check")
+            #pform("id=$id" "action=j_spring_security_check")
         </div>
     </div>
 
