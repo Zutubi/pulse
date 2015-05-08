@@ -128,6 +128,11 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     public String getUrlPath()
     {
+        if (base.isDirectory())
+        {
+            return "";
+        }
+
         try
         {
             return "/file/artifacts/" + getArtifact().getId() + "/" + getArtifactPath();
@@ -135,7 +140,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         catch (FileSystemException e)
         {
             LOG.warning(e);
-            return NO_HASH;
+            return "";
         }
     }
 
