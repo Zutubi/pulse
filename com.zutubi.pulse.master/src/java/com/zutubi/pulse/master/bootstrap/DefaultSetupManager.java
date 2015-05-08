@@ -96,7 +96,7 @@ public class DefaultSetupManager implements SetupManager
      */
     private List<String> startupContexts = new LinkedList<String>();
 
-    private SetupState state = SetupState.STARTING;
+    private SetupState state = SetupState.WAITING;
 
     private boolean promptShown = false;
     private DatabaseConsole databaseConsole;
@@ -112,25 +112,32 @@ public class DefaultSetupManager implements SetupManager
 
     public void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask)
     {
-        this.setupCallback = processSetupStartupTask;
-
-        state = SetupState.STARTING;
-
-        // record the startup configuration so that it can be reused next time.
-        createExternalConfigFileIfRequired();
-
-        initialiseConfigurationSystem();
-
-        if (isDataRequired())
+        try
         {
-            printConsoleMessage("No data path configured, requesting via web UI...");
+            this.setupCallback = processSetupStartupTask;
 
-            // request data input.
-            state = SetupState.DATA;
-            showPrompt();
-            return;
+            state = SetupState.WAITING;
+
+            // record the startup configuration so that it can be reused next time.
+            createExternalConfigFileIfRequired();
+
+            initialiseConfigurationSystem();
+
+            if (isDataRequired())
+            {
+                printConsoleMessage("No data path configured, requesting via web UI...");
+
+                // request data input.
+                state = SetupState.DATA;
+                showPrompt();
+                return;
+            }
+            requestDataComplete();
         }
-        requestDataComplete();
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     private void createExternalConfigFileIfRequired()
@@ -191,22 +198,29 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestDataComplete()
     {
-        // If this is the first time this directory is being used as a data directory, then we need
-        // to ensure that it is initialised. If we are working with an already existing directory,
-        // then it will have been initialised and no re-initialisation is required (or allowed).
-        Data d = configurationManager.getData();
-        printConsoleMessage("Using data path '%s'.", d.getData().getAbsolutePath());
-        if (!d.isInitialised())
+        try
         {
-            printConsoleMessage("Empty data directory, initialising...");
-            configurationManager.getData().init(configurationManager.getSystemPaths());
-            printConsoleMessage("Data directory initialised.");
+            // If this is the first time this directory is being used as a data directory, then we need
+            // to ensure that it is initialised. If we are working with an already existing directory,
+            // then it will have been initialised and no re-initialisation is required (or allowed).
+            Data d = configurationManager.getData();
+            printConsoleMessage("Using data path '%s'.", d.getData().getAbsolutePath());
+            if (!d.isInitialised())
+            {
+                printConsoleMessage("Empty data directory, initialising...");
+                configurationManager.getData().init(configurationManager.getSystemPaths());
+                printConsoleMessage("Data directory initialised.");
+            }
+
+            eventManager.publish(new DataDirectoryLocatedEvent(this));
+
+            loadSystemProperties();
+            handleDbSetup();
         }
-
-        eventManager.publish(new DataDirectoryLocatedEvent(this));
-
-        loadSystemProperties();
-        handleDbSetup();
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     private void loadSystemProperties()
@@ -276,37 +290,44 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestDbComplete()
     {
-        state = SetupState.STARTING;
-
-        loadContexts(dataContextsA);
-        loadContexts(dataContextsB);
-
-        // create the database based on the hibernate configuration.
-        databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
-        if (databaseConsole.isEmbedded())
+        try
         {
-            printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
-        }
-        else
-        {
-            printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
-        }
+            state = SetupState.WAITING;
 
-        if (!databaseConsole.schemaExists())
-        {
-            printConsoleMessage("Database schema does not exist, initialising...");
-            try
+            loadContexts(dataContextsA);
+            loadContexts(dataContextsB);
+
+            // create the database based on the hibernate configuration.
+            databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
+            if (databaseConsole.isEmbedded())
             {
-                databaseConsole.createSchema();
+                printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
             }
-            catch (SQLException e)
+            else
             {
-                throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
+                printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
             }
-            printConsoleMessage("Database initialised.");
-        }
 
-        handleRestorationProcess();
+            if (!databaseConsole.schemaExists())
+            {
+                printConsoleMessage("Database schema does not exist, initialising...");
+                try
+                {
+                    databaseConsole.createSchema();
+                }
+                catch (SQLException e)
+                {
+                    throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
+                }
+                printConsoleMessage("Database initialised.");
+            }
+
+            handleRestorationProcess();
+        }
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     private void ensureDriversRegisteredAndLoaded()
@@ -368,30 +389,37 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestRestoreComplete(boolean restored)
     {
-        if (databaseConsole.isEmbedded())
+        try
         {
-            printConsoleMessage("Compacting embedded database.  This may take some time.");
+            if (databaseConsole.isEmbedded())
+            {
+                printConsoleMessage("Compacting embedded database.  This may take some time.");
+            }
+
+            databaseConsole.postRestoreHook(restored);
+
+            linkUserTemplates();
+
+            initialiseConfigurationPersistence();
+
+            loadContexts(licenseContexts);
+
+            printConsoleMessage("Checking license...");
+            if (isLicenseRequired())
+            {
+                printConsoleMessage("No valid license found, requesting via web UI...");
+                //TODO: we need to provide some feedback to the user about what / why there current license
+                //TODO: (if one exists) is not sufficient.
+                state = SetupState.LICENSE;
+                showPrompt();
+                return;
+            }
+            requestLicenseComplete();
         }
-
-        databaseConsole.postRestoreHook(restored);
-        
-        linkUserTemplates();
-
-        initialiseConfigurationPersistence();
-
-        loadContexts(licenseContexts);
-
-        printConsoleMessage("Checking license...");
-        if (isLicenseRequired())
+        catch (Exception e)
         {
-            printConsoleMessage("No valid license found, requesting via web UI...");
-            //TODO: we need to provide some feedback to the user about what / why there current license
-            //TODO: (if one exists) is not sufficient.
-            state = SetupState.LICENSE;
-            showPrompt();
-            return;
+            setupCallback.finaliseSetup(e);
         }
-        requestLicenseComplete();
     }
 
     private void linkUserTemplates()
@@ -415,23 +443,30 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestLicenseComplete()
     {
-        printConsoleMessage("License accepted.");
-
-        // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
-        databaseConsole.postSchemaHook();
-        loadContexts(upgradeContexts);
-
-        if (isUpgradeRequired())
+        try
         {
-            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
-            state = SetupState.UPGRADE;
-            showPrompt();
-            return;
+            printConsoleMessage("License accepted.");
+
+            // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
+            databaseConsole.postSchemaHook();
+            loadContexts(upgradeContexts);
+
+            if (isUpgradeRequired())
+            {
+                printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + "', Pulse version '" + Version.getVersion().getVersionNumber() + "'...");
+                state = SetupState.UPGRADE;
+                showPrompt();
+                return;
+            }
+
+            updateVersionIfNecessary();
+
+            requestUpgradeComplete(false);
         }
-
-        updateVersionIfNecessary();
-
-        requestUpgradeComplete(false);
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     private void initialiseConfigurationPersistence()
@@ -482,60 +517,74 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestUpgradeComplete(final boolean changes)
     {
-        SecurityUtils.runAsSystem(new Runnable()
+        try
         {
-            public void run()
+            SecurityUtils.runAsSystem(new Runnable()
             {
-                if (changes)
+                public void run()
                 {
-                    printConsoleMessage("Upgrade complete.");
-                }
-                databaseConsole.postUpgradeHook(changes);
+                    if (changes)
+                    {
+                        printConsoleMessage("Upgrade complete.");
+                    }
+                    databaseConsole.postUpgradeHook(changes);
 
-                // Remove the upgrade context from the ComponentContext stack / namespace.
-                // They are no longer required.
-                SpringComponentContext.pop();
-                loadContexts(setupContexts);
+                    // Remove the upgrade context from the ComponentContext stack / namespace.
+                    // They are no longer required.
+                    SpringComponentContext.pop();
+                    loadContexts(setupContexts);
 
-                if (isSetupRequired())
-                {
-                    printConsoleMessage("Database empty, requesting setup via web UI...");
-                    state = SetupState.SETUP;
-                    initialInstallation = true;
-                    showPrompt();
-                    return;
+                    if (isSetupRequired())
+                    {
+                        printConsoleMessage("Database empty, requesting setup via web UI...");
+                        state = SetupState.SETUP;
+                        initialInstallation = true;
+                        showPrompt();
+                        return;
+                    }
+                    requestSetupComplete(false);
                 }
-                requestSetupComplete(false);
-            }
-        });
+            });
+        }
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     public void requestSetupComplete(boolean setupWizard)
     {
-        if (setupWizard)
+        try
         {
-            printConsoleMessage("Setup wizard complete.");
+            if (setupWizard)
+            {
+                printConsoleMessage("Setup wizard complete.");
+            }
+
+            state = SetupState.STARTING;
+
+            // Load the remaining contexts.  Note that the subsystems created
+            // within should generally wait for the configuration system to
+            // start (by listening for an appropriate event).
+            loadContexts(startupContexts);
+
+            // Fire up the extension managers.  These need most systems available
+            // (e.g. the command extension manager requires the file loader), but
+            // must come before the final init of the configuration as they are
+            // required when instantiating config objects.
+            PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
+            pluginManager.initialiseExtensions();
+
+            DefaultConfigurationProvider configurationProvider = SpringComponentContext.getBean("configurationProvider");
+            configurationProvider.init();
+            this.configurationProvider = configurationProvider;
+
+            setupCallback.finaliseSetup(null);
         }
-
-        state = SetupState.STARTING;
-
-        // Load the remaining contexts.  Note that the subsystems created
-        // within should generally wait for the configuration system to
-        // start (by listening for an appropriate event).
-        loadContexts(startupContexts);
-
-        // Fire up the extension managers.  These need most systems available
-        // (e.g. the command extension manager requires the file loader), but
-        // must come before the final init of the configuration as they are
-        // required when instantiating config objects.
-        PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
-        pluginManager.initialiseExtensions();
-
-        DefaultConfigurationProvider configurationProvider = SpringComponentContext.getBean("configurationProvider");
-        configurationProvider.init();
-        this.configurationProvider = configurationProvider;
-
-        setupCallback.finaliseSetup();
+        catch (Exception e)
+        {
+            setupCallback.finaliseSetup(e);
+        }
     }
 
     private void loadContexts(List<String> contexts)
