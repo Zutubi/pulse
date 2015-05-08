@@ -51,11 +51,9 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
                 try
                 {
                     Trigger trigger = scheduler.getTrigger(instance.getTriggerId());
+                    scheduler.preUpdate(trigger);
                     instance.update(trigger);
-
-                    // on an update, the details of the trigger will have changed.  We need to update the
-                    // scheduler accordingly.
-                    scheduler.update(trigger);
+                    scheduler.postUpdate(trigger);
                 }
                 catch (SchedulingException e)
                 {

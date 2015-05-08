@@ -1,8 +1,6 @@
 package com.zutubi.pulse.master.scheduling;
 
-import static com.google.common.base.Predicates.and;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.find;
 import com.google.common.collect.Lists;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
@@ -13,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Iterables.find;
 
 /**
  * The implementation of the scheduler interface.  It provides persistence of
@@ -216,7 +217,15 @@ public class DefaultScheduler implements Scheduler
         }
     }
 
-    public void update(Trigger trigger) throws SchedulingException
+    public void preUpdate(Trigger trigger) throws SchedulingException
+    {
+        assertScheduled(trigger);
+
+        SchedulerStrategy impl = getStrategy(trigger);
+        impl.unschedule(trigger);
+    }
+
+    public void postUpdate(Trigger trigger) throws SchedulingException
     {
         assertScheduled(trigger);
 
@@ -226,9 +235,7 @@ public class DefaultScheduler implements Scheduler
         }
 
         TriggerState state = trigger.getState();
-
         SchedulerStrategy impl = getStrategy(trigger);
-        impl.unschedule(trigger);
 
         switch (state)
         {
