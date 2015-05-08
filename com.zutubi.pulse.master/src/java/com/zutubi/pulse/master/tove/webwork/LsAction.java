@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.tove.webwork;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.group.ServerPermission;
 import com.zutubi.pulse.master.vfs.CompoundFileFilter;
 import com.zutubi.pulse.master.vfs.FilePrefixFilter;
@@ -14,7 +13,7 @@ import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
 import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.pulse.master.xwork.actions.vfs.VFSActionSupport;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.StringUtils;
@@ -82,7 +81,7 @@ public class LsAction extends VFSActionSupport
     private String filterFlag = null;
 
     private StartupManager startupManager;
-    private ConfigurationProvider configurationProvider;
+    private SystemConfiguration systemConfiguration;
 
     public String getBasePath()
     {
@@ -221,12 +220,11 @@ public class LsAction extends VFSActionSupport
         {
             sortChildren(fileObject, children);
 
-            final String baseUrl = configurationProvider == null ? "" : configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
             extFiles = transform(asList(children), new Function<FileObject, ExtFile>()
             {
                 public ExtFile apply(FileObject child)
                 {
-                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), baseUrl);
+                    ExtFile extFile = new ExtFile(new FileObjectWrapper(child, fileObject), systemConfiguration.getContextPath());
                     if (!extFile.isLeaf() && currentDepth < depth)
                     {
                         try
@@ -282,9 +280,8 @@ public class LsAction extends VFSActionSupport
         this.startupManager = startupManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
+    public void setSystemConfiguration(SystemConfiguration systemConfiguration) {
+        this.systemConfiguration = systemConfiguration;
     }
 
     /**
