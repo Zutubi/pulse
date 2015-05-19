@@ -87,7 +87,7 @@ public class Data implements MasterUserPaths
         }
 
         // create the data directory.
-        if (!pulseData.exists() && !pulseData.mkdirs())
+        if (pulseData.isFile() || (!pulseData.exists() && !pulseData.mkdirs()))
         {
             throw new StartupException("Failed to create the configured data directory: " + pulseData + ".");
         }

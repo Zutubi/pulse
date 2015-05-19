@@ -26,6 +26,7 @@
             <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="setup" type="redirect">/setupconfig/init/?wizard</result>
+            <result name="waiting" type="redirect">/startup/starting.action</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
             <result name="migrate" type="redirect">/migrate/preview!input.action</result>
             <result name="migrateInProgress" type="redirect">/migrate/execute.action</result>

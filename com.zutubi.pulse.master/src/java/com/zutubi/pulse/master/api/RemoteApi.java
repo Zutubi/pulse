@@ -80,6 +80,7 @@ import static com.zutubi.pulse.master.scm.ScmClientUtils.withScmClient;
 /**
  * Implements a simple API for remote monitoring and control.
  */
+@SuppressWarnings({"unused", "JavaDoc"})
 public class RemoteApi
 {
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
@@ -1189,7 +1190,7 @@ public class RemoteApi
             }
             
             accessManager.ensurePermission(AccessManager.ACTION_CREATE, path);
-            return configurationRefactoringManager.introduceParentTemplate(PathUtils.getParentPath(path), Arrays.asList(PathUtils.getBaseName(path)), newParentKey, pullUp);
+            return configurationRefactoringManager.introduceParentTemplate(PathUtils.getParentPath(path), Collections.singletonList(PathUtils.getBaseName(path)), newParentKey, pullUp);
         }
         finally
         {

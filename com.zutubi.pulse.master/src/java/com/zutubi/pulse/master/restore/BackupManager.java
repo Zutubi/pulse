@@ -145,9 +145,9 @@ public class BackupManager
         
         if (!existingCronString.equals(instance.getCronSchedule()))
         {
+            scheduler.preUpdate(cronTrigger);
             cronTrigger.setCron(instance.getCronSchedule());
-
-            scheduler.update(trigger);
+            scheduler.postUpdate(cronTrigger);
         }
     }
 

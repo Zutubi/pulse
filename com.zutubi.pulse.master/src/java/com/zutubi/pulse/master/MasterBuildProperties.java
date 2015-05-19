@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -31,6 +32,7 @@ public class MasterBuildProperties extends BuildProperties
 
     public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration, boolean includeUserDefined)
     {
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PULSE_VERSION, Version.getVersion().getVersionNumber());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfiguration.getName());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_ORGANISATION, projectConfiguration.getOrganisation());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_PROJECT_HANDLE, projectConfiguration.getHandle());

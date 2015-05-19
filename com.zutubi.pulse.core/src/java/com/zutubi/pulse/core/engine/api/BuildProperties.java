@@ -163,6 +163,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_PROJECT_HANDLE          = "project.handle";
     /**
+     * The version of Pulse running the build.
+     */
+    public static final String PROPERTY_PULSE_VERSION           = "pulse.version";
+    /**
      * The pattern that defines where retrieved dependencies are to be delivered.
      */
     public static final String PROPERTY_RETRIEVAL_PATTERN       = "retrieval.pattern";

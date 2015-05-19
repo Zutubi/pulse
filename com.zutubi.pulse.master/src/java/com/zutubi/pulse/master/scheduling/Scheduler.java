@@ -77,13 +77,22 @@ public interface Scheduler extends Stoppable
     void unschedule(Trigger trigger) throws SchedulingException;
 
     /**
-     * Update the details of the trigger.
+     * Called just before the details of a trigger will be updated.
      *
-     * @param trigger   the trigger being updated.
+     * @param trigger the trigger about to be updated
      *
      * @throws SchedulingException on error.
      */
-    void update(Trigger trigger) throws SchedulingException;
+    void preUpdate(Trigger trigger) throws SchedulingException;
+
+    /**
+     * Called just after the details of a trigger are updated.
+     *
+     * @param trigger   the trigger that was updated
+     *
+     * @throws SchedulingException on error.
+     */
+    void postUpdate(Trigger trigger) throws SchedulingException;
 
     /**
      * Pause the triggers that belong to the specified group. A trigger

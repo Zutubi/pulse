@@ -40,7 +40,7 @@ public class ExtFile
         this.leaf = leaf;
     }
 
-    public ExtFile(FileObjectWrapper fo,  String baseUrl)
+    public ExtFile(FileObjectWrapper fo,  String contextPath)
     {
         baseName = fo.getBaseName();
         text = fo.getName();
@@ -62,7 +62,7 @@ public class ExtFile
 
             if (!absolute)
             {
-                href = StringUtils.join('/', true, true, baseUrl, href);
+                href = StringUtils.join('/', true, true, contextPath, href);
             }
         }
         iconCls = fo.getIconCls();

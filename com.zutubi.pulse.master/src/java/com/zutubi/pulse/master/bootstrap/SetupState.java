@@ -5,6 +5,7 @@ package com.zutubi.pulse.master.bootstrap;
  */
 public enum SetupState
 {
+    WAITING,
     DATA,
     DATABASE,
     MIGRATE,

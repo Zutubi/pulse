@@ -3,6 +3,8 @@ package com.zutubi.pulse.master.xwork.actions.setup;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.zutubi.pulse.master.bootstrap.SetupManager;
+import com.zutubi.pulse.master.bootstrap.SetupState;
 import com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesActionSupport;
 import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.tove.security.AccessManager;
@@ -20,6 +22,7 @@ public class SystemStartingAction extends ServerMessagesActionSupport
     private static final int MAX_ERRORS = 5;
 
     private List<CustomLogRecord> errorRecords;
+    private SetupManager setupManager;
 
     public List<CustomLogRecord> getErrorRecords()
     {
@@ -29,7 +32,7 @@ public class SystemStartingAction extends ServerMessagesActionSupport
     @Override
     public String execute() throws Exception
     {
-        if (accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null))
+        if (setupManager.getCurrentState() != SetupState.STARTING || accessManager.hasPermission(AccessManager.ACTION_ADMINISTER, null))
         {
             errorRecords = Lists.newLinkedList(Iterables.filter(serverMessagesHandler.takeSnapshot(), new Predicate<CustomLogRecord>()
             {
@@ -47,5 +50,10 @@ public class SystemStartingAction extends ServerMessagesActionSupport
         }
 
         return SUCCESS;
+    }
+
+    public void setSetupManager(SetupManager setupManager)
+    {
+        this.setupManager = setupManager;
     }
 }
