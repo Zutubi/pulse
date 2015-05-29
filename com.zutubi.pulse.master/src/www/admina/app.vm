@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <link href="${base}/css/reset.css" rel="stylesheet"/>
+
+    <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.default.min.css" rel="stylesheet"/>
+    <link href="${base}/css/admina.css" rel="stylesheet"/>
+
+    <script src="${base}/js/kendo/jquery.min.js"></script>
+    <script src="${base}/js/kendo/kendo.all.js"></script>
+
+    <script>
+        window.baseUrl = '$base';
+    </script>
+
+    #javascript()
+    #end
+
+    <title>Pulse Admin</title>
+</head>
+<body>
+<div id="navbar">
+    Nav
+</div>
+
+<div id="content">
+    <div id="outer-split" style="height: 100%; width: 100%">
+        <div id="left-pane">
+            <div id="hierarchy-tree" class="pane-content">
+                Template Tree
+            </div>
+            <div id="config-tree" class="pane-content">
+                Config Tree
+            </div>
+        </div>
+        <div id="center-pane">
+            <div class="pane-content">
+                <p>Main pane.</p>
+            </div>
+        </div>
+        <div id="right-pane">
+            <div class="pane-content">
+                <p>Help pane.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer">
+    footer bar
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#outer-split").kendoSplitter({
+            panes: [
+                { collapsible: true, size: "220px" },
+                { collapsible: false },
+                { collapsible: true, size: "220px" }
+            ]
+        });
+
+        $("#left-pane").kendoSplitter({
+            orientation: "vertical",
+            panes: [
+                { collapsible: true, size: "50%" },
+                { collapsible: true, size: "50%" }
+            ]
+        });
+    });
+</script>
+</body>
+</html>

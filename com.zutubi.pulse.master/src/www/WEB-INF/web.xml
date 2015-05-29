@@ -278,6 +278,11 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
+        <url-pattern>/admina/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
         <url-pattern>/setupconfig/*</url-pattern>
     </servlet-mapping>
 

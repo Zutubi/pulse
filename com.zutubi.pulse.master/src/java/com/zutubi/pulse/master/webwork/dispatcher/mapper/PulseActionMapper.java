@@ -112,6 +112,11 @@ public class PulseActionMapper implements ActionMapper
         {
             mapping = getAdminMapping(path, request);
         }
+        // FIXME kendo
+        else if("/admina".equals(namespace))
+        {
+            mapping = new ActionMapping("app", "/admina", null, new HashMap());
+        }
 
         if(mapping == null)
         {

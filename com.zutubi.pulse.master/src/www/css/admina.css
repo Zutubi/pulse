@@ -1,0 +1,35 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+#navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: #abcdef;
+}
+
+#content {
+    position: fixed;
+    top: 50px;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    background-color: #F63;
+    overflow: auto;
+}
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background-color: #abcdef;
+}

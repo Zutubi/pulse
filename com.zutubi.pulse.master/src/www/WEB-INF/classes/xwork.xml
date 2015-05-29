@@ -353,6 +353,14 @@
         </action>
     </package>
 
+    <package name="admina" namespace="/admina" extends="webwork-default-package">
+        <default-interceptor-ref name="defaultReadOnlyStack"/>
+
+        <action name="app" class="com.zutubi.pulse.master.xwork.actions.admin.AdminAppAction">
+            <result name="success" type="velocity">app.vm</result>
+        </action>
+    </package>
+
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxReadOnlyStack"/>
 
