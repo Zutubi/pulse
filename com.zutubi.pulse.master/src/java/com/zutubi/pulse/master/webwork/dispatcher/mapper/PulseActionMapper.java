@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.webwork.dispatcher.mapper;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
@@ -115,7 +116,9 @@ public class PulseActionMapper implements ActionMapper
         // FIXME kendo
         else if("/admina".equals(namespace))
         {
-            mapping = new ActionMapping("app", "/admina", null, new HashMap());
+            Map<String, String> params = Maps.newHashMap();
+            params.put("path", path);
+            mapping = new ActionMapping("app", "/admina", null, params);
         }
 
         if(mapping == null)

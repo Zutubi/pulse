@@ -8,4 +8,15 @@ import com.zutubi.pulse.master.xwork.actions.ActionSupport;
  */
 public class AdminAppAction extends ActionSupport
 {
+    private String path;
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
 }

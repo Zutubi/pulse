@@ -11,7 +11,8 @@
     <script src="${base}/js/kendo/kendo.all.js"></script>
 
     <script>
-        window.baseUrl = '$base';
+        window.baseUrl = '${base}';
+        adminPath = '/${path}/';
     </script>
 
     #javascript()
@@ -25,6 +26,7 @@
 </div>
 
 <div id="content">
+    <div id="notification"></div>
     <div id="outer-split" style="height: 100%; width: 100%">
         <div id="left-pane">
             <div id="hierarchy-tree" class="pane-content">
@@ -52,22 +54,65 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        $("#outer-split").kendoSplitter({
-            panes: [
-                { collapsible: true, size: "220px" },
-                { collapsible: false },
-                { collapsible: true, size: "220px" }
-            ]
-        });
+    var notificationElement = $("#notification");
+    notificationElement.kendoNotification({
+        autoHideAfter: 7000,
+        allowHideAfter: 1000,
+        button: true,
+        hideOnClick: false,
+        position: {
+            top: 50
+        },
+        stacking: 'down'
+    });
 
-        $("#left-pane").kendoSplitter({
-            orientation: "vertical",
-            panes: [
-                { collapsible: true, size: "50%" },
-                { collapsible: true, size: "50%" }
-            ]
-        });
+    var notificationWidget = notificationElement.data("kendoNotification");
+
+    var router = new kendo.Router({
+        root: window.baseUrl + '/admina',
+        pushState: true,
+        routeMissing: function(e)
+        {
+            notificationWidget.error('Unknown admin path "' + e.url + '", redirecting.')
+            router.navigate("/projects/");
+        }
+    });
+
+    router.route("/", function(path) {
+        router.navigate("/projects/");
+    });
+
+    router.route("/projects/*path", function(path) {
+        if (path === '')
+        {
+            path = 'hello';
+        }
+
+        console.log(path);
+    });
+
+    router.route("/agents/*path", function(path) {
+        console.dir(path);
+    });
+
+    router.route("/settings/*path", function(path) {
+        console.dir(path);
+    });
+
+    router.route("/users/*path", function(path) {
+        console.dir(path);
+    });
+
+    router.route("/groups/*path", function(path) {
+        console.dir(path);
+    });
+
+    router.route("/plugins(/:id)", function(id) {
+        console.dir(id);
+    });
+
+    $(document).ready(function () {
+        router.start();
     });
 </script>
 </body>
