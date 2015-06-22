@@ -65,6 +65,9 @@ import com.zutubi.util.SystemUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -1838,6 +1841,95 @@ public class RemoteApi
     }
 
     /**
+     * Returns the latest changes for the user represented by the login token, sorted so that the
+     * most recent is first.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param maxResults the maximum number of changes to return
+     * @return {@xtype array<[RemoteApi.Changelist]>} the most recent changes by the user, as
+     *         would be shown in the "my changes" section of the dashboard
+     * @access available to all users
+     * @see #getLatestChangesForProjects(String, Vector, int)
+     * @see #getChangesInBuild(String, String, int)
+     */
+    public Vector<Hashtable<String, Object>> getMyChanges(String token, final int maxResults)
+    {
+        final User user = tokenManager.loginAndReturnUser(token);
+        try
+        {
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+            {
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+                    List<PersistentChangelist> changelists = changelistManager.getLatestChangesForUser(user, maxResults);
+                    Collections.sort(changelists, new ChangelistComparator());
+                    for (PersistentChangelist change : changelists)
+                    {
+                        result.add(convertChangelist(change));
+                    }
+
+                    return result;
+                }
+            });
+
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Returns the latest changes for the given set of projects.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param projectNames names of the projects to get the latest changes for; these may be
+     *                     template project names in which case all concrete descendant projects
+     *                     are included
+     * @param maxResults the maximum number of changes to return
+     * @return {@xtype array<[RemoteApi.Changelist]>} the most recent changes to builds of the
+     *         given set of projects
+     * @access available to all users
+     * @see #getMyChanges(String, int)
+     * @see #getMyProjectNames(String)
+     * @see #getChangesInBuild(String, String, int)
+     */
+    public Vector<Hashtable<String, Object>> getLatestChangesForProjects(String token, final Vector<String> projectNames, final int maxResults)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Vector<Hashtable<String, Object>>>()
+            {
+                public Vector<Hashtable<String, Object>> process()
+                {
+                    ArrayList<Project> projects = newArrayListWithExpectedSize(projectNames.size());
+                    for (String projectName : projectNames)
+                    {
+                        projects.addAll(Arrays.asList(internalGetProjectSet(projectName, true)));
+                    }
+
+                    final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+                    List<PersistentChangelist> changelists = changelistManager.getLatestChangesForProjects(projects.toArray(new Project[projects.size()]), maxResults);
+                    Collections.sort(changelists, new ChangelistComparator());
+                    for (PersistentChangelist change : changelists)
+                    {
+                        result.add(convertChangelist(change));
+                    }
+
+                    return result;
+                }
+            });
+
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
      * Gets the name of a project by its database id, if such a project exists.
      *
      * @param token authentication token, see {@link #login}.
@@ -1989,7 +2081,7 @@ public class RemoteApi
      * calling user.
      *
      * @param token authentication token, see {@link #login}
-     * @return the naames of all concrete projects visible to the calling user
+     * @return the names of all concrete projects visible to the calling user
      * @access available to all users, although the result is filtered based on the visibility of
      * agents to the calling user
      * @see #getProjectCount(String)
