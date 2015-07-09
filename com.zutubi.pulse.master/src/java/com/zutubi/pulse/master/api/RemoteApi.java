@@ -63,11 +63,9 @@ import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.UnaryProcedure;
+import com.zutubi.util.adt.DAGraph;
 import com.zutubi.util.logging.Logger;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -1930,6 +1928,147 @@ public class RemoteApi
     }
 
     /**
+     * Returns all builds affected by the changelists with the given ids.  Each entry in the
+     * returned struct has a changelist id as key, and an {@xtype array<[RemoteApi.BuildResult]>}
+     * as value. This array includes all build results that were affected by that change. If
+     * includeUpstream is true, builds that were affected indirectly (via dependencies) are also
+     * included. In this case the build structs returned have an additional property, "via", giving
+     * all paths from a directly-affected build to the build itself. These build paths are
+     * sequences of project/build id pairs. In general there are multiple via entries as a build
+     * could be affected via multiple upstream paths. For a directly-affected build one of the
+     * entries in the via set will be an empty array.
+     *
+     * @param token authentication token, see {@link #login}
+     * @param changeIds ids of the changelists to find affected builds for (this method handles
+     *                  multiple changes to avoid needless API round trips)
+     * @param includeDownstream if true, builds affected indirectly (via dependencies) are also
+     *                          included in the result
+     * @return a struct keyed by changelist id where each entry is of type
+     *         {@xtype array<[RemoteApi.BuildResult]>} (note that build results are shallow: they
+     *         do not include stage or command information)
+     * @access available to all users, note that returned builds may be filtered if the user does
+     *         not have permission to view all projects
+     * @see #getLatestChangesForProjects(String, Vector, int)
+     * @see #getMyChanges(String, int)
+     * @see #getChangesInBuild(String, String, int, boolean)
+     */
+    public Hashtable<String, Object> getBuildsAffectedByChanges(String token, final Vector<String> changeIds, final boolean includeDownstream)
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return transactionContext.executeInsideTransaction(new NullaryFunction<Hashtable<String, Object>>()
+            {
+                public Hashtable<String, Object> process()
+                {
+                    Hashtable<String, Object> result = new Hashtable<String, Object>();
+                    for (String changeId : changeIds)
+                    {
+                        result.put(changeId, getBuildsAffectedByChange(changeId, includeDownstream));
+                    }
+
+                    return result;
+                }
+            });
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Vector<Hashtable<String, Object>> getBuildsAffectedByChange(String changeId, boolean includeDownstream)
+    {
+        try
+        {
+            PersistentChangelist changelist = changelistManager.getChangelist(Long.parseLong(changeId));
+            if (changelist == null)
+            {
+                throw new IllegalArgumentException("Unknown changelist ID '" + changeId + "'");
+            }
+
+            List<BuildGraph> affectedBuilds = changelistManager.getAffectedBuilds(changelist);
+            Vector<Hashtable<String, Object>> builds = new Vector<Hashtable<String, Object>>();
+            if (includeDownstream)
+            {
+                for (BuildGraph graph : affectedBuilds)
+                {
+                    addBuildGraph(graph, builds);
+                }
+            }
+            else
+            {
+                for (long id : changelistManager.getAffectedBuildIds(changelist))
+                {
+                    try
+                    {
+                        builds.add(ApiUtils.convertBuild(buildManager.getBuildResult(id), false));
+                    }
+                    catch (AccessDeniedException e)
+                    {
+                        // Just omit builds that can't be viewed.
+                    }
+                }
+            }
+
+            return builds;
+        }
+        catch (NumberFormatException e)
+        {
+            throw new IllegalArgumentException("Invalid changelist ID '" + changeId + "', should be an integer");
+        }
+    }
+
+    private void addBuildGraph(final BuildGraph graph, final Vector<Hashtable<String, Object>> builds)
+    {
+        graph.forEach(new UnaryProcedure<DAGraph.Node<BuildResult>>()
+        {
+            public void run(DAGraph.Node<BuildResult> buildResultNode)
+            {
+                Set<BuildPath> buildPaths = graph.getBuildPaths(buildResultNode);
+
+                Hashtable<String, Object> build = findExistingBuild(buildResultNode.getData(), builds);
+                Vector<Vector<Hashtable<String, Object>>> via;
+                if (build == null)
+                {
+                    build = ApiUtils.convertBuild(buildResultNode.getData(), false);
+                    via = new Vector<Vector<Hashtable<String, Object>>>(buildPaths.size());
+                    build.put("via", via);
+                    builds.add(build);
+                } else
+                {
+                    via = (Vector<Vector<Hashtable<String, Object>>>) build.get("via");
+                }
+
+                for (BuildPath path : buildPaths)
+                {
+                    // The paths exclude the root and include this node, which makes sense when
+                    // looking at upstream changes but here we are looking at downstream builds. So
+                    // we shift the path to include the root but exclude this node.
+                    List<BuildResult> shiftedPath = new ArrayList<BuildResult>();
+                    shiftedPath.add(graph.getRoot().getData());
+                    shiftedPath.addAll(path.getBuilds());
+                    shiftedPath.remove(shiftedPath.size() - 1);
+                    via.add(convertBuildPath(new BuildPath(shiftedPath.toArray(new BuildResult[shiftedPath.size()]))));
+                }
+            }
+        });
+    }
+
+    private Hashtable<String, Object> findExistingBuild(BuildResult buildResult, Vector<Hashtable<String, Object>> builds)
+    {
+        for (Hashtable<String, Object> candidate: builds)
+        {
+            if (candidate.get("project").equals(buildResult.getProject().getName()) && candidate.get("id").equals(Integer.valueOf((int) buildResult.getNumber())))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the name of a project by its database id, if such a project exists.
      *
      * @param token authentication token, see {@link #login}.
@@ -3059,6 +3198,8 @@ public class RemoteApi
     private Hashtable<String, Object> convertChangelist(PersistentChangelist change)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(change.getId()));
+
         if (change.getRevision() != null && change.getRevision().getRevisionString() != null)
         {
             result.put("revision", change.getRevision().getRevisionString());
@@ -3108,24 +3249,28 @@ public class RemoteApi
     private Hashtable<String, Object> convertUpstreamChangelist(UpstreamChangelist change)
     {
         Hashtable<String, Object> result = convertChangelist(change.getChangelist());
-        Vector<Vector<Hashtable<String, Object>>> via = new Vector<Vector<Hashtable<String, Object>>>(change.getUpstreamContexts().size());
-        for (BuildPath context : change.getUpstreamContexts())
+        List<BuildPath> upstreamContexts = change.getUpstreamContexts();
+        Vector<Vector<Hashtable<String, Object>>> via = new Vector<Vector<Hashtable<String, Object>>>(upstreamContexts.size());
+        for (BuildPath path: upstreamContexts)
         {
-            Vector<Hashtable<String, Object>> path = new Vector<Hashtable<String, Object>>(context.size());
-            for (BuildResult build : context)
-            {
-                Hashtable<String, Object> pathEntry = new Hashtable<String, Object>();
-                pathEntry.put("id", (int) build.getNumber());
-                pathEntry.put("project", build.getProject().getName());
-                path.add(pathEntry);
-            }
+            via.add(convertBuildPath(path));
+        }
+        result.put("via", via);
+        return result;
+    }
 
-            via.add(path);
+    private Vector<Hashtable<String, Object>> convertBuildPath(BuildPath buildPath)
+    {
+        Vector<Hashtable<String, Object>> path = new Vector<Hashtable<String, Object>>(buildPath.size());
+        for (BuildResult build : buildPath)
+        {
+            Hashtable<String, Object> pathEntry = new Hashtable<String, Object>();
+            pathEntry.put("id", (int) build.getNumber());
+            pathEntry.put("project", build.getProject().getName());
+            path.add(pathEntry);
         }
 
-        result.put("via", via);
-
-        return result;
+        return path;
     }
 
     /**
