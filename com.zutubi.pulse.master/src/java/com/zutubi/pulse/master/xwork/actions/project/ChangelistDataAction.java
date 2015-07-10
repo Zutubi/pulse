@@ -121,7 +121,6 @@ public class ChangelistDataAction extends ActionSupport
         }
 
         ProjectConfiguration projectWithChangeViewerConfig = projectWithChangeViewer == null ? null : projectWithChangeViewer.getConfig();
-        ChangeViewerConfiguration changeViewer = projectWithChangeViewerConfig == null ? null : projectWithChangeViewerConfig.getChangeViewer();
         Collection<CommitMessageTransformerConfiguration> transformers;
         if(contextProject == null)
         {
