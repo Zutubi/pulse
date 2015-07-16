@@ -1,9 +1,6 @@
 package com.zutubi.pulse.master.vfs.provider.pulse;
 
-import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.model.BuildManager;
-import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
@@ -11,7 +8,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.File;
 import java.util.Collection;
 
 /**
@@ -23,7 +19,6 @@ public class PulseFileSystem extends AbstractFileSystem
     private Class<? extends FileObject> rootFileType;
     
     private ObjectFactory objectFactory;
-    private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
     private FileObject rootFile;
 
@@ -86,25 +81,6 @@ public class PulseFileSystem extends AbstractFileSystem
     protected void addCapabilities(Collection caps)
     {
         caps.addAll(PulseFileProvider.CAPABILITIES);
-    }
-
-    /**
-     * Provide a utility method for retrieving a build recipies base file system path.
-     *
-     * @param buildId  the build id
-     * @param recipeId the recipe id
-     * @return the base.dir for the specified builds recipe.
-     */
-    protected File getBaseDir(Long buildId, Long recipeId)
-    {
-        BuildResult result = buildManager.getBuildResult(buildId);
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        return paths.getBaseDir(result, recipeId);
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
