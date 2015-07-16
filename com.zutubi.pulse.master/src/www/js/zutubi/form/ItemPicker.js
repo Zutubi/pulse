@@ -364,7 +364,7 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
 
     onRemove: function(evt)
     {
-        var selected, selectedRecord, value, i, hiddenField;
+        var selected, selectedRecord, value;
 
         selected = this.getSelection();
         if(selected >= 0)
@@ -381,18 +381,8 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                 this.combo.store.addSorted(this.optionRecordCache[value]);
             }
 
-            // find the matching hidden input field and remove it.
-            for(i = 0; i < this.hiddenFields.length; i++)
-            {
-                hiddenField = this.hiddenFields[i];
-                if (hiddenField.dom.value === value)
-                {
-                    // this is the one to remove.
-                    this.hiddenFields[i].remove();
-                    this.hiddenFields.splice(selected, 1);
-                    break;
-                }
-            }
+            this.hiddenFields[selected].remove();
+            this.hiddenFields.splice(selected, 1);
 
             this.fireEvent('change', this, evt);
         }
