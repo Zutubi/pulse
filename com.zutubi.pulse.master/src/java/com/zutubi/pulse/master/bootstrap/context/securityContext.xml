@@ -15,7 +15,6 @@ based upon the Spring Security system.
      -->
     <bean id="securityManager" class="com.zutubi.pulse.master.security.PulseSecurityManager">
         <property name="jettyServerManager" ref="jettyServerManager"/>
-        <property name="configurationManager" ref="configurationManager"/>
     </bean>
 
     <bean id="ldapManager" class="com.zutubi.pulse.master.security.ldap.AcegiLdapManager">

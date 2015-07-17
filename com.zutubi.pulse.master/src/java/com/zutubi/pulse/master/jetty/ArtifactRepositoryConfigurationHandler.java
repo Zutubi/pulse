@@ -22,8 +22,10 @@ public class ArtifactRepositoryConfigurationHandler implements ContextConfigurat
 
     private Handler securityHandler;
 
-    public void configure(ContextHandler context) throws IOException
+    public void configure(String contextPath, ContextHandler context) throws IOException
     {
+        context.setContextPath(contextPath);
+
         HandlerCollection handlers = new HandlerList();
         handlers.addHandler(securityHandler);
 
