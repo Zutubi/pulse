@@ -10,5 +10,5 @@ import java.io.IOException;
  */
 public interface ContextConfigurationHandler
 {
-    void configure(ContextHandler context) throws IOException;
+    void configure(String contextPath, ContextHandler context) throws IOException;
 }

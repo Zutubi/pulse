@@ -1,7 +1,5 @@
 package com.zutubi.pulse.servercore.jetty;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.jetty.server.Handler;
@@ -10,8 +8,6 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
 import java.io.IOException;
-
-import static java.util.Arrays.asList;
 
 /**
  * The jetty server manager is responsible for managing the lifecycle of Jetty.
@@ -34,38 +30,20 @@ public class JettyServerManager implements Stoppable
 
     public synchronized ContextHandler configureContext(final String contextPath, ContextConfigurationHandler handler) throws IOException
     {
-        if (!isContextAvailable(contextPath))
-        {
-            throw new IllegalArgumentException("Context '" + contextPath + "' has already been configured.");
-        }
-
-        ContextHandler context = new ContextHandler(contextPath);
-        handler.configure(context);
+        // It might seem simpler to set the context path on this outer handler, and mostly it is.
+        // However, this means things inside nested handlers won't see the full context path,
+        // which can confound things (like setting up $base so the web UI can construct links).
+        // So we allow the path to be set at a lower level so it is still accessible from requests.
+        ContextHandler context = new ContextHandler();
+        handler.configure(contextPath, context);
         contexts.addHandler(context);
         startContextIfServerStarted(contextPath, context);
         return context;
     }
 
-    public ContextHandler getContextHandler(final String contextPath)
+    public <T extends Handler> T getContextHandler(final Class<T> type)
     {
-        Handler[] handlers = contexts.getHandlers();
-        if (handlers == null)
-        {
-            return null;
-        }
-
-        return (ContextHandler) Iterables.tryFind(asList(handlers), new Predicate<Handler>()
-        {
-            public boolean apply(Handler handler)
-            {
-                return ((ContextHandler) handler).getContextPath().equals(contextPath);
-            }
-        }).orNull();
-    }
-
-    public synchronized boolean isContextAvailable(final String contextPath)
-    {
-        return getContextHandler(contextPath) == null;
+        return contexts.getChildHandlerByClass(type);
     }
 
     private void startContextIfServerStarted(String contextPath, ContextHandler context) throws IOException

@@ -3,7 +3,7 @@
     <import file="macros.xml"/>
 
     <presetdef name="javac">
-        <javac source="5" target="5" includeantruntime="false" />
+        <javac source="7" target="7" includeantruntime="false" />
     </presetdef>
 
     <!-- initialise configuration -->
@@ -207,7 +207,7 @@
         <if> <!-- if we have srcs to build, then do so. -->
             <not><isset property="no.src"/></not>
             <then>
-                <javac target="5" destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
+                <javac target="7" destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
                     <classpath refid="lib.path"/>
                     <src refid="src.paths"/>
                 </javac>
@@ -222,7 +222,7 @@
             <not><isset property="no.tests"/></not>
             <then>
                 <retrieve-dependencies dest="${build.lib.dir}" conf="test"/>
-                <javac target="5" destdir="${test.classes.dir}" debug="true">
+                <javac target="7" destdir="${test.classes.dir}" debug="true">
                     <classpath refid="lib.path"/>
                     <classpath location="${classes.dir}"/>
                     <src refid="test.paths"/>

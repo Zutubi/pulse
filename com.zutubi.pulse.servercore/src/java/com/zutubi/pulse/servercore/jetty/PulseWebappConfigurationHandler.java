@@ -8,7 +8,6 @@ import com.zutubi.util.StringUtils;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -109,11 +108,8 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
         }
     }
 
-    public void configure(ContextHandler context) throws IOException
+    public void configure(String contextPath, ContextHandler context) throws IOException
     {
-        SystemConfiguration config = configurationManager.getSystemConfig();
-        context.setContextPath(config.getContextPath());
-
         if (!tmpDir.exists() && !tmpDir.mkdirs())
         {
             throw new IOException("Failed to create " + tmpDir.getCanonicalPath());
@@ -121,11 +117,8 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 
         context.setAttribute("javax.servlet.context.tempdir", tmpDir);
 
-        HandlerCollection handlers = new HandlerCollection();
-
-        WebAppContext webApp = new WebAppContext(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath(), null);
+        WebAppContext webApp = new WebAppContext(configurationManager.getSystemPaths().getContentRoot().getAbsolutePath(), contextPath);
         webApp.setDefaultsDescriptor(null);
-        handlers.addHandler(webApp);
 
         if (isRequestLoggingEnabled())
         {
@@ -138,10 +131,13 @@ public class PulseWebappConfigurationHandler implements ServerConfigurationHandl
 
             RequestLogHandler logHandler = new RequestLogHandler();
             logHandler.setRequestLog(requestLog);
-            handlers.addHandler(logHandler);
+            logHandler.setHandler(webApp);
+            context.setHandler(logHandler);
         }
-
-        context.setHandler(handlers);
+        else
+        {
+            context.setHandler(webApp);
+        }
     }
 
     private String[] getRequestLoggingIgnorePaths()

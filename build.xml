@@ -539,7 +539,7 @@
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
-        <javac source="5" target="5" srcdir="com.zutubi.pulse.master/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+        <javac source="7" target="7" srcdir="com.zutubi.pulse.master/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
             <classpath>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
