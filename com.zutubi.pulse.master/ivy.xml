@@ -45,6 +45,7 @@
         <dependency org="com.opensymphony.webwork" name="com.opensymphony.webwork" rev="2.2.6" conf="external,build,release->default;src->src"/>
 
         <dependency org="com.uwyn" name="com.uwyn.jhighlight" rev="1.0.0" conf="external,build,release->default;src->src"/>
+        <dependency org="com.fasterxml.jackson" name="com.fasterxml.jackson" rev="2.5.4" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.aop" rev="4.1.7.RELEASE" conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.jdbc" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>
         <dependency org="org.springframework" name="org.springframework.orm" rev="4.1.7.RELEASE"  conf="external,build,release->default;src->src"/>

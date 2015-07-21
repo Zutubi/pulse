@@ -2845,7 +2845,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scope == null)
             {
-                throw new IllegalArgumentException("Invalid path '" + path + "': refers to unknown root scope '" + pathElements[0]);
+                throw new IllegalArgumentException("Invalid path '" + path + "': refers to unknown root scope '" + pathElements[0] + "'");
             }
 
             if (scope.isTemplated())

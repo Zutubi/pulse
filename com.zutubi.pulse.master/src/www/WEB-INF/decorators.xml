@@ -5,6 +5,7 @@
     <excludes>
         <pattern>/admina/*</pattern>
         <pattern>/ajax/*</pattern>
+        <pattern>/api/*</pattern>
         <pattern>/personal/*</pattern>
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>

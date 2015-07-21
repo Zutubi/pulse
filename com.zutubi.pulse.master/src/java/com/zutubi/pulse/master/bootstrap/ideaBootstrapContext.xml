@@ -20,6 +20,7 @@
             <list>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.DeployArtifactRepositoryStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.DeployMainWebappStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.DeployApiServletStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.SystemStartedMessageStartupTask</value>
                 <value>com.zutubi.pulse.master.bootstrap.tasks.DiscoverMasterResourcesStartupTask</value>
             </list>
