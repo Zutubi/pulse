@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest;
 
+import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.model.ConfigModel;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
@@ -35,7 +36,7 @@ public class ConfigController
         Configuration instance = configurationTemplateManager.getInstance(configPath);
         if (instance == null)
         {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new NotFoundException("Configuration path '" + configPath + "' not found");
         }
 
         return new ResponseEntity<>(new ConfigModel(instance, configurationTemplateManager.getType(configPath)), HttpStatus.OK);

@@ -21,7 +21,13 @@ public class DeployApiServletStartupTask implements StartupTask
     {
         XmlWebApplicationContext xmlWebApplicationContext = new XmlWebApplicationContext();
         xmlWebApplicationContext.setParent(SpringComponentContext.getContext());
-        ServletHolder servletHolder = new ServletHolder("api", new DispatcherServlet(xmlWebApplicationContext));
+
+        DispatcherServlet servlet = new DispatcherServlet(xmlWebApplicationContext);
+        // This allows the ApiExceptionHandler to process no-handler-found just like other
+        // exceptions.
+        servlet.setThrowExceptionIfNoHandlerFound(true);
+
+        ServletHolder servletHolder = new ServletHolder("api", servlet);
         WebAppContext webAppContext = jettyServerManager.getContextHandler(WebAppContext.class);
         webAppContext.addServlet(servletHolder, "/api/*");
     }

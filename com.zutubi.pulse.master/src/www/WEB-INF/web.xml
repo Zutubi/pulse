@@ -68,7 +68,7 @@
     </listener>
 
     <servlet>
-      <servlet-name>default</servlet-name>
+      <servlet-name>static</servlet-name>
       <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
       <init-param>
         <param-name>acceptRanges</param-name>
@@ -206,6 +206,14 @@
         </init-param>
     </servlet>
 
+    <!-- We make our default webwork, as it handles the most namespaces, simplifying config.
+         This does mean we need to call out static namespaces and point them at Jetty (see
+         the last mappings, this would be simpler if we consolidated under /static/) -->
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>display</servlet-name>
         <url-pattern>/display/*</url-pattern>
@@ -217,73 +225,8 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
         <servlet-name>hessian</servlet-name>
         <url-pattern>/hessian</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>*.action</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/config/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/help/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/action/*.action</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/ajax/template/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/dashboard/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/browse/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/server/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/agents/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/admin/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/admina/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
-        <url-pattern>/setupconfig/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -320,6 +263,21 @@
     <servlet-mapping>
         <servlet-name>ViewFileServlet</servlet-name>
         <url-pattern>/view/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>static</servlet-name>
+        <url-pattern>/css/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>static</servlet-name>
+        <url-pattern>/images/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>static</servlet-name>
+        <url-pattern>/js/*</url-pattern>
     </servlet-mapping>
 
     <session-config>
