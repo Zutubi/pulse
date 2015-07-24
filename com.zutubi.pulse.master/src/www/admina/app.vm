@@ -38,7 +38,7 @@
         </div>
         <div id="center-pane">
             <div class="pane-content">
-                <p>Main pane.</p>
+                <p>Main pane. <a href="#" onclick="loadTemplatedScope('projects/lgit')">doit</a> </p>
             </div>
         </div>
         <div id="right-pane">
@@ -78,17 +78,36 @@
         }
     });
 
+    function loadTemplatedScope(path)
+    {
+        jQuery.ajax({
+            type: "GET",
+            url: window.baseUrl + "/api/config/" + "projects/lgit",
+            dataType: 'json',
+            headers: {
+                Accept: "application/json; charset=utf-8",
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            success: function (data, status, jqXHR) {
+                console.log('success');
+                console.dir(data);
+            },
+            error: function (jqXHR, textStatus) {
+                if (jqXHR.status === 401)
+                {
+                    alert("Auth required");
+                }
+                console.log(jqXHR.responseText);
+            }
+        });
+    }
+
     router.route("/", function(path) {
         router.navigate("/projects/");
     });
 
     router.route("/projects/*path", function(path) {
-        if (path === '')
-        {
-            path = 'hello';
-        }
-
-        console.log(path);
+        loadTemplatedScope(path);
     });
 
     router.route("/agents/*path", function(path) {

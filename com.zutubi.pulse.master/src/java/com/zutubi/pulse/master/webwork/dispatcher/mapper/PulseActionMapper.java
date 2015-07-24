@@ -46,7 +46,7 @@ public class PulseActionMapper implements ActionMapper
     private ActionResolver agentsActionResolver = new AgentsActionResolver();
 
     // Pure config namespaces only, no hybrids here!
-    private static final Set<String> configNamespaces = new HashSet<String>();
+    private static final Set<String> configNamespaces = new HashSet<>();
     static
     {
         configNamespaces.add("/setupconfig");
@@ -56,7 +56,7 @@ public class PulseActionMapper implements ActionMapper
     }
 
     // Setup paths are only available during the setup.
-    private static final Set<String> setupNamespaces = new HashSet<String>();
+    private static final Set<String> setupNamespaces = new HashSet<>();
     static
     {
         setupNamespaces.add("migrate");
@@ -69,11 +69,28 @@ public class PulseActionMapper implements ActionMapper
 
     public ActionMapping getMapping(HttpServletRequest request)
     {
-        String namespace = request.getServletPath();
-        String path = request.getPathInfo();
-        if(path != null)
+        String namespace;
+        String path;
+        String fullPath = request.getServletPath();
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && fullPath.contains("/"))
         {
-            path = PathUtils.normalisePath(path);
+            // FIXME kendo this funky part can hopefully be dropped along with the multi-element
+            // namespaces defined in web.xml.
+            namespace = fullPath;
+            path = PathUtils.normalisePath(pathInfo);
+        }
+        else
+        {
+            if (pathInfo != null)
+            {
+                fullPath = PathUtils.getPath(fullPath, pathInfo);
+            }
+
+            fullPath = PathUtils.normalisePath(fullPath);
+
+            namespace = "/" + PathUtils.getElement(fullPath, 0);
+            path = PathUtils.getSuffix(fullPath, 1);
         }
 
         // Is this a request for one of the setup paths?
@@ -181,7 +198,7 @@ public class PulseActionMapper implements ActionMapper
         {
             if(params == null)
             {
-                params = new HashMap<String, String>();
+                params = new HashMap<>();
             }
 
             if (query != null)
@@ -268,7 +285,7 @@ public class PulseActionMapper implements ActionMapper
         {
             // /dashboard/preferences/<path> is a config view rooted at
             // users/<user>/preferences
-            Map<String, String> parameters = new HashMap<String, String>();
+            Map<String, String> parameters = new HashMap<>();
             parameters.put("prefixPath", "users/${principle}");
             parameters.put("section", "dashboard");
             parameters.put("tab", PATH_PREFERENCES);
@@ -282,7 +299,7 @@ public class PulseActionMapper implements ActionMapper
                 return null;
             }
 
-            Map<String, String> parameters = new HashMap<String, String>(2);
+            Map<String, String> parameters = new HashMap<>(2);
             parameters.put("id", WebUtils.uriComponentDecode(elements[1]));
             if (elements.length > 2)
             {
@@ -349,7 +366,7 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping resolve(String namespace, String encodedPath, ActionResolver actionResolver)
     {
-        Map<String, String> parameters = new HashMap<String, String>(actionResolver.getParameters());
+        Map<String, String> parameters = new HashMap<>(actionResolver.getParameters());
         String[] elements = encodedPath.length() == 0 ? new String[0] : encodedPath.split("/");
         for(String element: elements)
         {
@@ -401,7 +418,7 @@ public class PulseActionMapper implements ActionMapper
 
             // /admin/plugins/<id> takes you to the plugins view, selecting a
             // plugin with the given id if any is specified.
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             String[] pathElements = PathUtils.getPathElements(path);
             if(pathElements.length > 1)
             {
