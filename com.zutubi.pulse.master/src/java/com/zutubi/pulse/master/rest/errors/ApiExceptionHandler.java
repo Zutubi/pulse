@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.rest.errors;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -26,6 +27,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
     public final ResponseEntity<Object> handleNotFound(Exception ex, WebRequest request)
     {
         HttpStatus status = HttpStatus.NOT_FOUND;
+        return handleExceptionInternal(ex, null, new HttpHeaders(), status, request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public final ResponseEntity<Object> handleAuthenticationFailed(Exception ex, WebRequest request)
+    {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         return handleExceptionInternal(ex, null, new HttpHeaders(), status, request);
     }
 

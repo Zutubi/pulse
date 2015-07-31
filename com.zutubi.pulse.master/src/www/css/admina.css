@@ -33,3 +33,15 @@ body {
     height: 20px;
     background-color: #abcdef;
 }
+
+table.form {
+    width: 100%;
+}
+
+.form th {
+    text-align: right;
+}
+
+.form th, .form td {
+    padding: 0.33em;
+}

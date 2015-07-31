@@ -153,7 +153,7 @@ based upon the Spring Security system.
         <constructor-arg ref="rememberMeServices"/>
     </bean>
 
-    <bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+    <bean id="rememberMeServices" class="com.zutubi.pulse.master.security.CustomRememberMeServices">
         <constructor-arg value="pulse"/>
         <constructor-arg ref="userManager"/>
     </bean>
@@ -247,6 +247,7 @@ based upon the Spring Security system.
         <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <property name="securityMetadataSource">
             <security:filter-security-metadata-source request-matcher="ant" lowercase-comparisons="true">
+                <security:intercept-url pattern="/api/auth/session" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/login*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/signup*.action*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
                 <security:intercept-url pattern="/logout.action" access="IS_AUTHENTICATED_ANONYMOUSLY" />
