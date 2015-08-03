@@ -7,8 +7,6 @@ import com.zutubi.util.GraphFunction;
  */
 public interface ComplexType extends Type
 {
-    String getSymbolicName();
-
     MutableRecord createNewRecord(boolean applyDefaults);
 
     boolean isTemplated();

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.tove.handler;
 
+import com.zutubi.pulse.master.rest.model.forms.FieldModel;
+import com.zutubi.pulse.master.rest.model.forms.OptionFieldModel;
 import com.zutubi.pulse.master.tove.model.Descriptor;
 import com.zutubi.pulse.master.tove.model.OptionFieldDescriptor;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -22,6 +24,7 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
     private ObjectFactory objectFactory;
     protected ConfigurationProvider configurationProvider;
 
+    // FIXME kendo old version
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         super.process(annotatedType, annotation, descriptor);
@@ -67,6 +70,56 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             field.setListValue(value);
         }
     }
+
+
+
+    public void process(CompositeType annotatedType, TypeProperty property, Annotation annotation, FieldModel field) throws Exception
+    {
+        super.process(annotatedType, property, annotation, field);
+
+        OptionFieldModel optionField = (OptionFieldModel) field;
+        if (!optionField.isLazy())
+        {
+            OptionProvider optionProvider = OptionProviderFactory.build(annotatedType, property.getType(), annotation, objectFactory);
+            Configuration instance = null;
+            String path = field.getPath();
+            String baseName = path == null ? null : PathUtils.getBaseName(path);
+            if (baseName != null && configurationProvider != null)
+            {
+                instance = configurationProvider.get(path, Configuration.class);
+            }
+
+            process(property, optionField, optionProvider, instance);
+        }
+    }
+
+    protected void process(TypeProperty property, OptionFieldModel field, OptionProvider optionProvider, Object instance)
+    {
+        String path = field.getPath();
+        String parentPath = path == null ? null : PathUtils.getParentPath(path);
+
+        List optionList = optionProvider.getOptions(instance, parentPath, property);
+        field.setList(optionList);
+
+        Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, property);
+        if (emptyOption != null)
+        {
+            field.setEmptyOption(emptyOption);
+        }
+
+        String key = optionProvider.getOptionKey();
+        if (key != null)
+        {
+            field.setListKey(key);
+        }
+
+        String value = optionProvider.getOptionValue();
+        if (value != null)
+        {
+            field.setListValue(value);
+        }
+    }
+
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {

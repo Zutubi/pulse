@@ -1,13 +1,8 @@
 package com.zutubi.pulse.master.tove.webwork;
 
-import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.i18n.context.ClassContext;
-import com.zutubi.i18n.context.ContextResolver;
-import com.zutubi.i18n.context.ExtendedClassContextResolver;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
-import com.zutubi.pulse.master.tove.velocity.VelocityClasspathResourceLoader;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -15,14 +10,6 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
-import com.zutubi.util.NullaryFunction;
-import com.zutubi.util.logging.Logger;
-import org.apache.velocity.Template;
-import org.apache.velocity.app.VelocityEngine;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Base class for tove webwork actions.
@@ -33,8 +20,6 @@ import java.util.List;
  */
 public class ToveActionSupport extends ActionSupport implements MessagesProvider
 {
-    private static final Logger LOG = Logger.getLogger(ToveActionSupport.class);
-
     // These constants are used in numerous locations throughout the code base.
     // Where is the best place to define them?.  Most of the references are in master,
     // with some in the annotations package.
@@ -63,8 +48,6 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
     protected Type type;
 
     private String submitField;
-
-    private Template template;
 
     public boolean isCancelled()
     {
@@ -183,17 +166,9 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
         // a) do we have a custom template for rendering this type / instance?.
         if (type instanceof CompositeType)
         {
-            CompositeType compositeType = (CompositeType) type;
-            template = lookupTemplate(compositeType.getClazz());
-            if (template != null)
-            {
-                return "custom";
-            }
-
-            // default.
             return "composite";
         }
-        if (type instanceof CollectionType)
+        else if (type instanceof CollectionType)
         {
             // default for collections.
             return "map";
@@ -213,83 +188,6 @@ public class ToveActionSupport extends ActionSupport implements MessagesProvider
 
         ComplexType parentType = configurationTemplateManager.getType(parentPath);
         return ToveUtils.isEmbeddedCollection(parentType);
-    }
-
-    /**
-     * Find and return (if available) a custom velocity template to use when rendering
-     * the specified configuration type.
-     *
-     * @param clazz the type for which we are looking up the custom template.
-     *
-     * @return a velocity template instance if located, null otherwise.
-     */
-    private Template lookupTemplate(Class<? extends Configuration> clazz)
-    {
-        final List<String> paths = resolve(new ClassContext(clazz));
-
-        final VelocityEngine engine = VelocityManager.getInstance().getVelocityEngine();
-
-        if (engine == null)
-        {
-            // This happens if the velocity system within webwork has not finished initialisation. The
-            // best option available to us is to assume no custom template is available.
-            return null;
-        }
-
-        return executeVelocityOperation(clazz, new NullaryFunction<Template>()
-        {
-            public Template process()
-            {
-                for (String path : paths)
-                {
-                    String templatePath = path + ".template.vm";
-                    if (engine.templateExists(templatePath))
-                    {
-                        try
-                        {
-                            return engine.getTemplate(templatePath);
-                        }
-                        catch (Exception e)
-                        {
-                            // there is a problem with the template we tried to load.  Swallow the
-                            // error and keep going.
-                            LOG.warning(e);
-                        }
-                    }
-                }
-                return null;
-            }
-        });
-    }
-
-    private List<String> resolve(ClassContext context)
-    {
-        List<String> resolvedNames = new LinkedList<String>();
-        ContextResolver<ClassContext> resolver = new ExtendedClassContextResolver();
-        resolvedNames.addAll(Arrays.asList(resolver.resolve(context)));
-        return resolvedNames;
-    }
-
-    private <T> T executeVelocityOperation(Object context, NullaryFunction<T> f)
-    {
-        // HAX: We need the context to be part of the resource search, but can not dynamically configure
-        // a resource loader within the already configured velocity engine.  So, we use a thread local
-        // to pass the context through to the pre-configured resource loader, and make sure we cleanup after
-        //  ourselves.
-        VelocityClasspathResourceLoader.CONTEXT.set((Class)context);
-        try
-        {
-            return f.process();
-        }
-        finally
-        {
-            VelocityClasspathResourceLoader.CONTEXT.set(null);
-        }
-    }
-
-    public Template getTemplate()
-    {
-        return template;
     }
 
     public Messages getMessages()

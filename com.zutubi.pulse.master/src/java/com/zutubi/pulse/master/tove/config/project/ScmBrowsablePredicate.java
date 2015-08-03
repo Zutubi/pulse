@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.rest.model.forms.FieldModel;
 import com.zutubi.pulse.master.scm.ScmClientUtils;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
@@ -39,14 +40,25 @@ public class ScmBrowsablePredicate implements FieldActionPredicate
     private ProjectManager projectManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
+    @Override
     public boolean satisfied(FieldDescriptor field, FieldAction annotation)
     {
-        String path = field.getPath();
-        String projectPath;
+        return satisfied(field.getPath(), field.getBaseName());
+    }
 
+    @Override
+    public boolean satisfied(FieldModel field, FieldAction annotation)
+    {
+        String path = field.getPath();
+        return satisfied(path, path == null ? null : PathUtils.getBaseName(path));
+    }
+
+    private boolean satisfied(String path, String baseName)
+    {
+        String projectPath;
         if (MasterConfigurationRegistry.PROJECTS_SCOPE.equals(PathUtils.getParentPath(path)))
         {
-            if(StringUtils.stringSet(field.getBaseName()))
+            if(StringUtils.stringSet(baseName))
             {
                 projectPath = RootFileObject.PREFIX_CONFIG + path;
             }

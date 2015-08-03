@@ -2835,6 +2835,19 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
         return typeClass.cast(type);
     }
 
+    /**
+     * Retrieves the type for the given path. The path must have a complex type, but need not be
+     * defined (it may be an unset property of an existing parent composite).  When the path is not
+     * defined the type may be abstract (i.e. it may be a composite type with multiple extensions).
+     *
+     * @see #getType(String, Class)
+     *
+     * @param path      the path to retrieve the type for
+     * @return the type of the given path
+     * @throws IllegalArgumentException if the given path does not have a known complex type
+     *         (either it refers to a simple type or it does not exist, not even as the property
+     *         of a composite parent)
+     */
     public ComplexType getType(String path)
     {
         String[] pathElements = PathUtils.getPathElements(path);

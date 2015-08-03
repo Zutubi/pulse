@@ -6,6 +6,8 @@ package com.zutubi.tove.type;
  */
 public interface Type
 {
+    String getSymbolicName();
+
     Type getTargetType();
 
     Type getActualType(Object value);

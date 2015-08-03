@@ -1,20 +1,19 @@
 package com.zutubi.tove.annotations;
 
 /**
- *
- *
+ * Defines constants naming annotation handler types.
  */
 public interface DefaultAnnotationHandlers
 {
-    public static final String HANDLER_PACKAGE    = "com.zutubi.pulse.master.tove.handler";
+    String HANDLER_PACKAGE    = "com.zutubi.pulse.master.tove.handler";
 
-    public static final String CONTROLLING_SELECT = HANDLER_PACKAGE + ".ControllingSelectAnnotationHandler";
-    public static final String FIELD_ACTION       = HANDLER_PACKAGE + ".FieldActionAnnotationHandler";
-    public static final String FIELD_PARAMETER    = HANDLER_PACKAGE + ".FieldParameterAnnotationHandler";
-    public static final String FIELD_SCRIPT       = HANDLER_PACKAGE + ".FieldScriptAnnotationHandler";
-    public static final String FIELD              = HANDLER_PACKAGE + ".FieldAnnotationHandler";
-    public static final String FORM               = HANDLER_PACKAGE + ".FormAnnotationHandler";
-    public static final String ITEM_PICKER        = HANDLER_PACKAGE + ".ItemPickerAnnotationHandler";
-    public static final String REFERENCE          = HANDLER_PACKAGE + ".ReferenceAnnotationHandler";
-    public static final String SELECT             = HANDLER_PACKAGE + ".SelectAnnotationHandler";
+    String CONTROLLING_SELECT = HANDLER_PACKAGE + ".ControllingSelectAnnotationHandler";
+    String FIELD_ACTION       = HANDLER_PACKAGE + ".FieldActionAnnotationHandler";
+    String FIELD_PARAMETER    = HANDLER_PACKAGE + ".FieldParameterAnnotationHandler";
+    String FIELD_SCRIPT       = HANDLER_PACKAGE + ".FieldScriptAnnotationHandler";
+    String FIELD              = HANDLER_PACKAGE + ".FieldAnnotationHandler";
+    String FORM               = HANDLER_PACKAGE + ".FormAnnotationHandler";
+    String ITEM_PICKER        = HANDLER_PACKAGE + ".ItemPickerAnnotationHandler";
+    String REFERENCE          = HANDLER_PACKAGE + ".ReferenceAnnotationHandler";
+    String SELECT             = HANDLER_PACKAGE + ".SelectAnnotationHandler";
 }

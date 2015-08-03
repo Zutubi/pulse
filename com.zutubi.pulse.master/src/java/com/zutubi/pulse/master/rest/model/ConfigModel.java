@@ -1,29 +1,19 @@
 package com.zutubi.pulse.master.rest.model;
 
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.Type;
-
-import java.util.List;
-
 /**
  * Toy model class while working on RESTish API.
  */
-public class ConfigModel
+public abstract class ConfigModel
 {
-    private List<String> simpleProperties;
+    private TypeModel type;
 
-    public ConfigModel(Configuration config, Type type)
+    protected ConfigModel(TypeModel type)
     {
-        if (type instanceof CompositeType)
-        {
-            CompositeType compositeType = (CompositeType) type;
-            simpleProperties = compositeType.getSimplePropertyNames();
-        }
+        this.type = type;
     }
 
-    public List<String> getSimpleProperties()
+    public TypeModel getType()
     {
-        return simpleProperties;
+        return type;
     }
 }
