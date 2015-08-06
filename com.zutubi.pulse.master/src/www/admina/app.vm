@@ -7,15 +7,13 @@
     <link href="${base}/css/kendo/kendo.default.min.css" rel="stylesheet"/>
     <link href="${base}/css/admina.css" rel="stylesheet"/>
 
-    <script src="${base}/js/kendo/jquery.min.js"></script>
-    <script src="${base}/js/kendo/kendo.all.js"></script>
-
     <script>
         window.baseUrl = '${base}';
         adminPath = '/${path}/';
     </script>
 
     #javascript()
+        zutubi/admin/package.js
     #end
 
     <title>Pulse Admin</title>
@@ -53,9 +51,6 @@
     <div id="notification"></div>
     <div id="outer-split" style="height: 100%; width: 100%">
         <div id="left-pane">
-            <div id="hierarchy-tree" class="pane-content">
-                Template Tree
-            </div>
             <div id="config-tree" class="pane-content">
                 Config Tree
             </div>
@@ -156,26 +151,31 @@
 
     function loadTemplatedScope(path)
     {
-        jQuery.ajax({
-            type: "GET",
-            url: window.baseUrl + "/api/config/" + "projects/lgit?depth=-1",
-            dataType: 'json',
-            headers: {
-                Accept: "application/json; charset=utf-8",
-                "Content-Type": "application/json; charset=utf-8"
-            },
-            success: function (data, status, jqXHR) {
-                console.log('success');
-                console.dir(data);
-            },
-            error: function (jqXHR, textStatus) {
-                if (jqXHR.status === 401)
-                {
-                    showLoginForm();
-                }
-                console.log(jqXHR.responseText);
-            }
+        var configTree = $("#config-tree").kendoZaConfigTree().data("kendoZaConfigTree");
+        configTree.bind("pathselect", function(e) {
+            console.log('selected path ' + e.path);
         });
+
+//        jQuery.ajax({
+//            type: "GET",
+//            url: window.baseUrl + "/api/config/" + "projects/lgit?depth=-1",
+//            dataType: 'json',
+//            headers: {
+//                Accept: "application/json; charset=utf-8",
+//                "Content-Type": "application/json; charset=utf-8"
+//            },
+//            success: function (data, status, jqXHR) {
+//                console.log('success');
+//                console.dir(data);
+//            },
+//            error: function (jqXHR, textStatus) {
+//                if (jqXHR.status === 401)
+//                {
+//                    showLoginForm();
+//                }
+//                console.log(jqXHR.responseText);
+//            }
+//        });
     }
 
     router.route("/", function(path) {
@@ -207,6 +207,13 @@
     });
 
     $(document).ready(function () {
+        $("#outer-split").kendoSplitter({
+            panes: [
+                { collapsible: true, size: "250px" },
+                { collapsible: false },
+                { collapsible: true, size: "250px" }
+            ]
+        });
         router.start();
     });
 </script>

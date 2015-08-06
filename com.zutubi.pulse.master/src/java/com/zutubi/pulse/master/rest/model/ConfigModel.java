@@ -8,15 +8,17 @@ import java.util.List;
 public abstract class ConfigModel
 {
     private final String kind;
+    private final String handle;
     private final String key;
     private final String label;
     private TypeModel type;
     private String iconClass;
-    private List<ConfigModel> children;
+    private List<ConfigModel> nested;
 
-    protected ConfigModel(String kind, String key, String label)
+    protected ConfigModel(String kind, String handle, String key, String label)
     {
         this.kind = kind;
+        this.handle = handle;
         this.key = key;
         this.label = label;
     }
@@ -24,6 +26,11 @@ public abstract class ConfigModel
     public String getKind()
     {
         return kind;
+    }
+
+    public String getHandle()
+    {
+        return handle;
     }
 
     public String getKey()
@@ -56,13 +63,13 @@ public abstract class ConfigModel
         this.iconClass = iconClass;
     }
 
-    public List<ConfigModel> getChildren()
+    public List<ConfigModel> getNested()
     {
-        return children;
+        return nested;
     }
 
-    public void setChildren(List<ConfigModel> children)
+    public void setNested(List<ConfigModel> nested)
     {
-        this.children = children;
+        this.nested = nested;
     }
 }

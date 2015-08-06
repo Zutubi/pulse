@@ -15,9 +15,9 @@ public class CompositeModel extends ConfigModel
     private FormModel form;
     private List<ActionModel> actions;
 
-    public CompositeModel(String key, String label)
+    public CompositeModel(String handle, String key, String label)
     {
-        super("composite", key, label);
+        super("composite", handle, key, label);
     }
 
     public Map<String, Object> getProperties()

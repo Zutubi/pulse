@@ -14,7 +14,7 @@ public class TypeSelectionModel extends ConfigModel
 
     public TypeSelectionModel(String key, String label)
     {
-        super("type-selection", key, label);
+        super("type-selection", null, key, label);
     }
 
     public List<Pair<Integer, String>> getConfiguredDescendants()

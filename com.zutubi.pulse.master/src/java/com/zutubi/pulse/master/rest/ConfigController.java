@@ -60,7 +60,7 @@ public class ConfigController
     private SystemPaths systemPaths;
 
     @RequestMapping(value = "/**", method = RequestMethod.GET)
-    public ResponseEntity<ConfigModel> get(HttpServletRequest request,
+    public ResponseEntity<ConfigModel[]> get(HttpServletRequest request,
                                            @RequestParam(value = "filter", required = false) String[] filters,
                                            @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
@@ -91,7 +91,7 @@ public class ConfigController
 
         ConfigModel model = createModel(filters, configPath, type, parentType, (MutableRecord) unstantiated, depth);
 
-        return new ResponseEntity<>(model, HttpStatus.OK);
+        return new ResponseEntity<>(new ConfigModel[]{model}, HttpStatus.OK);
     }
 
     private String[] canonicaliseFilters(String[] filters)
@@ -121,7 +121,7 @@ public class ConfigController
         ConfigModel model;
         if (type instanceof CollectionType)
         {
-            model = new CollectionModel(baseName, label);
+            model = new CollectionModel(Long.toString(record.getHandle()), baseName, label);
             if (isFieldSelected(filters, "type"))
             {
                 model.setType(new CollectionTypeModel((CollectionType) type));
@@ -143,8 +143,9 @@ public class ConfigController
         model.setIconClass(classificationManager.classify(path));
         if (depth != 0 && record != null)
         {
-            model.setChildren(getChildren(filters, path, type, record, depth - 1));
+            model.setNested(getNested(filters, path, type, record, depth - 1));
         }
+
         return model;
     }
 
@@ -209,7 +210,7 @@ public class ConfigController
     private CompositeModel createCompositeModel(String path, CompositeType type, String label, MutableRecord record, String[] filters) throws TypeException
     {
         String baseName = PathUtils.getBaseName(path);
-        CompositeModel model = new CompositeModel(baseName, label);
+        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label);
         Configuration instance = configurationTemplateManager.getInstance(path);
         if (isFieldSelected(filters, "properties"))
         {
@@ -302,7 +303,7 @@ public class ConfigController
         }
     }
 
-    private List<ConfigModel> getChildren(final String[] filters, final String path, final ComplexType type, final MutableRecord record, final int depth)
+    private List<ConfigModel> getNested(final String[] filters, final String path, final ComplexType type, final MutableRecord record, final int depth)
     {
         List<String> order;
         if (type instanceof CompositeType)

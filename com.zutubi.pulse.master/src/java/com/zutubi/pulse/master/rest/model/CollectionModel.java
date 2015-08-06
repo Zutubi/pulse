@@ -5,9 +5,9 @@ package com.zutubi.pulse.master.rest.model;
  */
 public class CollectionModel extends ConfigModel
 {
-    public CollectionModel(String key, String label)
+    public CollectionModel(String key, String handle, String label)
     {
-        super("collection", key, label);
+        super("collection", handle, key, label);
     }
 
 }
