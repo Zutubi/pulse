@@ -151,6 +151,7 @@ public class ToveUtils
         return !isFolder(path, configurationTemplateManager, configurationSecurityManager);
     }
 
+    // FIXME kendo this can die, it handles collapsed collections
     public static List<String> getPathListing(String path, Type type, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         List<String> listing = Collections.emptyList();
@@ -266,20 +267,6 @@ public class ToveUtils
         }
 
         return null;
-    }
-
-    public static List<String> getEmbeddedCollections(CompositeType ctype)
-    {
-        List<String> result = new LinkedList<String>();
-        for(TypeProperty property: ctype.getProperties())
-        {
-            if(isEmbeddedCollection(property.getType()))
-            {
-                result.add(property.getName());
-            }
-        }
-
-        return result;
     }
 
     public static boolean isEmbeddedCollection(Type type)

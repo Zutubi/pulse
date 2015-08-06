@@ -618,14 +618,14 @@ public class CompositeType extends AbstractType implements ComplexType
         return property.startsWith("meta.") || properties.containsKey(property);
     }
 
-    private void propertyFromXmlRpc(String tempalteOwnerPath, TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
+    private void propertyFromXmlRpc(String templateOwnerPath, TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
     {
         Object value = rpcForm.get(property.getName());
         if (value != null)
         {
             try
             {
-                result.put(property.getName(), property.getType().fromXmlRpc(tempalteOwnerPath, value, true));
+                result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
             }
             catch (TypeException e)
             {

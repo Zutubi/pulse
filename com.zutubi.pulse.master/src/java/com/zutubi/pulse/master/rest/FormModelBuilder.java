@@ -1,8 +1,10 @@
 package com.zutubi.pulse.master.rest;
 
+import com.google.common.base.Function;
 import com.zutubi.pulse.master.rest.model.forms.*;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
+import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
@@ -25,11 +27,20 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * Builds {@link FormModel} instances out of annotated type information.
  *
  * FIXME kendo this replaces FormDescriptorFactory (FormModel replaces FormDescriptor, and Form
  *       dies because we instantiate on the client)
+ *
+ * FIXME kendo it feels like this belongs in Tove (along with the models) as it is not really
+ *       specific to the RESTish API: it just makes a model that is not dependent on the backend
+ *       (and thus is suitable to serialise for any purpose).  However, some other models are
+ *       really just ways to represent things in an API-friendly manner, so the question is
+ *       whether it is better to keep forms with them (all models together)?
  */
 public class FormModelBuilder
 {
@@ -86,8 +97,23 @@ public class FormModelBuilder
         form.setActions(Arrays.asList("save", "cancel"));
 
         Form formAnnotation = type.getAnnotation(Form.class, true);
-        AnnotationUtils.setPropertiesFromAnnotation(formAnnotation, form);
+        List<String> fieldOrder = new ArrayList<>();
+        if (formAnnotation != null)
+        {
+            AnnotationUtils.setPropertiesFromAnnotation(formAnnotation, form);
+            fieldOrder.addAll(Arrays.asList(formAnnotation.fieldOrder()));
+        }
         addFields(parentPath, baseName, type, concrete, form);
+
+        fieldOrder = ToveUtils.evaluateFieldOrder(fieldOrder, newArrayList(transform(form.getFields(), new Function<FieldModel, String>()
+        {
+            public String apply(FieldModel field)
+            {
+                return field.getName();
+            }
+        })));
+
+        form.sortFields(fieldOrder);
 
         return form;
     }

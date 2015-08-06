@@ -1,9 +1,14 @@
 package com.zutubi.pulse.master.rest.model.forms;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Represents a form to display in a UI. Forms are sets of fields, plus some config parameters.
  */
 public class FormModel
 {
@@ -14,6 +19,8 @@ public class FormModel
     private String name;
     private String id;
     private String symbolicName;
+    // FIXME kendo we are overloading the term "action" here for both the Webwork action and the form submit
+    // actions. We should rename the latter once we've ditched the old forms to alleviate confusion.
     private String actionName = DEFAULT_ACTION;
     private List<String> actions = new ArrayList<>();
     private boolean readOnly = false;
@@ -63,6 +70,21 @@ public class FormModel
         this.actions = actions;
     }
 
+    public String getDefaultSubmit()
+    {
+        String defaultAction = actions.size() > 0 ? actions.get(0) : DEFAULT_ACTION;
+        if (actions.contains(ACTION_NEXT))
+        {
+            defaultAction = ACTION_NEXT;
+        }
+        else if (actions.contains(ACTION_FINISH))
+        {
+            defaultAction = ACTION_FINISH;
+        }
+
+        return defaultAction;
+    }
+
     public boolean isReadOnly()
     {
         return readOnly;
@@ -91,5 +113,28 @@ public class FormModel
     public void addField(FieldModel field)
     {
         fields.add(field);
+    }
+
+    public void sortFields(List<String> fieldOrder)
+    {
+        List<FieldModel> sortedFields = new ArrayList<>(fields.size());
+        for (final String fieldName: fieldOrder)
+        {
+            Optional<FieldModel> maybeField = Iterables.tryFind(fields, new Predicate<FieldModel>()
+            {
+                @Override
+                public boolean apply(FieldModel input)
+                {
+                    return input.getName().equals(fieldName);
+                }
+            });
+
+            if (maybeField.isPresent())
+            {
+                sortedFields.add(maybeField.get());
+            }
+        }
+
+        fields = sortedFields;
     }
 }

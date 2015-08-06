@@ -1,23 +1,33 @@
 package com.zutubi.pulse.master.rest.model;
 
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
-import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.CompositeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Model representing composites.
  */
 public class CompositeModel extends ConfigModel
 {
+    private Map<String, Object> properties;
     private FormModel form;
-    private List<ActionModel> actions = new ArrayList<>();
+    private List<ActionModel> actions;
 
-    public CompositeModel(CompositeType type, Configuration instance)
+    public CompositeModel(String key, String label)
     {
-        super(new CompositeTypeModel(type));
+        super("composite", key, label);
+    }
+
+    public Map<String, Object> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties)
+    {
+        this.properties = properties;
     }
 
     public FormModel getForm()
@@ -37,6 +47,10 @@ public class CompositeModel extends ConfigModel
 
     public void addAction(ActionModel action)
     {
+        if (actions == null)
+        {
+            actions = new ArrayList<>();
+        }
         actions.add(action);
     }
 }
