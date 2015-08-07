@@ -49,22 +49,8 @@
 
 <div id="content">
     <div id="notification"></div>
-    <div id="outer-split" style="height: 100%; width: 100%">
-        <div id="left-pane">
-            <div id="config-tree" class="pane-content">
-                Config Tree
-            </div>
-        </div>
-        <div id="center-pane">
-            <div class="pane-content">
-                <p>Main pane. <a href="#" onclick="showLoginForm();">doit</a> </p>
-            </div>
-        </div>
-        <div id="right-pane">
-            <div class="pane-content">
-                <p>Help pane.</p>
-            </div>
-        </div>
+    <div id="config-view" style="height: 100%; width: 100%">
+
     </div>
 </div>
 
@@ -86,6 +72,37 @@
     });
 
     var notificationWidget = notificationElement.data("kendoNotification");
+
+    function zaReportError(message)
+    {
+        notificationWidget.error(message);
+    }
+
+    function zaAjaxError(jqXHR)
+    {
+        var message = '';
+        if (jqXHR.statusText)
+        {
+            message = jqXHR.statusText + ' ';
+        }
+
+        message += '(' + jqXHR.status + ')';
+
+        try
+        {
+            details = JSON.parse(jqXHR.responseText);
+            if (details.message)
+            {
+                message += ': ' + details.message;
+            }
+        }
+        catch(e)
+        {
+            // Do nothing.
+        }
+
+        return message;
+    }
 
     var router = new kendo.Router({
         root: window.baseUrl + '/admina',
@@ -149,14 +166,39 @@
         });
     }
 
-    function loadTemplatedScope(path)
+    function showScope(scope)
     {
-        var configTree = $("#config-tree").kendoZaConfigTree().data("kendoZaConfigTree");
-        configTree.bind("pathselect", function(e) {
-            console.log('selected path ' + e.path);
-        });
+        window.configPanel.destroy();
+        window.configPanel = null;
+    }
 
-//        jQuery.ajax({
+    function subpath(path, begin, end)
+    {
+        var elements = path.split('/');
+
+        if (typeof end === "undefined")
+        {
+            end = elements.length;
+        }
+
+        elements = elements.slice(begin, end);
+        return elements.join('/');
+    }
+
+    function showConfig(path)
+    {
+        if (!window.configPanel)
+        {
+            window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
+            window.configPanel.bind('pathselect', function (e) {
+                router.navigate(e.path, true);
+            })
+        }
+
+        window.configPanel.setPath(path);
+    }
+
+    //        jQuery.ajax({
 //            type: "GET",
 //            url: window.baseUrl + "/api/config/" + "projects/lgit?depth=-1",
 //            dataType: 'json',
@@ -176,14 +218,20 @@
 //                console.log(jqXHR.responseText);
 //            }
 //        });
-    }
 
     router.route("/", function(path) {
         router.navigate("/projects/");
     });
 
     router.route("/projects/*path", function(path) {
-        loadTemplatedScope(path);
+        if (path)
+        {
+            showConfig('projects/' + path);
+        }
+        else
+        {
+            showScope('projects');
+        }
     });
 
     router.route("/agents/*path", function(path) {
@@ -207,13 +255,6 @@
     });
 
     $(document).ready(function () {
-        $("#outer-split").kendoSplitter({
-            panes: [
-                { collapsible: true, size: "250px" },
-                { collapsible: false },
-                { collapsible: true, size: "250px" }
-            ]
-        });
         router.start();
     });
 </script>
