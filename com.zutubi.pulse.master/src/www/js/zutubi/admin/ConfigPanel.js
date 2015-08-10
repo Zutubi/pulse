@@ -6,7 +6,8 @@
         PATHSELECT = 'pathselect';
 
     Zutubi.admin.ConfigPanel = Observable.extend({
-        init: function (containerSelector) {
+        init: function (containerSelector)
+        {
             var that = this;
 
             Observable.fn.init.call(this);
@@ -49,7 +50,8 @@
             PATHSELECT
         ],
 
-        setPath: function(path) {
+        setPath: function(path)
+        {
             this.configTree.setRootPath(subpath(path, 0, 2));
             this.configTree.selectConfig(subpath(path, 2));
         }

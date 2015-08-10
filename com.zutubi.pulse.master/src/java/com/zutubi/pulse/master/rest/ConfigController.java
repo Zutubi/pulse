@@ -121,7 +121,7 @@ public class ConfigController
         ConfigModel model;
         if (type instanceof CollectionType)
         {
-            model = new CollectionModel(Long.toString(record.getHandle()), baseName, label);
+            model = new CollectionModel(baseName, Long.toString(record.getHandle()), label);
             if (isFieldSelected(filters, "type"))
             {
                 model.setType(new CollectionTypeModel((CollectionType) type));
