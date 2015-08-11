@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 
-(function($) {
+(function($)
+{
     var ui = kendo.ui,
         TreeView = ui.TreeView,
         PATHSELECT = "pathselect";

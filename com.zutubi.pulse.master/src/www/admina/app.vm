@@ -142,10 +142,12 @@
                 "Content-Type": "application/json; charset=utf-8"
             },
             data: JSON.stringify(data),
-            success: function (data, status, jqXHR) {
+            success: function (data, status, jqXHR)
+            {
                 $("#login").data("kendoWindow").close();
             },
-            error: function (jqXHR, textStatus) {
+            error: function (jqXHR, textStatus)
+            {
                 var data, errorWidget, message;
                 if (jqXHR.status === 401)
                 {
@@ -198,32 +200,12 @@
         window.configPanel.setPath(path);
     }
 
-    //        jQuery.ajax({
-//            type: "GET",
-//            url: window.baseUrl + "/api/config/" + "projects/lgit?depth=-1",
-//            dataType: 'json',
-//            headers: {
-//                Accept: "application/json; charset=utf-8",
-//                "Content-Type": "application/json; charset=utf-8"
-//            },
-//            success: function (data, status, jqXHR) {
-//                console.log('success');
-//                console.dir(data);
-//            },
-//            error: function (jqXHR, textStatus) {
-//                if (jqXHR.status === 401)
-//                {
-//                    showLoginForm();
-//                }
-//                console.log(jqXHR.responseText);
-//            }
-//        });
-
     router.route("/", function(path) {
         router.navigate("/projects/");
     });
 
-    router.route("/projects/*path", function(path) {
+    router.route("/projects/*path", function(path)
+    {
         if (path)
         {
             showConfig('projects/' + path);
@@ -234,27 +216,33 @@
         }
     });
 
-    router.route("/agents/*path", function(path) {
+    router.route("/agents/*path", function(path)
+    {
         console.dir(path);
     });
 
-    router.route("/settings/*path", function(path) {
+    router.route("/settings/*path", function(path)
+    {
         console.dir(path);
     });
 
-    router.route("/users/*path", function(path) {
+    router.route("/users/*path", function(path)
+    {
         console.dir(path);
     });
 
-    router.route("/groups/*path", function(path) {
+    router.route("/groups/*path", function(path)
+    {
         console.dir(path);
     });
 
-    router.route("/plugins(/:id)", function(id) {
+    router.route("/plugins(/:id)", function(id)
+    {
         console.dir(id);
     });
 
-    $(document).ready(function () {
+    $(document).ready(function()
+    {
         router.start();
     });
 </script>

@@ -25,6 +25,10 @@ body {
     overflow: auto;
 }
 
+#outer-split {
+    border-width: 0;
+}
+
 #footer {
     position: fixed;
     bottom: 0;
@@ -32,6 +36,11 @@ body {
     right: 0;
     height: 20px;
     background-color: #abcdef;
+}
+
+.pane-content {
+    width: 100%;
+    height: 100%;
 }
 
 table.form {
