@@ -51,21 +51,21 @@ public interface OptionProvider
     List getOptions(Object instance, String parentPath, TypeProperty property);
 
     /**
-     * Defines the key/property to be used to retrieve the option key from the
-     * items in the collection.  The key is submitted back by the UI when the
-     * user selects the option.
+     * Defines the key/property to be used to retrieve the option value from
+     * the items in the collection.  The value is submitted back by the UI when
+     * the user selects the option.
      *
-     * @return the key / property name used to retrieve the option key from the
-     * collection item, or null if the item itself is the key.
-     */
-    String getOptionKey();
-
-    /**
-     * Defines the key/property to be used to retrieve the option value from the
-     * items in the collection.  The value is displayed to the user.
-     *
-     * @return the key / property name used to retrieve the option value from the 
-     * collection item, or null if the item itself is the value.
+     * @return the key / property name used to retrieve the option value from
+     *         the collection item, or null if the item itself is the value.
      */
     String getOptionValue();
+
+    /**
+     * Defines the key/property to be used to retrieve the option text from the
+     * items in the collection.  The text is displayed to the user.
+     *
+     * @return the key / property name used to retrieve the option text from the
+     *         collection item, or null if the item itself is the text.
+     */
+    String getOptionText();
 }

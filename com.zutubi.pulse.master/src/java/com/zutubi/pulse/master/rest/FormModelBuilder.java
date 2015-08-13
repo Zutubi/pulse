@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.rest;
 
 import com.google.common.base.Function;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.model.forms.*;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
@@ -93,6 +94,7 @@ public class FormModelBuilder
 
     public FormModel createForm(String parentPath, String baseName, CompositeType type, boolean concrete, String name)
     {
+        Messages messages = Messages.getInstance(type.getClazz());
         FormModel form = new FormModel(name, type.getClazz().getName(), type.getSymbolicName());
         form.setActions(Arrays.asList("save", "cancel"));
 
@@ -103,7 +105,9 @@ public class FormModelBuilder
             AnnotationUtils.setPropertiesFromAnnotation(formAnnotation, form);
             fieldOrder.addAll(Arrays.asList(formAnnotation.fieldOrder()));
         }
-        addFields(parentPath, baseName, type, concrete, form);
+        addFields(parentPath, baseName, type, messages, concrete, form);
+
+        transformOptionFieldTypes(form);
 
         fieldOrder = ToveUtils.evaluateFieldOrder(fieldOrder, newArrayList(transform(form.getFields(), new Function<FieldModel, String>()
         {
@@ -118,14 +122,14 @@ public class FormModelBuilder
         return form;
     }
 
-    private void addFields(String parentPath, String baseName, CompositeType type, boolean concrete, FormModel form)
+    private void addFields(String parentPath, String baseName, CompositeType type, Messages messages, boolean concrete, FormModel form)
     {
         List<Validator> validators = getValidators(parentPath, baseName, concrete, type);
         String path = PathUtils.getPath(parentPath, baseName);
 
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
-            FieldModel fd = createField(path, property);
+            FieldModel fd = createField(path, property, messages);
             addFieldParameters(type, parentPath, property, fd, validators);
             form.addField(fd);
         }
@@ -143,23 +147,15 @@ public class FormModelBuilder
                     fieldType = field.type();
                 }
 
-                FieldModel fd = createFieldOfType(fieldType);
+                FieldModel fd = createFieldOfType(fieldType, path, property, messages);
                 if (fd instanceof OptionFieldModel)
                 {
                     ((OptionFieldModel) fd).setMultiple(true);
                 }
-                initialiseField(fd, fieldType, path, property);
                 addFieldParameters(type, parentPath, property, fd, validators);
                 form.addField(fd);
             }
         }
-    }
-
-    private void initialiseField(FieldModel fd, String fieldType, String path, TypeProperty property)
-    {
-        fd.setPath(path);
-        fd.setName(property.getName());
-        fd.setType(fieldType);
     }
 
     private List<Validator> getValidators(String parentPath, String baseName, boolean concrete, CompositeType type)
@@ -180,7 +176,7 @@ public class FormModelBuilder
         return validators;
     }
 
-    private FieldModel createField(String path, TypeProperty property)
+    private FieldModel createField(String path, TypeProperty property, Messages messages)
     {
         String fieldType = FieldType.TEXT;
         com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
@@ -201,31 +197,35 @@ public class FormModelBuilder
             }
         }
 
-        FieldModel fd = createFieldOfType(fieldType);
-        initialiseField(fd, fieldType, path, property);
-
-        return fd;
+        return createFieldOfType(fieldType, path, property, messages);
     }
 
-    private FieldModel createFieldOfType(String type)
+    private FieldModel createFieldOfType(String type, String path, TypeProperty property, Messages messages)
     {
         Class<? extends FieldModel> clazz = fieldDescriptorTypes.get(type);
+        FieldModel field;
         if (clazz == null)
         {
-            return new FieldModel();
+            field = new FieldModel();
         }
         else
         {
             try
             {
-                return clazz.newInstance();
+                field = clazz.newInstance();
             }
             catch (Exception e)
             {
                 LOG.severe(e);
-                return new FieldModel();
+                field = new FieldModel();
             }
         }
+
+        field.setPath(path);
+        field.setName(property.getName());
+        field.setType(type);
+        field.setLabel(messages.format(property.getName() + ".label"));
+        return field;
     }
 
     private void addFieldParameters(CompositeType type, String parentPath, TypeProperty property, FieldModel field, List<Validator> validators)
@@ -272,8 +272,8 @@ public class FormModelBuilder
             // does not make use of the instance.
             EnumOptionProvider optionProvider = new EnumOptionProvider();
             fd.setList(optionProvider.getOptions(null, parentPath, typeProperty));
-            fd.setListKey(optionProvider.getOptionKey());
             fd.setListValue(optionProvider.getOptionValue());
+            fd.setListText(optionProvider.getOptionText());
 
             Object emptyOption = optionProvider.getEmptyOption(null, parentPath, typeProperty);
             if (emptyOption != null)
@@ -309,6 +309,30 @@ public class FormModelBuilder
                 catch (Exception e)
                 {
                     LOG.warning("Unexpected exception processing the annotation handler.", e);
+                }
+            }
+        }
+    }
+
+    private void transformOptionFieldTypes(FormModel form)
+    {
+        // FIXME kendo: this is a hack to replace something that happened on instantiate previously.
+        // We need some other way for this to happen, maybe in the annotation handlers?
+        for (FieldModel field: form.getFields())
+        {
+            if (field instanceof OptionFieldModel && !(field instanceof ControllingSelectFieldModel))
+            {
+                OptionFieldModel optionFieldModel = (OptionFieldModel) field;
+                if (!optionFieldModel.isMultiple() && optionFieldModel.getSize() <= 1)
+                {
+                    if (optionFieldModel.isEditable())
+                    {
+                        optionFieldModel.setType(FieldType.COMBOBOX);
+                    }
+                    else
+                    {
+                        optionFieldModel.setType(FieldType.DROPDOWN);
+                    }
                 }
             }
         }

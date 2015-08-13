@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.tove.config.user;
 
 import com.zutubi.pulse.master.notifications.renderer.BuildResultRenderer;
 import com.zutubi.pulse.master.notifications.renderer.TemplateInfo;
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -16,9 +15,9 @@ public class SubscriptionTemplateOptionProvider extends MapOptionProvider
 {
     private BuildResultRenderer buildResultRenderer;
 
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
-        return new MapOption("", "");
+        return new Option("", "");
     }
 
     protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)

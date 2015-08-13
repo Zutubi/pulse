@@ -273,8 +273,8 @@ public class FormDescriptorFactory
             // does not make use of the instance.
             EnumOptionProvider optionProvider = new EnumOptionProvider();
             fd.setList(optionProvider.getOptions(null, parentPath, fd.getProperty()));
-            fd.setListKey(optionProvider.getOptionKey());
-            fd.setListValue(optionProvider.getOptionValue());
+            fd.setListKey(optionProvider.getOptionValue());
+            fd.setListValue(optionProvider.getOptionText());
 
             Object emptyOption = optionProvider.getEmptyOption(null, parentPath, fd.getProperty());
             if (emptyOption != null)

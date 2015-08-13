@@ -1,9 +1,15 @@
 package com.zutubi.pulse.master.tove.handler;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract base for the common case of providing a map of options with keys
@@ -12,38 +18,68 @@ import java.util.*;
  */
 public abstract class MapOptionProvider implements OptionProvider
 {
-    public abstract MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property);
+    public abstract Option getEmptyOption(Object instance, String parentPath, TypeProperty property);
 
-    public List<Map.Entry<String, String>> getOptions(Object instance, String parentPath, TypeProperty property)
+    public List<Option> getOptions(Object instance, String parentPath, TypeProperty property)
     {
         Map<String, String> optionMap = getMap(instance, parentPath, property);
-        List<Map.Entry<String, String>> options = new ArrayList<Map.Entry<String, String>>(optionMap.entrySet());
+        List<Option> options = Lists.newArrayList(Iterables.transform(optionMap.entrySet(), new Function<Map.Entry<String, String>, Option>()
+        {
+            @Override
+            public Option apply(Map.Entry<String, String> input)
+            {
+                return new Option(input.getKey(), input.getValue());
+            }
+        }));
+
         sort(options);
         return options;
     }
 
-    protected void sort(List<Map.Entry<String, String>> options)
+    protected void sort(List<Option> options)
     {
-        // By default, lexically sort by the values (what is displayed)
         final Comparator<String> comparator = new Sort.StringComparator();
-        Collections.sort(options, new Comparator<Map.Entry<String, String>>()
+        Collections.sort(options, new Comparator<Option>()
         {
-            public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2)
+            @Override
+            public int compare(Option o1, Option o2)
             {
-                return comparator.compare(o1.getValue(), o2.getValue());
+                return comparator.compare(o1.getText(), o2.getText());
             }
         });
     }
 
     protected abstract Map<String, String> getMap(Object instance, String parentPath, TypeProperty property);
 
-    public String getOptionKey()
-    {
-        return "key";
-    }
-
     public String getOptionValue()
     {
         return "value";
+    }
+
+    public String getOptionText()
+    {
+        return "text";
+    }
+
+    public static class Option
+    {
+        private String value;
+        private String text;
+
+        public Option(String value, String text)
+        {
+            this.value = value;
+            this.text = text;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+
+        public String getText()
+        {
+            return text;
+        }
     }
 }

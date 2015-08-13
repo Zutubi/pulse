@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.TypeProperty;
@@ -18,7 +17,7 @@ public class ProjectAuthorityProvider extends MapOptionProvider
 {
     private static final Messages I18N = Messages.getInstance(ProjectAuthorityProvider.class);
 
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
     }

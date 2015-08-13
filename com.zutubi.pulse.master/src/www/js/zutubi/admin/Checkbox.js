@@ -30,7 +30,7 @@
 
             if (typeof options.value !== "undefined")
             {
-                this.bindValue(value);
+                this.bindValue(options.value);
             }
         },
 

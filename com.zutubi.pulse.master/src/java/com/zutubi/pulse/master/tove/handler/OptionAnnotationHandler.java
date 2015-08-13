@@ -58,13 +58,13 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             field.setEmptyOption(emptyOption);
         }
 
-        String key = optionProvider.getOptionKey();
+        String key = optionProvider.getOptionValue();
         if (key != null)
         {
             field.setListKey(key);
         }
 
-        String value = optionProvider.getOptionValue();
+        String value = optionProvider.getOptionText();
         if (value != null)
         {
             field.setListValue(value);
@@ -107,16 +107,16 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             field.setEmptyOption(emptyOption);
         }
 
-        String key = optionProvider.getOptionKey();
+        String key = optionProvider.getOptionValue();
         if (key != null)
         {
-            field.setListKey(key);
+            field.setListValue(key);
         }
 
-        String value = optionProvider.getOptionValue();
+        String value = optionProvider.getOptionText();
         if (value != null)
         {
-            field.setListValue(value);
+            field.setListText(value);
         }
     }
 

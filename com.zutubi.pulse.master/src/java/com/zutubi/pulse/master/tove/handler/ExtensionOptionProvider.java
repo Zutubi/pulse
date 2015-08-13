@@ -27,7 +27,7 @@ public class ExtensionOptionProvider extends MapOptionProvider
         this.extensions = extensions;
     }
 
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
     }

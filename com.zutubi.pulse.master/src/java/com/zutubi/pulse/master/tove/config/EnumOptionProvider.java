@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
@@ -16,9 +15,9 @@ import java.util.Map;
  */
 public class EnumOptionProvider extends MapOptionProvider
 {
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
-        return new MapOption("", "");
+        return new Option("", "");
     }
 
     public Map<String,String> getMap(Object instance, String path, TypeProperty property)

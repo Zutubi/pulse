@@ -74,7 +74,7 @@
                 },
                 success: function (data)
                 {
-                    if (data.length == 1)
+                    if (data.length === 1)
                     {
                         that.showContent(data[0]);
                     }

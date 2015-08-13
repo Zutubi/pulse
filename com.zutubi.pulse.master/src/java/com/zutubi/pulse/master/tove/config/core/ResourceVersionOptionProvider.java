@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.core;
 
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
@@ -14,7 +13,7 @@ import java.util.*;
  */
 public class ResourceVersionOptionProvider extends MapOptionProvider
 {
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         // There is always an 'empty' option.
         return null;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
 import com.google.common.collect.ImmutableMap;
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -27,7 +26,7 @@ public class BrowseViewColumnsOptionProvider extends MapOptionProvider
             .put(KEY_WARNINGS, "warning count")
             .build();
 
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
     }

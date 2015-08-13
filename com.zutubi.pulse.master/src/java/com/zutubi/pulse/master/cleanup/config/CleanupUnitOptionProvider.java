@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.cleanup.config;
 
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.tove.type.TypeProperty;
 
 /**
@@ -10,7 +9,7 @@ import com.zutubi.tove.type.TypeProperty;
  */
 public class CleanupUnitOptionProvider extends EnumOptionProvider
 {
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         return null;
     }

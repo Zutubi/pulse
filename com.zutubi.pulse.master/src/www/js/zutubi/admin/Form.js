@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
 // dependency: ./Checkbox.js
+// dependency: ./DropDownList.js
 // dependency: ./TextField.js
 
 (function($)
@@ -24,7 +25,7 @@
             name: "ZaForm",
             template: '<form name="#: name #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
-            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: name #</label></th><td></td></tr>'
+            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td></td></tr>'
         },
 
         _create: function()
@@ -75,6 +76,10 @@
                 {
                     this.fields.push(fieldElement.kendoZaCheckbox({structure: fieldOptions}).data("kendoZaCheckbox"));
                 }
+                if (fieldOptions.type === "dropdown")
+                {
+                    this.fields.push(fieldElement.kendoZaDropDownList({structure: fieldOptions}).data("kendoZaDropDownList"));
+                }
                 else if (fieldOptions.type === "text")
                 {
                     this.fields.push(fieldElement.kendoZaTextField({structure: fieldOptions}).data("kendoZaTextField"));
@@ -92,7 +97,7 @@
                 name = field.getFieldName();
                 if (values.hasOwnProperty(name))
                 {
-                    field.bindValue(values[name])
+                    field.bindValue(values[name]);
                 }
             }
         }

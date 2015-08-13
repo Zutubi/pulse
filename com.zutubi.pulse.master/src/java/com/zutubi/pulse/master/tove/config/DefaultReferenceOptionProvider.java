@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.tove.config;
 
-import com.zutubi.pulse.master.tove.handler.MapOption;
 import com.zutubi.pulse.master.tove.handler.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -30,7 +29,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
         // An empty option is always available from getMap.
         return null;

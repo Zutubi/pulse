@@ -129,7 +129,7 @@
                     }
                 }
 
-                if (j == children.length)
+                if (j === children.length)
                 {
                     break;
                 }

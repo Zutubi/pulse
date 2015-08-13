@@ -13,8 +13,8 @@ public class OptionFieldModel extends FieldModel
     private boolean editable;
     private Object emptyOption;
     private List list;
-    private String listKey;
     private String listValue;
+    private String listText;
     private boolean multiple;
     private int size;
     private boolean lazy;
@@ -65,16 +65,6 @@ public class OptionFieldModel extends FieldModel
         this.list = list;
     }
 
-    public String getListKey()
-    {
-        return listKey;
-    }
-
-    public void setListKey(String listKey)
-    {
-        this.listKey = listKey;
-    }
-
     public String getListValue()
     {
         return listValue;
@@ -83,6 +73,16 @@ public class OptionFieldModel extends FieldModel
     public void setListValue(String listValue)
     {
         this.listValue = listValue;
+    }
+
+    public String getListText()
+    {
+        return listText;
+    }
+
+    public void setListText(String listText)
+    {
+        this.listText = listText;
     }
 
     public boolean isMultiple()
