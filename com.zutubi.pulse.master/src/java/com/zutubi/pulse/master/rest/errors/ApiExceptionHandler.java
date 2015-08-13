@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.rest.errors;
 
-import com.zutubi.pulse.master.api.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +41,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
     public final ResponseEntity<Object> handleValidationFailed(Exception ex, WebRequest request)
     {
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-        return handleExceptionInternal(ex, null, new HttpHeaders(), status, request);
+        return handleExceptionInternal(ex, ((ValidationException) ex).getError(), new HttpHeaders(), status, request);
     }
 
     @Override

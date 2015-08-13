@@ -6,8 +6,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
-import com.zutubi.pulse.master.api.ValidationException;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
+import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
@@ -96,7 +96,7 @@ public class ConfigController
     @RequestMapping(value = "/**", method = RequestMethod.PUT)
     public ResponseEntity<String> put(HttpServletRequest request,
                                       @RequestBody CompositeModel config,
-                                      @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException, ValidationException
+                                      @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
         String configPath = getConfigPath(request);
 
@@ -113,16 +113,17 @@ public class ConfigController
             throw new IllegalArgumentException("Configuration path '" + configPath + "' refers to unsupported type " + type.toString() + " (PUT is only supported for composite types)");
         }
 
+        CompositeType compositeType = (CompositeType) type;
         String parentPath = PathUtils.getParentPath(configPath);
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
 
-        MutableRecord record = convertProperties((CompositeType) type, templateOwnerPath, config.getProperties());
+        MutableRecord record = convertProperties(compositeType, templateOwnerPath, config.getProperties());
         ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
 
         Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);
         if (!instance.isValid())
         {
-            throw new ValidationException(type, instance);
+            throw new ValidationException(compositeType, instance);
         }
 
         return new ResponseEntity<>(configurationTemplateManager.saveRecord(configPath, record, false), HttpStatus.OK);

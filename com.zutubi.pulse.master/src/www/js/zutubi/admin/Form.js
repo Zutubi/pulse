@@ -29,7 +29,8 @@
             template: '<form name="#: name #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td></td></tr>',
-            buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>'
+            buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
+            errorTemplate: '<li>#: message #</li>'
         },
 
         _create: function()
@@ -47,6 +48,7 @@
             this.hiddenTemplate = kendo.template(this.options.hiddenTemplate);
             this.fieldTemplate = kendo.template(this.options.fieldTemplate);
             this.buttonTemplate = kendo.template(this.options.buttonTemplate);
+            this.errorTemplate = kendo.template(this.options.errorTemplate);
 
             this.element.html(this.template(structure));
             this.formElement = this.element.find("form");
@@ -135,6 +137,7 @@
             }
             else
             {
+                this.clearValidationErrors();
                 this.trigger(SUBMIT, {value: value});
             }
         },
@@ -161,6 +164,7 @@
 
         resetValues: function()
         {
+            this.clearValidationErrors();
             if (this.originalValues)
             {
                 this.bindValues(this.originalValues);
@@ -178,6 +182,74 @@
             }
 
             return values;
+        },
+
+        getFieldNamed: function(name)
+        {
+            var i, field;
+
+            for (i = 0; i < this.fields.length; i++)
+            {
+                field = this.fields[i];
+                if (field.getFieldName() === name)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        },
+
+        clearValidationErrors: function()
+        {
+            this.element.find(".validation-errors").remove();
+        },
+
+        showValidationErrors: function(errorDetails)
+        {
+            var field, fieldErrors;
+
+            if (errorDetails.instanceErrors)
+            {
+                this._showInstanceErrors(errorDetails.instanceErrors);
+            }
+
+            fieldErrors = errorDetails.fieldErrors;
+            if (fieldErrors)
+            {
+                for (field in fieldErrors)
+                {
+                    if (fieldErrors.hasOwnProperty(field))
+                    {
+                        this._showFieldErrors(field, fieldErrors[field]);
+                    }
+                }
+            }
+        },
+
+        _showInstanceErrors: function(messages)
+        {
+            // FIXME kendo : what is an appropriate spot for these?
+        },
+
+        _showFieldErrors: function(fieldName, messages)
+        {
+            var i, field, fieldCell, errorList;
+
+            if (messages.length)
+            {
+                field = this.getFieldNamed(fieldName);
+                if (field)
+                {
+                    fieldCell = field.element.closest("td");
+                    fieldCell.append('<ul class="validation-errors"></ul>');
+                    errorList = fieldCell.children('.validation-errors');
+                    for (i = 0; i < messages.length; i++)
+                    {
+                        errorList.append(this.errorTemplate({message: messages[i]}));
+                    }
+                }
+            }
         }
     });
 

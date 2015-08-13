@@ -55,7 +55,6 @@
 
         setPath: function(path)
         {
-            this.path = path;
             this.configTree.setRootPath(subpath(path, 0, 2));
             this.configTree.selectConfig(subpath(path, 2));
             this.loadContentPanes(path);
@@ -64,6 +63,8 @@
         loadContentPanes: function(path)
         {
             var that = this;
+
+            this.path = path;
 
             jQuery.ajax({
                 type: "GET",
@@ -170,9 +171,27 @@
                 },
                 error: function (jqXHR, textStatus)
                 {
+                    var details;
+
                     if (jqXHR.status === 401)
                     {
                         showLoginForm();
+                    }
+                    else if (jqXHR.status == 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                that.form.showValidationErrors(details);
+                                return;
+                            }
+                        }
+                        catch(e)
+                        {
+                            // Do nothing.
+                        }
                     }
 
                     zaReportError("Could not save configuration: " + zaAjaxError(jqXHR));
