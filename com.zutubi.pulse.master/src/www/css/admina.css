@@ -54,3 +54,7 @@ table.form {
 .form th, .form td {
     padding: 0.33em;
 }
+
+.form td.submit {
+    text-align: center;
+}

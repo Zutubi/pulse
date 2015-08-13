@@ -55,6 +55,7 @@
 
         setPath: function(path)
         {
+            this.path = path;
             this.configTree.setRootPath(subpath(path, 0, 2));
             this.configTree.selectConfig(subpath(path, 2));
             this.loadContentPanes(path);
@@ -97,17 +98,19 @@
 
         showContent: function(data)
         {
+            this.data = data;
+
             if (data.kind === "composite")
             {
-                this.showComposite(data);
+                this._showComposite(data);
             }
             else if (data.kind === "collection")
             {
-                this.showCollection(data);
+                this._showCollection(data);
             }
             else if (data.kind === "type-selection")
             {
-                this.showTypeSelection(data);
+                this._showTypeSelection(data);
             }
             else
             {
@@ -115,27 +118,101 @@
             }
         },
 
-        showComposite: function(data)
+        _showComposite: function(data)
         {
+            var that = this;
+
             console.log("composite");
             console.dir(data);
 
-            this.form = $("#center-pane-content").kendoZaForm({
+            that.form = $("#center-pane-content").kendoZaForm({
                 structure: data.form,
                 values: data.properties
             }).data("kendoZaForm");
+
+            that.form.bind("submit", function(e)
+            {
+                that._saveComposite(that.form.getValues());
+            });
         },
 
-        showCollection: function(data)
+        _showCollection: function(data)
         {
             console.log("collection");
             console.dir(data);
         },
 
-        showTypeSelection: function(data)
+        _showTypeSelection: function(data)
         {
             console.log("type select");
             console.dir(data);
+        },
+
+        _saveComposite: function(properties)
+        {
+            var that = this;
+
+            that._coerce(properties);
+
+            jQuery.ajax({
+                type: "PUT",
+                url: window.baseUrl + "/api/config/" + that.path + "?depth=-1",
+                dataType: "json",
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                data: JSON.stringify({properties: properties}),
+                success: function (data)
+                {
+                    console.log('save succcess');
+                    console.dir(data);
+                },
+                error: function (jqXHR, textStatus)
+                {
+                    if (jqXHR.status === 401)
+                    {
+                        showLoginForm();
+                    }
+
+                    zaReportError("Could not save configuration: " + zaAjaxError(jqXHR));
+                }
+            });
+        },
+
+        _coerce: function(properties)
+        {
+            var i,
+                propertyTypes = this.data.type.simpleProperties,
+                propertyType;
+
+            for (i = 0; i < propertyTypes.length; i++)
+            {
+                propertyType = propertyTypes[i];
+                if (propertyType.shortType === "int")
+                {
+                    this._coerceInt(properties, propertyType.name);
+                }
+            }
+        },
+
+        _coerceInt: function(properties, name)
+        {
+            var value, newValue;
+            if (properties.hasOwnProperty(name))
+            {
+                value = properties[name];
+                if (value === "")
+                {
+                    newValue = null;
+                }
+                else
+                {
+                    newValue = Number(value);
+                }
+
+                properties[name] = newValue;
+            }
         }
     });
 }(jQuery));

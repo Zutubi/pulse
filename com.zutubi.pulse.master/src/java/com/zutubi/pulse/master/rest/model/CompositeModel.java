@@ -15,6 +15,11 @@ public class CompositeModel extends ConfigModel
     private FormModel form;
     private List<ActionModel> actions;
 
+    public CompositeModel()
+    {
+        super("composite");
+    }
+
     public CompositeModel(String handle, String key, String label)
     {
         super("composite", handle, key, label);

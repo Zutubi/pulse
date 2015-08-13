@@ -15,6 +15,11 @@ public abstract class ConfigModel
     private String iconClass;
     private List<ConfigModel> nested;
 
+    protected ConfigModel(String kind)
+    {
+        this(kind, null, null, null);
+    }
+
     protected ConfigModel(String kind, String handle, String key, String label)
     {
         this.kind = kind;

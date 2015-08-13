@@ -553,7 +553,7 @@ public class CompositeType extends AbstractType implements ComplexType
      * @return the symbolic name of the type of the struct
      * @throws TypeException if no symbolic name is found in the struct
      */
-    public static String getTypeFromXmlRpc(Hashtable rpcForm) throws TypeException
+    public static String getTypeFromXmlRpc(Map rpcForm) throws TypeException
     {
         Object o = rpcForm.get(XML_RPC_SYMBOLIC_NAME);
         if (o == null)
@@ -567,9 +567,9 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public MutableRecord fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
-        typeCheck(data, Hashtable.class);
+        typeCheck(data, Map.class);
 
-        Hashtable rpcForm = (Hashtable) data;
+        Map rpcForm = (Map) data;
         String symbolicName = getTypeFromXmlRpc(rpcForm);
         if (symbolicName.equals(getSymbolicName()))
         {
@@ -618,7 +618,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return property.startsWith("meta.") || properties.containsKey(property);
     }
 
-    private void propertyFromXmlRpc(String templateOwnerPath, TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
+    private void propertyFromXmlRpc(String templateOwnerPath, TypeProperty property, Map rpcForm, MutableRecord result) throws TypeException
     {
         Object value = rpcForm.get(property.getName());
         if (value != null)

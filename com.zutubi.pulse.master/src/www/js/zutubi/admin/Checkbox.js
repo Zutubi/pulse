@@ -42,6 +42,11 @@
         bindValue: function(value)
         {
             this.inputElement.prop("checked", value);
+        },
+
+        getValue: function()
+        {
+            return this.inputElement.prop("checked");
         }
     });
 

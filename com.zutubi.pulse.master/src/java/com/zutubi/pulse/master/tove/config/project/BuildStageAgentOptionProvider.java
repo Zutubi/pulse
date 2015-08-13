@@ -10,15 +10,10 @@ import java.util.Map;
  */
 public class BuildStageAgentOptionProvider extends DefaultReferenceOptionProvider
 {
-    public Option getEmptyOption(Object instance, String parentPath, TypeProperty property)
-    {
-        return null;
-    }
-
     public Map<String, String> getMap(Object instance, String path, TypeProperty property)
     {
         Map<String, String> allAgents = super.getMap(instance, path, property);
-        allAgents.put("0", "[any capable]");
+        allAgents.put("", "[any capable]");
         return allAgents;
     }
 }

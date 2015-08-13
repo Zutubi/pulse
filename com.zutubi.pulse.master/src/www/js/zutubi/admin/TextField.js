@@ -51,6 +51,11 @@
         bindValue: function(value)
         {
             this.inputElement.prop("value", value);
+        },
+
+        getValue: function()
+        {
+            return this.inputElement.prop("value");
         }
     });
 

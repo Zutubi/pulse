@@ -6,6 +6,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
+import com.zutubi.pulse.master.api.ValidationException;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
@@ -30,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,10 +62,7 @@ public class ConfigController
                                            @RequestParam(value = "filter", required = false) String[] filters,
                                            @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
-        String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        AntPathMatcher apm = new AntPathMatcher();
-        String configPath = apm.extractPathWithinPattern(bestMatchPattern, requestPath);
+        String configPath = getConfigPath(request);
 
         filters = canonicaliseFilters(filters);
 
@@ -92,6 +87,87 @@ public class ConfigController
         ConfigModel model = createModel(filters, configPath, type, parentType, (MutableRecord) unstantiated, depth);
 
         return new ResponseEntity<>(new ConfigModel[]{model}, HttpStatus.OK);
+    }
+
+    // PUT <path> to update composite. Collection paths are errors.
+    // POST <path> to add to a collection. Composite paths are errors.
+    // DELETE <path> to remove composite or an item from collection.
+
+    @RequestMapping(value = "/**", method = RequestMethod.PUT)
+    public ResponseEntity<String> put(HttpServletRequest request,
+                                      @RequestBody CompositeModel config,
+                                      @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException, ValidationException
+    {
+        String configPath = getConfigPath(request);
+
+        Record existingRecord = configurationTemplateManager.getRecord(configPath);
+        if (existingRecord == null)
+        {
+            throw new NotFoundException("Invalid path '" + configPath + "': no existing configuration found (use POST to create new configuration)");
+        }
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
+        ComplexType type = configurationTemplateManager.getType(configPath);
+        if (!(type instanceof CompositeType))
+        {
+            throw new IllegalArgumentException("Configuration path '" + configPath + "' refers to unsupported type " + type.toString() + " (PUT is only supported for composite types)");
+        }
+
+        String parentPath = PathUtils.getParentPath(configPath);
+        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
+
+        MutableRecord record = convertProperties((CompositeType) type, templateOwnerPath, config.getProperties());
+        ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
+
+        Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);
+        if (!instance.isValid())
+        {
+            throw new ValidationException(type, instance);
+        }
+
+        return new ResponseEntity<>(configurationTemplateManager.saveRecord(configPath, record, false), HttpStatus.OK);
+    }
+
+    private MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
+    {
+        MutableRecord result = type.createNewRecord(true);
+
+        // Internal properties may not be set this way, so strip them from the default config.
+        for (TypeProperty property: type.getInternalProperties())
+        {
+            result.remove(property.getName());
+        }
+
+        for (TypeProperty property: type.getProperties(SimpleType.class))
+        {
+            Object value = properties.get(property.getName());
+            if (value != null)
+            {
+                result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
+            }
+        }
+
+        for (TypeProperty property: type.getProperties(CollectionType.class))
+        {
+            if (property.getType().getTargetType() instanceof SimpleType)
+            {
+                Object value = properties.get(property.getName());
+                if (value != null)
+                {
+                    result.put(property.getName(), property.getType().fromXmlRpc(templateOwnerPath, value, true));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private String getConfigPath(HttpServletRequest request)
+    {
+        String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        AntPathMatcher apm = new AntPathMatcher();
+        return apm.extractPathWithinPattern(bestMatchPattern, requestPath);
     }
 
     private String[] canonicaliseFilters(String[] filters)
@@ -245,10 +321,7 @@ public class ConfigController
         for (TypeProperty property: type.getProperties(SimpleType.class))
         {
             Object value = property.getType().toXmlRpc(templateOwnerPath, record.get(property.getName()));
-            if (value != null)
-            {
-                result.put(property.getName(), value);
-            }
+            result.put(property.getName(), value);
         }
 
         for (TypeProperty property: type.getProperties(CollectionType.class))
@@ -256,10 +329,7 @@ public class ConfigController
             if (property.getType().getTargetType() instanceof SimpleType)
             {
                 Object value = property.getType().toXmlRpc(templateOwnerPath, record.get(property.getName()));
-                if (value != null)
-                {
-                    result.put(property.getName(), value);
-                }
+                result.put(property.getName(), value);
             }
         }
 

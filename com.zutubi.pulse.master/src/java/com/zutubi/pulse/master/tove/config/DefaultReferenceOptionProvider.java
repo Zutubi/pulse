@@ -36,7 +36,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
     }
 
     /**
-     * Gets the map of options, which for references maps from handles to names.  The parameters are tweaked vs our
+     * Gets the map of options, which for references maps from paths to names.  The parameters are tweaked vs our
      * super implementation, hence the documentation here.  See also the {@link com.zutubi.pulse.master.tove.handler.ReferenceAnnotationHandler}
      * which does the tweaking.
      *
@@ -66,10 +66,10 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), referencedScopeConfiguration.getConfigurationPath());
         Map<String, String> options = new LinkedHashMap<String, String>();
 
-        // Empty option (0 handle == null reference).  This is the initial
+        // Empty option (empty path == null reference).  This is the initial
         // selection when a new instance is being created - required validation
         // can be used to ensure a selection is made.
-        options.put("0", "");
+        options.put("", "");
 
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(referencingFieldParentPath);
         for (Configuration r : referencable)
@@ -78,8 +78,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
             {
                 try
                 {
-                    long handle = configurationReferenceManager.getReferenceHandleForPath(templateOwnerPath, r.getConfigurationPath());
-                    options.put(Long.toString(handle), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
+                    options.put(r.getConfigurationPath(), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
                 }
                 catch (BeanException e)
                 {

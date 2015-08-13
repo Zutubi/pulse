@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider;
-import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.type.TypeProperty;
 
 import java.util.Map;
 
@@ -24,10 +24,9 @@ public class DependencyProjectOptionProvider extends DefaultReferenceOptionProvi
         Configuration c = configurationProvider.get(path, Configuration.class);
         ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(c, ProjectConfiguration.class);
 
-        String handle = String.valueOf(projectConfig.getHandle());
-        if (map.containsKey(handle))
+        if (map.containsKey(projectConfig.getConfigurationPath()))
         {
-            map.remove(handle);
+            map.remove(projectConfig.getConfigurationPath());
         }
 
         return map;
