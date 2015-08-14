@@ -9,6 +9,7 @@
         init: function(element, options)
         {
             var that = this,
+                tagTemplate,
                 structure = options.structure,
                 kendoOptions = {
                     dataSource: structure.list,
@@ -41,8 +42,8 @@
                     },
                     change: function()
                     {
-                        var multiSelectItems = that.dataSource.data();
-                        var sortedValues = [];
+                        var multiSelectItems = that.dataSource.data(),
+                            sortedValues = [];
                         jQuery.each(this.items(), function(index, sortableItemEl)
                         {
                             var matchingDataItems = jQuery.grep(multiSelectItems, function (dataItem)
@@ -50,7 +51,8 @@
                                 return dataItem.text === $(sortableItemEl).find('.k-tag-content').html();
                             });
 
-                            if (matchingDataItems.length) {
+                            if (matchingDataItems.length)
+                            {
                                 sortedValues.push(matchingDataItems[0].value);
                             }
                         });
@@ -69,23 +71,26 @@
         // when a drag handle is clicked.
         _wrapperMousedown: function(e)
         {
-            var that = this;
-            var notInput = e.target.nodeName.toLowerCase() !== "input";
+            var that = this,
+                notInput = e.target.nodeName.toLowerCase() !== "input";
 
-            if (notInput) {
+            if (notInput)
+            {
                 e.preventDefault();
             }
 
-            if (e.target.className.indexOf("k-delete") === -1 && e.target.className.indexOf("k-handle") === -1) {
-                if (that.input[0] !== kendo._activeElement() && notInput) {
+            if (e.target.className.indexOf("k-delete") === -1 && e.target.className.indexOf("k-handle") === -1)
+            {
+                if (that.input[0] !== kendo._activeElement() && notInput)
+                {
                     that.input.focus();
                 }
 
-                if (that.options.minLength === 0) {
+                if (that.options.minLength === 0)
+                {
                     that.open();
                 }
             }
-
         },
 
         getFieldName: function()
