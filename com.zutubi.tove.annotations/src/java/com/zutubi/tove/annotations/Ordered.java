@@ -21,9 +21,4 @@ public @interface Ordered
      *         sorted for convenience)
      */
     boolean allowReordering() default true;
-
-    /**
-     * @return true if the user should be allowed to select duplicate items.
-     */
-    boolean allowDuplicates() default false;
 }

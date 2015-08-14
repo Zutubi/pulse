@@ -177,7 +177,7 @@
                     {
                         showLoginForm();
                     }
-                    else if (jqXHR.status == 422)
+                    else if (jqXHR.status === 422)
                     {
                         try
                         {

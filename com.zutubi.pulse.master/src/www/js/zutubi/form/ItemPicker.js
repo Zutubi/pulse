@@ -19,12 +19,6 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     hiddenFields: [],
     allowReordering: true,
     
-    /**
-     * If true, duplicate values are allowed in the store.  If false,
-     * options will be removed to avoid duplicate store values.
-     */
-    allowDuplicates: false,
-    
     value: [],
     optionStore: undefined,
     defaultAutoCreate: {tag: 'div', cls: 'x-item-picker', tabindex: '0', style:"outline:none;border:0px"},
@@ -185,35 +179,29 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
     },
 
     /**
-     * Used when we do not allow duplicate values, the refreshOptions
-     * method ensures that the combo box options do not contain any records
-     * that has already been selected.
-     *
-     * This does nothing if allowDuplicates is true.
+     * Ensures that the combo box options do not contain any records that have already been
+     * selected.
      */
     refreshOptions: function()
     {
         var value;
 
-        if (!this.allowDuplicates)
+        for (value in this.optionRecordCache)
         {
-            for (value in this.optionRecordCache)
+            if (this.store.findExact('value', value) < 0)
             {
-                if (this.store.findExact('value', value) < 0)
+                if (this.combo.store.findExact(this.valueField, value) < 0)
                 {
-                    if (this.combo.store.findExact(this.valueField, value) < 0)
-                    {
-                        // if the option has not been selected and is not in the options, add it.
-                        this.combo.store.addSorted(this.optionRecordCache[value]);
-                    }
+                    // if the option has not been selected and is not in the options, add it.
+                    this.combo.store.addSorted(this.optionRecordCache[value]);
                 }
-                else
+            }
+            else
+            {
+                if (this.combo.store.findExact(this.valueField, value) >= 0)
                 {
-                    if (this.combo.store.findExact(this.valueField, value) >= 0)
-                    {
-                        // if the option has been selected and is in the options, remove it.
-                        this.combo.store.remove(this.optionRecordCache[value]);
-                    }
+                    // if the option has been selected and is in the options, remove it.
+                    this.combo.store.remove(this.optionRecordCache[value]);
                 }
             }
         }
@@ -324,13 +312,10 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
                     text = record.get(this.displayField);
                     value = record.get(this.valueField);
 
-                    if (!this.allowDuplicates)
-                    {
-                        // Remove the option from the combo store so that the user can
-                        // not add it a second time.
-                        this.combo.store.remove(record);
-                        this.combo.setValue('');
-                    }
+                    // Remove the option from the combo store so that the user can
+                    // not add it a second time.
+                    this.combo.store.remove(record);
+                    this.combo.setValue('');
                 }
             }
         }
@@ -373,9 +358,9 @@ Ext.extend(Zutubi.form.ItemPicker, Ext.form.Field, {
             this.store.remove(selectedRecord);
             value = selectedRecord.get('value');
 
-            if (this.optionStore && !this.allowDuplicates)
+            if (this.optionStore)
             {
-                // If we are not allowing duplicates, we will have removed this
+                // As we do not allow duplicates, we will have removed this
                 // option from the combo list when it was added.  Now that is has
                 // been removed, re-add it as an option.
                 this.combo.store.addSorted(this.optionRecordCache[value]);

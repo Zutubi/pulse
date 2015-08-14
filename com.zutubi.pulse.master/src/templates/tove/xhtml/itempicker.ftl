@@ -46,9 +46,6 @@
 
     fc.store = store;
     fc.value = v;
-<#if parameters.allowDuplicates?exists>
-    fc.allowDuplicates = ${parameters.allowDuplicates?string};
-</#if>
 <#if parameters.allowReordering?exists>
     fc.allowReordering = ${parameters.allowReordering?string};
 </#if>
