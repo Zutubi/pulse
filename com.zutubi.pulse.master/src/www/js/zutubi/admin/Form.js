@@ -3,6 +3,7 @@
 // dependency: ./Checkbox.js
 // dependency: ./ControllingCheckbox.js
 // dependency: ./DropDownList.js
+// dependency: ./ItemPicker.js
 // dependency: ./TextField.js
 
 (function($)
@@ -14,6 +15,7 @@
             checkbox: "kendoZaCheckbox",
             "controlling-checkbox": "kendoZaControllingCheckbox",
             dropdown: "kendoZaDropDownList",
+            itempicker: "kendoZaItemPicker",
             text: "kendoZaTextField"
         };
 

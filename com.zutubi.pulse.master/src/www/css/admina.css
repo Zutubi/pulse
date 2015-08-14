@@ -58,3 +58,11 @@ table.form {
 .form td.submit {
     text-align: center;
 }
+
+.k-hint {
+    opacity: 0.6;
+}
+
+.k-placeholder {
+    opacity: 0.4;
+}

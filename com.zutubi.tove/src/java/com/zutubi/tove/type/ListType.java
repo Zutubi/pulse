@@ -42,7 +42,7 @@ public class ListType extends CollectionType
 
             // Keys are not significant in lists, so we don't compare the key
             // values.
-            if(order1.size() != order2.size())
+            if (order1.size() != order2.size())
             {
                 return false;
             }
@@ -60,12 +60,7 @@ public class ListType extends CollectionType
         }
         else if(data1 instanceof String[])
         {
-            if(!(data2 instanceof String[]))
-            {
-                return false;
-            }
-
-            return Arrays.equals((String[]) data1, (String[]) data2);
+            return data2 instanceof String[] && Arrays.equals((String[]) data1, (String[]) data2);
         }
 
         throw new IllegalArgumentException("Expecting record or string array, got '" + data1.getClass().getName() + "'");
@@ -79,11 +74,11 @@ public class ListType extends CollectionType
         }
         else if(data instanceof Record)
         {
-            return new ConfigurationList<Object>();
+            return new ConfigurationList<>();
         }
         else if(data instanceof String[])
         {
-            List<Object> list = new LinkedList<Object>();
+            List<Object> list = new LinkedList<>();
             Type type = getCollectionType();
             String[] references = (String[]) data;
             for (int i = 0; i < references.length; i++)
@@ -177,7 +172,7 @@ public class ListType extends CollectionType
         MutableRecord result = createNewRecord(true);
         copyMetaToRecord(collection, result);
 
-        List<String> order = new ArrayList<String>(collection.size());
+        List<String> order = new ArrayList<>(collection.size());
         for(Object o: collection)
         {
             String key = toRecord.getKey(o);
@@ -224,7 +219,7 @@ public class ListType extends CollectionType
 
             String[] items = (String[]) data;
             Type type = getCollectionType();
-            Vector<Object> result = new Vector<Object>(items.length);
+            Vector<Object> result = new Vector<>(items.length);
             for(String item: items)
             {
                 result.add(type.toXmlRpc(templateOwnerPath, item));
@@ -237,7 +232,7 @@ public class ListType extends CollectionType
             typeCheck(data, Record.class);
 
             Record record = (Record) data;
-            Vector<Object> result = new Vector<Object>(record.size());
+            Vector<Object> result = new Vector<>(record.size());
             convertFromRecord(record, result, new XmlRpcFromRecord(templateOwnerPath));
             return result;
         }
@@ -245,17 +240,17 @@ public class ListType extends CollectionType
 
     public Object fromXmlRpc(String templateOwnerPath, Object data, boolean applyDefaults) throws TypeException
     {
-        typeCheck(data, Vector.class);
-        Vector vector = (Vector) data;
+        typeCheck(data, List.class);
+        List list = (List) data;
 
         Type collectionType = getCollectionType();
         if(collectionType instanceof SimpleType)
         {
             SimpleType simpleType = (SimpleType) collectionType;
 
-            String[] result = new String[vector.size()];
+            String[] result = new String[list.size()];
             int i = 0;
-            for(Object item: vector)
+            for(Object item: list)
             {
                 try
                 {
@@ -271,7 +266,7 @@ public class ListType extends CollectionType
         }
         else
         {
-            return convertToRecord(vector, collectionType, new XmlRpcToRecord(templateOwnerPath));
+            return convertToRecord(list, collectionType, new XmlRpcToRecord(templateOwnerPath));
         }
     }
 
@@ -370,7 +365,7 @@ public class ListType extends CollectionType
         return "list[" + getCollectionType().toString() + "]";
     }
 
-    private static interface FromRecord
+    private interface FromRecord
     {
         void handleFieldError(String key, String error);
         Object convert(String key, Type type, Object child) throws TypeException;
@@ -421,7 +416,7 @@ public class ListType extends CollectionType
         }
     }
 
-    private static interface ToRecord
+    private interface ToRecord
     {
         Object convert(Type type, Object data) throws TypeException;
         String getKey(Object data);

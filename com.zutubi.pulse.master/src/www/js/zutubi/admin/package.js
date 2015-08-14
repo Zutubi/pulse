@@ -5,4 +5,5 @@
 // dependency: ./ControllingCheckbox.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
+// dependency: ./ItemPicker.js
 // dependency: ./TextField.js
