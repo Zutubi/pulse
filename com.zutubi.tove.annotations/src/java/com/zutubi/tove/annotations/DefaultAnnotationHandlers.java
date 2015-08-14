@@ -9,7 +9,6 @@ public interface DefaultAnnotationHandlers
 
     String CONTROLLING_SELECT = HANDLER_PACKAGE + ".ControllingSelectAnnotationHandler";
     String FIELD_ACTION       = HANDLER_PACKAGE + ".FieldActionAnnotationHandler";
-    String FIELD_PARAMETER    = HANDLER_PACKAGE + ".FieldParameterAnnotationHandler";
     String FIELD_SCRIPT       = HANDLER_PACKAGE + ".FieldScriptAnnotationHandler";
     String FIELD              = HANDLER_PACKAGE + ".FieldAnnotationHandler";
     String FORM               = HANDLER_PACKAGE + ".FormAnnotationHandler";
