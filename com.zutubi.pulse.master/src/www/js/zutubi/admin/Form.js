@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ./Button.js
 // dependency: ./Checkbox.js
+// dependency: ./ControllingCheckbox.js
 // dependency: ./DropDownList.js
 // dependency: ./TextField.js
 
@@ -8,7 +9,13 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
-        SUBMIT = "submit";
+        SUBMIT = "submit",
+        FIELD_TYPES = {
+            checkbox: "kendoZaCheckbox",
+            "controlling-checkbox": "kendoZaControllingCheckbox",
+            dropdown: "kendoZaDropDownList",
+            text: "kendoZaTextField"
+        };
 
     Zutubi.admin.Form = Widget.extend({
         init: function(element, options)
@@ -75,7 +82,7 @@
 
         _appendField: function(fieldOptions)
         {
-            var fieldElement;
+            var fieldElement, fieldType;
 
             fieldOptions.id = "zaf-" + fieldOptions.name;
 
@@ -88,17 +95,17 @@
                 this.tableBodyElement.append(this.fieldTemplate(fieldOptions));
                 fieldElement = this.tableBodyElement.children().last().find("td");
 
-                if (fieldOptions.type === "checkbox")
+                fieldType = FIELD_TYPES[fieldOptions.type];
+                if (fieldType)
                 {
-                    this.fields.push(fieldElement.kendoZaCheckbox({structure: fieldOptions}).data("kendoZaCheckbox"));
+                    this.fields.push(fieldElement[fieldType]({
+                        structure: fieldOptions,
+                        parentForm: this
+                    }).data(fieldType));
                 }
-                if (fieldOptions.type === "dropdown")
+                else
                 {
-                    this.fields.push(fieldElement.kendoZaDropDownList({structure: fieldOptions}).data("kendoZaDropDownList"));
-                }
-                else if (fieldOptions.type === "text")
-                {
-                    this.fields.push(fieldElement.kendoZaTextField({structure: fieldOptions}).data("kendoZaTextField"));
+                    console.warn("Ignoring unsupported field type '" + fieldOptions.type + "'");
                 }
             }
         },

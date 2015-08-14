@@ -47,6 +47,19 @@
         getValue: function()
         {
             return this.inputElement.prop("checked");
+        },
+
+        enable: function(enable)
+        {
+            this.inputElement.prop("disabled", !enable);
+            if (enable)
+            {
+                this.inputElement.removeClass("k-state-disabled");
+            }
+            else
+            {
+                this.inputElement.addClass("k-state-disabled");
+            }
         }
     });
 
