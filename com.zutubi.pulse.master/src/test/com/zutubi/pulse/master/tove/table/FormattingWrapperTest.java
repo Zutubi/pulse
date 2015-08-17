@@ -1,9 +1,7 @@
 package com.zutubi.pulse.master.tove.table;
 
-import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
@@ -37,11 +35,6 @@ public class FormattingWrapperTest extends ZutubiTestCase
     public void testEnumFormatting() throws Exception
     {
         assertFormatting("test constant", "enum");
-    }
-
-    public void testReturnFormatting() throws Exception
-    {
-        assertFormatting("<r>" + value + "</r>", "b");
     }
 
     public void testVirtualFormatting() throws Exception
@@ -113,12 +106,6 @@ public class FormattingWrapperTest extends ZutubiTestCase
         {
             return TestEnum.TEST_CONSTANT;
         }
-        
-        @Format("StringFormatter")
-        public String getB()
-        {
-            return value;
-        }
     }
 
     public static class ExtendedSample extends Sample
@@ -143,14 +130,6 @@ public class FormattingWrapperTest extends ZutubiTestCase
         public String getC(Sample a)
         {
             return "<f>" + a.getA() + "</f>";
-        }
-    }
-
-    public static class StringFormatter implements Formatter<String>
-    {
-        public String format(String str)
-        {
-            return "<r>" + str + "</r>";
         }
     }
 }

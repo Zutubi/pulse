@@ -6,4 +6,5 @@
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
 // dependency: ./ItemPicker.js
+// dependency: ./Table.js
 // dependency: ./TextField.js

@@ -12,6 +12,7 @@ import java.util.Map;
 public class CompositeModel extends ConfigModel
 {
     private Map<String, Object> properties;
+    private Map<String, Object> formattedProperties;
     private FormModel form;
     private List<ActionModel> actions;
 
@@ -33,6 +34,16 @@ public class CompositeModel extends ConfigModel
     public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
+    }
+
+    public Map<String, Object> getFormattedProperties()
+    {
+        return formattedProperties;
+    }
+
+    public void setFormattedProperties(Map<String, Object> formattedProperties)
+    {
+        this.formattedProperties = formattedProperties;
     }
 
     public FormModel getForm()

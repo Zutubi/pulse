@@ -12,6 +12,7 @@ import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -26,6 +27,9 @@ import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -44,6 +49,8 @@ import java.util.*;
 @RequestMapping("/config")
 public class ConfigController
 {
+    private static final Logger LOG = Logger.getLogger(ConfigController.class);
+
     @Autowired
     private ActionManager actionManager;
     @Autowired
@@ -54,6 +61,10 @@ public class ConfigController
     private ConfigurationTemplateManager configurationTemplateManager;
     @Autowired
     private FormModelBuilder formModelBuilder;
+    @Autowired
+    private TableModelBuilder tableModelBuilder;
+    @Autowired
+    private ObjectFactory objectFactory;
     @Autowired
     private SystemPaths systemPaths;
 
@@ -193,23 +204,18 @@ public class ConfigController
 
     private ConfigModel createModel(String[] filters, String path, ComplexType type, ComplexType parentType, MutableRecord record, int depth) throws TypeException
     {
-        String baseName = PathUtils.getBaseName(path);
         String label = getLabel(path, type, parentType, record);
         ConfigModel model;
         if (type instanceof CollectionType)
         {
-            model = new CollectionModel(baseName, Long.toString(record.getHandle()), label);
-            if (isFieldSelected(filters, "type"))
-            {
-                model.setType(new CollectionTypeModel((CollectionType) type));
-            }
+            model = createCollectionModel(path, (CollectionType) type, label, record, filters);
         }
         else
         {
             CompositeType compositeType = (CompositeType) type;
             if (record == null)
             {
-                model = createTypeSelectionModel(filters, path, label, compositeType);
+                model = createTypeSelectionModel(path, compositeType, label, filters);
             }
             else
             {
@@ -236,7 +242,22 @@ public class ConfigController
         return label;
     }
 
-    private ConfigModel createTypeSelectionModel(String[] filters, String path, String label, CompositeType compositeType)
+    private ConfigModel createCollectionModel(String path, CollectionType type, String label, MutableRecord record, String[] filters)
+    {
+        String baseName = PathUtils.getBaseName(path);
+        CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label);
+        if (isFieldSelected(filters, "table"))
+        {
+            model.setTable(tableModelBuilder.createTable(type));
+        }
+        if (isFieldSelected(filters, "type"))
+        {
+            model.setType(new CollectionTypeModel(type));
+        }
+        return model;
+    }
+
+    private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)
     {
         TypeSelectionModel model = new TypeSelectionModel(PathUtils.getBaseName(path), label);
         if (isFieldSelected(filters, "type"))
@@ -294,6 +315,11 @@ public class ConfigController
             model.setProperties(getProperties(path, type, record));
         }
 
+        if (isFieldSelected(filters, "formattedProperties"))
+        {
+            model.setFormattedProperties(getFormattedProperties(path, type));
+        }
+
         if (isFieldSelected(filters, "type"))
         {
             model.setType(new CompositeTypeModel(type));
@@ -335,6 +361,51 @@ public class ConfigController
         }
 
         return result;
+    }
+
+    private Map<String, Object> getFormattedProperties(String path, CompositeType type) throws TypeException
+    {
+        // FIXME kendo there is reflection here that could be cached (and moved outside this controller).
+        Class<?> formatter = ConventionSupport.getFormatter(type);
+        if (formatter != null)
+        {
+            Configuration instance = configurationTemplateManager.getInstance(path);
+            if (instance != null)
+            {
+                Map<String, Object> properties = new HashMap<>();
+                Object formatterInstance = objectFactory.buildBean(formatter);
+                for (Method method: formatter.getMethods())
+                {
+                    if (isGetter(method, type))
+                    {
+                        try
+                        {
+                            Object result  = method.invoke(formatterInstance, instance);
+                            properties.put(method.getName().substring(3, 4).toLowerCase() + method.getName().substring(4), result);
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.severe(e);
+                        }
+                    }
+                }
+
+                if (properties.size() > 0)
+                {
+                    return properties;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isGetter(Method method, CompositeType type)
+    {
+        return method.getName().length() > 3 &&
+                method.getName().startsWith("get") &&
+                ReflectionUtils.acceptsParameters(method, type.getClazz()) &&
+                ReflectionUtils.returnsType(method, Object.class);
     }
 
     private void addActions(CompositeModel model, String path, CompositeType type, Configuration instance)

@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
@@ -31,7 +30,6 @@ public abstract class AbstractCleanupConfiguration extends AbstractNamedConfigur
     @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
     protected CleanupUnit unit = CleanupUnit.BUILDS;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
-    @Format("CleanupStateColumnFormatter")
     protected List<ResultState> states;
     @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
     private List<String> statuses = new LinkedList<String>();

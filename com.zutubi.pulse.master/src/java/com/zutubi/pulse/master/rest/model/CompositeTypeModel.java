@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.rest.model;
 
-import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TypeProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,33 +57,7 @@ public class CompositeTypeModel extends TypeModel
 
         public String getShortType()
         {
-            Type type = property.getType();
-            if (type instanceof CollectionType)
-            {
-                String collectionType;
-                if (type instanceof ListType)
-                {
-                    collectionType = "List";
-                }
-                else
-                {
-                    collectionType = "Map";
-                }
-
-                return collectionType + "<" + type.getTargetType().getSymbolicName() + ">";
-            }
-            else if (type instanceof ReferenceType)
-            {
-                return "Reference<" + type.getTargetType().getSymbolicName() +">";
-            }
-            else if (type instanceof EnumType)
-            {
-                return "Enum";
-            }
-            else
-            {
-                return type.getSymbolicName();
-            }
+            return formatShortType(property.getType());
         }
     }
 }

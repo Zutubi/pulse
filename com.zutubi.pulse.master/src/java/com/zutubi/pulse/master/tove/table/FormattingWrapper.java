@@ -1,12 +1,8 @@
 package com.zutubi.pulse.master.tove.table;
 
 import com.zutubi.tove.ConventionSupport;
-import com.zutubi.tove.annotations.Format;
-import com.zutubi.tove.config.api.Formatter;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.EnumType;
 import com.zutubi.tove.type.TypeProperty;
-import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.EnumUtils;
 import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -16,6 +12,8 @@ import java.lang.reflect.Method;
 
 /**
  * A wrapper object that provides access to formatted property values.
+ *
+ * FIXME kendo replaced in new UI
  */
 public class FormattingWrapper
 {
@@ -49,7 +47,7 @@ public class FormattingWrapper
     {
         try
         {
-            Class<Object> formatter = ConventionSupport.getFormatter(type);
+            Class<?> formatter = ConventionSupport.getFormatter(type);
             if (formatter != null)
             {
                 Object formatterInstance = objectFactory.buildBean(formatter);
@@ -83,36 +81,7 @@ public class FormattingWrapper
         }
 
         Object fieldValue = getFieldValue(name);
-
-        TypeProperty property = type.getProperty(name);
-        if (property != null)
-        {
-            Format formatAnnotation = property.getAnnotation(Format.class);
-            if (formatAnnotation != null)
-            {
-                Class clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), formatAnnotation.value());
-                if (Formatter.class.isAssignableFrom(clazz))
-                {
-                    Formatter formatterInstance = (Formatter) objectFactory.buildBean(clazz);
-                    return formatterInstance.format(fieldValue);
-                }
-                else
-                {
-                    LOG.warning("Property %s of type %s is marked using @Format with " +
-                            "formatter that does not implement %s.",
-                            name, type.getClazz(), Formatter.class);
-                }
-            }
-
-            if (property.getType() instanceof EnumType)
-            {
-                // Apply default formatting for enums.
-                fieldValue = EnumUtils.toPrettyString((Enum)fieldValue);
-            }
-        }
-
-        // Default formatting for enum constants.
-        if (fieldValue.getClass().isEnum())
+        if (fieldValue != null && fieldValue.getClass().isEnum())
         {
             return EnumUtils.toPrettyString((Enum) fieldValue);
         }

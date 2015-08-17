@@ -35,7 +35,7 @@ public class ConventionSupport
         return loadClass(clazz, "CleanupTasks");
     }
 
-    public static Class getFormatter(Type type)
+    public static Class<?> getFormatter(Type type)
     {
         return loadClass(type, "Formatter");
     }

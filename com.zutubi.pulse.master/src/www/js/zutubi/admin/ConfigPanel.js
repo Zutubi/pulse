@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ./ConfigTree.js
 // dependency: ./Form.js
+// dependency: ./Table.js
 
 (function($)
 {
@@ -139,8 +140,15 @@
 
         _showCollection: function(data)
         {
+            var that = this;
+
             console.log("collection");
             console.dir(data);
+
+            that.table = $("#center-pane-content").kendoZaTable({
+                structure: data.table,
+                items: data.nested
+            }).data("kendoZaTable");
         },
 
         _showTypeSelection: function(data)

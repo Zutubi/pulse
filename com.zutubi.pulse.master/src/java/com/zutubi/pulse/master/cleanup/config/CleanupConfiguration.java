@@ -2,13 +2,13 @@ package com.zutubi.pulse.master.cleanup.config;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Format;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
@@ -25,11 +25,12 @@ import java.util.List;
 @Form(fieldOrder = {"name", "cleanupAll", "what", "retain", "unit", "states", "statuses"})
 public class CleanupConfiguration extends AbstractCleanupConfiguration
 {
+    private static final Messages I18N = Messages.getInstance(CleanupConfiguration.class);
+
     @ControllingCheckbox(uncheckedFields = {"what"})
     private boolean cleanupAll = true;
 
     @Required
-    @Format("CleanupWhatColumnFormatter")
     private List<CleanupWhat> what;
 
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
@@ -111,12 +112,16 @@ public class CleanupConfiguration extends AbstractCleanupConfiguration
         }
         else
         {
-            final CleanupWhatColumnFormatter whatFormatter = new CleanupWhatColumnFormatter();
             whatString = StringUtils.join(", ", Iterables.transform(what, new Function<CleanupWhat, String>()
             {
                 public String apply(CleanupWhat input)
                 {
-                    return whatFormatter.format(input);
+                    String key = "what." + input + ".label";
+                    if (I18N.isKeyDefined(key))
+                    {
+                        return I18N.format(key);
+                    }
+                    return key;
                 }
             }));
         }
