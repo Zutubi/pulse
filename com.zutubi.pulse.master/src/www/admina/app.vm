@@ -23,30 +23,6 @@
     Nav
 </div>
 
-<div id="login" style="display: none">
-    <div id="login-error"></div>
-    <form id="login-form" action="javascript:loginUser();">
-        <table class="form">
-            <tr>
-                <th><label for="username">login:</label></th>
-                <td><input class="k-textbox" type="text" name="username" required/></td>
-            </tr>
-            <tr>
-                <th><label for="password">password:</label></th>
-                <td><input class="k-textbox" type="password" name="password"/></td>
-            </tr>
-            <tr>
-                <th><label for="rememberMe">remember me:</label></th>
-                <td><input type="checkbox" name="rememberMe" value="true"/></td>
-            </tr>
-            <tr>
-                <th>&nbsp;</th>
-                <td><input class="k-button" type="submit" name="login" value="login"/></td>
-            </tr>
-        </table>
-    </form>
-</div>
-
 <div id="content">
     <div id="notification"></div>
     <div id="config-view" style="height: 100%; width: 100%">
@@ -114,60 +90,6 @@
         }
     });
 
-    function showLoginForm()
-    {
-        $("#login-form").kendoValidator();
-        var loginWindow = $("#login").kendoWindow({
-            width: 400,
-            modal: true,
-            title: "Login"
-        }).data("kendoWindow");
-
-        loginWindow.center();
-        loginWindow.open();
-    }
-
-    function loginUser()
-    {
-        var form = $("#login-form");
-        var data = {};
-        form.serializeArray().map(function(x) { data[x.name] = x.value; });
-
-        jQuery.ajax({
-            type: "POST",
-            url:  window.baseUrl + "/api/auth/session",
-            dataType: 'json',
-            headers: {
-                Accept: "application/json; charset=utf-8",
-                "Content-Type": "application/json; charset=utf-8"
-            },
-            data: JSON.stringify(data),
-            success: function (data, status, jqXHR)
-            {
-                $("#login").data("kendoWindow").close();
-            },
-            error: function (jqXHR, textStatus)
-            {
-                var data, errorWidget, message;
-                if (jqXHR.status === 401)
-                {
-                    message = "invalid username or password";
-                }
-                else
-                {
-                    data = JSON.parse(jqXHR.responseText);
-                    message = data["message"] || textStatus;
-                }
-
-                errorWidget = $("#notification").kendoNotification({
-                    appendTo: "#login-error",
-                    stacking: 'down'
-                }).data("kendoNotification");
-                errorWidget.error(message)
-            }
-        });
-    }
-
     function showScope(scope)
     {
         if (window.configPanel)
@@ -197,7 +119,7 @@
             window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
             window.configPanel.bind('pathselect', function (e) {
                 router.navigate(e.path, true);
-            })
+            });
         }
 
         window.configPanel.setPath(path);

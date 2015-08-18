@@ -1,4 +1,5 @@
 // dependency: ./namespace.js
+// dependency: ./ajax.js
 // dependency: ./ConfigTree.js
 // dependency: ./Form.js
 // dependency: ./Table.js
@@ -22,12 +23,10 @@
                                            '</div>' +
                                            '<div id="center-pane">' +
                                                '<div id="center-pane-content" class="pane-content">' +
-                                                   '<p>Main pane.</p>' +
                                                '</div>' +
                                            '</div>' +
                                            '<div id="right-pane">' +
                                                '<div class="pane-content">' +
-                                                   '<p>Help pane.</p>' +
                                                '</div>' +
                                            '</div>' +
                                        '</div>', {wrap: false});
@@ -67,14 +66,9 @@
 
             this.path = path;
 
-            jQuery.ajax({
+            Zutubi.admin.ajax({
                 type: "GET",
-                url: window.baseUrl + "/api/config/" + path + "?depth=-1",
-                dataType: "json",
-                headers: {
-                    Accept: "application/json; charset=utf-8",
-                    "Content-Type": "application/json; charset=utf-8"
-                },
+                url: "/api/config/" + path + "?depth=-1",
                 success: function (data)
                 {
                     if (data.length === 1)
@@ -86,13 +80,8 @@
                         zaReportError("Unexpected result for config lookup, length = " + data.length);
                     }
                 },
-                error: function (jqXHR, textStatus)
+                error: function (jqXHR)
                 {
-                    if (jqXHR.status === 401)
-                    {
-                        showLoginForm();
-                    }
-
                     zaReportError("Could not load configuration: " + zaAjaxError(jqXHR));
                 }
             });
@@ -169,29 +158,20 @@
 
             that._coerce(properties);
 
-            jQuery.ajax({
+            Zutubi.admin.ajax({
                 type: "PUT",
-                url: window.baseUrl + "/api/config/" + that.path + "?depth=-1",
-                dataType: "json",
-                headers: {
-                    Accept: "application/json; charset=utf-8",
-                    "Content-Type": "application/json; charset=utf-8"
-                },
-                data: JSON.stringify({kind: "composite", properties: properties}),
+                url: "/api/config/" + that.path + "?depth=-1",
+                data: {kind: "composite", properties: properties},
                 success: function (data)
                 {
                     console.log('save succcess');
                     console.dir(data);
                 },
-                error: function (jqXHR, textStatus)
+                error: function (jqXHR)
                 {
                     var details;
 
-                    if (jqXHR.status === 401)
-                    {
-                        showLoginForm();
-                    }
-                    else if (jqXHR.status === 422)
+                    if (jqXHR.status === 422)
                     {
                         try
                         {
@@ -252,32 +232,20 @@
         {
             var that = this;
 
-            jQuery.ajax({
+            Zutubi.admin.ajax({
                 type: "PUT",
-                url: window.baseUrl + "/api/config/" + that.path + "?depth=-1",
-                dataType: "json",
-                headers: {
-                    Accept: "application/json; charset=utf-8",
-                    "Content-Type": "application/json; charset=utf-8"
-                },
-                data: JSON.stringify({kind: "collection", nested: jQuery.map(order, function(key)
+                url: "/api/config/" + that.path + "?depth=-1",
+                data: {kind: "collection", nested: jQuery.map(order, function(key)
                 {
                     return {kind: "composite", key: key};
-                })}),
+                })},
                 success: function (data)
                 {
                     console.log('set order succcess');
                     console.dir(data);
                 },
-                error: function (jqXHR, textStatus)
+                error: function (jqXHR)
                 {
-                    var details;
-
-                    if (jqXHR.status === 401)
-                    {
-                        showLoginForm();
-                    }
-
                     zaReportError("Could not save order: " + zaAjaxError(jqXHR));
                 }
             });
