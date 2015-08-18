@@ -1,13 +1,21 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.util.List;
 
 /**
- * Toy model class while working on RESTish API.
+ * Base configuration model class for the RESTish API.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+@JsonSubTypes({
+        @JsonSubTypes.Type(CollectionModel.class),
+        @JsonSubTypes.Type(CompositeModel.class),
+        @JsonSubTypes.Type(TypeSelectionModel.class)
+})
 public abstract class ConfigModel
 {
-    private final String kind;
     private final String handle;
     private final String key;
     private final String label;
@@ -15,22 +23,16 @@ public abstract class ConfigModel
     private String iconClass;
     private List<ConfigModel> nested;
 
-    protected ConfigModel(String kind)
+    protected ConfigModel()
     {
-        this(kind, null, null, null);
+        this(null, null, null);
     }
 
-    protected ConfigModel(String kind, String handle, String key, String label)
+    protected ConfigModel(String handle, String key, String label)
     {
-        this.kind = kind;
         this.handle = handle;
         this.key = key;
         this.label = label;
-    }
-
-    public String getKind()
-    {
-        return kind;
     }
 
     public String getHandle()

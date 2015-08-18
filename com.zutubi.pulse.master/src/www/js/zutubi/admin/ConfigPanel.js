@@ -147,8 +147,14 @@
 
             that.table = $("#center-pane-content").kendoZaTable({
                 structure: data.table,
-                items: data.nested
+                items: data.nested,
+                allowSorting: data.type.ordered && jQuery.inArray("write", data.allowedActions)
             }).data("kendoZaTable");
+
+            that.table.bind("reorder", function(e)
+            {
+                that._setCollectionOrder(that.table.getOrder());
+            });
         },
 
         _showTypeSelection: function(data)
@@ -171,7 +177,7 @@
                     Accept: "application/json; charset=utf-8",
                     "Content-Type": "application/json; charset=utf-8"
                 },
-                data: JSON.stringify({properties: properties}),
+                data: JSON.stringify({kind: "composite", properties: properties}),
                 success: function (data)
                 {
                     console.log('save succcess');
@@ -240,6 +246,41 @@
 
                 properties[name] = newValue;
             }
+        },
+
+        _setCollectionOrder: function(order)
+        {
+            var that = this;
+
+            jQuery.ajax({
+                type: "PUT",
+                url: window.baseUrl + "/api/config/" + that.path + "?depth=-1",
+                dataType: "json",
+                headers: {
+                    Accept: "application/json; charset=utf-8",
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                data: JSON.stringify({kind: "collection", nested: jQuery.map(order, function(key)
+                {
+                    return {kind: "composite", key: key};
+                })}),
+                success: function (data)
+                {
+                    console.log('set order succcess');
+                    console.dir(data);
+                },
+                error: function (jqXHR, textStatus)
+                {
+                    var details;
+
+                    if (jqXHR.status === 401)
+                    {
+                        showLoginForm();
+                    }
+
+                    zaReportError("Could not save order: " + zaAjaxError(jqXHR));
+                }
+            });
         }
     });
 }(jQuery));

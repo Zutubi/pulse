@@ -100,13 +100,13 @@ public class ConfigController
         return new ResponseEntity<>(new ConfigModel[]{model}, HttpStatus.OK);
     }
 
-    // PUT <path> to update composite. Collection paths are errors.
+    // PUT <path> to update composite, or set the order of a collection.
     // POST <path> to add to a collection. Composite paths are errors.
     // DELETE <path> to remove composite or an item from collection.
 
     @RequestMapping(value = "/**", method = RequestMethod.PUT)
     public ResponseEntity<String> put(HttpServletRequest request,
-                                      @RequestBody CompositeModel config,
+                                      @RequestBody ConfigModel config,
                                       @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
         String configPath = getConfigPath(request);
@@ -119,25 +119,43 @@ public class ConfigController
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
         ComplexType type = configurationTemplateManager.getType(configPath);
-        if (!(type instanceof CompositeType))
+        if (type instanceof CompositeType)
         {
-            throw new IllegalArgumentException("Configuration path '" + configPath + "' refers to unsupported type " + type.toString() + " (PUT is only supported for composite types)");
+            CompositeType compositeType = (CompositeType) type;
+            String parentPath = PathUtils.getParentPath(configPath);
+            String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
+
+            CompositeModel compositeModel = (CompositeModel) config;
+            MutableRecord record = convertProperties(compositeType, templateOwnerPath, compositeModel.getProperties());
+            ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
+
+            Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);
+            if (!instance.isValid())
+            {
+                throw new ValidationException(compositeType, instance);
+            }
+
+            return new ResponseEntity<>(configurationTemplateManager.saveRecord(configPath, record, false), HttpStatus.OK);
         }
-
-        CompositeType compositeType = (CompositeType) type;
-        String parentPath = PathUtils.getParentPath(configPath);
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
-
-        MutableRecord record = convertProperties(compositeType, templateOwnerPath, config.getProperties());
-        ToveUtils.unsuppressPasswords(existingRecord, record, type, true);
-
-        Configuration instance = configurationTemplateManager.validate(parentPath, PathUtils.getBaseName(configPath), record, configurationTemplateManager.isConcrete(configPath), false);
-        if (!instance.isValid())
+        else
         {
-            throw new ValidationException(compositeType, instance);
-        }
+            CollectionModel collectionModel = (CollectionModel) config;
+            if (collectionModel.getNested() == null)
+            {
+                throw new IllegalArgumentException("Collection does not have nested records, nothing to save");
+            }
 
-        return new ResponseEntity<>(configurationTemplateManager.saveRecord(configPath, record, false), HttpStatus.OK);
+            configurationTemplateManager.setOrder(configPath, Lists.newArrayList(Iterables.transform(collectionModel.getNested(), new Function<ConfigModel, String>()
+            {
+                @Override
+                public String apply(ConfigModel input)
+                {
+                    return input.getKey();
+                }
+            })));
+
+            return new ResponseEntity<>(configPath, HttpStatus.OK);
+        }
     }
 
     private MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
@@ -250,10 +268,25 @@ public class ConfigController
         {
             model.setTable(tableModelBuilder.createTable(type));
         }
+
         if (isFieldSelected(filters, "type"))
         {
             model.setType(new CollectionTypeModel(type));
         }
+
+        if (isFieldSelected(filters, "allowedActions"))
+        {
+            if (configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE))
+            {
+                model.addAllowedAction(AccessManager.ACTION_CREATE);
+            }
+
+            if (configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE))
+            {
+                model.addAllowedAction(AccessManager.ACTION_WRITE);
+            }
+        }
+
         return model;
     }
 

@@ -66,3 +66,7 @@ table.form {
 .k-placeholder {
     opacity: 0.4;
 }
+
+.k-grid table[data-role=sortable] tbody tr {
+    cursor: move;
+}

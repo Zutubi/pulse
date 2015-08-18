@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  * Model representing composites.
  */
+@JsonTypeName("composite")
 public class CompositeModel extends ConfigModel
 {
     private Map<String, Object> properties;
@@ -18,12 +20,11 @@ public class CompositeModel extends ConfigModel
 
     public CompositeModel()
     {
-        super("composite");
     }
 
     public CompositeModel(String handle, String key, String label)
     {
-        super("composite", handle, key, label);
+        super(handle, key, label);
     }
 
     public Map<String, Object> getProperties()

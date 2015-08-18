@@ -126,14 +126,11 @@ public class TemplateRecord extends AbstractRecord
 
     private boolean canInherit(String key)
     {
-        // No parent, nothing to inherit.
         return parent != null && !isPropertyAnnotated(key, NoInherit.class);
     }
 
     private boolean isPropertyAnnotated(String key, Class<? extends Annotation> annotationClass)
     {
-        // Composite properties explicitly marked NoInherit cannot be
-        // inherited.
         if (type instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) type;
