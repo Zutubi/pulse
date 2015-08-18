@@ -170,8 +170,11 @@
 
     function showScope(scope)
     {
-        window.configPanel.destroy();
-        window.configPanel = null;
+        if (window.configPanel)
+        {
+            window.configPanel.destroy();
+            window.configPanel = null;
+        }
     }
 
     function subpath(path, begin, end)
