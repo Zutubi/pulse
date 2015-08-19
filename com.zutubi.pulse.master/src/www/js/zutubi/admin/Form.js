@@ -11,6 +11,7 @@
     var ui = kendo.ui,
         Widget = ui.Widget,
         SUBMIT = "submit",
+        DEFAULT_SUBMITS = ["apply", "reset"],
         FIELD_TYPES = {
             checkbox: "kendoZaCheckbox",
             "controlling-checkbox": "kendoZaControllingCheckbox",
@@ -23,14 +24,6 @@
         init: function(element, options)
         {
             var that = this;
-
-            // Default option merging does a jQuery deep extend, which merges arrays based on
-            // index.  We don't want that for submits, so clobber directly.
-            if (options.submits)
-            {
-                that.options.submits = options.submits;
-                delete options.submits;
-            }
 
             Widget.fn.init.call(this, element, options);
 
@@ -48,15 +41,14 @@
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
-            errorTemplate: '<li>#: message #</li>',
-            submits: ["apply", "reset"]
+            errorTemplate: '<li>#: message #</li>'
         },
 
         _create: function()
         {
             var structure = this.options.structure,
                 fields = structure.fields,
-                submits = this.options.submits,
+                submits = this.options.submits || DEFAULT_SUBMITS,
                 fieldOptions,
                 submitCell,
                 i;
