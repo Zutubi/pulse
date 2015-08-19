@@ -17,7 +17,7 @@
 
         options: {
             name: "ZaTextField",
-            template: '<input class="k-input" type="text" id="#: id #" name="#: name #">'
+            template: '<input class="k-input k-textbox" type="text" id="#: id #" name="#: name #">'
         },
 
         _create: function()

@@ -4,6 +4,7 @@
 // dependency: ./ControllingCheckbox.js
 // dependency: ./DropDownList.js
 // dependency: ./ItemPicker.js
+// dependency: ./PasswordField.js
 // dependency: ./TextField.js
 
 (function($)
@@ -17,6 +18,7 @@
             "controlling-checkbox": "kendoZaControllingCheckbox",
             dropdown: "kendoZaDropDownList",
             itempicker: "kendoZaItemPicker",
+            password: "kendoZaPasswordField",
             text: "kendoZaTextField"
         };
 
