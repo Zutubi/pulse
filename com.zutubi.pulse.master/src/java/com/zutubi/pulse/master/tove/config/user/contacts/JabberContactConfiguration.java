@@ -4,7 +4,10 @@ import com.zutubi.pulse.master.model.NotificationException;
 import com.zutubi.pulse.master.notifications.NotificationAttachment;
 import com.zutubi.pulse.master.notifications.jabber.JabberManager;
 import com.zutubi.pulse.master.notifications.renderer.RenderedResult;
-import com.zutubi.tove.annotations.*;
+import com.zutubi.tove.annotations.Classification;
+import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Wire;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 import org.jivesoftware.smack.Chat;
@@ -18,7 +21,6 @@ import java.util.List;
 @SymbolicName("zutubi.jabberContactConfig")
 @Form(fieldOrder = {"name", "username"})
 @Classification(single = "jabber")
-@ConfigurationCheck("JabberContactConfigurationCheckHandler")
 @Wire
 public class JabberContactConfiguration extends ContactConfiguration
 {

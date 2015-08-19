@@ -11,12 +11,12 @@ import com.zutubi.tove.annotations.Transient;
  * <li>testing of the configuration can be done without updating the configuration</li>
  * </ul>
  *
- * A configuration check handler is associated with a configuration via the ConfigurationCheck annotation.
+ * A configuration check handler is associated with a configuration via convention: the check handler
+ * class should have the same (fully qualified) name as the configuration class, with an added
+ * "CheckHandler" suffix.
  *
  * The configuration check handler is presented to the UI as a form, and so it has all of the standard
  * form processing support available to it.
- *
- * @see com.zutubi.tove.annotations.ConfigurationCheck
  */
 public interface ConfigurationCheckHandler<T extends Configuration> extends Configuration
 {

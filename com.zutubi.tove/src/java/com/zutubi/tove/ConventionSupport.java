@@ -13,7 +13,13 @@ import java.util.Set;
  */
 public class ConventionSupport
 {
-    public static final String I18N_KEY_SUFFIX_LABEL   = ".label";    
+    public static final String I18N_KEY_SUFFIX_LABEL   = ".label";
+
+    @SuppressWarnings({"unchecked"})
+    public static Class<? extends Configuration> getCheckHandler(Type type)
+    {
+        return loadClass(type, "CheckHandler");
+    }
 
     public static Class getWizard(Type type)
     {

@@ -16,7 +16,6 @@ import java.util.List;
  * Subversion SCM configuration.
  */
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "cleanOnUpdateFailure", "useExport", "showChangedPaths", "externalsMonitoring", "externalMonitorPaths", "verifyExternals", "enableHttpSpooling", "monitor", "includedPaths", "excludedPaths", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
-@ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
 public class SubversionConfiguration extends PollableScmConfiguration implements Validateable
 {

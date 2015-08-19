@@ -10,7 +10,6 @@ import com.zutubi.validation.annotations.Required;
  * Configures integration with the git (http://www.git-scm.org/) SCM.
  */
 @SymbolicName("zutubi.gitConfig")
-@ConfigurationCheck("GitConfigurationCheckHandler")
 @Form(fieldOrder = {"repository", "branch", "trackSelectedBranch", "cloneType", "cloneDepth", "masterCloneDepth",
                     "submoduleProcessing", "selectedSubmodules", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds",
                     "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths",

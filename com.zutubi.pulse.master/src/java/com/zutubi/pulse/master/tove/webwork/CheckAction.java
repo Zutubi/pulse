@@ -76,7 +76,7 @@ public class CheckAction extends ToveActionSupport
         }
 
         // Now lets create the record for the secondary form, used to generate the check processor. 
-        CompositeType checkType = configurationRegistry.getConfigurationCheckType((CompositeType) type);
+        CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
         checkRecord = ToveUtils.toRecord(checkType, parameters);
 
         try

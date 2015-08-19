@@ -13,7 +13,6 @@ import java.util.List;
 @Form(fieldOrder = {"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
         "userBaseDn", "userFilter", "autoAddUsers", "passwordAttribute", "emailAttribute", "groupBaseDns",
         "groupSearchFilter", "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
-@ConfigurationCheck("LDAPConfigurationCheckHandler")
 @Classification(single = "security")
 public class LDAPConfiguration extends AbstractConfiguration
 {

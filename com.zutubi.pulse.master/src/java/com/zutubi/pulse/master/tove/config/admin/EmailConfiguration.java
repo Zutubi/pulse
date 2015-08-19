@@ -17,7 +17,6 @@ import com.zutubi.validation.validators.EmailValidator;
  */
 @SymbolicName("zutubi.emailConfig")
 @Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port", "localhost"})
-@ConfigurationCheck("EmailConfigurationCheckHandler")
 @Classification(single = "email")
 public class EmailConfiguration extends AbstractConfiguration implements Validateable
 {

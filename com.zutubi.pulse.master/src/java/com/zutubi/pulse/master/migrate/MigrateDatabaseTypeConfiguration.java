@@ -21,7 +21,6 @@ import java.util.jar.JarFile;
  */
 @SymbolicName("zutubi.setupMigrateDatabaseTypeConfig")
 @Form(fieldOrder = {"type", "host", "port", "database", "user", "password", "driver", "driverFile"}, actions = {"cancel", "next"})
-@ConfigurationCheck("MigrateDatabaseTypeConfigurationCheckHandler")
 public class MigrateDatabaseTypeConfiguration extends AbstractConfiguration implements Validateable
 {
     @ControllingSelect(enableSet = {"MYSQL", "POSTGRESQL"})

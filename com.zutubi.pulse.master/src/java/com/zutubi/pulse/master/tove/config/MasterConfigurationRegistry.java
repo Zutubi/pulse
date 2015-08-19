@@ -36,7 +36,6 @@ import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
-import com.zutubi.tove.annotations.ConfigurationCheck;
 import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.api.Configuration;
@@ -47,6 +46,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -251,28 +251,12 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
         {
             public void handle(CompositeType type) throws TypeException
             {
-                ConfigurationCheck annotation = type.getAnnotation(ConfigurationCheck.class, false);
-                if (annotation != null)
+                Class<? extends Configuration> checkClass = ConventionSupport.getCheckHandler(type);
+                if (checkClass != null && !Modifier.isAbstract(checkClass.getModifiers()))
                 {
-                    String checkClassName = annotation.value();
-                    if (!checkClassName.contains("."))
-                    {
-                        checkClassName = type.getClazz().getPackage().getName() + "." + checkClassName;
-                    }
-
-                    Class checkClass;
-                    try
-                    {
-                        checkClass = type.getClazz().getClassLoader().loadClass(checkClassName);
-                    }
-                    catch (ClassNotFoundException e)
-                    {
-                        throw new TypeException("Registering check type for class '" + type.getClazz().getName() + "': " + e.getMessage(), e);
-                    }
-
                     if (!ConfigurationCheckHandler.class.isAssignableFrom(checkClass))
                     {
-                        throw new TypeException("Check type '" + checkClassName + "' does not implement ConfigurationCheckHandler");
+                        throw new TypeException("Check type '" + checkClass.getName() + "' does not implement ConfigurationCheckHandler");
                     }
 
                     @SuppressWarnings({"unchecked"})

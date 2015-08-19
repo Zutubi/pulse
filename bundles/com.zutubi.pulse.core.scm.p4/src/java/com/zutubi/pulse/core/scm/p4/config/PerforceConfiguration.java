@@ -12,7 +12,6 @@ import com.zutubi.validation.annotations.Required;
  * Configures details of a Perforce depot and client.
  */
 @Form(fieldOrder = { "port", "user", "password", "useTemplateClient", "spec", "stream", "view", "options", "useTicketAuth", "unicodeServer", "charset", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod", "includedPaths", "excludedPaths", "inactivityTimeout", "syncWorkspacePattern", "timeOffset" })
-@ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends PollableScmConfiguration
 {

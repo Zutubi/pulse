@@ -9,7 +9,6 @@ import com.zutubi.validation.annotations.Required;
  * Configures integration with the Mercurial (http://mercurial.selenic.com/) SCM.
  */
 @SymbolicName("zutubi.mercurialConfig")
-@ConfigurationCheck("MercurialConfigurationCheckHandler")
 @Form(fieldOrder = {"repository", "branch", "inactivityTimeoutEnabled", "inactivityTimeoutSeconds", "monitor", "customPollingInterval", "pollingInterval", "includedPaths", "excludedPaths", "quietPeriodEnabled", "quietPeriod"})
 public class MercurialConfiguration extends PollableScmConfiguration
 {

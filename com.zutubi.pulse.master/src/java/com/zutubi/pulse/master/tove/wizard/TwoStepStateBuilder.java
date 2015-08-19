@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
-     * Some types need a little more than just a single wizard state / form to present all of the
+ * Some types need a little more than just a single wizard state / form to present all of the
  * information.  In particular, types that define multiple extension points.  These types need two-step
  * wizards.
  */
