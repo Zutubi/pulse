@@ -295,7 +295,7 @@ public class ConfigController
         TypeSelectionModel model = new TypeSelectionModel(PathUtils.getBaseName(path), label);
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(new CompositeTypeModel(compositeType));
+            model.setType(createCompositeTypeModel(path, compositeType, configurationTemplateManager.isConcrete(path)));
         }
 
         if (isFieldSelected(filters, "configuredDescendants"))
@@ -355,12 +355,7 @@ public class ConfigController
 
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(new CompositeTypeModel(type));
-        }
-
-        if (isFieldSelected(filters, "form"))
-        {
-            model.setForm(formModelBuilder.createForm(PathUtils.getParentPath(path), baseName, type, instance.isConcrete(), "form"));
+            model.setType(createCompositeTypeModel(path, type, instance.isConcrete()));
         }
 
         if (isFieldSelected(filters, "actions"))
@@ -369,6 +364,22 @@ public class ConfigController
         }
 
         return model;
+    }
+
+    private CompositeTypeModel createCompositeTypeModel(String path, CompositeType type, boolean concrete)
+    {
+        CompositeTypeModel typeModel = new CompositeTypeModel(type);
+        if (!type.isExtendable())
+        {
+            typeModel.setForm(formModelBuilder.createForm(PathUtils.getParentPath(path), PathUtils.getBaseName(path), type, concrete));
+        }
+        List<CompositeType> extensions = type.getExtensions();
+        for (CompositeType extension: extensions)
+        {
+            typeModel.addSubType(createCompositeTypeModel(path, extension, concrete));
+        }
+
+        return typeModel;
     }
 
     private Map<String, Object> getProperties(String path, CompositeType type, MutableRecord record) throws TypeException

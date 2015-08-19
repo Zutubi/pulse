@@ -16,7 +16,6 @@ public class FormModel
     private static final String ACTION_NEXT = "next";
     private static final String ACTION_FINISH = "finish";
 
-    private String name;
     private String id;
     private String symbolicName;
     // FIXME kendo we are overloading the term "action" here for both the Webwork action and the form submit
@@ -28,16 +27,10 @@ public class FormModel
 
     private List<FieldModel> fields = new ArrayList<>();
 
-    public FormModel(String name, String id, String symbolicName)
+    public FormModel(String id, String symbolicName)
     {
-        this.name = name;
         this.id = id;
         this.symbolicName = symbolicName;
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public String getId()

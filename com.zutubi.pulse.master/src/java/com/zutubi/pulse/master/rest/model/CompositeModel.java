@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.zutubi.pulse.master.rest.model.forms.FormModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ public class CompositeModel extends ConfigModel
 {
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
-    private FormModel form;
     private List<ActionModel> actions;
 
     public CompositeModel()
@@ -45,16 +43,6 @@ public class CompositeModel extends ConfigModel
     public void setFormattedProperties(Map<String, Object> formattedProperties)
     {
         this.formattedProperties = formattedProperties;
-    }
-
-    public FormModel getForm()
-    {
-        return form;
-    }
-
-    public void setForm(FormModel form)
-    {
-        this.form = form;
     }
 
     public List<ActionModel> getActions()

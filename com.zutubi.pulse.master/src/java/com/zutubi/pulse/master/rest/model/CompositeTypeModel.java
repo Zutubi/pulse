@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -14,6 +15,7 @@ public class CompositeTypeModel extends TypeModel
     private List<PropertyModel> simpleProperties;
     private List<PropertyModel> nestedProperties;
     private List<CompositeTypeModel> subTypes;
+    private FormModel form;
 
     public CompositeTypeModel(CompositeType type)
     {
@@ -40,16 +42,6 @@ public class CompositeTypeModel extends TypeModel
                 nestedProperties.add(new PropertyModel(property));
             }
         }
-
-        List<CompositeType> extensions = type.getExtensions();
-        if (extensions.size() > 0)
-        {
-            subTypes = new ArrayList<>();
-            for (CompositeType extension: extensions)
-            {
-                subTypes.add(new CompositeTypeModel(extension));
-            }
-        }
     }
 
     public List<PropertyModel> getSimpleProperties()
@@ -65,6 +57,26 @@ public class CompositeTypeModel extends TypeModel
     public List<CompositeTypeModel> getSubTypes()
     {
         return subTypes;
+    }
+
+    public void addSubType(CompositeTypeModel subType)
+    {
+        if (subTypes == null)
+        {
+            subTypes = new ArrayList<>();
+        }
+
+        subTypes.add(subType);
+    }
+
+    public FormModel getForm()
+    {
+        return form;
+    }
+
+    public void setForm(FormModel form)
+    {
+        this.form = form;
     }
 
     public static class PropertyModel

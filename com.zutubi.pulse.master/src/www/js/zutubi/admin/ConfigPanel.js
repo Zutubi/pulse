@@ -117,7 +117,7 @@
             console.dir(data);
 
             that.form = $("#center-pane-content").kendoZaForm({
-                structure: data.form,
+                structure: data.type.form,
                 values: data.properties
             }).data("kendoZaForm");
 

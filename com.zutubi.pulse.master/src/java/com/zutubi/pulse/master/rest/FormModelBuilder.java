@@ -89,10 +89,10 @@ public class FormModelBuilder
         fieldDescriptorTypes.put(type, clazz);
     }
 
-    public FormModel createForm(String parentPath, String baseName, CompositeType type, boolean concrete, String name)
+    public FormModel createForm(String parentPath, String baseName, CompositeType type, boolean concrete)
     {
         Messages messages = Messages.getInstance(type.getClazz());
-        FormModel form = new FormModel(name, type.getClazz().getName(), type.getSymbolicName());
+        FormModel form = new FormModel(type.getClazz().getName(), type.getSymbolicName());
         form.setActions(Arrays.asList("save", "cancel"));
 
         Form formAnnotation = type.getAnnotation(Form.class, true);
