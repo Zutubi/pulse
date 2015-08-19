@@ -16,6 +16,7 @@
         FIELD_TYPES = {
             checkbox: "kendoZaCheckbox",
             "controlling-checkbox": "kendoZaControllingCheckbox",
+            "controlling-select": "kendoZaControllingDropDownList",
             dropdown: "kendoZaDropDownList",
             itempicker: "kendoZaItemPicker",
             password: "kendoZaPasswordField",
@@ -189,6 +190,11 @@
             }
 
             return values;
+        },
+
+        getFields: function()
+        {
+            return this.fields;
         },
 
         getFieldNamed: function(name)

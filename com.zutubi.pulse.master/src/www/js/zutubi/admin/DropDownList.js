@@ -12,11 +12,14 @@
             var that = this,
                 structure = options.structure,
                 kendoOptions = {
-                dataSource: that._fixEmpty(structure.list, structure.listValue),
-                dataTextField: structure.listText,
-                dataValueField: structure.listValue
-            };
+                    dataSource: that._fixEmpty(structure.list, structure.listValue),
+                    dataTextField: structure.listText,
+                    dataValueField: structure.listValue
+                };
 
+            // FIXME kendo this is clunky, should we just wrap the kendo widget?
+            // It affects controllingdropdownlist too.
+            that.parentForm = options.parentForm;
             that.structure = structure;
 
             DropDownList.fn.init.call(this, element, kendoOptions);

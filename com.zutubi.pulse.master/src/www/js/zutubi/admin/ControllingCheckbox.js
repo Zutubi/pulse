@@ -13,8 +13,6 @@
 
             Checkbox.fn.init.call(this, element, options);
 
-            that._create();
-
             that.inputElement.change(function()
             {
                 that._updateDependents();

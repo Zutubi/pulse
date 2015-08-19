@@ -5,6 +5,7 @@
 // dependency: ./ConfigPanel.js
 // dependency: ./ConfigTree.js
 // dependency: ./ControllingCheckbox.js
+// dependency: ./ControllingDropDownList.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
 // dependency: ./ItemPicker.js
