@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-/**
- */
 public class MapTypeTest extends TypeTestCase
 {
     private MapType mapType;
@@ -149,7 +147,7 @@ public class MapTypeTest extends TypeTestCase
         }
         catch (TypeException e)
         {
-            assertEquals("Converting map element 'a': Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+            assertEquals("Converting map element 'a': Expecting 'java.util.Map', found 'java.lang.String'", e.getMessage());
         }
     }
 

@@ -156,7 +156,7 @@ public class ListTypeTest extends TypeTestCase
         }
         catch (TypeException e)
         {
-            assertEquals("Expecting 'java.util.Vector', found 'java.util.Hashtable'", e.getMessage());
+            assertEquals("Expecting 'java.util.List', found 'java.util.Hashtable'", e.getMessage());
         }
     }
 
@@ -171,7 +171,7 @@ public class ListTypeTest extends TypeTestCase
         }
         catch (TypeException e)
         {
-            assertEquals("Converting list element: Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+            assertEquals("Converting list element: Expecting 'java.util.Map', found 'java.lang.String'", e.getMessage());
         }
     }
 
@@ -206,7 +206,7 @@ public class ListTypeTest extends TypeTestCase
         }
         catch (TypeException e)
         {
-            assertEquals("Expecting 'java.util.Vector', found 'java.lang.String'", e.getMessage());
+            assertEquals("Expecting 'java.util.List', found 'java.lang.String'", e.getMessage());
         }
     }
 

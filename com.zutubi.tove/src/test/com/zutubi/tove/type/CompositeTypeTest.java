@@ -2,8 +2,6 @@ package com.zutubi.tove.type;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.size;
 import com.zutubi.tove.annotations.Reference;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -16,6 +14,9 @@ import java.lang.annotation.*;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 
 public class CompositeTypeTest extends TypeTestCase
 {
@@ -249,7 +250,7 @@ public class CompositeTypeTest extends TypeTestCase
         }
         catch (TypeException e)
         {
-            assertEquals("Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+            assertEquals("Expecting 'java.util.Map', found 'java.lang.String'", e.getMessage());
         }
     }
 
