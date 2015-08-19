@@ -113,7 +113,6 @@ public class ConfigurationActions
                     }
                 }
 
-                // ok, we have an action here.
                 String action = methodToAction(methodName);
                 availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getVariantsMethod(action), getPrepareMethod(action, argumentType), method));
             }
@@ -122,7 +121,6 @@ public class ConfigurationActions
 
     private String methodToAction(String methodName)
     {
-        // ok, we have an action here.
         String actionName = methodName.substring(2, 3).toLowerCase();
         if (methodName.length() > 3)
         {

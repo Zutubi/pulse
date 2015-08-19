@@ -24,6 +24,14 @@
         {
             var that = this;
 
+            // Default option merging does a jQuery deep extend, which merges arrays based on
+            // index.  We don't want that for submits, so clobber directly.
+            if (options.submits)
+            {
+                that.options.submits = options.submits;
+                delete options.submits;
+            }
+
             Widget.fn.init.call(this, element, options);
 
             that._create();
@@ -35,21 +43,25 @@
 
         options: {
             name: "ZaForm",
-            template: '<form name="#: name #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
+            formName: "form",
+            template: '<form name="#: id #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
             fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
-            errorTemplate: '<li>#: message #</li>'
+            errorTemplate: '<li>#: message #</li>',
+            submits: ["apply", "reset"]
         },
 
         _create: function()
         {
             var structure = this.options.structure,
                 fields = structure.fields,
-                submits = structure.actions,
+                submits = this.options.submits,
                 fieldOptions,
                 submitCell,
                 i;
+
+            this.id = "zaf-" + this.options.formName;
 
             this.fields = [];
             this.submits = [];
@@ -59,7 +71,7 @@
             this.buttonTemplate = kendo.template(this.options.buttonTemplate);
             this.errorTemplate = kendo.template(this.options.errorTemplate);
 
-            this.element.html(this.template(structure));
+            this.element.html(this.template({id: this.id}));
             this.formElement = this.element.find("form");
             this.tableBodyElement = this.formElement.find("tbody");
 
@@ -86,7 +98,7 @@
         {
             var fieldElement, fieldType;
 
-            fieldOptions.id = "zaf-" + fieldOptions.name;
+            fieldOptions.id = this.id + "-" + fieldOptions.name;
 
             if (fieldOptions.type === "hidden")
             {
@@ -115,19 +127,11 @@
         _addSubmit: function(name, parentElement)
         {
             var that = this,
-                id = "zas-" + name,
-                displayName = name,
+                id = this.id + "-submit-" + name,
                 element,
                 button;
 
-            if (name === "cancel")
-            {
-                // FIXME kendo in the case of collapsed collection parent, this should not be done.
-                // (that is the displayMode false case).
-                displayName = "reset";
-            }
-
-            parentElement.append(this.buttonTemplate({name: displayName, value: name, id: id}));
+            parentElement.append(this.buttonTemplate({name: name, value: name, id: id}));
             element = parentElement.find("button").last();
             button = element.kendoZaButton({structure: {value: name}}).data("kendoZaButton");
             button.bind("click", function(e)
@@ -140,7 +144,7 @@
 
         _buttonClicked: function(value)
         {
-            if (value === "cancel")
+            if (value === "reset")
             {
                 this.resetValues();
             }

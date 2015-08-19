@@ -49,6 +49,11 @@
 
     var notificationWidget = notificationElement.data("kendoNotification");
 
+    function zaReportSuccess(message)
+    {
+        notificationWidget.success(message);
+    }
+
     function zaReportError(message)
     {
         notificationWidget.error(message);
@@ -148,7 +153,7 @@
 
     router.route("/settings/*path", function(path)
     {
-        console.dir(path);
+        showConfig('settings/' + (path ? path : ''));
     });
 
     router.route("/users/*path", function(path)

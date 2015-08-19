@@ -73,7 +73,7 @@
                 {
                     if (data.length === 1)
                     {
-                        that.showContent(data[0]);
+                        that._showContent(data[0]);
                     }
                     else
                     {
@@ -87,8 +87,10 @@
             });
         },
 
-        showContent: function(data)
+        _showContent: function(data)
         {
+            this._clearContent();
+
             this.data = data;
 
             if (data.kind === "composite")
@@ -109,14 +111,29 @@
             }
         },
 
+        _clearContent: function()
+        {
+            var contentEl = $("#center-pane-content");
+
+            this.form = null;
+            this.checkForm = null;
+            this.table = null;
+            kendo.destroy(contentEl);
+            contentEl.empty();
+        },
+
         _showComposite: function(data)
         {
-            var that = this;
+            var that = this,
+                contentEl = $("#center-pane-content"),
+                formEl = $("<div></div>"),
+                checkFormEl;
 
             console.log("composite");
             console.dir(data);
 
-            that.form = $("#center-pane-content").kendoZaForm({
+            contentEl.append(formEl);
+            that.form = formEl.kendoZaForm({
                 structure: data.type.form,
                 values: data.properties
             }).data("kendoZaForm");
@@ -125,6 +142,26 @@
             {
                 that._saveComposite(that.form.getValues());
             });
+
+            // FIXME kendo if the composite is not writable, don't show this
+            if (data.type.checkType)
+            {
+                checkFormEl = $("<div></div>");
+
+                contentEl.append("<h1>check</h1>");
+                contentEl.append(checkFormEl);
+                that.checkForm = checkFormEl.kendoZaForm({
+                    formName: "check",
+                    structure: data.type.checkType.form,
+                    values: [],
+                    submits: ["check"]
+                }).data("kendoZaForm");
+
+                that.checkForm.bind("submit", function(e)
+                {
+                    that._checkComposite(that.form.getValues(), that.checkForm.getValues());
+                });
+            }
         },
 
         _showCollection: function(data)
@@ -156,11 +193,11 @@
         {
             var that = this;
 
-            that._coerce(properties);
+            that._coerce(properties, this.data.type.simpleProperties);
 
             Zutubi.admin.ajax({
                 type: "PUT",
-                url: "/api/config/" + that.path + "?depth=-1",
+                url: "/api/config/" + that.path + "?depth=1",
                 data: {kind: "composite", properties: properties},
                 success: function (data)
                 {
@@ -193,18 +230,81 @@
             });
         },
 
-        _coerce: function(properties)
+        _checkComposite: function(properties, checkProperties)
+        {
+            var that = this,
+                type = this.data.type;
+
+            that._coerce(properties, type.simpleProperties);
+            that._coerce(checkProperties, type.checkType.simpleProperties);
+
+            Zutubi.admin.ajax({
+                type: "POST",
+                url: "/api/action/check/" + that.path,
+                data: {
+                    main: {kind: "composite", properties: properties},
+                    check: {kind: "composite", properties: checkProperties}
+                },
+                success: function (data)
+                {
+                    // FIXME kendo better to display these near the check button
+                    if (data.success)
+                    {
+                        zaReportSuccess("configuration ok");
+                    }
+                    else
+                    {
+                        zaReportError(data.message || "check failed");
+                    }
+                },
+                error: function (jqXHR)
+                {
+                    var details;
+
+                    if (jqXHR.status === 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                if (details.key === "main")
+                                {
+                                    that.form.showValidationErrors(details);
+                                }
+                                else
+                                {
+                                    that.checkForm.showValidationErrors(details);
+                                }
+                                return;
+                            }
+                        }
+                        catch(e)
+                        {
+                            // Do nothing.
+                        }
+                    }
+
+                    zaReportError("Could not check configuration: " + zaAjaxError(jqXHR));
+                }
+            });
+
+        },
+
+        _coerce: function(properties, propertyTypes)
         {
             var i,
-                propertyTypes = this.data.type.simpleProperties,
                 propertyType;
 
-            for (i = 0; i < propertyTypes.length; i++)
+            if (propertyTypes)
             {
-                propertyType = propertyTypes[i];
-                if (propertyType.shortType === "int")
+                for (i = 0; i < propertyTypes.length; i++)
                 {
-                    this._coerceInt(properties, propertyType.name);
+                    propertyType = propertyTypes[i];
+                    if (propertyType.shortType === "int")
+                    {
+                        this._coerceInt(properties, propertyType.name);
+                    }
                 }
             }
         },

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.rest.errors;
 
 import com.zutubi.tove.config.api.Configuration;
-import com.zutubi.tove.type.CompositeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,14 +12,19 @@ import java.util.Map;
  */
 public class ValidationException extends RuntimeException
 {
-    private CompositeType type;
     private Configuration instance;
+    private String key;
 
-    public ValidationException(CompositeType type, Configuration instance)
+    public ValidationException(Configuration instance)
+    {
+        this(instance, null);
+    }
+
+    public ValidationException(Configuration instance, String key)
     {
         super("Validation failed");
-        this.type = type;
         this.instance = instance;
+        this.key = key;
     }
 
     public Error getError()
@@ -30,14 +34,16 @@ public class ValidationException extends RuntimeException
 
     public static class Error extends ApiExceptionHandler.Error
     {
-        private List<String> instanceErrors;
-        private Map<String, List<String>> fieldErrors;
+        private final List<String> instanceErrors;
+        private final Map<String, List<String>> fieldErrors;
+        private final String key;
 
         public Error(ValidationException ex, Configuration instance)
         {
             super(ex);
             instanceErrors = new ArrayList<>(instance.getInstanceErrors());
             fieldErrors = new HashMap<>(instance.getFieldErrors());
+            key = ex.key;
         }
 
         public List<String> getInstanceErrors()
@@ -48,6 +54,11 @@ public class ValidationException extends RuntimeException
         public Map<String, List<String>> getFieldErrors()
         {
             return fieldErrors;
+        }
+
+        public String getKey()
+        {
+            return key;
         }
     }
 }

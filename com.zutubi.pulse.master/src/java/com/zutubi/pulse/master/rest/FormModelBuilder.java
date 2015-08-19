@@ -92,8 +92,7 @@ public class FormModelBuilder
     public FormModel createForm(String parentPath, String baseName, CompositeType type, boolean concrete)
     {
         Messages messages = Messages.getInstance(type.getClazz());
-        FormModel form = new FormModel(type.getClazz().getName(), type.getSymbolicName());
-        form.setActions(Arrays.asList("save", "cancel"));
+        FormModel form = new FormModel();
 
         Form formAnnotation = type.getAnnotation(Form.class, true);
         List<String> fieldOrder = new ArrayList<>();

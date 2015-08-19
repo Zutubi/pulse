@@ -16,6 +16,7 @@ public class CompositeTypeModel extends TypeModel
     private List<PropertyModel> nestedProperties;
     private List<CompositeTypeModel> subTypes;
     private FormModel form;
+    private CompositeTypeModel checkType;
 
     public CompositeTypeModel(CompositeType type)
     {
@@ -77,6 +78,16 @@ public class CompositeTypeModel extends TypeModel
     public void setForm(FormModel form)
     {
         this.form = form;
+    }
+
+    public CompositeTypeModel getCheckType()
+    {
+        return checkType;
+    }
+
+    public void setCheckType(CompositeTypeModel checkType)
+    {
+        this.checkType = checkType;
     }
 
     public static class PropertyModel
