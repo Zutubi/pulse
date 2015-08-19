@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * A default implementation that obtains validators from a list of providers and applies them.
  */
 public class DefaultValidationManager implements ValidationManager
 {
@@ -21,17 +21,15 @@ public class DefaultValidationManager implements ValidationManager
     {
         verify(providers);
 
-        // get validators
         List<Validator> validators = new LinkedList<Validator>();
         for (ValidatorProvider provider : providers)
         {
-            validators.addAll(provider.getValidators(o, context));
+            validators.addAll(provider.getValidators(o.getClass(), context));
         }
 
-        // run them.
         for (Validator v : validators)
         {
-            // short curcuit is on a per field basis.
+            // short circuit is on a per field basis.
             if (v instanceof FieldValidator)
             {
                 FieldValidator vf = (FieldValidator) v;

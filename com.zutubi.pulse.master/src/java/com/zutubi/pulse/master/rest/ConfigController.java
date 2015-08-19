@@ -84,15 +84,15 @@ public class ConfigController
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
         Configuration instance = configurationTemplateManager.getInstance(configPath);
-        if (instance == null)
-        {
-            throw new NotFoundException("Configuration path '" + configPath + "' not found");
-        }
+        Object unstantiated = null;
 
-        Object unstantiated = type.unstantiate(instance, templateOwnerPath);
-        if (!(unstantiated instanceof MutableRecord))
+        if (instance != null)
         {
-            throw new NotFoundException("Path '" + configPath + "' does not refer to a selectable resource");
+            unstantiated = type.unstantiate(instance, templateOwnerPath);
+            if (!(unstantiated instanceof MutableRecord))
+            {
+                throw new NotFoundException("Path '" + configPath + "' does not refer to a selectable resource");
+            }
         }
 
         ConfigModel model = createModel(filters, configPath, type, parentType, (MutableRecord) unstantiated, depth);

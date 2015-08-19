@@ -33,7 +33,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     // happy autowiring context.
     private ObjectFactory objectFactory = new DefaultObjectFactory();
     /**
-     * High-level cache of the results of {@link #getValidators(Object, com.zutubi.validation.ValidationContext)}.
+     * High-level cache of the results of {@link #getValidators(Class, com.zutubi.validation.ValidationContext)}.
      */
     private Map<Class, List<Validator>> secondLevelCache = Collections.synchronizedMap(new HashMap<Class, List<Validator>>());
     /**
@@ -46,11 +46,11 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         this.objectFactory = objectFactory;
     }
 
-    public List<Validator> getValidators(Object obj, ValidationContext context)
+    @Override
+    public List<Validator> getValidators(Class clazz, ValidationContext context)
     {
-        Class<?> clazz = obj.getClass();
         List<Validator> validators = secondLevelCache.get(clazz);
-        if(validators == null)
+        if (validators == null)
         {
             validators = traverse(clazz, new HashSet<Class>());
             secondLevelCache.put(clazz, validators);
@@ -61,7 +61,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     public List<Validator> traverse(Class clazz, Set<Class> checked)
     {
-        List<Validator> validators = new LinkedList<Validator>();
+        List<Validator> validators = new LinkedList<>();
 
         if (checked.contains(clazz) || clazz.equals(Object.class))
         {
@@ -107,7 +107,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         List<Validator> validators = firstLevelCache.get(clazz);
         if(validators == null)
         {
-            validators = new LinkedList<Validator>();
+            validators = new LinkedList<>();
             try
             {
                 Class stopClass = clazz.getSuperclass();
@@ -117,7 +117,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                     Method read = descriptor.getReadMethod();
                     if (read != null)
                     {
-                        List<Annotation> constraints = new LinkedList<Annotation>();
+                        List<Annotation> constraints = new LinkedList<>();
                         constraints.addAll(constraintsOn(read));
                         Method write = descriptor.getWriteMethod();
                         if (write != null)
@@ -159,7 +159,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
             return Collections.emptySet();
         }
         
-        List<Annotation> constraints = new LinkedList<Annotation>();
+        List<Annotation> constraints = new LinkedList<>();
         for (Annotation annotation : element.getAnnotations())
         {
             if (isConstraint(annotation))
@@ -177,7 +177,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     private List<Validator> validatorsFromConstraints(Class clazz, List<Annotation> constraints, PropertyDescriptor descriptor)
     {
-        List<Validator> validators = new LinkedList<Validator>();
+        List<Validator> validators = new LinkedList<>();
         for (Annotation annotation : constraints)
         {
             Constraint constraint;

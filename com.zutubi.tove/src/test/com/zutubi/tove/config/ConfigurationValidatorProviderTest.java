@@ -11,13 +11,14 @@ import com.zutubi.validation.validators.RegexValidator;
 import com.zutubi.validation.validators.RequiredValidator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigurationValidatorProviderTest extends ZutubiTestCase
 {
     private static final List<Validator> NON_REQUIRED_VALIDATORS = Arrays.<Validator>asList(new EssentialValidator(), new RegexValidator());
-    private static final List<Validator> DELEGATE_VALIDATORS = new LinkedList<Validator>();
+    private static final List<Validator> DELEGATE_VALIDATORS = new LinkedList<>();
     static
     {
         DELEGATE_VALIDATORS.addAll(NON_REQUIRED_VALIDATORS);
@@ -34,7 +35,7 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
 
         delegateProvider = new TestValidatorProvider();
         provider = new ConfigurationValidatorProvider();
-        provider.setDelegates(Arrays.<ValidatorProvider>asList(delegateProvider));
+        provider.setDelegates(Collections.<ValidatorProvider>singletonList(delegateProvider));
     }
 
     public void testAllValidators()
@@ -52,10 +53,10 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
         RequiredValidator nonIgnorable = new RequiredValidator();
         nonIgnorable.setIgnorable(false);
 
-        List<Validator> expected = new LinkedList<Validator>(NON_REQUIRED_VALIDATORS);
+        List<Validator> expected = new LinkedList<>(NON_REQUIRED_VALIDATORS);
         expected.add(nonIgnorable);
 
-        List<Validator> delegate = new LinkedList<Validator>(DELEGATE_VALIDATORS);
+        List<Validator> delegate = new LinkedList<>(DELEGATE_VALIDATORS);
         delegate.add(nonIgnorable);
 
         helper(createContext(true), expected, delegate);
@@ -80,7 +81,7 @@ public class ConfigurationValidatorProviderTest extends ZutubiTestCase
     {
         private List<Validator> validators;
 
-        public List<Validator> getValidators(Object obj, ValidationContext context)
+        public List<Validator> getValidators(Class clazz, ValidationContext context)
         {
             return validators;
         }

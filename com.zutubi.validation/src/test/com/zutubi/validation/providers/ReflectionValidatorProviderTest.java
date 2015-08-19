@@ -30,15 +30,15 @@ public class ReflectionValidatorProviderTest extends ZutubiTestCase
 
     public void testValidateableObject()
     {
-        List<Validator> validators = provider.getValidators(new TestWallet(), null);
+        List<Validator> validators = provider.getValidators(TestWallet.class, null);
         assertEquals(1, validators.size());
 
-        ValidateableValidator v = (ValidateableValidator) validators.get(0);
+        assertTrue(validators.get(0) instanceof ValidateableValidator);
     }
 
     public void testPlainOldJavaObject()
     {
-        List<Validator> validators = provider.getValidators(new Object(), null);
+        List<Validator> validators = provider.getValidators(Object.class, null);
         assertEquals(0, validators.size());
     }
 }

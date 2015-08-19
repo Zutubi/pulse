@@ -11,23 +11,44 @@ import java.util.List;
  */
 public class CompositeTypeModel extends TypeModel
 {
-    private List<PropertyModel> simpleProperties = new ArrayList<>();
-    private List<PropertyModel> nestedProperties = new ArrayList<>();
+    private List<PropertyModel> simpleProperties;
+    private List<PropertyModel> nestedProperties;
+    private List<CompositeTypeModel> subTypes;
 
     public CompositeTypeModel(CompositeType type)
     {
         super(type);
 
-        for (String propertyName: type.getSimplePropertyNames())
+        List<String> simplePropertyNames = type.getSimplePropertyNames();
+        if (simplePropertyNames.size() > 0)
         {
-            TypeProperty property = type.getProperty(propertyName);
-            simpleProperties.add(new PropertyModel(property));
+            simpleProperties = new ArrayList<>();
+            for (String propertyName: simplePropertyNames)
+            {
+                TypeProperty property = type.getProperty(propertyName);
+                simpleProperties.add(new PropertyModel(property));
+            }
         }
 
-        for (String propertyName: type.getNestedPropertyNames())
+        List<String> nestedPropertyNames = type.getNestedPropertyNames();
+        if (nestedPropertyNames.size() > 0)
         {
-            TypeProperty property = type.getProperty(propertyName);
-            nestedProperties.add(new PropertyModel(property));
+            nestedProperties = new ArrayList<>();
+            for (String propertyName: nestedPropertyNames)
+            {
+                TypeProperty property = type.getProperty(propertyName);
+                nestedProperties.add(new PropertyModel(property));
+            }
+        }
+
+        List<CompositeType> extensions = type.getExtensions();
+        if (extensions.size() > 0)
+        {
+            subTypes = new ArrayList<>();
+            for (CompositeType extension: extensions)
+            {
+                subTypes.add(new CompositeTypeModel(extension));
+            }
         }
     }
 
@@ -39,6 +60,11 @@ public class CompositeTypeModel extends TypeModel
     public List<PropertyModel> getNestedProperties()
     {
         return nestedProperties;
+    }
+
+    public List<CompositeTypeModel> getSubTypes()
+    {
+        return subTypes;
     }
 
     public static class PropertyModel

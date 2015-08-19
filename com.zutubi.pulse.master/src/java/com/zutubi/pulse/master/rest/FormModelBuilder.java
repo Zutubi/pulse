@@ -9,10 +9,8 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.config.ConfigurationValidatorProvider;
-import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -54,7 +52,7 @@ public class FormModelBuilder
      */
     private ObjectFactory objectFactory = new DefaultObjectFactory();
 
-    private static final Map<Class, String> DEFAULT_FIELD_TYPE_MAPPING = new HashMap<Class, String>();
+    private static final Map<Class, String> DEFAULT_FIELD_TYPE_MAPPING = new HashMap<>();
 
     static
     {
@@ -69,7 +67,6 @@ public class FormModelBuilder
     }
 
     private Map<String, Class<? extends FieldModel>> fieldDescriptorTypes = new HashMap<>();
-    private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationValidatorProvider configurationValidatorProvider;
 
     public FormModelBuilder()
@@ -163,15 +160,14 @@ public class FormModelBuilder
         List<Validator> validators;
         try
         {
-            Configuration dummyInstance = type.getClazz().newInstance();
-            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, false, configurationTemplateManager);
-            validators = configurationValidatorProvider.getValidators(dummyInstance, validationContext);
+            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(null, null, parentPath, baseName, !concrete, false, null);
+            validators = configurationValidatorProvider.getValidators(type.getClazz(), validationContext);
         }
         catch (Throwable e)
         {
             // Not ideal, but we can soldier on regardless.
             LOG.warning("Unable to get validators for type '" + type.getSymbolicName() + "': " + e.getMessage(), e);
-            validators = new ArrayList<>(0);
+            validators = Collections.emptyList();
         }
         return validators;
     }
@@ -341,11 +337,6 @@ public class FormModelBuilder
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
-    }
-
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
-    {
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void setConfigurationValidatorProvider(ConfigurationValidatorProvider configurationValidatorProvider)

@@ -8,13 +8,12 @@ import java.util.List;
 public interface ValidatorProvider
 {
     /**
-     * Get the list of validators applicable to the specified object being
-     * validated within the given validation context.
+     * Get the list of validators applicable to the specified class within the given context.
      *
-     * @param obj to be validated.
+     * @param clazz type of objects to validate
      * @param context for this validation
      *
      * @return list of validators to be used to validate the object.
      */
-    List<Validator> getValidators(Object obj, ValidationContext context);
+    List<Validator> getValidators(Class clazz, ValidationContext context);
 }

@@ -38,7 +38,7 @@ public class ConfigurationValidationContext implements ValidationContext
     }
 
     /**
-     * @return the instance to be validation
+     * @return the instance to be validated
      */
     public Configuration getInstance()
     {
