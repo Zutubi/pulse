@@ -92,7 +92,7 @@
         routeMissing: function(e)
         {
             notificationWidget.error("Unknown admin path '" + e.url + "', redirecting.")
-            router.navigate("/projects/");
+            router.navigate("/");
         }
     });
 
@@ -103,6 +103,13 @@
             window.configPanel.destroy();
             delete window.configPanel;
         }
+
+        if (!window.scopePanel)
+        {
+            window.scopePanel = new Zutubi.admin.ScopePanel("#config-view")
+        }
+
+        window.scopePanel.setScope(scope);
     }
 
     function subpath(path, begin, end)
@@ -124,60 +131,68 @@
             rootPath = subpath(path, 0, rootIndex),
             configPath = subpath(path, rootIndex);
 
+        if (window.scopePanel)
+        {
+            window.scopePanel.destroy();
+            delete window.scopePanel;
+        }
+
         if (!window.configPanel)
         {
             window.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
             window.configPanel.bind("pathselect", function (e) {
-                router.navigate(e.path, true);
+                router.navigate("/config/" + e.path, true);
             });
         }
 
         window.configPanel.setPaths(rootPath, configPath);
     }
 
-    router.route("/", function(path) {
-        router.navigate("/projects/");
+    router.route("/", function(path)
+    {
+        router.navigate("/hierarchy/projects/");
     });
 
-    router.route("/projects/*path", function(path)
+    router.route("/hierarchy/projects/(:name)", function(path, name)
     {
         window.navbar.selectScope("projects");
-        if (path)
-        {
-            showConfig("projects/" + path, true);
-        }
-        else
-        {
-            showScope("projects");
-        }
+        showScope("projects", name);
     });
 
-    router.route("/agents/*path", function(path)
+    router.route("/config/projects/*path", function(path)
+    {
+        window.navbar.selectScope("projects");
+        showConfig("projects/" + path, true);
+    });
+
+    router.route("/hierarchy/agents/(:name)", function(path, name)
+    {
+        window.navbar.selectScope("agents");
+        showScope("agents", name);
+    });
+
+    router.route("/config/agents/*path", function(path)
     {
         window.navbar.selectScope("agents");
         if (path)
         {
             showConfig("agents/" + path, true);
         }
-        else
-        {
-            showScope("agents");
-        }
     });
 
-    router.route("/settings/*path", function(path)
+    router.route("/config/settings/*path", function(path)
     {
         window.navbar.selectScope("settings");
         showConfig("settings/" + (path ? path : ""), false);
     });
 
-    router.route("/users/*path", function(path)
+    router.route("/config/users/*path", function(path)
     {
         window.navbar.selectScope("users");
         showConfig("users/" + (path ? path : ""), false);
     });
 
-    router.route("/groups/*path", function(path)
+    router.route("/config/groups/*path", function(path)
     {
         window.navbar.selectScope("groups");
         showConfig("groups/" + (path ? path : ""), false);
@@ -194,7 +209,18 @@
         window.navbar = $("#navbar").kendoZaNavbar().data("kendoZaNavbar");
         window.navbar.bind("scope-selected", function(e)
         {
-            router.navigate("/" + e.scope + "/");
+            if (e.scope === "projects" || e.scope === "agents")
+            {
+                router.navigate("/hierarchy/" + e.scope + "/");
+            }
+            else if (e.scope === "plugins")
+            {
+                router.navigate("/plugins/");
+            }
+            else
+            {
+                router.navigate("/config/" + e.scope + "/");
+            }
         });
 
         router.start();

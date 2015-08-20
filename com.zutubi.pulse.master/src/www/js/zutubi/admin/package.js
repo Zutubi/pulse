@@ -8,9 +8,11 @@
 // dependency: ./ControllingDropDownList.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
+// dependency: ./HierarchyTree.js
 // dependency: ./ItemPicker.js
 // dependency: ./LoginWindow.js
 // dependency: ./Navbar.js
 // dependency: ./PasswordField.js
+// dependency: ./ScopePanel.js
 // dependency: ./Table.js
 // dependency: ./TextField.js
