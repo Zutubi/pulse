@@ -429,7 +429,7 @@ public class ConfigController
         String key = null;
         Record parentRecord = null;
         String parentPath = PathUtils.getParentPath(path);
-        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
         if (parentType != null && parentType instanceof MapType)
         {
             parentRecord = configurationTemplateManager.getRecord(parentPath);

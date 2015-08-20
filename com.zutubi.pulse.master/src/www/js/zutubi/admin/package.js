@@ -10,6 +10,7 @@
 // dependency: ./Form.js
 // dependency: ./ItemPicker.js
 // dependency: ./LoginWindow.js
+// dependency: ./Navbar.js
 // dependency: ./PasswordField.js
 // dependency: ./Table.js
 // dependency: ./TextField.js

@@ -11,13 +11,45 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 50px;
-    background-color: #abcdef;
+    height: 39px;
+    background-color: #ffc693;
+    border-bottom: solid 1px #eee;
+}
+
+ul.navlist {
+    height: 30px;
+    padding: 4px;
+}
+
+.navlist li {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 8px;
+}
+
+.navlist a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #083772;
+}
+
+.k-split-button {
+    cursor: pointer;
+}
+
+.selector-popup li {
+    padding: 4px 12px;
+    cursor: pointer;
+}
+
+.selector-popup li:hover {
+    background-color: #eee;
 }
 
 #content {
     position: fixed;
-    top: 50px;
+    top: 40px;
     bottom: 20px;
     left: 0;
     right: 0;

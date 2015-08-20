@@ -54,6 +54,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
             body = new Error(ex);
         }
 
+        // FIXME kendo: remove
+        ex.printStackTrace();
+
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 

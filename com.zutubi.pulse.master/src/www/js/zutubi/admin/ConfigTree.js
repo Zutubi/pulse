@@ -137,6 +137,7 @@
                 dataItem = children[j];
             }
 
+            that.expand(root);
             if (dataItem)
             {
                 that.expandTo(dataItem);

@@ -53,11 +53,17 @@
             PATHSELECT
         ],
 
-        setPath: function(path)
+        destroy: function()
         {
-            this.configTree.setRootPath(subpath(path, 0, 2));
-            this.configTree.selectConfig(subpath(path, 2));
-            this.loadContentPanes(path);
+            // FIXME kendo need we do more?
+            this.view.destroy();
+        },
+
+        setPaths: function(rootPath, configPath)
+        {
+            this.configTree.setRootPath(rootPath);
+            this.configTree.selectConfig(configPath);
+            this.loadContentPanes(rootPath + "/" + configPath);
         },
 
         loadContentPanes: function(path)
