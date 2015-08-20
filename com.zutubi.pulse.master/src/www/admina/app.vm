@@ -31,7 +31,9 @@
 </div>
 
 <div id="footer">
-    footer bar
+    <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number)
+    <b>::</b> copyright &copy; 2005-2015 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+    <a href="http://jira.zutubi.com/">report bug/request feature</a>
 </div>
 
 <script>

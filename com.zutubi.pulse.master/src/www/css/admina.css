@@ -21,7 +21,6 @@ body {
     bottom: 20px;
     left: 0;
     right: 0;
-    background-color: #F63;
     overflow: auto;
 }
 
@@ -35,7 +34,17 @@ body {
     left: 0;
     right: 0;
     height: 20px;
-    background-color: #abcdef;
+    font-size: 12px;
+    color: #aaa;
+    text-align: center;
+    line-height: 20px;
+    border-top: solid 1px #eee;
+}
+
+#footer a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #aaa;
 }
 
 .pane-content {
