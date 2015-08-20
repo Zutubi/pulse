@@ -174,7 +174,7 @@
             that.table = $("#center-pane-content").kendoZaTable({
                 structure: data.table,
                 items: data.nested,
-                allowSorting: data.type.ordered && (jQuery.inArray("write", data.allowedActions) != -1)
+                allowSorting: data.type.ordered && (jQuery.inArray("write", data.allowedActions) !== -1)
             }).data("kendoZaTable");
 
             that.table.bind("reorder", function(e)

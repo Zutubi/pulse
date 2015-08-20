@@ -33,7 +33,7 @@
         {
             var value = this.getValue(),
                 structure = this.structure,
-                enable = jQuery.inArray(value, structure.enableSet) != -1,
+                enable = jQuery.inArray(value, structure.enableSet) !== -1,
                 fieldNames = structure.dependentFields,
                 form = this.parentForm,
                 fields,

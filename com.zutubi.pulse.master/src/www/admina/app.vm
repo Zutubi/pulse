@@ -3,8 +3,8 @@
 <head>
     <link href="${base}/css/reset.css" rel="stylesheet"/>
 
-    <link href="${base}/css/kendo/kendo.common.min.css" rel="stylesheet"/>
-    <link href="${base}/css/kendo/kendo.default.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.common-material.min.css" rel="stylesheet"/>
+    <link href="${base}/css/kendo/kendo.material.min.css" rel="stylesheet"/>
     <link href="${base}/css/admina.css" rel="stylesheet"/>
 
     <script>

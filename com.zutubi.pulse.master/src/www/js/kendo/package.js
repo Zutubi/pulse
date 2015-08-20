@@ -1,2 +1,2 @@
 // dependency: ./jquery.min.js
-// dependency: ./kendo.all.js
+// dependency: ./kendo.all.min.js
