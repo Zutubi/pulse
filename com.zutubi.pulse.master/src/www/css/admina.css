@@ -104,20 +104,13 @@ table.form {
 .form th {
     width: 1%;
     white-space: nowrap;
-}
-
-.form td.submit {
-    text-align: center;
-}
-
-.form th {
     text-align: right;
     vertical-align: top;
     padding-top: 0.7em;
 }
 
-.form th label {
-    display: inline-block;
+.form td.submit {
+    text-align: center;
 }
 
 .form td.submit button {
