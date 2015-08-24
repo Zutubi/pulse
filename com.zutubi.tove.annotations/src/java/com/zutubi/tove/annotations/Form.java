@@ -39,5 +39,6 @@ public @interface Form
      */
     String[] actions() default { "save", "cancel" };
 
+    // FIXME kendo deprecated
     int labelWidth() default 150;
 }

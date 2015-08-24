@@ -94,10 +94,16 @@ ul.navlist {
 
 table.form {
     width: 100%;
+    max-width: 800px;
 }
 
 .form th, .form td {
     padding: 0.33em;
+}
+
+.form th {
+    width: 1%;
+    white-space: nowrap;
 }
 
 .form td.submit {
@@ -108,6 +114,10 @@ table.form {
     text-align: right;
     vertical-align: top;
     padding-top: 0.7em;
+}
+
+.form th label {
+    display: inline-block;
 }
 
 .form td.submit button {
