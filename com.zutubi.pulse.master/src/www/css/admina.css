@@ -6,6 +6,8 @@ body {
     height: 100%;
 }
 
+/* Navigation bar */
+
 #navbar {
     position: fixed;
     top: 0;
@@ -47,6 +49,8 @@ ul.navlist {
     background-color: #eee;
 }
 
+/* Main content area (between nav and footer */
+
 #content {
     position: fixed;
     top: 40px;
@@ -59,6 +63,13 @@ ul.navlist {
 #outer-split {
     border-width: 0;
 }
+
+.pane-content {
+    width: 100%;
+    height: 100%;
+}
+
+/* Footer bar */
 
 #footer {
     position: fixed;
@@ -79,17 +90,10 @@ ul.navlist {
     color: #aaa;
 }
 
-.pane-content {
-    width: 100%;
-    height: 100%;
-}
+/* Forms */
 
 table.form {
     width: 100%;
-}
-
-.form th {
-    text-align: right;
 }
 
 .form th, .form td {
@@ -99,6 +103,43 @@ table.form {
 .form td.submit {
     text-align: center;
 }
+
+.form th {
+    text-align: right;
+    vertical-align: top;
+    padding-top: 0.7em;
+}
+
+.form td.submit button {
+    margin: 4px;
+}
+
+input.k-textbox, .k-dropdown-wrap .k-input {
+    height: 2em;
+}
+
+input.k-textbox {
+    text-indent: 0.2em;
+}
+
+.k-dropdown-wrap .k-input {
+    line-height: 2em;
+}
+
+.k-dropdown-wrap .k-select {
+    line-height: 2.2em;
+}
+
+input[type=checkbox].k-input {
+    height: 2em;
+    line-height: 2em;
+}
+
+.k-button {
+    text-transform: none;
+}
+
+/* Drag and drop in collection tables */
 
 .k-hint {
     opacity: 0.6;

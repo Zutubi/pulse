@@ -22,7 +22,7 @@
 
         _create: function()
         {
-            var options = this.options;
+            var options = this.options, width = "100%";
 
             this.template = kendo.template(options.template);
             this.element.html(this.template(options.structure));
@@ -30,12 +30,9 @@
 
             if (options.structure.size)
             {
-                this.inputElement.width(options.structure.size);
+                width = options.structure.size + "px";
             }
-            else
-            {
-                this.inputElement.width("100%");
-            }
+            this.inputElement.css("width", width);
 
             if (typeof options.value !== "undefined")
             {

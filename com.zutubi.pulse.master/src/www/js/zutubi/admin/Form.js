@@ -42,7 +42,7 @@
             formName: "form",
             template: '<form name="#: id #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
-            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td></td></tr>',
+            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap"></span></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
             errorTemplate: '<li>#: message #</li>'
         },
@@ -102,7 +102,7 @@
             else
             {
                 this.tableBodyElement.append(this.fieldTemplate(fieldOptions));
-                fieldElement = this.tableBodyElement.children().last().find("td");
+                fieldElement = this.tableBodyElement.find("#" + fieldOptions.id + "-wrap");
 
                 fieldType = FIELD_TYPES[fieldOptions.type];
                 if (fieldType)
