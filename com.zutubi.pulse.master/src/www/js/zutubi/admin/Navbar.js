@@ -8,7 +8,7 @@
         SCOPE_SELECTED = "scope-selected";
 
     Zutubi.admin.ScopeSelector = Widget.extend({
-        init: function (element, options)
+        init: function(element, options)
         {
             var that = this;
 
@@ -102,7 +102,7 @@
     });
 
     Zutubi.admin.Navbar = Widget.extend({
-        init: function (element, options)
+        init: function(element, options)
         {
             var that = this;
 
@@ -119,7 +119,7 @@
             SCOPE_SELECTED
         ],
 
-        _create: function ()
+        _create: function()
         {
             var that = this;
 

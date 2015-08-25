@@ -5,6 +5,7 @@
 
     <link href="${base}/css/kendo/kendo.common-material.min.css" rel="stylesheet"/>
     <link href="${base}/css/kendo/kendo.material.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="${base}/css/font-awesome.min.css"/>
     <link href="${base}/css/admina.css" rel="stylesheet"/>
 
     <script>

@@ -54,6 +54,7 @@ based upon the Spring Security system.
             <security:filter-chain pattern="/css/**"        filters="none" />
             <security:filter-chain pattern="/images/**"     filters="none" />
             <security:filter-chain pattern="/favicon.*"     filters="none" />
+            <security:filter-chain pattern="/fonts/**"     filters="none" />
             <security:filter-chain pattern="/ajax/**"       filters="securityContextFilter, apiPreAuthenticatedProcessingFilter, anonymousAuthenticationFilter, ajaxExceptionTranslationFilter, filterInvocationInterceptor"/>
             <security:filter-chain pattern="/**"            filters="securityContextFilter, logoutFilter, formLoginAuthenticationFilter, basicAuthenticationFilter, apiPreAuthenticatedProcessingFilter, rememberMeProcessingFilter, requestCacheFilter, anonymousAuthenticationFilter, sessionManagementFilter, exceptionTranslationFilter, filterInvocationInterceptor"/>
         </security:filter-chain-map>

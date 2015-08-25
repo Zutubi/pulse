@@ -64,7 +64,8 @@ ul.navlist {
     border-width: 0;
 }
 
-.pane-content {
+.pane-content, .fill-parent {
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
 }
@@ -87,6 +88,46 @@ ul.navlist {
 #footer a {
     text-decoration: none;
     font-weight: bold;
+    color: #aaa;
+}
+
+/* Hierarchy Selector */
+
+.k-hierarchy-selector {
+    padding: 0.5em;
+}
+
+.k-hierarchy-selector input {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 80%;
+    height: 1.6em;
+    margin-bottom: 0.5em;
+}
+
+.k-hierarchy-selector input::-ms-clear {
+    height: 0;
+    width: 0;
+}
+
+.k-hierarchy-selector .k-treeview {
+    overflow: visible;
+}
+
+.k-hierarchy-selector-clear {
+    position:relative;
+    z-index: 2;
+    float: right;
+    margin-top: -33px;
+    margin-right: 6px;
+    color: #444;
+}
+
+.k-hierarchy-selector-clear:hover {
+    color: #888;
+}
+
+.k-hierarchy-selector-clear:active {
     color: #aaa;
 }
 

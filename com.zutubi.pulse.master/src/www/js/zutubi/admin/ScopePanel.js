@@ -1,6 +1,6 @@
 // dependency: ./namespace.js
 // dependency: ./ajax.js
-// dependency: ./HierarchyTree.js
+// dependency: ./HierarchySelector.js
 
 (function($)
 {
@@ -40,8 +40,8 @@
                 ]
             });
 
-            that.hierarchyTree = $("#hierarchy-tree").kendoZaHierarchyTree().data("kendoZaHierarchyTree");
-            that.hierarchyTree.bind("nodeselect", function(e)
+            that.hierarchySelector = $("#hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.hierarchySelector.bind("nodeselect", function(e)
             {
                 that._loadContentPanes(e.name);
             });
@@ -60,12 +60,12 @@
         setScope: function(scope)
         {
             this.scope = scope;
-            this.hierarchyTree.setScope(scope);
+            this.hierarchySelector.setScope(scope);
         },
 
         setItem: function(name)
         {
-            this.hierarchyTree.selectItem(name);
+            this.hierarchySelector.selectItem(name);
             this._loadContentPanes(name);
         },
 

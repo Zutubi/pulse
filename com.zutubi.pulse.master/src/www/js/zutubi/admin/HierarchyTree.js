@@ -93,6 +93,55 @@
             }
         },
 
+        _prefixFilterSubtree: function(root, dataItem, text)
+        {
+            var visible = root.find(".k-in").first().text().toLowerCase().indexOf(text) == 0,
+                nested,
+                childVisible = false,
+                children,
+                items,
+                child,
+                item,
+                i;
+
+            nested = root.children("ul");
+            if (nested.length > 0)
+            {
+                children = dataItem.children.data();
+                items = nested.children("li");
+
+                for (i = 0; i < items.length; i++)
+                {
+                    item = items.eq(i);
+                    child = children[i];
+
+                    childVisible = this._prefixFilterSubtree(item, child, text) || childVisible;
+                }
+
+                if (childVisible && !dataItem.expanded)
+                {
+                    this._toggle(root, dataItem, true);
+                }
+
+                visible = visible || childVisible;
+            }
+
+            root.css("display", visible ? "" : "none");
+            return visible;
+        },
+
+        prefixFilter: function(s)
+        {
+            if (s)
+            {
+                this._prefixFilterSubtree(this.root.children("li").first(), this.dataSource.at(0), s.toLowerCase());
+            }
+            else
+            {
+                this.root.find("li").css("display", "");
+            }
+        },
+
         _updateSelected: function()
         {
             var that = this,

@@ -8,6 +8,7 @@
 // dependency: ./ControllingDropDownList.js
 // dependency: ./DropDownList.js
 // dependency: ./Form.js
+// dependency: ./HierarchySelector.js
 // dependency: ./HierarchyTree.js
 // dependency: ./ItemPicker.js
 // dependency: ./LoginWindow.js
