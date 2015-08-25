@@ -35,7 +35,7 @@
 
             $("#outer-split").kendoSplitter({
                 panes: [
-                    { collapsible: true, size: "250px" },
+                    { collapsible: true, size: "350px" },
                     { collapsible: false },
                     { collapsible: true, size: "250px" }
                 ]
