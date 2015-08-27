@@ -14,5 +14,6 @@ public @interface Wizard
 {
     @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
+    @Handler(className = DefaultAnnotationHandlers.WIZARD_IGNORE)
     @interface Ignore {}
 }

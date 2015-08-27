@@ -12,6 +12,7 @@ import java.util.List;
 @JsonTypeName("collection")
 public class CollectionModel extends ConfigModel
 {
+    private CollectionTypeModel type;
     private TableModel table;
     private List<String> allowedActions;
 
@@ -22,6 +23,16 @@ public class CollectionModel extends ConfigModel
     public CollectionModel(String key, String handle, String label)
     {
         super(handle, key, label);
+    }
+
+    public CollectionTypeModel getType()
+    {
+        return type;
+    }
+
+    public void setType(CollectionTypeModel type)
+    {
+        this.type = type;
     }
 
     public TableModel getTable()

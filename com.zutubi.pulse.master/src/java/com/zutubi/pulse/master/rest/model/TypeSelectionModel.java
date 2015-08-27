@@ -12,11 +12,22 @@ import java.util.List;
 @JsonTypeName("type-selection")
 public class TypeSelectionModel extends ConfigModel
 {
+    private CompositeTypeModel type;
     private List<Pair<Integer, String>> configuredDescendants;
 
     public TypeSelectionModel(String key, String label)
     {
         super(null, key, label);
+    }
+
+    public CompositeTypeModel getType()
+    {
+        return type;
+    }
+
+    public void setType(CompositeTypeModel type)
+    {
+        this.type = type;
     }
 
     public List<Pair<Integer, String>> getConfiguredDescendants()

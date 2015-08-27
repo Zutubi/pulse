@@ -18,9 +18,13 @@ public class CompositeTypeModel extends TypeModel
     private FormModel form;
     private CompositeTypeModel checkType;
 
+    public CompositeTypeModel()
+    {
+    }
+
     public CompositeTypeModel(CompositeType type)
     {
-        super(type);
+        super(type.getSymbolicName());
 
         List<String> simplePropertyNames = type.getSimplePropertyNames();
         if (simplePropertyNames.size() > 0)

@@ -19,7 +19,6 @@ public abstract class ConfigModel
     private final String handle;
     private final String key;
     private final String label;
-    private TypeModel type;
     private String iconClass;
     private List<ConfigModel> nested;
 
@@ -48,16 +47,6 @@ public abstract class ConfigModel
     public String getLabel()
     {
         return label;
-    }
-
-    public TypeModel getType()
-    {
-        return type;
-    }
-
-    public void setType(TypeModel type)
-    {
-        this.type = type;
     }
 
     public String getIconClass()

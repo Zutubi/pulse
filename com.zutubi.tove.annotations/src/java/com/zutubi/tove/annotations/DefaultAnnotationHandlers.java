@@ -15,4 +15,5 @@ public interface DefaultAnnotationHandlers
     String ITEM_PICKER        = HANDLER_PACKAGE + ".ItemPickerAnnotationHandler";
     String REFERENCE          = HANDLER_PACKAGE + ".ReferenceAnnotationHandler";
     String SELECT             = HANDLER_PACKAGE + ".SelectAnnotationHandler";
+    String WIZARD_IGNORE      = HANDLER_PACKAGE + ".WizardIgnoreAnnotationHandler";
 }

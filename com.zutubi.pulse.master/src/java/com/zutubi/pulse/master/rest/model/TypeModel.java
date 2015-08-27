@@ -7,16 +7,25 @@ import com.zutubi.tove.type.*;
  */
 public class TypeModel
 {
-    private ComplexType type;
+    private String symbolicName;
 
-    public TypeModel(ComplexType type)
+    public TypeModel()
     {
-        this.type = type;
+    }
+
+    public TypeModel(String symbolicName)
+    {
+        this.symbolicName = symbolicName;
     }
 
     public String getSymbolicName()
     {
-        return type.getSymbolicName();
+        return symbolicName;
+    }
+
+    public void setSymbolicName(String symbolicName)
+    {
+        this.symbolicName = symbolicName;
     }
 
     public static String formatShortType(Type type)

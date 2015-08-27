@@ -11,7 +11,7 @@ public class CollectionTypeModel extends TypeModel
 
     public CollectionTypeModel(CollectionType type)
     {
-        super(type);
+        super();
         collectionType = type;
     }
 

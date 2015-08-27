@@ -3,6 +3,7 @@
 // dependency: ./ConfigTree.js
 // dependency: ./Form.js
 // dependency: ./Table.js
+// dependency: ./Wizard.js
 
 (function($)
 {
@@ -191,8 +192,15 @@
 
         _showTypeSelection: function(data)
         {
-            console.log("type select");
-            console.dir(data);
+            var that = this,
+                link = $('<a>create a new thing</a>');
+            link.on("click", function(e)
+            {
+                e.preventDefault();
+                that._showWizard();
+            });
+
+            $("#center-pane-content").append(link);
         },
 
         _saveComposite: function(properties)
@@ -341,10 +349,16 @@
             Zutubi.admin.ajax({
                 type: "PUT",
                 url: "/api/config/" + that.path + "?depth=-1",
-                data: {kind: "collection", nested: jQuery.map(order, function(key)
-                {
-                    return {kind: "composite", key: key};
-                })},
+                data: {
+                    kind: "collection",
+                    nested: jQuery.map(order, function(key)
+                            {
+                                return {
+                                    kind: "composite",
+                                    key: key
+                                };
+                            })
+                },
                 success: function (data)
                 {
                     console.log('set order succcess');
@@ -354,6 +368,93 @@
                 {
                     zaReportError("Could not save order: " + zaAjaxError(jqXHR));
                 }
+            });
+        },
+
+        _showWizard: function()
+        {
+            var that = this;
+
+            Zutubi.admin.ajax({
+                type: "GET",
+                url: "/api/wizard/" + that.path,
+                success: function (data)
+                {
+                    console.log('wizard');
+                    console.dir(data);
+
+                    that._renderWizard(data);
+                },
+                error: function (jqXHR)
+                {
+                    zaReportError("Could not get wizard information: " + zaAjaxError(jqXHR));
+                }
+            });
+        },
+
+        _renderWizard: function(data)
+        {
+            var that = this,
+                contentEl = $("#center-pane-content"),
+                wizardEl = $("<div></div>");
+
+            that._clearContent();
+
+            contentEl.append(wizardEl);
+            that.wizard = wizardEl.kendoZaWizard({
+                structure: data
+            }).data("kendoZaWizard");
+
+            that.wizard.bind("finish", function()
+            {
+                var wizardData = that.wizard.getValue();
+                jQuery.each(wizardData, function(property, data)
+                {
+                    data.kind = "composite";
+                    that._coerce(data.properties, data.type.simpleProperties);
+                    data.type = { symbolicName: data.type.symbolicName };
+                });
+
+                Zutubi.admin.ajax({
+                    type: "POST",
+                    url: "/api/wizard/" + that.path,
+                    data: wizardData,
+                    success: function (data)
+                    {
+                        console.log('wizard posted');
+                        that.loadContentPanes(that.path);
+                    },
+                    error: function (jqXHR)
+                    {
+                        var details;
+
+                        if (jqXHR.status === 422)
+                        {
+                            try
+                            {
+                                details = JSON.parse(jqXHR.responseText);
+                                console.dir(details);
+                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                                {
+                                    that.wizard.showValidationErrors(details);
+                                    return;
+                                }
+                            }
+                            catch(e)
+                            {
+                                // Do nothing.
+                                console.dir(e);
+                            }
+                        }
+
+                        zaReportError("Could not finish wizard: " + zaAjaxError(jqXHR));
+                    }
+                });
+            });
+
+            that.wizard.bind("cancel", function()
+            {
+                that.loadContentPanes(that.path);
             });
         }
     });

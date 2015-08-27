@@ -12,6 +12,7 @@ import java.util.Map;
 @JsonTypeName("composite")
 public class CompositeModel extends ConfigModel
 {
+    private CompositeTypeModel type;
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
     private List<ActionModel> actions;
@@ -23,6 +24,16 @@ public class CompositeModel extends ConfigModel
     public CompositeModel(String handle, String key, String label)
     {
         super(handle, key, label);
+    }
+
+    public CompositeTypeModel getType()
+    {
+        return type;
+    }
+
+    public void setType(CompositeTypeModel type)
+    {
+        this.type = type;
     }
 
     public Map<String, Object> getProperties()
@@ -58,4 +69,5 @@ public class CompositeModel extends ConfigModel
         }
         actions.add(action);
     }
+
 }

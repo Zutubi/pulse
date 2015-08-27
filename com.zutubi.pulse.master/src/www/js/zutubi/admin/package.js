@@ -17,3 +17,4 @@
 // dependency: ./ScopePanel.js
 // dependency: ./Table.js
 // dependency: ./TextField.js
+// dependency: ./Wizard.js

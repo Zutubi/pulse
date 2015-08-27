@@ -128,10 +128,11 @@ public class ConfigModelBuilder
 
     private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)
     {
-        TypeSelectionModel model = new TypeSelectionModel(PathUtils.getBaseName(path), label);
+        String baseName = PathUtils.getBaseName(path);
+        TypeSelectionModel model = new TypeSelectionModel(baseName, label);
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(createCompositeTypeModel(path, compositeType, configurationTemplateManager.isConcrete(path)));
+            model.setType(buildCompositeTypeModel(PathUtils.getParentPath(path), baseName, compositeType, configurationTemplateManager.isConcrete(path)));
         }
 
         if (isFieldSelected(filters, "configuredDescendants"))
@@ -191,7 +192,7 @@ public class ConfigModelBuilder
 
         if (isFieldSelected(filters, "type"))
         {
-            model.setType(createCompositeTypeModel(path, type, instance.isConcrete()));
+            model.setType(buildCompositeTypeModel(PathUtils.getParentPath(path), baseName, type, instance.isConcrete()));
         }
 
         if (isFieldSelected(filters, "actions"))
@@ -202,13 +203,12 @@ public class ConfigModelBuilder
         return model;
     }
 
-    private CompositeTypeModel createCompositeTypeModel(String path, CompositeType type, boolean concrete)
+    public CompositeTypeModel buildCompositeTypeModel(String parentPath, String baseName, CompositeType type, boolean concrete)
     {
         CompositeTypeModel typeModel = new CompositeTypeModel(type);
         if (!type.isExtendable())
         {
-            String parentPath = PathUtils.getParentPath(path);
-            typeModel.setForm(formModelBuilder.createForm(parentPath, PathUtils.getBaseName(path), type, concrete));
+            typeModel.setForm(formModelBuilder.createForm(parentPath, baseName, type, concrete));
 
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
             if (checkType != null)
@@ -222,7 +222,7 @@ public class ConfigModelBuilder
         List<CompositeType> extensions = type.getExtensions();
         for (CompositeType extension: extensions)
         {
-            typeModel.addSubType(createCompositeTypeModel(path, extension, concrete));
+            typeModel.addSubType(buildCompositeTypeModel(parentPath, baseName, extension, concrete));
         }
 
         return typeModel;
