@@ -95,7 +95,7 @@
 
         _prefixFilterSubtree: function(root, dataItem, text)
         {
-            var visible = root.find(".k-in").first().text().toLowerCase().indexOf(text) == 0,
+            var visible = root.find(".k-in").first().text().toLowerCase().indexOf(text) === 0,
                 nested,
                 childVisible = false,
                 children,

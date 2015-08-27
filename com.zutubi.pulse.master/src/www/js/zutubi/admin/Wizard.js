@@ -49,7 +49,7 @@
 
             that.element.html(that.template({}));
             that.stepIndexElement = that.element.find(".k-wizard-step-index");
-            if (steps.length == 1)
+            if (steps.length === 1)
             {
                 that.stepIndexElement.hide();
             }
@@ -63,9 +63,9 @@
 
             that.typeSelectWrapper = that.element.find(".k-wizard-type-select");
             that.typeSelectDropDown = that.typeSelectWrapper.children("input").kendoDropDownList({
-                change: jQuery.proxy(that._typeSelected, that),
-                height: "auto"
+                change: jQuery.proxy(that._typeSelected, that)
             }).data("kendoDropDownList");
+
             that.formWrapper = that.element.find(".k-wizard-form");
 
             that._showStepAtIndex(0);
@@ -143,12 +143,18 @@
 
         _updateTypeSelect: function(types)
         {
-            var labels;
+            var labels,
+                dropDown = this.typeSelectDropDown,
+                width;
 
             if (types.length > 1)
             {
                 labels = jQuery.map(types, function(type) { return type.label; });
-                this.typeSelectDropDown.setDataSource(labels);
+                dropDown.setDataSource(labels);
+                width = dropDown.list.width() + 40;
+
+                dropDown.list.width(width - 1);
+                dropDown.element.closest(".k-widget").width(width);
                 this.typeSelectWrapper.show();
             }
             else
@@ -170,7 +176,7 @@
                     that._showTypeAtIndex(i);
                     return false;
                 }
-            })
+            });
         },
 
         _showTypeAtIndex: function(index)

@@ -131,6 +131,29 @@ ul.navlist {
     color: #aaa;
 }
 
+/* Center pane */
+
+#center-pane-content h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #888;
+}
+
+/* Collections */
+
+.k-collection-panel {
+    padding: 8px 16px;
+}
+
+.k-collection-panel h1 {
+    line-height: 36px;
+    margin-bottom: 8px;
+}
+
+.k-collection-add {
+    float: right;
+}
+
 /* Forms */
 
 table.form {
@@ -195,4 +218,10 @@ input[type=checkbox].k-input {
 
 .k-grid table[data-role=sortable] tbody tr {
     cursor: move;
+}
+
+/* Buttons */
+
+.k-button .fa {
+    line-height: 14px;
 }

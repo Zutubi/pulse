@@ -18,7 +18,7 @@
 
         options: {
             name: "ZaTable",
-            template: '<div id="#: id #" style="margin: 20px"></div>'
+            template: '<div id="#: id #"></div>'
         },
 
         events: [

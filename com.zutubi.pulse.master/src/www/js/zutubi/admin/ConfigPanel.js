@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ./ajax.js
 // dependency: ./ConfigTree.js
+// dependency: ./CollectionPanel.js
 // dependency: ./Form.js
 // dependency: ./Table.js
 // dependency: ./Wizard.js
@@ -124,7 +125,19 @@
 
             this.form = null;
             this.checkForm = null;
-            this.table = null;
+
+            if (this.collection)
+            {
+                this.collection.destroy();
+                this.collection = null;
+            }
+
+            if (this.wizard)
+            {
+                this.wizard.destroy();
+                this.wizard = null;
+            }
+
             kendo.destroy(contentEl);
             contentEl.empty();
         },
@@ -178,15 +191,19 @@
             console.log("collection");
             console.dir(data);
 
-            that.table = $("#center-pane-content").kendoZaTable({
-                structure: data.table,
-                items: data.nested,
-                allowSorting: data.type.ordered && (jQuery.inArray("write", data.allowedActions) !== -1)
-            }).data("kendoZaTable");
+            that.collection = new Zutubi.admin.CollectionPanel({
+                containerSelector: "#center-pane-content",
+                collection: data
+            });
 
-            that.table.bind("reorder", function(e)
+            that.collection.bind("add", function()
             {
-                that._setCollectionOrder(that.table.getOrder());
+                that._showWizard();
+            });
+
+            that.collection.bind("reorder", function()
+            {
+                that._setCollectionOrder(that.collection.table.getOrder());
             });
         },
 
