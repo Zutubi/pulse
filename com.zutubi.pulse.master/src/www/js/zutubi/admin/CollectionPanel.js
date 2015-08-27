@@ -4,7 +4,6 @@
 (function($)
 {
     var Observable = kendo.Observable,
-        NS = ".kendoZaCollectionPanel",
         ADD = "add",
         REORDER = "reorder";
 
@@ -35,10 +34,14 @@
             that.view.render($(config.containerSelector));
 
             that.addElement = $("#collection-add");
-            that.addButton = that.addElement.kendoButton({spriteCssClass: "fa fa-plus-circle"}).data("kendoButton");
             if (createAllowed)
             {
-                that.addElement.on("click" + NS, jQuery.proxy(that._addClicked, that));
+                that.addButton = that.addElement.kendoButton({spriteCssClass: "fa fa-plus-circle"}).data("kendoButton");
+                that.addButton.bind("click", jQuery.proxy(that._addClicked, that));
+            }
+            else
+            {
+                that.addElement.hide();
             }
 
             that.table = $("#collection-table").kendoZaTable({
@@ -61,7 +64,6 @@
         destroy: function()
         {
             // FIXME moar destruction?
-            this.addElement.off(NS);
             this.view.destroy();
         },
 
