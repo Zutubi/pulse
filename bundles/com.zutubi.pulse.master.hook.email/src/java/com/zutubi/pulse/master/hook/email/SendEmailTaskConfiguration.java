@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
  * users that committed changes that affected the build.
  */
 @SymbolicName("zutubi.sendEmailTaskConfig")
-@Form(fieldOrder = {"template", "attachLogs", "logLineLimit", "emailContacts", "emailCommitters", "includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+@Form(fieldOrder = {"template", "attachLogs", "logLineLimit", "emailContacts", "emailCommitters", "includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails", "enforceDomain"})
 @CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
 @Wire
 public class SendEmailTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
@@ -69,7 +69,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     @Numeric(min = 0, max = 250)
     private int logLineLimit = 50;
     private boolean emailContacts;
-    @ControllingCheckbox(checkedFields = {"includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails"})
+    @ControllingCheckbox(checkedFields = {"includeUpstreamCommitters", "emailDomain", "sinceLastSuccess", "ignorePulseUsers", "useScmEmails", "enforceDomain"})
     private boolean emailCommitters;
     private boolean includeUpstreamCommitters;
     @Required
@@ -77,6 +77,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     private boolean sinceLastSuccess = false;
     private boolean ignorePulseUsers = false;
     private boolean useScmEmails = false;
+    private boolean enforceDomain = false;
 
     private BuildResultRenderer buildResultRenderer;
     private ConfigurationProvider configurationProvider;
@@ -176,6 +177,16 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
     public void setUseScmEmails(boolean useScmEmails)
     {
         this.useScmEmails = useScmEmails;
+    }
+
+    public boolean isEnforceDomain()
+    {
+        return enforceDomain;
+    }
+
+    public void setEnforceDomain(boolean enforceDomain)
+    {
+        this.enforceDomain = enforceDomain;
     }
 
     public boolean isIgnorePulseUsers()
@@ -306,10 +317,36 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
                 {
                     if (StringUtils.stringSet(scmLogin) && (!ignorePulseUsers || userManager.getUser(scmLogin) == null))
                     {
-                        emails.add(getEmail(projectConfig, projectState, scmLogin));
+                        String email = getEmail(projectConfig, projectState, scmLogin);
+                        if (checkDomain(email))
+                        {
+                            emails.add(email);
+                        }
+                        else
+                        {
+                            LOG.debug("Ignoring email '" + email + "' because it does not have domain '" + emailDomain + "'");
+                        }
                     }
                 }
             }
+        }
+    }
+
+    private boolean checkDomain(String email)
+    {
+        if (enforceDomain)
+        {
+            String domain = emailDomain;
+            if (!domain.startsWith("@"))
+            {
+                domain = "@" + domain;
+            }
+
+            return email.endsWith(domain);
+        }
+        else
+        {
+            return true;
         }
     }
 

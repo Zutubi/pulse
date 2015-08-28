@@ -220,6 +220,7 @@
                 <ref local="populateAgentStorageConfiguration"/>
                 <ref local="addGitShallowMasterClones"/>
                 <ref local="removeAgentDataDirectory"/>
+                <ref local="addEmailHookEnforceDomain"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -1160,5 +1161,9 @@
 
     <bean id="removeAgentDataDirectory" class="com.zutubi.pulse.master.upgrade.tasks.RemoveAgentDataDirectoryUpgradeTask">
         <property name="buildNumber" value="207007001"/>
+    </bean>
+
+    <bean id="addEmailHookEnforceDomain" class="com.zutubi.pulse.master.upgrade.tasks.AddEmailHookEnforceDomainUpgradeTask">
+        <property name="buildNumber" value="207013001"/>
     </bean>
 </beans>
