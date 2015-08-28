@@ -196,7 +196,7 @@ public class ChangelistDataAction extends ActionSupport
         ScmClient scmClient = null;
         try
         {
-            scmClient = scmManager.createClient(scmConfiguration);
+            scmClient = scmManager.createClient(projectConfiguration, scmConfiguration);
             ScmContext scmContext = scmManager.createContext(projectWithViewer.getConfig(), projectWithViewer.getState(), scmClient.getImplicitResource());
             final ChangeContext context = new ChangeContextImpl(revision, projectConfiguration, scmClient, scmContext);
 

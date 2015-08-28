@@ -780,8 +780,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         listener.register(configurationProvider, true);
 
         insertB("new", "template/globalt/b");
-        assertId("template/grandchild/b", 1);
-        assertId("template/child/b", 2);
+        assertId("template/child/b", 1);
+        assertId("template/grandchild/b", 2);
     }
 
     public void testChangeInSave()

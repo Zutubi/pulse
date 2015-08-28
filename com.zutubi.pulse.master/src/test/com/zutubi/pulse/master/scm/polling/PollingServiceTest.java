@@ -23,6 +23,7 @@ import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.DependencyConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.Condition;
@@ -804,7 +805,7 @@ public class PollingServiceTest extends ZutubiTestCase
         stub(scmConfig.isMonitor()).toReturn(monitor);
 
         ScmClient scmClient = mock(ScmClient.class);
-        stub(scmManager.createClient(scmConfig)).toReturn(scmClient);
+        stub(scmManager.createClient((ProjectConfiguration) anyObject(), eq(scmConfig))).toReturn(scmClient);
 
         PulseExecutionContext environmentContext = new PulseExecutionContext();
         environmentContext.addValue(BuildProperties.PROPERTY_PROJECT_HANDLE, project.getConfig().getHandle());

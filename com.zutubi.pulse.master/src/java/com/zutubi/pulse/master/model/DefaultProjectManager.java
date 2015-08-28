@@ -263,7 +263,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 ScmClient client = null;
                 try
                 {
-                    client = scmManager.createClient(newScm);
+                    client = scmManager.createClient(instance, newScm);
                     if (client.configChangeRequiresClean(oldScm, newScm))
                     {
                         makeStateTransition(instance.getProjectId(), Project.Transition.INITIALISE);

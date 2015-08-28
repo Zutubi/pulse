@@ -3,13 +3,11 @@ package com.zutubi.pulse.master.tove.config;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.master.MasterBuildProperties;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
 import com.zutubi.tove.variables.VariableResolver;
 import com.zutubi.tove.variables.api.VariableMap;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -21,28 +19,23 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
 {
     private static final Logger LOG = Logger.getLogger(MasterConfigurationVariableProvider.class);
     
-    private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
     
-    public VariableMap variablesForConfiguration(Configuration config)
+    public VariableMap variablesForConfiguration(Configuration scope)
     {
         PulseExecutionContext context = new PulseExecutionContext();
-        if (StringUtils.stringSet(config.getConfigurationPath()))
+        if (scope != null && scope instanceof ProjectConfiguration)
         {
-            ProjectConfiguration projectConfig = configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);
-            if (projectConfig != null)
-            {
-                MasterBuildProperties.addProjectProperties(context, projectConfig, true);
-            }
+            ProjectConfiguration projectConfig = (ProjectConfiguration) scope;
+            MasterBuildProperties.addProjectProperties(context, projectConfig, true);
         }
 
         return context.getScope();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Configuration> T resolveStringProperties(T config)
+    public <T extends Configuration> T resolveStringProperties(T config, VariableMap variables)
     {
-        VariableMap variables = variablesForConfiguration(config);
         if (variables.getVariables().isEmpty())
         {
             return config;
@@ -82,11 +75,6 @@ public class MasterConfigurationVariableProvider implements ConfigurationVariabl
             }
             property.setValue(resolvedConfig, value);
         }
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

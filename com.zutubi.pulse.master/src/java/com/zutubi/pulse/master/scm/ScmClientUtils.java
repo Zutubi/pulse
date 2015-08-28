@@ -1,6 +1,9 @@
 package com.zutubi.pulse.master.scm;
 
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -26,12 +29,12 @@ public class ScmClientUtils
      * @return the result of the callback
      * @throws ScmException if the callback encounters an error
      */
-    public static <T> T withScmClient(ScmConfiguration scmConfiguration, ScmClientFactory<ScmConfiguration> clientFactory, ScmAction<T> action) throws ScmException
+    public static <T> T withScmClient(ProjectConfiguration project, ScmConfiguration scmConfiguration, MasterScmClientFactory clientFactory, ScmAction<T> action) throws ScmException
     {
         ScmClient client = null;
         try
         {
-            client = clientFactory.createClient(scmConfiguration);
+            client = clientFactory.createClient(project, scmConfiguration);
             return action.process(client);
         }
         finally
@@ -56,7 +59,7 @@ public class ScmClientUtils
         ScmClient client = null;
         try
         {
-            client = scmManager.createClient(scmConfiguration);
+            client = scmManager.createClient(null, scmConfiguration);
             ScmContext context = scmManager.createContext(client.getImplicitResource());
             return action.process(client, context);
         }
@@ -89,7 +92,7 @@ public class ScmClientUtils
         try
         {
             ScmConfiguration scm = project.getScm();
-            client = scmManager.createClient(scm);
+            client = scmManager.createClient(project, scm);
             ScmContext context = scmManager.createContext(project, projectState, client.getImplicitResource());
             return action.process(client, context);
         }

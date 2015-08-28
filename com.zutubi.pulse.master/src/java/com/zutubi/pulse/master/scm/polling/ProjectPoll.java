@@ -7,7 +7,6 @@ import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.Pollable;
-import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.project.events.ProjectStatusEvent;
@@ -74,7 +73,7 @@ public class ProjectPoll implements Callable<ProjectPollingState>
             publishStatusMessage(projectConfig, I18N.format("polling.start"));
             projectManager.updateLastPollTime(projectId, now);
 
-            client = createClient(projectConfig.getScm());
+            client = createClient(projectConfig);
             ScmContext context = createContext(project, client.getImplicitResource());
 
             // When was the last time that we checked?  If never, get the latest revision.
@@ -192,9 +191,9 @@ public class ProjectPoll implements Callable<ProjectPollingState>
         return scmManager.createContext(project.getConfig(), project.getState(), implicitResource);
     }
 
-    private ScmClient createClient(ScmConfiguration config) throws ScmException
+    private ScmClient createClient(ProjectConfiguration project) throws ScmException
     {
-        return scmManager.createClient(config);
+        return scmManager.createClient(project, project.getScm());
     }
 
     private Revision getLatestRevisionSince(Revision revision, ScmClient client, ScmContext context) throws ScmException
