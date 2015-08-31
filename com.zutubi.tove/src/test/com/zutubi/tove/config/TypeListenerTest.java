@@ -1,5 +1,6 @@
 package com.zutubi.tove.config;
 
+import com.google.common.collect.Sets;
 import com.zutubi.tove.annotations.ID;
 import com.zutubi.tove.annotations.Internal;
 import com.zutubi.tove.annotations.SymbolicName;
@@ -10,9 +11,7 @@ import com.zutubi.tove.type.MapType;
 import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.record.MutableRecord;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 {
@@ -780,8 +779,12 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         listener.register(configurationProvider, true);
 
         insertB("new", "template/globalt/b");
-        assertId("template/child/b", 1);
-        assertId("template/grandchild/b", 2);
+
+        Set<Long> ids = new HashSet<Long>();
+        ids.add(configurationProvider.get("template/child/b", EyeDee.class).getId());
+        ids.add(configurationProvider.get("template/grandchild/b", EyeDee.class).getId());
+        
+        assertEquals(Sets.newHashSet(1l, 2l), ids);
     }
 
     public void testChangeInSave()
