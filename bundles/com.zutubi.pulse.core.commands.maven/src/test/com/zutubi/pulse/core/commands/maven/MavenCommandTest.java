@@ -73,7 +73,7 @@ public class MavenCommandTest extends ExecutableCommandTestCase
         MavenCommandConfiguration command = new MavenCommandConfiguration();
         command.setTargets("mybuild");
         command.setArgs("-X");
-        successRun(command, "Loading plugin", "'maven-ejb-plugin'", "build target", "_Apache_", "v. 1.1");
+        successRun(command, "Loading plugin", "'maven-ejb-plugin", "build target", "_Apache_", "v. 1.1");
     }
 
     private File copyMavenFile(String name) throws IOException
