@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResourceProperty;
@@ -20,6 +21,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.SecurityUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.FileSystemUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -30,14 +32,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.Iterables.partition;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 public class PerforceClient extends CachingScmClient implements PatchInterceptor
 {
+    private static final Logger LOG = Logger.getLogger(PerforceClient.class);
+
     public static final String TYPE = "p4";
 
-    // Artifact of p4 sync -f:
+    // Output of p4 sync -f:
     //   <depot file>#<revision> - (refreshing|added as) <local file>
     //   <depot file>#<revision> - (refreshing|updating|added as|deleted as) <local file>
     //   ...
@@ -109,7 +112,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         }
     }
 
-    private Changelist getChangelist(String clientName, long number) throws ScmException
+    private Changelist getChangelist(String clientName, long number, boolean includeFiles) throws ScmException
     {
         //   Change <number> by <user>@<client> on <date> <time> (*pending*)?
         //
@@ -120,7 +123,21 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        PerforceCore.P4Result result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        PerforceCore.P4Result result;
+        // Even when we aren't including files in the result, if we are applying filters we need to list the files so
+        // we can determine if the entire change should be filtered out.
+        boolean fileListingRequired = includeFiles || configuration.filtersPaths();
+        // When we don't need to list the files, we set max files to 1 (0 doesn't work, it appears to mean "no limit").
+        int fileLimit = fileListingRequired ? Integer.getInteger("pulse.p4.changelist.file.limit", -1) : 1;
+        if (fileLimit <= 0)
+        {
+            result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        }
+        else
+        {
+            result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, FLAG_MAXIMUM, Integer.toString(fileLimit), Long.toString(number));
+        }
+
         if (result.stderr.length() > 0)
         {
             if (result.stderr.indexOf("no such changelist") >= 0)
@@ -185,26 +202,45 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
         Revision revision = new Revision(Long.toString(number));
-        FilterPathsPredicate predicate = new FilterPathsPredicate(configuration.getIncludedPaths(), configuration.getExcludedPaths());
-        List<FileChange> changes = new LinkedList<FileChange>();
-        boolean fileExcluded = false;
-        for (int i = affectedFilesIndex + 2; i < lines.length; i++)
+
+        int firstFileIndex = affectedFilesIndex + 2;
+        int fileCount = lines.length - firstFileIndex;
+        List<FileChange> changes = new ArrayList<FileChange>(fileCount);
+        if (fileListingRequired)
         {
-            FileChange change = getChangelistChange(lines[i]);
-            if (predicate.apply(change.getPath()))
+            if (fileCount == fileLimit)
             {
-                changes.add(change);
+                // If we hit the file limit we simply don't apply filters to this change, as it may include files that
+                // pass the filter but we didn't see due to limiting.
+                LOG.debug("Not applying filters to changelist '" + revision + "': file limit reached");
+                for (int i = firstFileIndex; i < lines.length; i++)
+                {
+                    changes.add(getChangelistChange(lines[i]));
+                }
             }
             else
             {
-                fileExcluded = true;
-            }
-        }
+                FilterPathsPredicate predicate = new FilterPathsPredicate(configuration.getIncludedPaths(), configuration.getExcludedPaths());
+                boolean fileExcluded = false;
+                for (int i = firstFileIndex; i < lines.length; i++)
+                {
+                    FileChange change = getChangelistChange(lines[i]);
+                    if (predicate.apply(change.getPath()))
+                    {
+                        changes.add(change);
+                    }
+                    else
+                    {
+                        fileExcluded = true;
+                    }
+                }
 
-        // if all of the changes have been filtered out, then there is no changelist so we return null.
-        if (changes.isEmpty() || (fileExcluded && noFilesInView(clientName, changes)))
-        {
-            return null;
+                // if all of the changes have been filtered out, then there is no changelist so we return null.
+                if (changes.isEmpty() || (fileExcluded && noFilesInView(clientName, changes)))
+                {
+                    return null;
+                }
+            }
         }
 
         return new Changelist(revision, offset(date), user, comment, changes);
@@ -217,7 +253,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
 
     private boolean noFilesInView(String clientName, List<FileChange> changes) throws ScmException
     {
-        Iterable<List<FileChange>> partitioned = partition(changes, FILE_LIMIT);
+        Iterable<List<FileChange>> partitioned = Lists.partition(changes, FILE_LIMIT);
         for (List<FileChange> sublist: partitioned)
         {
             if (hasFilesInView(clientName, sublist))
@@ -236,7 +272,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         // the view a line (<path> - file(s) not in client view) goes to
         // stderr.  Hence any line on stdout means there was a file in our
         // view.
-        List<String> command = new LinkedList<String>();
+        List<String> command = new ArrayList<String>(changes.size() + 4);
         command.add(getP4Command(COMMAND_WHERE));
         command.add(FLAG_CLIENT);
         command.add(clientName);
@@ -601,7 +637,7 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
                 while (matcher.find())
                 {
                     Revision revision = new Revision(matcher.group(1));
-                    Changelist list = getChangelist(workspace.getName(), Long.valueOf(revision.toString()));
+                    Changelist list = getChangelist(workspace.getName(), Long.valueOf(revision.toString()), changes != null);
                     if (list != null)
                     {
                         // P4 gives us the result in reverse order, so if the request revisions are
@@ -918,13 +954,13 @@ public class PerforceClient extends CachingScmClient implements PatchInterceptor
         PerforceWorkspace workspace = workspaceManager.getSyncWorkspace(core, configuration, context);
         try
         {
-            Iterable<List<FileStatus>> partitioned = partition(addedFiles, FILE_LIMIT);
+            Iterable<List<FileStatus>> partitioned = Iterables.partition(addedFiles, FILE_LIMIT);
             for (List<FileStatus> sublist: partitioned)
             {
                 convertTargetPathsForAddedFiles(workspace, sublist);
             }
 
-            partitioned = partition(existingFiles, FILE_LIMIT);
+            partitioned = Iterables.partition(existingFiles, FILE_LIMIT);
             for (List<FileStatus> sublist: partitioned)
             {
                 convertTargetPathsForExistingFiles(workspace, sublist);
