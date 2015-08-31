@@ -74,7 +74,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
                 return new ScmContextImpl(null, new PulseExecutionContext());
             }
 
-            public ScmClient createClient(ScmConfiguration config) throws ScmException
+            public ScmClient createClient(ProjectConfiguration projectConfiguration, ScmConfiguration config) throws ScmException
             {
                 return scmClient;
             }

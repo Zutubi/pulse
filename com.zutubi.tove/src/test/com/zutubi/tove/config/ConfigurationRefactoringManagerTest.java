@@ -163,7 +163,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testCloneInvalidParentPath()
     {
-        illegalClonePathHelper("huh/instance", "Invalid path 'huh': references non-existant root scope 'huh'");
+        illegalClonePathHelper("huh/instance", "Invalid path 'huh': references non-existent root scope 'huh'");
     }
 
     public void testCloneInvalidPath()

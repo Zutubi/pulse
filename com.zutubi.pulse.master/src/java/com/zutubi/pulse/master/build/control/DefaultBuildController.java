@@ -45,6 +45,7 @@ import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.dependency.ivy.ModuleDescriptorFactory;
 import com.zutubi.pulse.master.events.build.*;
 import com.zutubi.pulse.master.model.*;
+import com.zutubi.pulse.master.scm.MasterScmClientFactory;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
 import com.zutubi.pulse.master.tove.config.project.*;
@@ -114,7 +115,7 @@ public class DefaultBuildController implements EventListener, BuildController
     private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
 
     private ScmManager scmManager;
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private MasterScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
     private ObjectFactory objectFactory;
 
@@ -241,7 +242,7 @@ public class DefaultBuildController implements EventListener, BuildController
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
         // We resolve the SCM properties on the master as the full context is not available on
         // the agents.
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm()));
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CONFIGURATION, configurationVariableProvider.resolveStringProperties(projectConfig.getScm(), configurationVariableProvider.variablesForConfiguration(projectConfig)));
         context.setSecurityHash(authToken);
         return context;
     }
@@ -418,7 +419,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // If the SCM has an implicit resource not conflicting with those configured, add it too.
         try
         {
-            final String implicitResource = withScmClient(projectConfig.getScm(), scmClientFactory, new ScmAction<String>()
+            final String implicitResource = withScmClient(projectConfig, projectConfig.getScm(), scmClientFactory, new ScmAction<String>()
             {
                 public String process(ScmClient scmClient) throws ScmException
                 {
@@ -875,7 +876,7 @@ public class DefaultBuildController implements EventListener, BuildController
                     Set<ScmCapability> capabilities = getCapabilities(project.getConfig(), project.getState(), scmManager);
                     if (capabilities.contains(ScmCapability.CHANGESETS))
                     {
-                        client = scmManager.createClient(scm);
+                        client = scmManager.createClient(projectConfig, scm);
                         ScmContext context = scmManager.createContext(projectConfig, project.getState(), client.getImplicitResource());
 
                         List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
@@ -1351,7 +1352,7 @@ public class DefaultBuildController implements EventListener, BuildController
         this.repositoryAttributes = repositoryAttributes;
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmClientFactory(MasterScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }

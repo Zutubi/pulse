@@ -85,7 +85,7 @@ public class ProjectInitialisationService extends BackgroundServiceSupport
                     checkExistingInitialisation(projectConfiguration);
 
                     ScmConfiguration scmConfiguration = projectConfiguration.getScm();
-                    scmClient = scmManager.createClient(scmConfiguration);
+                    scmClient = scmManager.createClient(projectConfiguration, scmConfiguration);
 
                     // Pass the idle project state as a special case in initialisation -
                     // so that we get a new persistent context.

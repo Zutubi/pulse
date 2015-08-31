@@ -68,7 +68,7 @@ public class OutstandingChangesTriggerConditionTest extends PulseTestCase
 
         scmManager = mock(ScmManager.class);
         stub(scmManager.createContext((ProjectConfiguration) anyObject(), Matchers.<Project.State>anyObject(), anyString())).toReturn(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
-        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(scmClient);
+        stub(scmManager.createClient((ProjectConfiguration) anyObject(), (ScmConfiguration) anyObject())).toReturn(scmClient);
 
         config = new OutstandingChangesTriggerConditionConfiguration();
         condition = new OutstandingChangesTriggerCondition(config);

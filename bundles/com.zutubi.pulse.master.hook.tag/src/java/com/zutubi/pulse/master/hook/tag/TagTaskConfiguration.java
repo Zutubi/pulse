@@ -74,7 +74,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         try
         {
             String tagName = context.resolveVariables(tag);
-            client = scmManager.createClient(scm);
+            client = scmManager.createClient(project.getConfig(), scm);
             ScmContext scmContext = scmManager.createContext(project.getConfig(), project.getState(), client.getImplicitResource());
             // Override with our environment
             scmContext = new ScmContextImpl(scmContext.getPersistentContext(), context);

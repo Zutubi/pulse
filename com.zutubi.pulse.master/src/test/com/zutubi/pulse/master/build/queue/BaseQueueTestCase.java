@@ -145,7 +145,7 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         ScmClient scmClient = mock(ScmClient.class);
         stub(scmClient.getCapabilities(Matchers.<ScmContext>anyObject())).toReturn(new HashSet<ScmCapability>());
         scmManager = mock(ScmManager.class);
-        stub(scmManager.createClient(Matchers.<ScmConfiguration>anyObject())).toReturn(scmClient);
+        stub(scmManager.createClient((ProjectConfiguration) anyObject(), Matchers.<ScmConfiguration>anyObject())).toReturn(scmClient);
 
         userManager = mock(UserManager.class);
         stub(userManager.getConcurrentPersonalBuilds(Matchers.<User>anyObject())).toReturn(1);

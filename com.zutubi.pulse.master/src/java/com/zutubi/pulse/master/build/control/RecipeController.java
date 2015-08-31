@@ -28,7 +28,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.scheduling.CallbackService;
-import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.scm.MasterScmClientFactory;
 import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -88,7 +88,7 @@ public class RecipeController
     private ResourceManager resourceManager;
     private BuildHookManager buildHookManager;
     private RecipeDispatchService recipeDispatchService;
-    private ScmManager scmManager;
+    private MasterScmClientFactory scmClientFactory;
     private CallbackService callbackService;
 
     public RecipeController(ProjectConfiguration projectConfiguration, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, int retryCount)
@@ -286,7 +286,7 @@ public class RecipeController
     {
         try
         {
-            return withScmClient(projectConfiguration.getScm(), scmManager, new ScmAction<List<ResourceProperty>>()
+            return withScmClient(projectConfiguration, projectConfiguration.getScm(), scmClientFactory, new ScmAction<List<ResourceProperty>>()
             {
                 public List<ResourceProperty> process(ScmClient scmClient) throws ScmException
                 {
@@ -680,9 +680,9 @@ public class RecipeController
         this.recipeDispatchService = recipeDispatchService;
     }
 
-    public void setScmManager(ScmManager scmManager)
+    public void setScmClientFactory(MasterScmClientFactory scmClientFactory)
     {
-        this.scmManager = scmManager;
+        this.scmClientFactory = scmClientFactory;
     }
 
     public void setCallbackService(CallbackService callbackService)

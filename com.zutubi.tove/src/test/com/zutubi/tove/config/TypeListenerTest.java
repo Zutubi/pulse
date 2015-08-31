@@ -779,15 +779,12 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         listener.register(configurationProvider, true);
 
         insertB("new", "template/globalt/b");
-        Set<Long> ids = new HashSet<Long>();
-        EyeDee c = (EyeDee) configurationTemplateManager.getInstance("template/grandchild/b");
-        assertNotNull(c);
-        ids.add(c.getId());
-        c = (EyeDee) configurationTemplateManager.getInstance("template/child/b");
-        assertNotNull(c);
-        ids.add(c.getId());
 
-        assertEquals(Sets.newHashSet(1L, 2L), ids);
+        Set<Long> ids = new HashSet<Long>();
+        ids.add(configurationProvider.get("template/child/b", EyeDee.class).getId());
+        ids.add(configurationProvider.get("template/grandchild/b", EyeDee.class).getId());
+        
+        assertEquals(Sets.newHashSet(1l, 2l), ids);
     }
 
     public void testChangeInSave()

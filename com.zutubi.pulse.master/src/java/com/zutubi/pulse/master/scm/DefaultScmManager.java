@@ -2,7 +2,6 @@ package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
@@ -14,7 +13,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedListener;
 public class DefaultScmManager implements ScmManager
 {
     private EventManager eventManager;
-    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    private MasterScmClientFactory scmClientFactory;
     private MasterScmContextFactory scmContextFactory;
 
     private PollingService pollingService;
@@ -55,9 +54,9 @@ public class DefaultScmManager implements ScmManager
         return scmContextFactory.createContext(projectConfiguration, projectState, implicitResource);
     }
 
-    public ScmClient createClient(ScmConfiguration config) throws ScmException
+    public ScmClient createClient(ProjectConfiguration project, ScmConfiguration config) throws ScmException
     {
-        return scmClientFactory.createClient(config);
+        return scmClientFactory.createClient(project, config);
     }
 
     public void setPollingService(PollingService pollingService)
@@ -70,7 +69,7 @@ public class DefaultScmManager implements ScmManager
         this.eventManager = eventManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    public void setScmClientFactory(MasterScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }

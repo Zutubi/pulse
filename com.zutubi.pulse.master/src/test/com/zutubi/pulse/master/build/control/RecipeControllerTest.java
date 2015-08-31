@@ -25,7 +25,7 @@ import com.zutubi.pulse.master.build.queue.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.build.queue.RecipeQueue;
 import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.master.scm.ScmManager;
+import com.zutubi.pulse.master.scm.MasterScmClientFactory;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
@@ -102,8 +102,8 @@ public class RecipeControllerTest extends PulseTestCase
 
         recipeDispatchService = mock(RecipeDispatchService.class);
 
-        ScmManager scmManager = mock(ScmManager.class);
-        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(new TestScmClient());
+        MasterScmClientFactory scmClientFactory = mock(MasterScmClientFactory.class);
+        stub(scmClientFactory.createClient((ProjectConfiguration) anyObject(), (ScmConfiguration) anyObject())).toReturn(new TestScmClient());
         recipeController = new RecipeController(projectConfig, build, stageResult, assignmentRequest, null, logger, resultCollector, 0);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
@@ -111,7 +111,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeController.setConfigurationManager(configurationManager);
         recipeController.setResourceManager(new DefaultResourceManager());
         recipeController.setRecipeDispatchService(recipeDispatchService);
-        recipeController.setScmManager(scmManager);
+        recipeController.setScmClientFactory(scmClientFactory);
         recipeController.setBuildHookManager(mock(BuildHookManager.class));
     }
 

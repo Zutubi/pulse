@@ -130,6 +130,8 @@ public class DefaultDependencyManager implements DependencyManager
     private List<RetrievedArtifactSource> processRetrievalReport(IvyRetrievalReport report) throws Exception
     {
         String masterLocation = masterLocationProvider.getMasterLocation();
+        String contextPath = configurationManager.getSystemConfig().getContextPath();
+
         IvyConfiguration configuration = new IvyConfiguration(masterLocation + WebManager.REPOSITORY_PATH);
         Urls urls = new Urls(configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
 
@@ -142,7 +144,7 @@ public class DefaultDependencyManager implements DependencyManager
             stageDependency.setArtifactName(artifact.getName() + "." + artifact.getExt());
             stageDependency.setStageName(artifact.getExtraAttribute("stage"));
             String repositoryPath = configuration.getArtifactPath(artifact);
-            String artifactUrl = PathUtils.getPath(masterLocation, WebManager.REPOSITORY_PATH, WebUtils.uriPathEncode(repositoryPath));
+            String artifactUrl = PathUtils.getPath(contextPath, WebManager.REPOSITORY_PATH, WebUtils.uriPathEncode(repositoryPath));
 
             File artifactFile = new File(configurationManager.getUserPaths().getRepositoryRoot(), repositoryPath);
             if (artifactFile.isFile())

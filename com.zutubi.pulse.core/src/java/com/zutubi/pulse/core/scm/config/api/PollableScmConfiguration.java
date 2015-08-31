@@ -97,6 +97,11 @@ public abstract class PollableScmConfiguration extends ScmConfiguration implemen
         this.quietPeriod = quietPeriod;
     }
 
+    public boolean filtersPaths()
+    {
+        return includedPaths.size() > 0 || excludedPaths.size() > 0;
+    }
+
     public List<String> getIncludedPaths()
     {
         return includedPaths;
