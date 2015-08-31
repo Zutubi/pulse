@@ -32,6 +32,11 @@ public class LatestScmRevisionSupplier implements Supplier<Revision>
             {
                 public Revision process(ScmClient client, ScmContext context) throws ScmException
                 {
+                    if (context.getPersistentContext() == null)
+                    {
+                        throw new ScmException("No persistent context, project state is '" + project.getState() + "'");
+                    }
+
                     boolean supportsRevisions = client.getCapabilities(context).contains(ScmCapability.REVISIONS);
                     return supportsRevisions ? client.getLatestRevision(context) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
                 }
