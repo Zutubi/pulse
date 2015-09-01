@@ -8,6 +8,8 @@ import com.zutubi.events.RecordingEventListener;
 import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
+import com.zutubi.pulse.core.scm.PersistentContextImpl;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
@@ -145,7 +147,8 @@ public abstract class BaseQueueTestCase extends PulseTestCase
         ScmClient scmClient = mock(ScmClient.class);
         stub(scmClient.getCapabilities(Matchers.<ScmContext>anyObject())).toReturn(new HashSet<ScmCapability>());
         scmManager = mock(ScmManager.class);
-        stub(scmManager.createClient((ProjectConfiguration) anyObject(), Matchers.<ScmConfiguration>anyObject())).toReturn(scmClient);
+        stub(scmManager.createClient(Matchers.<ProjectConfiguration>anyObject(), Matchers.<ScmConfiguration>anyObject())).toReturn(scmClient);
+        stub(scmManager.createContext(Matchers.<ProjectConfiguration>anyObject(), Matchers.<Project.State>anyObject(), Matchers.anyString())).toReturn(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
 
         userManager = mock(UserManager.class);
         stub(userManager.getConcurrentPersonalBuilds(Matchers.<User>anyObject())).toReturn(1);
