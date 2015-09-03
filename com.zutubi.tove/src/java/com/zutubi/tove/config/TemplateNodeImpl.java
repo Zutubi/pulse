@@ -5,10 +5,7 @@ import com.google.common.base.Predicate;
 import static com.google.common.collect.Iterables.find;
 import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implementation of nodes in the template hierarchy.  This should only be used
@@ -18,7 +15,7 @@ import java.util.List;
 public class TemplateNodeImpl implements TemplateNode
 {
     private TemplateNode parent;
-    private List<TemplateNode> children = new LinkedList<TemplateNode>();
+    private List<TemplateNode> children = new ArrayList<>();
     private String path;
     private String id;
     private boolean concrete;
@@ -122,7 +119,7 @@ public class TemplateNodeImpl implements TemplateNode
 
     public void forEachAncestor(Function<TemplateNode, Boolean> callback, boolean strict)
     {
-        if((strict || callback.apply(this)) && parent != null)
+        if((strict || Boolean.TRUE == callback.apply(this)) && parent != null)
         {
             parent.forEachAncestor(callback, false);
         }
@@ -130,7 +127,7 @@ public class TemplateNodeImpl implements TemplateNode
 
     public void forEachDescendant(Function<TemplateNode, Boolean> callback, boolean strict, Comparator<TemplateNode> comparator)
     {
-        if (strict || callback.apply(this))
+        if (strict || Boolean.TRUE == callback.apply(this))
         {
             List<TemplateNode> children;
             if (comparator == null)
@@ -139,7 +136,7 @@ public class TemplateNodeImpl implements TemplateNode
             }
             else
             {
-                children = new LinkedList<TemplateNode>(this.children);
+                children = new LinkedList<>(this.children);
                 Collections.sort(children, comparator);
             }
             

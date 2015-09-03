@@ -104,8 +104,8 @@ public interface TemplateNode
     void forEachAncestor(Function<TemplateNode, Boolean>  callback, boolean strict);
 
     /**
-     * Walks down the hierarchy from this node, executing the given callback on
-     * each node as it goes.  If the callback returns false, the walk is
+     * Walks the hierarchy depth-first from this node, executing the given callback on
+     * each node followed by it children.  If the callback returns false, the walk is
      * stopped at this node.
      * 
      * @param callback   the callback to execute on each node
