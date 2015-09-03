@@ -50,7 +50,7 @@ public class ScmRootFileObjectTest extends PulseTestCase
         scmManager = mock(ScmManager.class);
         scmClient = mock(ScmClient.class);
 
-        stub(scmManager.createClient((ScmConfiguration) anyObject())).toReturn(scmClient);
+        stub(scmManager.createClient((ProjectConfiguration) anyObject(), (ScmConfiguration) anyObject())).toReturn(scmClient);
 
         objectFactory = new WiringObjectFactory();
         objectFactory.initProperties(this);

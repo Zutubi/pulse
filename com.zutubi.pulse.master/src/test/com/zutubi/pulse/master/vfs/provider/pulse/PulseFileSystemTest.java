@@ -85,7 +85,7 @@ public class PulseFileSystemTest extends PulseTestCase
         stub(scmConfig.isValid()).toReturn(true);
 
         ScmClient client = mock(ScmClient.class);
-        stub(scmManager.createClient(scmConfig)).toReturn(client);
+        stub(scmManager.createClient((ProjectConfiguration) anyObject(), eq(scmConfig))).toReturn(client);
 
         int id = 1;
         Project project = createProject(id);

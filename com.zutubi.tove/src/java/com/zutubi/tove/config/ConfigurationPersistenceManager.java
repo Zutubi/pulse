@@ -241,7 +241,7 @@ public class ConfigurationPersistenceManager
         ConfigurationScopeInfo info = rootScopes.get(pathElements[0]);
         if (info == null)
         {
-            throw new IllegalArgumentException("Invalid path '" + path + "': references non-existant root scope '" + pathElements[0] + "'");
+            throw new IllegalArgumentException("Invalid path '" + path + "': references non-existent root scope '" + pathElements[0] + "'");
         }
 
         if (parentElements.length == 0)

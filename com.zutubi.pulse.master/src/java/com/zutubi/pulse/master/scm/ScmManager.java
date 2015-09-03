@@ -1,14 +1,18 @@
 package com.zutubi.pulse.master.scm;
 
-import com.zutubi.pulse.core.scm.api.ScmClientFactory;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
  * The scm manager handles the basic management of the background scm processes
  * and life cycle.
  */
-public interface ScmManager extends MasterScmContextFactory, ScmClientFactory<ScmConfiguration>
+public interface ScmManager extends MasterScmContextFactory
 {
+    ScmClient createClient(ProjectConfiguration project, ScmConfiguration config) throws ScmException;
+
     /**
      * Clears any cached information for the project with the given id.  This
      * should be called whenever the SCM details for a project change

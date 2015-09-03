@@ -535,7 +535,7 @@ public class IvyClient
      *
      * @param logger the logger to receive logging messages.
      */
-    public synchronized void pushMessageLogger(MessageLogger logger)
+    public void pushMessageLogger(MessageLogger logger)
     {
         LOCK.lock();
         try
@@ -546,6 +546,36 @@ public class IvyClient
         {
             LOCK.unlock();
         }
+    }
+
+    /**
+     * Enter a new context, allowing interruption of threads within ivy operations.  This method
+     * (and the operations themselves) should be called by a thread that is disposable.  When the
+     * operations are done you must call {@link #popContext()}.
+     */
+    public void pushContext()
+    {
+        ivy.pushContext();
+    }
+
+    /**
+     * Pops the current context, must be paired with a prior call to {@link #pushContext()}.
+     */
+    public void popContext()
+    {
+        ivy.popContext();
+    }
+
+    /**
+     * Attempts to interrupt a running Ivy operation.  Must be passed a thread that has previously
+     * called {@link #pushContext()}.  If the operation does not die quickly enough Ivy tries to
+     * forcefully stop the given thread, so make sure it is disposable!
+     *
+     * @param operatingThread the thread running the ivy operation (in a context!)
+     */
+    public void interrupt(Thread operatingThread)
+    {
+        ivy.interrupt(operatingThread);
     }
 
     private boolean isFile(String path)

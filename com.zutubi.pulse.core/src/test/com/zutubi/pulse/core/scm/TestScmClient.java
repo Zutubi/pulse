@@ -8,15 +8,17 @@ import com.zutubi.pulse.core.scm.config.api.ScmConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class TestScmClient implements ScmClient, DataCacheAware
+public class TestScmClient implements ScmClient
 {
     public static String TEST_PROPERTY = "scm.prop";
-    public static String TEST_VALUE    = "scm.val";
-    
+    public static String TEST_VALUE = "scm.val";
+
     private boolean throwError = false;
-    protected Map<Object, Object> cache;
 
     public TestScmClient()
     {
@@ -88,11 +90,10 @@ public class TestScmClient implements ScmClient, DataCacheAware
 
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        if(throwError)
+        if (throwError)
         {
             throw new ScmException("test");
-        }
-        else
+        } else
         {
             return new Revision("1");
         }
@@ -141,15 +142,5 @@ public class TestScmClient implements ScmClient, DataCacheAware
     public boolean configChangeRequiresClean(ScmConfiguration oldConfig, ScmConfiguration newConfig)
     {
         return false;
-    }
-
-    public String getCacheId()
-    {
-        return "test";
-    }
-
-    public void setCache(Map<Object, Object> cache)
-    {
-        this.cache = cache;
     }
 }

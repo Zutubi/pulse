@@ -856,28 +856,28 @@ public class ConfigUIAcceptanceTest extends AcceptanceTestBase
         assertFalse(getBrowser().isTextPresent("url requires a value"));
     }
 
-    public void testInvalidPathNonExistantScope() throws Exception
+    public void testInvalidPathNonExistentScope() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.admin() + "scopish/");
-        waitForActionError("Invalid path 'scopish': references non-existant root scope 'scopish'");
+        waitForActionError("Invalid path 'scopish': references non-existent root scope 'scopish'");
     }
 
-    public void testInvalidPathNonExistantCollectionItem() throws Exception
+    public void testInvalidPathNonExistentCollectionItem() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminUser("nosuchuser"));
         waitForActionError("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection");
     }
 
-    public void testInvalidPathNonExistantTemplateItem() throws Exception
+    public void testInvalidPathNonExistentTemplateItem() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject("nosuchproject"));
         waitForActionError("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection");
     }
 
-    public void testInvalidPathNonExistantProperty() throws Exception
+    public void testInvalidPathNonExistentProperty() throws Exception
     {
         getBrowser().loginAsAdmin();
         getBrowser().open(urls.adminProject(GLOBAL_PROJECT_NAME) + "nosuchproperty/");

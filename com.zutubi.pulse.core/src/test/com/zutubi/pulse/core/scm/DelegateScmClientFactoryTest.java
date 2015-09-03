@@ -39,18 +39,4 @@ public class DelegateScmClientFactoryTest extends ZutubiTestCase
             client.close();
         }
     }
-
-    public void testDataCache() throws ScmException
-    {
-        TestScmClient client = (TestScmClient) factory.createClient(new TestScmConfiguration());
-        assertNotNull(client.cache);
-        client.cache.put("key", "value");
-
-        TestScmClient anotherClient = (TestScmClient) factory.createClient(new TestScmConfiguration());
-        assertNotNull(anotherClient.cache);
-        assertEquals("value", anotherClient.cache.get("key"));
-
-        client.close();
-        anotherClient.close();
     }
-}

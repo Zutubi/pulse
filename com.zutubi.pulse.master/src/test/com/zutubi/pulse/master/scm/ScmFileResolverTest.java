@@ -45,7 +45,7 @@ public class ScmFileResolverTest extends PulseTestCase
 
         ScmManager mockScmManager = mock(ScmManager.class);
         stub(mockScmManager.createContext((ProjectConfiguration) anyObject(), Matchers.<Project.State>anyObject(), anyString())).toReturn(new ScmContextImpl(new PersistentContextImpl(null), new PulseExecutionContext()));
-        stub(mockScmManager.createClient((ScmConfiguration) anyObject())).toReturn(mockScmClient);
+        stub(mockScmManager.createClient((ProjectConfiguration) anyObject(), (ScmConfiguration) anyObject())).toReturn(mockScmClient);
 
         ProjectConfiguration projectConfiguration = new ProjectConfiguration();
         Project project = new Project();
