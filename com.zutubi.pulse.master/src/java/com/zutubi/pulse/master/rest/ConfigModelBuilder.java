@@ -14,13 +14,13 @@ import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Listing;
+import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
-import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.Sort;
@@ -51,7 +51,7 @@ public class ConfigModelBuilder
     private SystemPaths systemPaths;
     private MasterConfigurationRegistry configurationRegistry;
 
-    public ConfigModel buildModel(String[] filters, String path, ComplexType type, ComplexType parentType, MutableRecord record, int depth) throws TypeException
+    public ConfigModel buildModel(String[] filters, String path, ComplexType type, ComplexType parentType, Record record, int depth) throws TypeException
     {
         String label = getLabel(path, type, parentType, record);
         ConfigModel model;
@@ -96,7 +96,7 @@ public class ConfigModelBuilder
         return label;
     }
 
-    private ConfigModel createCollectionModel(String path, CollectionType type, String label, MutableRecord record, String[] filters)
+    private ConfigModel createCollectionModel(String path, CollectionType type, String label, Record record, String[] filters)
     {
         String baseName = PathUtils.getBaseName(path);
         CollectionModel model = new CollectionModel(baseName, Long.toString(record.getHandle()), label);
@@ -175,7 +175,7 @@ public class ConfigModelBuilder
         return null;
     }
 
-    private CompositeModel createCompositeModel(String path, CompositeType type, String label, MutableRecord record, String[] filters) throws TypeException
+    private CompositeModel createCompositeModel(String path, CompositeType type, String label, Record record, String[] filters) throws TypeException
     {
         String baseName = PathUtils.getBaseName(path);
         CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label);
@@ -228,16 +228,20 @@ public class ConfigModelBuilder
         return typeModel;
     }
 
-    private Map<String, Object> getProperties(String path, CompositeType type, MutableRecord record) throws TypeException
+    private Map<String, Object> getProperties(String path, CompositeType type, Record record) throws TypeException
     {
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
-        ToveUtils.suppressPasswords(record, type, false);
 
         // FIXME kendo generalise toXmlRpc if necessary?
         Map<String, Object> result = new HashMap<>();
         for (TypeProperty property: type.getProperties(SimpleType.class))
         {
             Object value = property.getType().toXmlRpc(templateOwnerPath, record.get(property.getName()));
+            if (value != null && property.getAnnotation(Password.class) != null)
+            {
+                value = ToveUtils.SUPPRESSED_PASSWORD;
+            }
+
             result.put(property.getName(), value);
         }
 
@@ -335,7 +339,7 @@ public class ConfigModelBuilder
         }
     }
 
-    private List<ConfigModel> getNested(final String[] filters, final String path, final ComplexType type, final MutableRecord record, final int depth)
+    private List<ConfigModel> getNested(final String[] filters, final String path, final ComplexType type, final Record record, final int depth)
     {
         List<String> order;
         if (type instanceof CompositeType)
@@ -355,7 +359,7 @@ public class ConfigModelBuilder
             @Override
             public ConfigModel apply(String key)
             {
-                MutableRecord value = (MutableRecord) record.get(key);
+                Record value = (Record) record.get(key);
                 ComplexType propertyType = (ComplexType) type.getActualPropertyType(key, value);
                 try
                 {

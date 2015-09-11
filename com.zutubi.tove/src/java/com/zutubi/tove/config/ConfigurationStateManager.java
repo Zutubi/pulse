@@ -4,7 +4,6 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.TransactionResource;
 import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -133,7 +132,7 @@ public class ConfigurationStateManager
             recordManager.update(instance.getConfigurationPath(), mutable);
             property.setValue(instance, id);
         }
-        catch (TypeException e)
+        catch (Exception e)
         {
             LOG.severe(e);
         }

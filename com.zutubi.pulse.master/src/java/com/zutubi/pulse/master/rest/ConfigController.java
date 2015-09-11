@@ -7,6 +7,7 @@ import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CollectionModel;
 import com.zutubi.pulse.master.rest.model.CompositeModel;
+import com.zutubi.pulse.master.rest.model.ConfigDeltaModel;
 import com.zutubi.pulse.master.rest.model.ConfigModel;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
@@ -77,9 +78,9 @@ public class ConfigController
     // DELETE <path> to remove composite or an item from collection.
 
     @RequestMapping(value = "/**", method = RequestMethod.PUT)
-    public ResponseEntity<String> put(HttpServletRequest request,
-                                      @RequestBody ConfigModel config,
-                                      @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
+    public ResponseEntity<ConfigDeltaModel> put(HttpServletRequest request,
+                                                @RequestBody ConfigModel config,
+                                                @RequestParam(value = "depth", required = false, defaultValue = "0") int depth) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
 
@@ -91,10 +92,12 @@ public class ConfigController
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
         ComplexType type = configurationTemplateManager.getType(configPath);
+        String parentPath = PathUtils.getParentPath(configPath);
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+
         if (type instanceof CompositeType)
         {
             CompositeType compositeType = (CompositeType) type;
-            String parentPath = PathUtils.getParentPath(configPath);
             String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
 
             CompositeModel compositeModel = (CompositeModel) config;
@@ -107,7 +110,17 @@ public class ConfigController
                 throw new ValidationException(instance);
             }
 
-            return new ResponseEntity<>(configurationTemplateManager.saveRecord(configPath, record, false), HttpStatus.OK);
+            String newConfigPath = configurationTemplateManager.saveRecord(configPath, record, false);
+
+            ConfigDeltaModel delta = new ConfigDeltaModel();
+            Record newRecord = configurationTemplateManager.getRecord(newConfigPath);
+            delta.addUpdatedPath(newConfigPath, configModelBuilder.buildModel(null, newConfigPath, compositeType, parentType, newRecord, -1));
+            if (!newConfigPath.equals(configPath))
+            {
+                delta.addRenamedPath(configPath, newConfigPath);
+            }
+
+            return new ResponseEntity<>(delta, HttpStatus.OK);
         }
         else
         {
@@ -126,7 +139,11 @@ public class ConfigController
                 }
             })));
 
-            return new ResponseEntity<>(configPath, HttpStatus.OK);
+            ConfigDeltaModel delta = new ConfigDeltaModel();
+            Record newRecord = configurationTemplateManager.getRecord(configPath);
+            delta.addUpdatedPath(configPath, configModelBuilder.buildModel(null, configPath, type, parentType, newRecord, -1));
+
+            return new ResponseEntity<>(delta, HttpStatus.OK);
         }
     }
 

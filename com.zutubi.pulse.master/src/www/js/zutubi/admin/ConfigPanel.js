@@ -220,6 +220,17 @@
             $("#center-pane-content").append(link);
         },
 
+        _applyDelta: function(delta)
+        {
+            this.configTree.applyDelta(delta);
+            if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
+            {
+                newPath = delta.renamedPaths[this.path];
+                replaceConfigPath(newPath);
+                this.path = newPath;
+            }
+        },
+
         _saveComposite: function(properties)
         {
             var that = this;
@@ -232,8 +243,14 @@
                 data: {kind: "composite", properties: properties},
                 success: function (data)
                 {
+                    var newPath;
+
                     console.log('save succcess');
                     console.dir(data);
+
+                    that._applyDelta(data);
+                    that._clearContent();
+                    that._showComposite(data.models[that.path]);
                 },
                 error: function (jqXHR)
                 {
@@ -380,6 +397,7 @@
                 {
                     console.log('set order succcess');
                     console.dir(data);
+                    that._applyDelta(data);
                 },
                 error: function (jqXHR)
                 {

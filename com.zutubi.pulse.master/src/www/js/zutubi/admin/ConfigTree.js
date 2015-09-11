@@ -32,8 +32,9 @@
             loadOnDemand: false,
             dataBound: function(e)
             {
-                // This callback is invoked for every level, but only once with a null node.
-                if (!e.node)
+                // This callback is invoked for every level, but only once with a null node. It is also called when we
+                // later update the datasource, so once we've bound we don't trigger again.
+                if (!this.bound && !e.node)
                 {
                     this.bound = true;
                     this.selectConfigNode();
@@ -42,19 +43,31 @@
             select: function(e)
             {
                 var that = this;
-                that.trigger(PATHSELECT, {path: that.configPathForNode(e.node)});
+                that.configPath = that.pathForNode(e.node, true);
+                that.trigger(PATHSELECT, {path: that.pathForNode(e.node)});
             }
         },
 
-        configPathForNode: function(node)
+        pathForNode: function(node, relative)
         {
             var nodeData = this.dataItem(node),
                 path = nodeData.key,
-                parent = this.parent(node);
+                parent = this.parent(node),
+                parentPath;
 
             if (parent.length)
             {
-                path = this.configPathForNode(parent) + '/' + path;
+                parentPath = this.pathForNode(parent, relative);
+                if (parentPath.length > 0)
+                {
+                    parentPath += '/';
+                }
+
+                path =  parentPath + path;
+            }
+            else if (relative)
+            {
+                path = '';
             }
             else
             {
@@ -79,7 +92,7 @@
             dataSource = new kendo.data.HierarchicalDataSource({
                 transport: {
                     read: {
-                        url: window.baseUrl + "/api/config/" + rootPath + "?depth=-1&filter=nested",
+                        url: window.baseUrl + "/api/config/" + rootPath + "?depth=-1&filter=nested&filter=type",
                             dataType: "json",
                             headers: {
                                 Accept: "application/json; charset=utf-8",
@@ -101,7 +114,7 @@
             this.setDataSource(dataSource);
         },
 
-        selectConfigNode: function()
+        _dataItemForConfigPath: function(configPath)
         {
             var that = this,
                 root = that.wrapper.find(".k-item:first"),
@@ -111,9 +124,9 @@
                 key,
                 children;
 
-            if (this.configPath)
+            if (configPath)
             {
-                keys = this.configPath.split("/");
+                keys = configPath.split("/");
             }
 
             for (i = 0; i < keys.length; i++)
@@ -131,11 +144,20 @@
 
                 if (j === children.length)
                 {
-                    break;
+                    return null;
                 }
 
                 dataItem = children[j];
             }
+
+            return dataItem;
+        },
+
+        selectConfigNode: function()
+        {
+            var that = this,
+                root = that.wrapper.find(".k-item:first"),
+                dataItem = that._dataItemForConfigPath(that.configPath);
 
             that.expand(root);
             if (dataItem)
@@ -155,6 +177,137 @@
             if (this.bound)
             {
                 this.selectConfigNode();
+            }
+        },
+
+        _absoluteToConfigPath: function(path)
+        {
+            if (path.indexOf(this.rootPath) === 0)
+            {
+                path = path.substring(this.rootPath.length);
+            }
+
+            if (path.length > 0 && path[0] === "/")
+            {
+                path = path.substring(1);
+            }
+
+            return path;
+        },
+
+        _addModel: function(model, parentDataItem, index)
+        {
+            var i, data, item;
+
+            if (!parentDataItem.type.ordered)
+            {
+                // Order by label.
+                data = parentDataItem.children.data();
+                for (i = 0; i < data.length; i++)
+                {
+                    item = data[i];
+                    if (item.label.localeCompare(model.label) > 0)
+                    {
+                        break;
+                    }
+                }
+
+                index = i;
+            }
+            else if (index === undefined || index < 0)
+            {
+                index = parentDataItem.children.data().length;
+            }
+
+            parentDataItem.children.insert(index, model);
+        },
+
+        applyDelta: function(delta)
+        {
+            var that = this,
+                i,
+                model,
+                item,
+                parentItem,
+                path,
+                index = -1;
+
+            if (delta.addedPaths)
+            {
+                for (i = 0; i < delta.addedPaths.length; i++)
+                {
+                    path = that._absoluteToConfigPath(delta.addedPaths[i]);
+                    item = that._dataItemForConfigPath(parentPath(path));
+                    if (item)
+                    {
+                        that._addModel(delta.models[delta.addedPaths[i]], item);
+                    }
+                }
+            }
+
+            if (delta.deletedPaths)
+            {
+                for (i = 0; i < delta.deletedPaths.length; i++)
+                {
+                    path = that._absoluteToConfigPath(delta.deletedPaths[i]);
+                    item = that._dataItemForConfigPath(path);
+                    if (item)
+                    {
+                        that.dataSource.remove(item);
+                    }
+                }
+            }
+
+            if (delta.renamedPaths)
+            {
+                jQuery.each(delta.renamedPaths, function(oldPath, newPath)
+                {
+                    model = delta.models[newPath];
+                    oldPath = that._absoluteToConfigPath(oldPath);
+                    newPath = that._absoluteToConfigPath(newPath);
+
+                    item = that._dataItemForConfigPath(oldPath);
+                    if (item)
+                    {
+                        index = item.parentNode().children.indexOf(item);
+                        that.dataSource.remove(item);
+                    }
+
+                    item = that._dataItemForConfigPath(parentPath(newPath));
+                    if (item)
+                    {
+                        that._addModel(model, item, index);
+                    }
+
+                    if (oldPath === that.configPath)
+                    {
+                        that.selectConfig(newPath);
+                    }
+                });
+            }
+
+            if (delta.updatedPaths)
+            {
+                for (i = 0; i < delta.updatedPaths.length; i++)
+                {
+                    path = delta.updatedPaths[i];
+                    model = delta.models[path];
+                    path = that._absoluteToConfigPath(path);
+                    item = that._dataItemForConfigPath(path);
+                    if (item && item.children && item.children.data().length > 0)
+                    {
+                        // Update to a collection, maybe a change to the order. Refresh.
+                        parentItem = item.parentNode();
+                        index = parentItem.children.indexOf(item);
+                        that.dataSource.remove(item);
+                        model.expanded = item.expanded;
+                        parentItem.children.insert(index, model);
+                        if (path === that.configPath)
+                        {
+                            that.selectConfig(path);
+                        }
+                    }
+                }
             }
         }
     });
