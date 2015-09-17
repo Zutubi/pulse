@@ -17,18 +17,18 @@ jQuery.extend(Zutubi.admin, {
             {
                 if (jqXHR.status === 401)
                 {
-                    window.loginWindow = new Zutubi.admin.LoginWindow({
+                    Zutubi.admin.app.loginWindow = new Zutubi.admin.LoginWindow({
                         success: function ()
                         {
                             jQuery.ajax(o);
                         },
                         cancel: function ()
                         {
-                            zaReportError("Action cancelled: authentication required.");
+                            Zutubi.admin.reportError("Action cancelled: authentication required.");
                         }
                     });
 
-                    window.loginWindow.show();
+                    Zutubi.admin.app.loginWindow.show();
                 }
                 else
                 {
@@ -38,5 +38,33 @@ jQuery.extend(Zutubi.admin, {
         });
 
         jQuery.ajax(o);
+    },
+
+    ajaxError: function(jqXHR)
+    {
+        var message = "",
+            details;
+
+        if (jqXHR.statusText)
+        {
+            message = jqXHR.statusText + " ";
+        }
+
+        message += "(" + jqXHR.status + ")";
+
+        try
+        {
+            details = JSON.parse(jqXHR.responseText);
+            if (details.message)
+            {
+                message += ": " + details.message;
+            }
+        }
+        catch(e)
+        {
+            // Do nothing.
+        }
+
+        return message;
     }
 });

@@ -108,7 +108,7 @@
             });
 
             dataSource.bind('error', function(e) {
-                zaReportError('Could not load configuration tree: ' + zaAjaxError(e.xhr));
+                Zutubi.admin.reportError('Could not load configuration tree: ' + Zutubi.admin.ajaxError(e.xhr));
             });
 
             this.setDataSource(dataSource);
@@ -237,7 +237,7 @@
                 for (i = 0; i < delta.addedPaths.length; i++)
                 {
                     path = that._absoluteToConfigPath(delta.addedPaths[i]);
-                    item = that._dataItemForConfigPath(parentPath(path));
+                    item = that._dataItemForConfigPath(Zutubi.admin.parentPath(path));
                     if (item)
                     {
                         that._addModel(delta.models[delta.addedPaths[i]], item);
@@ -273,7 +273,7 @@
                         that.dataSource.remove(item);
                     }
 
-                    item = that._dataItemForConfigPath(parentPath(newPath));
+                    item = that._dataItemForConfigPath(Zutubi.admin.parentPath(newPath));
                     if (item)
                     {
                         that._addModel(model, item, index);

@@ -78,7 +78,7 @@
 
             dataSource.bind('error', function(e)
             {
-                zaReportError('Could not load hierarchy tree: ' + zaAjaxError(e.xhr));
+                Zutubi.admin.reportError('Could not load hierarchy tree: ' + Zutubi.admin.ajaxError(e.xhr));
             });
 
             this.setDataSource(dataSource);

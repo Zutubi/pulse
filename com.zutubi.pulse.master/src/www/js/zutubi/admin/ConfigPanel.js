@@ -85,12 +85,12 @@
                     }
                     else
                     {
-                        zaReportError("Unexpected result for config lookup, length = " + data.length);
+                        Zutubi.admin.reportError("Unexpected result for config lookup, length = " + data.length);
                     }
                 },
                 error: function (jqXHR)
                 {
-                    zaReportError("Could not load configuration: " + zaAjaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not load configuration: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
         },
@@ -115,7 +115,7 @@
             }
             else
             {
-                zaReportError("Unrecognised config kind: " + data.kind);
+                Zutubi.admin.reportError("Unrecognised config kind: " + data.kind);
             }
         },
 
@@ -222,11 +222,13 @@
 
         _applyDelta: function(delta)
         {
+            var newPath;
+
             this.configTree.applyDelta(delta);
             if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
             {
                 newPath = delta.renamedPaths[this.path];
-                replaceConfigPath(newPath);
+                Zutubi.admin.replaceConfigPath(newPath);
                 this.path = newPath;
             }
         },
@@ -243,8 +245,6 @@
                 data: {kind: "composite", properties: properties},
                 success: function (data)
                 {
-                    var newPath;
-
                     console.log('save succcess');
                     console.dir(data);
 
@@ -273,7 +273,7 @@
                         }
                     }
 
-                    zaReportError("Could not save configuration: " + zaAjaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
         },
@@ -298,11 +298,11 @@
                     // FIXME kendo better to display these near the check button
                     if (data.success)
                     {
-                        zaReportSuccess("configuration ok");
+                        Zutubi.admin.reportSuccess("configuration ok");
                     }
                     else
                     {
-                        zaReportError(data.message || "check failed");
+                        Zutubi.admin.reportError(data.message || "check failed");
                     }
                 },
                 error: function (jqXHR)
@@ -333,7 +333,7 @@
                         }
                     }
 
-                    zaReportError("Could not check configuration: " + zaAjaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not check configuration: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
 
@@ -401,7 +401,7 @@
                 },
                 error: function (jqXHR)
                 {
-                    zaReportError("Could not save order: " + zaAjaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not save order: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
         },
@@ -422,7 +422,7 @@
                 },
                 error: function (jqXHR)
                 {
-                    zaReportError("Could not get wizard information: " + zaAjaxError(jqXHR));
+                    Zutubi.admin.reportError("Could not get wizard information: " + Zutubi.admin.ajaxError(jqXHR));
                 }
             });
         },
@@ -482,7 +482,7 @@
                             }
                         }
 
-                        zaReportError("Could not finish wizard: " + zaAjaxError(jqXHR));
+                        Zutubi.admin.reportError("Could not finish wizard: " + Zutubi.admin.ajaxError(jqXHR));
                     }
                 });
             });

@@ -122,7 +122,7 @@
 
             if (stepIndex === -1)
             {
-                zaReportError("Unrecognisable validation failure in wizard");
+                Zutubi.admin.reportError("Unrecognisable validation failure in wizard");
             }
             else
             {
