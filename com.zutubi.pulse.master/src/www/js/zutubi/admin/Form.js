@@ -5,6 +5,7 @@
 // dependency: ./DropDownList.js
 // dependency: ./ItemPicker.js
 // dependency: ./PasswordField.js
+// dependency: ./TextArea.js
 // dependency: ./TextField.js
 
 (function($)
@@ -20,7 +21,8 @@
             dropdown: "kendoZaDropDownList",
             itempicker: "kendoZaItemPicker",
             password: "kendoZaPasswordField",
-            text: "kendoZaTextField"
+            text: "kendoZaTextField",
+            textarea: "kendoZaTextArea"
         };
 
     Zutubi.admin.Form = Widget.extend({
