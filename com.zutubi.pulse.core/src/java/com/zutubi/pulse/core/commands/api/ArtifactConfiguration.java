@@ -1,12 +1,14 @@
 package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.tove.annotations.SymbolicName;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.NamedConfiguration;
 
 /**
  * Basic interface for artifact capture configurations.
  */
 @SymbolicName("zutubi.artifactConfig")
+@Table(columns = {"name", "featured"})
 public interface ArtifactConfiguration extends NamedConfiguration
 {
     /**
