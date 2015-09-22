@@ -22,6 +22,7 @@ public interface FieldType
     String PASSWORD = "password";
     String SELECT = "select";
     String SUBMIT = "submit";
+    String STRING_LIST = "stringlist";
     /**
      * Text field type, represents a plain string value.
      */

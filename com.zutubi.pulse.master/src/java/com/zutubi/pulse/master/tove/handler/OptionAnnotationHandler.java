@@ -19,7 +19,7 @@ import java.util.List;
  * user.  Uses an {@link com.zutubi.pulse.master.tove.handler.OptionProvider}
  * to get the list of options.
  */
-public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
+public class OptionAnnotationHandler extends FieldAnnotationHandler
 {
     private ObjectFactory objectFactory;
     protected ConfigurationProvider configurationProvider;

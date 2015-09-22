@@ -77,9 +77,10 @@ public class FormModelBuilder
         registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldModel.class);
         registerFieldType(FieldType.CONTROLLING_SELECT, ControllingSelectFieldModel.class);
         registerFieldType(FieldType.HIDDEN, HiddenFieldModel.class);
+        registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldModel.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldModel.class);
         registerFieldType(FieldType.SELECT, SelectFieldModel.class);
-        registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldModel.class);
+        registerFieldType(FieldType.STRING_LIST, StringListFieldModel.class);
         registerFieldType(FieldType.TEXT, TextFieldModel.class);
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldModel.class);
     }

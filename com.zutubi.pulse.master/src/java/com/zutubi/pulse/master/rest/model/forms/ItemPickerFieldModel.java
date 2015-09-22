@@ -8,8 +8,6 @@ import com.zutubi.tove.annotations.FieldType;
  */
 public class ItemPickerFieldModel extends OptionFieldModel
 {
-    public static final String PARAMETER_SUPPRESS_DEFAULT = "suppressDefault";
-
     public ItemPickerFieldModel()
     {
         setType(FieldType.ITEM_PICKER);

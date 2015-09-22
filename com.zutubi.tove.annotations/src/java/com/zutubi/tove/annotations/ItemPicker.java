@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Field(type = FieldType.ITEM_PICKER)
-@Handler(className = DefaultAnnotationHandlers.ITEM_PICKER)
+@Handler(className = DefaultAnnotationHandlers.OPTION)
 public @interface ItemPicker
 {
     String optionProvider();

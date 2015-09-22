@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Field(type = FieldType.SELECT)
-@Handler(className = DefaultAnnotationHandlers.SELECT)
+@Handler(className = DefaultAnnotationHandlers.OPTION)
 public @interface Select
 {
     String optionProvider() default "";

@@ -100,6 +100,11 @@
 
         bindValue: function(value)
         {
+            // The kendo widget does not handle unexpected values gracefully, so we help cleanse.
+            value = jQuery.grep(value, function(element)
+            {
+                return element !== null;
+            });
             this.value(value);
         },
 

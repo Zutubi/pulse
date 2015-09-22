@@ -206,6 +206,21 @@ input[type=checkbox].k-input {
     text-transform: none;
 }
 
+.k-stringlist input {
+    display: block;
+}
+
+.k-stringlist button {
+    position: absolute;
+    bottom: 0.25em;
+    right: 0.25em;
+    padding: 0.35em;
+}
+
+.k-multiselect-wrap li span {
+    margin-right: 0.5em;
+}
+
 /* Drag and drop in collection tables */
 
 .k-hint {

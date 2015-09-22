@@ -5,6 +5,7 @@
 // dependency: ./DropDownList.js
 // dependency: ./ItemPicker.js
 // dependency: ./PasswordField.js
+// dependency: ./StringList.js
 // dependency: ./TextArea.js
 // dependency: ./TextField.js
 
@@ -21,6 +22,7 @@
             dropdown: "kendoZaDropDownList",
             itempicker: "kendoZaItemPicker",
             password: "kendoZaPasswordField",
+            stringlist: "kendoZaStringList",
             text: "kendoZaTextField",
             textarea: "kendoZaTextArea"
         };
