@@ -6,7 +6,6 @@ import com.zutubi.pulse.master.rest.model.forms.*;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
-import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
@@ -139,7 +138,7 @@ public class FormModelBuilder
             {
                 String fieldType = FieldType.ITEM_PICKER;
                 com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
-                if (field != null && !(field instanceof Dropdown))
+                if (field != null && !field.type().equals(FieldType.DROPDOWN))
                 {
                     fieldType = field.type();
                 }
@@ -238,12 +237,12 @@ public class FormModelBuilder
                 ((TextFieldModel) field).setSize(100);
             }
         }
-        else if (field instanceof DropdownFieldModel)
+        else if (field instanceof OptionFieldModel)
         {
-            DropdownFieldModel dropdown = (DropdownFieldModel) field;
-            if (dropdown.getList() == null)
+            OptionFieldModel optionModel = (OptionFieldModel) field;
+            if (optionModel.getList() == null)
             {
-                addDefaultOptions(parentPath, property, dropdown);
+                addDefaultOptions(parentPath, property, optionModel);
             }
         }
 
@@ -256,7 +255,7 @@ public class FormModelBuilder
         }
     }
 
-    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, DropdownFieldModel fd)
+    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, OptionFieldModel fd)
     {
         if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
