@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.pulse.core.engine.api.ResultState;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractConfiguration;
@@ -20,7 +20,7 @@ public class StatusMappingConfiguration extends AbstractConfiguration implements
 {
     @Required
     private int code;
-    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
+    @Required @Dropdown(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private ResultState status;
 
     public int getCode()

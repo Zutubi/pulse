@@ -1,8 +1,5 @@
 package com.zutubi.pulse.master.rest.model.forms;
 
-import com.zutubi.tove.annotations.FieldType;
-import com.zutubi.tove.type.record.Record;
-
 import java.util.List;
 
 /**
@@ -10,13 +7,10 @@ import java.util.List;
  */
 public class OptionFieldModel extends FieldModel
 {
-    private boolean editable;
     private Object emptyOption;
     private List list;
     private String listValue;
     private String listText;
-    private boolean multiple;
-    private int size;
     private boolean lazy;
 
     /**
@@ -33,16 +27,6 @@ public class OptionFieldModel extends FieldModel
     public void setLazy(boolean lazy)
     {
         this.lazy = lazy;
-    }
-
-    public boolean isEditable()
-    {
-        return editable;
-    }
-
-    public void setEditable(boolean editable)
-    {
-        this.editable = editable;
     }
 
     public Object getEmptyOption()
@@ -83,46 +67,5 @@ public class OptionFieldModel extends FieldModel
     public void setListText(String listText)
     {
         this.listText = listText;
-    }
-
-    public boolean isMultiple()
-    {
-        return multiple;
-    }
-
-    public void setMultiple(boolean multiple)
-    {
-        this.multiple = multiple;
-    }
-
-    public int getSize()
-    {
-        return size;
-    }
-
-    public void setSize(int size)
-    {
-        this.size = size;
-    }
-
-    // FIXME kendo this wont be called, we don't instantiate! either handle client side or late in form handling?
-    public void instantiate(String path, Record instance)
-    {
-        if (transformType())
-        {
-            if (isEditable())
-            {
-                setType(FieldType.COMBOBOX);
-            }
-            else
-            {
-                setType(FieldType.DROPDOWN);
-            }
-        }
-    }
-
-    protected boolean transformType()
-    {
-        return !isEditable() && getSize() <= 1;
     }
 }

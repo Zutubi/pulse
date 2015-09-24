@@ -7,9 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Item pickers are a type of multi-select box that allow the user to build
- * up a list of selections.  Items are shown in a dropdown box of options.  This
- * is most appropriate when there is a large number of possible options from
- * which multiple items are selected.
+ * up a list of selections.  Items are shown in a dropdown list of options.
  */
 @Target({ ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

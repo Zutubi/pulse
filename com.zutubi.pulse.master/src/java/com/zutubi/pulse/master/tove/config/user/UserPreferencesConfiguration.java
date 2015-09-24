@@ -41,7 +41,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
 
     @StringList
     private List<String> aliases = new LinkedList<String>();
-    @Select(optionProvider = "DefaultActionOptionProvider")
+    @Dropdown(optionProvider = "DefaultActionOptionProvider")
     private String defaultAction = DefaultAction.WELCOME_ACTION;
     @ControllingCheckbox(checkedFields = "refreshInterval")
     boolean refreshingEnabled = true;

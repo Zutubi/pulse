@@ -4,8 +4,8 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.master.tove.config.project.types.MultiRecipeTypeConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.tove.annotations.ControllingSelect;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
@@ -35,7 +35,7 @@ public class ProjectTypeSelectionConfiguration extends AbstractConfiguration
 
     @ControllingSelect(enableSet = {TYPE_SINGLE_STEP}, optionProvider = "ProjectTypeOptionProvider")
     private String primaryType = TYPE_SINGLE_STEP;
-    @Select(optionProvider = "CommandTypeOptionProvider")
+    @Dropdown(optionProvider = "CommandTypeOptionProvider")
     private String commandType;
 
     public String getPrimaryType()

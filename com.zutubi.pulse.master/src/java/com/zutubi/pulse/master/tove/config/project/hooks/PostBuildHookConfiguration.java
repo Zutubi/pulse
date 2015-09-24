@@ -7,7 +7,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.tove.annotations.ControllingCheckbox;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.ItemPicker;
 import com.zutubi.tove.annotations.SymbolicName;
 
 import java.util.LinkedList;
@@ -22,7 +22,7 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 {
     @ControllingCheckbox(uncheckedFields = "runForStates")
     private boolean runForAll = true;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
+    @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> runForStates = new LinkedList<ResultState>();
     private boolean runTaskOnAgents;
 

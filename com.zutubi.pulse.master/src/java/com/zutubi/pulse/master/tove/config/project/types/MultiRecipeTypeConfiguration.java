@@ -23,7 +23,7 @@ import java.util.Map;
 @Form(fieldOrder = {"defaultRecipe"})
 public class MultiRecipeTypeConfiguration extends TypeConfiguration
 {
-    @Select(optionProvider = "MultiRecipeTypeDefaultRecipeOptionProvider", editable = true)
+    @Combobox(optionProvider = "MultiRecipeTypeDefaultRecipeOptionProvider")
     @Wizard.Ignore
     private String defaultRecipe;
     private Map<String, RecipeConfiguration> recipes = new LinkedHashMap<String, RecipeConfiguration>();

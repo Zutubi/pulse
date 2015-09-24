@@ -18,7 +18,7 @@ public abstract class SubscriptionConfiguration extends AbstractNamedConfigurati
     @Required
     @Reference
     private ContactConfiguration contact;
-    @Select(optionProvider = "SubscriptionTemplateOptionProvider")
+    @Dropdown(optionProvider = "SubscriptionTemplateOptionProvider")
     private String template;
     @ControllingCheckbox(checkedFields = "logLineLimit")
     private boolean attachLogs;

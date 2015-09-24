@@ -21,7 +21,7 @@ public class ResourceConfiguration  extends AbstractNamedConfiguration
     @Ordered @Addable("property")
     private Map<String, ResourcePropertyConfiguration> properties = new LinkedHashMap<String, ResourcePropertyConfiguration>();
 
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.core.ResourceVersionOptionProvider")
+    @Dropdown(optionProvider = "com.zutubi.pulse.master.tove.config.core.ResourceVersionOptionProvider")
     private String defaultVersion;
     @Addable("version")
     private Map<String, ResourceVersionConfiguration> versions = new HashMap<String, ResourceVersionConfiguration>();

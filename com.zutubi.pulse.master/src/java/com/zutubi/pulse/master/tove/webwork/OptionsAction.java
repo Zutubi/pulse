@@ -5,7 +5,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.CompositeType;
@@ -124,7 +124,7 @@ public class OptionsAction extends ActionSupport
 
     private Annotation getOptionAnnotation(TypeProperty property)
     {
-        Select annotation = property.getAnnotation(Select.class);
+        Dropdown annotation = property.getAnnotation(Dropdown.class);
         if (annotation == null)
         {
             throw new RuntimeException("Invalid property: no select annotation");

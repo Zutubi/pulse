@@ -187,7 +187,7 @@ public class ConfigurationForm extends SeleniumForm
         {
             return ITEM_PICKER;
         }
-        else if(name.equals(FieldType.SELECT) || name.equals(FieldType.CONTROLLING_SELECT))
+        else if(name.equals("select") || name.equals(FieldType.CONTROLLING_SELECT))
         {
             return collection ? COMBOBOX : MULTI_SELECT;
         }

@@ -20,7 +20,6 @@ public interface FieldType
      * A text field where the value is not echoed.
      */
     String PASSWORD = "password";
-    String SELECT = "select";
     String SUBMIT = "submit";
     String STRING_LIST = "stringlist";
     /**

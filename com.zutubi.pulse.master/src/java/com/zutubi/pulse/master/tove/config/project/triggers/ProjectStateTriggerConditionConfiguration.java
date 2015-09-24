@@ -5,8 +5,8 @@ import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.trigger.ProjectStateTriggerCondition;
 import com.zutubi.pulse.master.trigger.TriggerCondition;
 import com.zutubi.tove.annotations.Form;
+import com.zutubi.tove.annotations.ItemPicker;
 import com.zutubi.tove.annotations.Reference;
-import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 
@@ -21,7 +21,7 @@ public class ProjectStateTriggerConditionConfiguration extends TriggerConditionC
 {
     @Reference @Required
     private ProjectConfiguration project;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
+    @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     private List<ResultState> states;
 
     @Override

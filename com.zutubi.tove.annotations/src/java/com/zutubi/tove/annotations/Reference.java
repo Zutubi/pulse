@@ -12,11 +12,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 
-@Field(type = FieldType.ITEM_PICKER)
+@Field(type = FieldType.DROPDOWN)
 @Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {
-    static final String DEFAULT_dependentOn = "";
+    String DEFAULT_dependentOn = "";
 
     String optionProvider() default "com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider";
     String cleanupTaskProvider() default "com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider";

@@ -6,7 +6,8 @@ import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
-import com.zutubi.tove.annotations.Select;
+import com.zutubi.tove.annotations.Dropdown;
+import com.zutubi.tove.annotations.ItemPicker;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.api.AbstractNamedConfiguration;
@@ -27,11 +28,11 @@ public abstract class AbstractCleanupConfiguration extends AbstractNamedConfigur
 {
     @Numeric(min = 0)
     protected int retain;
-    @Select(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
+    @Dropdown(optionProvider = "com.zutubi.pulse.master.cleanup.config.CleanupUnitOptionProvider")
     protected CleanupUnit unit = CleanupUnit.BUILDS;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
+    @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.CompletedResultStateOptionProvider")
     protected List<ResultState> states;
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
+    @ItemPicker(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
     private List<String> statuses = new LinkedList<String>();
 
     public List<ResultState> getStates()

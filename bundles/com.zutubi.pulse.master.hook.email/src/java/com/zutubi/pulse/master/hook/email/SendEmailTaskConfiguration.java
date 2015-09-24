@@ -62,7 +62,7 @@ public class SendEmailTaskConfiguration extends AbstractConfiguration implements
 {
     public static final Logger LOG = Logger.getLogger(SendEmailTaskConfiguration.class);
 
-    @Required @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
+    @Required @Dropdown(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
     @ControllingCheckbox(checkedFields = "logLineLimit")
     private boolean attachLogs;

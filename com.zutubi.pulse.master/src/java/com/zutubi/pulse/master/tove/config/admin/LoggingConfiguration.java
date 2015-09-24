@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
 import com.zutubi.tove.annotations.Classification;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 
@@ -22,7 +22,7 @@ public class LoggingConfiguration extends AbstractConfiguration
         setPermanent(true);
     }
 
-    @Select(optionProvider = "LoggingLevelProvider")
+    @Dropdown(optionProvider = "LoggingLevelProvider")
     public String getLevel()
     {
         return level;

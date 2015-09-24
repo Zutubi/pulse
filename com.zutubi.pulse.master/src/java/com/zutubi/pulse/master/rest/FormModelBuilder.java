@@ -6,6 +6,7 @@ import com.zutubi.pulse.master.rest.model.forms.*;
 import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.pulse.master.tove.handler.AnnotationHandler;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.FieldType;
 import com.zutubi.tove.annotations.Form;
 import com.zutubi.tove.annotations.Handler;
@@ -74,12 +75,13 @@ public class FormModelBuilder
         // FIXME kendo: There is a duplication here: the default constructors set these types, and
         // we also pair them with the classes here.
         registerFieldType(FieldType.CHECKBOX, CheckboxFieldModel.class);
+        registerFieldType(FieldType.COMBOBOX, ComboboxFieldModel.class);
         registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldModel.class);
         registerFieldType(FieldType.CONTROLLING_SELECT, ControllingSelectFieldModel.class);
+        registerFieldType(FieldType.DROPDOWN, DropdownFieldModel.class);
         registerFieldType(FieldType.HIDDEN, HiddenFieldModel.class);
         registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldModel.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldModel.class);
-        registerFieldType(FieldType.SELECT, SelectFieldModel.class);
         registerFieldType(FieldType.STRING_LIST, StringListFieldModel.class);
         registerFieldType(FieldType.TEXT, TextFieldModel.class);
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldModel.class);
@@ -103,8 +105,6 @@ public class FormModelBuilder
             fieldOrder.addAll(Arrays.asList(formAnnotation.fieldOrder()));
         }
         addFields(parentPath, baseName, type, messages, concrete, form);
-
-        transformOptionFieldTypes(form);
 
         fieldOrder = ToveUtils.evaluateFieldOrder(fieldOrder, newArrayList(transform(form.getFields(), new Function<FieldModel, String>()
         {
@@ -137,18 +137,14 @@ public class FormModelBuilder
             Type targetType = propertyType.getCollectionType();
             if (targetType instanceof SimpleType)
             {
-                String fieldType = FieldType.SELECT;
+                String fieldType = FieldType.ITEM_PICKER;
                 com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
-                if (field != null)
+                if (field != null && !(field instanceof Dropdown))
                 {
                     fieldType = field.type();
                 }
 
                 FieldModel fd = createFieldOfType(fieldType, path, property, messages);
-                if (fd instanceof OptionFieldModel)
-                {
-                    ((OptionFieldModel) fd).setMultiple(true);
-                }
                 addFieldParameters(type, parentPath, property, fd, validators);
                 form.addField(fd);
             }
@@ -189,7 +185,7 @@ public class FormModelBuilder
             }
             else if (propertyType instanceof EnumType)
             {
-                fieldType = FieldType.SELECT;
+                fieldType = FieldType.DROPDOWN;
             }
         }
 
@@ -242,12 +238,12 @@ public class FormModelBuilder
                 ((TextFieldModel) field).setSize(100);
             }
         }
-        else if (field instanceof SelectFieldModel)
+        else if (field instanceof DropdownFieldModel)
         {
-            SelectFieldModel select = (SelectFieldModel) field;
-            if (select.getList() == null)
+            DropdownFieldModel dropdown = (DropdownFieldModel) field;
+            if (dropdown.getList() == null)
             {
-                addDefaultOptions(parentPath, property, select);
+                addDefaultOptions(parentPath, property, dropdown);
             }
         }
 
@@ -260,7 +256,7 @@ public class FormModelBuilder
         }
     }
 
-    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, SelectFieldModel fd)
+    private void addDefaultOptions(String parentPath, TypeProperty typeProperty, DropdownFieldModel fd)
     {
         if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
@@ -305,30 +301,6 @@ public class FormModelBuilder
                 catch (Exception e)
                 {
                     LOG.warning("Unexpected exception processing the annotation handler.", e);
-                }
-            }
-        }
-    }
-
-    private void transformOptionFieldTypes(FormModel form)
-    {
-        // FIXME kendo: this is a hack to replace something that happened on instantiate previously.
-        // We need some other way for this to happen, maybe in the annotation handlers?
-        for (FieldModel field: form.getFields())
-        {
-            if (field instanceof OptionFieldModel && !(field instanceof ControllingSelectFieldModel))
-            {
-                OptionFieldModel optionFieldModel = (OptionFieldModel) field;
-                if (!optionFieldModel.isMultiple() && optionFieldModel.getSize() <= 1)
-                {
-                    if (optionFieldModel.isEditable())
-                    {
-                        optionFieldModel.setType(FieldType.COMBOBOX);
-                    }
-                    else
-                    {
-                        optionFieldModel.setType(FieldType.DROPDOWN);
-                    }
                 }
             }
         }

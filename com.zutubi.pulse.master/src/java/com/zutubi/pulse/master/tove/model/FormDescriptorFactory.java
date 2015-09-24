@@ -65,7 +65,8 @@ public class FormDescriptorFactory
         registerFieldType(FieldType.CONTROLLING_SELECT, ControllingSelectFieldDescriptor.class);
         registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldDescriptor.class);
-        registerFieldType(FieldType.SELECT, SelectFieldDescriptor.class);
+        registerFieldType(FieldType.DROPDOWN, SelectFieldDescriptor.class);
+        registerFieldType(FieldType.COMBOBOX, SelectFieldDescriptor.class);
         registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldDescriptor.class);
         registerFieldType(FieldType.TEXT, TextFieldDescriptor.class);
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldDescriptor.class);
@@ -128,7 +129,7 @@ public class FormDescriptorFactory
             Type targetType = propertyType.getCollectionType();
             if (targetType instanceof SimpleType)
             {
-                String fieldType = FieldType.SELECT;
+                String fieldType = FieldType.DROPDOWN;
                 com.zutubi.tove.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.tove.annotations.Field.class);
                 if (field != null)
                 {
@@ -195,7 +196,7 @@ public class FormDescriptorFactory
             }
             else if (propertyType instanceof EnumType)
             {
-                fieldType = FieldType.SELECT;
+                fieldType = FieldType.DROPDOWN;
             }
         }
 

@@ -33,7 +33,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private boolean remote = true;
     @NoInherit
     private String name;
-    @Required @Select(optionProvider = "AgentHostOptionProvider", editable = true)
+    @Required @Combobox(optionProvider = "AgentHostOptionProvider")
     private String host;
     @Numeric(min = 1)
     private int port = 8090;

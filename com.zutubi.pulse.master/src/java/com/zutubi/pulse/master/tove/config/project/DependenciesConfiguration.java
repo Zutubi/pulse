@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.pulse.core.dependency.ivy.IvyStatus;
 import com.zutubi.pulse.core.engine.api.BuildProperties;
+import com.zutubi.tove.annotations.Dropdown;
 import com.zutubi.tove.annotations.Form;
-import com.zutubi.tove.annotations.Select;
 import com.zutubi.tove.annotations.SymbolicName;
 import com.zutubi.tove.config.api.AbstractConfiguration;
 import com.zutubi.validation.annotations.Constraint;
@@ -30,7 +30,7 @@ public class DependenciesConfiguration extends AbstractConfiguration
     private boolean syncDestination = BuildProperties.DEFAULT_SYNC_DESTINATION;  
     @Required
     @Constraint("com.zutubi.pulse.core.dependency.StatusValidator")
-    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
+    @Dropdown(optionProvider = "com.zutubi.pulse.master.tove.config.project.BuildStatusOptionProvider")
     private String status = IvyStatus.STATUS_INTEGRATION;
 
     public DependenciesConfiguration()
