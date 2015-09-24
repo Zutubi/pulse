@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ./Button.js
 // dependency: ./Checkbox.js
+// dependency: ./ComboBox.js
 // dependency: ./ControllingCheckbox.js
 // dependency: ./DropDownList.js
 // dependency: ./ItemPicker.js
@@ -19,6 +20,7 @@
             checkbox: "kendoZaCheckbox",
             "controlling-checkbox": "kendoZaControllingCheckbox",
             "controlling-select": "kendoZaControllingDropDownList",
+            combobox: "kendoZaComboBox",
             dropdown: "kendoZaDropDownList",
             itempicker: "kendoZaItemPicker",
             password: "kendoZaPasswordField",

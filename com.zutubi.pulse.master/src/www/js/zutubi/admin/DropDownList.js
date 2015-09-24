@@ -18,7 +18,7 @@
                 };
 
             // FIXME kendo this is clunky, should we just wrap the kendo widget?
-            // It affects controllingdropdownlist too.
+            // It affects combobox and controllingdropdownlist too.
             that.parentForm = options.parentForm;
             that.structure = structure;
 
