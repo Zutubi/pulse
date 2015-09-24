@@ -5,6 +5,7 @@
     var ui = kendo.ui,
         Widget = ui.Widget,
         TABLE_ID = "za-collection-table",
+        ACTION = "action",
         REORDER = "reorder";
 
     Zutubi.admin.Table = Widget.extend({
@@ -22,6 +23,7 @@
         },
 
         events: [
+            ACTION,
             REORDER
         ],
 
@@ -35,8 +37,11 @@
 
             that.grid = $("#" + TABLE_ID).kendoGrid({
                 dataSource: data,
-                columns: columns
+                columns: columns,
+                scrollable: false
             }).data("kendoGrid");
+
+            that._addActionMenus();
 
             if (that.options.allowSorting)
             {
@@ -75,6 +80,12 @@
                 columns.push({title: column.label, field: column.name});
             }
 
+            columns.push({
+                title: "actions",
+                template: '<ul class="k-collection-menu"></ul>',
+                width: 100
+            });
+
             return columns;
         },
 
@@ -102,6 +113,56 @@
             }
 
             return data;
+        },
+
+        _addActionMenus: function()
+        {
+            var that = this,
+                i = 0,
+                item,
+                menuItems;
+
+            that.grid.table.find(".k-collection-menu").each(function(index, el)
+            {
+                item = that.options.items[i];
+                menuItems = jQuery.map(item.actions, function(action)
+                {
+                    return {text: action.label};
+                });
+
+                $(el).kendoMenu({
+                    dataSource: [{
+                        text: "... ",
+                        items: menuItems
+                    }],
+                    select: jQuery.proxy(that._actionSelected, that, i)
+                });
+
+                i++;
+            });
+        },
+
+        _actionSelected: function(row, e)
+        {
+            var item = this.options.items[row],
+                actionLabel = $(e.item).text(),
+                actions;
+
+            console.dir(item);
+            actions = jQuery.grep(item.actions, function(action)
+            {
+                return action.label === actionLabel;
+            });
+
+            if (actions.length > 0)
+            {
+                this.trigger(ACTION, {key: item.key, action: actions[0].action});
+            }
+        },
+
+        _doAction: function(item, action)
+        {
+            console.log("doing " + action);
         },
 
         _getValue: function(item, name)

@@ -180,6 +180,11 @@
             }
         },
 
+        selectAbsolutePath: function(path)
+        {
+            this.selectConfig(this._absoluteToConfigPath(path));
+        },
+
         _absoluteToConfigPath: function(path)
         {
             if (path.indexOf(this.rootPath) === 0)

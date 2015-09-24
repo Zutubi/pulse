@@ -4,6 +4,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
+        ACTION = "action",
         ADD = "add",
         REORDER = "reorder";
 
@@ -50,6 +51,10 @@
                 allowSorting: collection.type.ordered && writeAllowed
             }).data("kendoZaTable");
 
+            that.table.bind(ACTION, function(e)
+            {
+                that.trigger(ACTION, e);
+            });
             that.table.bind(REORDER, function(e)
             {
                 that.trigger(REORDER, e);
@@ -57,6 +62,7 @@
         },
 
         events: [
+            ACTION,
             ADD,
             REORDER
         ],

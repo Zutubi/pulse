@@ -201,6 +201,18 @@
                 that._showWizard();
             });
 
+            that.collection.bind("action", function(e)
+            {
+                var path = that.path + "/" + e.key;
+
+                if (e.action === "view")
+                {
+                    that.configTree.selectAbsolutePath(path);
+                    that.trigger(PATHSELECT, {path: path});
+                    that.loadContentPanes(path);
+                }
+            });
+
             that.collection.bind("reorder", function()
             {
                 that._setCollectionOrder(that.collection.table.getOrder());

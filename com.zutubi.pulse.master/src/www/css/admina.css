@@ -14,7 +14,7 @@ body {
     left: 0;
     right: 0;
     height: 39px;
-    background-color: #ffc693;
+    background-color: #7ea700;
     border-bottom: solid 1px #eee;
 }
 
@@ -33,7 +33,7 @@ ul.navlist {
 .navlist a {
     text-decoration: none;
     font-weight: bold;
-    color: #083772;
+    color: #ffffff;
 }
 
 .k-split-button {
@@ -152,6 +152,25 @@ ul.navlist {
 
 .k-collection-add {
     float: right;
+}
+
+#collection-table td
+{
+    /* Allows a menu opened from a grid cell to overflow out of the cell. */
+    overflow: visible;
+    padding: 0.4em;
+}
+
+#collection-table .k-menu
+{
+    display: inline-block;
+    border-right-width: 0;
+}
+
+/* This makes the actions menu open with its right side aligned with the right side of the ... hover target. */
+#collection-table .k-menu .k-animation-container {
+    left: auto !important;
+    right: -4px;
 }
 
 /* Forms */

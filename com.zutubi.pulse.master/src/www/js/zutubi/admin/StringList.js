@@ -161,6 +161,11 @@
         {
             var i;
 
+            if (value === null)
+            {
+                value = [];
+            }
+
             this.listElement.children("li").remove();
             for (i = 0; i < value.length; i++)
             {
