@@ -154,6 +154,7 @@
 
             contentEl.append(formEl);
             that.form = formEl.kendoZaForm({
+                path: that.path,
                 structure: data.type.form,
                 values: data.properties
             }).data("kendoZaForm");
