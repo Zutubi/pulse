@@ -35,7 +35,9 @@
                                      '#: text #' +
                                  '</span>' +
                              '</span>' +
-                             '<span unselectable="on" class="k-icon k-delete">delete</span>' +
+                             '<span class="k-select">' +
+                                 '<span unselectable="on" class="k-icon k-i-close">delete</span>' +
+                             '</span>' +
                          '</li>'
         },
 
@@ -99,7 +101,7 @@
             {
                 that.element.on(RESIZE, jQuery.proxy(that._resized, that));
                 that.inputElement.on(KEYPRESS, jQuery.proxy(that._keyPressed, that));
-                that.listElement.on(CLICK, ".k-delete", jQuery.proxy(that._tagDeleteClicked, that));
+                that.listElement.on(CLICK, ".k-i-close", jQuery.proxy(that._tagDeleteClicked, that));
 
                 that.addButton.bind("click", jQuery.proxy(that._addClicked, that));
             }

@@ -181,29 +181,9 @@ table.form {
     margin: 4px;
 }
 
-input.k-textbox, .k-dropdown-wrap .k-input {
-    height: 2em;
-}
-
-input.k-textbox {
-    text-indent: 0.2em;
-}
-
-.k-dropdown-wrap .k-input {
-    line-height: 2em;
-}
-
-.k-dropdown-wrap .k-select {
-    line-height: 2.2em;
-}
-
 input[type=checkbox].k-input {
     height: 2em;
     line-height: 2em;
-}
-
-.k-button {
-    text-transform: none;
 }
 
 .k-stringlist input {
@@ -212,13 +192,17 @@ input[type=checkbox].k-input {
 
 .k-stringlist button {
     position: absolute;
-    bottom: 0.25em;
-    right: 0.25em;
-    padding: 0.35em;
+    bottom: 0.15em;
+    right: 0.15em;
+    padding: 0.2em;
+    line-height: 1.2em;
 }
 
-.k-multiselect-wrap li span {
-    margin-right: 0.5em;
+.k-multiselect-wrap .k-handle {
+    position: relative;
+    background: none;
+    cursor: move;
+    margin-right: 1ch;
 }
 
 /* Drag and drop in collection tables */

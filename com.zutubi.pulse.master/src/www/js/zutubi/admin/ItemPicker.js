@@ -26,8 +26,13 @@
                 // This is hacking into the guts of the Kendo multiselect widget to add our own
                 // content to tags: specifically drag handles.
                 tagTemplate = kendo.template("#:" + kendo.expr(kendoOptions.dataTextField, "data") + "#", { useWithBlock: false });
-                that.tagTemplate = function(data) {
-                    return '<li class="k-button" unselectable="on"><span unselectable="on"><span class="k-handle">||</span> <span class="k-tag-content" unselectable="on">' + tagTemplate(data) + '</span></span><span unselectable="on" class="k-icon k-delete">delete</span></li>';
+
+                that.tagTemplate = function(data)
+                {
+                    return '<li class="k-button" unselectable="on"><span unselectable="on">' +
+                        '<span class="k-handle">||</span> <span class="k-tag-content" unselectable="on">' +
+                        tagTemplate(data) +
+                        '</span></span><span unselectable="on" class="k-select"><span unselectable="on" class="k-icon k-i-close">delete</span></span></li>';
                 };
 
                 that.tagList.kendoSortable({
