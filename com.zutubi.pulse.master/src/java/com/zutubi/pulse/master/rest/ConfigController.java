@@ -52,7 +52,8 @@ public class ConfigController
 
         // We can model anything with a type, even if it is not an existing path yet.
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_VIEW);
-        ComplexType type = configurationTemplateManager.getType(configPath);
+        ComplexType type = Utils.getType(configPath, configurationTemplateManager);
+
         String parentPath = PathUtils.getParentPath(configPath);
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
@@ -91,7 +92,7 @@ public class ConfigController
         }
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
-        ComplexType type = configurationTemplateManager.getType(configPath);
+        ComplexType type = Utils.getType(configPath, configurationTemplateManager);
         String parentPath = PathUtils.getParentPath(configPath);
         ComplexType parentType = configurationTemplateManager.getType(parentPath);
 

@@ -54,7 +54,7 @@ public class ConfigActionsController
         String configPath = Utils.getConfigPath(request);
 
         // FIXME kendo support getting the type from the CheckModel, path type may not always exist (wizard).
-        ComplexType type = configurationTemplateManager.getType(configPath);
+        ComplexType type = Utils.getType(configPath, configurationTemplateManager);
         if (!(type instanceof CompositeType))
         {
             throw new IllegalArgumentException("Path '" + configPath + "' refers to unexpected type '" + type + "'");
