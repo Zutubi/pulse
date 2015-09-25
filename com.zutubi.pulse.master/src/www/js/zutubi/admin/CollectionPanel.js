@@ -57,7 +57,7 @@
             });
             that.table.bind(REORDER, function(e)
             {
-                that.trigger(REORDER, e);
+                that.trigger(REORDER, {order: that.table.getOrder()});
             });
         },
 

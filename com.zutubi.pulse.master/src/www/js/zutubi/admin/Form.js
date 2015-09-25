@@ -95,6 +95,16 @@
             }
         },
 
+        destroy: function()
+        {
+            var that = this;
+
+            Widget.fn.destroy.call(that);
+            kendo.destroy(that.element);
+
+            that.element = null;
+        },
+
         _appendField: function(fieldOptions)
         {
             var fieldElement, fieldType;

@@ -2,8 +2,8 @@
 // dependency: ./ajax.js
 // dependency: ./ConfigTree.js
 // dependency: ./CollectionPanel.js
+// dependency: ./CompositePanel.js
 // dependency: ./DeleteWindow.js
-// dependency: ./Form.js
 // dependency: ./Table.js
 // dependency: ./Wizard.js
 
@@ -131,19 +131,10 @@
         {
             var contentEl = $("#center-pane-content");
 
-            this.form = null;
-            this.checkForm = null;
-
-            if (this.collection)
+            if (this.contentPanel)
             {
-                this.collection.destroy();
-                this.collection = null;
-            }
-
-            if (this.wizard)
-            {
-                this.wizard.destroy();
-                this.wizard = null;
+                this.contentPanel.destroy();
+                this.contentPanel = null;
             }
 
             kendo.destroy(contentEl);
@@ -152,45 +143,26 @@
 
         _showComposite: function(data)
         {
-            var that = this,
-                contentEl = $("#center-pane-content"),
-                formEl = $("<div></div>"),
-                checkFormEl;
+            var that = this;
 
             console.log("composite");
             console.dir(data);
 
-            contentEl.append(formEl);
-            that.form = formEl.kendoZaForm({
-                path: that.path,
-                structure: data.type.form,
-                values: data.properties
-            }).data("kendoZaForm");
-
-            that.form.bind("submit", function(e)
-            {
-                that._saveComposite(that.form.getValues());
+            that.contentPanel = new Zutubi.admin.CompositePanel({
+                containerSelector: "#center-pane-content",
+                composite: data,
+                path: that.path
             });
 
-            // FIXME kendo if the composite is not writable, don't show this
-            if (data.type.checkType)
+            that.contentPanel.bind("save", function(e)
             {
-                checkFormEl = $("<div></div>");
+                that._saveComposite(e.values);
+            });
 
-                contentEl.append("<h1>check</h1>");
-                contentEl.append(checkFormEl);
-                that.checkForm = checkFormEl.kendoZaForm({
-                    formName: "check",
-                    structure: data.type.checkType.form,
-                    values: [],
-                    submits: ["check"]
-                }).data("kendoZaForm");
-
-                that.checkForm.bind("submit", function(e)
-                {
-                    that._checkComposite(that.form.getValues(), that.checkForm.getValues());
-                });
-            }
+            that.contentPanel.bind("check", function(e)
+            {
+                that._checkComposite(e.values, e.checkValues);
+            });
         },
 
         _showCollection: function(data)
@@ -200,17 +172,17 @@
             console.log("collection");
             console.dir(data);
 
-            that.collection = new Zutubi.admin.CollectionPanel({
+            that.contentPanel = new Zutubi.admin.CollectionPanel({
                 containerSelector: "#center-pane-content",
                 collection: data
             });
 
-            that.collection.bind("add", function()
+            that.contentPanel.bind("add", function()
             {
                 that._showWizard();
             });
 
-            that.collection.bind("action", function(e)
+            that.contentPanel.bind("action", function(e)
             {
                 var path = that.path + "/" + e.key;
 
@@ -224,9 +196,9 @@
                 }
             });
 
-            that.collection.bind("reorder", function()
+            that.contentPanel.bind("reorder", function(e)
             {
-                that._setCollectionOrder(that.collection.table.getOrder());
+                that._setCollectionOrder(e.order);
             });
         },
 
@@ -286,7 +258,7 @@
                             details = JSON.parse(jqXHR.responseText);
                             if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
                             {
-                                that.form.showValidationErrors(details);
+                                that.contentPanel.showValidationErrors(details);
                                 return;
                             }
                         }
@@ -341,11 +313,11 @@
                             {
                                 if (details.key === "main")
                                 {
-                                    that.form.showValidationErrors(details);
+                                    that.contentPanel.showValidationErrors(details);
                                 }
                                 else
                                 {
-                                    that.checkForm.showValidationErrors(details);
+                                    that.contentPanel.showCheckValidationErrors(details);
                                 }
                                 return;
                             }
@@ -459,13 +431,13 @@
             that._clearContent();
 
             contentEl.append(wizardEl);
-            that.wizard = wizardEl.kendoZaWizard({
+            that.contentPanel = wizardEl.kendoZaWizard({
                 structure: data
             }).data("kendoZaWizard");
 
-            that.wizard.bind("finish", function()
+            that.contentPanel.bind("finish", function()
             {
-                var wizardData = that.wizard.getValue();
+                var wizardData = that.contentPanel.getValue();
                 jQuery.each(wizardData, function(property, data)
                 {
                     data.kind = "composite";
@@ -494,7 +466,7 @@
                                 console.dir(details);
                                 if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
                                 {
-                                    that.wizard.showValidationErrors(details);
+                                    that.contentPanel.showValidationErrors(details);
                                     return;
                                 }
                             }
@@ -510,7 +482,7 @@
                 });
             });
 
-            that.wizard.bind("cancel", function()
+            that.contentPanel.bind("cancel", function()
             {
                 that.loadContentPanes(that.path);
             });
