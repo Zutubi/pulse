@@ -2265,10 +2265,11 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * deleted this way.
      * 
      * @param path the path to delete
+     * @return the cleanup tasks that were executed
      */
-    public void delete(final String path)
+    public RecordCleanupTask delete(final String path)
     {
-        delete(path, true);
+        return delete(path, true);
     }
 
     /**
@@ -2281,15 +2282,16 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
      * @param checkTemplateParent if true, verify invariants against the
      *                            template parent (in particular, do not allow
      *                            inherited composites to be deleted)
+     * @return the cleanup tasks that were executed
      */
-    void delete(final String path, final boolean checkTemplateParent)
+    RecordCleanupTask delete(final String path, final boolean checkTemplateParent)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        executeInsideTransaction(new NullaryFunction<Object>()
+        return executeInsideTransaction(new NullaryFunction<RecordCleanupTask>()
         {
-            public Object process()
+            public RecordCleanupTask process()
             {
                 Record record = recordManager.select(path);
                 if (record == null)
@@ -2301,7 +2303,8 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
-                List<ConfigurationEvent> events = configurationCleanupManager.runCleanupTasks(getCleanupTasks(path, checkTemplateParent), recordManager);
+                RecordCleanupTask task = getCleanupTasks(path, checkTemplateParent);
+                List<ConfigurationEvent> events = configurationCleanupManager.runCleanupTasks(task, recordManager);
                 refreshCaches();
 
                 for (ConfigurationEvent e : events)
@@ -2309,7 +2312,7 @@ public class ConfigurationTemplateManager implements com.zutubi.events.EventList
                     publishEvent(e);
                 }
 
-                return null;
+                return task;
             }
         });
     }

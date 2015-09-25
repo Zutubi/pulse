@@ -105,6 +105,7 @@ ul.navlist {
     margin-bottom: 0.5em;
 }
 
+/*noinspection CssInvalidPseudoSelector*/
 .k-hierarchy-selector input::-ms-clear {
     height: 0;
     width: 0;
@@ -242,4 +243,36 @@ input[type=checkbox].k-input {
 
 .k-button .fa {
     line-height: 14px;
+}
+
+/* Workflow Window */
+
+.k-workflow-content {
+    padding: 0.4em;
+}
+
+.k-workflow-actions {
+    text-align: center;
+}
+
+.k-workflow-actions .k-button {
+    margin: 0.4em;
+}
+
+/* Delete Window */
+
+table.cleanup-tasks
+{
+    margin: 12px;
+}
+
+table.cleanup-tasks th, .cleanup-tasks td
+{
+    padding: 0.4em;
+    border: solid 1px #dbdbdb;
+}
+
+table.cleanup-tasks th
+{
+    font-weight: bold;
 }

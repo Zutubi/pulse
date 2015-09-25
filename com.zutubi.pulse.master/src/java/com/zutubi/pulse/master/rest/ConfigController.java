@@ -13,6 +13,7 @@ import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.ComplexType;
 import com.zutubi.tove.type.CompositeType;
@@ -34,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/config")
 public class ConfigController
 {
+    private static final String[] DELTA_FILTERS = {"type", "properties", "nested"};
+
     @Autowired
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
@@ -115,7 +118,7 @@ public class ConfigController
 
             ConfigDeltaModel delta = new ConfigDeltaModel();
             Record newRecord = configurationTemplateManager.getRecord(newConfigPath);
-            delta.addUpdatedPath(newConfigPath, configModelBuilder.buildModel(null, newConfigPath, compositeType, parentType, newRecord, -1));
+            delta.addUpdatedPath(newConfigPath, configModelBuilder.buildModel(DELTA_FILTERS, newConfigPath, compositeType, parentType, newRecord, -1));
             if (!newConfigPath.equals(configPath))
             {
                 delta.addRenamedPath(configPath, newConfigPath);
@@ -142,10 +145,74 @@ public class ConfigController
 
             ConfigDeltaModel delta = new ConfigDeltaModel();
             Record newRecord = configurationTemplateManager.getRecord(configPath);
-            delta.addUpdatedPath(configPath, configModelBuilder.buildModel(null, configPath, type, parentType, newRecord, -1));
+            delta.addUpdatedPath(configPath, configModelBuilder.buildModel(DELTA_FILTERS, configPath, type, parentType, newRecord, -1));
 
             return new ResponseEntity<>(delta, HttpStatus.OK);
         }
+    }
+
+    @RequestMapping(value = "/**", method = RequestMethod.DELETE)
+    public ResponseEntity<ConfigDeltaModel> put(HttpServletRequest request) throws TypeException
+    {
+        String configPath = Utils.getConfigPath(request);
+
+        Record existingRecord = configurationTemplateManager.getRecord(configPath);
+        if (existingRecord == null)
+        {
+            throw new NotFoundException("Invalid path '" + configPath + "': no configuration found");
+        }
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_DELETE);
+
+        RecordCleanupTask cleanupTask = configurationTemplateManager.delete(configPath);
+        ConfigDeltaModel delta = new ConfigDeltaModel();
+        collectCleanupDeltas(cleanupTask, delta);
+        return new ResponseEntity<>(delta, HttpStatus.OK);
+    }
+
+    private void collectCleanupDeltas(RecordCleanupTask task, ConfigDeltaModel delta) throws TypeException
+    {
+        switch (task.getCleanupAction())
+        {
+            case DELETE:
+            {
+                delta.addDeletedPath(task.getAffectedPath());
+                String parentPath = PathUtils.getParentPath(task.getAffectedPath());
+                // If the user deleted a composite property, then the path itself still has a type.
+                // From the UI POV the path will likely need to be refreshed, so we add an update
+                // to the delta on the parent path.
+                if (configurationTemplateManager.pathExists(parentPath) && configurationTemplateManager.getType(parentPath) instanceof CompositeType)
+                {
+                    delta.addUpdatedPath(parentPath, createDeltaModel(parentPath));
+                }
+                break;
+            }
+            case PARENT_UPDATE:
+            {
+                String parentPath = PathUtils.getParentPath(task.getAffectedPath());
+                if (configurationTemplateManager.pathExists(parentPath))
+                {
+                    delta.addUpdatedPath(parentPath, createDeltaModel(parentPath));
+                }
+                break;
+            }
+            case NONE:
+                break;
+        }
+
+        for (RecordCleanupTask child: task.getCascaded())
+        {
+            collectCleanupDeltas(child, delta);
+        }
+    }
+
+    private ConfigModel createDeltaModel(String configPath) throws TypeException
+    {
+        String parnetPath = PathUtils.getParentPath(configPath);
+        ComplexType type = configurationTemplateManager.getType(configPath);
+        ComplexType parentType = configurationTemplateManager.getType(parnetPath);
+        Record record = configurationTemplateManager.getRecord(configPath);
+        return configModelBuilder.buildModel(DELTA_FILTERS, configPath, type, parentType, record, -1);
     }
 
     private String[] canonicaliseFilters(String[] filters)

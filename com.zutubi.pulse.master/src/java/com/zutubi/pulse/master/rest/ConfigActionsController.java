@@ -4,6 +4,7 @@ import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.CheckModel;
 import com.zutubi.pulse.master.rest.model.CheckResultModel;
+import com.zutubi.pulse.master.rest.model.CleanupTaskModel;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
@@ -14,6 +15,7 @@ import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
+import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -51,7 +53,22 @@ public class ConfigActionsController
     @Autowired
     private ConfigurationReferenceManager configurationReferenceManager;
     @Autowired
+    private ConfigModelBuilder configModelBuilder;
+    @Autowired
     private ObjectFactory objectFactory;
+
+    @RequestMapping(value = "delete/**", method = RequestMethod.GET)
+    public ResponseEntity<CleanupTaskModel> delete(HttpServletRequest request) throws Exception
+    {
+        String configPath = Utils.getConfigPath(request);
+        // This is to validate the path, we don't need the type.
+        Utils.getType(configPath, configurationTemplateManager);
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_VIEW);
+
+        RecordCleanupTask task = configurationTemplateManager.getCleanupTasks(configPath);
+        return new ResponseEntity<>(configModelBuilder.buildCleanupTask(task), HttpStatus.OK);
+    }
 
     @RequestMapping(value = "options/**", method = RequestMethod.GET)
     public ResponseEntity<List<String>> options(HttpServletRequest request) throws Exception

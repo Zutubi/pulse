@@ -185,6 +185,47 @@
             this.selectConfig(this._absoluteToConfigPath(path));
         },
 
+        longestMatchingSubpath: function(path)
+        {
+            var result = this.rootPath,
+                configPath = this._absoluteToConfigPath(path),
+                root = this.wrapper.find(".k-item:first"),
+                dataItem = this.dataItem(root),
+                keys = [],
+                i, j,
+                key,
+                children;
+
+            if (configPath)
+            {
+                keys = configPath.split("/");
+            }
+
+            for (i = 0; i < keys.length; i++)
+            {
+                key = keys[i];
+
+                children = dataItem.children.data();
+                for (j = 0; j < children.length; j++)
+                {
+                    if (children[j].key === key)
+                    {
+                        break;
+                    }
+                }
+
+                if (j === children.length)
+                {
+                    break;
+                }
+
+                dataItem = children[j];
+                result = result + "/" + key;
+            }
+
+            return result;
+        },
+
         _absoluteToConfigPath: function(path)
         {
             if (path.indexOf(this.rootPath) === 0)
@@ -301,7 +342,7 @@
                     item = that._dataItemForConfigPath(path);
                     if (item && item.children && item.children.data().length > 0)
                     {
-                        // Update to a collection, maybe a change to the order. Refresh.
+                        // Update to a node, e.g. collection reorder. Refresh.
                         parentItem = item.parentNode();
                         index = parentItem.children.indexOf(item);
                         that.dataSource.remove(item);

@@ -19,6 +19,7 @@ import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.Configuration;
+import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -419,6 +420,20 @@ public class ConfigModelBuilder
                 }
             }
         }
+    }
+
+    public CleanupTaskModel buildCleanupTask(RecordCleanupTask task)
+    {
+        CleanupTaskModel model = new CleanupTaskModel(task.getAffectedPath(), Messages.getInstance(task).format("summary"));
+        for (RecordCleanupTask child: task.getCascaded())
+        {
+            if (configurationSecurityManager.hasPermission(child.getAffectedPath(), AccessManager.ACTION_VIEW))
+            {
+                model.addChild(buildCleanupTask(child));
+            }
+        }
+
+        return model;
     }
 
     public void setActionManager(ActionManager actionManager)

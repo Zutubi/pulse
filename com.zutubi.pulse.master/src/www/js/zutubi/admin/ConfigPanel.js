@@ -2,6 +2,7 @@
 // dependency: ./ajax.js
 // dependency: ./ConfigTree.js
 // dependency: ./CollectionPanel.js
+// dependency: ./DeleteWindow.js
 // dependency: ./Form.js
 // dependency: ./Table.js
 // dependency: ./Wizard.js
@@ -66,6 +67,13 @@
             this.configTree.setRootPath(rootPath);
             this.configTree.selectConfig(configPath);
             this.loadContentPanes(rootPath + "/" + configPath);
+        },
+
+        _openPath: function(path)
+        {
+            this.configTree.selectAbsolutePath(path);
+            this.trigger(PATHSELECT, {path: path});
+            this.loadContentPanes(path);
         },
 
         loadContentPanes: function(path)
@@ -208,9 +216,11 @@
 
                 if (e.action === "view")
                 {
-                    that.configTree.selectAbsolutePath(path);
-                    that.trigger(PATHSELECT, {path: path});
-                    that.loadContentPanes(path);
+                    that._openPath(path);
+                }
+                else if (e.action === "delete")
+                {
+                    that._deleteConfig(path);
                 }
             });
 
@@ -504,6 +514,34 @@
             {
                 that.loadContentPanes(that.path);
             });
+        },
+
+        _deleteConfig: function(path)
+        {
+            var that = this,
+                deleteWindow;
+
+            deleteWindow = new Zutubi.admin.DeleteWindow({
+                path: path,
+                confirm: function()
+                {
+                    Zutubi.admin.ajax({
+                        type: "DELETE",
+                        url: "/api/config/" + path,
+                        success: function (delta)
+                        {
+                            that._applyDelta(delta);
+                            that._openPath(that.configTree.longestMatchingSubpath(path));
+                        },
+                        error: function (jqXHR)
+                        {
+                            Zutubi.admin.reportError("Could not delete configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                        }
+                    });
+                }
+            });
+
+            deleteWindow.show();
         }
     });
 }(jQuery));
