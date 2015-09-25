@@ -61,6 +61,7 @@
 
                         grid.dataSource.remove(dataItem);
                         grid.dataSource.insert(e.newIndex, dataItem);
+                        that._addActionMenus();
                         that.trigger(REORDER, {item: dataItem, oldIndex: e.oldIndex, newIndex: e.newIndex});
                     }
                 });
@@ -102,7 +103,7 @@
             for (i = 0; i < items.length; i++)
             {
                 item = items[i];
-                row = {key: item.key};
+                row = {key: item.key, actions: item.actions};
                 for (j = 0; j < columns.length; j++)
                 {
                     column = columns[j];
@@ -119,36 +120,41 @@
         {
             var that = this,
                 i = 0,
-                item,
-                menuItems;
+                item;
 
             that.grid.table.find(".k-collection-menu").each(function(index, el)
             {
-                item = that.options.items[i];
-                menuItems = jQuery.map(item.actions, function(action)
-                {
-                    return {text: action.label};
-                });
-
-                $(el).kendoMenu({
-                    dataSource: [{
-                        text: "... ",
-                        items: menuItems
-                    }],
-                    select: jQuery.proxy(that._actionSelected, that, i)
-                });
-
+                item = that.grid.dataSource.at(i);
+                that._addActionMenu(item, el, i);
                 i++;
+            });
+        },
+
+        _addActionMenu: function(item, el, row)
+        {
+            var that = this,
+                menuItems;
+
+            menuItems = jQuery.map(item.actions, function(action)
+            {
+                return {text: action.label};
+            });
+
+            $(el).kendoMenu({
+                dataSource: [{
+                    text: "... ",
+                    items: menuItems
+                }],
+                select: jQuery.proxy(that._actionSelected, that, row)
             });
         },
 
         _actionSelected: function(row, e)
         {
-            var item = this.options.items[row],
+            var item = this.grid.dataSource.at(row),
                 actionLabel = $(e.item).text(),
                 actions;
 
-            console.dir(item);
             actions = jQuery.grep(item.actions, function(action)
             {
                 return action.label === actionLabel;
@@ -158,11 +164,6 @@
             {
                 this.trigger(ACTION, {key: item.key, action: actions[0].action});
             }
-        },
-
-        _doAction: function(item, action)
-        {
-            console.log("doing " + action);
         },
 
         _getValue: function(item, name)
