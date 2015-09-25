@@ -35,8 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/config")
 public class ConfigController
 {
-    private static final String[] DELTA_FILTERS = {"type", "properties", "nested"};
-
     @Autowired
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
@@ -118,7 +116,7 @@ public class ConfigController
 
             ConfigDeltaModel delta = new ConfigDeltaModel();
             Record newRecord = configurationTemplateManager.getRecord(newConfigPath);
-            delta.addUpdatedPath(newConfigPath, configModelBuilder.buildModel(DELTA_FILTERS, newConfigPath, compositeType, parentType, newRecord, -1));
+            delta.addUpdatedPath(newConfigPath, configModelBuilder.buildModel(null, newConfigPath, compositeType, parentType, newRecord, -1));
             if (!newConfigPath.equals(configPath))
             {
                 delta.addRenamedPath(configPath, newConfigPath);
@@ -145,7 +143,7 @@ public class ConfigController
 
             ConfigDeltaModel delta = new ConfigDeltaModel();
             Record newRecord = configurationTemplateManager.getRecord(configPath);
-            delta.addUpdatedPath(configPath, configModelBuilder.buildModel(DELTA_FILTERS, configPath, type, parentType, newRecord, -1));
+            delta.addUpdatedPath(configPath, configModelBuilder.buildModel(null, configPath, type, parentType, newRecord, -1));
 
             return new ResponseEntity<>(delta, HttpStatus.OK);
         }
@@ -212,7 +210,7 @@ public class ConfigController
         ComplexType type = configurationTemplateManager.getType(configPath);
         ComplexType parentType = configurationTemplateManager.getType(parnetPath);
         Record record = configurationTemplateManager.getRecord(configPath);
-        return configModelBuilder.buildModel(DELTA_FILTERS, configPath, type, parentType, record, -1);
+        return configModelBuilder.buildModel(null, configPath, type, parentType, record, -1);
     }
 
     private String[] canonicaliseFilters(String[] filters)
