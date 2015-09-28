@@ -4,14 +4,15 @@
 (function($)
 {
     var Observable = kendo.Observable,
-        CHECK = "check",
-        SAVE = "save";
+        SAVED = "saved";
 
     Zutubi.admin.CompositePanel = Observable.extend({
         init: function (options)
         {
             var that = this,
                 composite = options.composite;
+
+            that.options = options;
 
             Observable.fn.init.call(this);
 
@@ -41,10 +42,7 @@
                 values: composite.properties
             }).data("kendoZaForm");
 
-            that.form.bind("submit", function(e)
-            {
-                that.trigger(SAVE, {values: that.form.getValues()});
-            });
+            that.form.bind("submit", jQuery.proxy(that._submitClicked, that));
 
             // FIXME kendo if the composite is not writable, don't show this
             if (composite.type.checkType)
@@ -58,19 +56,12 @@
                     submits: ["check"]
                 }).data("kendoZaForm");
 
-                that.checkForm.bind("submit", function(e)
-                {
-                    that.trigger(CHECK, {
-                        values: that.form.getValues(),
-                        checkValues: that.checkForm.getValues()
-                    });
-                });
+                that.checkForm.bind("submit", jQuery.proxy(that._checkClicked, that));
             }
         },
 
         events: [
-            CHECK,
-            SAVE
+            SAVED
         ],
 
         destroy: function()
@@ -79,14 +70,111 @@
             this.view.destroy();
         },
 
-        showValidationErrors: function(details)
+        _submitClicked: function()
         {
-            this.form.showValidationErrors(details);
+            var that = this,
+                properties = that.form.getValues();
+
+            Zutubi.admin.coerceProperties(properties, that.options.composite.type.simpleProperties);
+
+            Zutubi.admin.ajax({
+                type: "PUT",
+                url: "/api/config/" + that.options.path + "?depth=1",
+                data: {kind: "composite", properties: properties},
+                success: function (data)
+                {
+                    console.log('save succcess');
+                    console.dir(data);
+
+                    that.trigger(SAVED, {delta: data});
+                },
+                error: function (jqXHR)
+                {
+                    var details;
+
+                    if (jqXHR.status === 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                that.form.showValidationErrors(details);
+                                return;
+                            }
+                        }
+                        catch(e)
+                        {
+                            // Do nothing.
+                        }
+                    }
+
+                    Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
         },
 
-        showCheckValidationErrors: function(details)
+        _checkClicked: function()
         {
-            this.checkForm.showValidationErrors(details);
+            var that = this,
+                type = that.options.composite.type,
+                properties = that.form.getValues(),
+                checkProperties = that.checkForm.getValues();
+
+            Zutubi.admin.coerceProperties(properties, type.simpleProperties);
+            Zutubi.admin.coerceProperties(checkProperties, type.checkType.simpleProperties);
+
+            Zutubi.admin.ajax({
+                type: "POST",
+                url: "/api/action/check/" + that.options.path,
+                data: {
+                    main: {kind: "composite", properties: properties},
+                    check: {kind: "composite", properties: checkProperties}
+                },
+                success: function (data)
+                {
+                    // FIXME kendo better to display these near the check button
+                    if (data.success)
+                    {
+                        Zutubi.admin.reportSuccess("configuration ok");
+                    }
+                    else
+                    {
+                        Zutubi.admin.reportError(data.message || "check failed");
+                    }
+                },
+                error: function (jqXHR)
+                {
+                    var details;
+
+                    if (jqXHR.status === 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                if (details.key === "main")
+                                {
+                                    that.form.showValidationErrors(details);
+                                }
+                                else
+                                {
+                                    that.checkForm.showValidationErrors(details);
+                                }
+                                return;
+                            }
+                        }
+                        catch(e)
+                        {
+                            // Do nothing.
+                        }
+                    }
+
+                    Zutubi.admin.reportError("Could not check configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
+
         }
     });
 }(jQuery));

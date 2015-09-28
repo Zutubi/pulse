@@ -115,9 +115,28 @@ if (window.Zutubi.admin === undefined)
             return navbar;
         }
 
+        function _coerceInt(properties, name)
+        {
+            var value, newValue;
+            if (properties.hasOwnProperty(name))
+            {
+                value = properties[name];
+                if (value === "")
+                {
+                    newValue = null;
+                }
+                else
+                {
+                    newValue = Number(value);
+                }
+
+                properties[name] = newValue;
+            }
+        }
+
         return {
             app: app,
-            
+
             init: function()
             {
                 app.notificationWidget = _createNotificationWidget();
@@ -206,6 +225,24 @@ if (window.Zutubi.admin === undefined)
                 }
 
                 app.configPanel.setPaths(rootPath, configPath);
+            },
+
+            coerceProperties: function(properties, propertyTypes)
+            {
+                var i,
+                    propertyType;
+
+                if (propertyTypes)
+                {
+                    for (i = 0; i < propertyTypes.length; i++)
+                    {
+                        propertyType = propertyTypes[i];
+                        if (propertyType.shortType === "int")
+                        {
+                            _coerceInt(properties, propertyType.name);
+                        }
+                    }
+                }
             }
         };
     }(jQuery));

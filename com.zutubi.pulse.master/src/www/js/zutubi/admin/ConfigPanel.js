@@ -154,14 +154,11 @@
                 path: that.path
             });
 
-            that.contentPanel.bind("save", function(e)
+            that.contentPanel.bind("saved", function(e)
             {
-                that._saveComposite(e.values);
-            });
-
-            that.contentPanel.bind("check", function(e)
-            {
-                that._checkComposite(e.values, e.checkValues);
+                that._applyDelta(e.delta);
+                that._clearContent();
+                that._showComposite(e.delta.models[that.path]);
             });
         },
 
@@ -225,149 +222,6 @@
                 newPath = delta.renamedPaths[this.path];
                 Zutubi.admin.replaceConfigPath(newPath);
                 this.path = newPath;
-            }
-        },
-
-        _saveComposite: function(properties)
-        {
-            var that = this;
-
-            that._coerce(properties, this.data.type.simpleProperties);
-
-            Zutubi.admin.ajax({
-                type: "PUT",
-                url: "/api/config/" + that.path + "?depth=1",
-                data: {kind: "composite", properties: properties},
-                success: function (data)
-                {
-                    console.log('save succcess');
-                    console.dir(data);
-
-                    that._applyDelta(data);
-                    that._clearContent();
-                    that._showComposite(data.models[that.path]);
-                },
-                error: function (jqXHR)
-                {
-                    var details;
-
-                    if (jqXHR.status === 422)
-                    {
-                        try
-                        {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                            {
-                                that.contentPanel.showValidationErrors(details);
-                                return;
-                            }
-                        }
-                        catch(e)
-                        {
-                            // Do nothing.
-                        }
-                    }
-
-                    Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
-                }
-            });
-        },
-
-        _checkComposite: function(properties, checkProperties)
-        {
-            var that = this,
-                type = this.data.type;
-
-            that._coerce(properties, type.simpleProperties);
-            that._coerce(checkProperties, type.checkType.simpleProperties);
-
-            Zutubi.admin.ajax({
-                type: "POST",
-                url: "/api/action/check/" + that.path,
-                data: {
-                    main: {kind: "composite", properties: properties},
-                    check: {kind: "composite", properties: checkProperties}
-                },
-                success: function (data)
-                {
-                    // FIXME kendo better to display these near the check button
-                    if (data.success)
-                    {
-                        Zutubi.admin.reportSuccess("configuration ok");
-                    }
-                    else
-                    {
-                        Zutubi.admin.reportError(data.message || "check failed");
-                    }
-                },
-                error: function (jqXHR)
-                {
-                    var details;
-
-                    if (jqXHR.status === 422)
-                    {
-                        try
-                        {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                            {
-                                if (details.key === "main")
-                                {
-                                    that.contentPanel.showValidationErrors(details);
-                                }
-                                else
-                                {
-                                    that.contentPanel.showCheckValidationErrors(details);
-                                }
-                                return;
-                            }
-                        }
-                        catch(e)
-                        {
-                            // Do nothing.
-                        }
-                    }
-
-                    Zutubi.admin.reportError("Could not check configuration: " + Zutubi.admin.ajaxError(jqXHR));
-                }
-            });
-
-        },
-
-        _coerce: function(properties, propertyTypes)
-        {
-            var i,
-                propertyType;
-
-            if (propertyTypes)
-            {
-                for (i = 0; i < propertyTypes.length; i++)
-                {
-                    propertyType = propertyTypes[i];
-                    if (propertyType.shortType === "int")
-                    {
-                        this._coerceInt(properties, propertyType.name);
-                    }
-                }
-            }
-        },
-
-        _coerceInt: function(properties, name)
-        {
-            var value, newValue;
-            if (properties.hasOwnProperty(name))
-            {
-                value = properties[name];
-                if (value === "")
-                {
-                    newValue = null;
-                }
-                else
-                {
-                    newValue = Number(value);
-                }
-
-                properties[name] = newValue;
             }
         },
 
@@ -441,7 +295,7 @@
                 jQuery.each(wizardData, function(property, data)
                 {
                     data.kind = "composite";
-                    that._coerce(data.properties, data.type.simpleProperties);
+                    Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
                     data.type = { symbolicName: data.type.symbolicName };
                 });
 
