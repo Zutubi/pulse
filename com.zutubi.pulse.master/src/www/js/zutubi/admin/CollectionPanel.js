@@ -6,15 +6,17 @@
     var Observable = kendo.Observable,
         ACTION = "action",
         ADD = "add",
-        REORDER = "reorder";
+        REORDERED = "reordered";
 
     Zutubi.admin.CollectionPanel = Observable.extend({
-        init: function (config)
+        init: function (options)
         {
             var that = this,
-                collection = config.collection,
+                collection = options.collection,
                 createAllowed = jQuery.inArray("create", collection.allowedActions) !== -1,
                 writeAllowed = (jQuery.inArray("write", collection.allowedActions) !== -1);
+
+            that.options = options;
 
             Observable.fn.init.call(this);
 
@@ -32,7 +34,7 @@
                     }
                 });
 
-            that.view.render($(config.containerSelector));
+            that.view.render($(options.containerSelector));
 
             that.addElement = $("#collection-add");
             if (createAllowed)
@@ -55,16 +57,14 @@
             {
                 that.trigger(ACTION, e);
             });
-            that.table.bind(REORDER, function(e)
-            {
-                that.trigger(REORDER, {order: that.table.getOrder()});
-            });
+
+            that.table.bind("reorder", jQuery.proxy(that._reordered, that));
         },
 
         events: [
             ACTION,
             ADD,
-            REORDER
+            REORDERED
         ],
 
         destroy: function()
@@ -77,6 +77,36 @@
         {
             e.preventDefault();
             this.trigger(ADD);
+        },
+
+        _reordered: function(order)
+        {
+            var that = this;
+
+            Zutubi.admin.ajax({
+                type: "PUT",
+                url: "/api/config/" + that.options.path + "?depth=-1",
+                data: {
+                    kind: "collection",
+                    nested: jQuery.map(that.table.getOrder(), function(key)
+                    {
+                        return {
+                            kind: "composite",
+                            key: key
+                        };
+                    })
+                },
+                success: function (data)
+                {
+                    console.log('set order succcess');
+                    console.dir(data);
+                    that.trigger(REORDERED, {delta: data});
+                },
+                error: function (jqXHR)
+                {
+                    Zutubi.admin.reportError("Could not save order: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
         }
     });
 }(jQuery));

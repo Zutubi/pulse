@@ -171,7 +171,8 @@
 
             that.contentPanel = new Zutubi.admin.CollectionPanel({
                 containerSelector: "#center-pane-content",
-                collection: data
+                collection: data,
+                path: that.path
             });
 
             that.contentPanel.bind("add", function()
@@ -193,9 +194,9 @@
                 }
             });
 
-            that.contentPanel.bind("reorder", function(e)
+            that.contentPanel.bind("reordered", function(e)
             {
-                that._setCollectionOrder(e.order);
+                that._applyDelta(e.delta);
             });
         },
 
@@ -223,36 +224,6 @@
                 Zutubi.admin.replaceConfigPath(newPath);
                 this.path = newPath;
             }
-        },
-
-        _setCollectionOrder: function(order)
-        {
-            var that = this;
-
-            Zutubi.admin.ajax({
-                type: "PUT",
-                url: "/api/config/" + that.path + "?depth=-1",
-                data: {
-                    kind: "collection",
-                    nested: jQuery.map(order, function(key)
-                            {
-                                return {
-                                    kind: "composite",
-                                    key: key
-                                };
-                            })
-                },
-                success: function (data)
-                {
-                    console.log('set order succcess');
-                    console.dir(data);
-                    that._applyDelta(data);
-                },
-                error: function (jqXHR)
-                {
-                    Zutubi.admin.reportError("Could not save order: " + Zutubi.admin.ajaxError(jqXHR));
-                }
-            });
         },
 
         _showWizard: function()
