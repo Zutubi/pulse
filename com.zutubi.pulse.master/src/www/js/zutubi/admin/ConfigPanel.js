@@ -257,57 +257,16 @@
 
             contentEl.append(wizardEl);
             that.contentPanel = wizardEl.kendoZaWizard({
-                structure: data
+                structure: data,
+                path: that.path
             }).data("kendoZaWizard");
 
-            that.contentPanel.bind("finish", function()
+            that.contentPanel.bind("finished", function(e)
             {
-                var wizardData = that.contentPanel.getValue();
-                jQuery.each(wizardData, function(property, data)
-                {
-                    data.kind = "composite";
-                    Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
-                    data.type = { symbolicName: data.type.symbolicName };
-                });
-
-                Zutubi.admin.ajax({
-                    type: "POST",
-                    url: "/api/wizard/" + that.path,
-                    data: wizardData,
-                    success: function (data)
-                    {
-                        console.log('wizard posted');
-                        that.loadContentPanes(that.path);
-                    },
-                    error: function (jqXHR)
-                    {
-                        var details;
-
-                        if (jqXHR.status === 422)
-                        {
-                            try
-                            {
-                                details = JSON.parse(jqXHR.responseText);
-                                console.dir(details);
-                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
-                                {
-                                    that.contentPanel.showValidationErrors(details);
-                                    return;
-                                }
-                            }
-                            catch(e)
-                            {
-                                // Do nothing.
-                                console.dir(e);
-                            }
-                        }
-
-                        Zutubi.admin.reportError("Could not finish wizard: " + Zutubi.admin.ajaxError(jqXHR));
-                    }
-                });
+                that.loadContentPanes(that.path);
             });
 
-            that.contentPanel.bind("cancel", function()
+            that.contentPanel.bind("cancelled", function()
             {
                 that.loadContentPanes(that.path);
             });

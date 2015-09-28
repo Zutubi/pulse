@@ -7,8 +7,10 @@
         Widget = ui.Widget,
         PREVIOUS = "previous",
         NEXT = "next",
+        CANCEL = "cancel",
         FINISH = "finish",
-        CANCEL = "cancel";
+        FINISHED = "finished",
+        CANCELLED = "cancelled";
 
     Zutubi.admin.Wizard = Widget.extend({
         init: function(element, options)
@@ -21,7 +23,7 @@
         },
 
         events: [
-            FINISH
+            FINISHED
         ],
 
         options: {
@@ -238,7 +240,7 @@
 
             if (submit === CANCEL)
             {
-                this.trigger(CANCEL);
+                this.trigger(CANCELLED);
             }
             else
             {
@@ -268,12 +270,60 @@
             // FIXME kendo validate before stepping forward.
             if (this.currentStepIndex === this.steps.length - 1)
             {
-                this.trigger(FINISH);
+                this._finish();
             }
             else
             {
                 this._showStepAtIndex(this.currentStepIndex + 1);
             }
+        },
+
+        _finish: function()
+        {
+            var that = this,
+                wizardData = that.getValue();
+
+            jQuery.each(wizardData, function(property, data)
+            {
+                data.kind = "composite";
+                Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
+                data.type = { symbolicName: data.type.symbolicName };
+            });
+
+            Zutubi.admin.ajax({
+                type: "POST",
+                url: "/api/wizard/" + that.options.path,
+                data: wizardData,
+                success: function (data)
+                {
+                    console.log('wizard posted');
+                    that.trigger(FINISHED, {delta: data});
+                },
+                error: function (jqXHR)
+                {
+                    var details;
+
+                    if (jqXHR.status === 422)
+                    {
+                        try
+                        {
+                            details = JSON.parse(jqXHR.responseText);
+                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            {
+                                that.showValidationErrors(details);
+                                return;
+                            }
+                        }
+                        catch(e)
+                        {
+                            // Do nothing.
+                            console.dir(e);
+                        }
+                    }
+
+                    Zutubi.admin.reportError("Could not finish wizard: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
         }
     });
 
