@@ -122,7 +122,9 @@
 
         _addString: function()
         {
-            var input = this.inputElement.val();
+            var input = this.inputElement.val(),
+                value;
+            
             if (input.length > 0)
             {
                 value = this.getValue();

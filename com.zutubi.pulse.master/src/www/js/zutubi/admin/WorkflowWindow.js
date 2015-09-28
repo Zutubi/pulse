@@ -120,7 +120,6 @@
                 spriteCssClass: "fa fa-times-circle",
                 click: function()
                 {
-                    console.log("closing...");
                     that.close();
                 }
             });
