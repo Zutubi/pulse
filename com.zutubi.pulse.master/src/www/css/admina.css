@@ -276,3 +276,31 @@ table.cleanup-tasks th
 {
     font-weight: bold;
 }
+
+/* Context panel */
+
+.context-content
+{
+    padding: 0.4em 1em;
+}
+
+.config-links li, .config-actions li
+{
+    padding: 0.4em 0;
+}
+
+.config-links a, .config-actions a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+.config-links .fa, .config-actions .fa
+{
+    width: 20px;
+}
+
+.config-actions li:hover
+{
+    cursor: pointer;
+}

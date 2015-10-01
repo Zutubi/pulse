@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.zutubi.tove.links.ConfigurationLink;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ public class CompositeModel extends ConfigModel
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
     private List<ActionModel> actions;
+    private List<ActionModel> descendantActions;
+    private List<ConfigurationLink> links;
 
     public CompositeModel()
     {
@@ -70,4 +73,34 @@ public class CompositeModel extends ConfigModel
         actions.add(action);
     }
 
+    public List<ActionModel> getDescendantActions()
+    {
+        return descendantActions;
+    }
+
+    public void addDescendantAction(ActionModel action)
+    {
+        if (descendantActions == null)
+        {
+            descendantActions = new ArrayList<>();
+        }
+        descendantActions.add(action);
+    }
+
+    public List<ConfigurationLink> getLinks()
+    {
+        return links;
+    }
+
+    public void setLinks(List<ConfigurationLink> links)
+    {
+        if (links.size() > 0)
+        {
+            this.links = new ArrayList<>(links);
+        }
+        else
+        {
+            this.links = null;
+        }
+    }
 }

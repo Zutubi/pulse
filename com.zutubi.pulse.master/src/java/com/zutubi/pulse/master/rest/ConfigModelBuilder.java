@@ -20,6 +20,7 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
+import com.zutubi.tove.links.LinkManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -48,6 +49,7 @@ public class ConfigModelBuilder
     private ConfigurationTemplateManager configurationTemplateManager;
     private FormModelBuilder formModelBuilder;
     private TableModelBuilder tableModelBuilder;
+    private LinkManager linkManager;
     private ObjectFactory objectFactory;
     private SystemPaths systemPaths;
     private MasterConfigurationRegistry configurationRegistry;
@@ -201,6 +203,11 @@ public class ConfigModelBuilder
             addActions(model, path, type, instance);
         }
 
+        if (isFieldSelected(filters, "links"))
+        {
+            model.setLinks(linkManager.getLinks(instance));
+        }
+
         return model;
     }
 
@@ -334,8 +341,28 @@ public class ConfigModelBuilder
             {
                 for (String variant: variants)
                 {
-                    model.addAction(new ActionModel(actionName, variant, ToveUtils.getActionIconName(actionName, systemPaths.getContentRoot()), variant));
+                    model.addAction(new ActionModel(actionName, variant, variant));
                 }
+            }
+        }
+
+        List<String> descendantPaths = configurationTemplateManager.getDescendantPaths(path, true, true, false);
+        configurationSecurityManager.filterPaths("", descendantPaths, AccessManager.ACTION_VIEW);
+        if (descendantPaths.size() > 0)
+        {
+            Set<String> actionSet = new HashSet<String>();
+            for (String descendantPath: descendantPaths)
+            {
+                Configuration descendantInstance = configurationTemplateManager.getInstance(descendantPath);
+                if (descendantInstance != null)
+                {
+                    actionSet.addAll(actionManager.getActions(descendantInstance, false, false));
+                }
+            }
+
+            for (String actionName: actionSet)
+            {
+                model.addDescendantAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths)));
             }
         }
     }
@@ -479,6 +506,11 @@ public class ConfigModelBuilder
     public void setConfigurationRegistry(MasterConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
+    }
+
+    public void setLinkManager(LinkManager linkManager)
+    {
+        this.linkManager = linkManager;
     }
 
     private static class NodeIdComparator implements Comparator<TemplateNode>

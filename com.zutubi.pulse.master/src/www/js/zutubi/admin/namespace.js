@@ -137,6 +137,54 @@ if (window.Zutubi.admin === undefined)
         return {
             app: app,
 
+            ACTION_ICONS: {
+                "add": "plus-circle",
+                "addComment": "comment",
+                "changePassword": "key",
+                "clean": "eraser",
+                "clearResponsibility": "user-times",
+                "clone": "clone",
+                "convertToCustom": "code",
+                "convertToVersioned": "file-code-o",
+                "delete": "trash",
+                "disable": "toggle-off",
+                "enable": "toggle-on",
+                "fire": "bolt",
+                "hide": "trash-o",
+                "initialise": "refresh",
+                "kill": "exclamation-circle",
+                "pause": "pause",
+                "pin": "thumb-tack",
+                "ping": "bullseye",
+                "pullUp": "angle-double-up",
+                "pushDown": "angle-double-down",
+                "rebuild": "bolt",
+                "reload": "repeat",
+                "rename": "pencil",
+                "restore": "plus-square-o",
+                "resume": "play",
+                "setPassword": "key",
+                "takeResponsibility": "wrench",
+                "trigger": "bolt",
+                "unpin": "minus",
+                "view": "arrow-circle-right",
+                "write": "pencil-square-o"
+            },
+
+            LINK_ICONS: {
+                "dependencies": "sitemap",
+                "home": "home",
+                "homepage": "external-link",
+                "history": "clock-o",
+                "info": "info-circle",
+                "log": "file-text",
+                "messages": "files-o",
+                "reports": "bar-chart",
+                "rss": "rss",
+                "statistics": "pie-chart",
+                "status": "heartbeat"
+            },
+
             init: function()
             {
                 app.notificationWidget = _createNotificationWidget();

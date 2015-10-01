@@ -12,19 +12,17 @@ public class ActionModel
 {
     private String action;
     private String label;
-    private String icon;
     private String argument;
 
     public ActionModel(ActionLink actionLink)
     {
-        this(actionLink.getAction(), actionLink.getLabel(), actionLink.getIcon(), actionLink.getArgument());
+        this(actionLink.getAction(), actionLink.getLabel(), actionLink.getArgument());
     }
 
-    public ActionModel(String action, String label, String icon, String argument)
+    public ActionModel(String action, String label, String argument)
     {
         this.action = action;
         this.label = label;
-        this.icon = icon;
         this.argument = argument;
     }
 
@@ -36,11 +34,6 @@ public class ActionModel
     public String getLabel()
     {
         return label;
-    }
-
-    public String getIcon()
-    {
-        return icon;
     }
 
     public String getArgument()

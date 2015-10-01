@@ -55,7 +55,7 @@
 
             that.table.bind(ACTION, function(e)
             {
-                that.trigger(ACTION, e);
+                that.trigger(ACTION, {path: that.options.path + "/" + e.key, action: e.action});
             });
 
             that.table.bind("reorder", jQuery.proxy(that._reordered, that));
@@ -98,8 +98,6 @@
                 },
                 success: function (data)
                 {
-                    console.log('set order succcess');
-                    console.dir(data);
                     that.trigger(REORDERED, {delta: data});
                 },
                 error: function (jqXHR)

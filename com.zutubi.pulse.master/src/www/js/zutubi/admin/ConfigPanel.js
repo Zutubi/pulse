@@ -1,6 +1,7 @@
 // dependency: ./namespace.js
 // dependency: ./ajax.js
 // dependency: ./ConfigTree.js
+// dependency: ./ContextPanel.js
 // dependency: ./CollectionPanel.js
 // dependency: ./CompositePanel.js
 // dependency: ./DeleteWindow.js
@@ -29,7 +30,7 @@
                                                '</div>' +
                                            '</div>' +
                                            '<div id="right-pane">' +
-                                               '<div class="pane-content">' +
+                                               '<div id="right-pane-content" class="pane-content">' +
                                                '</div>' +
                                            '</div>' +
                                        '</div>', {wrap: false});
@@ -50,6 +51,9 @@
                 that.trigger(PATHSELECT, {path: e.path});
                 that.loadContentPanes(e.path);
             });
+
+            that.contextPanel = $("#right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
+            that.contextPanel.bind("action", jQuery.proxy(that._doAction, that));
         },
 
         events: [
@@ -125,6 +129,8 @@
             {
                 Zutubi.admin.reportError("Unrecognised config kind: " + data.kind);
             }
+
+            this.contextPanel.setData(this.path, this.data);
         },
 
         _clearContent: function()
@@ -145,9 +151,6 @@
         {
             var that = this;
 
-            console.log("composite");
-            console.dir(data);
-
             that.contentPanel = new Zutubi.admin.CompositePanel({
                 containerSelector: "#center-pane-content",
                 composite: data,
@@ -166,9 +169,6 @@
         {
             var that = this;
 
-            console.log("collection");
-            console.dir(data);
-
             that.contentPanel = new Zutubi.admin.CollectionPanel({
                 containerSelector: "#center-pane-content",
                 collection: data,
@@ -180,19 +180,7 @@
                 that._showWizard();
             });
 
-            that.contentPanel.bind("action", function(e)
-            {
-                var path = that.path + "/" + e.key;
-
-                if (e.action === "view")
-                {
-                    that._openPath(path);
-                }
-                else if (e.action === "delete")
-                {
-                    that._deleteConfig(path);
-                }
-            });
+            that.contentPanel.bind("action", jQuery.proxy(that._doAction, that));
 
             that.contentPanel.bind("reordered", function(e)
             {
@@ -235,9 +223,6 @@
                 url: "/api/wizard/" + that.path,
                 success: function (data)
                 {
-                    console.log('wizard');
-                    console.dir(data);
-
                     that._renderWizard(data);
                 },
                 error: function (jqXHR)
@@ -270,6 +255,19 @@
             {
                 that.loadContentPanes(that.path);
             });
+        },
+
+        _doAction: function(e)
+        {
+            console.dir(e);
+            if (e.action === "view")
+            {
+                this._openPath(e.path);
+            }
+            else if (e.action === "delete")
+            {
+                this._deleteConfig(e.path);
+            }
         },
 
         _deleteConfig: function(path)

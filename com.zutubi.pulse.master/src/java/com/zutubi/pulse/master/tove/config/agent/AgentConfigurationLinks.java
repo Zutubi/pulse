@@ -21,6 +21,8 @@ public class AgentConfigurationLinks
             String name = WebUtils.uriComponentEncode(agentConfiguration.getName());
             return Arrays.asList(
                     new ConfigurationLink("status", urls.agentStatus(name)),
+                    new ConfigurationLink("statistics", urls.agentStatistics(name)),
+                    new ConfigurationLink("history", urls.agentHistory(name)),
                     new ConfigurationLink("messages", urls.agentMessages(name)),
                     new ConfigurationLink("info", urls.agentInfo(name))
             );
