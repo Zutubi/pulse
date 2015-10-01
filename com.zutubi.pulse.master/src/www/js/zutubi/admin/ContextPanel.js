@@ -8,6 +8,11 @@
         CLICK = "click" + ns,
         ACTION = "action";
 
+    function _actionCompare(a1, a2)
+    {
+        return a1.label.localeCompare(a2.label);
+    }
+
     Zutubi.admin.ContextPanel = Widget.extend({
         init: function (options)
         {
@@ -74,6 +79,8 @@
 
             if (data.actions && (data.actions.length > 1 || data.actions[0].action !== "view"))
             {
+                data.actions.sort(_actionCompare);
+
                 element = $('<div class="context-content"></div>');
                 that._renderActions(element, data.actions, "action");
                 panels.push({
@@ -85,6 +92,8 @@
 
             if (data.descendantActions && data.descendantActions.length > 0)
             {
+                data.descendantActions.sort(_actionCompare);
+
                 element = $('<div class="context-content"></div>');
                 that._renderActions(element, data.descendantActions, "descendant");
                 panels.push({
