@@ -4,17 +4,30 @@
 
 (function($)
 {
-    var WorkflowWindow = Zutubi.admin.WorkflowWindow;
+    var WorkflowWindow = Zutubi.admin.WorkflowWindow,
+        DEFAULT_ACTIONS = ["clone", "pullUp", "pushDown"];
 
     Zutubi.admin.ActionWindow = WorkflowWindow.extend({
         init: function (options)
         {
-            var that = this;
+            var that = this,
+                actionPart;
 
             that.options = jQuery.extend({}, that.options, options);
 
+            if (DEFAULT_ACTIONS.indexOf(options.action.action) >= 0)
+            {
+                actionPart = options.action.action;
+            }
+            else
+            {
+                actionPart = "single/" + options.action.action;
+            }
+
+            that.url = "/api/action/" + actionPart + "/" + options.path;
+
             WorkflowWindow.fn.init.call(that, {
-                url: "/api/action/single/" + options.action.action + "/" + options.path,
+                url: that.url,
                 title: options.action.label,
                 continueLabel: options.action.label,
                 width: 600,
@@ -55,7 +68,7 @@
 
             Zutubi.admin.ajax({
                 type: "POST",
-                url: "/api/action/single/" + that.action.action + "/" + that.options.path,
+                url: that.url,
                 data: {
                     kind: "composite",
                     properties: properties

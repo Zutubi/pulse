@@ -6,6 +6,8 @@ import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -35,6 +37,22 @@ public class Utils
         {
             throw new NotFoundException("Path '" + configPath + "' does not exist or is not addressable via the API");
         }
+    }
+
+    static Record getComposite(String path, ConfigurationTemplateManager configurationTemplateManager)
+    {
+        Record record = configurationTemplateManager.getRecord(path);
+        if (record == null)
+        {
+            throw new NotFoundException("Path '" + path + "' does not exist");
+        }
+
+        if (!StringUtils.stringSet(record.getSymbolicName()))
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not address a composite");
+        }
+
+        return record;
     }
 
     static PostContext getPostContext(String configPath, ConfigurationTemplateManager configurationTemplateManager)

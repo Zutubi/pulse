@@ -23,6 +23,17 @@ public class FieldModel
 
     private Map<String, Object> parameters = new HashMap<>();
 
+    public FieldModel()
+    {
+    }
+
+    public FieldModel(String type, String name, String label)
+    {
+        this.type = type;
+        this.name = name;
+        this.label = label;
+    }
+
     public String getType()
     {
         return type;

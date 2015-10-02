@@ -12,8 +12,13 @@ import java.util.Map;
  */
 public class ValidationException extends RuntimeException
 {
-    private Configuration instance;
-    private String key;
+    private final Error error;
+
+    public ValidationException()
+    {
+        super("Validation failed");
+        this.error = new Error(this);
+    }
 
     public ValidationException(Configuration instance)
     {
@@ -23,13 +28,17 @@ public class ValidationException extends RuntimeException
     public ValidationException(Configuration instance, String key)
     {
         super("Validation failed");
-        this.instance = instance;
-        this.key = key;
+        this.error = new Error(this, instance, key);
+    }
+
+    public void addFieldError(String field, String message)
+    {
+        error.addFieldError(field, message);
     }
 
     public Error getError()
     {
-        return new Error(this, instance);
+        return error;
     }
 
     public static class Error extends ApiExceptionHandler.Error
@@ -38,12 +47,20 @@ public class ValidationException extends RuntimeException
         private final Map<String, List<String>> fieldErrors;
         private final String key;
 
-        public Error(ValidationException ex, Configuration instance)
+        public Error(ValidationException ex)
+        {
+            super(ex);
+            instanceErrors = new ArrayList<>();
+            fieldErrors = new HashMap<>();
+            key = null;
+        }
+
+        public Error(ValidationException ex, Configuration instance, String key)
         {
             super(ex);
             instanceErrors = new ArrayList<>(instance.getInstanceErrors());
             fieldErrors = new HashMap<>(instance.getFieldErrors());
-            key = ex.key;
+            this.key = key;
         }
 
         public List<String> getInstanceErrors()
@@ -59,6 +76,18 @@ public class ValidationException extends RuntimeException
         public String getKey()
         {
             return key;
+        }
+
+        public void addFieldError(String field, String message)
+        {
+            List<String> errors = fieldErrors.get(field);
+            if (errors == null)
+            {
+                errors = new ArrayList<>();
+                fieldErrors.put(field, errors);
+            }
+
+            errors.add(message);
         }
     }
 }

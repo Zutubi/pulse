@@ -13,6 +13,16 @@ public class OptionFieldModel extends FieldModel
     private String listText;
     private boolean lazy;
 
+    public OptionFieldModel()
+    {
+    }
+
+    public OptionFieldModel(String type, String name, String label, List list)
+    {
+        super(type, name, label);
+        this.list = list;
+    }
+
     /**
      * Indicates if the options for the field are provided lazily (i.e. only
      * when the user expands the field).

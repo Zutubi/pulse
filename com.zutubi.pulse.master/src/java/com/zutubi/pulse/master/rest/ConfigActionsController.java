@@ -4,6 +4,8 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
+import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
+import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
@@ -13,6 +15,7 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
 import com.zutubi.tove.annotations.Combobox;
+import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -56,6 +59,8 @@ public class ConfigActionsController
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
     private ConfigurationReferenceManager configurationReferenceManager;
+    @Autowired
+    private ConfigurationRefactoringManager configurationRefactoringManager;
     @Autowired
     private ConfigModelBuilder configModelBuilder;
     @Autowired
@@ -193,6 +198,61 @@ public class ConfigActionsController
             result = new CheckResultModel(e);
         }
 
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "pullUp/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getPullUp(HttpServletRequest request) throws Exception
+    {
+        String configPath = Utils.getConfigPath(request);
+        Utils.getComposite(configPath, configurationTemplateManager);
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
+        if (!configurationRefactoringManager.canPullUp(configPath))
+        {
+            throw new IllegalArgumentException("Cannot pull up path '" + configPath + "'");
+        }
+
+        ActionModel model = new ActionModel(ConfigurationRefactoringManager.ACTION_PULL_UP, "pull up", null, true);
+        FormModel form = new FormModel();
+        form.addField(new DropdownFieldModel("ancestorKey", "to ancestor", configurationRefactoringManager.getPullUpAncestors(configPath)));
+        model.setForm(form);
+
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "pullUp/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postPullUp(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
+    {
+        String configPath = Utils.getConfigPath(request);
+        Utils.getComposite(configPath, configurationTemplateManager);
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
+        if (!configurationRefactoringManager.canPullUp(configPath))
+        {
+            throw new IllegalArgumentException("Cannot pull up path '" + configPath + "'");
+        }
+
+        Object ancestorKey = body.getProperties().get("ancestorKey");
+        if (ancestorKey == null || !(ancestorKey instanceof String) || ((String) ancestorKey).length() == 0)
+        {
+            ValidationException exception = new ValidationException();
+            exception.addFieldError("ancestorKey", "ancestor is required");
+            throw exception;
+        }
+
+        String ancestor = (String) ancestorKey;
+        if (!configurationRefactoringManager.canPullUp(configPath, ancestor))
+        {
+            ValidationException exception = new ValidationException();
+            exception.addFieldError("ancestorKey", "cannot pull up to ancestor '" + ancestor + "'");
+            throw exception;
+        }
+
+        configurationRefactoringManager.pullUp(configPath, ancestor);
+
+        CompositeModel model = (CompositeModel) configModelBuilder.buildModel(null, configPath, -1);
+        ActionResultModel result = new ActionResultModel(new ActionResult(ActionResult.Status.SUCCESS, "pulled up"), model);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

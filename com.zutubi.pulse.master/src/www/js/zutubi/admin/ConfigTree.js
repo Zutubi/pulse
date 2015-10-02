@@ -300,6 +300,7 @@
             if (index >= 0)
             {
                 dataSource.remove(item);
+                // FIXME kendo it would be nicer to maintain all expansions, not just this one.
                 data.expanded = item.expanded;
                 dataSource.insert(index, data);
                 if (path === this.configPath)
