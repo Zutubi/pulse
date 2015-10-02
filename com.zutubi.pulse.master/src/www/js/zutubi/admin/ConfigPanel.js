@@ -292,22 +292,7 @@
             actionWindow = new Zutubi.admin.ActionWindow({
                 path: path,
                 action: action,
-                executed: function(data)
-                {
-                    if (data.success)
-                    {
-                        Zutubi.admin.reportSuccess(data.message);
-                    }
-                    else
-                    {
-                        Zutubi.admin.reportError(data.message);
-                    }
-
-                    if (data.delta)
-                    {
-                        that._applyDelta(data.delta)
-                    }
-                }
+                executed: jQuery.proxy(that._handleActionResult, that)
             });
 
             actionWindow.show();
@@ -320,7 +305,35 @@
 
         _executeAction: function(path, action)
         {
+            var that = this;
 
+            // FIXME kendo mask/feedback
+            Zutubi.admin.ajax({
+                type: "POST",
+                url: "/api/action/single/" + action.action + "/" + path,
+                success: jQuery.proxy(that._handleActionResult, that),
+                error: function (jqXHR)
+                {
+                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
+        },
+
+        _handleActionResult: function(data)
+        {
+            if (data.success)
+            {
+                Zutubi.admin.reportSuccess(data.message);
+            }
+            else
+            {
+                Zutubi.admin.reportError(data.message);
+            }
+
+            if (data.delta)
+            {
+                this._applyDelta(data.delta)
+            }
         },
 
         _deleteConfig: function(path)

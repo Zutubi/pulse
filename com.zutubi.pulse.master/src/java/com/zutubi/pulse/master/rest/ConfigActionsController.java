@@ -225,7 +225,7 @@ public class ConfigActionsController
     }
 
     @RequestMapping(value = "single/**", method = RequestMethod.POST)
-    public ResponseEntity<ActionResultModel> postSingle(HttpServletRequest request, @RequestBody ConfigModel body) throws Exception
+    public ResponseEntity<ActionResultModel> postSingle(HttpServletRequest request, @RequestBody(required = false) ConfigModel body) throws Exception
     {
         ActionContext context = createContext(request);
 
