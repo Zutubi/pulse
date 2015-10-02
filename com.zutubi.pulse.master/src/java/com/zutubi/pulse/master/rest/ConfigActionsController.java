@@ -1,18 +1,22 @@
 package com.zutubi.pulse.master.rest;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
-import com.zutubi.pulse.master.rest.model.CheckModel;
-import com.zutubi.pulse.master.rest.model.CheckResultModel;
-import com.zutubi.pulse.master.rest.model.CleanupTaskModel;
+import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
+import com.zutubi.tove.ConventionSupport;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.actions.ConfigurationAction;
+import com.zutubi.tove.actions.ConfigurationActions;
 import com.zutubi.tove.annotations.Combobox;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
@@ -54,6 +58,12 @@ public class ConfigActionsController
     private ConfigurationReferenceManager configurationReferenceManager;
     @Autowired
     private ConfigModelBuilder configModelBuilder;
+    @Autowired
+    private ActionManager actionManager;
+    @Autowired
+    private TypeRegistry typeRegistry;
+    @Autowired
+    private FormModelBuilder formModelBuilder;
     @Autowired
     private ObjectFactory objectFactory;
 
@@ -121,7 +131,6 @@ public class ConfigActionsController
         return annotation;
     }
 
-
     @RequestMapping(value = "check/**", method = RequestMethod.POST)
     public ResponseEntity<CheckResultModel> check(HttpServletRequest request,
                                       @RequestBody CheckModel check) throws TypeException
@@ -185,5 +194,122 @@ public class ConfigActionsController
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "single/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getSingle(HttpServletRequest request) throws Exception
+    {
+        ActionContext context = createContext(request);
+
+        // Common actions including delete are not supported here.  So we don't need any of the
+        // extra logic such as s/delete/hide which can complicate creating action models in
+        // general.
+        Messages messages = Messages.getInstance(context.type.getClazz());
+        String label = messages.format(context.actionName + ConventionSupport.I18N_KEY_SUFFIX_LABEL);
+        ActionModel model = new ActionModel(context.actionName, label, null, actionManager.hasArgument(context.actionName, context.type));
+
+        if (context.action.hasArgument())
+        {
+            CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
+            model.setForm(formModelBuilder.createForm(null, null, argumentType, true));
+
+            Configuration defaults = actionManager.prepare(context.actionName, context.instance);
+            if (defaults != null)
+            {
+                MutableRecord record = argumentType.unstantiate(defaults, null);
+                model.setFormDefaults(configModelBuilder.getProperties(null, argumentType, record));
+            }
+        }
+
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "single/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postSingle(HttpServletRequest request, @RequestBody ConfigModel body) throws Exception
+    {
+        ActionContext context = createContext(request);
+
+        Configuration argument = null;
+        if (context.action.hasArgument() && body != null)
+        {
+            if (body instanceof CompositeModel)
+            {
+                CompositeModel compositeBody = (CompositeModel) body;
+                CompositeType argumentType = typeRegistry.getType(context.action.getArgumentClass());
+                CompositeType bodyType;
+
+                if (compositeBody.getType() != null && compositeBody.getType().getSymbolicName() != null)
+                {
+                    bodyType = typeRegistry.getType(compositeBody.getType().getSymbolicName());
+                }
+                else
+                {
+                    bodyType = argumentType;
+                }
+
+                if (argumentType.isAssignableFrom(bodyType))
+                {
+                    MutableRecord record = Utils.convertProperties(bodyType, null, compositeBody.getProperties());
+
+                    argument = configurationTemplateManager.validate(null, null, record, true, false);
+                    if (!argument.isValid())
+                    {
+                        throw new ValidationException(argument);
+                    }
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Action argument has unexpected type '" + bodyType + "' (expected '" + argumentType + "')");
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException("Action argument must be a composite (got '" + body.getClass().getSimpleName() + "')");
+            }
+        }
+
+        ActionResult result = actionManager.execute(context.actionName, context.instance, argument);
+        return new ResponseEntity<>(new ActionResultModel(result, configModelBuilder), HttpStatus.OK);
+    }
+
+    private ActionContext createContext(HttpServletRequest request)
+    {
+        ActionContext context = new ActionContext();
+        String configPath = Utils.getConfigPath(request);
+        if (configPath.length() == 0)
+        {
+            throw new IllegalArgumentException("Action name is required");
+        }
+
+        String[] elements = PathUtils.getPathElements(configPath);
+        context.actionName = PathUtils.getPath(0, 1, elements);
+        context.path = PathUtils.getPath(1, elements);
+
+        configurationSecurityManager.ensurePermission(context.path, AccessManager.ACTION_VIEW);
+
+        context.instance = configurationTemplateManager.getInstance(context.path);
+        if (context.instance == null)
+        {
+            throw new NotFoundException("Path '" + context.path + "' does not refer to a concrete instance");
+        }
+
+        context.type = typeRegistry.getType(context.instance.getClass());
+        ConfigurationActions configurationActions = actionManager.getConfigurationActions(context.type);
+        context.action = configurationActions.getAction(context.actionName);
+        if (context.action == null)
+        {
+            throw new IllegalArgumentException("Action '" + context.actionName + "' not valid for instance at path '" + context.path + "'");
+        }
+
+        return context;
+    }
+
+    private static class ActionContext
+    {
+        String actionName;
+        String path;
+        Configuration instance;
+        CompositeType type;
+        ConfigurationAction action;
     }
 }

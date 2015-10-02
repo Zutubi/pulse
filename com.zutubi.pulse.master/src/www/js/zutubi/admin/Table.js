@@ -162,7 +162,7 @@
 
             if (actions.length > 0)
             {
-                this.trigger(ACTION, {key: item.key, action: actions[0].action});
+                this.trigger(ACTION, {key: item.key, action: actions[0]});
             }
         },
 

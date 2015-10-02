@@ -41,6 +41,11 @@
             width: 400
         },
 
+        mask: function(mask)
+        {
+            kendo.ui.progress(this.element, mask);
+        },
+
         show: function()
         {
             var that = this;
@@ -72,14 +77,14 @@
             that.window.center();
             that.window.open();
 
-            kendo.ui.progress(that.element, true);
+            that.mask(true);
 
             Zutubi.admin.ajax({
                 type: "GET",
-                url: that.options.url,
+                url: window.baseUrl + that.options.url,
                 success: function (data)
                 {
-                    kendo.ui.progress(that.element, false);
+                    that.mask(false);
                     that.options.render(data, that.element.find(".k-workflow-content"));
                     that._renderButtons();
                     that.window.center();

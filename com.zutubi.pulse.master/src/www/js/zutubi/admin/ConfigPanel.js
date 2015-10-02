@@ -1,5 +1,6 @@
 // dependency: ./namespace.js
 // dependency: ./ajax.js
+// dependency: ./ActionWindow.js
 // dependency: ./ConfigTree.js
 // dependency: ./ContextPanel.js
 // dependency: ./CollectionPanel.js
@@ -259,15 +260,67 @@
 
         _doAction: function(e)
         {
-            console.dir(e);
-            if (e.action === "view")
+            var action = e.action;
+
+            if (action.action === "view")
             {
                 this._openPath(e.path);
             }
-            else if (e.action === "delete")
+            else if (action.action === "delete")
             {
                 this._deleteConfig(e.path);
             }
+            else if (action.descendant)
+            {
+                this._executeDescendantAction(e.path, action);
+            }
+            else if (action.inputRequired)
+            {
+                this._doActionWithInput(e.path, e.action);
+            }
+            else
+            {
+                this._executeAction(e.path, e.action);
+            }
+        },
+
+        _doActionWithInput: function(path, action)
+        {
+            var that = this,
+                actionWindow;
+
+            actionWindow = new Zutubi.admin.ActionWindow({
+                path: path,
+                action: action,
+                executed: function(data)
+                {
+                    if (data.success)
+                    {
+                        Zutubi.admin.reportSuccess(data.message);
+                    }
+                    else
+                    {
+                        Zutubi.admin.reportError(data.message);
+                    }
+
+                    if (data.delta)
+                    {
+                        that._applyDelta(data.delta)
+                    }
+                }
+            });
+
+            actionWindow.show();
+        },
+
+        _executeDescendantAction: function(path, action)
+        {
+
+        },
+
+        _executeAction: function(path, action)
+        {
+
         },
 
         _deleteConfig: function(path)

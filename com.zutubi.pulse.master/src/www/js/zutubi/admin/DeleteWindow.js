@@ -13,7 +13,7 @@
             that.taskTemplate = kendo.template("<tr><td>#= indent # #: path #</td><td>#: summary #</td></tr>");
 
             WorkflowWindow.fn.init.call(that, {
-                url: window.baseUrl + "/api/action/delete/" + options.path,
+                url: "/api/action/delete/" + options.path,
                 title: "confirm delete",
                 continueLabel: "confirm delete",
                 width: 600,

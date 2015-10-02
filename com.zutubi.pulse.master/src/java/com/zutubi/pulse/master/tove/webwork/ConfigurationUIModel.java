@@ -9,6 +9,7 @@ import com.zutubi.pulse.master.tove.model.ActionLinkComparator;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.links.ConfigurationLink;
 import com.zutubi.tove.links.LinkManager;
@@ -291,10 +292,10 @@ public class ConfigurationUIModel
                 key[0] = PathUtils.getBaseName(path);
             }
 
-            actions = new ArrayList<ActionLink>(actionNames.size());
+            actions = new ArrayList<>(actionNames.size());
             for (String actionName: actionNames)
             {
-                List<String> variants = null;
+                List<ActionVariant> variants = null;
                 if (instance != null)
                 {
                     variants = actionManager.getVariants(actionName, instance);
@@ -306,9 +307,9 @@ public class ConfigurationUIModel
                 }
                 else
                 {
-                    for (String variant: variants)
+                    for (ActionVariant variant: variants)
                     {
-                        actions.add(new ActionLink(actionName, variant, ToveUtils.getActionIconName(actionName, systemPaths.getContentRoot()), variant));
+                        actions.add(new ActionLink(actionName, variant.getName(), ToveUtils.getActionIconName(actionName, systemPaths.getContentRoot()), variant.getName()));
                     }
                 }
             }

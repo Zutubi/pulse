@@ -29,7 +29,7 @@ if (window.Zutubi.admin === undefined)
                 pushState: true,
                 routeMissing: function(e)
                 {
-                    this.app.notificationWidget.error("Unknown admin path '" + e.url + "', redirecting.");
+                    app.notificationWidget.error("Unknown admin path '" + e.url + "', redirecting.");
                     router.navigate("/");
                 }
             });

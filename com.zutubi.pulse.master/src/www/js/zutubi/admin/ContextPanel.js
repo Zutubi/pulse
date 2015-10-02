@@ -181,8 +181,7 @@
 
                 this.trigger(ACTION, {
                     path: this.path,
-                    action: action.action,
-                    argument: action.argument,
+                    action: action,
                     descendant: descendant
                 });
             }

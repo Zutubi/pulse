@@ -181,7 +181,7 @@ public class ConfigController
                 // to the delta on the parent path.
                 if (configurationTemplateManager.pathExists(parentPath) && configurationTemplateManager.getType(parentPath) instanceof CompositeType)
                 {
-                    delta.addUpdatedPath(parentPath, createDeltaModel(parentPath));
+                    delta.addUpdatedPath(parentPath, configModelBuilder.buildModel(null, parentPath, -1));
                 }
                 break;
             }
@@ -190,7 +190,7 @@ public class ConfigController
                 String parentPath = PathUtils.getParentPath(task.getAffectedPath());
                 if (configurationTemplateManager.pathExists(parentPath))
                 {
-                    delta.addUpdatedPath(parentPath, createDeltaModel(parentPath));
+                    delta.addUpdatedPath(parentPath, configModelBuilder.buildModel(null, parentPath, -1));
                 }
                 break;
             }
@@ -202,15 +202,6 @@ public class ConfigController
         {
             collectCleanupDeltas(child, delta);
         }
-    }
-
-    private ConfigModel createDeltaModel(String configPath) throws TypeException
-    {
-        String parnetPath = PathUtils.getParentPath(configPath);
-        ComplexType type = configurationTemplateManager.getType(configPath);
-        ComplexType parentType = configurationTemplateManager.getType(parnetPath);
-        Record record = configurationTemplateManager.getRecord(configPath);
-        return configModelBuilder.buildModel(null, configPath, type, parentType, record, -1);
     }
 
     private String[] canonicaliseFilters(String[] filters)

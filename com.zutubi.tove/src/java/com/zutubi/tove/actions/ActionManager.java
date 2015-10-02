@@ -5,6 +5,7 @@ import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
@@ -27,17 +28,24 @@ public class ActionManager
     private static final Logger LOG = Logger.getLogger(ActionManager.class);
 
     public static final String I18N_KEY_SUFFIX_FEEDACK = ".feedback";
-    public static final Set<String> COMMON_ACTIONS = new HashSet<String>();
+
+    // Simple actions require no argument
+    private static final Set<String> SIMPLE_COMMON_ACTIONS = new HashSet<>();
     static
     {
-        COMMON_ACTIONS.add(AccessManager.ACTION_VIEW);
-        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_CLONE);
-        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
-        COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
-        COMMON_ACTIONS.add(AccessManager.ACTION_DELETE);
+        SIMPLE_COMMON_ACTIONS.add(AccessManager.ACTION_VIEW);
+        SIMPLE_COMMON_ACTIONS.add(AccessManager.ACTION_DELETE);
+    }
+    // Complex actions need an input argument.
+    private static final Set<String> COMPLEX_COMMON_ACTIONS = new HashSet<>();
+    static
+    {
+        COMPLEX_COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_CLONE);
+        COMPLEX_COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PULL_UP);
+        COMPLEX_COMMON_ACTIONS.add(ConfigurationRefactoringManager.ACTION_PUSH_DOWN);
     }
 
-    private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<CompositeType, ConfigurationActions>();
+    private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<>();
     private ObjectFactory objectFactory;
     private TypeRegistry typeRegistry;
     private ConfigurationSecurityManager configurationSecurityManager;
@@ -46,7 +54,7 @@ public class ActionManager
 
     public List<String> getActions(Configuration configurationInstance, boolean includeDefault, boolean includeNonSimple)
     {
-        List<String> result = new LinkedList<String>();
+        List<String> result = new ArrayList<>();
 
         if (configurationInstance != null)
         {
@@ -129,20 +137,32 @@ public class ActionManager
         }
     }
 
-    public List<String> getVariants(final String actionName, final Configuration configurationInstance)
+    public List<ActionVariant> getVariants(final String actionName, final Configuration configurationInstance)
     {
-        if (COMMON_ACTIONS.contains(actionName))
+        if (SIMPLE_COMMON_ACTIONS.contains(actionName) || COMPLEX_COMMON_ACTIONS.contains(actionName))
         {
             return null;
         }
 
-        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions,List<String>,Exception>()
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, List<ActionVariant>, Exception>()
         {
-            public List<String> process(ConfigurationActions actions) throws Exception
+            public List<ActionVariant> process(ConfigurationActions actions) throws Exception
             {
                 return actions.getVariants(actionName, configurationInstance);
             }
         });
+    }
+
+    public boolean hasArgument(final String actionName, final CompositeType type)
+    {
+        if (COMPLEX_COMMON_ACTIONS.contains(actionName))
+        {
+            return true;
+        }
+
+        ConfigurationActions configurationActions = getConfigurationActions(type);
+        ConfigurationAction configurationAction = configurationActions.getAction(actionName);
+        return configurationAction != null && configurationAction.hasArgument();
     }
 
     public Configuration prepare(final String actionName, final Configuration configurationInstance)

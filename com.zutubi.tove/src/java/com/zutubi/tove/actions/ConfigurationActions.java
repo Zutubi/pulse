@@ -5,6 +5,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.bean.ObjectFactory;
@@ -12,8 +13,8 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -230,7 +231,7 @@ public class ConfigurationActions
         List<ConfigurationAction> actions;
         if (actionListingMethod == null)
         {
-            actions = new LinkedList<ConfigurationAction>(availableActions.values());
+            actions = new ArrayList<>(availableActions.values());
         }
         else
         {
@@ -246,7 +247,7 @@ public class ConfigurationActions
                 actionNames = (List<String>) actionListingMethod.invoke(actionHandler, configurationInstance);
             }
 
-            actions = new LinkedList<ConfigurationAction>();
+            actions = new ArrayList<>();
             for(String actionName: actionNames)
             {
                 ConfigurationAction action = availableActions.get(actionName);
@@ -265,21 +266,21 @@ public class ConfigurationActions
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getVariants(String name, Configuration configurationInstance) throws Exception
+    public List<ActionVariant> getVariants(String name, Configuration configurationInstance) throws Exception
     {
         ConfigurationAction action = verifyAction(name, configurationInstance);
         Method variantsMethod = action.getVariantsMethod();
-        List<String> result = null;
+        List<ActionVariant> result = null;
         if (variantsMethod != null)
         {
             Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
             if (variantsMethod.getParameterTypes().length == 0)
             {
-                result = (List<String>) variantsMethod.invoke(handlerInstance);
+                result = (List<ActionVariant>) variantsMethod.invoke(handlerInstance);
             }
             else
             {
-                result = (List<String>) variantsMethod.invoke(handlerInstance, configurationInstance);
+                result = (List<ActionVariant>) variantsMethod.invoke(handlerInstance, configurationInstance);
             }
         }
 

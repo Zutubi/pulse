@@ -18,6 +18,7 @@ import com.zutubi.tove.annotations.Password;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 import com.zutubi.tove.links.LinkManager;
@@ -53,6 +54,15 @@ public class ConfigModelBuilder
     private ObjectFactory objectFactory;
     private SystemPaths systemPaths;
     private MasterConfigurationRegistry configurationRegistry;
+
+    public ConfigModel buildModel(String[] filters, String path, int depth) throws TypeException
+    {
+        String parentPath = PathUtils.getParentPath(path);
+        ComplexType type = configurationTemplateManager.getType(path);
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        Record record = configurationTemplateManager.getRecord(path);
+        return buildModel(filters, path, type, parentType, record, depth);
+    }
 
     public ConfigModel buildModel(String[] filters, String path, ComplexType type, ComplexType parentType, Record record, int depth) throws TypeException
     {
@@ -185,7 +195,7 @@ public class ConfigModelBuilder
         Configuration instance = configurationTemplateManager.getInstance(path);
         if (isFieldSelected(filters, "properties"))
         {
-            model.setProperties(getProperties(path, type, record));
+            model.setProperties(getProperties(configurationTemplateManager.getTemplateOwnerPath(path), type, record));
         }
 
         if (isFieldSelected(filters, "formattedProperties"))
@@ -236,10 +246,8 @@ public class ConfigModelBuilder
         return typeModel;
     }
 
-    private Map<String, Object> getProperties(String path, CompositeType type, Record record) throws TypeException
+    public Map<String, Object> getProperties(String templateOwnerPath, CompositeType type, Record record) throws TypeException
     {
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(path);
-
         // FIXME kendo generalise toXmlRpc if necessary?
         Map<String, Object> result = new HashMap<>();
         for (TypeProperty property: type.getProperties(SimpleType.class))
@@ -327,7 +335,7 @@ public class ConfigModelBuilder
 
         for (String actionName: actionNames)
         {
-            List<String> variants = null;
+            List<ActionVariant> variants = null;
             if (instance != null)
             {
                 variants = actionManager.getVariants(actionName, instance);
@@ -335,13 +343,13 @@ public class ConfigModelBuilder
 
             if (variants == null)
             {
-                model.addAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths)));
+                model.addAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths), actionManager.hasArgument(actionName, type)));
             }
             else
             {
-                for (String variant: variants)
+                for (ActionVariant variant: variants)
                 {
-                    model.addAction(new ActionModel(actionName, variant, variant));
+                    model.addAction(new ActionModel(actionName, variant.getName(), variant.getName(), variant.hasArgument()));
                 }
             }
         }
@@ -350,7 +358,7 @@ public class ConfigModelBuilder
         configurationSecurityManager.filterPaths("", descendantPaths, AccessManager.ACTION_VIEW);
         if (descendantPaths.size() > 0)
         {
-            Set<String> actionSet = new HashSet<String>();
+            Set<String> actionSet = new HashSet<>();
             for (String descendantPath: descendantPaths)
             {
                 Configuration descendantInstance = configurationTemplateManager.getInstance(descendantPath);
@@ -362,7 +370,7 @@ public class ConfigModelBuilder
 
             for (String actionName: actionSet)
             {
-                model.addDescendantAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths)));
+                model.addDescendantAction(new ActionModel(ToveUtils.getActionLink(actionName, parentRecord, key, messages, systemPaths), false));
             }
         }
     }

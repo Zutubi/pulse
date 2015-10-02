@@ -19,6 +19,7 @@ import com.zutubi.tove.annotations.Permission;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.api.ActionResult;
+import com.zutubi.tove.config.api.ActionVariant;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
@@ -155,14 +156,14 @@ public class ProjectConfigurationActions
         projectManager.triggerBuild(projectConfig, options, null);
     }
 
-    public List<String> variantsOfTrigger(ProjectConfiguration projectConfiguration)
+    public List<ActionVariant> variantsOfTrigger(ProjectConfiguration projectConfiguration)
     {
         List<ManualTriggerConfiguration> triggers = TriggerUtils.getTriggers(projectConfiguration, ManualTriggerConfiguration.class);
-        return Lists.transform(triggers, new Function<ManualTriggerConfiguration, String>()
+        return Lists.transform(triggers, new Function<ManualTriggerConfiguration, ActionVariant>()
         {
-            public String apply(ManualTriggerConfiguration input)
+            public ActionVariant apply(ManualTriggerConfiguration input)
             {
-                return input.getName();
+                return new ActionVariant(input.getName(), input.isPrompt());
             }
         });
     }

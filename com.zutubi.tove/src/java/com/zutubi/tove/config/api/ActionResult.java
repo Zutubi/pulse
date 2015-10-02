@@ -70,7 +70,7 @@ public class ActionResult
     {
         this.status = status;
         this.message = message;
-        this.invalidatedPaths = new LinkedList<String>(invalidatedPaths);
+        this.invalidatedPaths = new LinkedList<>(invalidatedPaths);
     }
 
     /**
