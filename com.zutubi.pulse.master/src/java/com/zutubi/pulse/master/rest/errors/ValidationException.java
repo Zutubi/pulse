@@ -73,11 +73,6 @@ public class ValidationException extends RuntimeException
             return fieldErrors;
         }
 
-        public String getKey()
-        {
-            return key;
-        }
-
         public void addFieldError(String field, String message)
         {
             List<String> errors = fieldErrors.get(field);
@@ -88,6 +83,11 @@ public class ValidationException extends RuntimeException
             }
 
             errors.add(message);
+        }
+
+        public String getKey()
+        {
+            return key;
         }
     }
 }

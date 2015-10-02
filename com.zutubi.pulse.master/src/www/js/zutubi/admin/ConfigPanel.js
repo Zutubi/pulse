@@ -330,19 +330,24 @@
                 Zutubi.admin.reportError(data.message);
             }
 
-            if (data.model)
+            this.configTree.updatePath(path, data.model);
+
+            if (path === this.path)
             {
-                if (path === this.path)
+                if (data.model)
                 {
                     this._showContent(data.model);
                 }
-                else if (Zutubi.admin.parentPath(path) === this.path)
+                else
                 {
-                    // We are showing this item in a collection.
-                    this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
+                    // The model was removed as part of the action.
+                    this._openPath(this.configTree.longestMatchingSubpath(path));
                 }
-
-                this.configTree.updatePath(path, data.model);
+            }
+            else if (Zutubi.admin.parentPath(path) === this.path)
+            {
+                // We are showing this item in a collection.
+                this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
             }
         },
 

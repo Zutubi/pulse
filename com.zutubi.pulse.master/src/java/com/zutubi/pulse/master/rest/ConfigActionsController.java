@@ -1,11 +1,12 @@
 package com.zutubi.pulse.master.rest;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.rest.actions.ActionHandler;
+import com.zutubi.pulse.master.rest.actions.PullUpHandler;
+import com.zutubi.pulse.master.rest.actions.PushDownHandler;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
-import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
-import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.handler.OptionProvider;
 import com.zutubi.pulse.master.tove.handler.OptionProviderFactory;
@@ -204,56 +205,56 @@ public class ConfigActionsController
     @RequestMapping(value = "pullUp/**", method = RequestMethod.GET)
     public ResponseEntity<ActionModel> getPullUp(HttpServletRequest request) throws Exception
     {
-        String configPath = Utils.getConfigPath(request);
-        Utils.getComposite(configPath, configurationTemplateManager);
-
-        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
-        if (!configurationRefactoringManager.canPullUp(configPath))
-        {
-            throw new IllegalArgumentException("Cannot pull up path '" + configPath + "'");
-        }
-
-        ActionModel model = new ActionModel(ConfigurationRefactoringManager.ACTION_PULL_UP, "pull up", null, true);
-        FormModel form = new FormModel();
-        form.addField(new DropdownFieldModel("ancestorKey", "to ancestor", configurationRefactoringManager.getPullUpAncestors(configPath)));
-        model.setForm(form);
-
-        return new ResponseEntity<>(model, HttpStatus.OK);
+        return getWithHandler(request, PullUpHandler.class);
     }
 
     @RequestMapping(value = "pullUp/**", method = RequestMethod.POST)
     public ResponseEntity<ActionResultModel> postPullUp(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
     {
+        return postWithHandler(request, body, PullUpHandler.class);
+    }
+
+    @RequestMapping(value = "pushDown/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getPushDown(HttpServletRequest request) throws Exception
+    {
+        return getWithHandler(request, PushDownHandler.class);
+    }
+
+    @RequestMapping(value = "pushDown/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postPushDown(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
+    {
+        return postWithHandler(request, body, PushDownHandler.class);
+    }
+
+    private ResponseEntity<ActionModel> getWithHandler(HttpServletRequest request, Class<? extends ActionHandler> handlerClass)
+    {
+        String configPath = Utils.getConfigPath(request);
+        // This is a validation step to check a composite record exists.
+        Utils.getComposite(configPath, configurationTemplateManager);
+
+        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
+
+        ActionHandler handler = objectFactory.buildBean(handlerClass);
+        return new ResponseEntity<>(handler.getModel(configPath), HttpStatus.OK);
+    }
+
+    private ResponseEntity<ActionResultModel> postWithHandler(HttpServletRequest request, @RequestBody CompositeModel body, Class<? extends ActionHandler> handlerClass) throws TypeException
+    {
         String configPath = Utils.getConfigPath(request);
         Utils.getComposite(configPath, configurationTemplateManager);
 
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_WRITE);
-        if (!configurationRefactoringManager.canPullUp(configPath))
+
+        ActionHandler handler = objectFactory.buildBean(handlerClass);
+        ActionResult actionResult = handler.doAction(configPath, body.getProperties());
+
+        CompositeModel model = null;
+        if (configurationTemplateManager.pathExists(configPath))
         {
-            throw new IllegalArgumentException("Cannot pull up path '" + configPath + "'");
+            model = (CompositeModel) configModelBuilder.buildModel(null, configPath, -1);
         }
 
-        Object ancestorKey = body.getProperties().get("ancestorKey");
-        if (ancestorKey == null || !(ancestorKey instanceof String) || ((String) ancestorKey).length() == 0)
-        {
-            ValidationException exception = new ValidationException();
-            exception.addFieldError("ancestorKey", "ancestor is required");
-            throw exception;
-        }
-
-        String ancestor = (String) ancestorKey;
-        if (!configurationRefactoringManager.canPullUp(configPath, ancestor))
-        {
-            ValidationException exception = new ValidationException();
-            exception.addFieldError("ancestorKey", "cannot pull up to ancestor '" + ancestor + "'");
-            throw exception;
-        }
-
-        configurationRefactoringManager.pullUp(configPath, ancestor);
-
-        CompositeModel model = (CompositeModel) configModelBuilder.buildModel(null, configPath, -1);
-        ActionResultModel result = new ActionResultModel(new ActionResult(ActionResult.Status.SUCCESS, "pulled up"), model);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(actionResult, model), HttpStatus.OK);
     }
 
     @RequestMapping(value = "single/**", method = RequestMethod.GET)

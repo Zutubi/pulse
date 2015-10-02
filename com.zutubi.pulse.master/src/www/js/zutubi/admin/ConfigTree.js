@@ -277,7 +277,14 @@
 
             if (item)
             {
-                this.updateItem(path, item, data);
+                if (data)
+                {
+                    this.updateItem(path, item, data);
+                }
+                else
+                {
+                    this.dataSource.remove(item);
+                }
             }
         },
 

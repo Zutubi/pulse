@@ -204,7 +204,10 @@
             {
                 index = dataSource.indexOf(existingItem);
                 dataSource.remove(existingItem);
-                dataSource.insert(index, this._formatItem(data));
+                if (data)
+                {
+                    dataSource.insert(index, this._formatItem(data));
+                }
                 this._addActionMenus();
             }
         }
