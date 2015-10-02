@@ -73,6 +73,11 @@
             this.view.destroy();
         },
 
+        updateItem: function(key, data)
+        {
+            this.table.updateItem(key, data);
+        },
+
         _addClicked: function(e)
         {
             e.preventDefault();

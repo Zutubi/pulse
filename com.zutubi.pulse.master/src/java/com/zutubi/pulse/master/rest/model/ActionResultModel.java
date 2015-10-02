@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.rest.model;
 
-import com.zutubi.pulse.master.rest.ConfigModelBuilder;
 import com.zutubi.tove.config.api.ActionResult;
 import com.zutubi.tove.type.TypeException;
 
@@ -11,20 +10,13 @@ public class ActionResultModel
 {
     private boolean success;
     private String message;
-    private ConfigDeltaModel delta;
+    private CompositeModel model;
 
-    public ActionResultModel(ActionResult result, ConfigModelBuilder builder) throws TypeException
+    public ActionResultModel(ActionResult result, CompositeModel model) throws TypeException
     {
         success = result.getStatus() == ActionResult.Status.SUCCESS;
         message = result.getMessage();
-        if (result.getInvalidatedPaths().size() > 0)
-        {
-            delta = new ConfigDeltaModel();
-            for (String path: result.getInvalidatedPaths())
-            {
-                delta.addUpdatedPath(path, builder.buildModel(null, path, -1));
-            }
-        }
+        this.model = model;
     }
 
     public boolean isSuccess()
@@ -37,8 +29,8 @@ public class ActionResultModel
         return message;
     }
 
-    public ConfigDeltaModel getDelta()
+    public CompositeModel getModel()
     {
-        return delta;
+        return model;
     }
 }

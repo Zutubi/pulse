@@ -268,13 +268,53 @@
             parentDataItem.children.insert(index, model);
         },
 
+        updatePath: function(path, data)
+        {
+            var item;
+
+            path = this._absoluteToConfigPath(path);
+            item = this._dataItemForConfigPath(path);
+
+            if (item)
+            {
+                this.updateItem(path, item, data);
+            }
+        },
+
+        updateItem: function(path, item, data)
+        {
+            var parentItem = item.parentNode(),
+                dataSource,
+                index;
+
+            if (parentItem)
+            {
+                dataSource = parentItem.children;
+            }
+            else
+            {
+                dataSource = this.dataSource;
+            }
+
+            index = dataSource.indexOf(item);
+            if (index >= 0)
+            {
+                dataSource.remove(item);
+                data.expanded = item.expanded;
+                dataSource.insert(index, data);
+                if (path === this.configPath)
+                {
+                    this.selectConfig(path);
+                }
+            }
+        },
+
         applyDelta: function(delta)
         {
             var that = this,
                 i,
                 model,
                 item,
-                parentItem,
                 path,
                 index = -1;
 
@@ -343,15 +383,7 @@
                     if (item && item.children && item.children.data().length > 0)
                     {
                         // Update to a node, e.g. collection reorder. Refresh.
-                        parentItem = item.parentNode();
-                        index = parentItem.children.indexOf(item);
-                        that.dataSource.remove(item);
-                        model.expanded = item.expanded;
-                        parentItem.children.insert(index, model);
-                        if (path === that.configPath)
-                        {
-                            that.selectConfig(path);
-                        }
+                        that.updateItem(path, item, model);
                     }
                 }
             }

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.commands.api;
 
 import com.zutubi.tove.config.ConfigurationProvider;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,11 +19,11 @@ public class CommandConfigurationActions
     {
         if (instance.isEnabled())
         {
-            return Arrays.asList(ACTION_DISABLE);
+            return Collections.singletonList(ACTION_DISABLE);
         }
         else
         {
-            return Arrays.asList(ACTION_ENABLE);
+            return Collections.singletonList(ACTION_ENABLE);
         }
     }
 

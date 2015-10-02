@@ -292,7 +292,7 @@
             actionWindow = new Zutubi.admin.ActionWindow({
                 path: path,
                 action: action,
-                executed: jQuery.proxy(that._handleActionResult, that)
+                executed: jQuery.proxy(that._handleActionResult, that, path)
             });
 
             actionWindow.show();
@@ -311,7 +311,7 @@
             Zutubi.admin.ajax({
                 type: "POST",
                 url: "/api/action/single/" + action.action + "/" + path,
-                success: jQuery.proxy(that._handleActionResult, that),
+                success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {
                     Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
@@ -319,7 +319,7 @@
             });
         },
 
-        _handleActionResult: function(data)
+        _handleActionResult: function(path, data)
         {
             if (data.success)
             {
@@ -330,9 +330,19 @@
                 Zutubi.admin.reportError(data.message);
             }
 
-            if (data.delta)
+            if (data.model)
             {
-                this._applyDelta(data.delta)
+                if (path === this.path)
+                {
+                    this._showContent(data.model);
+                }
+                else if (Zutubi.admin.parentPath(path) === this.path)
+                {
+                    // We are showing this item in a collection.
+                    this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
+                }
+
+                this.configTree.updatePath(path, data.model);
             }
         },
 

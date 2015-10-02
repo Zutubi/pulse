@@ -36,7 +36,12 @@
             that.element.html(that.template({id: TABLE_ID}));
 
             that.grid = $("#" + TABLE_ID).kendoGrid({
-                dataSource: data,
+                dataSource: new kendo.data.DataSource({
+                    data: data,
+                    schema: {
+                        model: { id: "key" }
+                    }
+                }),
                 columns: columns,
                 scrollable: false
             }).data("kendoGrid");
@@ -92,28 +97,33 @@
 
         _formatData: function()
         {
-            var columns = this.options.structure.columns,
-                items = this.options.items,
+            var items = this.options.items,
                 data = [],
-                item,
-                column,
-                row,
-                i, j;
+                i;
 
             for (i = 0; i < items.length; i++)
             {
-                item = items[i];
-                row = {key: item.key, actions: item.actions};
-                for (j = 0; j < columns.length; j++)
-                {
-                    column = columns[j];
-                    row[column.name] = this._getValue(item, column.name);
-                }
-
-                data.push(row);
+                data.push(this._formatItem(items[i]));
             }
 
             return data;
+        },
+
+        _formatItem: function(item)
+        {
+            var columns = this.options.structure.columns,
+                i,
+                row,
+                column;
+
+            row = {key: item.key, actions: item.actions};
+            for (i = 0; i < columns.length; i++)
+            {
+                column = columns[i];
+                row[column.name] = this._getValue(item, column.name);
+            }
+
+            return row;
         },
 
         _addActionMenus: function()
@@ -182,6 +192,21 @@
             {
                 return item.key;
             });
+        },
+
+        updateItem: function(key, data)
+        {
+            var dataSource = this.grid.dataSource,
+                existingItem = dataSource.get(key),
+                index;
+
+            if (existingItem)
+            {
+                index = dataSource.indexOf(existingItem);
+                dataSource.remove(existingItem);
+                dataSource.insert(index, this._formatItem(data));
+                this._addActionMenus();
+            }
         }
     });
 

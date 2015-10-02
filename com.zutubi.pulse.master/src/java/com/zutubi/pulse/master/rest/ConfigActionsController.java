@@ -269,7 +269,7 @@ public class ConfigActionsController
         }
 
         ActionResult result = actionManager.execute(context.actionName, context.instance, argument);
-        return new ResponseEntity<>(new ActionResultModel(result, configModelBuilder), HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(result, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
     private ActionContext createContext(HttpServletRequest request)

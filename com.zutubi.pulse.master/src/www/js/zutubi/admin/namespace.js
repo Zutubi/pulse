@@ -221,6 +221,17 @@ if (window.Zutubi.admin === undefined)
                 return null;
             },
 
+            baseName: function(path)
+            {
+                var i = path.lastIndexOf("/");
+                if (i >= 0)
+                {
+                    return path.substring(i + 1);
+                }
+
+                return path;
+            },
+
             reportSuccess: function(message)
             {
                 app.notificationWidget.success(message);
