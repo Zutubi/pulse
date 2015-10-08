@@ -31,9 +31,19 @@ public class ValidationException extends RuntimeException
         this.error = new Error(this, instance, key);
     }
 
+    public boolean hasErrors()
+    {
+        return error.hasErrors();
+    }
+
     public void addFieldError(String field, String message)
     {
         error.addFieldError(field, message);
+    }
+
+    public void addInstanceError(String message)
+    {
+        error.addInstanceError(message);
     }
 
     public Error getError()
@@ -68,6 +78,11 @@ public class ValidationException extends RuntimeException
             return instanceErrors;
         }
 
+        public void addInstanceError(String message)
+        {
+            instanceErrors.add(message);
+        }
+
         public Map<String, List<String>> getFieldErrors()
         {
             return fieldErrors;
@@ -88,6 +103,24 @@ public class ValidationException extends RuntimeException
         public String getKey()
         {
             return key;
+        }
+
+        public boolean hasErrors()
+        {
+            if (instanceErrors.size() > 0)
+            {
+                return true;
+            }
+
+            for (List<String> errors: fieldErrors.values())
+            {
+                if (errors.size() > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

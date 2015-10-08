@@ -66,6 +66,11 @@
             {
                 this.inputElement.addClass("k-state-disabled");
             }
+        },
+
+        isEnabled: function()
+        {
+            return !this.inputElement.prop("disabled");
         }
     });
 

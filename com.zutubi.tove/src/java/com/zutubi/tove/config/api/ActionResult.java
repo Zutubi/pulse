@@ -41,6 +41,9 @@ public class ActionResult
     /**
      * A list of paths that this action execution has invalidated.  The UI will
      * refresh displays of these paths.
+     *
+     * FIXME kendo I've overloaded this in the RESTish API action handlers, so if a path is added
+     * it is taken to be a new path added by the action processing, dodgy?
      */
     private List<String> invalidatedPaths;
 

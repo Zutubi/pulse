@@ -14,6 +14,7 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
+        CREATED = "created",
         SUBMIT = "submit",
         DEFAULT_SUBMITS = ["apply", "reset"],
         FIELD_TYPES = {
@@ -40,6 +41,7 @@
         },
 
         events: [
+            CREATED,
             SUBMIT
         ],
 
@@ -93,6 +95,8 @@
             {
                 this.bindValues(this.options.values);
             }
+
+            this.trigger(CREATED);
         },
 
         destroy: function()
@@ -107,9 +111,11 @@
 
         _appendField: function(fieldOptions)
         {
-            var fieldElement, fieldType;
+            var rowElement, fieldElement, fieldType;
 
-            fieldOptions.id = this.id + "-" + fieldOptions.name;
+            // HTML5 ids can contain most anything, but not spaces.  Our names can't include
+            // slashes, so use them as a safe substitute.
+            fieldOptions.id = this.id + "-" + fieldOptions.name.replace(/ /g, '/');
 
             if (fieldOptions.type === "hidden")
             {
@@ -117,8 +123,8 @@
             }
             else
             {
-                this.tableBodyElement.append(this.fieldTemplate(fieldOptions));
-                fieldElement = this.tableBodyElement.find("#" + fieldOptions.id + "-wrap");
+                rowElement = $(this.fieldTemplate(fieldOptions));
+                fieldElement = rowElement.appendTo(this.tableBodyElement).find("span");
 
                 fieldType = FIELD_TYPES[fieldOptions.type];
                 if (fieldType)

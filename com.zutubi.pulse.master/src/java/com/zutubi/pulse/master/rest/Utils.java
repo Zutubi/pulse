@@ -39,17 +39,34 @@ public class Utils
         }
     }
 
-    static Record getComposite(String path, ConfigurationTemplateManager configurationTemplateManager)
+    static Record getRecord(String path, ConfigurationTemplateManager configurationTemplateManager)
     {
         Record record = configurationTemplateManager.getRecord(path);
         if (record == null)
         {
             throw new NotFoundException("Path '" + path + "' does not exist");
         }
+        return record;
+    }
 
+    static Record getComposite(String path, ConfigurationTemplateManager configurationTemplateManager)
+    {
+        Record record = getRecord(path, configurationTemplateManager);
         if (!StringUtils.stringSet(record.getSymbolicName()))
         {
             throw new IllegalArgumentException("Path '" + path + "' does not address a composite");
+        }
+
+        return record;
+    }
+
+    static Record getMap(String path, ConfigurationTemplateManager configurationTemplateManager)
+    {
+        Record record = getRecord(path, configurationTemplateManager);
+
+        if (!(configurationTemplateManager.getType(path) instanceof MapType))
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not address a map");
         }
 
         return record;

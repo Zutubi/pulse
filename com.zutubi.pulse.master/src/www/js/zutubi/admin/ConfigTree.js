@@ -286,6 +286,15 @@
                     this.dataSource.remove(item);
                 }
             }
+            else if (data)
+            {
+                path = Zutubi.admin.parentPath(path);
+                item = this._dataItemForConfigPath(path);
+                if (item)
+                {
+                    this._addModel(data, item);
+                }
+            }
         },
 
         updateItem: function(path, item, data)

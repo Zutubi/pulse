@@ -5,7 +5,10 @@
 (function($)
 {
     var WorkflowWindow = Zutubi.admin.WorkflowWindow,
-        DEFAULT_ACTIONS = ["clone", "pullUp", "pushDown"];
+        CLONE = "clone",
+        CLONE_KEY = "cloneKey",
+        CLONE_KEY_PREFIX = "cloneKey_",
+        DEFAULT_ACTIONS = [CLONE, "pullUp", "pushDown"];
 
     Zutubi.admin.ActionWindow = WorkflowWindow.extend({
         init: function (options)
@@ -53,16 +56,82 @@
             el.append(wrapper);
         },
 
+        _translateProperties: function()
+        {
+            var properties,
+                fields,
+                field,
+                name,
+                i;
+
+            // Some actions need to transform from the form to a more direct representation.
+            // FIXME kendo this is perhaps where we also need to coerce? Could generic actions
+            // have a type to allow this?
+            if (this.action.action === CLONE)
+            {
+                properties = {};
+                properties[Zutubi.admin.baseName(this.options.path)] = this.form.getFieldNamed(CLONE_KEY).getValue();
+                fields = this.form.getFields();
+                for (i = 0; i < fields.length; i++)
+                {
+                    field = fields[i];
+                    name = field.getFieldName();
+                    if (name.indexOf(CLONE_KEY_PREFIX) === 0 && field.isEnabled())
+                    {
+                        properties[name.substring(CLONE_KEY_PREFIX.length)] = field.getValue();
+                    }
+                }
+            }
+            else
+            {
+                properties = this.form.getValues();
+            }
+
+            return properties;
+        },
+
+        _translateErrors: function(errorDetails)
+        {
+            var fieldErrors,
+                baseName,
+                field,
+                translated;
+
+            if (this.action.action === CLONE)
+            {
+                fieldErrors = errorDetails.fieldErrors;
+                if (fieldErrors)
+                {
+                    baseName = Zutubi.admin.baseName(this.options.path);
+                    translated = {};
+                    for (field in fieldErrors)
+                    {
+                        if (fieldErrors.hasOwnProperty(field))
+                        {
+                            if (field === baseName)
+                            {
+                                translated[CLONE_KEY] = fieldErrors[field];
+                            }
+                            else
+                            {
+                                translated[CLONE_KEY_PREFIX + field] = fieldErrors[field];
+                            }
+                        }
+                    }
+
+                    errorDetails.fieldErrors = translated;
+                }
+            }
+
+            return errorDetails;
+        },
+
         _execute: function()
         {
             var that = this,
-                properties = that.form.getValues();
+                properties = that._translateProperties();
 
             that.form.clearValidationErrors();
-
-            // FIXME kendo we have no type for this, and in general can't!  Should we just use when available?
-            // Or does coercion need to work differently?
-            //Zutubi.admin.coerceProperties(properties, that.action.argumentType);
 
             that.mask(true);
 
@@ -91,7 +160,7 @@
                             details = JSON.parse(jqXHR.responseText);
                             if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
                             {
-                                that.form.showValidationErrors(details);
+                                that.form.showValidationErrors(that._translateErrors(details));
                                 return;
                             }
                         }

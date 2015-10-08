@@ -69,16 +69,37 @@
 
         setPaths: function(rootPath, configPath)
         {
+            var path = rootPath;
+            if (configPath && configPath.length > 0)
+            {
+                path += "/" + configPath;
+            }
+
             this.configTree.setRootPath(rootPath);
             this.configTree.selectConfig(configPath);
-            this.loadContentPanes(rootPath + "/" + configPath);
+            this.loadContentPanes(path);
         },
 
-        _openPath: function(path)
+        /**
+         * Opens a new path, within our root.  Observers are notified.
+         *
+         * @param path new path to open
+         * @param model (optional) data for the new path (if we already know it), if not specified
+         *              the data will be loaded
+         * @private
+         */
+        _openPath: function(path, model)
         {
             this.configTree.selectAbsolutePath(path);
             this.trigger(PATHSELECT, {path: path});
-            this.loadContentPanes(path);
+            if (model)
+            {
+                this._showContent(model);
+            }
+            else
+            {
+                this.loadContentPanes(path);
+            }
         },
 
         loadContentPanes: function(path)
@@ -330,24 +351,39 @@
                 Zutubi.admin.reportError(data.message);
             }
 
-            this.configTree.updatePath(path, data.model);
-
-            if (path === this.path)
+            if (data.newPath)
             {
-                if (data.model)
+                this.configTree.updatePath(data.newPath, data.model);
+                if (data.newPath === this.path)
                 {
                     this._showContent(data.model);
                 }
                 else
                 {
-                    // The model was removed as part of the action.
-                    this._openPath(this.configTree.longestMatchingSubpath(path));
+                    this._openPath(data.newPath, data.model);
                 }
             }
-            else if (Zutubi.admin.parentPath(path) === this.path)
+            else
             {
-                // We are showing this item in a collection.
-                this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
+                this.configTree.updatePath(path, data.model);
+
+                if (path === this.path)
+                {
+                    if (data.model)
+                    {
+                        this._showContent(data.model);
+                    }
+                    else
+                    {
+                        // The model was removed as part of the action.
+                        this._openPath(this.configTree.longestMatchingSubpath(path));
+                    }
+                }
+                else if (Zutubi.admin.parentPath(path) === this.path)
+                {
+                    // We are showing this item in a collection.
+                    this.contentPanel.updateItem(Zutubi.admin.baseName(path), data.model);
+                }
             }
         },
 

@@ -11,6 +11,12 @@ public class TextFieldModel extends FieldModel
 
     public TextFieldModel()
     {
+        this(null, null);
+    }
+
+    public TextFieldModel(String name, String label)
+    {
+        super(FieldType.TEXT, name, label);
         setType(FieldType.TEXT);
         setSubmitOnEnter(true);
     }

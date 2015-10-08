@@ -13,6 +13,8 @@
 
             Checkbox.fn.init.call(this, element, options);
 
+            that.options.parentForm.one("created", jQuery.proxy(that._updateDependents, that));
+
             that.inputElement.change(function()
             {
                 that._updateDependents();
@@ -23,6 +25,12 @@
             name: "ZaControllingCheckbox"
         },
 
+        enable: function(enable)
+        {
+            Checkbox.fn.enable.call(this, enable);
+            this._updateDependents();
+        },
+
         bindValue: function(value)
         {
             Checkbox.fn.bindValue.call(this, value);
@@ -31,9 +39,33 @@
 
         _updateDependents: function()
         {
-            var checked = this.getValue();
-            this._updateFields(this.options.structure.checkedFields, checked);
-            this._updateFields(this.options.structure.uncheckedFields, !checked);
+            var checked = !this.inputElement.prop("disabled") && this.getValue(),
+                fields,
+                field,
+                i;
+
+            if (this._hasFields(this.options.structure.checkedFields) || this._hasFields(this.options.structure.uncheckedFields))
+            {
+                this._updateFields(this.options.structure.checkedFields, checked);
+                this._updateFields(this.options.structure.uncheckedFields, !checked);
+            }
+            else
+            {
+                fields = this.options.parentForm.getFields();
+                for (i = 0; i < fields.length; i++)
+                {
+                    field = fields[i];
+                    if (field !== this && field.enable)
+                    {
+                        field.enable(checked);
+                    }
+                }
+            }
+        },
+
+        _hasFields: function(fieldNames)
+        {
+            return fieldNames && fieldNames.length > 0;
         },
 
         _updateFields: function(fieldNames, enable)

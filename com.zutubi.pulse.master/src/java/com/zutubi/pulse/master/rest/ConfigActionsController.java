@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.rest;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.actions.ActionHandler;
+import com.zutubi.pulse.master.rest.actions.CloneHandler;
 import com.zutubi.pulse.master.rest.actions.PullUpHandler;
 import com.zutubi.pulse.master.rest.actions.PushDownHandler;
 import com.zutubi.pulse.master.rest.errors.NotFoundException;
@@ -16,7 +17,6 @@ import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.actions.ConfigurationAction;
 import com.zutubi.tove.actions.ConfigurationActions;
 import com.zutubi.tove.annotations.Combobox;
-import com.zutubi.tove.config.ConfigurationRefactoringManager;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
@@ -60,8 +60,6 @@ public class ConfigActionsController
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
     private ConfigurationReferenceManager configurationReferenceManager;
-    @Autowired
-    private ConfigurationRefactoringManager configurationRefactoringManager;
     @Autowired
     private ConfigModelBuilder configModelBuilder;
     @Autowired
@@ -202,6 +200,18 @@ public class ConfigActionsController
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "clone/**", method = RequestMethod.GET)
+    public ResponseEntity<ActionModel> getClone(HttpServletRequest request) throws Exception
+    {
+        return getWithHandler(request, CloneHandler.class);
+    }
+
+    @RequestMapping(value = "clone/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postClone(HttpServletRequest request, @RequestBody CompositeModel body) throws Exception
+    {
+        return postWithHandler(request, body, CloneHandler.class);
+    }
+
     @RequestMapping(value = "pullUp/**", method = RequestMethod.GET)
     public ResponseEntity<ActionModel> getPullUp(HttpServletRequest request) throws Exception
     {
@@ -248,13 +258,20 @@ public class ConfigActionsController
         ActionHandler handler = objectFactory.buildBean(handlerClass);
         ActionResult actionResult = handler.doAction(configPath, body.getProperties());
 
+        String newPath = null;
         CompositeModel model = null;
-        if (configurationTemplateManager.pathExists(configPath))
+        List<String> invalidatedPaths = actionResult.getInvalidatedPaths();
+        if (invalidatedPaths.size() > 0)
+        {
+            newPath = invalidatedPaths.get(0);
+            model = (CompositeModel) configModelBuilder.buildModel(null, newPath, -1);
+        }
+        else if (configurationTemplateManager.pathExists(configPath))
         {
             model = (CompositeModel) configModelBuilder.buildModel(null, configPath, -1);
         }
 
-        return new ResponseEntity<>(new ActionResultModel(actionResult, model), HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(actionResult, newPath, model), HttpStatus.OK);
     }
 
     @RequestMapping(value = "single/**", method = RequestMethod.GET)
@@ -330,7 +347,7 @@ public class ConfigActionsController
         }
 
         ActionResult result = actionManager.execute(context.actionName, context.instance, argument);
-        return new ResponseEntity<>(new ActionResultModel(result, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
+        return new ResponseEntity<>(new ActionResultModel(result, null, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
     private ActionContext createContext(HttpServletRequest request)

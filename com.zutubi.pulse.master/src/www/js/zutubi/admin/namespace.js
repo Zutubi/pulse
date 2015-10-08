@@ -48,7 +48,7 @@ if (window.Zutubi.admin === undefined)
             router.route("/config/projects/*path", function(path)
             {
                 app.navbar.selectScope("projects");
-                Zutubi.admin.showConfig("projects/" + path, true);
+                Zutubi.admin.showConfig("projects/" + Zutubi.admin.normalisedPath(path), true);
             });
 
             router.route("/hierarchy/agents/(:name)", function(path, name)
@@ -62,26 +62,26 @@ if (window.Zutubi.admin === undefined)
                 app.navbar.selectScope("agents");
                 if (path)
                 {
-                    Zutubi.admin.showConfig("agents/" + path, true);
+                    Zutubi.admin.showConfig("agents/" + Zutubi.admin.normalisedPath(path), true);
                 }
             });
 
             router.route("/config/settings/*path", function(path)
             {
                 app.navbar.selectScope("settings");
-                Zutubi.admin.showConfig("settings/" + (path || ""), false);
+                Zutubi.admin.showConfig("settings/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/config/users/*path", function(path)
             {
                 app.navbar.selectScope("users");
-                Zutubi.admin.showConfig("users/" + (path || ""), false);
+                Zutubi.admin.showConfig("users/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/config/groups/*path", function(path)
             {
                 app.navbar.selectScope("groups");
-                Zutubi.admin.showConfig("groups/" + (path || ""), false);
+                Zutubi.admin.showConfig("groups/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/plugins(/:id)", function(id)
@@ -195,6 +195,25 @@ if (window.Zutubi.admin === undefined)
             start: function()
             {
                 app.router.start();
+            },
+
+            normalisedPath: function(path)
+            {
+                if (!path)
+                {
+                    return "";
+                }
+
+                if (path.length > 0 && path[0] === "/")
+                {
+                    path = path.substring(1);
+                }
+                if (path.length > 0 && path[path.length - 1] === "/")
+                {
+                    path = path.substring(0, path.length - 1);
+                }
+
+                return path;
             },
 
             subPath: function(path, begin, end)
