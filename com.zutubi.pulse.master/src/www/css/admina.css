@@ -140,6 +140,17 @@ ul.navlist {
     color: #888;
 }
 
+/* Overview panels */
+
+.k-overview-panel {
+    padding: 0.4em;
+}
+
+.k-overview-panel .k-tabstrip {
+    border: none;
+}
+
+
 /* Collections */
 
 .k-collection-panel {

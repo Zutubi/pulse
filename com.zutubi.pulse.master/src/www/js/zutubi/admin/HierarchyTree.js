@@ -4,6 +4,7 @@
 {
     var ui = kendo.ui,
         TreeView = ui.TreeView,
+        BOUND = "bound",
         NODESELECT = "nodeselect";
 
     Zutubi.admin.HierarchyTree = TreeView.extend({
@@ -33,10 +34,12 @@
             dataBound: function(e)
             {
                 // This callback is invoked for every level, but only once with a null node.
-                if (!e.node)
+                if (!this.bound && !e.node)
                 {
+                    this.expand(this._getRoot());
                     this.bound = true;
                     this._updateSelected();
+                    this.trigger(BOUND);
                 }
             },
             select: function(e)
@@ -84,12 +87,22 @@
             this.setDataSource(dataSource);
         },
 
+        _getRoot: function()
+        {
+            return this.wrapper.find(".k-item:first");
+        },
+
+        getRootName: function()
+        {
+            return this.dataSource.at(0).name;
+        },
+
         selectItem: function(name)
         {
             this.item = name;
             if (this.bound)
             {
-                this.updateSelected();
+                this._updateSelected();
             }
         },
 
@@ -145,7 +158,7 @@
         _updateSelected: function()
         {
             var that = this,
-                root = that.wrapper.find(".k-item:first"),
+                root = that._getRoot(),
                 node;
 
             if (that.item)
@@ -153,21 +166,15 @@
                 node = that.findByText(that.item);
             }
 
-            if (!node)
+            if (node)
             {
-                node = root;
-            }
+                if (node !== root)
+                {
+                    that.expandTo(that.dataItem(node));
+                }
 
-            if (node === root)
-            {
-                that.expand(root);
+                that.select(node);
             }
-            else
-            {
-                that.expandTo(that.dataItem(node));
-            }
-
-            that.select(node);
         }
     });
 

@@ -5,6 +5,7 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
+        BOUND = "bound",
         NODESELECT = "nodeselect";
 
     jQuery.expr[":"].ustartswith = jQuery.expr.createPseudo(function (arg) {
@@ -28,6 +29,7 @@
         },
 
         events: [
+            BOUND,
             NODESELECT
         ],
 
@@ -53,6 +55,7 @@
             that.outer.append(that.treeEl);
 
             that.tree = that.treeEl.kendoZaHierarchyTree({scope: that.options.scope}).data("kendoZaHierarchyTree");
+            that.tree.bind(BOUND, function(e) { that.trigger(BOUND); });
             that.tree.bind(NODESELECT, function(e) { that.trigger(NODESELECT, {name: e.name}); });
         },
 
@@ -95,6 +98,21 @@
             this.scope = scope;
             this._clear();
             this.tree.setScope(scope);
+        },
+
+        getRootName: function()
+        {
+            return this.tree.getRootName();
+        },
+
+        selectItem: function(name)
+        {
+            if (this.lastFilterString && name.indexOf(this.lastFilterString) !== 0)
+            {
+                this._clear();
+            }
+
+            this.tree.selectItem(name)
         }
     });
 

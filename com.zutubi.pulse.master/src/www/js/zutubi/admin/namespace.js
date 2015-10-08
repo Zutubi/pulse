@@ -39,7 +39,7 @@ if (window.Zutubi.admin === undefined)
                 router.navigate("/hierarchy/projects/");
             });
 
-            router.route("/hierarchy/projects/(:name)", function(path, name)
+            router.route("/hierarchy/projects(/)(:name)(/)", function(name)
             {
                 app.navbar.selectScope("projects");
                 Zutubi.admin.showScope("projects", name);
@@ -51,7 +51,7 @@ if (window.Zutubi.admin === undefined)
                 Zutubi.admin.showConfig("projects/" + Zutubi.admin.normalisedPath(path), true);
             });
 
-            router.route("/hierarchy/agents/(:name)", function(path, name)
+            router.route("/hierarchy/agents(/)(:name)(/)", function(name)
             {
                 app.navbar.selectScope("agents");
                 Zutubi.admin.showScope("agents", name);
@@ -172,6 +172,7 @@ if (window.Zutubi.admin === undefined)
             },
 
             LINK_ICONS: {
+                "config": "pencil",
                 "dependencies": "sitemap",
                 "home": "home",
                 "homepage": "external-link",
@@ -266,7 +267,7 @@ if (window.Zutubi.admin === undefined)
                 app.router.replace("/config/" + newPath, true);
             },
 
-            showScope: function(scope)
+            showScope: function(scope, name)
             {
                 if (app.configPanel)
                 {
@@ -277,9 +278,19 @@ if (window.Zutubi.admin === undefined)
                 if (!app.scopePanel)
                 {
                     app.scopePanel = new Zutubi.admin.ScopePanel("#config-view");
+                    app.scopePanel.bind("select", function(e)
+                    {
+                        var url = "/hierarchy/" + e.scope;
+                        if (e.name.length > 0)
+                        {
+                            url += "/" + e.name;
+                        }
+
+                        app.router.navigate(url, true);
+                    });
                 }
 
-                app.scopePanel.setScope(scope);
+                app.scopePanel.setScope(scope, name);
             },
 
             showConfig: function (path, templated)
@@ -297,7 +308,8 @@ if (window.Zutubi.admin === undefined)
                 if (!app.configPanel)
                 {
                     app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
-                    app.configPanel.bind("pathselect", function (e) {
+                    app.configPanel.bind("pathselect", function(e)
+                    {
                         app.router.navigate("/config/" + e.path, true);
                     });
                 }
