@@ -175,7 +175,7 @@
             if (item.length > 0)
             {
                 id = item.attr("id");
-                index = parseInt(id.substring(id.lastIndexOf("-") + 1));
+                index = parseInt(id.substring(id.lastIndexOf("-") + 1), 10);
                 descendant = id.indexOf("descendant") === 0;
                 action = descendant ? this.data.descendantActions[index] : this.data.actions[index];
 

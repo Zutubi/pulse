@@ -112,7 +112,7 @@
                 this._clear();
             }
 
-            this.tree.selectItem(name)
+            this.tree.selectItem(name);
         }
     });
 
