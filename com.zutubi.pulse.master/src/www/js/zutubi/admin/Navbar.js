@@ -5,7 +5,9 @@
     var ui = kendo.ui,
         Widget = ui.Widget,
         SELECT = "select",
-        SCOPE_SELECTED = "scope-selected";
+        ADD = "add",
+        SCOPE_SELECTED = "scope-selected",
+        TEMPLATED_SCOPES = ["projects", "agents"];
 
     Zutubi.admin.ScopeSelector = Widget.extend({
         init: function(element, options)
@@ -116,6 +118,7 @@
         },
 
         events: [
+            ADD,
             SCOPE_SELECTED
         ],
 
@@ -132,15 +135,46 @@
             that.scopeSelector = that.scopeSelectorItem.kendoZaScopeSelector({}).data("kendoZaScopeSelector");
             that.scopeSelector.bind(SELECT, function(e)
             {
+                that._updateAddButton();
                 that.trigger(SCOPE_SELECTED, {scope: e.scope});
             });
 
             that.list.append(that.scopeSelectorItem);
+
         },
 
         selectScope: function(scope)
         {
             this.scopeSelector.selectScope(scope);
+            this._updateAddButton(scope);
+        },
+
+        _updateAddButton: function()
+        {
+            var that = this,
+                scope = that.scopeSelector.selected;
+
+            if (that.addButton)
+            {
+                that.addButton.destroy();
+                kendo.destroy(that.addButtonItem);
+                that.addButtonItem.remove();
+
+                that.addButton = that.addButtonItem = null;
+            }
+
+            if (TEMPLATED_SCOPES.indexOf(scope) >= 0)
+            {
+                that.addButtonItem = $('<li><button class="k-primary"><span class="fa fa-plus-circle"></span> add new ' + scope.substring(0, scope.length - 1) + '</li>');
+                that.addButton = that.addButtonItem.find("button").kendoButton().data("kendoButton");
+                that.addButton.bind("click", jQuery.proxy(that._addClicked, that));
+                that.list.append(that.addButtonItem);
+            }
+        },
+
+        _addClicked: function()
+        {
+            this.trigger(ADD, {scope: this.scopeSelector.selected});
         }
     });
 

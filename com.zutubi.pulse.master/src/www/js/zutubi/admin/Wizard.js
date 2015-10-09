@@ -296,7 +296,6 @@
                 data: wizardData,
                 success: function (data)
                 {
-                    console.log('wizard posted');
                     that.trigger(FINISHED, {delta: data});
                 },
                 error: function (jqXHR)

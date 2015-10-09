@@ -52,7 +52,6 @@
 
             that.completed = false;
 
-            $("#login-form").kendoValidator();
             that.window = $(that.element).kendoWindow({
                 width: Math.min(that.options.width, $(window).width() - 80),
                 maxHeight: $(window).height() - 80,

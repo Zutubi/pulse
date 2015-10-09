@@ -80,8 +80,8 @@ public class WizardController
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.POST)
-    public ResponseEntity<String> put(HttpServletRequest request,
-                                      @RequestBody Map<String, CompositeModel> body) throws TypeException
+    public ResponseEntity<ConfigDeltaModel> put(HttpServletRequest request,
+                                                @RequestBody Map<String, CompositeModel> body) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
         if (!body.keySet().equals(Sets.newHashSet((""))))
@@ -144,6 +144,9 @@ public class WizardController
             throw new ValidationException(instance, key);
         }
 
-        return new ResponseEntity<>(configurationTemplateManager.insertRecord(configPath, record), HttpStatus.OK);
+        String path = configurationTemplateManager.insertRecord(configPath, record);
+        ConfigDeltaModel delta = new ConfigDeltaModel();
+        delta.addAddedPath(path, configModelBuilder.buildModel(null, path, -1));
+        return new ResponseEntity<>(delta, HttpStatus.OK);
     }
 }

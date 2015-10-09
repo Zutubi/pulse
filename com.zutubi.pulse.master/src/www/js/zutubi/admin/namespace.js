@@ -112,7 +112,23 @@ if (window.Zutubi.admin === undefined)
                 }
             });
 
+            navbar.bind("add", function(e)
+            {
+                _showAddWizard(e.scope);
+            });
+
             return navbar;
+        }
+
+        function _showAddWizard(scope)
+        {
+            new Zutubi.admin.WizardWindow({
+                path: scope,
+                success: function(delta)
+                {
+
+                }
+            }).show();
         }
 
         function _coerceInt(properties, name)

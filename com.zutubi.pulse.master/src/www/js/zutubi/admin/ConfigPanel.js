@@ -7,7 +7,7 @@
 // dependency: ./CompositePanel.js
 // dependency: ./DeleteWindow.js
 // dependency: ./Table.js
-// dependency: ./Wizard.js
+// dependency: ./WizardWindow.js
 
 (function($)
 {
@@ -238,45 +238,21 @@
 
         _showWizard: function()
         {
-            var that = this;
+            var that = this,
+                window;
 
-            Zutubi.admin.ajax({
-                type: "GET",
-                url: "/api/wizard/" + that.path,
-                success: function (data)
-                {
-                    that._renderWizard(data);
-                },
-                error: function (jqXHR)
-                {
-                    Zutubi.admin.reportError("Could not get wizard information: " + Zutubi.admin.ajaxError(jqXHR));
-                }
+            window = new Zutubi.admin.WizardWindow({
+                path: that.path,
+                success: jQuery.proxy(that._wizardFinished, that)
             });
+
+            window.show();
         },
 
-        _renderWizard: function(data)
+        _wizardFinished: function(delta)
         {
-            var that = this,
-                contentEl = $("#center-pane-content"),
-                wizardEl = $("<div></div>");
-
-            that._clearContent();
-
-            contentEl.append(wizardEl);
-            that.contentPanel = wizardEl.kendoZaWizard({
-                structure: data,
-                path: that.path
-            }).data("kendoZaWizard");
-
-            that.contentPanel.bind("finished", function(e)
-            {
-                that.loadContentPanes(that.path);
-            });
-
-            that.contentPanel.bind("cancelled", function()
-            {
-                that.loadContentPanes(that.path);
-            });
+            this._applyDelta(delta);
+            this.loadContentPanes(this.path);
         },
 
         _doAction: function(e)
