@@ -1,22 +1,17 @@
 package com.zutubi.pulse.master.rest.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * A single step of a wizard.  If the type is known, a common case, there is only one entry in the
- * types list. Otherwise the user has a choice of types, effectively making this two steps.
+ * Abstract base for steps of a wizard.
  */
-public class WizardStepModel
+public abstract class WizardStepModel
 {
-    private String key;
-    private String label;
-    private List<WizardTypeModel> types = new ArrayList<>();
+    protected String key;
+    protected String label;
 
-    public WizardStepModel(String key, String label)
+    public WizardStepModel(String label, String key)
     {
-        this.key = key;
         this.label = label;
+        this.key = key;
     }
 
     public String getKey()
@@ -27,15 +22,5 @@ public class WizardStepModel
     public String getLabel()
     {
         return label;
-    }
-
-    public List<WizardTypeModel> getTypes()
-    {
-        return types;
-    }
-
-    public void addType(WizardTypeModel type)
-    {
-        types.add(type);
     }
 }

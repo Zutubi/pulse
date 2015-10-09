@@ -6,12 +6,16 @@ import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TemplatedMapType;
 import com.zutubi.tove.type.TypeException;
 import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,14 +51,44 @@ public class WizardController
     public ResponseEntity<WizardModel> get(HttpServletRequest request) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
+        WizardModel model;
 
-        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_CREATE);
+        String[] configPathElements = PathUtils.getPathElements(configPath);
+        String scope = configPathElements[0];
+        if (configPathElements.length <= 2 && configurationTemplateManager.isTemplatedCollection(scope))
+        {
+            configurationSecurityManager.ensurePermission(scope, AccessManager.ACTION_CREATE);
 
-        PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);
-        return new ResponseEntity<>(buildModel(context.getPostableType(), context.getParentPath(), context.getBaseName(), configurationTemplateManager.isConcrete(configPath)), HttpStatus.OK);
+            model = buildTemplateModel(scope, configPathElements.length > 1 ? configPathElements[1] : null);
+        }
+        else
+        {
+            configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_CREATE);
+
+            PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);
+            model = buildModel(context.getPostableType(), context.getParentPath(), context.getBaseName(), configurationTemplateManager.isConcrete(configPath));
+        }
+
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    private WizardModel buildTemplateModel(String scope, String parentName)
+    {
+        WizardModel model = new WizardModel();
+        TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
+        CompositeType itemType = collectionType.getTargetType();
+        model.addStep(buildStepForType(itemType, scope, null, true));
+        return model;
     }
 
     private WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete)
+    {
+        WizardModel model = new WizardModel();
+        model.addStep(buildStepForType(type, parentPath, baseName, concrete));
+        return model;
+    }
+
+    private TypedWizardStepModel buildStepForType(CompositeType type, String parentPath, String baseName, boolean concrete)
     {
         List<CompositeType> types;
         if (type.isExtendable())
@@ -65,18 +99,15 @@ public class WizardController
             types = Collections.singletonList(type);
         }
 
-        WizardModel model = new WizardModel();
         Messages messages = Messages.getInstance(type.getClazz());
-        WizardStepModel step = new WizardStepModel("", messages.format("label"));
+        TypedWizardStepModel step = new TypedWizardStepModel("", messages.format("label"));
         for (CompositeType stepType : types)
         {
             messages = Messages.getInstance(stepType.getClazz());
             String labelKey = messages.isKeyDefined("wizard.label") ? "wizard.label" : "label";
             step.addType(new WizardTypeModel(configModelBuilder.buildCompositeTypeModel(parentPath, baseName, stepType, concrete), messages.format(labelKey)));
         }
-
-        model.addStep(step);
-        return model;
+        return step;
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.POST)
@@ -84,6 +115,54 @@ public class WizardController
                                                 @RequestBody Map<String, CompositeModel> body) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
+
+        String[] configPathElements = PathUtils.getPathElements(configPath);
+        String scope = configPathElements[0];
+        String newPath;
+        if (configPathElements.length <= 2 && configurationTemplateManager.isTemplatedCollection(scope))
+        {
+            newPath = insertTemplatedConfig(scope, body);
+        }
+        else
+        {
+            newPath = insertConfig(configPath, body);
+        }
+
+        ConfigDeltaModel delta = new ConfigDeltaModel();
+        delta.addAddedPath(newPath, configModelBuilder.buildModel(null, newPath, -1));
+        return new ResponseEntity<>(delta, HttpStatus.OK);
+    }
+
+    private String insertTemplatedConfig(String scope, Map<String, CompositeModel> body) throws TypeException
+    {
+        TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
+        CompositeType itemType = collectionType.getTargetType();
+
+        boolean templated = false;
+
+        String key = "";
+        CompositeModel model = body.get(key);
+        MutableRecord record = createRecord(null, itemType, key, model);
+
+        Configuration instance = configurationTemplateManager.validate(scope, null, record, !templated, false);
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance, key);
+        }
+
+        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
+        Record templateParentRecord = configurationTemplateManager.getRecord(PathUtils.getPath(scope, hierarchy.getRoot().getId()));
+        configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
+        if (templated)
+        {
+            configurationTemplateManager.markAsTemplate(record);
+        }
+
+        return configurationTemplateManager.insertRecord(scope, record);
+    }
+
+    private String insertConfig(String configPath, @RequestBody Map<String, CompositeModel> body) throws TypeException
+    {
         if (!body.keySet().equals(Sets.newHashSet((""))))
         {
             throw new IllegalArgumentException("Only single step wizards are currently supported");
@@ -92,25 +171,39 @@ public class WizardController
         configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_CREATE);
 
         PostContext context = Utils.getPostContext(configPath, configurationTemplateManager);
-        CompositeType postableType = context.getPostableType();
+
+        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
+        String key = "";
+        CompositeModel model = body.get(key);
+        MutableRecord record = createRecord(templateOwnerPath, context.getPostableType(), key, model);
+
+        Configuration instance = configurationTemplateManager.validate(configPath, null, record, configurationTemplateManager.isConcrete(configPath), false);
+        if (!instance.isValid())
+        {
+            throw new ValidationException(instance, key);
+        }
+
+        return configurationTemplateManager.insertRecord(configPath, record);
+    }
+
+    private MutableRecord createRecord(String templateOwnerPath, CompositeType expectedType, String key, CompositeModel model) throws TypeException
+    {
         CompositeType actualType = null;
         CompositeType postedType = null;
+        CompositeTypeModel typeModel = model.getType();
 
-        if (postableType.isExtendable())
+        if (expectedType.isExtendable())
         {
-            if (postableType.getExtensions().size() == 1)
+            if (expectedType.getExtensions().size() == 1)
             {
-                actualType = postableType.getExtensions().get(0);
+                actualType = expectedType.getExtensions().get(0);
             }
         }
         else
         {
-            actualType = postableType;
+            actualType = expectedType;
         }
 
-        String key = "";
-        CompositeModel model = body.get(key);
-        CompositeTypeModel typeModel = model.getType();
         if (typeModel != null && typeModel.getSymbolicName() != null)
         {
             postedType = typeRegistry.getType(typeModel.getSymbolicName());
@@ -130,23 +223,11 @@ public class WizardController
             actualType = postedType;
         }
 
-        if (!postableType.isAssignableFrom(actualType))
+        if (!expectedType.isAssignableFrom(actualType))
         {
             throw new IllegalArgumentException("Model for key '" + key + "' has incompatible type '" + actualType.getSymbolicName() + "'.");
         }
 
-        String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
-        MutableRecord record = Utils.convertProperties(actualType, templateOwnerPath, model.getProperties());
-
-        Configuration instance = configurationTemplateManager.validate(context.getParentPath(), context.getBaseName(), record, configurationTemplateManager.isConcrete(configPath), false);
-        if (!instance.isValid())
-        {
-            throw new ValidationException(instance, key);
-        }
-
-        String path = configurationTemplateManager.insertRecord(configPath, record);
-        ConfigDeltaModel delta = new ConfigDeltaModel();
-        delta.addAddedPath(path, configModelBuilder.buildModel(null, path, -1));
-        return new ResponseEntity<>(delta, HttpStatus.OK);
+        return Utils.convertProperties(actualType, templateOwnerPath, model.getProperties());
     }
 }

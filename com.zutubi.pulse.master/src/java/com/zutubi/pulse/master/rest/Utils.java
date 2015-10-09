@@ -24,7 +24,13 @@ public class Utils
         String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         AntPathMatcher apm = new AntPathMatcher();
-        return PathUtils.normalisePath(apm.extractPathWithinPattern(bestMatchPattern, requestPath));
+        String path = PathUtils.normalisePath(apm.extractPathWithinPattern(bestMatchPattern, requestPath));
+        if (path.length() == 0)
+        {
+            throw new IllegalArgumentException("Path cannot be empty");
+        }
+
+        return path;
     }
 
     static ComplexType getType(String configPath, ConfigurationTemplateManager configurationTemplateManager)

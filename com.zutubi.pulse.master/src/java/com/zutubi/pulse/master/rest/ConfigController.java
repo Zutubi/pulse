@@ -150,7 +150,7 @@ public class ConfigController
     }
 
     @RequestMapping(value = "/**", method = RequestMethod.DELETE)
-    public ResponseEntity<ConfigDeltaModel> put(HttpServletRequest request) throws TypeException
+    public ResponseEntity<ConfigDeltaModel> delete(HttpServletRequest request) throws TypeException
     {
         String configPath = Utils.getConfigPath(request);
 
