@@ -1,5 +1,7 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import java.util.List;
  * only one entry in the types list. Otherwise the user has a choice of types, effectively making
  * this two steps (choice of type and config of that type).
  */
+@JsonTypeName("typed")
 public class TypedWizardStepModel extends WizardStepModel
 {
     private List<WizardTypeModel> types = new ArrayList<>();

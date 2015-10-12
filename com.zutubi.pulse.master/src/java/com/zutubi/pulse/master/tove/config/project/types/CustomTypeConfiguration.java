@@ -44,7 +44,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     private static final Cache<HashCode, List<String>> VALIDATION_CACHE = CacheBuilder.from(VALIDATION_CACHE_SPEC).build();
     private static final HashFunction VALIDATION_CACHE_HASH_FUNCTION = Hashing.goodFastHash(32);
 
-    @TextArea(rows = 30, cols = 80)
+    @TextArea(rows = 30, cols = 72)
     private String pulseFileString;
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;

@@ -10,7 +10,44 @@
         CANCEL = "cancel",
         FINISH = "finish",
         FINISHED = "finished",
-        CANCELLED = "cancelled";
+        CANCELLED = "cancelled",
+
+    WizardStep = function(config)
+    {
+        this.key = config.key;
+        this.label = config.label;
+        this.selectedTypeIndex = 0;
+
+        if (config.kind === "custom")
+        {
+            this.types = [{
+                label: "",
+                form: config.form,
+                propertyTypes: []
+            }];
+
+            this.valuesByType = [config.formDefaults];
+        }
+        else if(config.kind === "typed")
+        {
+            this.types = jQuery.map(config.types, function(type) { return {
+                label: type.label,
+                symbolicName: type.type.symbolicName,
+                form: type.type.form,
+                propertyTypes: type.type.simpleProperties
+            }; });
+
+            this.valuesByType = jQuery.map(config.types, function() { return {}; });
+        }
+        else
+        {
+            console.warn("Unknown wizard step type '" + config.kind + "'");
+        }
+    };
+
+    WizardStep.prototype = {
+
+    };
 
     Zutubi.admin.Wizard = Widget.extend({
         init: function(element, options)
@@ -43,7 +80,7 @@
 
             that.steps = jQuery.map(steps, function(step)
             {
-                return that._generateStep(step);
+                return new WizardStep(step);
             });
 
             that.template = kendo.template(that.options.template);
@@ -73,15 +110,6 @@
             that._showStepAtIndex(0);
         },
 
-        _generateStep: function(structure)
-        {
-            return {
-                structure: structure,
-                selectedTypeIndex: 0,
-                valuesByType: jQuery.map(structure.types, function() { return {}; })
-            };
-        },
-
         destroy: function()
         {
             var that = this;
@@ -99,9 +127,9 @@
 
             jQuery.each(that.steps, function(index, step)
             {
-                result[step.structure.key] = {
+                result[step.key] = {
                     properties: step.valuesByType[step.selectedTypeIndex],
-                    type: step.structure.types[step.selectedTypeIndex].type
+                    type: step.types[step.selectedTypeIndex]
                 };
             });
 
@@ -115,7 +143,7 @@
 
             jQuery.each(that.steps, function(index, step)
             {
-                if (step.structure.key === details.key)
+                if (step.key === details.key)
                 {
                     stepIndex = index;
                     return false;
@@ -133,13 +161,35 @@
             }
         },
 
+        _stashValuesAndCleanupForm: function()
+        {
+            var form = this.form,
+                step;
+
+            if (form)
+            {
+                step = this.steps[this.currentStepIndex];
+                step.valuesByType[step.selectedTypeIndex] = form.getValues();
+
+                form.element.empty();
+                form.destroy();
+                this.form = null;
+            }
+        },
+
         _showStepAtIndex: function(index)
         {
             var that = this,
-                step = that.steps[index];
+                step = that.steps[index],
+                items = that.stepIndexElement.children("li");
+
+            this._stashValuesAndCleanupForm();
+
+            items.removeClass("active");
+            items.eq(index).addClass("active");
 
             this.currentStepIndex = index;
-            this._updateTypeSelect(step.structure.types);
+            this._updateTypeSelect(step.types);
             this._showTypeAtIndex(step.selectedTypeIndex);
         },
 
@@ -153,10 +203,6 @@
             {
                 labels = jQuery.map(types, function(type) { return type.label; });
                 dropDown.setDataSource(labels);
-                width = dropDown.list.width() + 40;
-
-                dropDown.list.width(width - 1);
-                dropDown.element.closest(".k-widget").width(width);
                 this.typeSelectWrapper.show();
             }
             else
@@ -171,7 +217,7 @@
                 step = that.steps[that.currentStepIndex],
                 typeLabel = that.typeSelectDropDown.value();
 
-            jQuery.each(step.structure.types, function(i, type)
+            jQuery.each(step.types, function(i, type)
             {
                 if (type.label === typeLabel)
                 {
@@ -186,17 +232,13 @@
             var that = this,
                 stepIndex = that.currentStepIndex,
                 step = that.steps[stepIndex],
-                type = step.structure.types[index],
+                type = step.types[index],
                 lastIndex = that.steps.length - 1,
                 submits = [];
 
-            step.selectedTypeIndex = index;
+            this._stashValuesAndCleanupForm();
 
-            if (that.form)
-            {
-                that.form.element.empty();
-                that.form.destroy();
-            }
+            step.selectedTypeIndex = index;
 
             if (stepIndex !== 0)
             {
@@ -215,7 +257,7 @@
             submits.push(CANCEL);
 
             that.form = that.formWrapper.kendoZaForm({
-                structure: that._filterFields(type.type.form),
+                structure: that._filterFields(type.form),
                 values: step.valuesByType[index],
                 submits: submits
             }).data("kendoZaForm");
@@ -286,8 +328,15 @@
             jQuery.each(wizardData, function(property, data)
             {
                 data.kind = "composite";
-                Zutubi.admin.coerceProperties(data.properties, data.type.simpleProperties);
-                data.type = { symbolicName: data.type.symbolicName };
+                Zutubi.admin.coerceProperties(data.properties, data.type.propertyTypes);
+                if (data.type.symbolicName)
+                {
+                    data.type = {symbolicName: data.type.symbolicName};
+                }
+                else
+                {
+                    delete data.type;
+                }
             });
 
             Zutubi.admin.ajax({

@@ -1,12 +1,17 @@
 package com.zutubi.pulse.master.rest;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
 import com.zutubi.pulse.master.rest.model.*;
+import com.zutubi.pulse.master.rest.model.forms.CheckboxFieldModel;
+import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
+import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
+import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.CompositeType;
@@ -16,6 +21,8 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * RESTish controller for wizards: structured UIs for creating configuration. These are intended
@@ -38,6 +43,10 @@ import java.util.Map;
 @RequestMapping("/wizard")
 public class WizardController
 {
+    private static final String STEP_HIERARCHY = "meta.hierarcy";
+    private static final String FIELD_PARENT_TEMPLATE = "parentTemplate";
+    private static final String FIELD_TEMPLATE = "isTemplate";
+
     @Autowired
     private ConfigurationSecurityManager configurationSecurityManager;
     @Autowired
@@ -75,10 +84,58 @@ public class WizardController
     private WizardModel buildTemplateModel(String scope, String parentName)
     {
         WizardModel model = new WizardModel();
+        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
+        TemplateNode parentNode = hierarchy.getRoot();
+        if (StringUtils.stringSet(parentName))
+        {
+            TemplateNode node = hierarchy.getNodeById(parentName);
+            if (node != null)
+            {
+                while (node.isConcrete())
+                {
+                    node = node.getParent();
+                }
+
+                parentNode = node;
+            }
+        }
+
+        FormModel form = new FormModel();
+        Map<String, Object> formDefaults = new HashMap<>();
+
+        form.addField(new DropdownFieldModel(FIELD_PARENT_TEMPLATE, "parent template", getAllTemplates(hierarchy)));
+        formDefaults.put(FIELD_PARENT_TEMPLATE, parentNode.getId());
+        form.addField(new CheckboxFieldModel(FIELD_TEMPLATE, "template project"));
+        formDefaults.put(FIELD_TEMPLATE, false);
+
+        CustomWizardStepModel preludeStep = new CustomWizardStepModel("hierarcy", STEP_HIERARCHY, form);
+        preludeStep.setFormDefaults(formDefaults);
+        model.addStep(preludeStep);
+
         TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
         CompositeType itemType = collectionType.getTargetType();
         model.addStep(buildStepForType(itemType, scope, null, true));
         return model;
+    }
+
+    private List getAllTemplates(TemplateHierarchy hierarchy)
+    {
+        final List<String> templates = new ArrayList<>();
+        hierarchy.getRoot().forEachDescendant(new Function<TemplateNode, Boolean>()
+        {
+            @Override
+            public Boolean apply(TemplateNode node)
+            {
+                if (!node.isConcrete())
+                {
+                    templates.add(node.getId());
+                }
+                return true;
+            }
+        }, false, null);
+
+        templates.sort(new Sort.StringComparator());
+        return templates;
     }
 
     private WizardModel buildModel(CompositeType type, String parentPath, String baseName, boolean concrete)
@@ -138,7 +195,31 @@ public class WizardController
         TemplatedMapType collectionType = configurationTemplateManager.getType(scope, TemplatedMapType.class);
         CompositeType itemType = collectionType.getTargetType();
 
-        boolean templated = false;
+
+        CompositeModel hierarchyDetails = body.get(STEP_HIERARCHY);
+        if (hierarchyDetails == null)
+        {
+            throw new IllegalArgumentException("Missing hierarchy details, should be included using key " + STEP_HIERARCHY);
+        }
+
+        Object parentTemplateName = hierarchyDetails.getProperties().get(FIELD_PARENT_TEMPLATE);
+        if (parentTemplateName == null)
+        {
+            ValidationException e = new ValidationException(null, STEP_HIERARCHY);
+            e.addFieldError(FIELD_PARENT_TEMPLATE, "parent template is required");
+            throw e;
+        }
+
+        Record templateParentRecord = configurationTemplateManager.getRecord(PathUtils.getPath(scope, parentTemplateName.toString()));
+        if (templateParentRecord == null)
+        {
+            ValidationException e = new ValidationException(null, STEP_HIERARCHY);
+            e.addFieldError(FIELD_PARENT_TEMPLATE, "invalid parent template '" + parentTemplateName + "'");
+            throw e;
+        }
+
+        Object isTemplate = hierarchyDetails.getProperties().get(FIELD_TEMPLATE);
+        boolean templated = isTemplate == null ? false : Boolean.valueOf(isTemplate.toString());
 
         String key = "";
         CompositeModel model = body.get(key);
@@ -150,8 +231,6 @@ public class WizardController
             throw new ValidationException(instance, key);
         }
 
-        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(scope);
-        Record templateParentRecord = configurationTemplateManager.getRecord(PathUtils.getPath(scope, hierarchy.getRoot().getId()));
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if (templated)
         {

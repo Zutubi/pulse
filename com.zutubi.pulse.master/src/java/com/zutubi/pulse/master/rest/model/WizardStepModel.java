@@ -1,12 +1,20 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * Abstract base for steps of a wizard.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
+@JsonSubTypes({
+        @JsonSubTypes.Type(TypedWizardStepModel.class),
+        @JsonSubTypes.Type(CustomWizardStepModel.class)
+})
 public abstract class WizardStepModel
 {
-    protected String key;
-    protected String label;
+    private String key;
+    private String label;
 
     public WizardStepModel(String label, String key)
     {

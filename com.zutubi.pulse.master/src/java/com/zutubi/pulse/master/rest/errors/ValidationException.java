@@ -68,8 +68,17 @@ public class ValidationException extends RuntimeException
         public Error(ValidationException ex, Configuration instance, String key)
         {
             super(ex);
-            instanceErrors = new ArrayList<>(instance.getInstanceErrors());
-            fieldErrors = new HashMap<>(instance.getFieldErrors());
+            if (instance == null)
+            {
+                instanceErrors = new ArrayList<>();
+                fieldErrors = new HashMap<>();
+            }
+            else
+            {
+                instanceErrors = new ArrayList<>(instance.getInstanceErrors());
+                fieldErrors = new HashMap<>(instance.getFieldErrors());
+            }
+
             this.key = key;
         }
 

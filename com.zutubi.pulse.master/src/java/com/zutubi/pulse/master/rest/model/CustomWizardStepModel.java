@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
 
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 /**
  * A wizard step that has a custom form (rather than one based on a defined type).
  */
+@JsonTypeName("custom")
 public class CustomWizardStepModel extends WizardStepModel
 {
     private FormModel form;

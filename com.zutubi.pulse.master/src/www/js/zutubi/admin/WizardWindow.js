@@ -24,7 +24,7 @@
 
             that.view = new kendo.View(
                 '<div style="display: none">' +
-                    '<div class="k-workflow-content"></div>' +
+                    '<div class="k-wizard-content"></div>' +
                 '</div>',
                 {wrap: false});
 
@@ -34,7 +34,7 @@
         options: {
             label: "config",
             id: "wizard-window",
-            width: 640
+            width: 720
         },
 
         mask: function(mask)
@@ -103,7 +103,7 @@
         _renderWizard: function(data)
         {
             var that = this,
-                contentEl = that.element.find(".k-workflow-content"),
+                contentEl = that.element.find(".k-wizard-content"),
                 wizardEl = $("<div></div>");
 
             contentEl.append(wizardEl);

@@ -236,6 +236,23 @@ input[type=checkbox].k-input {
     margin-right: 1ch;
 }
 
+/* Wizards */
+
+.k-wizard-step-index {
+    margin-bottom: 0.6em;
+    border-bottom: solid 1px #dbdbdb;
+}
+
+.k-wizard-step-index li {
+    display: inline-block;
+    padding-bottom: 0.4em;
+    margin-right: 0.6em;
+}
+
+.k-wizard-step-index li.active {
+    border-bottom: solid 3px #8ebc00;
+}
+
 /* Drag and drop in collection tables */
 
 .k-hint {

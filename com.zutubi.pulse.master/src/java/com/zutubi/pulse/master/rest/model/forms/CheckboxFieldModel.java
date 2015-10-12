@@ -9,7 +9,12 @@ public class CheckboxFieldModel extends FieldModel
 {
     public CheckboxFieldModel()
     {
-        setType(FieldType.CHECKBOX);
+        this(null, null);
+    }
+
+    public CheckboxFieldModel(String name, String label)
+    {
+        super(FieldType.CHECKBOX, name, label);
         setSubmitOnEnter(true);
     }
 }

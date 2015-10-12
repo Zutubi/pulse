@@ -14,7 +14,8 @@
                 kendoOptions = {
                     dataSource: that._fixEmpty(structure.list, structure.listValue),
                     dataTextField: structure.listText,
-                    dataValueField: structure.listValue
+                    dataValueField: structure.listValue,
+                    dataBound: jQuery.proxy(that._adjustWidth, that)
                 };
 
             // FIXME kendo this is clunky, should we just wrap the kendo widget?
@@ -27,6 +28,16 @@
 
         options: {
             name: "ZaDropDownList"
+        },
+
+        _adjustWidth: function()
+        {
+            var widgetEl = this.element.closest(".k-widget"),
+                width;
+
+            width = Math.min(widgetEl.parent().width(), this.list.width() + 40);
+            this.list.width(width - 1);
+            widgetEl.width(width);
         },
 
         getFieldName: function()
