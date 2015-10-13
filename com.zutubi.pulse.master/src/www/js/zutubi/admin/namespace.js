@@ -122,13 +122,31 @@ if (window.Zutubi.admin === undefined)
 
         function _showAddWizard(scope)
         {
-            new Zutubi.admin.WizardWindow({
-                path: scope,
+            var path, item, window;
+
+            if (app.scopePanel)
+            {
+                path = scope;
+                item = app.scopePanel.getItem();
+                if (item)
+                {
+                    path += "/" + item;
+                }
+            }
+            else if (app.configPanel)
+            {
+                path = app.configPanel.getRootPath();
+            }
+
+            window = new Zutubi.admin.WizardWindow({
+                path: path,
                 success: function(delta)
                 {
-
+                    app.router.navigate("/config/" + delta.addedPaths[0], false);
                 }
-            }).show();
+            });
+
+            window.show();
         }
 
         function _coerceInt(properties, name)

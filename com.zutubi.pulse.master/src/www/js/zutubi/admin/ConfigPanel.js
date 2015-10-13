@@ -67,6 +67,11 @@
             this.view.destroy();
         },
 
+        getRootPath: function()
+        {
+            return this.configTree.getRootPath();
+        },
+
         setPaths: function(rootPath, configPath)
         {
             var path = rootPath;
@@ -99,6 +104,19 @@
             else
             {
                 this.loadContentPanes(path);
+            }
+        },
+
+        applyDelta: function(delta)
+        {
+            var newPath;
+
+            this.configTree.applyDelta(delta);
+            if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
+            {
+                newPath = delta.renamedPaths[this.path];
+                Zutubi.admin.replaceConfigPath(newPath);
+                this.path = newPath;
             }
         },
 
@@ -181,7 +199,7 @@
 
             that.contentPanel.bind("saved", function(e)
             {
-                that._applyDelta(e.delta);
+                that.applyDelta(e.delta);
                 that._clearContent();
                 that._showComposite(e.delta.models[that.path]);
             });
@@ -206,7 +224,7 @@
 
             that.contentPanel.bind("reordered", function(e)
             {
-                that._applyDelta(e.delta);
+                that.applyDelta(e.delta);
             });
         },
 
@@ -221,19 +239,6 @@
             });
 
             $("#center-pane-content").append(link);
-        },
-
-        _applyDelta: function(delta)
-        {
-            var newPath;
-
-            this.configTree.applyDelta(delta);
-            if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
-            {
-                newPath = delta.renamedPaths[this.path];
-                Zutubi.admin.replaceConfigPath(newPath);
-                this.path = newPath;
-            }
         },
 
         _showWizard: function()
@@ -251,7 +256,7 @@
 
         _wizardFinished: function(delta)
         {
-            this._applyDelta(delta);
+            this.applyDelta(delta);
             this.loadContentPanes(this.path);
         },
 
@@ -377,7 +382,7 @@
                         url: "/api/config/" + path,
                         success: function (delta)
                         {
-                            that._applyDelta(delta);
+                            that.applyDelta(delta);
                             that._openPath(that.configTree.longestMatchingSubpath(path));
                         },
                         error: function (jqXHR)

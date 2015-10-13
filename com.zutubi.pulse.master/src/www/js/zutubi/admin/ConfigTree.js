@@ -77,6 +77,11 @@
             return path;
         },
 
+        getRootPath: function()
+        {
+            return this.rootPath;
+        },
+
         setRootPath: function(rootPath)
         {
             var dataSource;

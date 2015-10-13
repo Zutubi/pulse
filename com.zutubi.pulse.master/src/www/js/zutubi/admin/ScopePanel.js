@@ -94,6 +94,11 @@
             this.trigger(SELECT, {scope: this.scope, name: name});
         },
 
+        getItem: function()
+        {
+            return this.name || "";
+        },
+
         setItem: function(name)
         {
             this.hierarchySelector.selectItem(name);
