@@ -93,33 +93,6 @@ if (window.Zutubi.admin === undefined)
             return router;
         }
 
-        function _createNavbar()
-        {
-            var navbar = $("#navbar").kendoZaNavbar().data("kendoZaNavbar");
-            navbar.bind("scope-selected", function(e)
-            {
-                if (e.scope === "projects" || e.scope === "agents")
-                {
-                    app.router.navigate("/hierarchy/" + e.scope + "/");
-                }
-                else if (e.scope === "plugins")
-                {
-                    app.router.navigate("/plugins/");
-                }
-                else
-                {
-                    app.router.navigate("/config/" + e.scope + "/");
-                }
-            });
-
-            navbar.bind("add", function(e)
-            {
-                _showAddWizard(e.scope);
-            });
-
-            return navbar;
-        }
-
         function _showAddWizard(scope)
         {
             var path, item, window;
@@ -147,6 +120,33 @@ if (window.Zutubi.admin === undefined)
             });
 
             window.show();
+        }
+
+        function _createNavbar()
+        {
+            var navbar = $("#navbar").kendoZaNavbar().data("kendoZaNavbar");
+            navbar.bind("scope-selected", function(e)
+            {
+                if (e.scope === "projects" || e.scope === "agents")
+                {
+                    app.router.navigate("/hierarchy/" + e.scope + "/");
+                }
+                else if (e.scope === "plugins")
+                {
+                    app.router.navigate("/plugins/");
+                }
+                else
+                {
+                    app.router.navigate("/config/" + e.scope + "/");
+                }
+            });
+
+            navbar.bind("add", function(e)
+            {
+                _showAddWizard(e.scope);
+            });
+
+            return navbar;
         }
 
         function _coerceInt(properties, name)
