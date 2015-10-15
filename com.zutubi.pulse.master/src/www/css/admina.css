@@ -156,7 +156,6 @@ ul.navlist {
     border: none;
 }
 
-
 /* Collections */
 
 .k-collection-panel {
@@ -189,6 +188,39 @@ ul.navlist {
 #collection-table .k-menu .k-animation-container {
     left: auto !important;
     right: -4px;
+}
+
+/* Type select panel */
+
+.k-type-select-panel {
+    padding: 8px 16px;
+}
+
+#type-select-content {
+    margin: 1em 0 ;
+}
+
+.configured-descendants p {
+    margin: 1em 0;
+}
+
+.configured-descendants ul {
+    margin-left: 4ch;
+    list-style-type: circle;
+}
+
+.configured-descendants li {
+    margin: 0.4em 0;
+}
+
+.configured-descendants a {
+    cursor: pointer;
+    padding: 0.2em;
+}
+
+.configured-descendants a:hover {
+    color: #fff;
+    background-color: #8ebc00;
 }
 
 /* Forms */

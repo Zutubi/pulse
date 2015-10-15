@@ -22,6 +22,56 @@ if (window.Zutubi.admin === undefined)
             }).data("kendoNotification");
         }
 
+        function _showScope(scope, name)
+        {
+            if (app.configPanel)
+            {
+                app.configPanel.destroy();
+                delete app.configPanel;
+            }
+
+            if (!app.scopePanel)
+            {
+                app.scopePanel = new Zutubi.admin.ScopePanel("#config-view");
+                app.scopePanel.bind("select", function(e)
+                {
+                    var url = "/hierarchy/" + e.scope;
+                    if (e.name.length > 0)
+                    {
+                        url += "/" + e.name;
+                    }
+
+                    app.router.navigate(url, true);
+                });
+            }
+
+            app.scopePanel.setScope(scope, name);
+        }
+
+        function _showConfig(path, templated)
+        {
+            var rootIndex = templated ? 2 : 1,
+                rootPath = Zutubi.admin.subPath(path, 0, rootIndex),
+                configPath = Zutubi.admin.subPath(path, rootIndex);
+
+            if (app.scopePanel)
+            {
+                app.scopePanel.destroy();
+                delete app.scopePanel;
+            }
+
+            if (!app.configPanel)
+            {
+                app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
+                app.configPanel.bind("pathselect", function(e)
+                {
+                    app.router.navigate("/config/" + e.path, true);
+                });
+            }
+
+            app.configPanel.setPaths(rootPath, configPath);
+        }
+
         function _createRouter()
         {
             var router = new kendo.Router({
@@ -42,19 +92,19 @@ if (window.Zutubi.admin === undefined)
             router.route("/hierarchy/projects(/)(:name)(/)", function(name)
             {
                 app.navbar.selectScope("projects");
-                Zutubi.admin.showScope("projects", name);
+                _showScope("projects", name);
             });
 
             router.route("/config/projects/*path", function(path)
             {
                 app.navbar.selectScope("projects");
-                Zutubi.admin.showConfig("projects/" + Zutubi.admin.normalisedPath(path), true);
+                _showConfig("projects/" + Zutubi.admin.normalisedPath(path), true);
             });
 
             router.route("/hierarchy/agents(/)(:name)(/)", function(name)
             {
                 app.navbar.selectScope("agents");
-                Zutubi.admin.showScope("agents", name);
+                _showScope("agents", name);
             });
 
             router.route("/config/agents/*path", function(path)
@@ -62,26 +112,26 @@ if (window.Zutubi.admin === undefined)
                 app.navbar.selectScope("agents");
                 if (path)
                 {
-                    Zutubi.admin.showConfig("agents/" + Zutubi.admin.normalisedPath(path), true);
+                    _showConfig("agents/" + Zutubi.admin.normalisedPath(path), true);
                 }
             });
 
             router.route("/config/settings/*path", function(path)
             {
                 app.navbar.selectScope("settings");
-                Zutubi.admin.showConfig("settings/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("settings/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/config/users/*path", function(path)
             {
                 app.navbar.selectScope("users");
-                Zutubi.admin.showConfig("users/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("users/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/config/groups/*path", function(path)
             {
                 app.navbar.selectScope("groups");
-                Zutubi.admin.showConfig("groups/" + Zutubi.admin.normalisedPath(path), false);
+                _showConfig("groups/" + Zutubi.admin.normalisedPath(path), false);
             });
 
             router.route("/plugins(/:id)", function(id)
@@ -300,59 +350,14 @@ if (window.Zutubi.admin === undefined)
                 app.notificationWidget.error(message);
             },
 
-            replaceConfigPath: function (newPath)
+            openConfigPath: function(newPath)
+            {
+                app.router.navigate("/config/" + newPath, false);
+            },
+
+            replaceConfigPath: function(newPath)
             {
                 app.router.replace("/config/" + newPath, true);
-            },
-
-            showScope: function(scope, name)
-            {
-                if (app.configPanel)
-                {
-                    app.configPanel.destroy();
-                    delete app.configPanel;
-                }
-
-                if (!app.scopePanel)
-                {
-                    app.scopePanel = new Zutubi.admin.ScopePanel("#config-view");
-                    app.scopePanel.bind("select", function(e)
-                    {
-                        var url = "/hierarchy/" + e.scope;
-                        if (e.name.length > 0)
-                        {
-                            url += "/" + e.name;
-                        }
-
-                        app.router.navigate(url, true);
-                    });
-                }
-
-                app.scopePanel.setScope(scope, name);
-            },
-
-            showConfig: function (path, templated)
-            {
-                var rootIndex = templated ? 2 : 1,
-                    rootPath = Zutubi.admin.subPath(path, 0, rootIndex),
-                    configPath = Zutubi.admin.subPath(path, rootIndex);
-
-                if (app.scopePanel)
-                {
-                    app.scopePanel.destroy();
-                    delete app.scopePanel;
-                }
-
-                if (!app.configPanel)
-                {
-                    app.configPanel = new Zutubi.admin.ConfigPanel("#config-view");
-                    app.configPanel.bind("pathselect", function(e)
-                    {
-                        app.router.navigate("/config/" + e.path, true);
-                    });
-                }
-
-                app.configPanel.setPaths(rootPath, configPath);
             },
 
             coerceProperties: function(properties, propertyTypes)

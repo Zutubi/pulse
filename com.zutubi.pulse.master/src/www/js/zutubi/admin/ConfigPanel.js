@@ -7,6 +7,7 @@
 // dependency: ./CompositePanel.js
 // dependency: ./DeleteWindow.js
 // dependency: ./Table.js
+// dependency: ./TypeSelectPanel.js
 // dependency: ./WizardWindow.js
 
 (function($)
@@ -238,15 +239,18 @@
 
         _showTypeSelection: function(data)
         {
-            var that = this,
-                link = $('<a>create a new thing</a>');
-            link.on("click", function(e)
-            {
-                e.preventDefault();
-                that._showWizard(data);
+            var that = this;
+
+            that.contentPanel = new Zutubi.admin.TypeSelectPanel({
+                containerSelector: "#center-pane-content",
+                type: data,
+                path: that.path
             });
 
-            that.contentEl.append(link);
+            that.contentPanel.bind("configure", function()
+            {
+                that._showWizard(data);
+            });
         },
 
         _showWizard: function(data)
