@@ -25,7 +25,7 @@ public class PerforceConfiguration extends PollableScmConfiguration
     private String spec;
     private String options;
     private String stream;
-    @TextArea(rows = 10, cols = 80)
+    @TextArea(rows = 10, cols = 64)
     private String view = "//depot/... //pulse/...";
     private boolean useTicketAuth = false;
     @Wizard.Ignore @Min(0)
