@@ -262,14 +262,25 @@
             }
         },
 
+        _showErrors: function(errorList, messages)
+        {
+            var i;
+
+            for (i = 0; i < messages.length; i++)
+            {
+                errorList.append(this.errorTemplate({message: messages[i]}));
+            }
+        },
+
         _showInstanceErrors: function(messages)
         {
-            // FIXME kendo : what is an appropriate spot for these?
+            var errorList = $('<ul class="validation-errors"></ul>').prependTo(this.element);
+            this._showErrors(errorList, messages);
         },
 
         _showFieldErrors: function(fieldName, messages)
         {
-            var i, field, fieldCell, errorList;
+            var field, fieldCell, errorList;
 
             if (messages.length)
             {
@@ -277,12 +288,8 @@
                 if (field)
                 {
                     fieldCell = field.element.closest("td");
-                    fieldCell.append('<ul class="validation-errors"></ul>');
-                    errorList = fieldCell.children('.validation-errors');
-                    for (i = 0; i < messages.length; i++)
-                    {
-                        errorList.append(this.errorTemplate({message: messages[i]}));
-                    }
+                    errorList = $('<ul class="validation-errors"></ul>').appendTo(fieldCell);
+                    this._showErrors(errorList, messages);
                 }
             }
         }

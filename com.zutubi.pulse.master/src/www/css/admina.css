@@ -274,6 +274,18 @@ input[type=checkbox].k-input {
     margin-right: 1ch;
 }
 
+ul.validation-errors
+{
+    color: #bb2222;
+    list-style-type: disc;
+    margin-left: 4ch;
+}
+
+.validation-errors li
+{
+    margin: 0.4em 0;
+}
+
 /* Wizards */
 
 .k-wizard-step-index {

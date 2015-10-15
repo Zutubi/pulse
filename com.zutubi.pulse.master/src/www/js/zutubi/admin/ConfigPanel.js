@@ -226,7 +226,7 @@
 
             that.contentPanel.bind("add", function()
             {
-                that._showWizard();
+                that._showWizard(data.type.targetType);
             });
 
             that.contentPanel.bind("action", jQuery.proxy(that._doAction, that));
@@ -253,14 +253,14 @@
             });
         },
 
-        _showWizard: function(data)
+        _showWizard: function(type)
         {
             var that = this,
                 window;
 
             window = new Zutubi.admin.WizardWindow({
                 path: that.path,
-                label: data.label,
+                label: type.label,
                 success: jQuery.proxy(that._wizardFinished, that)
             });
 
