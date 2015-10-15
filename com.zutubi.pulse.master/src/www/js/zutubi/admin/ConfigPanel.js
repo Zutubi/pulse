@@ -243,19 +243,20 @@
             link.on("click", function(e)
             {
                 e.preventDefault();
-                that._showWizard();
+                that._showWizard(data);
             });
 
             that.contentEl.append(link);
         },
 
-        _showWizard: function()
+        _showWizard: function(data)
         {
             var that = this,
                 window;
 
             window = new Zutubi.admin.WizardWindow({
                 path: that.path,
+                label: data.label,
                 success: jQuery.proxy(that._wizardFinished, that)
             });
 

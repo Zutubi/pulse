@@ -95,7 +95,7 @@ if (window.Zutubi.admin === undefined)
 
         function _showAddWizard(scope)
         {
-            var path, item, window;
+            var path, item, label, window;
 
             if (app.scopePanel)
             {
@@ -111,8 +111,12 @@ if (window.Zutubi.admin === undefined)
                 path = app.configPanel.getRootPath();
             }
 
+            label = Zutubi.admin.subPath(path, 0, 1);
+            label = label.substring(0, label.length - 1);
+
             window = new Zutubi.admin.WizardWindow({
                 path: path,
+                label: label,
                 success: function(delta)
                 {
                     app.router.navigate("/config/" + delta.addedPaths[0], false);
