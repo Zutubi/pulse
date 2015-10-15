@@ -53,6 +53,8 @@
                 that.loadContentPanes(e.path);
             });
 
+            that.contentEl = $("#center-pane-content");
+
             that.contextPanel = $("#right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
             that.contextPanel.bind("action", jQuery.proxy(that._doAction, that));
         },
@@ -120,29 +122,36 @@
             }
         },
 
+        beginNavigation: function()
+        {
+            this._clearContent();
+            kendo.ui.progress(this.contentEl, true);
+        },
+
+        endNavigation: function(error)
+        {
+            kendo.ui.progress(this.contentEl, false);
+            if (error)
+            {
+                $('<p class="nav-error"></p>').appendTo(this.contentEl).text(error);
+            }
+        },
+
         loadContentPanes: function(path)
         {
             var that = this;
 
-            this.path = path;
+            that.path = path;
 
-            Zutubi.admin.ajax({
-                type: "GET",
-                url: "/api/config/" + path + "?depth=-1",
-                success: function (data)
+            Zutubi.admin.navigate("/api/config/" + path + "?depth=-1", [that, that.contextPanel], function(data)
+            {
+                if (data.length === 1)
                 {
-                    if (data.length === 1)
-                    {
-                        that._showContent(data[0]);
-                    }
-                    else
-                    {
-                        Zutubi.admin.reportError("Unexpected result for config lookup, length = " + data.length);
-                    }
-                },
-                error: function (jqXHR)
+                    return that._showContent(data[0]);
+                }
+                else
                 {
-                    Zutubi.admin.reportError("Could not load configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                    return "Unexpected result for config lookup, length = " + data.length;
                 }
             });
         },
@@ -167,24 +176,23 @@
             }
             else
             {
-                Zutubi.admin.reportError("Unrecognised config kind: " + data.kind);
+                return "Unrecognised config kind: " + data.kind;
             }
 
             this.contextPanel.setData(this.path, this.data);
+            return null;
         },
 
         _clearContent: function()
         {
-            var contentEl = $("#center-pane-content");
-
             if (this.contentPanel)
             {
                 this.contentPanel.destroy();
                 this.contentPanel = null;
             }
 
-            kendo.destroy(contentEl);
-            contentEl.empty();
+            kendo.destroy(this.contentEl);
+            this.contentEl.empty();
         },
 
         _showComposite: function(data)
@@ -238,7 +246,7 @@
                 that._showWizard();
             });
 
-            $("#center-pane-content").append(link);
+            that.contentEl.append(link);
         },
 
         _showWizard: function()
@@ -309,9 +317,9 @@
         {
             var that = this;
 
-            // FIXME kendo mask/feedback
             Zutubi.admin.ajax({
                 type: "POST",
+                maskAll: true,
                 url: "/api/action/single/" + action.action + "/" + path,
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)

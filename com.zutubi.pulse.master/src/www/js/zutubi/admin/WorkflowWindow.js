@@ -43,7 +43,7 @@
 
         mask: function(mask)
         {
-            kendo.ui.progress(this.element, mask);
+            kendo.ui.progress(this.element.closest(".k-widget"), mask);
         },
 
         show: function()

@@ -66,47 +66,66 @@
             that.path = path;
             that.data = data;
 
-            if (data.links && data.links.length > 0)
+            if (data)
             {
-                element = $('<div class="context-content"></div>');
-                that._renderLinks(element, data.links);
-                panels.push({
-                    text: "links",
-                    expanded: true,
-                    content: element[0].outerHTML
-                });
-            }
+                if (data.links && data.links.length > 0)
+                {
+                    element = $('<div class="context-content"></div>');
+                    that._renderLinks(element, data.links);
+                    panels.push({
+                        text: "links",
+                        expanded: true,
+                        content: element[0].outerHTML
+                    });
+                }
 
-            if (data.actions && (data.actions.length > 1 || data.actions[0].action !== "view"))
+                if (data.actions && (data.actions.length > 1 || data.actions[0].action !== "view"))
+                {
+                    data.actions.sort(_actionCompare);
+
+                    element = $('<div class="context-content"></div>');
+                    that._renderActions(element, data.actions, "action");
+                    panels.push({
+                        text: "actions",
+                        expanded: true,
+                        content: element[0].outerHTML
+                    });
+                }
+
+                if (data.descendantActions && data.descendantActions.length > 0)
+                {
+                    data.descendantActions.sort(_actionCompare);
+
+                    element = $('<div class="context-content"></div>');
+                    that._renderActions(element, data.descendantActions, "descendant");
+                    panels.push({
+                        text: "descendant actions",
+                        expanded: true,
+                        content: element[0].outerHTML
+                    });
+                }
+
+                that.panelBar = that.contentElement.kendoPanelBar({dataSource: panels}).data("kendoPanelBar");
+
+                that.actionLists = that.contentElement.find(".config-actions");
+                that.actionLists.on(CLICK, jQuery.proxy(that._actionClicked, that));
+            }
+            else
             {
-                data.actions.sort(_actionCompare);
-
-                element = $('<div class="context-content"></div>');
-                that._renderActions(element, data.actions, "action");
-                panels.push({
-                    text: "actions",
-                    expanded: true,
-                    content: element[0].outerHTML
-                });
+                that.contentElement.html("");
             }
+        },
 
-            if (data.descendantActions && data.descendantActions.length > 0)
-            {
-                data.descendantActions.sort(_actionCompare);
+        beginNavigation: function()
+        {
+            this.setData(null);
+            kendo.ui.progress(this.contentElement, true);
+        },
 
-                element = $('<div class="context-content"></div>');
-                that._renderActions(element, data.descendantActions, "descendant");
-                panels.push({
-                    text: "descendant actions",
-                    expanded: true,
-                    content: element[0].outerHTML
-                });
-            }
-
-            that.panelBar = that.contentElement.kendoPanelBar({dataSource: panels}).data("kendoPanelBar");
-
-            that.actionLists = that.contentElement.find(".config-actions");
-            that.actionLists.on(CLICK, jQuery.proxy(that._actionClicked, that));
+        endNavigation: function(error)
+        {
+            // Note we ignore the error if present, assuming another panel will display it.
+            kendo.ui.progress(this.contentElement, false);
         },
 
         _renderLinks: function(element, links)

@@ -39,7 +39,7 @@
 
         mask: function(mask)
         {
-            kendo.ui.progress(this.element, mask);
+            kendo.ui.progress(this.element.closest(".k-widget"), mask);
         },
 
         show: function()
@@ -111,6 +111,16 @@
                 structure: data,
                 path: that.options.path
             }).data("kendoZaWizard");
+
+            that.wizard.bind("posting", function()
+            {
+                that.mask(true);
+            });
+
+            that.wizard.bind("posted", function()
+            {
+                that.mask(false);
+            });
 
             that.wizard.bind("finished", function(e)
             {

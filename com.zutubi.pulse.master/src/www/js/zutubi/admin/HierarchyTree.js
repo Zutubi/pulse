@@ -36,6 +36,7 @@
                 // This callback is invoked for every level, but only once with a null node.
                 if (!this.bound && !e.node)
                 {
+                    kendo.ui.progress(this.element, false);
                     this.expand(this._getRoot());
                     this.bound = true;
                     this._updateSelected();
@@ -84,6 +85,7 @@
                 Zutubi.admin.reportError('Could not load hierarchy tree: ' + Zutubi.admin.ajaxError(e.xhr));
             });
 
+            kendo.ui.progress(this.element, true);
             this.setDataSource(dataSource);
         },
 

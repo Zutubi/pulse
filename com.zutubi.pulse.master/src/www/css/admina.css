@@ -70,6 +70,12 @@ ul.navlist {
     height: 100%;
 }
 
+.nav-error {
+    padding: 1em;
+    color: #bb2222;
+    font-weight: bold;
+}
+
 /* Footer bar */
 
 #footer {

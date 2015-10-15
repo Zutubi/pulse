@@ -79,6 +79,7 @@
 
             Zutubi.admin.ajax({
                 type: "PUT",
+                maskAll: true,
                 url: "/api/config/" + that.options.path + "?depth=1",
                 data: {kind: "composite", properties: properties},
                 success: function (data)
@@ -126,6 +127,7 @@
 
             Zutubi.admin.ajax({
                 type: "POST",
+                maskAll: true,
                 url: "/api/action/check/" + that.options.path,
                 data: {
                     main: {kind: "composite", properties: properties},

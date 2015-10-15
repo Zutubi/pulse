@@ -36,6 +36,7 @@
                 // later update the datasource, so once we've bound we don't trigger again.
                 if (!this.bound && !e.node)
                 {
+                    kendo.ui.progress(this.element, false);
                     this.bound = true;
                     this.selectConfigNode();
                 }
@@ -98,10 +99,10 @@
                 transport: {
                     read: {
                         url: window.baseUrl + "/api/config/" + rootPath + "?depth=-1&filter=nested&filter=type",
-                            dataType: "json",
-                            headers: {
-                                Accept: "application/json; charset=utf-8",
-                                    "Content-Type": "application/json; charset=utf-8"
+                        dataType: "json",
+                        headers: {
+                            Accept: "application/json; charset=utf-8",
+                            "Content-Type": "application/json; charset=utf-8"
                         }
                     }
                 },
@@ -116,6 +117,7 @@
                 Zutubi.admin.reportError('Could not load configuration tree: ' + Zutubi.admin.ajaxError(e.xhr));
             });
 
+            kendo.ui.progress(this.element, true);
             this.setDataSource(dataSource);
         },
 

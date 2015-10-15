@@ -90,6 +90,7 @@
 
             Zutubi.admin.ajax({
                 type: "PUT",
+                maskAll: true,
                 url: "/api/config/" + that.options.path + "?depth=-1",
                 data: {
                     kind: "collection",

@@ -9,6 +9,8 @@
         NEXT = "next",
         CANCEL = "cancel",
         FINISH = "finish",
+        POSTING = "posting",
+        POSTED = "posted",
         FINISHED = "finished",
         CANCELLED = "cancelled",
 
@@ -60,6 +62,8 @@
         },
 
         events: [
+            POSTING,
+            POSTED,
             FINISHED
         ],
 
@@ -339,17 +343,22 @@
                 }
             });
 
+            that.trigger(POSTING);
+
             Zutubi.admin.ajax({
                 type: "POST",
                 url: "/api/wizard/" + that.options.path,
                 data: wizardData,
                 success: function (data)
                 {
+                    that.trigger(POSTED);
                     that.trigger(FINISHED, {delta: data});
                 },
                 error: function (jqXHR)
                 {
                     var details;
+
+                    that.trigger(POSTED);
 
                     if (jqXHR.status === 422)
                     {

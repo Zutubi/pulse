@@ -43,6 +43,7 @@
             });
 
             that.hierarchySelector = $("#hierarchy-tree").kendoZaHierarchySelector().data("kendoZaHierarchySelector");
+            that.contentEl = $("#center-pane-content");
             that.contextPanel = $("#right-pane-content").kendoZaContextPanel().data("kendoZaContextPanel");
 
             that.hierarchySelector.bind("bound", function(e)
@@ -105,29 +106,37 @@
             this._loadContentPanes(name);
         },
 
+        beginNavigation: function()
+        {
+            this._clearContent();
+            kendo.ui.progress(this.contentEl, true);
+        },
+
+        endNavigation: function(error)
+        {
+            kendo.ui.progress(this.contentEl, false);
+            if (error)
+            {
+                $('<p class="nav-error"></p>').appendTo(this.contentEl).text(error);
+            }
+        },
+
         _loadContentPanes: function(name)
         {
             var that = this;
 
-            this.name = name;
+            that.name = name;
 
-            Zutubi.admin.ajax({
-                type: "GET",
-                url: "/api/config/" + that.scope + "/" + that.name + "?depth=-1",
-                success: function (data)
+            Zutubi.admin.navigate("/api/config/" + that.scope + "/" + that.name + "?depth=-1", [that, that.contextPanel], function(data)
+            {
+                if (data.length === 1)
                 {
-                    if (data.length === 1)
-                    {
-                        that._showContent(data[0]);
-                    }
-                    else
-                    {
-                        Zutubi.admin.reportError("Unexpected result for config lookup, length = " + data.length);
-                    }
-                },
-                error: function (jqXHR)
+                    that._showContent(data[0]);
+                    return null;
+                }
+                else
                 {
-                    Zutubi.admin.reportError("Could not load configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                    return "Unexpected result for config lookup, length = " + data.length;
                 }
             });
         },
@@ -162,16 +171,14 @@
 
         _clearContent: function()
         {
-            var contentEl = $("#center-pane-content");
-
             if (this.contentPanel)
             {
                 this.contentPanel.destroy();
                 this.contentPanel = null;
             }
 
-            kendo.destroy(contentEl);
-            contentEl.empty();
+            kendo.destroy(this.contentEl);
+            this.contentEl.empty();
         }
     });
 }(jQuery));
