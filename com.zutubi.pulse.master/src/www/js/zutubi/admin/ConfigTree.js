@@ -4,7 +4,53 @@
 {
     var ui = kendo.ui,
         TreeView = ui.TreeView,
-        PATHSELECT = "pathselect";
+        PATHSELECT = "pathselect",
+
+    PathInfo = function(found, item, path, embedded)
+    {
+        this.found = found;
+        this.item = item;
+        this.path = path;
+        this.embedded = embedded;
+    };
+
+    function _embedCollections(item)
+    {
+        var i;
+        if (item.nested)
+        {
+            if (item.kind === "collection" && !item.type.keyed)
+            {
+                item.embedded = item.nested;
+                delete item.nested;
+            }
+            else if (Zutubi.admin.hasCollapsedCollection(item))
+            {
+                item.collapsed = item.nested[0];
+                item.nestedName = item.collapsed.key;
+                item.nested = item.collapsed.nested;
+            }
+
+            if (item.nested)
+            {
+                for (i = 0; i < item.nested.length; i++)
+                {
+                    _embedCollections(item.nested[i]);
+                }
+            }
+        }
+    }
+
+    function _cloneAndEmbed(data)
+    {
+        if (data)
+        {
+            data = jQuery.extend(true, {}, data);
+            _embedCollections(data);
+        }
+
+        return data;
+    }
 
     Zutubi.admin.ConfigTree = TreeView.extend({
         init: function(element, options)
@@ -38,27 +84,39 @@
                 {
                     kendo.ui.progress(this.element, false);
                     this.bound = true;
-                    this.selectConfigNode();
+                    this._selectConfigNode();
                 }
             },
             select: function(e)
             {
                 var that = this;
-                that.configPath = that.pathForNode(e.node, true);
-                that.trigger(PATHSELECT, {path: that.pathForNode(e.node)});
+                that.configPath = that._pathForNode(e.node, true);
+                that.trigger(PATHSELECT, {path: that._pathForNode(e.node)});
             }
         },
 
-        pathForNode: function(node, relative)
+        _pathForNode: function(node, relative)
         {
             var nodeData = this.dataItem(node),
                 path = nodeData.key,
                 parent = this.parent(node),
+                parentItem,
                 parentPath;
 
             if (parent.length)
             {
-                parentPath = this.pathForNode(parent, relative);
+                parentPath = this._pathForNode(parent, relative);
+                parentItem = this.dataItem(parent);
+                if (parentItem.nestedName)
+                {
+                    if (parentPath.length > 0)
+                    {
+                        parentPath += '/';
+                    }
+
+                    parentPath += parentItem.nestedName;
+                }
+
                 if (parentPath.length > 0)
                 {
                     parentPath += '/';
@@ -107,6 +165,12 @@
                     }
                 },
                 schema: {
+                    parse: function(response) {
+                        return jQuery.map(response, function(item) {
+                            _embedCollections(item);
+                            return item;
+                        });
+                    },
                     model: {
                         children: "nested"
                     }
@@ -121,15 +185,21 @@
             this.setDataSource(dataSource);
         },
 
-        _dataItemForConfigPath: function(configPath)
+        _infoForConfigPath: function(configPath)
         {
             var that = this,
                 root = that.wrapper.find(".k-item:first"),
                 dataItem = that.dataItem(root),
+                path = that.rootPath,
                 keys = [],
                 i, j,
                 key,
                 children;
+
+            if (!dataItem)
+            {
+                return new PathInfo(false, null, null, false);
+            }
 
             if (configPath)
             {
@@ -139,6 +209,43 @@
             for (i = 0; i < keys.length; i++)
             {
                 key = keys[i];
+
+                if (dataItem.nestedName)
+                {
+                    if (dataItem.nestedName !== key)
+                    {
+                        return new PathInfo(false, dataItem, path, false);
+                    }
+
+                    path += "/" + key;
+
+                    if (i < keys.length - 1)
+                    {
+                        i++;
+                        key = keys[i];
+                    }
+                    else
+                    {
+                        return new PathInfo(true, dataItem, path, false);
+                    }
+                }
+                else if (dataItem.embedded)
+                {
+                    // We've hit list of non-named items, the end of the line.  If this is the last
+                    // path element we might hit it in the embedded collection.
+                    if (i === keys.length - 1)
+                    {
+                        for (j = 0; j < dataItem.embedded.length; j++)
+                        {
+                            if (dataItem.embedded[j].key === key)
+                            {
+                                return new PathInfo(true, dataItem, path, true);
+                            }
+                        }
+                    }
+
+                    return new PathInfo(false, dataItem, path, false);
+                }
 
                 children = dataItem.children.data();
                 for (j = 0; j < children.length; j++)
@@ -151,26 +258,27 @@
 
                 if (j === children.length)
                 {
-                    return null;
+                    return new PathInfo(false, dataItem, path, false);
                 }
 
                 dataItem = children[j];
+                path += "/" + key;
             }
 
-            return dataItem;
+            return new PathInfo(true, dataItem, path, false);
         },
 
-        selectConfigNode: function()
+        _selectConfigNode: function()
         {
             var that = this,
                 root = that.wrapper.find(".k-item:first"),
-                dataItem = that._dataItemForConfigPath(that.configPath);
+                info = that._infoForConfigPath(that.configPath);
 
             that.expand(root);
-            if (dataItem)
+            if (info.found)
             {
-                that.expandTo(dataItem);
-                that.select(that.findByUid(dataItem.uid));
+                that.expandTo(info.item);
+                that.select(that.findByUid(info.item.uid));
             }
             else
             {
@@ -183,7 +291,7 @@
             this.configPath = configPath;
             if (this.bound)
             {
-                this.selectConfigNode();
+                this._selectConfigNode();
             }
         },
 
@@ -194,43 +302,9 @@
 
         longestMatchingSubpath: function(path)
         {
-            var result = this.rootPath,
-                configPath = this._absoluteToConfigPath(path),
-                root = this.wrapper.find(".k-item:first"),
-                dataItem = this.dataItem(root),
-                keys = [],
-                i, j,
-                key,
-                children;
-
-            if (configPath)
-            {
-                keys = configPath.split("/");
-            }
-
-            for (i = 0; i < keys.length; i++)
-            {
-                key = keys[i];
-
-                children = dataItem.children.data();
-                for (j = 0; j < children.length; j++)
-                {
-                    if (children[j].key === key)
-                    {
-                        break;
-                    }
-                }
-
-                if (j === children.length)
-                {
-                    break;
-                }
-
-                dataItem = children[j];
-                result = result + "/" + key;
-            }
-
-            return result;
+            var info = this._infoForConfigPath(this._absoluteToConfigPath(path)),
+                collapsed = Zutubi.admin.baseName(info.path) === info.item.nestedName;
+            return collapsed ? Zutubi.admin.parentPath(info.path) : info.path;
         },
 
         _absoluteToConfigPath: function(path)
@@ -250,61 +324,78 @@
 
         _addModel: function(model, parentDataItem, index)
         {
-            var i, data, item;
+            var parentType, i, data, item;
 
-            if (!parentDataItem.type.ordered)
+            if (parentDataItem.embedded)
             {
-                // Order by label.
-                data = parentDataItem.children.data();
-                for (i = 0; i < data.length; i++)
+                parentDataItem.embedded.push(model);
+            }
+            else
+            {
+                if (parentDataItem.collapsed)
                 {
-                    item = data[i];
-                    if (item.label.localeCompare(model.label) > 0)
-                    {
-                        break;
-                    }
+                    parentType = parentDataItem.collapsed.type;
+                }
+                else
+                {
+                    parentType = parentDataItem.type;
                 }
 
-                index = i;
-            }
-            else if (index === undefined || index < 0)
-            {
-                index = parentDataItem.children.data().length;
-            }
+                if (!parentType.ordered)
+                {
+                    // Order by label.
+                    data = parentDataItem.children.data();
+                    for (i = 0; i < data.length; i++)
+                    {
+                        item = data[i];
+                        if (item.label.localeCompare(model.label) > 0)
+                        {
+                            break;
+                        }
+                    }
 
-            parentDataItem.children.insert(index, model);
+                    index = i;
+                }
+                else if (index === undefined || index < 0)
+                {
+                    index = parentDataItem.children.data().length;
+                }
+
+                parentDataItem.children.insert(index, model);
+            }
         },
 
         updatePath: function(path, data)
         {
-            var item;
+            var info;
 
+            data = _cloneAndEmbed(data);
             path = this._absoluteToConfigPath(path);
-            item = this._dataItemForConfigPath(path);
+            info = this._infoForConfigPath(path);
 
-            if (item)
+            if (info.found)
             {
                 if (data)
                 {
-                    this.updateItem(path, item, data);
+                    this._updateItem(path, info.item, data);
                 }
                 else
                 {
-                    this.dataSource.remove(item);
+                    this.dataSource.remove(info.item);
                 }
             }
             else if (data)
             {
                 path = Zutubi.admin.parentPath(path);
-                item = this._dataItemForConfigPath(path);
-                if (item)
+                info = this._infoForConfigPath(path);
+                if (info.found)
                 {
-                    this._addModel(data, item);
+                    this._addModel(data, info.item);
                 }
             }
         },
 
-        updateItem: function(path, item, data)
+        _updateItem: function(path, item, data)
         {
             var parentItem = item.parentNode(),
                 dataSource,
@@ -333,12 +424,30 @@
             }
         },
 
+        _removeEmbedded: function(item, key)
+        {
+            var i;
+
+            for (i = 0; i < item.embedded.length; i++)
+            {
+                if (item.embedded[i].key === key)
+                {
+                    break;
+                }
+            }
+
+            if (i < item.embedded.length)
+            {
+                item.embedded.splice(i, 1);
+            }
+        },
+
         applyDelta: function(delta)
         {
             var that = this,
                 i,
                 model,
-                item,
+                info,
                 path,
                 index = -1;
 
@@ -347,10 +456,10 @@
                 for (i = 0; i < delta.addedPaths.length; i++)
                 {
                     path = that._absoluteToConfigPath(delta.addedPaths[i]);
-                    item = that._dataItemForConfigPath(Zutubi.admin.parentPath(path));
-                    if (item)
+                    info = that._infoForConfigPath(Zutubi.admin.parentPath(path));
+                    if (info.found)
                     {
-                        that._addModel(delta.models[delta.addedPaths[i]], item);
+                        that._addModel(_cloneAndEmbed(delta.models[delta.addedPaths[i]]), info.item);
                     }
                 }
             }
@@ -360,10 +469,18 @@
                 for (i = 0; i < delta.deletedPaths.length; i++)
                 {
                     path = that._absoluteToConfigPath(delta.deletedPaths[i]);
-                    item = that._dataItemForConfigPath(path);
-                    if (item)
+                    info = that._infoForConfigPath(path);
+                    if (info.found)
                     {
-                        that.dataSource.remove(item);
+                        if (info.embedded)
+                        {
+                            info = that._infoForConfigPath(Zutubi.admin.parentPath(path));
+                            this._removeEmbedded(info.item, Zutubi.admin.baseName(path));
+                        }
+                        else
+                        {
+                            that.dataSource.remove(info.item);
+                        }
                     }
                 }
             }
@@ -376,17 +493,17 @@
                     oldPath = that._absoluteToConfigPath(oldPath);
                     newPath = that._absoluteToConfigPath(newPath);
 
-                    item = that._dataItemForConfigPath(oldPath);
-                    if (item)
+                    info = that._infoForConfigPath(oldPath);
+                    if (info.found)
                     {
-                        index = item.parentNode().children.indexOf(item);
-                        that.dataSource.remove(item);
+                        index = info.item.parentNode().children.indexOf(info.item);
+                        that.dataSource.remove(info.item);
                     }
 
-                    item = that._dataItemForConfigPath(Zutubi.admin.parentPath(newPath));
-                    if (item)
+                    info = that._infoForConfigPath(Zutubi.admin.parentPath(newPath));
+                    if (info.found)
                     {
-                        that._addModel(model, item, index);
+                        that._addModel(_cloneAndEmbed(model), info.item, index);
                     }
 
                     if (oldPath === that.configPath)
@@ -403,11 +520,11 @@
                     path = delta.updatedPaths[i];
                     model = delta.models[path];
                     path = that._absoluteToConfigPath(path);
-                    item = that._dataItemForConfigPath(path);
-                    if (item && item.children && item.children.data().length > 0)
+                    info = that._infoForConfigPath(path);
+                    if (info.found && info.item.children && info.item.children.data().length > 0)
                     {
                         // Update to a node, e.g. collection reorder. Refresh.
-                        that.updateItem(path, item, model);
+                        that._updateItem(path, info.item, _cloneAndEmbed(model));
                     }
                 }
             }

@@ -206,12 +206,22 @@
                 path: that.path
             });
 
+            that.contentPanel.bind("cancelled", function(e)
+            {
+                that._openPath(Zutubi.admin.parentPath(that.path));
+            });
+
             that.contentPanel.bind("saved", function(e)
             {
                 that.applyDelta(e.delta);
                 that._clearContent();
                 that._showComposite(e.delta.models[that.path]);
             });
+
+            if (that.contentPanel.collapsedCollectionPanel)
+            {
+                that._bindCollectionHandlers(that.contentPanel.collapsedCollectionPanel, data.nested[0]);
+            }
         },
 
         _showCollection: function(data)
@@ -224,14 +234,21 @@
                 path: that.path
             });
 
-            that.contentPanel.bind("add", function()
+            that._bindCollectionHandlers(that.contentPanel, data);
+        },
+
+        _bindCollectionHandlers: function(panel, collection)
+        {
+            var that = this;
+
+            panel.bind("add", function()
             {
-                that._showWizard(data.type.targetType);
+                that._showWizard(collection.type.targetType, panel.options.path);
             });
 
-            that.contentPanel.bind("action", jQuery.proxy(that._doAction, that));
+            panel.bind("action", jQuery.proxy(that._doAction, that));
 
-            that.contentPanel.bind("reordered", function(e)
+            panel.bind("reordered", function(e)
             {
                 that.applyDelta(e.delta);
             });
@@ -249,17 +266,17 @@
 
             that.contentPanel.bind("configure", function()
             {
-                that._showWizard(data);
+                that._showWizard(data, that.path);
             });
         },
 
-        _showWizard: function(type)
+        _showWizard: function(type, path)
         {
             var that = this,
                 window;
 
             window = new Zutubi.admin.WizardWindow({
-                path: that.path,
+                path: path,
                 label: type.label,
                 success: jQuery.proxy(that._wizardFinished, that)
             });

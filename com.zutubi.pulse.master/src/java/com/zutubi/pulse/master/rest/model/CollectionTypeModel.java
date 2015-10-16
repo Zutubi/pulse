@@ -29,6 +29,11 @@ public class CollectionTypeModel extends TypeModel
         return collectionType.isOrdered();
     }
 
+    public boolean isKeyed()
+    {
+        return collectionType.hasSignificantKeys();
+    }
+
     public String getTargetShortType()
     {
         return formatShortType(collectionType.getTargetType());

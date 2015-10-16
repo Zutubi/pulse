@@ -81,7 +81,7 @@ public class ConfigModelBuilder
             }
             else
             {
-                model = createCompositeModel(path, compositeType, label, record, filters);
+                model = createCompositeModel(path, compositeType, label, parentType.hasSignificantKeys(), record, filters);
             }
         }
 
@@ -188,10 +188,10 @@ public class ConfigModelBuilder
         return null;
     }
 
-    private CompositeModel createCompositeModel(String path, CompositeType type, String label, Record record, String[] filters) throws TypeException
+    private CompositeModel createCompositeModel(String path, CompositeType type, String label, boolean keyed, Record record, String[] filters) throws TypeException
     {
         String baseName = PathUtils.getBaseName(path);
-        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label);
+        CompositeModel model = new CompositeModel(Long.toString(record.getHandle()), baseName, label, keyed);
         Configuration instance = configurationTemplateManager.getInstance(path);
         if (isFieldSelected(filters, "properties"))
         {

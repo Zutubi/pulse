@@ -14,6 +14,7 @@ import java.util.Map;
 public class CompositeModel extends ConfigModel
 {
     private CompositeTypeModel type;
+    private boolean keyed;
     private Map<String, Object> properties;
     private Map<String, Object> formattedProperties;
     private List<ActionModel> actions;
@@ -24,9 +25,10 @@ public class CompositeModel extends ConfigModel
     {
     }
 
-    public CompositeModel(String handle, String key, String label)
+    public CompositeModel(String handle, String key, String label, boolean keyed)
     {
         super(handle, key, label);
+        this.keyed = keyed;
     }
 
     public CompositeTypeModel getType()
@@ -37,6 +39,11 @@ public class CompositeModel extends ConfigModel
     public void setType(CompositeTypeModel type)
     {
         this.type = type;
+    }
+
+    public boolean isKeyed()
+    {
+        return keyed;
     }
 
     public Map<String, Object> getProperties()

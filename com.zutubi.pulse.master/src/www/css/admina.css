@@ -167,7 +167,7 @@ ul.navlist {
     margin-bottom: 8px;
 }
 
-.k-check-wrapper {
+.k-check-wrapper, .k-collapsed-collection-wrapper {
     border-top: solid 1px #ddd;
     margin-top: 16px;
 }

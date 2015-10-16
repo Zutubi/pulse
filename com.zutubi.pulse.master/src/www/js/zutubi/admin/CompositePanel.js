@@ -4,6 +4,7 @@
 (function($)
 {
     var Observable = kendo.Observable,
+        CANCELLED = "cancelled",
         SAVED = "saved";
 
     Zutubi.admin.CompositePanel = Observable.extend({
@@ -26,6 +27,8 @@
                         '<div id="#: id #-checkform">' +
                         '</div>' +
                     '</div>' +
+                    '<div style="display:none" id="#: id #-collapsed-collection" class="k-collapsed-collection-wrapper">' +
+                    '</div>' +
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
@@ -41,7 +44,8 @@
                 path: options.path,
                 structure: composite.type.form,
                 values: composite.properties,
-                dirtyChecking: true
+                dirtyChecking: composite.keyed,
+                submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");
 
             that.form.bind("submit", jQuery.proxy(that._submitClicked, that));
@@ -60,9 +64,21 @@
 
                 that.checkForm.bind("submit", jQuery.proxy(that._checkClicked, that));
             }
+
+            if (Zutubi.admin.hasCollapsedCollection(composite))
+            {
+                $("#composite-collapsed-collection").show();
+
+                that.collapsedCollectionPanel = new Zutubi.admin.CollectionPanel({
+                    containerSelector: "#composite-collapsed-collection",
+                    collection: composite.nested[0],
+                    path: that.options.path + "/" + composite.nested[0].key
+                });
+            }
         },
 
         events: [
+            CANCELLED,
             SAVED
         ],
 
@@ -72,49 +88,57 @@
             this.view.destroy();
         },
 
-        _submitClicked: function()
+        _submitClicked: function(e)
         {
             var that = this,
+                properties;
+
+            if (e.value === "cancel")
+            {
+                that.trigger(CANCELLED);
+            }
+            else
+            {
                 properties = that.form.getValues();
+                Zutubi.admin.coerceProperties(properties, that.options.composite.type.simpleProperties);
 
-            Zutubi.admin.coerceProperties(properties, that.options.composite.type.simpleProperties);
-
-            Zutubi.admin.ajax({
-                type: "PUT",
-                maskAll: true,
-                url: "/api/config/" + that.options.path + "?depth=1",
-                data: {kind: "composite", properties: properties},
-                success: function (data)
-                {
-                    console.log('save succcess');
-                    console.dir(data);
-
-                    that.trigger(SAVED, {delta: data});
-                },
-                error: function (jqXHR)
-                {
-                    var details;
-
-                    if (jqXHR.status === 422)
+                Zutubi.admin.ajax({
+                    type: "PUT",
+                    maskAll: true,
+                    url: "/api/config/" + that.options.path + "?depth=1",
+                    data: {kind: "composite", properties: properties},
+                    success: function(data)
                     {
-                        try
+                        console.log('save succcess');
+                        console.dir(data);
+
+                        that.trigger(SAVED, {delta: data});
+                    },
+                    error: function(jqXHR)
+                    {
+                        var details;
+
+                        if (jqXHR.status === 422)
                         {
-                            details = JSON.parse(jqXHR.responseText);
-                            if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                            try
                             {
-                                that.form.showValidationErrors(details);
-                                return;
+                                details = JSON.parse(jqXHR.responseText);
+                                if (details.type === "com.zutubi.pulse.master.rest.errors.ValidationException")
+                                {
+                                    that.form.showValidationErrors(details);
+                                    return;
+                                }
+                            }
+                            catch (e)
+                            {
+                                // Do nothing.
                             }
                         }
-                        catch(e)
-                        {
-                            // Do nothing.
-                        }
-                    }
 
-                    Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
-                }
-            });
+                        Zutubi.admin.reportError("Could not save configuration: " + Zutubi.admin.ajaxError(jqXHR));
+                    }
+                });
+            }
         },
 
         _checkClicked: function()

@@ -195,7 +195,7 @@
 
             if (this.options.dirtyChecking)
             {
-                enabled = this.fields.length == 0 || this.isDirty();
+                enabled = this.fields.length === 0 || this.isDirty();
 
                 for (i = 0; i < this.submits.length; i++)
                 {

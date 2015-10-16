@@ -376,6 +376,14 @@ if (window.Zutubi.admin === undefined)
                         }
                     }
                 }
+            },
+
+            hasCollapsedCollection: function(data)
+            {
+                // Simple (<10 field) composite with a single nested property will be collapsed.
+                return data.kind === "composite" &&
+                    data.nested && data.nested.length === 1 &&
+                    (!data.type.simpleProperties || data.type.simpleProperties.length < 10);
             }
         };
     }(jQuery));
