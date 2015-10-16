@@ -14,6 +14,10 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
+        ns = ".kendoForm",
+        CLICK = "click" + ns,
+        KEYUP = "keyup" + ns,
+        SELECTOR_FIELD_WRAPPER = ".k-field-wrapper",
         CREATED = "created",
         SUBMIT = "submit",
         DEFAULT_SUBMITS = ["apply", "reset"],
@@ -50,7 +54,7 @@
             formName: "form",
             template: '<form name="#: id #" id="#: id #"><table class="form"><tbody></tbody></table></form>',
             hiddenTemplate: '<input type="hidden" id="#: id #" name="#: name #">',
-            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap"></span></td></tr>',
+            fieldTemplate: '<tr><th><label id="#: id #-label" for="#: id #">#: label #</label></th><td><span id="#: id #-wrap" class="k-field-wrapper"></span></td></tr>',
             buttonTemplate: '<button id="#: id #" type="button" value="#: value #">#: name #</button>',
             errorTemplate: '<li>#: message #</li>'
         },
@@ -96,12 +100,19 @@
                 this.bindValues(this.options.values);
             }
 
+            if (this.options.dirtyChecking)
+            {
+                this._updateButtons();
+            }
+
             this.trigger(CREATED);
         },
 
         destroy: function()
         {
             var that = this;
+
+            that.tableBodyElement.find(SELECTOR_FIELD_WRAPPER).off(ns);
 
             Widget.fn.destroy.call(that);
             kendo.destroy(that.element);
@@ -111,7 +122,7 @@
 
         _appendField: function(fieldOptions)
         {
-            var rowElement, fieldElement, fieldType;
+            var rowElement, fieldElement, fieldType, field;
 
             // HTML5 ids can contain most anything, but not spaces.  Our names can't include
             // slashes, so use them as a safe substitute.
@@ -124,15 +135,24 @@
             else
             {
                 rowElement = $(this.fieldTemplate(fieldOptions));
-                fieldElement = rowElement.appendTo(this.tableBodyElement).find("span");
+                fieldElement = rowElement.appendTo(this.tableBodyElement).find(SELECTOR_FIELD_WRAPPER);
 
                 fieldType = FIELD_TYPES[fieldOptions.type];
                 if (fieldType)
                 {
-                    this.fields.push(fieldElement[fieldType]({
+                    field = fieldElement[fieldType]({
                         structure: fieldOptions,
                         parentForm: this
-                    }).data(fieldType));
+                    }).data(fieldType);
+
+                    if (this.options.dirtyChecking)
+                    {
+                        fieldElement.on(KEYUP, jQuery.proxy(this._updateButtons, this));
+                        fieldElement.on(CLICK, jQuery.proxy(this._updateButtons, this));
+                        field.bind("change", jQuery.proxy(this._updateButtons, this));
+                    }
+
+                    this.fields.push(field);
                 }
                 else
                 {
@@ -172,6 +192,17 @@
             }
         },
 
+        _updateButtons: function()
+        {
+            var i,
+                enabled = this.fields.length == 0 || this.isDirty();
+
+            for (i = 0; i < this.submits.length; i++)
+            {
+                this.submits[i].enable(enabled);
+            }
+        },
+
         bindValues: function(values)
         {
             var i, field, name;
@@ -190,6 +221,8 @@
                     field.bindValue(values[name]);
                 }
             }
+
+            this._updateButtons();
         },
 
         resetValues: function()
@@ -212,6 +245,81 @@
             }
 
             return values;
+        },
+
+        _isEmptyValue: function(value)
+        {
+            return value === null || value === "";
+        },
+
+        _arraysEqual: function(a1, a2)
+        {
+            var i;
+
+            if (a1.length !== a2.length)
+            {
+                return false;
+            }
+
+            for (i = 0; i < a1.length; i++)
+            {
+                if (a1[i] !== a2[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        _valuesEqual: function(v1, v2)
+        {
+            if (this._isEmptyValue(v1))
+            {
+                return this._isEmptyValue(v2);
+            }
+
+            if (Array.isArray(v1))
+            {
+                return Array.isArray(v2) && this._arraysEqual(v1, v2);
+            }
+
+            return String(v1) === String(v2);
+        },
+
+        isDirty: function()
+        {
+            var values, field, original, value;
+
+            if (this.originalValues)
+            {
+                values = this.getValues();
+                for (field in values)
+                {
+                    if (values.hasOwnProperty(field))
+                    {
+                        value = values[field];
+                        if (this.originalValues.hasOwnProperty(field))
+                        {
+                            original = this.originalValues[field];
+                            if (!this._valuesEqual(value, original))
+                            {
+                                return true;
+                            }
+                        }
+                        else if (!this._isEmptyValue(value))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         },
 
         getFields: function()

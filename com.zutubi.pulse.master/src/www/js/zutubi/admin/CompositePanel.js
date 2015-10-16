@@ -39,7 +39,8 @@
             that.form = $("#composite-form").kendoZaForm({
                 path: options.path,
                 structure: composite.type.form,
-                values: composite.properties
+                values: composite.properties,
+                dirtyChecking: true
             }).data("kendoZaForm");
 
             that.form.bind("submit", jQuery.proxy(that._submitClicked, that));
