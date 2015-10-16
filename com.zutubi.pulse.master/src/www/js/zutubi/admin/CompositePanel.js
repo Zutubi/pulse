@@ -20,8 +20,9 @@
                 '<div id="#: id #" class="k-composite-panel">' +
                     '<h1>#: label #</h1>' +
                     '<div id="#: id #-form"></div>' +
-                    '<div style="display:none" id="#: id #-checkwrapper">' +
-                        '<h1>check</h1>' +
+                    '<div style="display:none" id="#: id #-checkwrapper" class="k-check-wrapper">' +
+                        '<h1>check configuration</h1>' +
+                        '<p>click <em>check</em> below to test your configuration</p>' +
                         '<div id="#: id #-checkform">' +
                         '</div>' +
                     '</div>' +

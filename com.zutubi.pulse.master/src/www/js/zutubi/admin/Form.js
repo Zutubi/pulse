@@ -100,11 +100,7 @@
                 this.bindValues(this.options.values);
             }
 
-            if (this.options.dirtyChecking)
-            {
-                this._updateButtons();
-            }
-
+            this._updateButtons();
             this.trigger(CREATED);
         },
 
@@ -195,11 +191,16 @@
         _updateButtons: function()
         {
             var i,
+                enabled;
+
+            if (this.options.dirtyChecking)
+            {
                 enabled = this.fields.length == 0 || this.isDirty();
 
-            for (i = 0; i < this.submits.length; i++)
-            {
-                this.submits[i].enable(enabled);
+                for (i = 0; i < this.submits.length; i++)
+                {
+                    this.submits[i].enable(enabled);
+                }
             }
         },
 

@@ -156,7 +156,33 @@ ul.navlist {
     border: none;
 }
 
+/* Composites */
+
+.k-composite-panel {
+    padding: 8px 16px;
+}
+
+.k-composite-panel h1 {
+    line-height: 36px;
+    margin-bottom: 8px;
+}
+
+.k-check-wrapper {
+    border-top: solid 1px #ddd;
+    margin-top: 16px;
+}
+
+.k-check-wrapper p {
+    margin: 0.5em 0;
+}
+
+.k-check-wrapper em {
+    font-style: italic;
+}
+
 /* Collections */
+
+/* FIXME kendo some duplication with above */
 
 .k-collection-panel {
     padding: 8px 16px;
@@ -171,15 +197,13 @@ ul.navlist {
     float: right;
 }
 
-#collection-table td
-{
+#collection-table td {
     /* Allows a menu opened from a grid cell to overflow out of the cell. */
     overflow: visible;
     padding: 0.4em;
 }
 
-#collection-table .k-menu
-{
+#collection-table .k-menu  {
     display: inline-block;
     border-right-width: 0;
 }

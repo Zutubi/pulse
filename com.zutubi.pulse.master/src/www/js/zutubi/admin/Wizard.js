@@ -200,8 +200,7 @@
         _updateTypeSelect: function(types)
         {
             var labels,
-                dropDown = this.typeSelectDropDown,
-                width;
+                dropDown = this.typeSelectDropDown;
 
             if (types.length > 1)
             {
