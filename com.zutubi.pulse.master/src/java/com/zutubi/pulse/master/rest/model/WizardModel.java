@@ -15,7 +15,12 @@ public class WizardModel
         return steps;
     }
 
-    public void addStep(WizardStepModel step)
+    public void prependStep(WizardStepModel step)
+    {
+        steps.add(0, step);
+    }
+
+    public void appendStep(WizardStepModel step)
     {
         steps.add(step);
     }

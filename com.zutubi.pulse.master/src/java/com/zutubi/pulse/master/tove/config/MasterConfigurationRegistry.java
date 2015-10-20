@@ -40,7 +40,6 @@ import com.zutubi.tove.config.ConfigurationPersistenceManager;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.api.Configuration;
 import com.zutubi.tove.config.api.ConfigurationCheckHandler;
-import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
@@ -264,17 +263,6 @@ public class MasterConfigurationRegistry extends CoreConfigurationRegistry
 
                     // TODO should verify that everything in the check type would land in one form
                     checkTypeMapping.put(type, checkType);
-                }
-
-                Class<? extends Configuration> creatorClass = ConventionSupport.getCreator(type);
-                if(creatorClass != null)
-                {
-                    if(!ConfigurationCreator.class.isAssignableFrom(creatorClass))
-                    {
-                        throw new TypeException("Creator type '" + creatorClass.getName() + "' does not implement ConfigurationCreator");
-                    }
-
-                    typeRegistry.register(creatorClass);
                 }
 
                 Class actionsClass = ConventionSupport.getActions(type.getClazz());

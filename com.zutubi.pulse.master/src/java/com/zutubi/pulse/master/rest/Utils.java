@@ -121,7 +121,7 @@ public class Utils
         return new PostContext(parentPath, baseName, postableType);
     }
 
-    static MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
+    public static MutableRecord convertProperties(CompositeType type, String templateOwnerPath, Map<String, Object> properties) throws TypeException
     {
         MutableRecord result = type.createNewRecord(true);
 

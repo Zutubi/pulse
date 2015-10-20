@@ -61,12 +61,6 @@ public class ConventionSupport
         return loadClass(clazz, "Examples");
     }
 
-    @SuppressWarnings({"unchecked"})
-    public static Class<? extends Configuration> getCreator(Type type)
-    {
-        return loadClass(type, "Creator");
-    }
-
     private static Class loadClass(Type type, String suffix)
     {
         // we need to search up the inheritence hierarchy.

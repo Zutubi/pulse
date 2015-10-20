@@ -1,10 +1,10 @@
-package com.zutubi.pulse.master.tove.config.user;
+package com.zutubi.pulse.master.rest.wizards;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.api.AbstractConfiguration;
-import com.zutubi.tove.config.api.ConfigurationCreator;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
@@ -14,13 +14,12 @@ import com.zutubi.validation.annotations.Required;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 /**
- * Used when creating new users.  Handles the confirmation of the user's
- * password.
+ * Helper type for creating users.
  */
 @SymbolicName("zutubi.userConfigCreator")
 @Form(fieldOrder = {"login", "name", "emailAddress", "authenticatedViaLdap", "password", "confirmPassword"})
 @Wire
-public class UserConfigurationCreator extends AbstractConfiguration implements ConfigurationCreator<UserConfiguration>, Validateable
+public class UserConfigurationCreator extends AbstractConfiguration implements Validateable
 {
     private static final Messages I18N = Messages.getInstance(UserConfiguration.class);
 
@@ -44,12 +43,11 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
     public UserConfiguration create()
     {
         UserConfiguration user = new UserConfiguration(login, name);
-        if(authenticatedViaLdap)
+        if (authenticatedViaLdap)
         {
             user.setAuthenticatedViaLdap(true);
             user.setPassword(passwordEncoder.encodePassword(RandomUtils.secureRandomString(10), null));
-        }
-        else
+        } else
         {
             user.setPassword(passwordEncoder.encodePassword(password, null));
         }
@@ -125,11 +123,11 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
 
     public void validate(ValidationContext context)
     {
-        if(!authenticatedViaLdap)
+        if (!authenticatedViaLdap)
         {
-            if(password != null && confirmPassword != null)
+            if (password != null && confirmPassword != null)
             {
-                if(!password.equals(confirmPassword))
+                if (!password.equals(confirmPassword))
                 {
                     context.addFieldError("password", I18N.format("passwords.differ"));
                 }
