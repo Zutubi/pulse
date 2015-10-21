@@ -521,7 +521,7 @@
                     model = delta.models[path];
                     path = that._absoluteToConfigPath(path);
                     info = that._infoForConfigPath(path);
-                    if (info.found && info.item.children && info.item.children.data().length > 0)
+                    if (info.found)
                     {
                         // Update to a node, e.g. collection reorder. Refresh.
                         that._updateItem(path, info.item, _cloneAndEmbed(model));

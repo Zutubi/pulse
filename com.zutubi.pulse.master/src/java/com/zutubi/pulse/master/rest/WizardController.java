@@ -3,10 +3,7 @@ package com.zutubi.pulse.master.rest;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import com.zutubi.pulse.master.rest.errors.ValidationException;
-import com.zutubi.pulse.master.rest.model.CompositeModel;
-import com.zutubi.pulse.master.rest.model.ConfigDeltaModel;
-import com.zutubi.pulse.master.rest.model.CustomWizardStepModel;
-import com.zutubi.pulse.master.rest.model.WizardModel;
+import com.zutubi.pulse.master.rest.model.*;
 import com.zutubi.pulse.master.rest.model.forms.CheckboxFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.DropdownFieldModel;
 import com.zutubi.pulse.master.rest.model.forms.FormModel;
@@ -192,7 +189,16 @@ public class WizardController
         }
 
         ConfigDeltaModel delta = new ConfigDeltaModel();
-        delta.addAddedPath(newPath, configModelBuilder.buildModel(null, newPath, -1));
+        ConfigModel model = configModelBuilder.buildModel(null, newPath, -1);
+        if (newPath.equals(configPath))
+        {
+            delta.addUpdatedPath(newPath, model);
+        }
+        else
+        {
+            delta.addAddedPath(newPath, model);
+        }
+
         return new ResponseEntity<>(delta, HttpStatus.OK);
     }
 
