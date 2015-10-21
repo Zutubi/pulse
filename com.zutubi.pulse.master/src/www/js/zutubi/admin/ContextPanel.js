@@ -128,6 +128,14 @@
             kendo.ui.progress(this.contentElement, false);
         },
 
+        applyDelta: function(delta)
+        {
+            if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
+            {
+                this.path = delta.renamedPaths[this.path];
+            }
+        },
+
         _renderLinks: function(element, links)
         {
             var list = $('<ul class="config-links"></ul>'),

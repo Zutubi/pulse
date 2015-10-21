@@ -102,6 +102,7 @@
             this.trigger(PATHSELECT, {path: path});
             if (model)
             {
+                this.path = path;
                 this._showContent(model);
             }
             else
@@ -115,6 +116,7 @@
             var newPath;
 
             this.configTree.applyDelta(delta);
+            this.contextPanel.applyDelta(delta);
             if (delta.renamedPaths && delta.renamedPaths.hasOwnProperty(this.path))
             {
                 newPath = delta.renamedPaths[this.path];
