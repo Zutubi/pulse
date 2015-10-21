@@ -72,7 +72,6 @@ public class CloneHandler implements ActionHandler
                     return true;
                 }
             }, true, null);
-
         }
 
         ActionModel model = new ActionModel(ConfigurationRefactoringManager.ACTION_CLONE, "clone", null, true);
@@ -167,13 +166,8 @@ public class CloneHandler implements ActionHandler
 
         Map<String, String> keyMap = validate(parentPath, baseName, mapType, input);
         configurationRefactoringManager.clone(parentPath, keyMap);
-        List<String> invalidatedPaths = new ArrayList<>();
-        if (!(mapType instanceof TemplatedMapType))
-        {
-            invalidatedPaths.add(PathUtils.getPath(parentPath, keyMap.get(baseName)));
-        }
 
-        return new ActionResult(ActionResult.Status.SUCCESS, "configuration cloned", invalidatedPaths);
+        return new ActionResult(ActionResult.Status.SUCCESS, "configuration cloned", Collections.singletonList(PathUtils.getPath(parentPath, keyMap.get(baseName))));
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

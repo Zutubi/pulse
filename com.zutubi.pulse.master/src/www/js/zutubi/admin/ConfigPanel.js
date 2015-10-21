@@ -364,14 +364,21 @@
 
             if (data.newPath)
             {
-                this.configTree.updatePath(data.newPath, data.model);
-                if (data.newPath === this.path)
+                if (data.newPath.indexOf(this.getRootPath()) === 0)
                 {
-                    this._showContent(data.model);
+                    this.configTree.updatePath(data.newPath, data.model);
+                    if (data.newPath === this.path)
+                    {
+                        this._showContent(data.model);
+                    }
+                    else
+                    {
+                        this._openPath(data.newPath, data.model);
+                    }
                 }
                 else
                 {
-                    this._openPath(data.newPath, data.model);
+                    Zutubi.admin.openConfigPath(data.newPath);
                 }
             }
             else
