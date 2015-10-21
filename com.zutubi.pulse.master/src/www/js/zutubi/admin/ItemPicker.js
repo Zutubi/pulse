@@ -11,13 +11,15 @@
             var that = this,
                 tagTemplate,
                 structure = options.structure,
-                kendoOptions = {
-                    dataSource: structure.list,
-                    dataTextField: structure.listText,
-                    dataValueField: structure.listValue
-                };
+                kendoOptions;
 
             that.structure = structure;
+
+            kendoOptions = {
+                dataSource: that._removeEmpty(structure.list),
+                dataTextField: structure.listText,
+                dataValueField: structure.listValue
+            };
 
             MultiSelect.fn.init.call(this, element, kendoOptions);
 
@@ -96,6 +98,21 @@
                     that.open();
                 }
             }
+        },
+
+        _removeEmpty: function(list)
+        {
+            // The list may have an empty option, but that is not needed and just confuses a blank
+            // widget, so remove it.
+            var valueKey = this.structure.listValue;
+            list = jQuery.grep(list, function(element)
+            {
+                var t = valueKey ? element[valueKey] : element;
+                return t !== null && t !== "";
+            });
+
+            console.dir(list);
+            return list;
         },
 
         getFieldName: function()
