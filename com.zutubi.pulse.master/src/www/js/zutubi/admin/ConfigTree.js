@@ -156,7 +156,7 @@
             dataSource = new kendo.data.HierarchicalDataSource({
                 transport: {
                     read: {
-                        url: window.baseUrl + "/api/config/" + rootPath + "?depth=-1&filter=nested&filter=type",
+                        url: window.baseUrl + "/api/config/" + Zutubi.admin.encodePath(rootPath) + "?depth=-1&filter=nested&filter=type",
                         dataType: "json",
                         headers: {
                             Accept: "application/json; charset=utf-8",

@@ -346,7 +346,7 @@
 
             Zutubi.admin.ajax({
                 type: "POST",
-                url: "/api/wizard/" + that.options.path,
+                url: "/api/wizard/" + Zutubi.admin.encodePath(that.options.path),
                 data: wizardData,
                 success: function (data)
                 {

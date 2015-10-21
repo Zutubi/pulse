@@ -81,7 +81,7 @@
 
             Zutubi.admin.ajax({
                 type: "GET",
-                url: "/api/wizard/" + that.options.path,
+                url: "/api/wizard/" + Zutubi.admin.encodePath(that.options.path),
                 success: function (data)
                 {
                     that.mask(false);

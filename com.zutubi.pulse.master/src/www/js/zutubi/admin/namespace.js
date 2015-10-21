@@ -340,6 +340,26 @@ if (window.Zutubi.admin === undefined)
                 return path;
             },
 
+            encodePath: function(path)
+            {
+                var pieces, encodedPath, i;
+
+                pieces = path.split('/');
+                encodedPath = '';
+
+                for (i = 0; i < pieces.length; i++)
+                {
+                    if (encodedPath.length > 0)
+                    {
+                        encodedPath += '/';
+                    }
+
+                    encodedPath += encodeURIComponent(pieces[i]);
+                }
+
+                return encodedPath;
+            },
+
             reportSuccess: function(message)
             {
                 app.notificationWidget.success(message);

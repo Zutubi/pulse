@@ -26,7 +26,7 @@
                             read: function(o)
                             {
                                 Zutubi.admin.ajax({
-                                    url: window.baseUrl + "/api/action/options/" + options.parentForm.options.path + "/" + structure.name,
+                                    url: window.baseUrl + "/api/action/options/" + Zutubi.admin.encodePath(options.parentForm.options.path) + "/" + structure.name,
                                     success: function(result)
                                     {
                                         o.success(result);

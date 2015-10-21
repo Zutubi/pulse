@@ -91,7 +91,7 @@
             Zutubi.admin.ajax({
                 type: "PUT",
                 maskAll: true,
-                url: "/api/config/" + that.options.path + "?depth=-1",
+                url: "/api/config/" + Zutubi.admin.encodePath(that.options.path) + "?depth=-1",
                 data: {
                     kind: "collection",
                     nested: jQuery.map(that.table.getOrder(), function(key)

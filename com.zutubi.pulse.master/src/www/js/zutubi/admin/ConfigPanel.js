@@ -342,7 +342,7 @@
             Zutubi.admin.ajax({
                 type: "POST",
                 maskAll: true,
-                url: "/api/action/single/" + action.action + "/" + path,
+                url: "/api/action/single/" + action.action + "/" + Zutubi.admin.encodePath(path),
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {
@@ -409,7 +409,7 @@
                 {
                     Zutubi.admin.ajax({
                         type: "DELETE",
-                        url: "/api/config/" + path,
+                        url: "/api/config/" + Zutubi.admin.encodePath(path),
                         success: function (delta)
                         {
                             that.applyDelta(delta);
