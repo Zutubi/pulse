@@ -15,6 +15,7 @@ import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.annotations.Listing;
 import com.zutubi.tove.annotations.Password;
+import com.zutubi.tove.annotations.Table;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
@@ -34,6 +35,7 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -276,13 +278,36 @@ public class ConfigModelBuilder
     private Map<String, Object> getFormattedProperties(String path, CompositeType type) throws TypeException
     {
         // FIXME kendo there is reflection here that could be cached (and moved outside this controller).
-        Class<?> formatter = ConventionSupport.getFormatter(type);
-        if (formatter != null)
+        Configuration instance = configurationTemplateManager.getInstance(path);
+        if (instance != null)
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
-            if (instance != null)
+            Map<String, Object> properties = new HashMap<>();
+            Class<?> formatter = ConventionSupport.getFormatter(type);
+
+            if (formatter == null)
             {
-                Map<String, Object> properties = new HashMap<>();
+                // If there is a table annotation, it could reference transient properties which we
+                // include with no extra formatting.
+                Table table = type.getAnnotation(Table.class, true);
+                if (table != null)
+                {
+                    for (String column: table.columns())
+                    {
+                        String methodName = getGetterMethodName(column);
+                        try
+                        {
+                            Method getter = instance.getClass().getMethod(methodName);
+                            properties.put(column, getter.invoke(instance));
+                        }
+                        catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
+                        {
+                            // noop
+                        }
+                    }
+                }
+            }
+            else
+            {
                 Object formatterInstance = objectFactory.buildBean(formatter);
                 for (Method method: formatter.getMethods())
                 {
@@ -299,12 +324,13 @@ public class ConfigModelBuilder
                         }
                     }
                 }
-
-                if (properties.size() > 0)
-                {
-                    return properties;
-                }
             }
+
+            if (properties.size() > 0)
+            {
+                return properties;
+            }
+
         }
 
         return null;
@@ -316,6 +342,11 @@ public class ConfigModelBuilder
                 method.getName().startsWith("get") &&
                 ReflectionUtils.acceptsParameters(method, type.getClazz()) &&
                 ReflectionUtils.returnsType(method, Object.class);
+    }
+
+    private String getGetterMethodName(String name)
+    {
+        return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
     }
 
     private void addActions(CompositeModel model, String path, CompositeType type, Configuration instance)

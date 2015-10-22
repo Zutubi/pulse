@@ -13,7 +13,7 @@ import java.util.List;
  * implement.
  */
 @SymbolicName("zutubi.userContactConfig")
-@Table(columns = {"name", "uid"})
+@Table(columns = {"name", "uniqueId"})
 @Classification(collection = "contacts")
 public abstract class ContactConfiguration extends AbstractNamedConfiguration
 {
@@ -21,7 +21,7 @@ public abstract class ContactConfiguration extends AbstractNamedConfiguration
     private boolean primary;
     
     @Transient
-    public abstract String getUid();
+    public abstract String getUniqueId();
 
     @Transient
     public abstract boolean supportsAttachments();

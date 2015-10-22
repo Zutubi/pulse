@@ -47,7 +47,7 @@ public class JabberContactConfiguration extends ContactConfiguration
         this.username = username;
     }
 
-    public String getUid()
+    public String getUniqueId()
     {
         return getUsername();
     }

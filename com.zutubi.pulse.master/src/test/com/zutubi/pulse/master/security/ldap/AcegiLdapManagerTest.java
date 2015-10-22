@@ -139,7 +139,7 @@ public class AcegiLdapManagerTest extends AbstractLdapTestUnit
         Map<String, ContactConfiguration> contacts = user.getPreferences().getContacts();
         ContactConfiguration contact = contacts.get(EMAIL_CONTACT_NAME);
         assertNotNull(contact);
-        assertEquals("daniel@zutubi.com", contact.getUid());
+        assertEquals("daniel@zutubi.com", contact.getUniqueId());
     }
 
     @Test

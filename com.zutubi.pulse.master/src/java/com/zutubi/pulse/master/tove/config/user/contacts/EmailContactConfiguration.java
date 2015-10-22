@@ -59,7 +59,7 @@ public class EmailContactConfiguration extends ContactConfiguration
         this.address = address;
     }
 
-    public String getUid()
+    public String getUniqueId()
     {
         return getAddress();
     }
