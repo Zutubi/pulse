@@ -14,8 +14,9 @@
 
             WorkflowWindow.fn.init.call(that, {
                 url: "/api/action/delete/" + Zutubi.admin.encodePath(options.path),
-                title: "confirm delete",
-                continueLabel: "confirm delete",
+                label: options.label,
+                title: "confirm " + options.label,
+                continueLabel: "confirm " + options.label,
                 width: 600,
                 render: jQuery.proxy(that._render, that),
                 success: function()
@@ -28,9 +29,10 @@
 
         _render: function(data, el)
         {
-            var tbody;
+            var tbody,
+                postLabel = this.options.label === "delete" ? "deleted" : "hidden";
 
-            el.html("<p>Are you sure you would like to delete this item? Any descendants will also be deleted. The following tasks are required:</p>" +
+            el.html("<p>Are you sure you would like to " + this.options.label + " this item? Any descendants will also be " + postLabel + ". The following tasks are required:</p>" +
                 "<table class='cleanup-tasks'><tbody><tr><th>affected path</th><th>action</th></tr></tbody></table>"
             );
 

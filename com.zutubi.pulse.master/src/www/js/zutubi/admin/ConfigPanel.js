@@ -302,7 +302,7 @@
             }
             else if (action.action === "delete")
             {
-                this._deleteConfig(e.path);
+                this._deleteConfig(e.path, action.label);
             }
             else if (action.action === "restore")
             {
@@ -411,13 +411,14 @@
             }
         },
 
-        _deleteConfig: function(path)
+        _deleteConfig: function(path, label)
         {
             var that = this,
                 deleteWindow;
 
             deleteWindow = new Zutubi.admin.DeleteWindow({
                 path: path,
+                label: label,
                 confirm: function()
                 {
                     Zutubi.admin.ajax({
