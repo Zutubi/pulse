@@ -58,19 +58,9 @@ public class ConfigController
         String parentPath = PathUtils.getParentPath(configPath);
         String templateOwnerPath = configurationTemplateManager.getTemplateOwnerPath(configPath);
         ComplexType parentType = parentPath == null ? null : configurationTemplateManager.getType(parentPath);
-        Configuration instance = configurationTemplateManager.getInstance(configPath);
-        Object unstantiated = null;
+        Record record = configurationTemplateManager.getRecord(configPath);
 
-        if (instance != null)
-        {
-            unstantiated = type.unstantiate(instance, templateOwnerPath);
-            if (!(unstantiated instanceof MutableRecord))
-            {
-                throw new NotFoundException("Path '" + configPath + "' does not refer to a selectable resource");
-            }
-        }
-
-        ConfigModel model = configModelBuilder.buildModel(filters, configPath, type, parentType, (MutableRecord) unstantiated, depth);
+        ConfigModel model = configModelBuilder.buildModel(filters, configPath, type, parentType, record, depth);
 
         return new ResponseEntity<>(new ConfigModel[]{model}, HttpStatus.OK);
     }

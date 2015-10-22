@@ -4,7 +4,6 @@
 {
     var ui = kendo.ui,
         Widget = ui.Widget,
-        TABLE_ID = "za-collection-table",
         ACTION = "action",
         REORDER = "reorder";
 
@@ -19,7 +18,8 @@
 
         options: {
             name: "ZaTable",
-            template: '<div id="#: id #"></div>'
+            template: '<div id="#: id #" class="k-collection-table"></div>',
+            id: "za-collection-table"
         },
 
         events: [
@@ -33,9 +33,9 @@
                 data = that._formatData();
 
             that.template = kendo.template(that.options.template);
-            that.element.html(that.template({id: TABLE_ID}));
+            that.element.html(that.template(that.options));
 
-            that.grid = $("#" + TABLE_ID).kendoGrid({
+            that.grid = $("#" + that.options.id).kendoGrid({
                 dataSource: new kendo.data.DataSource({
                     data: data,
                     schema: {
@@ -58,7 +58,7 @@
                     {
                         return element.clone().addClass("k-state-hover").css("opacity", 0.65);
                     },
-                    container: "#" + TABLE_ID + " tbody",
+                    container: "#" + that.options.id + " tbody",
                     change: function(e)
                     {
                         var grid = that.grid,
@@ -145,18 +145,21 @@
             var that = this,
                 menuItems;
 
-            menuItems = jQuery.map(item.actions, function(action)
+            if (item.actions && item.actions.length > 0)
             {
-                return {text: action.label};
-            });
+                menuItems = jQuery.map(item.actions, function(action)
+                {
+                    return {text: action.label};
+                });
 
-            $(el).kendoMenu({
-                dataSource: [{
-                    text: "... ",
-                    items: menuItems
-                }],
-                select: jQuery.proxy(that._actionSelected, that, row)
-            });
+                $(el).kendoMenu({
+                    dataSource: [{
+                        text: "... ",
+                        items: menuItems
+                    }],
+                    select: jQuery.proxy(that._actionSelected, that, row)
+                });
+            }
         },
 
         _actionSelected: function(row, e)

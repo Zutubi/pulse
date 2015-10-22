@@ -237,6 +237,15 @@ public class ConfigActionsController
         return postWithHandler(request, body, PushDownHandler.class);
     }
 
+    @RequestMapping(value = "restore/**", method = RequestMethod.POST)
+    public ResponseEntity<CollectionModel> postRestore(HttpServletRequest request) throws TypeException
+    {
+        String configPath = Utils.getConfigPath(request);
+        String parentPath = PathUtils.getParentPath(configPath);
+        configurationTemplateManager.restore(configPath);
+        return new ResponseEntity<>((CollectionModel) configModelBuilder.buildModel(null, parentPath, -1), HttpStatus.OK);
+    }
+
     private ResponseEntity<ActionModel> getWithHandler(HttpServletRequest request, Class<? extends ActionHandler> handlerClass)
     {
         String configPath = Utils.getConfigPath(request);

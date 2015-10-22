@@ -27,6 +27,7 @@ import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.TemplateRecord;
 import com.zutubi.util.Sort;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.adt.Pair;
@@ -138,7 +139,41 @@ public class ConfigModelBuilder
             }
         }
 
+        if (isFieldSelected(filters, "hiddenItems"))
+        {
+            addHiddenItems(path, type, record, model);
+        }
+
         return model;
+    }
+
+    private void addHiddenItems(String path, CollectionType type, Record record, CollectionModel model)
+    {
+        if (record instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) record;
+            TemplateRecord templateParent = templateRecord.getParent();
+
+            if (templateParent != null)
+            {
+                String parentId = templateParent.getOwner();
+                String[] elements = PathUtils.getPathElements(path);
+                String parentPath = PathUtils.getPath(elements[0], parentId, PathUtils.getPath(2, elements));
+
+                List<String> hiddenKeys = new LinkedList<>(templateRecord.getHiddenKeys());
+                Collections.sort(hiddenKeys, type.getKeyComparator(record));
+                for (String hidden : hiddenKeys)
+                {
+                    String parentItemPath = PathUtils.getPath(parentPath, hidden);
+                    Configuration instance = configurationTemplateManager.getInstance(parentItemPath, Configuration.class);
+                    if (instance != null)
+                    {
+                        model.addHiddenItem(new HiddenItemModel(hidden, templateParent.getOwner(hidden)));
+                    }
+                }
+            }
+        }
+
     }
 
     private ConfigModel createTypeSelectionModel(String path, CompositeType compositeType, String label, String[] filters)

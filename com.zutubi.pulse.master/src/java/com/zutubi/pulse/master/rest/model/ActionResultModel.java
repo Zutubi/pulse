@@ -13,12 +13,22 @@ public class ActionResultModel
     private String newPath;
     private CompositeModel model;
 
-    public ActionResultModel(ActionResult result, String newPath, CompositeModel model) throws TypeException
+    private ActionResultModel(boolean success, String message, String newPath, CompositeModel model)
     {
-        success = result.getStatus() == ActionResult.Status.SUCCESS;
-        message = result.getMessage();
+        this.success = success;
+        this.message = message;
         this.newPath = newPath;
         this.model = model;
+    }
+
+    public ActionResultModel(ActionResult result, String newPath, CompositeModel model) throws TypeException
+    {
+        this(result.getStatus() == ActionResult.Status.SUCCESS, result.getMessage(), newPath, model);
+    }
+
+    public ActionResultModel(CompositeModel model)
+    {
+        this(true, null, null, model);
     }
 
     public boolean isSuccess()

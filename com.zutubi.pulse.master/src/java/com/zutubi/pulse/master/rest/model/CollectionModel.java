@@ -15,6 +15,7 @@ public class CollectionModel extends ConfigModel
     private CollectionTypeModel type;
     private TableModel table;
     private List<String> allowedActions;
+    private List<HiddenItemModel> hiddenItems;
 
     public CollectionModel()
     {
@@ -58,5 +59,20 @@ public class CollectionModel extends ConfigModel
         }
 
         allowedActions.add(action);
+    }
+
+    public List<HiddenItemModel> getHiddenItems()
+    {
+        return hiddenItems;
+    }
+
+    public void addHiddenItem(HiddenItemModel model)
+    {
+        if (hiddenItems == null)
+        {
+            hiddenItems = new ArrayList<>();
+        }
+
+        hiddenItems.add(model);
     }
 }

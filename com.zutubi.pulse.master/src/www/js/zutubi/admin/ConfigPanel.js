@@ -304,6 +304,10 @@
             {
                 this._deleteConfig(e.path);
             }
+            else if (action.action === "restore")
+            {
+                this._restoreConfig(e.path);
+            }
             else if (action.descendant)
             {
                 this._executeDescendantAction(e.path, action);
@@ -433,6 +437,29 @@
             });
 
             deleteWindow.show();
+        },
+
+        _restoreConfig: function(path)
+        {
+            var that = this;
+
+            Zutubi.admin.ajax({
+                type: "POST",
+                maskAll: true,
+                url: "/api/action/restore/" + Zutubi.admin.encodePath(path),
+                success: jQuery.proxy(that._handleRestoreResult, that),
+                error: function (jqXHR)
+                {
+                    Zutubi.admin.reportError("Could not perform action: " + Zutubi.admin.ajaxError(jqXHR));
+                }
+            });
+        },
+
+        _handleRestoreResult: function(data)
+        {
+            this.configTree.updatePath(this.path, data);
+            this._showContent(data);
         }
+
     });
 }(jQuery));

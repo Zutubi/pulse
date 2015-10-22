@@ -25,6 +25,10 @@
                     '<button id="#: id #-add" class="k-collection-add"><span class="k-sprite"></span> add</button>' +
                     '<h1>#: label #</h1>' +
                     '<div id="#: id #-table"></div>' +
+                    '<div id="#: id #-hidden-wrapper" class="k-collection-hidden" style="display: none">' +
+                        '<h1>hidden items</h1>' +
+                        '<div id="#: id #-hidden"></div>' +
+                    '</div>' +
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
@@ -59,6 +63,11 @@
             });
 
             that.table.bind("reorder", jQuery.proxy(that._reordered, that));
+
+            if (collection.hiddenItems && collection.hiddenItems.length > 0)
+            {
+                that._renderHiddenItems(collection.hiddenItems);
+            }
         },
 
         events: [
@@ -82,6 +91,42 @@
         {
             e.preventDefault();
             this.trigger(ADD);
+        },
+
+        _renderHiddenItems: function(items)
+        {
+            var that = this;
+
+            that.hiddenTable = $("#collection-hidden").kendoZaTable({
+                id: "hidden-grid",
+                structure: {
+                    columns: [{
+                        name: 'key',
+                        label: 'name'
+                    }, {
+                        name: 'templateOwner',
+                        label: 'hidden owner'
+                    }
+                ]},
+                items: jQuery.map(items, function(item)
+                {
+                    return {
+                        properties: item,
+                        actions: [{
+                            action: "restore",
+                            label: "restore"
+                        }]
+                    };
+                }),
+                allowSorting: false
+            }).data("kendoZaTable");
+
+            this.hiddenTable.bind(ACTION, function(e)
+            {
+                that.trigger(ACTION, {path: that.options.path + "/" + e.key, action: e.action});
+            });
+
+            $("#collection-hidden-wrapper").show();
         },
 
         _reordered: function(order)
