@@ -47,7 +47,8 @@
             that.action = data;
 
             that.form = wrapper.kendoZaForm({
-                path: that.options.path,
+                parentPath: Zutubi.admin.parentPath(that.options.path),
+                baseName: Zutubi.admin.baseName(that.options.path),
                 structure: data.form,
                 values: data.formDefaults || [],
                 submits: []

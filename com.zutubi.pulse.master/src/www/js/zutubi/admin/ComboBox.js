@@ -10,6 +10,7 @@
         {
             var that = this,
                 structure = options.structure,
+                formOptions = options.parentForm.options,
                 kendoOptions;
 
             if (options.structure.lazy)
@@ -26,7 +27,13 @@
                             read: function(o)
                             {
                                 Zutubi.admin.ajax({
-                                    url: window.baseUrl + "/api/action/options/" + Zutubi.admin.encodePath(options.parentForm.options.path) + "/" + structure.name,
+                                    method: "POST",
+                                    url: window.baseUrl + "/api/action/options/" + Zutubi.admin.encodePath(formOptions.parentPath),
+                                    data: {
+                                        symbolicName: formOptions.symbolicName,
+                                        baseName: formOptions.baseName,
+                                        propertyName: structure.name
+                                    },
                                     success: function(result)
                                     {
                                         o.success(result);

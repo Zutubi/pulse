@@ -29,6 +29,7 @@ import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,32 +85,32 @@ public class ConfigActionsController
         return new ResponseEntity<>(configModelBuilder.buildCleanupTask(task), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "options/**", method = RequestMethod.GET)
-    public ResponseEntity<List<String>> options(HttpServletRequest request) throws Exception
+    @RequestMapping(value = "options/**", method = RequestMethod.POST)
+    public ResponseEntity<List<String>> options(HttpServletRequest request, @RequestBody OptionsModel body) throws Exception
     {
-        String configPath = Utils.getConfigPath(request);
-        String propertyName = PathUtils.getBaseName(configPath);
-        configPath = PathUtils.getParentPath(configPath);
+        String parentPath = Utils.getConfigPath(request);
 
-        ComplexType type = Utils.getType(configPath, configurationTemplateManager);
-        if (!(type instanceof CompositeType))
+        CompositeType type = typeRegistry.getType(body.getSymbolicName());
+        if (type == null)
         {
-            throw new IllegalArgumentException("Path '" + configPath + "' refers to unexpected type '" + type + "'");
+            throw new IllegalArgumentException("Unrecognised type '" + body.getSymbolicName() + "'");
         }
 
-        configurationSecurityManager.ensurePermission(configPath, AccessManager.ACTION_VIEW);
+        configurationSecurityManager.ensurePermission(parentPath, AccessManager.ACTION_VIEW);
 
-        CompositeType compositeType = (CompositeType) type;
-        TypeProperty property = compositeType.getProperty(propertyName);
+        TypeProperty property = type.getProperty(body.getPropertyName());
         if (property == null)
         {
-            throw new NotFoundException("Type '" + compositeType + "' does not have a property named '" + propertyName + "'");
+            throw new NotFoundException("Type '" + type + "' does not have a property named '" + body.getPropertyName() + "'");
         }
 
-        Configuration instance = configurationTemplateManager.getInstance(configPath);
-        String parentPath = PathUtils.getParentPath(configPath);
+        Configuration instance = null;
+        if (StringUtils.stringSet(body.getBaseName()))
+        {
+            instance = configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, body.getBaseName()));
+        }
 
-        OptionProvider optionProvider = OptionProviderFactory.build(compositeType, property.getType(), getOptionAnnotation(property), objectFactory);
+        OptionProvider optionProvider = OptionProviderFactory.build(type, property.getType(), getOptionAnnotation(property), objectFactory);
         @SuppressWarnings("unchecked")
         List<String> list = (List<String>) optionProvider.getOptions(instance, parentPath, property);
         if (configurationTemplateManager.isTemplatedPath(parentPath))

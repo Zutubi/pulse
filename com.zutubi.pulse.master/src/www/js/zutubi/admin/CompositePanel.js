@@ -41,7 +41,9 @@
             that.view.render($(options.containerSelector));
 
             that.form = $("#composite-form").kendoZaForm({
-                path: options.path,
+                parentPath: Zutubi.admin.parentPath(options.path),
+                baseName: Zutubi.admin.baseName(options.path),
+                symbolicName: composite.type.symbolicName,
                 structure: composite.type.form,
                 values: composite.properties,
                 dirtyChecking: composite.keyed,
@@ -57,6 +59,7 @@
 
                 that.checkForm = $("#composite-checkform").kendoZaForm({
                     formName: "check",
+                    symbolicName: composite.type.checkType.symbolicName,
                     structure: composite.type.checkType.form,
                     values: [],
                     submits: ["check"]

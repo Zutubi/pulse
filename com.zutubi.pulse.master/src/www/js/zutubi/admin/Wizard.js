@@ -260,6 +260,8 @@
             submits.push(CANCEL);
 
             that.form = that.formWrapper.kendoZaForm({
+                parentPath: that.options.path,
+                symbolicName: type.symbolicName,
                 structure: that._filterFields(type.form),
                 values: step.valuesByType[index],
                 submits: submits
