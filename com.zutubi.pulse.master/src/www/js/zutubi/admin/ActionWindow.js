@@ -54,6 +54,7 @@
                 submits: []
             }).data("kendoZaForm");
 
+            that.form.bind("enterPressed", jQuery.proxy(that.complete, that));
             el.append(wrapper);
         },
 

@@ -14,7 +14,6 @@ public class ControllingSelectFieldModel extends OptionFieldModel
     public ControllingSelectFieldModel()
     {
         setType(FieldType.CONTROLLING_SELECT);
-        setSubmitOnEnter(true);
     }
 
     public String[] getEnableSet()

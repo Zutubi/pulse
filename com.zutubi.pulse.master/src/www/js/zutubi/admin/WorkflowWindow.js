@@ -96,6 +96,12 @@
             });
         },
 
+        complete: function()
+        {
+            this.completed = true;
+            this.options.success();
+        },
+
         close: function()
         {
             this.window.close();
@@ -111,11 +117,7 @@
             parentElement.append(buttonElement);
             buttonElement.kendoButton({
                 spriteCssClass: "fa fa-check-circle",
-                click: function()
-                {
-                    that.completed = true;
-                    that.options.success();
-                }
+                click: jQuery.proxy(that.complete, that)
             });
 
             buttonElement = $(that.buttonTemplate({name: "cancel", id: that.options.id + "-cancel"}));

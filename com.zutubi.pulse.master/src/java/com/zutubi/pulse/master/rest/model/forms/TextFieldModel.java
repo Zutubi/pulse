@@ -18,7 +18,6 @@ public class TextFieldModel extends FieldModel
     {
         super(FieldType.TEXT, name, label);
         setType(FieldType.TEXT);
-        setSubmitOnEnter(true);
     }
 
     public int getSize()

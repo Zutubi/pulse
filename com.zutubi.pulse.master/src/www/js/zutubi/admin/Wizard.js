@@ -267,7 +267,7 @@
                 submits: submits
             }).data("kendoZaForm");
 
-            that.form.bind("submit", jQuery.proxy(that._formSubmitted, that));
+            that.form.bind("buttonClicked", jQuery.proxy(that._formSubmitted, that));
         },
 
         _filterFields: function(formStructure)

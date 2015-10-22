@@ -18,7 +18,6 @@ public class ControllingCheckboxFieldModel extends FieldModel
     public ControllingCheckboxFieldModel(String name, String label)
     {
         super(FieldType.CONTROLLING_CHECKBOX, name, label);
-        setSubmitOnEnter(true);
     }
 
     public String[] getCheckedFields()

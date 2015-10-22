@@ -18,7 +18,6 @@ public class TextAreaFieldModel extends FieldModel
     public TextAreaFieldModel()
     {
         setType(FieldType.TEXTAREA);
-        setSubmitOnEnter(true);
     }
 
     public boolean isAutoSize()

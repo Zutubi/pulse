@@ -16,7 +16,6 @@ public class FieldModel
     private String label;
     private boolean required;
     private boolean readOnly;
-    private boolean submitOnEnter;
 
     private List<String> actions;
     private List<String> scripts;
@@ -92,16 +91,6 @@ public class FieldModel
     public void setReadOnly(boolean readOnly)
     {
         this.readOnly = readOnly;
-    }
-
-    public boolean isSubmitOnEnter()
-    {
-        return submitOnEnter;
-    }
-
-    public void setSubmitOnEnter(boolean submitOnEnter)
-    {
-        this.submitOnEnter = submitOnEnter;
     }
 
     public List<String> getActions()

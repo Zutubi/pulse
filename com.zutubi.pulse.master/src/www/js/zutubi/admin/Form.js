@@ -17,9 +17,11 @@
         ns = ".kendoForm",
         CLICK = "click" + ns,
         KEYUP = "keyup" + ns,
+        SUBMIT = "submit" + ns,
         SELECTOR_FIELD_WRAPPER = ".k-field-wrapper",
         CREATED = "created",
-        SUBMIT = "submit",
+        BUTTON_CLICKED = "buttonClicked",
+        ENTER_PRESSED = "enterPressed",
         DEFAULT_SUBMITS = ["apply", "reset"],
         FIELD_TYPES = {
             checkbox: "kendoZaCheckbox",
@@ -46,7 +48,8 @@
 
         events: [
             CREATED,
-            SUBMIT
+            BUTTON_CLICKED,
+            ENTER_PRESSED
         ],
 
         options: {
@@ -80,6 +83,8 @@
 
             this.element.html(this.template({id: this.id}));
             this.formElement = this.element.find("form");
+            this.formElement.on(SUBMIT, jQuery.proxy(this._formSubmit, this));
+
             this.tableBodyElement = this.formElement.find("tbody");
 
             for (i = 0; i < fields.length; i++)
@@ -108,6 +113,7 @@
         {
             var that = this;
 
+            that.formElement.off(ns);
             that.tableBodyElement.find(SELECTOR_FIELD_WRAPPER).off(ns);
 
             Widget.fn.destroy.call(that);
@@ -141,9 +147,9 @@
                         parentForm: this
                     }).data(fieldType);
 
+                    fieldElement.on(KEYUP, jQuery.proxy(this._keyUp, this));
                     if (this.options.dirtyChecking)
                     {
-                        fieldElement.on(KEYUP, jQuery.proxy(this._updateButtons, this));
                         fieldElement.on(CLICK, jQuery.proxy(this._updateButtons, this));
                         field.bind("change", jQuery.proxy(this._updateButtons, this));
                     }
@@ -175,6 +181,11 @@
             that.submits.push(button);
         },
 
+        _formSubmit: function(e)
+        {
+            e.preventDefault();
+        },
+
         _buttonClicked: function(value)
         {
             if (value === "reset")
@@ -184,8 +195,39 @@
             else
             {
                 this.clearValidationErrors();
-                this.trigger(SUBMIT, {value: value});
+                this.trigger(BUTTON_CLICKED, {value: value});
             }
+        },
+
+        _keyUp: function(e)
+        {
+            var wrapper;
+
+            if (this.options.dirtyChecking)
+            {
+                this._updateButtons();
+            }
+
+            if (e.which === 13)
+            {
+                wrapper = $(e.target).closest(SELECTOR_FIELD_WRAPPER);
+                if (wrapper && this._enterSubmits(wrapper))
+                {
+                    if (this.submits.length > 0)
+                    {
+                        this._buttonClicked(this.submits[0].structure.value);
+                    }
+                    else
+                    {
+                        this.trigger(ENTER_PRESSED);
+                    }
+                }
+            }
+        },
+
+        _enterSubmits: function(wrapperEl)
+        {
+            return ["zatextfield", "zacheckbox", "zacontrollingcheckbox"].indexOf(wrapperEl.attr("data-role")) >= 0;
         },
 
         _updateButtons: function()

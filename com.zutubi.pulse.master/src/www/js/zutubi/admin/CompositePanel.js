@@ -50,7 +50,7 @@
                 submits: composite.keyed ? ["apply", "reset"] : ["save", "cancel"]
             }).data("kendoZaForm");
 
-            that.form.bind("submit", jQuery.proxy(that._submitClicked, that));
+            that.form.bind("buttonClicked", jQuery.proxy(that._submitClicked, that));
 
             // FIXME kendo if the composite is not writable, don't show this
             if (composite.type.checkType)
@@ -65,7 +65,7 @@
                     submits: ["check"]
                 }).data("kendoZaForm");
 
-                that.checkForm.bind("submit", jQuery.proxy(that._checkClicked, that));
+                that.checkForm.bind("buttonClicked", jQuery.proxy(that._checkClicked, that));
             }
 
             if (Zutubi.admin.hasCollapsedCollection(composite))
