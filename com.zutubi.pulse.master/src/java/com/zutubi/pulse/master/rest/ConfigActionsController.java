@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller to handle invocation of configuration actions.
@@ -287,7 +288,7 @@ public class ConfigActionsController
     @RequestMapping(value = "single/**", method = RequestMethod.GET)
     public ResponseEntity<ActionModel> getSingle(HttpServletRequest request) throws Exception
     {
-        ActionContext context = createContext(request);
+        ActionContext context = createContext(request, true);
 
         // Common actions including delete are not supported here.  So we don't need any of the
         // extra logic such as s/delete/hide which can complicate creating action models in
@@ -315,7 +316,7 @@ public class ConfigActionsController
     @RequestMapping(value = "single/**", method = RequestMethod.POST)
     public ResponseEntity<ActionResultModel> postSingle(HttpServletRequest request, @RequestBody(required = false) ConfigModel body) throws Exception
     {
-        ActionContext context = createContext(request);
+        ActionContext context = createContext(request, true);
 
         Configuration argument = null;
         if (context.action.hasArgument() && body != null)
@@ -360,7 +361,32 @@ public class ConfigActionsController
         return new ResponseEntity<>(new ActionResultModel(result, null, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
     }
 
-    private ActionContext createContext(HttpServletRequest request)
+    @RequestMapping(value = "descendant/**", method = RequestMethod.POST)
+    public ResponseEntity<ActionResultModel> postDescendant(HttpServletRequest request) throws Exception
+    {
+        ActionContext context = createContext(request, false);
+
+        Map<String, ActionResult> results = actionManager.executeOnDescendants(context.actionName, context.path);
+
+        int failureCount = 0;
+        for (ActionResult result: results.values())
+        {
+            if (result.getStatus() != ActionResult.Status.SUCCESS)
+            {
+                failureCount++;
+            }
+        }
+
+        String message = "Executed on " + results.size() + " descendant" + (results.size() == 1 ? "" : "s");
+        if (failureCount > 0)
+        {
+            message += ", failed on " + failureCount;
+        }
+
+        return new ResponseEntity<>(new ActionResultModel(failureCount == 0, message, (CompositeModel) configModelBuilder.buildModel(null, context.path, -1)), HttpStatus.OK);
+    }
+
+    private ActionContext createContext(HttpServletRequest request, boolean single)
     {
         ActionContext context = new ActionContext();
         String configPath = Utils.getConfigPath(request);
@@ -375,18 +401,21 @@ public class ConfigActionsController
 
         configurationSecurityManager.ensurePermission(context.path, AccessManager.ACTION_VIEW);
 
-        context.instance = configurationTemplateManager.getInstance(context.path);
-        if (context.instance == null)
+        if (single)
         {
-            throw new NotFoundException("Path '" + context.path + "' does not refer to a concrete instance");
-        }
+            context.instance = configurationTemplateManager.getInstance(context.path);
+            if (context.instance == null)
+            {
+                throw new NotFoundException("Path '" + context.path + "' does not refer to a concrete instance");
+            }
 
-        context.type = typeRegistry.getType(context.instance.getClass());
-        ConfigurationActions configurationActions = actionManager.getConfigurationActions(context.type);
-        context.action = configurationActions.getAction(context.actionName);
-        if (context.action == null)
-        {
-            throw new IllegalArgumentException("Action '" + context.actionName + "' not valid for instance at path '" + context.path + "'");
+            context.type = typeRegistry.getType(context.instance.getClass());
+            ConfigurationActions configurationActions = actionManager.getConfigurationActions(context.type);
+            context.action = configurationActions.getAction(context.actionName);
+            if (context.action == null)
+            {
+                throw new IllegalArgumentException("Action '" + context.actionName + "' not valid for instance at path '" + context.path + "'");
+            }
         }
 
         return context;

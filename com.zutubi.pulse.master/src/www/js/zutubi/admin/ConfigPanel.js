@@ -308,9 +308,9 @@
             {
                 this._restoreConfig(e.path);
             }
-            else if (action.descendant)
+            else if (e.descendant)
             {
-                this._executeDescendantAction(e.path, action);
+                this._executeAction(e.path, action, true);
             }
             else if (action.inputRequired)
             {
@@ -318,7 +318,7 @@
             }
             else
             {
-                this._executeAction(e.path, e.action);
+                this._executeAction(e.path, e.action, false);
             }
         },
 
@@ -336,19 +336,14 @@
             actionWindow.show();
         },
 
-        _executeDescendantAction: function(path, action)
-        {
-
-        },
-
-        _executeAction: function(path, action)
+        _executeAction: function(path, action, descendant)
         {
             var that = this;
 
             Zutubi.admin.ajax({
                 type: "POST",
                 maskAll: true,
-                url: "/api/action/single/" + action.action + "/" + Zutubi.admin.encodePath(path),
+                url: "/api/action/" + (descendant ? "descendant" : "single") + "/" + action.action + "/" + Zutubi.admin.encodePath(path),
                 success: jQuery.proxy(that._handleActionResult, that, path),
                 error: function (jqXHR)
                 {
@@ -461,6 +456,5 @@
             this.configTree.updatePath(this.path, data);
             this._showContent(data);
         }
-
     });
 }(jQuery));

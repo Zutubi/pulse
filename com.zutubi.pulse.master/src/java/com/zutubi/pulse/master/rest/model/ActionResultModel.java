@@ -26,9 +26,9 @@ public class ActionResultModel
         this(result.getStatus() == ActionResult.Status.SUCCESS, result.getMessage(), newPath, model);
     }
 
-    public ActionResultModel(CompositeModel model)
+    public ActionResultModel(boolean success, String message, CompositeModel model)
     {
-        this(true, null, null, model);
+        this(success, message, null, model);
     }
 
     public boolean isSuccess()
