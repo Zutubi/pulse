@@ -211,6 +211,10 @@ public class BuildProperties
      */
     public static final String PROPERTY_AGENT                   = "agent";
     /**
+     * The resolved path describing where an agent's data should be put.
+     */
+    public static final String PROPERTY_AGENT_DATA_DIR          = "agent.data.dir";
+    /**
      * The path pattern describing where an agent's data should be put.
      */
     public static final String PROPERTY_AGENT_DATA_PATTERN      = "agent.data.pattern";

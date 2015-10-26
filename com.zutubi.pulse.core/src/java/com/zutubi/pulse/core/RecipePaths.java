@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * The RecipePaths interface provides an interface that provides access to a recipes
@@ -31,4 +32,9 @@ public interface RecipePaths
      * @return the output directory.
      */
     File getOutputDir();
+
+    /**
+     * @return a set of path properties to be exposed to the recipe, e.g. base.dir, data.dir
+     */
+    Map<String,String> getPathProperties();
 }
