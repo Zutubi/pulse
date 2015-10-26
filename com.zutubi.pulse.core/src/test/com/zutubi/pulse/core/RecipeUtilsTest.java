@@ -6,6 +6,9 @@ import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourcePropertyConfiguration;
 import com.zutubi.pulse.core.resources.api.ResourceVersionConfiguration;
 import com.zutubi.pulse.core.test.api.PulseTestCase;
+import com.zutubi.util.SystemUtils;
+
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 
@@ -65,6 +68,40 @@ public class RecipeUtilsTest extends PulseTestCase
     private String propertyValue(String name)
     {
         return propertyName(name) + VALUE_SUFFIX;
+    }
+
+    public void testAcceptableNamesOnWindows()
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            return;
+        }
+
+        Set<String> suppressedEnvironment = RecipeUtils.getSuppressedEnvironment();
+        assertTrue(RecipeUtils.acceptableName("^", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName("<", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName(">", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName("|", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName("&", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName(" ", suppressedEnvironment));
+
+        assertFalse(RecipeUtils.acceptableName("=", suppressedEnvironment));
+    }
+
+    public void testAcceptableNames()
+    {
+        Set<String> suppressedEnvironment = RecipeUtils.getSuppressedEnvironment();
+        assertTrue(RecipeUtils.acceptableName("a", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName("Z", suppressedEnvironment));
+        assertTrue(RecipeUtils.acceptableName("2", suppressedEnvironment));
+
+        assertFalse(RecipeUtils.acceptableName("env.something", suppressedEnvironment));
+    }
+
+    public void testConvertNames()
+    {
+        assertEquals("PULSE_A", RecipeUtils.convertName("a"));
+        assertEquals("PULSE_1", RecipeUtils.convertName("1"));
     }
 
     public void testImportDefaultVersion()

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
 import com.zutubi.pulse.master.MasterRecipeRunner;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -139,11 +139,11 @@ public class MasterAgentService implements AgentService
         return new FileInfo(new File(base, relativePath));
     }
 
-    public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
+    public void executeCommand(PulseExecutionContext context, List<String> commandLine, String workingDir, int timeout)
     {
         try
         {
-            ProcessWrapper.runCommand(commandLine, workingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);
+            ProcessWrapper.runCommand(commandLine, workingDir, context, timeout, TimeUnit.SECONDS);
         }
         catch (Exception e)
         {
