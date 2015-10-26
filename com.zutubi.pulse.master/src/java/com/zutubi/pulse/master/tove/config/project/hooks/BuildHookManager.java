@@ -19,7 +19,9 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao;
 import com.zutubi.pulse.master.security.SecurityUtils;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
@@ -46,6 +48,7 @@ public class BuildHookManager
     private AccessManager accessManager;
     private MasterConfigurationManager configurationManager;
     private MasterLocationProvider     masterLocationProvider;
+    private ConfigurationProvider configurationProvider;
 
     public void handleEvent(Event event, HookLogger logger)
     {
@@ -82,7 +85,7 @@ public class BuildHookManager
                 public void run()
                 {
                     final PulseExecutionContext context = new PulseExecutionContext();
-                    MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
+                    MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager, configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
                     context.addString(BuildProperties.NAMESPACE_INTERNAL, PROPERTY_TRIGGER_USER, username);
 
                     if (hook.appliesTo(result))
@@ -222,5 +225,10 @@ public class BuildHookManager
                 return thread;
             }
         });
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

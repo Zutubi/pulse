@@ -43,6 +43,12 @@ public class BuildProperties
     //-----------------------------------------------------------------------
 
     /**
+     * The configured base URL of the server, which is general set by an admin
+     * to Pulse's externally-available address (it should not be used for
+     * internal communication, that is what master host is for).
+     */
+    public static final String PROPERTY_BASE_URL                = "base.url";
+    /**
      * The number of times the project has been built before the running
      * build.
      */
