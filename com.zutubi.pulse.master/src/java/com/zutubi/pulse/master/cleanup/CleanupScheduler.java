@@ -31,9 +31,10 @@ import java.util.List;
  * Pulse, triggering and generating cleanup tasks that are sent to the cleanup manager
  * for execution.
  * <p/>
- * The cleanup is triggered in response to two inputs.
+ * The cleanup is triggered in response to three inputs:
  * <ul>
- * <li>every time a build for that project completes</li>
+ * <li>every time a build for a project completes</li>
+ * <li>every time the rules for a project changes</li>
  * <li>at regularly scheduled intervals</li>
  * </ul>
  */
