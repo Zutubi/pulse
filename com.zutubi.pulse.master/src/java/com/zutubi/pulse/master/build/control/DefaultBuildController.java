@@ -48,10 +48,12 @@ import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scm.MasterScmClientFactory;
 import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.pulse.master.security.RepositoryAuthenticationProvider;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.*;
 import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectBootstrapper;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.events.FilteringListener;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.variables.ConfigurationVariableProvider;
@@ -127,9 +129,10 @@ public class DefaultBuildController implements EventListener, BuildController
     private RepositoryAttributes repositoryAttributes;
     private ModuleDescriptorFactory moduleDescriptorFactory;
     private ConfigurationVariableProvider configurationVariableProvider;
+    private ConfigurationProvider configurationProvider;
 
     private boolean dependencyInfoRecorded = false;
-    
+
     public DefaultBuildController(BuildRequestEvent event)
     {
         this.request = event;
@@ -236,7 +239,7 @@ public class DefaultBuildController implements EventListener, BuildController
         // contexts.  Note this excludes resource properties as they need to be added later for
         // recipes (when we are on the agent) and we want to avoid adding them twice (CIB-3090).
         PulseExecutionContext context = new PulseExecutionContext();
-        MasterBuildProperties.addBuildProperties(context, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
+        MasterBuildProperties.addBuildProperties(context, buildResult, project, buildDir, masterLocationProvider.getMasterUrl(), configurationProvider.get(GlobalConfiguration.class).getBaseUrl());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RETRIEVAL_PATTERN, projectConfig.getDependencies().getRetrievalPattern());
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_UNZIP_RETRIEVED_ARCHIVES, projectConfig.getDependencies().isUnzipRetrievedArchives());
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SYNC_DESTINATION, Boolean.toString(projectConfig.getDependencies().isSyncDestination()));
@@ -1360,6 +1363,11 @@ public class DefaultBuildController implements EventListener, BuildController
     public void setConfigurationVariableProvider(ConfigurationVariableProvider configurationVariableProvider)
     {
         this.configurationVariableProvider = configurationVariableProvider;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     private static class ContainsMatchingPropertyPredicate implements Predicate<ResourceProperty>

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.util.process;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
+import com.zutubi.pulse.core.RecipeUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.io.IOUtils;
 
@@ -27,9 +29,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ProcessWrapper
 {
+    public static final int TIMEOUT_NONE = 0;
+
     private static final int READER_JOIN_TIMEOUT = 30000;
     private static final int BUFFER_SIZE = 4096;
-    private static final int TIMEOUT_NONE = 0;
 
     private Process process;
     private AtomicBoolean destroyed = new AtomicBoolean(false);
@@ -50,28 +53,13 @@ public class ProcessWrapper
      * @param command the command to run
      * @param inDir if not null, the working directory to run in
      * @param outputStream if not null, the stream to send all output to
-     * @throws InterruptedException if we're interrupted waiting for the command to run
-     * @throws TimeoutException never thrown (this variant uses an infinite timeout)
-     * @throws IOException on I/O error creating or reading output from the process
-     */
-    public static void runCommand(List<String> command, String inDir, OutputStream outputStream) throws InterruptedException, TimeoutException, IOException
-    {
-        runCommand(command, inDir, outputStream, TIMEOUT_NONE, TimeUnit.SECONDS);
-    }
-
-    /**
-     * Convenience method to run a command under a wrapper sending all output to a stream.
-     *
-     * @param command the command to run
-     * @param inDir if not null, the working directory to run in
-     * @param outputStream if not null, the stream to send all output to
      * @param timeout time limit to apply to wait for the command to finish
      * @param timeUnit units of the timeout
      * @throws InterruptedException if we're interrupted waiting for the command to run
      * @throws TimeoutException never thrown (this variant uses an infinite timeout)
      * @throws IOException on I/O error creating or reading output from the process
      */
-    public static void runCommand(List<String> command, String inDir, OutputStream outputStream, long timeout, TimeUnit timeUnit) throws IOException, InterruptedException, TimeoutException
+    public static void runCommand(List<String> command, String inDir, PulseExecutionContext context, long timeout, TimeUnit timeUnit) throws IOException, InterruptedException, TimeoutException
     {
         ProcessWrapper processWrapper = null;
         try
@@ -83,14 +71,16 @@ public class ProcessWrapper
                 builder.directory(new File(inDir));
             }
 
+            RecipeUtils.addPulseEnvironment(context, builder);
+
             ByteHandler byteHandler;
-            if (outputStream == null)
+            if (context.getOutputStream() == null)
             {
                 byteHandler = new NullByteHandler();
             }
             else
             {
-                byteHandler = new ForwardingByteHandler(outputStream);
+                byteHandler = new ForwardingByteHandler(context.getOutputStream());
             }
 
             processWrapper = new ProcessWrapper(builder.start(), byteHandler, false);

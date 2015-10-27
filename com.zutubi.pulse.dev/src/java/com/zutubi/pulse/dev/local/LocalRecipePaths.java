@@ -1,8 +1,11 @@
 package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The implementation of the RecipePaths interface for the local build. The output
@@ -37,5 +40,14 @@ public class LocalRecipePaths implements RecipePaths
     public File getOutputDir()
     {
         return outputDir;
+    }
+
+    public Map<String, String> getPathProperties()
+    {
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(BuildProperties.PROPERTY_BASE_DIR, baseDir.getAbsolutePath());
+        properties.put(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
+        return properties;
+
     }
 }

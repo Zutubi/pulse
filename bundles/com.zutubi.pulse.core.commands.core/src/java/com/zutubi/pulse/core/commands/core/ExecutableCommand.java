@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.engine.api.BuildException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.engine.api.ResultState;
 import com.zutubi.pulse.core.util.process.ProcessControl;
-import com.zutubi.tove.variables.api.Variable;
 import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.SystemUtils;
@@ -17,10 +16,7 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The executable command represents a os command invocation.
@@ -44,7 +40,7 @@ public class ExecutableCommand extends OutputProducingCommandSupport
     private CancellableReader writer;
     private volatile boolean terminated = false;
 
-    private List<String> suppressedEnvironment = RecipeUtils.getSuppressedEnvironment();
+    private Set<String> suppressedEnvironment = RecipeUtils.getSuppressedEnvironment();
 
     public ExecutableCommand(ExecutableCommandConfiguration configuration)
     {
@@ -470,17 +466,12 @@ public class ExecutableCommand extends OutputProducingCommandSupport
 
     private void updateChildEnvironment(ExecutionContext context, ProcessBuilder builder)
     {
-        Map<String, String> childEnvironment = builder.environment();
         // Implicit PULSE_* variables come first: anything explicit
         // should override them.
+        RecipeUtils.addPulseEnvironment((PulseExecutionContext) context, builder);
+
         PulseScope scope = ((PulseExecutionContext) context).getScope();
-        for(Variable variable : scope.getVariables(String.class))
-        {
-            if(acceptableName(variable.getName()))
-            {
-                childEnvironment.put(convertName(variable.getName()), (String) variable.getValue());
-            }
-        }
+        Map<String, String> childEnvironment = builder.environment();
 
         // Now things defined on the scope.
         scope.applyEnvironment(childEnvironment);
@@ -491,43 +482,6 @@ public class ExecutableCommand extends OutputProducingCommandSupport
             String value = setting.getValue() != null ? setting.getValue() : "";
             childEnvironment.put(setting.getName(), value);
         }
-    }
-
-    /**
-     * Is the specified name an acceptable name for adding to the child processes environment.
-     * If it is already in the environment (env. prefix), then we return false.
-     *
-     * @param name variable name to check
-     *
-     * @return return false if the name contains the 'env.' prefix, or contains an unsupported
-     * character
-     */
-    protected boolean acceptableName(String name)
-    {
-        if(name.startsWith("env."))
-        {
-            return false;
-        }
-
-        if(suppressedEnvironment.contains(name.toUpperCase()))
-        {
-            return false;
-        }
-        
-        if (SystemUtils.IS_WINDOWS)
-        {
-            return name.matches("[-a-zA-Z._0-9<>|&^% ]+");
-        }
-
-        return name.matches("[-a-zA-Z._0-9]+");
-    }
-
-    protected String convertName(String name)
-    {
-        name = name.toUpperCase();
-        name = name.replaceAll("\\.", "_");
-
-        return "PULSE_" + name;
     }
 
     private String extractCommandLine(ProcessBuilder builder)

@@ -309,7 +309,11 @@ public class RecipeController
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
     {
-        recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, event.getBaseDir());
+        for (Map.Entry<String, String> pathProperty: event.getPathProperties().entrySet())
+        {
+            recipeContext.addString(NAMESPACE_INTERNAL, pathProperty.getKey(), pathProperty.getValue());
+        }
+
         recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(event.getStartTime())));
         recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(event.getStartTime()));
 

@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.PulseZipUtils;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
@@ -211,7 +210,7 @@ public class SlaveAgentService implements AgentService
         return service.getFileInfo(serviceTokenManager.getToken(), recipeDetails, path);    
     }
 
-    public void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout)
+    public void executeCommand(PulseExecutionContext context, List<String> commandLine, String workingDir, int timeout)
     {
         OutputStream outputStream = context.getOutputStream();
         if (outputStream == null)
@@ -222,8 +221,8 @@ public class SlaveAgentService implements AgentService
         long streamId = slaveOutputListener.registerStream(outputStream);
 
         // Now we can clear out the stream info rather than send the stream over hessian.
-        context = new PulseExecutionContext((PulseExecutionContext) context);
-        ((PulseExecutionContext) context).setOutputStream(null);
+        context = new PulseExecutionContext(context);
+        context.setOutputStream(null);
 
         try
         {

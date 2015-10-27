@@ -1,5 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.hooks;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.util.process.ProcessWrapper;
@@ -113,14 +114,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         }
         else
         {
-            if (timeoutApplied)
-            {
-                ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, context.getOutputStream(), timeout, TimeUnit.SECONDS);
-            }
-            else
-            {
-                ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, context.getOutputStream());
-            }
+            ProcessWrapper.runCommand(commandLine, resolvedWorkingDir, (PulseExecutionContext) context, timeoutApplied ? timeout : ProcessWrapper.TIMEOUT_NONE, TimeUnit.SECONDS);
         }
     }
 
@@ -167,7 +161,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
             }
         }
 
-        agent.getService().executeCommand(context, commandLine, resolvedWorkingDir, timeout);
+        agent.getService().executeCommand((PulseExecutionContext) context, commandLine, resolvedWorkingDir, timeout);
     }
 
     private String verifyCommand(String command, boolean onAgent) throws IOException

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servercore.services;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.resources.api.ResourceConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.ServerInfoModel;
@@ -127,5 +127,5 @@ public interface SlaveService
      * @param streamId id of the stream to use in {@link com.zutubi.pulse.core.events.GenericOutputEvent}s
      * @param timeout if non-zero, a time limit in seconds to apply to the command
      */
-    void runCommand(String token, String master, ExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout);
+    void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout);
 }

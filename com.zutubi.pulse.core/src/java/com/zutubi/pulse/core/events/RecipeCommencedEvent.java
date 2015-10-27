@@ -1,19 +1,21 @@
 package com.zutubi.pulse.core.events;
 
+import java.util.Map;
+
 /**
  * This event is raised by the recipe processor when commencing a recipe.
  */
 public class RecipeCommencedEvent extends RecipeEvent
 {
     private String name;
-    private String baseDir;
+    private Map<String, String> pathProperties;
     private long startTime;
 
-    public RecipeCommencedEvent(Object source, long buildId, long recipeId, String name, String baseDir, long startTime)
+    public RecipeCommencedEvent(Object source, long buildId, long recipeId, String name, Map<String, String> pathProperties, long startTime)
     {
         super(source, buildId, recipeId);
         this.name = name;
-        this.baseDir = baseDir;
+        this.pathProperties = pathProperties;
         this.startTime = startTime;
     }
 
@@ -22,9 +24,9 @@ public class RecipeCommencedEvent extends RecipeEvent
         return name;
     }
 
-    public String getBaseDir()
+    public Map<String, String> getPathProperties()
     {
-        return baseDir;
+        return pathProperties;
     }
 
     public long getStartTime()
@@ -32,6 +34,7 @@ public class RecipeCommencedEvent extends RecipeEvent
         return startTime;
     }
 
+    @Override
     public boolean equals(Object o)
     {
         if (this == o)
@@ -47,25 +50,26 @@ public class RecipeCommencedEvent extends RecipeEvent
             return false;
         }
 
-        RecipeCommencedEvent event = (RecipeCommencedEvent) o;
-        if (startTime != event.startTime)
+        RecipeCommencedEvent that = (RecipeCommencedEvent) o;
+
+        if (startTime != that.startTime)
         {
             return false;
         }
-
-        if ((baseDir != null ? !baseDir.equals(event.baseDir) : event.baseDir != null))
+        if (name != null ? !name.equals(that.name) : that.name != null)
         {
             return false;
         }
+        return !(pathProperties != null ? !pathProperties.equals(that.pathProperties) : that.pathProperties != null);
 
-        return !(name != null ? !name.equals(event.name) : event.name != null);
     }
 
+    @Override
     public int hashCode()
     {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (baseDir != null ? baseDir.hashCode() : 0);
+        result = 31 * result + (pathProperties != null ? pathProperties.hashCode() : 0);
         result = 31 * result + (int) (startTime ^ (startTime >>> 32));
         return result;
     }

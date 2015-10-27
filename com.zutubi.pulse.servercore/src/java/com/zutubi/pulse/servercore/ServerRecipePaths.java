@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore;
 
 import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.engine.api.BuildProperties;
 import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.tove.variables.SimpleVariable;
 import com.zutubi.tove.variables.VariableResolver;
@@ -10,6 +11,8 @@ import com.zutubi.util.io.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.zutubi.pulse.core.engine.api.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.engine.api.BuildProperties.PROPERTY_SKIP_CHECKOUT;
@@ -134,5 +137,15 @@ public class ServerRecipePaths implements RecipePaths
     public File getOutputDir()
     {
         return new File(getRecipeRoot(), "output");
+    }
+
+    public Map<String, String> getPathProperties()
+    {
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(BuildProperties.PROPERTY_BASE_DIR, getBaseDir().getAbsolutePath());
+        properties.put(BuildProperties.PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
+        properties.put(BuildProperties.PROPERTY_AGENT_DATA_DIR, getAgentDataDir().getAbsolutePath());
+        properties.put(BuildProperties.PROPERTY_OUTPUT_DIR, getOutputDir().getAbsolutePath());
+        return properties;
     }
 }
