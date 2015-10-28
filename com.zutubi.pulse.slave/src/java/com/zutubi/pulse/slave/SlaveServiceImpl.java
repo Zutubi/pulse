@@ -4,9 +4,9 @@ import com.google.common.collect.Iterables;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.EventOutputStream;
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.plugins.ResourceLocatorExtensionManager;
 import com.zutubi.pulse.core.plugins.repository.PluginInfo;
@@ -254,7 +254,7 @@ public class SlaveServiceImpl implements SlaveService
         return new FileInfo(new File(base, relativePath));
     }
 
-    public void runCommand(String token, String master, ExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
+    public void runCommand(String token, String master, PulseExecutionContext context, List<String> commandLine, String workingDir, long streamId, int timeout)
     {
         serviceTokenManager.validateToken(token);
         updateMaster(master);
@@ -262,7 +262,8 @@ public class SlaveServiceImpl implements SlaveService
         try
         {
             outputStream = new EventOutputStream(eventManager, false, 0, streamId);
-            ProcessWrapper.runCommand(commandLine, workingDir, outputStream, timeout, TimeUnit.SECONDS);
+            context.setOutputStream(outputStream);
+            ProcessWrapper.runCommand(commandLine, workingDir, context, timeout, TimeUnit.SECONDS);
         }
         catch (Exception e)
         {

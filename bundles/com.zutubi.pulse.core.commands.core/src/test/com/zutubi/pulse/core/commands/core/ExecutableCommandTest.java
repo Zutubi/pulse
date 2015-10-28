@@ -295,41 +295,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestCase
         }
     }
 
-    public void testAcceptableNamesOnWindows()
-    {
-        if (!SystemUtils.IS_WINDOWS)
-        {
-            return;
-        }
-
-        ExecutableCommand cmd = new ExecutableCommand(null);
-        assertTrue(cmd.acceptableName("^"));
-        assertTrue(cmd.acceptableName("<"));
-        assertTrue(cmd.acceptableName(">"));
-        assertTrue(cmd.acceptableName("|"));
-        assertTrue(cmd.acceptableName("&"));
-        assertTrue(cmd.acceptableName(" "));
-
-        assertFalse(cmd.acceptableName("="));
-    }
-
-    public void testAcceptableNames()
-    {
-        ExecutableCommand cmd = new ExecutableCommand(null);
-        assertTrue(cmd.acceptableName("a"));
-        assertTrue(cmd.acceptableName("Z"));
-        assertTrue(cmd.acceptableName("2"));
-
-        assertFalse(cmd.acceptableName("env.something"));
-    }
-
-    public void testConvertNames()
-    {
-        ExecutableCommand cmd = new ExecutableCommand(null);
-        assertEquals("PULSE_A", cmd.convertName("a"));
-        assertEquals("PULSE_1", cmd.convertName("1"));
-    }
-
     public void testWindowsEnvironmentNames() throws Exception
     {
         if (SystemUtils.IS_WINDOWS)

@@ -43,6 +43,12 @@ public class BuildProperties
     //-----------------------------------------------------------------------
 
     /**
+     * The configured base URL of the server, which is general set by an admin
+     * to Pulse's externally-available address (it should not be used for
+     * internal communication, that is what master host is for).
+     */
+    public static final String PROPERTY_BASE_URL                = "base.url";
+    /**
      * The number of times the project has been built before the running
      * build.
      */
@@ -204,6 +210,10 @@ public class BuildProperties
      * The name of the agent the stage is assigned to.
      */
     public static final String PROPERTY_AGENT                   = "agent";
+    /**
+     * The resolved path describing where an agent's data should be put.
+     */
+    public static final String PROPERTY_AGENT_DATA_DIR          = "agent.data.dir";
     /**
      * The path pattern describing where an agent's data should be put.
      */

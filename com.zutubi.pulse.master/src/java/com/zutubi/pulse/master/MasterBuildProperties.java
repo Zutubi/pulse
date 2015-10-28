@@ -51,9 +51,9 @@ public class MasterBuildProperties extends BuildProperties
         }
     }
 
-    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, MasterLocationProvider masterLocationProvider, MasterConfigurationManager configurationManager)
+    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, MasterLocationProvider masterLocationProvider, MasterConfigurationManager configurationManager, String baseUrl)
     {
-        addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterLocationProvider.getMasterUrl());
+        addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterLocationProvider.getMasterUrl(), baseUrl);
         if(result.getRevision() != null)
         {
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());
@@ -64,7 +64,7 @@ public class MasterBuildProperties extends BuildProperties
         addCompletedBuildProperties(context, result, configurationManager);
     }
 
-    public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildOutputDir, String masterUrl)
+    public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildOutputDir, String masterUrl, String baseUrl)
     {
         ProjectConfiguration projectConfig = project.getConfig();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_ID, Long.toString(buildResult.getId()));
@@ -85,6 +85,7 @@ public class MasterBuildProperties extends BuildProperties
         context.addString(NAMESPACE_INTERNAL, PROPERTY_LOCAL_BUILD, Boolean.toString(false));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PERSONAL_BUILD, Boolean.toString(buildResult.isPersonal()));
 
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_URL, baseUrl);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, masterUrl);
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));

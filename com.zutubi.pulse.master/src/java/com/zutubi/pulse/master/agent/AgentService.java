@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.core.PulseExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.engine.api.ExecutionContext;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.AgentRecipeDetails;
 import com.zutubi.pulse.servercore.agent.SynchronisationMessage;
@@ -87,5 +87,5 @@ public interface AgentService
      *                   to be resolved using the context
      * @param timeout if non-zero, a time limit in seconds to apply to the command
      */
-    void executeCommand(ExecutionContext context, List<String> commandLine, String workingDir, int timeout);
+    void executeCommand(PulseExecutionContext context, List<String> commandLine, String workingDir, int timeout);
 }

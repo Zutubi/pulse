@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.google.common.io.Files;
 import com.zutubi.events.EventManager;
-import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
 import com.zutubi.pulse.core.commands.ArtifactFactory;
 import com.zutubi.pulse.core.commands.CommandFactory;
 import com.zutubi.pulse.core.commands.DefaultCommandContext;
@@ -15,7 +14,6 @@ import com.zutubi.pulse.core.engine.ProjectRecipesConfiguration;
 import com.zutubi.pulse.core.engine.PulseFileProvider;
 import com.zutubi.pulse.core.engine.RecipeConfiguration;
 import com.zutubi.pulse.core.engine.api.*;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoader;
 import com.zutubi.pulse.core.engine.marshal.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.events.*;
@@ -43,6 +41,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.zutubi.pulse.core.RecipeUtils.addResourceProperties;
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * The recipe processor, as the name suggests, is responsible for running recipes.
@@ -82,13 +83,14 @@ public class RecipeProcessor
         PersistentTestSuiteResult testResults = new PersistentTestSuiteResult();
         Map<Pair<FieldScope, String>, String> customFields = new HashMap<Pair<FieldScope, String>, String>();
         PulseExecutionContext context = request.getContext();
+        RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
         try
         {
             runningRecipe = recipeResult.getId();
             long recipeStartTime = recipeResult.getStartTime();
-            eventManager.publish(new RecipeCommencedEvent(this, request.getBuildId(), recipeResult.getId(), recipeResult.getRecipeName(), context.getWorkingDir().getAbsolutePath(), recipeStartTime));
+            eventManager.publish(new RecipeCommencedEvent(this, request.getBuildId(), recipeResult.getId(), recipeResult.getRecipeName(), paths.getPathProperties(), recipeStartTime));
 
-            pushRecipeContext(context, request, testResults, customFields, recipeStartTime);
+            pushRecipeContext(context, paths, request, testResults, customFields, recipeStartTime);
             executeRequest(request);
         }
         catch (BuildException e)
@@ -102,7 +104,6 @@ public class RecipeProcessor
         }
         finally
         {
-            RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
             storeTestResults(paths, request.getBuildId(), recipeResult, testResults);
             storeCustomFields(paths, request.getBuildId(), customFields);
             
@@ -279,10 +280,14 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(PulseExecutionContext context, RecipeRequest request, PersistentTestSuiteResult testResults, Map<Pair<FieldScope, String>, String> customFields, long recipeStartTime)
+    private void pushRecipeContext(PulseExecutionContext context, RecipePaths paths, RecipeRequest request, PersistentTestSuiteResult testResults, Map<Pair<FieldScope, String>, String> customFields, long recipeStartTime)
     {
         context.push();
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
+        for (Map.Entry<String, String> pathProperty: paths.getPathProperties().entrySet())
+        {
+            context.addString(NAMESPACE_INTERNAL, pathProperty.getKey(), pathProperty.getValue());
+        }
+
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, new SimpleDateFormat(TIMESTAMP_FORMAT_STRING).format(new Date(recipeStartTime)));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);

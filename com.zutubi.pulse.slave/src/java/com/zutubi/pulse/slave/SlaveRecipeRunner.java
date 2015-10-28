@@ -3,7 +3,6 @@ package com.zutubi.pulse.slave;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.engine.api.BuildException;
-import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.scm.api.ScmClientFactory;
 import com.zutubi.pulse.core.scm.patch.PatchFormatFactory;
@@ -18,6 +17,8 @@ import com.zutubi.util.logging.Logger;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+
+import static com.zutubi.pulse.core.engine.api.BuildProperties.*;
 
 /**
  * Runner for recipes executing on a slave service.
@@ -81,7 +82,6 @@ public class SlaveRecipeRunner implements RecipeRunner
             {
                 recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), buildId, request.getId());
 
-                context.addValue(NAMESPACE_INTERNAL, PROPERTY_DATA_DIR, dataDir.getAbsolutePath());
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
