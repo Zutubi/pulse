@@ -7,15 +7,15 @@ import com.google.common.collect.Lists;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.api.PulseRuntimeException;
 import com.zutubi.pulse.master.rest.model.*;
+import com.zutubi.pulse.master.rest.model.forms.FieldModel;
+import com.zutubi.pulse.master.rest.model.forms.FormModel;
 import com.zutubi.pulse.master.tove.classification.ClassificationManager;
 import com.zutubi.pulse.master.tove.config.MasterConfigurationRegistry;
 import com.zutubi.pulse.master.tove.webwork.ToveUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.actions.ActionManager;
-import com.zutubi.tove.annotations.Listing;
-import com.zutubi.tove.annotations.Password;
-import com.zutubi.tove.annotations.Table;
+import com.zutubi.tove.annotations.*;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;
@@ -36,6 +36,7 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.util.reflection.ReflectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -243,6 +244,10 @@ public class ConfigModelBuilder
         if (isFieldSelected(filters, "type"))
         {
             model.setType(buildCompositeTypeModel(PathUtils.getParentPath(path), baseName, type, instance.isConcrete()));
+            if (record instanceof TemplateRecord)
+            {
+                decorateForm(model.getType().getForm(), type, (TemplateRecord) record);
+            }
         }
 
         if (isFieldSelected(filters, "actions"))
@@ -256,31 +261,6 @@ public class ConfigModelBuilder
         }
 
         return model;
-    }
-
-    public CompositeTypeModel buildCompositeTypeModel(String parentPath, String baseName, CompositeType type, boolean concrete)
-    {
-        CompositeTypeModel typeModel = new CompositeTypeModel(type);
-        if (!type.isExtendable())
-        {
-            typeModel.setForm(formModelBuilder.createForm(parentPath, baseName, type, concrete));
-
-            CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
-            if (checkType != null)
-            {
-                CompositeTypeModel checkTypeModel = new CompositeTypeModel(checkType);
-                checkTypeModel.setForm(formModelBuilder.createForm(parentPath, null, checkType, true));
-                typeModel.setCheckType(checkTypeModel);
-            }
-        }
-
-        List<CompositeType> extensions = type.getExtensions();
-        for (CompositeType extension: extensions)
-        {
-            typeModel.addSubType(buildCompositeTypeModel(parentPath, baseName, extension, concrete));
-        }
-
-        return typeModel;
     }
 
     public Map<String, Object> getProperties(String templateOwnerPath, CompositeType type, Record record) throws TypeException
@@ -382,6 +362,80 @@ public class ConfigModelBuilder
     private String getGetterMethodName(String name)
     {
         return "get" + name.substring(0,1).toUpperCase() + name.substring(1);
+    }
+
+    public CompositeTypeModel buildCompositeTypeModel(String parentPath, String baseName, CompositeType type, boolean concrete)
+    {
+        CompositeTypeModel typeModel = new CompositeTypeModel(type);
+        if (!type.isExtendable())
+        {
+            typeModel.setForm(formModelBuilder.createForm(parentPath, baseName, type, concrete));
+
+            CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
+            if (checkType != null)
+            {
+                CompositeTypeModel checkTypeModel = new CompositeTypeModel(checkType);
+                checkTypeModel.setForm(formModelBuilder.createForm(parentPath, null, checkType, true));
+                typeModel.setCheckType(checkTypeModel);
+            }
+        }
+
+        List<CompositeType> extensions = type.getExtensions();
+        for (CompositeType extension: extensions)
+        {
+            typeModel.addSubType(buildCompositeTypeModel(parentPath, baseName, extension, concrete));
+        }
+
+        return typeModel;
+    }
+
+    private void decorateForm(FormModel form, CompositeType type, TemplateRecord record)
+    {
+        // FIXME kendo does not add empty options to selects, do we need that?
+        TemplateRecord parentRecord = record.getParent();
+
+        for (FieldModel field : form.getFields())
+        {
+            String fieldName = field.getName();
+
+            // Note that if a field has both noInherit and noOverride,
+            // noInherit takes precedence.
+            if (fieldHasAnnotation(type, fieldName, NoInherit.class))
+            {
+                field.addParameter("noInherit", "true");
+            } else
+            {
+                String ownerId = record.getOwner(fieldName);
+                if (ownerId != null)
+                {
+                    if (!ownerId.equals(record.getOwner()))
+                    {
+                        if (fieldHasAnnotation(type, fieldName, NoOverride.class))
+                        {
+                            // This field should be read-only.
+                            field.addParameter("noOverride", "true");
+                        } else
+                        {
+                            field.addParameter("inheritedFrom", ownerId);
+                        }
+                    } else if (parentRecord != null)
+                    {
+                        // Check for override
+                        String parentOwnerId = parentRecord.getOwner(fieldName);
+                        if (parentOwnerId != null)
+                        {
+                            field.addParameter("overriddenOwner", parentOwnerId);
+                            field.addParameter("overriddenValue", parentRecord.get(fieldName));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean fieldHasAnnotation(CompositeType type, String fieldName, Class<? extends Annotation> annotationClass)
+    {
+        return type.getProperty(fieldName).getAnnotation(annotationClass) != null;
     }
 
     private void addActions(CompositeModel model, String path, CompositeType type, Configuration instance)
