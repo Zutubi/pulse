@@ -168,7 +168,7 @@
                 }
                 else
                 {
-                    console.warn("Ignoring unsupported field type '" + fieldOptions.type + "'");
+                    Zutubi.admin.reportWarning("Ignoring unsupported field type '" + fieldOptions.type + "'");
                 }
             }
         },

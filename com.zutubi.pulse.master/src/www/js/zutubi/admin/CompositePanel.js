@@ -5,14 +5,17 @@
 {
     var Observable = kendo.Observable,
         CANCELLED = "cancelled",
-        SAVED = "saved";
+        SAVED = "saved",
+        ns = ".kendoCompositePanel",
+        CLICK = "click" + ns;
 
     Zutubi.admin.CompositePanel = Observable.extend({
         init: function (options)
         {
             var that = this,
                 composite = options.composite,
-                writable = that._canWrite(composite);
+                writable = that._canWrite(composite),
+                el;
 
             that.options = options;
 
@@ -85,11 +88,12 @@
 
             if (!writable && !composite.keyed)
             {
-                $("#composite-upwrapper").show();
-                $("#composite-upwrapper").find("a").on("click", function()
+                el = $("#composite-upwrapper");
+                el.show();
+                el.find("a").on(CLICK, function()
                 {
                     that.trigger(CANCELLED);
-                })
+                });
             }
         },
 
@@ -101,6 +105,7 @@
         destroy: function()
         {
             // FIXME moar destruction?
+            $("#composite-upwrapper").find("a").off(ns);
             this.view.destroy();
         },
 
@@ -143,9 +148,6 @@
                     data: {kind: "composite", properties: properties},
                     success: function(data)
                     {
-                        console.log('save succcess');
-                        console.dir(data);
-
                         that.trigger(SAVED, {delta: data});
                     },
                     error: function(jqXHR)

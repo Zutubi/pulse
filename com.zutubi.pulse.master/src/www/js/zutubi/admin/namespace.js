@@ -137,7 +137,6 @@ if (window.Zutubi.admin === undefined)
             router.route("/plugins(/:id)", function(id)
             {
                 app.navbar.selectScope("plugins");
-                console.log("plugin: " + id);
             });
 
             return router;
@@ -372,6 +371,11 @@ if (window.Zutubi.admin === undefined)
             reportError: function(message)
             {
                 app.notificationWidget.error(message);
+            },
+
+            reportWarning: function(message)
+            {
+                app.notificationWidget.warning(message);
             },
 
             openConfigPath: function(newPath)

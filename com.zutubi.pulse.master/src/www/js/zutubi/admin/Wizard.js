@@ -43,7 +43,7 @@
         }
         else
         {
-            console.warn("Unknown wizard step type '" + config.kind + "'");
+            Zutubi.admin.reportWarning("Unknown wizard step type '" + config.kind + "'");
         }
     };
 
@@ -375,7 +375,6 @@
                         catch(e)
                         {
                             // Do nothing.
-                            console.dir(e);
                         }
                     }
 

@@ -111,7 +111,6 @@
                 return t !== null && t !== "";
             });
 
-            console.dir(list);
             return list;
         },
 
