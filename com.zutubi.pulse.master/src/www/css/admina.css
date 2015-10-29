@@ -334,15 +334,13 @@ input[type=checkbox].k-input {
     margin-right: 1ch;
 }
 
-ul.validation-errors
-{
+ul.validation-errors {
     color: #bb2222;
     list-style-type: disc;
     margin-left: 4ch;
 }
 
-.validation-errors li
-{
+.validation-errors li {
     margin: 0.4em 0;
 }
 
@@ -399,46 +397,38 @@ ul.validation-errors
 
 /* Delete Window */
 
-table.cleanup-tasks
-{
+table.cleanup-tasks {
     margin: 12px;
 }
 
-table.cleanup-tasks th, .cleanup-tasks td
-{
+table.cleanup-tasks th, .cleanup-tasks td {
     padding: 0.4em;
     border: solid 1px #dbdbdb;
 }
 
-table.cleanup-tasks th
-{
+table.cleanup-tasks th {
     font-weight: bold;
 }
 
 /* Context panel */
 
-.context-content
-{
+.context-content {
     padding: 0.4em 1em;
 }
 
-.config-links li, .config-actions li
-{
+.config-links li, .config-actions li {
     padding: 0.4em 0;
 }
 
-.config-links a, .config-actions a
-{
+.config-links a, .config-actions a {
     text-decoration: none;
     color: inherit;
 }
 
-.config-links .fa, .config-actions .fa
-{
+.config-links .fa, .config-actions .fa {
     width: 20px;
 }
 
-.config-actions li:hover
-{
+.config-actions li:hover {
     cursor: pointer;
 }
