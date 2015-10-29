@@ -34,6 +34,11 @@
             }
             this.inputElement.css("width", width);
 
+            if (options.structure.readOnly)
+            {
+                this.inputElement.attr("readonly", "");
+            }
+
             if (typeof options.value !== "undefined")
             {
                 this.bindValue(options.value);

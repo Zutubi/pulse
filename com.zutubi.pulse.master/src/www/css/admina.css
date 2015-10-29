@@ -315,6 +315,10 @@ input[type=checkbox].k-input {
     line-height: 2em;
 }
 
+input.k-input[readonly] {
+    background-color: #eee;
+}
+
 .k-stringlist input {
     display: block;
 }
