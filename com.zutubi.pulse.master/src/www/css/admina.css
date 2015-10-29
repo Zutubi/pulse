@@ -180,6 +180,15 @@ ul.navlist {
     font-style: italic;
 }
 
+.k-up-wrapper {
+    margin: 1em 0;
+}
+
+.k-up-wrapper a {
+    cursor: pointer;
+    padding: 0.2em;
+}
+
 /* Collections */
 
 /* FIXME kendo some duplication with above */

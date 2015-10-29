@@ -30,6 +30,9 @@
                     '</div>' +
                     '<div style="display:none" id="#: id #-collapsed-collection" class="k-collapsed-collection-wrapper">' +
                     '</div>' +
+                    '<div style="display:none" id="#: id #-upwrapper" class="k-up-wrapper">' +
+                        '<a><span class="fa fa-chevron-left"/> return to list</a>' +
+                    '</div>' +
                 '</div>', {
                     wrap: false,
                     evalTemplate: true,
@@ -78,6 +81,15 @@
                     collection: composite.nested[0],
                     path: that.options.path + "/" + composite.nested[0].key
                 });
+            }
+
+            if (!writable && !composite.keyed)
+            {
+                $("#composite-upwrapper").show();
+                $("#composite-upwrapper").find("a").on("click", function()
+                {
+                    that.trigger(CANCELLED);
+                })
             }
         },
 
