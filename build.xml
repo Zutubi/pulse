@@ -79,7 +79,7 @@
 
     <target name="check.js" depends="init">
       <jsl:jslint options="browser,confusion,evil,forin,plusplus,regexp,sloppy,white,nomen">
-        <predef>jQuery,kendo,Ext,Zutubi,showStatus,hideStatus,confirm,detailPanel,refresh,unescape,handleActionResponse,agentAction,handleSuccessfulConfigurationResponse,treesInitialised,each,toHtmlName,getBuildMenuItems,getBuildMenuLinks,getCommentsTooltip,takeResponsibility,clearResponsibility,showPromptDialog,cancelBuild,cancelQueuedBuild,encodeURIPath,configTree,navigateToOwner,actionPath,confirmUrl,handleDialogResponse,runAjaxRequest,triggerBuild,zaAjaxError,zaReportError,zaReportSuccess,subpath,console</predef>
+        <predef>jQuery,kendo,Ext,Zutubi,showStatus,hideStatus,confirm,detailPanel,refresh,unescape,handleActionResponse,agentAction,handleSuccessfulConfigurationResponse,treesInitialised,each,toHtmlName,getBuildMenuItems,getBuildMenuLinks,getCommentsTooltip,takeResponsibility,clearResponsibility,showPromptDialog,cancelBuild,cancelQueuedBuild,encodeURIPath,configTree,navigateToOwner,actionPath,confirmUrl,handleDialogResponse,runAjaxRequest,triggerBuild</predef>
         <formatter type="plain" />
         <fileset dir="com.zutubi.pulse.master/src/www/js" includes="**/*.js" excludes="ext/**,kendo/**,widget/treegrid/**"/>
       </jsl:jslint>
