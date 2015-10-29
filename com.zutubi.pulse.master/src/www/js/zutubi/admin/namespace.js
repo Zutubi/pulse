@@ -116,25 +116,25 @@ if (window.Zutubi.admin === undefined)
                 }
             });
 
-            router.route("/config/settings/*path", function(path)
+            router.route("/config/settings(/)*path", function(path)
             {
                 app.navbar.selectScope("settings");
                 _showConfig("settings/" + Zutubi.admin.normalisedPath(path), false);
             });
 
-            router.route("/config/users/*path", function(path)
+            router.route("/config/users(/)*path", function(path)
             {
                 app.navbar.selectScope("users");
                 _showConfig("users/" + Zutubi.admin.normalisedPath(path), false);
             });
 
-            router.route("/config/groups/*path", function(path)
+            router.route("/config/groups(/)*path", function(path)
             {
                 app.navbar.selectScope("groups");
                 _showConfig("groups/" + Zutubi.admin.normalisedPath(path), false);
             });
 
-            router.route("/plugins(/:id)", function(id)
+            router.route("/plugins(/)(:id)", function(id)
             {
                 app.navbar.selectScope("plugins");
             });
